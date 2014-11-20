@@ -703,7 +703,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
                     // Recurse a directory and locate appropriate SimEntity class files
                     } else {
-                        lTree.addContentRoot(file, true);
+                        addToEventGraphPallette(file, true);
                     }
                 }
             }
@@ -873,12 +873,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public boolean doEditPclEdge(PropChangeEdge pclEdge) {
-        return PclEdgeInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), pclEdge);
+        return PclEdgeInspectorDialog.showDialog(this, pclEdge);
     }
 
     @Override
     public boolean doEditAdapterEdge(AdapterEdge aEdge) {
-        return AdapterConnectionInspectorDialog.showDialog(VGlobals.instance().getAssemblyEditor(), aEdge);
+        return AdapterConnectionInspectorDialog.showDialog(this, aEdge);
     }
 
     @Override
@@ -908,8 +908,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void addToEventGraphPallette(File f, boolean b) {
-        // f may be an empty directory
-        if (f.exists() && f.listFiles().length > 0) {
+        if (f.exists()) {
             lTree.addContentRoot(f, b);
         }
     }

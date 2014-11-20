@@ -1323,12 +1323,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             if (diagnostic.contains("No Compiler Errors")) {
+                LOGGER.info(diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
             } else {
-                if (!baosOut.toString().isEmpty())
-                    LOGGER.error(baosOut.toString());
+                LOGGER.error(diagnostic + "\n");
+                if (!baosOut.toString().isEmpty()) {
+                    LOGGER.error(baosOut.toString() + "\n");
+                }
             }
-            LOGGER.info(diagnostic);
         } catch (IOException ioe) {
             LOGGER.error(ioe);
         } finally {

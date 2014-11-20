@@ -379,6 +379,11 @@ public class Vstatics {
 
     static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
+    /**
+     * For the given class type EG, recorded its specific ParameterMap
+     * @param type the EG class name
+     * @param p a List of parameter map object arrays
+     */
     static public void putParameterList(String type, List<Object>[] p) {
         if (debug) {
             System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));

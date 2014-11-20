@@ -152,7 +152,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (f == null) {
             f = currentFile;
         }
-        
+
         // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
         // file on a marshal error.
 
@@ -217,10 +217,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return currentFile;
     }
 
-    /**
-     *
-     * @param v
-     */
     @Override
     public void externalClassesChanged(Vector<String> v) {
 

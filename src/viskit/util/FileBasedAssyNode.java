@@ -14,7 +14,7 @@ import java.io.File;
  */
 public class FileBasedAssyNode {
 
-    public static final String delim = "<fbasdelim>";
+    public static final String FBAN_DELIM = "<fbasdelim>";
     public String loadedClass;
     public File xmlSource;
     public File classFile;
@@ -38,15 +38,15 @@ public class FileBasedAssyNode {
     @Override
     public String toString() {
         if (isXML) {
-            return classFile.getPath() + delim + loadedClass + delim + xmlSource.getPath() + delim + pkg;
+            return classFile.getPath() + FBAN_DELIM + loadedClass + FBAN_DELIM + xmlSource.getPath() + FBAN_DELIM + pkg;
         } else {
-            return classFile.getPath() + delim + loadedClass + delim + pkg;
+            return classFile.getPath() + FBAN_DELIM + loadedClass + FBAN_DELIM + pkg;
         }
     }
 
     public static FileBasedAssyNode fromString(String s) throws FileBasedAssyNode.exception {
         try {
-            String[] sa = s.split(delim);
+            String[] sa = s.split(FBAN_DELIM);
             if (sa.length == 3) {
                 return new FileBasedAssyNode(new File(sa[0]), sa[1], sa[2]);
             } else if (sa.length == 4) {

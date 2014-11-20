@@ -100,12 +100,12 @@ public class FileBasedClassManager implements Runnable {
      */
     public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
 
-        // if it is cached, cache directory exists and will be loaded on start
+        // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
             um = jaxbCtx.createUnmarshaller();
 
-            // Did we cache the EventGraph XML and Class?
+            // Did we cacheXML the EventGraph XML and Class?
             if (!isCached(f)) {
 
                 // Make sure it's not a Cached Miss
@@ -116,9 +116,11 @@ public class FileBasedClassManager implements Runnable {
 
                     // Tried to compile an Assembly as an EventGraph, so just return here
                     if (paf == null) {
-                        return fban;
+                        return null;
                     }
 
+                    // Reset this so that the correct FBAN gets created
+                    fXml = null;
                     setFileBasedAssemblyNode(f);
 
                     // TODO: work situtation where another build/classes gets added
@@ -134,14 +136,14 @@ public class FileBasedClassManager implements Runnable {
                 setFileBasedAssemblyNode(f);
             }
 
-        // Check, but don't cache other .class files
+        // Check, but don't cacheXML other .class files
         } else if (f.getName().toLowerCase().endsWith(".class")) {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
                 fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
 
-                // If we have an annotated ParameterMap, then cache it.  If not,
+                // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
                 List<Object>[] pMap = listOfParamNames(fclass);
@@ -163,7 +165,7 @@ public class FileBasedClassManager implements Runnable {
         // bug fix 1407
         ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
 
-        // since we're here, cache the parameter names
+        // since we're here, cacheXML the parameter names
         try {
             simEntity = (fXml == null) ? (SimEntity) um.unmarshal(f) : (SimEntity) um.unmarshal(fXml);
 
@@ -192,11 +194,11 @@ public class FileBasedClassManager implements Runnable {
 
     /**
      * Cache the EG and it's .class file with good MD5 hash
-     * @param xmlEg the EG to cache
+     * @param xmlEg the EG to cacheXML
      * @param classFile the classfile of this EG
      */
     public void addCache(File xmlEg, File classFile) {
-        // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cache
+        // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cacheXML
         if (isCached(xmlEg)) {
             return;
         }
@@ -211,7 +213,7 @@ public class FileBasedClassManager implements Runnable {
             }
 
             // TODO: Not used right now, but may be useful for other build/classes paths
-//            if (cache.isEmpty()) {
+//            if (cacheXML.isEmpty()) {
 //                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
 //                if (viskit.Vstatics.debug) {
 //                    log.debug("Cache is empty, creating workDir entry at " + s);
@@ -236,7 +238,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     /** Creates an MD5 message digest composed of files, if either changes
-     * there will be a mismatch in the new digest, so delete cache etc.
+ there will be a mismatch in the new digest, so delete cacheXML etc.
      * @param files the varargs containing files to evaluate
      * @return a String representation of the message digest
      */
@@ -271,18 +273,12 @@ public class FileBasedClassManager implements Runnable {
     }
 
     public boolean isCached(File file) {
-        List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
-            if (viskit.Vstatics.debug) {
-                log.debug("isCached() " + file + " of cacheSize " + cache.size());
-                if (cache.contains(filePath)) {
-                    log.debug("cached true");
-                } else {
-                    log.debug("cached false");
-                }
-            }
-            if (cache.contains(filePath)) {
+            log.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
+            log.debug("chached " + cacheXML.contains(filePath));
+            if (cacheXML.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);
                     return false;
@@ -300,7 +296,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     /**
-     * @param file
+     * @param file XML file cached with its class file
      * @return a cached class file given its cached XML file
      */
     public File getCachedClass(File file) {
@@ -326,7 +322,7 @@ public class FileBasedClassManager implements Runnable {
     }
 
     /**
-     * @param file
+     * @param file cached compiled class file of XML file
      * @return an XML file given its cached class file
      */
     public File getCachedXML(File file) {
@@ -351,8 +347,8 @@ public class FileBasedClassManager implements Runnable {
         return cachedFile;
     }
 
-    /** Delete cache given either xml or class file
-     * @param file the XML, or class file to delete from the cache
+    /** Delete cacheXML given either xml or class file
+     * @param file the XML, or class file to delete from the cacheXML
      */
     public void deleteCache(File file) {
         List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
@@ -402,9 +398,7 @@ public class FileBasedClassManager implements Runnable {
             if (index >= 0) {
                 String digest = digests.get(index);
                 String compare = createMessageDigest(file);
-                if (digest.equals(compare)) {
-                    return true;
-                }
+                return digest.equals(compare);
             }
         } catch (IOException ex) {
             log.error(ex);
@@ -440,17 +434,18 @@ public class FileBasedClassManager implements Runnable {
         }
     }
 
-    /** if either the egFile changed, or the classFile, the cache is stale
+    /** If either the egFile changed, or the classFile, the cacheXML is stale
      * @param egFile the EventGraph file to compare digests with
      * @return an indication EG state change
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
+        List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_DIGEST_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         String filePath;
         try {
             filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");
-            int index = cacheDigest.lastIndexOf(filePath);
+            int index = cacheXML.lastIndexOf(filePath);
             if (index >= 0) {
                 String cachedDigest = cacheDigest.get(index);
                 String compareDigest = createMessageDigest(egFile, classFile);
@@ -460,7 +455,7 @@ public class FileBasedClassManager implements Runnable {
             log.error(ex);
 //            ex.printStackTrace();
         }
-        // if egFile not in cache, it can't be stale
+        // if egFile not in cacheXML, it can't be stale
         return false;
     }
 
@@ -522,6 +517,10 @@ public class FileBasedClassManager implements Runnable {
         return fileMap.get(className).xmlSource;
     }
 
+    /* TODO: This must have been an attempt to track changes in loaded EGs
+     * before an Assembly run is initiated in order to get the EG recompiled and
+     * placed on the runtime claspath.  Not currently invoked.
+     */
     @Override
     public void run() {
         final Vector<String> v = new Vector<>();

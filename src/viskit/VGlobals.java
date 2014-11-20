@@ -180,19 +180,17 @@ public class VGlobals {
             buildAssemblyViewFrame();
         }
 
-        avf.setVisible(true);
-        avf.toFront();
-
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                if (assyFirstRun) {
-                    return;
-                }
+                avf.setVisible(true);
+                avf.toFront();
 
-                assyFirstRun = true;
-                acont.newAssembly();
+                if (!assyFirstRun) {
+                    assyFirstRun = true;
+                    acont.newAssembly();
+                }
             }
         });
     }
@@ -200,14 +198,20 @@ public class VGlobals {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (avf != null) {
-                avf.setVisible(false);
-            }
-            if (egvf != null && egvf.isVisible()) {
-                // do nothing at the moment
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (avf != null) {
+                        avf.setVisible(false);
+                    }
+                    if (egvf != null && egvf.isVisible()) {
+                        // do nothing at the moment
+                    }
+                }
+            });
         }
-     };
+    };
     ActionListener assyQuitHandler = defaultAssyQuitHandler;
 
     public void quitAssemblyEditor() {

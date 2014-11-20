@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.*;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
@@ -41,7 +42,8 @@ import viskit.xsd.bindings.eventgraph.Parameter;
 public class LegosTree extends JTree implements DragGestureListener, DragSourceListener {
 
     static Logger log = LogUtils.getLogger(LegosTree.class);
-    private DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+
+    private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("root");
     private Class<?> targetClass;
     private String targetClassName;
     private Color background = new Color(0xFB, 0xFB, 0xE5);
@@ -73,7 +75,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
      */
     LegosTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip) {
         super();
-        setModel(mod = new DefaultTreeModel(root));
+        setModel(mod = new DefaultTreeModel(rootNode));
+        directoryRoots = new HashMap<>();
 
         lis = dslis;
         targetClassName = className;
@@ -111,7 +114,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
     }
 
-    // beginning of hack to hide the tree root
+    // beginning of hack to hide the tree rootNode
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -127,7 +130,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         collapseRow(0);
         bugHack = false;
     }
-    // end of hack to hide the tree root
+    // end of hack to hide the tree rootNode
 
     /**
      * Override to provide a global tooltip for entire table..not just for nodes
@@ -162,7 +165,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
 
     public void removeContentRoot(File f) {
         //System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
-        if (_removeNode(root, f) != null) {
+        if (_removeNode(rootNode, f) != null) {
             // Do nothing?
         } // System.out.println("...success");
         else {
@@ -176,17 +179,20 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             if (n != null) {
                 Object uo = n.getUserObject();
                 if (!(uo instanceof FileBasedAssyNode)) {
-                    continue;
-                }
-                FileBasedAssyNode fban = (FileBasedAssyNode) uo;
-                try {
-                    if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
-                        mod.removeNodeFromParent(n);
-                        FileBasedClassManager.instance().unloadFile(fban);
-                        return n;
+
+                    // Keep looking for a FBAN in the root branches
+                    _removeNode(n, f);
+                } else {
+                    FileBasedAssyNode fban = (FileBasedAssyNode) uo;
+                    try {
+                        if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
+                            mod.removeNodeFromParent(n);
+                            FileBasedClassManager.instance().unloadFile(fban);
+                            return n;
+                        }
+                    } catch (IOException e) {
+                        log.error(e);
                     }
-                } catch (IOException e) {
-                    log.error("getCanonicalPath in LegosTree : " + e.getMessage());
                 }
             }
         }
@@ -215,7 +221,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
      */
     public void addContentRoot(File f, boolean recurse) {
         Vector<DefaultMutableTreeNode> v = new Vector<>();
-        directoryRoots = new HashMap<>();
 
         if (recurse) {
             recurseNogoList = new Vector<>();
@@ -230,15 +235,18 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     // The two above are the public ones.
     private void addContentRoot(File f, boolean recurse, Vector<DefaultMutableTreeNode> rootVector) {
         DefaultMutableTreeNode myNode;
+
+        // Prevent duplicates of the EG icons
         removeContentRoot(f);
+
         if (f.isDirectory()) {
             if (!recurse) {
                 myNode = new DefaultMutableTreeNode(f.getPath());
-                root.add(myNode);
+                rootNode.add(myNode);
                 rootVector.add(myNode); // for later pruning
                 directoryRoots.put(f.getPath(), myNode);
-                int idx = root.getIndex(myNode);
-                mod.nodesWereInserted(root, new int[] {idx});
+                int idx = rootNode.getIndex(myNode);
+                mod.nodesWereInserted(rootNode, new int[] {idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa) {
@@ -247,7 +255,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             } else { // recurse = true
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
-                // If not, put me in under the root
+                // If not, put me in under the rootNode
                 myNode = directoryRoots.get(f.getPath());
                 if (myNode == null) {
                     myNode = directoryRoots.get(f.getParent());
@@ -260,11 +268,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         mod.nodesWereInserted(parent, new int[] {idx});
                     } else {
                         myNode = new DefaultMutableTreeNode(f.getPath());
-                        root.add(myNode);
+                        rootNode.add(myNode);
                         rootVector.add(myNode); // for later pruning
                         directoryRoots.put(f.getPath(), myNode);
-                        int idx = root.getIndex(myNode);
-                        mod.nodesWereInserted(root, new int[] {idx});
+                        int idx = rootNode.getIndex(myNode);
+                        mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
@@ -277,23 +285,13 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         else {
             FileBasedAssyNode fban;
             try {
+
+                // This call generates the source, compiles and validates EG XML files
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
                 // If an Assembly, or non simkit.BasicSimEntity type class was
                 // encountered by the FBCM, just return for convenience
                 if (fban != null) {
-
-                    // TODO: investigate the need for this
-
-                    // Check here for duplicates of the classes which have been
-                    // loaded on the classpath (i.e. simkit.jar);
-                    // No dups accepted, should throw exception upon success
-                    try {
-                        Class.forName(fban.loadedClass);
-                        return;  // don't proceed
-                    } catch (ClassNotFoundException e) { // expectecd
-                        // Do nothing?
-                    }
                     myNode = new DefaultMutableTreeNode(fban);
                     DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
                     if (par != null) {
@@ -301,9 +299,9 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         int idx = par.getIndex(myNode);
                         mod.nodesWereInserted(par, new int[] {idx});
                     } else {
-                        root.add(myNode);
-                        int idx = root.getIndex(myNode);
-                        mod.nodesWereInserted(root, new int[] {idx});
+                        rootNode.add(myNode);
+                        int idx = rootNode.getIndex(myNode);
+                        mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
                     clear();
@@ -322,7 +320,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         } // directory
     }
     Map<String, DefaultMutableTreeNode> directoryRoots;
-    DefaultMutableTreeNode rootNode;
     Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
 
     private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
@@ -484,7 +481,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
-            mod.insertNodeInto(localRoot, root, 0);
+            mod.insertNodeInto(localRoot, rootNode, 0);
 
             for (Class<?> c : list) {
                 hookToParent(c, localRoot);
@@ -572,7 +569,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
     }
 
-    // Drag stuff
+    //** DragGestureListener **
+
     @Override
     public void dragGestureRecognized(DragGestureEvent e) {
         if (lis == null) {
@@ -610,6 +608,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             // nop, it works, makes some complaint, but works, why?
         }
     }
+
+    // ** DragSourceListener **
 
     @Override
     public void dragDropEnd(DragSourceDropEvent e) {
@@ -654,7 +654,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     public void clear() {
-        root.removeAllChildren();
+        rootNode.removeAllChildren();
         if (directoryRoots != null) {
             directoryRoots.clear();
         }

@@ -84,19 +84,13 @@ public class EventGraphAssemblyComboMain {
                 });
             }
 
-        } catch (InterruptedException e) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
-
-            // if we got here, then we need to nuke the ${user.home}/.viskit dir
-            // it will be recreated on next start up
-            nukeHomeDirectory();
-        } catch (InvocationTargetException e) {
+        } catch (InterruptedException | InvocationTargetException e) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
             // If we encounter this case, then uncomment printStackTrace() to
             // drill down on the cause.  Easier than setting a breakpoint and
             // debugging!
-//            e.printStackTrace();
+            e.printStackTrace();
 
             // if we got here, then we need to nuke the ${user.home}/.viskit dir
             // it will be recreated on next start up

@@ -92,6 +92,10 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     Vector<String> getVerboseOutputEntityNames();
 
+    /** NOTE: Not currently used
+     * Notify of a change in the external classpath
+     * @param v a Vector of external class names cached
+     */
     void externalClassesChanged(Vector<String> v);
 
     boolean nameExists(String name);

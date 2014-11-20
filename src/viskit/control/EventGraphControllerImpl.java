@@ -253,7 +253,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    /**
+     * Save and recompile our modified EG
+     * @param f the EG to save / recompile
+     */
     private void fileWatchSave(File f) {
+
+        // We don't need to recurse since we know this is a file
+        VGlobals.instance().getAssemblyEditor().addToEventGraphPallette(f, false);
         fileWatchOpen(f);
     }
 
