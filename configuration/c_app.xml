@@ -6,12 +6,9 @@
         <beanshell>
             <warning>true</warning>
         </beanshell>
-        <EventGraphEditor>
-            <FrameBounds h="0" w="0" x="0" y="0" />
-        </EventGraphEditor>
-        <AssemblyEditor>
-            <FrameBounds h="600" w="800" x="400" y="212" />
-        </AssemblyEditor>
+        <mainframe>
+          <size h="680" w="930"/>
+        </mainframe>
         <projecthome>
             <!-- These two attributes MUST always be at least zero length Strings -->
             <path dir=""/>
