@@ -1286,18 +1286,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     // This is code to manage server, port, user and password from CommonsConfig.
-    private static XMLConfiguration vConfig;
+    private static XMLConfiguration appConfig;
     private static String recentClusterKey = "history.Cluster.Account(0)";
     private Key cryptoKey;
 
     private void initConfig() {
         try {
-            vConfig = ViskitConfig.instance().getViskitAppConfig();
+            appConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            System.out.println("Error loading config file: " + e.getMessage());
-            vConfig = null;
+            System.err.println("Error loading config file: " + e.getMessage());
+            appConfig = null;
         }
-        serverCfg = vConfig.getString(recentClusterKey + "[@server]");
+        serverCfg = appConfig.getString(recentClusterKey + "[@server]");
         if (serverCfg == null || serverCfg.length() <= 0) {
             serverCfg = "localhost";
         }
@@ -1307,12 +1307,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             gridMode = false;
         }
 
-        portCfg = vConfig.getString(recentClusterKey + "[@port]");
+        portCfg = appConfig.getString(recentClusterKey + "[@port]");
         if (portCfg == null || portCfg.length() <= 0) {
             portCfg = "4444";
         }
-        String unameEncrCfg = vConfig.getString(recentClusterKey + "[@username]");
-        String pwordEncrCfg = vConfig.getString(recentClusterKey + "[@password]");
+        String unameEncrCfg = appConfig.getString(recentClusterKey + "[@username]");
+        String pwordEncrCfg = appConfig.getString(recentClusterKey + "[@password]");
 
         cryptoKey = CryptoMethods.getTheKey();
 
@@ -1330,10 +1330,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void writeConfig() {
-        vConfig.setProperty(recentClusterKey + "[@server]", serverCfg);
-        vConfig.setProperty(recentClusterKey + "[@port]", portCfg);
-        vConfig.setProperty(recentClusterKey + "[@username]", CryptoMethods.doEncryption(unameDecrCfg, cryptoKey));
-        vConfig.setProperty(recentClusterKey + "[@password]", CryptoMethods.doEncryption(pwordDecrCfg, cryptoKey));
+        appConfig.setProperty(recentClusterKey + "[@server]", serverCfg);
+        appConfig.setProperty(recentClusterKey + "[@port]", portCfg);
+        appConfig.setProperty(recentClusterKey + "[@username]", CryptoMethods.doEncryption(unameDecrCfg, cryptoKey));
+        appConfig.setProperty(recentClusterKey + "[@password]", CryptoMethods.doEncryption(pwordDecrCfg, cryptoKey));
     }
 
     private void unloadServerWidgets() {

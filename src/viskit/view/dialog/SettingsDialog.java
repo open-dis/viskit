@@ -305,12 +305,12 @@ public class SettingsDialog extends JDialog {
         }
       }
     }
-    private static XMLConfiguration vConfig;
+    private static XMLConfiguration appConfig;
     private static XMLConfiguration projectConfig;
     private static XMLConfiguration guiConfig;
 
     private static void initConfigs() {
-        vConfig = ViskitConfig.instance().getViskitAppConfig();
+        appConfig = ViskitConfig.instance().getViskitAppConfig();
         projectConfig = ViskitConfig.instance().getProjectXMLConfig();
         guiConfig = ViskitConfig.instance().getViskitGuiConfig();
     }
@@ -321,9 +321,9 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
-                vConfig.setProperty(ViskitConfig.EG_VISIBLE_KEY, evGrCB.isSelected());
+                appConfig.setProperty(ViskitConfig.EG_VISIBLE_KEY, evGrCB.isSelected());
             } else if (src == assyCB) {
-                vConfig.setProperty(ViskitConfig.ASSY_EDIT_VISIBLE_KEY, assyCB.isSelected());
+                appConfig.setProperty(ViskitConfig.ASSY_EDIT_VISIBLE_KEY, assyCB.isSelected());
             } else if (src == runCB) {
                 if (runCB.isSelected()) {
                     // if we turn on the assembly runner, we need also the assy editor
@@ -331,12 +331,12 @@ public class SettingsDialog extends JDialog {
                         assyCB.doClick();
                     } // reenter here
                 }
-                vConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
+                appConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
             } else if (src == debugMsgsCB) {
-                vConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
+                appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
                 Vstatics.debug = debugMsgsCB.isSelected();
             } else /* if(src == analRptCB) */ {
-                vConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
+                appConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
             }
         }
     }
@@ -606,7 +606,7 @@ public class SettingsDialog extends JDialog {
 
     /** @return a String array containing the extra classpaths to consider */
     public static String[] getExtraClassPath() {
-        if ((vConfig == null) || (projectConfig == null)) {
+        if ((appConfig == null) || (projectConfig == null)) {
             initConfigs();
         }
         return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATHS_KEY);
