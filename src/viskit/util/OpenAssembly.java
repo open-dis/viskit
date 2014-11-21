@@ -42,15 +42,16 @@ import org.jdom.Document;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
-/**
+/**<p>
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * www.nps.edu</p>
  * @author Mike Bailey
  * @since Dec 1, 2005
  * @since 11:18:53 AM
  *
- * This is a singleton class to coordinate opening of Assembly files
+ * This is a singleton class to coordinate opening of and modifications of
+ * Assembly files
  */
 public class OpenAssembly {
 

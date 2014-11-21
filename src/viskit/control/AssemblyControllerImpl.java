@@ -1456,7 +1456,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return Vstatics.getClassPathAsString();
     }
 
-    /** Compile the Assembly and prepare the Simulation Runner for external JVM */
+    /** Compile the Assembly and prepare the Simulation Runner for simulation run */
     @Override
     public void compileAssemblyAndPrepSimRunner() {
         initAssemblyRun();

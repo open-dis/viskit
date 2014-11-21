@@ -263,7 +263,6 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         final AssemblyController assyCntlr = (AssemblyController) asyFrame.getController();
         assyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-        assyCntlr.addAssemblyFileListener(asyRunComponent);
 
         /* DIFF between OA3302 branch and trunk */
         assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());

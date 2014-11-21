@@ -9,5 +9,17 @@
   </BuildDirectory>
   <DistDirectory name="dist" />
   <LibDirectory name="lib" />
+  <Cached>
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/ArrayTester.class" digest="-698a11daff2a2b4cf2d661a53a3292ca" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ArrayTester.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/Creator.class" digest="-30bee1fcffce97057f3a210a4e4b7f4" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/Creator.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/EntityCreator.class" digest="53602e4b8a136fa3dcf3e956b02cf81" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/EntityCreator.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/ServerGeneric.class" digest="7e28c2dcdce46441ab5818224ee42b1b" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ServerGeneric.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/ServerWithReneges.class" digest="1bc18895219cc9f749b90585b6659c35" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ServerWithReneges.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleInventory.class" digest="ad4a41db22e129e376ef30e3070857d" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleInventory.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleMachineFailure.class" digest="-47297d1551c0de2bcfec050726717412" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleMachineFailure.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleServer.class" digest="-2a30aeb4e98495af63911ca942b31b00" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/TransferLineComponent.class" digest="6224620d9cadf3ed35edc38c145f7aea" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/TransferLineComponent.xml" />
+    <EventGraphs class="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/build/classes/examples/ArrivalProcess.class" digest="4ce2c6aaee7f5f5317b197de82cd7e13" xml="/javaapis/wcm/Viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ArrivalProcess.xml" />
+  </Cached>
 </ViskitProject>
 

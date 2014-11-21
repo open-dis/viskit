@@ -466,7 +466,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
      */
     class myGraphSelectionListener implements GraphSelectionListener {
 
-        Vector<Object> selected = new Vector<Object>();
+        Vector<Object> selected = new Vector<>();
 
         @Override
         public void valueChanged(GraphSelectionEvent e) {

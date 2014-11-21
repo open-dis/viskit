@@ -53,7 +53,6 @@ import javax.swing.*;
 import org.apache.log4j.Logger;
 import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
-import viskit.util.OpenAssembly;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitProject;
@@ -73,7 +72,7 @@ import viskit.doe.LocalBootLoader;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, PropertyChangeListener {
+public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static String lineSep = System.getProperty("line.separator");
     static Logger log = LogUtils.getLogger(InternalAssemblyRunner.class);
@@ -148,34 +147,8 @@ public class InternalAssemblyRunner implements OpenAssembly.AssyChangeListener, 
         return null;
     }
 
-    @Override
-    public String getHandle() {
-        return "";
-    }
-
     public void setAnalystReportGUI(AnalystReportPanel pan) {
         reportPanel = pan;
-    }
-
-    // TODO: not used?
-    @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
-        switch (action) {
-            case JAXB_CHANGED:
-                break;
-            case NEW_ASSY:
-                // fill out the parameters here..
-                // todo
-                break;
-
-            case CLOSE_ASSY:
-                break;
-            case PARAM_LOCALLY_EDITTED:
-                break;
-
-            default:
-                System.err.println("Program error InternalAssemblyRunner.assyChanged");
-        }
     }
 
     /**
