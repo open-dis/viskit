@@ -65,8 +65,7 @@ public class ViskitConfig {
     public static final String CACHED_MISS_FILE_KEY = CACHED_CLEAR_KEY + ".Miss[@file]";
     public static final String CACHED_MISS_DIGEST_KEY = CACHED_CLEAR_KEY + ".Miss[@digest]";
 
-    public static final String EG_EDITOR_FRAME_BOUNDS_KEY = "app.EventGraphEditor.FrameBounds";
-    public static final String ASSY_EDITOR_FRAME_BOUNDS_KEY = "app.AssemblyEditor.FrameBounds";
+    public static final String APP_MAIN_BOUNDS_KEY = "app.mainframe.size";
     public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
     public static final String PROJECT_TITLE_NAME = "gui.projecttitle.name[@value]";
     public static final String LAF_DEFAULT = "default";

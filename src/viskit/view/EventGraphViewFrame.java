@@ -476,12 +476,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void prepareToQuit() {
-        Rectangle bounds = getBounds();
-        XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
-        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
-        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
-        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
-        appConfig.setProperty(ViskitConfig.EG_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
+        // Nothing
     }
 
     /**

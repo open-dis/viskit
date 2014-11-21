@@ -423,13 +423,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void quit() {
         if (preQuit()) {
-            ((EventGraphView) getView()).prepareToQuit();
             postQuit();
         }
     }
 
     @Override
     public boolean preQuit() {
+
+        ((EventGraphView) getView()).prepareToQuit();
 
         // Check for dirty models before exiting
         Model[] mods = ((EventGraphView) getView()).getOpenModels();

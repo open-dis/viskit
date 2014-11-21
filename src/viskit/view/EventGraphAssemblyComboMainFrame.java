@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
-import viskit.view.dialog.SettingsDialog;
-import viskit.control.InternalAssemblyRunner;
 import edu.nps.util.SysExitHandler;
 import java.awt.*;
 import java.awt.event.*;
@@ -43,18 +41,19 @@ import java.util.TimerTask;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.assembly.AssemblyRunnerPlug;
-
-import viskit.control.EventGraphController;
-import viskit.control.EventGraphControllerImpl;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
+import viskit.control.EventGraphController;
+import viskit.control.InternalAssemblyRunner;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
+import viskit.view.dialog.SettingsDialog;
 
 /**
  * MOVES Institute
@@ -96,10 +95,12 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         initUI();
 
+        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation((d.width - 800) / 2, (d.height - 600) / 2);
-        //this.setSize(800, 600);
-        this.setSize(930, 680);
+        this.setLocation((d.width - w) / 2, (d.height - h) / 2);
+        this.setSize(w, h);
 
         // Let the quit handler take care of an exit initiation
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -429,7 +430,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             {
                 if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
-                    if (!((EventGraphControllerImpl) egFrame.getController()).preQuit()) {
+                    if (!((EventGraphController) egFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -457,7 +458,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                     ((EventGraphController) egFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
-                    ((AssemblyControllerImpl) asyFrame.getController()).postQuit();
+                    ((AssemblyController) asyFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */
@@ -468,14 +469,20 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
                 // TODO: other postQuits here if needed
 
-                // Pretty-fy all xml docs used for configuration
-                ViskitConfig.instance().cleanup();
-
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.Vstatics.debug) {
                     System.out.println("in actionPerformed of exit");
                 }
+
+                // Remember the size of this main frame set by the user
+                Rectangle bounds = getBounds();
+                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+
+                // Pretty-fy all xml docs used for configuration
+                ViskitConfig.instance().cleanup();
+
                 VGlobals.instance().sysExit(0);  // quit application
             } //outer
 

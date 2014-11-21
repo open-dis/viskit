@@ -38,6 +38,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.awt.*;
 import viskit.VGlobals;
+import viskit.ViskitConfig;
 import viskit.Vstatics;
 
 /**
@@ -53,7 +54,6 @@ import viskit.Vstatics;
  */
 public class RunnerPanel2 extends JPanel {
 
-    private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     public boolean dump = true;
     public boolean search;
     public String lineEnd = System.getProperty("line.separator");
@@ -67,16 +67,16 @@ public class RunnerPanel2 extends JPanel {
     public JCheckBox printRepReportsCB;
     public JCheckBox searchCB;
     public JDialog searchPopup;
-    //private JButton searchB;
-    //private JTextField searchKey;
     public JCheckBox printSummReportsCB;
     public JCheckBox resetSeedCB;
     public JCheckBox analystReportCB;
     public JTextField numRepsTF;
     public JScrollBar bar;
-    private JLabel titl;
     public JTextField verboseRepNumberTF;
     public JLabel npsLabel;
+
+    private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
+    private JLabel titl;
 
     public RunnerPanel2(boolean verbose, boolean skipCloseButt) {
         this(null, skipCloseButt);
@@ -115,12 +115,15 @@ public class RunnerPanel2 extends JPanel {
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
         npsLabel.setIconTextGap(50);
 
+        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+
         leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
+        leftSplit.setDividerLocation((h/2) - 25);
 
         leftRightSplit.setLeftComponent(leftSplit);
         leftRightSplit.setRightComponent(jsp);
-        leftRightSplit.setDividerLocation(240);
-        leftSplit.setDividerLocation(255);
+        leftRightSplit.setDividerLocation((w/2) - (w/4));
 
         add(leftRightSplit, BorderLayout.CENTER);
 

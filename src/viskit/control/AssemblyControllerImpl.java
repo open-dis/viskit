@@ -602,13 +602,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void quit() {
         if (preQuit()) {
-            ((AssemblyView) getView()).prepareToQuit();
             postQuit();
         }
     }
 
     @Override
     public boolean preQuit() {
+
+        ((AssemblyView) getView()).prepareToQuit();
 
         // Check for dirty models before exiting
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();

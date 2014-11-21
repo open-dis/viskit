@@ -819,12 +819,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void prepareToQuit() {
-        Rectangle bounds = getBounds();
-        XMLConfiguration appConfig = ViskitConfig.instance().getViskitAppConfig();
-        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@w]", "" + bounds.width);
-        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@h]", "" + bounds.height);
-        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@x]", "" + bounds.x);
-        appConfig.setProperty(ViskitConfig.ASSY_EDITOR_FRAME_BOUNDS_KEY + "[@y]", "" + bounds.y);
+        // Nothing
     }
 
     // Some private classes to implement dnd and dynamic cursor update
