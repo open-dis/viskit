@@ -74,7 +74,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // file open, then open them upon Viskit starting, else, let the
             // Assembly file tell which EGs to open
             if (VGlobals.instance().getAssemblyController() != null) {
-                java.util.List<String> al = VGlobals.instance().getAssemblyController().getOpenAssyFileList(false);
+                java.util.List<String> al = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).getOpenAssyFileList(false);
                 if (al.isEmpty()) {
                     LOGGER.debug("In begin() (else) of EventGraphController");
                     for (String s : lis) {
@@ -96,7 +96,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Creates a new Viskit Project */
     @Override
     public void newProject() {
-        VGlobals.instance().getAssemblyController().newProject();
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).newProject();
     }
 
     @Override
@@ -396,7 +396,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return openEventGraphs;
     }
 
-    /* a component, e.g., model, wants to say something. */
     @Override
     public void messageUser(int typ, String msg) // typ is one of JOptionPane types
     {
@@ -753,7 +752,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOGGER.error(fnfe);
         }
 
-        String source = VGlobals.instance().getAssemblyController().buildJavaEventGraphSource(x2j);
+        String source = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
         LOGGER.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +

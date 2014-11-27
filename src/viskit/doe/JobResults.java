@@ -76,6 +76,7 @@ public class JobResults extends JFrame {
         this.data = data;
         dset = (MyDataSet) createDataset(data);
         JFreeChart jFreeChart = createChart(dset);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         ChartPanel cpan = new ChartPanel(jFreeChart);
         cpan.setPreferredSize(new Dimension(640, 270));
         cpan.setDomainZoomable(true);
@@ -96,7 +97,6 @@ public class JobResults extends JFrame {
         momp.y + (moms.height - mine.height) / 2);
          */
         setVisible(true);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     public void addPoint(JobLauncher.Gresults res) {

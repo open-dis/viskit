@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
+import viskit.VGlobals;
 import viskit.control.AssemblyController;
 import viskit.model.*;
 
@@ -51,7 +52,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
             @Override
             public void run() {
-                AssemblyController cntl = (AssemblyController) vGraphAssemblyUI.this.parent.parent.getController();     // todo fix this
+                AssemblyController cntl = (AssemblyController) VGlobals.instance().getAssemblyController();
                 if (cell instanceof vAssemblyEdgeCell) {
                     Object edgeObj = ((vAssemblyEdgeCell) cell).getUserObject();
                     if (edgeObj instanceof AdapterEdge) {
@@ -103,7 +104,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             if (messageGraph) {
                 Map map = graphLayoutCache.createNestedMap();
                 GraphConstants.setValue(map, newValue);
-                Map<Object, Map> nested = new Hashtable<Object, Map>();
+                Map<Object, Map> nested = new Hashtable<>();
                 nested.put(oldCell, map);
                 graphLayoutCache.edit(nested, null, null, null);
             }

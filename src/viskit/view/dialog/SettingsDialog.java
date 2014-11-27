@@ -51,12 +51,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.configuration.XMLConfiguration;
-import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.Vstatics;
+import viskit.control.AssemblyController;
 
 /**
  * <p>MOVES Institute
@@ -166,7 +166,7 @@ public class SettingsDialog extends JDialog {
     private void buildWidgets() {
         JPanel classpathP = new JPanel();
         classpathP.setLayout(new BoxLayout(classpathP, BoxLayout.Y_AXIS));
-        classPathJlist = new JList<String>(new DefaultListModel<String>());
+        classPathJlist = new JList<>(new DefaultListModel<String>());
         JScrollPane jsp = new JScrollPane(classPathJlist);
         jsp.setPreferredSize(new Dimension(70, 70));  // don't want it to control size of dialog
         classpathP.add(jsp);
@@ -345,7 +345,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphEditor().getController();
+            EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphController();
             ctrlr.clearRecentFileSet();
         }
     }
@@ -354,7 +354,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyControllerImpl aCtrlr = VGlobals.instance().getAssemblyController();
+            AssemblyController aCtrlr = (AssemblyController) VGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentAssyFileList();
         }
     }

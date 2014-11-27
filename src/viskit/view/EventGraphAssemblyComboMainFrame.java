@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
-import edu.nps.util.SysExitHandler;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import edu.nps.util.SysExitHandler;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
@@ -323,6 +323,12 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         @Override
         public void stateChanged(ChangeEvent e) {
+
+            // Make sure we save EGs if we wander off to another tab
+            if (VGlobals.instance().getActiveEventGraphModel().isDirty()) {
+                ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
+            }
+
             int i = tabbedPane.getSelectedIndex();
             if (i == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]) {
                 i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
@@ -423,7 +429,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
             // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
-            VGlobals.instance().getAssemblyController().setCloseAll(true);
+            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).setCloseAll(true);
 
             outer:
             {

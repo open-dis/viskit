@@ -7,6 +7,7 @@ import javax.swing.JDialog;
 import org.jgraph.graph.GraphCellEditor;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.plaf.basic.BasicGraphUI;
+import viskit.VGlobals;
 import viskit.control.EventGraphController;
 import viskit.model.CancellingEdge;
 import viskit.model.Edge;
@@ -52,7 +53,7 @@ public class vGraphUI extends BasicGraphUI {
     protected void createEditDialog(Object c, MouseEvent event) {
         Object cell = c;
 
-        EventGraphController cntl = (EventGraphController) vGraphUI.this.parent.parent.getController();     // todo fix this
+        EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();     // todo fix this
         if (cell instanceof vEdgeCell) {
             Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
             if (e instanceof SchedulingEdge) {

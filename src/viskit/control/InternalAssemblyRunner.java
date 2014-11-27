@@ -60,6 +60,7 @@ import viskit.Vstatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
 import viskit.doe.LocalBootLoader;
+import viskit.model.AssemblyModelImpl;
 
 /** Controller for the Assembly Run panel
  *
@@ -290,7 +291,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setStopTime.invoke(assemblyObj, getStopTime());
             setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
             setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyObj, VGlobals.instance().getAssemblyModel().getNodeCache());
+            setPclNodeCache.invoke(assemblyObj, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListener.invoke(assemblyObj, this);
             assemblyRunnable = (Runnable) assemblyObj;
 

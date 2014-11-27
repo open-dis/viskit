@@ -139,8 +139,8 @@ public class Vstatics {
 
     /**
      * Set the size(s) of c to be exactly those of src
-     * @param c
-     * @param src
+     * @param c the component who's size is to be clamped
+     * @param src the source component to clamp size to
      */
     public static void cloneSize(JComponent c, JComponent src) {
         Dimension d = new Dimension(src.getPreferredSize());
@@ -150,8 +150,8 @@ public class Vstatics {
     }
 
     /**
-     * Clamp the height of comp to it's preferred height
-     * @param comp
+     * Clamp the height of a component to it's preferred height
+     * @param comp the component who's height is to be clamped
      */
     public static void clampHeight(JComponent comp) {
         Dimension d = comp.getPreferredSize();
@@ -161,8 +161,8 @@ public class Vstatics {
 
     /**
      * Clamp the height of a component to another's height
-     * @param c
-     * @param h
+     * @param c the component who's height is to be clamped
+     * @param h the height to clamp to
      */
     public static void clampHeight(JComponent c, JComponent h) {
         int height = h.getPreferredSize().height;
@@ -380,7 +380,7 @@ public class Vstatics {
     static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
     /**
-     * For the given class type EG, recorded its specific ParameterMap
+     * For the given class type EG, record its specific ParameterMap
      * @param type the EG class name
      * @param p a List of parameter map object arrays
      */
@@ -458,9 +458,7 @@ public class Vstatics {
                             }
                         }
                     }
-                } catch (IllegalArgumentException ex) {
-                    LogUtils.getLogger(Vstatics.class).error(ex);
-                } catch (IllegalAccessException ex) {
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
                     LogUtils.getLogger(Vstatics.class).error(ex);
                 }
             } else {

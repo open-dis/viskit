@@ -112,7 +112,7 @@ public class FileBasedClassManager implements Runnable {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs via an external JVM compile run
-                    paf = VGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Tried to compile an Assembly as an EventGraph, so just return here
                     if (paf == null) {
@@ -539,7 +539,7 @@ public class FileBasedClassManager implements Runnable {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            VGlobals.instance().getAssemblyModel().externalClassesChanged(v);
+                            VGlobals.instance().getActiveAssemblyModel().externalClassesChanged(v);
                         }
                     });
                 }

@@ -417,7 +417,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         String[][] parameterMap = (String[][]) (f.get(new String[0][0]));
                         int numConstrs = parameterMap.length;
 
-                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs = constr.length
+                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
                             String[] params = parameterMap[n];
                             if (params != null) {
                                 plist[n] = new ArrayList<>();
@@ -442,10 +442,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                             }
                         }
                         break; // fix this up, should index along with i not n
-                    } catch (IllegalArgumentException ex) {
-                        log.error(ex);
-//                        ex.printStackTrace();
-                    } catch (IllegalAccessException ex) {
+                    } catch (IllegalArgumentException | IllegalAccessException ex) {
                         log.error(ex);
 //                        ex.printStackTrace();
                     }

@@ -63,7 +63,13 @@ public interface AssemblyView {
 
     int genericAsk2Butts(String title, String prompt, String button1, String button2);
 
-    void genericErrorReport(String title, String message);
+    /** A component, e.g., vAMod, wants to say something.
+     *
+     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
+     * @param title the title of the message
+     * @param msg the message to transmit
+     */
+    void genericReport(int typ, String title, String msg);
 
     String promptForStringOrCancel(String title, String message, String initval);
 

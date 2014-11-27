@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
-import viskit.view.dialog.ViskitProjectGenerationDialog3;
-import viskit.view.AssemblyView;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
@@ -43,6 +41,7 @@ import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.mvc.mvcController;
+import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
 /**
  * Edit this GUI with Netbeans Matisse

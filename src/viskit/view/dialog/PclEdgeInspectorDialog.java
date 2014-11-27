@@ -19,6 +19,7 @@ import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.VGlobals;
 import viskit.Vstatics;
+import viskit.control.AssemblyController;
 import viskit.model.EvGraphNode;
 import viskit.model.PropChangeEdge;
 import viskit.model.PropChangeListenerNode;
@@ -197,7 +198,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            VGlobals.instance().getAssemblyController().delete();
+            ((AssemblyController)VGlobals.instance().getAssemblyController()).delete();
             dispose();
         }
     }

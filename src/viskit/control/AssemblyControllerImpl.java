@@ -74,8 +74,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /**
-     *
-     * @param fil
+     * Sets an initial assy file to open upon Viskit startup supplied by the
+     * command line
+     * @param fil the assy file to initially open upon startup
      */
     public void setInitialFile(String fil) {
         if (viskit.Vstatics.debug) {
@@ -92,17 +93,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void compileAssembly(String assyPath) {
         LOGGER.debug("Compiling assembly: " + assyPath);
         File f = new File(assyPath);
+        initialFile = assyPath;
         _doOpen(f);
         compileAssemblyAndPrepSimRunner();
     }
 
-    /** Begin this Controller's initial state upon startup */
     @Override
     public void begin() {
 
         File f;
 
         // The initialFile is set if we have stated a file "arg" upon startup
+        // from the command line
         if (initialFile != null) {
             LOGGER.debug("Loading initial file: " + initialFile);
             f = new File(initialFile);
@@ -135,7 +137,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Information required by the EventGraphControllerImpl to see if an Assembly
- file is already open.  Also checked internally by this class.
+     * file is already open.  Also checked internally by this class.
      * @param refresh flag to refresh the list from viskitConfig.xml
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
@@ -316,7 +318,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
-                    ((EventGraphController)VGlobals.instance().getEventGraphEditor().getController()).closeAll();
+                    ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel vmod = (AssemblyModel) getModel();
                     markAssyConfigClosed(vmod.getLastFile());
@@ -545,10 +547,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void doProjectCleanup() {
         closeAll();
-        ((EventGraphController) VGlobals.instance().getEventGraphEditor().getController()).closeAll();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
         clearRecentAssyFileList();
-        ((EventGraphController) VGlobals.instance().getEventGraphEditor().getController()).clearRecentFileSet();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentFileSet();
         VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
@@ -715,7 +717,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         // Nothing selected or non-leaf
-        ((AssemblyView) getView()).genericErrorReport("Can't create", "You must first select an Event Graph from the panel on the left.");
+        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select an Event Graph from the panel on the left.");
     }
 
     @Override
@@ -745,7 +747,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         // If nothing selected or a non-leaf
-        ((AssemblyView) getView()).genericErrorReport("Can't create", "You must first select a Property Change Listener from the panel on the left.");
+        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
 
     @Override
@@ -795,11 +797,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             oArr = checkLegalForSEListenerArc(oA, oB);
         } catch (Exception e) {
-            ((AssemblyView) getView()).genericErrorReport("Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
         if (oArr == null) {
-            ((AssemblyView) getView()).genericErrorReport("Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
@@ -817,7 +819,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
 
         if (oArr == null) {
-            ((AssemblyView) getView()).genericErrorReport("Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
@@ -836,7 +838,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
 
         if (oArr == null) {
-            ((AssemblyView) getView()).genericErrorReport("Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
         pcListenerEdgeEdit(((AssemblyModel) getModel()).newPclEdge(oArr[0], oArr[1]));
@@ -1030,7 +1032,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
 
             // _doOpen checks if a tab is already opened
-            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphEditor().getController())._doOpen(f);
+            ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(f);
         }
     }
 
@@ -1129,33 +1131,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    /* a component, e.g., vAMod, wants to say something. */
-    /**
-     *
-     * @param typ
-     * @param msg
-     */
     @Override
-    public void messageUser(int typ, String msg) // typ is one of JOptionPane types
+    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
     {
-        String title;
-        switch (typ) {
-            case JOptionPane.WARNING_MESSAGE:
-                title = "Warning";
-                break;
-            case JOptionPane.ERROR_MESSAGE:
-                title = "Error";
-                break;
-            case JOptionPane.INFORMATION_MESSAGE:
-                title = "Information";
-                break;
-            case JOptionPane.PLAIN_MESSAGE:
-            case JOptionPane.QUESTION_MESSAGE:
-            default:
-                title = "";
-                break;
-        }
-        ((AssemblyView) getView()).genericErrorReport(title, msg);
+        ((AssemblyView) getView()).genericReport(typ, title, msg);
     }
 
     /********************************/
@@ -1423,8 +1402,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
         } catch (IOException e) {
-            ((AssemblyView) getView()).genericErrorReport("File System Error",
-                    "Error creating temporary file.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
         model.saveModel(tFile);
@@ -1456,7 +1434,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return Vstatics.getClassPathAsString();
     }
 
-    /** Compile the Assembly and prepare the Simulation Runner for simulation run */
     @Override
     public void compileAssemblyAndPrepSimRunner() {
         initAssemblyRun();
@@ -1530,7 +1507,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 
-    /** Screen capture a snapshot of the Assembly View Frame */
     @Override
     public void captureWindow() {
 
@@ -1576,6 +1552,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         File fil;
         boolean display;
 
+        /**
+         * Constructor for this timerCallBack
+         * @param f the file to write an image to
+         * @param b if true, display the image
+         */
         timerCallback(File f, boolean b) {
             fil = f;
             display = b;
@@ -1650,7 +1631,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened
-                ((EventGraphControllerImpl)VGlobals.instance().getEventGraphEditor().getController())._doOpen(tempFile);
+                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(tempFile);
             }
         } catch (Exception ex) {
             LOGGER.error("EventGraph file: " + tempFile + " caused error: " + ex);

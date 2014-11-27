@@ -23,15 +23,18 @@ import viskit.mvc.mvcRecentFileListener;
  */
 public interface AssemblyController {
 
-    /* start app */
+    /** Initialize this controller upon startup */
     void begin();
 
-    // user has clicked a menu item
+    /** User has clicked a menu item */
     void newEventGraphNode();
 
     void newPropChangeListenerNode();
 
-    // user has established some parameter, model can create object
+    /** User has established some parameter, model can create object
+     * @param name the name of the node
+     * @param p the (x, y) point it will appear
+     */
     void newEventGraphNode(String name, Point p);
 
     void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
@@ -61,8 +64,13 @@ public interface AssemblyController {
 
     void showXML();
 
-    /* a component, e.g., model, wants to say something. */
-    void messageUser(int typ, String msg);    // typ is one of JOptionPane types
+    /** A component, e.g., vAMod, wants to say something.
+     *
+     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
+     * @param title the title of the message
+     * @param msg the message to transmit
+     */
+    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
     void selectNodeOrEdge(Vector<Object> v);
 
@@ -182,16 +190,23 @@ public interface AssemblyController {
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
 
     /**
-     * Generates Java source code from an Assembly file
+     * Generates Java source code from an Assembly file and displays it from
+     * a source window for inspection.
      */
     void generateJavaSource();
 
+    /** Compile the Assembly and prepare the Simulation Runner for simulation
+     * run.  This is called from the AssemblyView via reflection when the
+     * Initialize assembly run button is selected from the Assembly Editor panel.
+     */
     void compileAssemblyAndPrepSimRunner();
 
+    /** Saving, generating java source and compilation are taken care of here */
     void initAssemblyRun();
 
     void export2grid();
 
+    /** Screen capture a snapshot of the Assembly View Frame */
     void captureWindow();
 
     void addRecentAssyFileSetListener(mvcRecentFileListener lis);

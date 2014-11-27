@@ -72,10 +72,7 @@ public class FileHandler {
         try {
             builder = new SAXBuilder();
             doc = builder.build(f);
-        } catch (IOException e) {
-            doc = null;
-            throw new Exception("Error parsing or finding file " + f.getAbsolutePath());
-        } catch (JDOMException e) {
+        } catch (IOException | JDOMException e) {
             doc = null;
             throw new Exception("Error parsing or finding file " + f.getAbsolutePath());
         }
@@ -161,44 +158,5 @@ public class FileHandler {
     private static List<SimEntity> getSimEntities(Document doc) throws Exception {
         Element elm = doc.getRootElement();
         return elm.getChildren("SimEntity");
-    }
-
-    public static class FileFilterEx extends FileFilter {
-
-        private String[] _extensions;
-        private String _msg;
-        private boolean _showDirs;
-
-        public FileFilterEx(String extension, String msg) {
-            this(extension, msg, false);
-        }
-
-        public FileFilterEx(String extension, String msg, boolean showDirectories) {
-            this(new String[]{extension}, msg, showDirectories);
-        }
-
-        public FileFilterEx(String[] extensions, String msg, boolean showDirectories) {
-            this._extensions = extensions;
-            this._msg = msg;
-            this._showDirs = showDirectories;
-        }
-
-        @Override
-        public boolean accept(java.io.File f) {
-            if (f.isDirectory()) {
-                return _showDirs;
-            }
-            for (String _extension : _extensions) {
-                if (f.getName().endsWith(_extension)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public String getDescription() {
-            return _msg;
-        }
     }
 }

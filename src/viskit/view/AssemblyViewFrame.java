@@ -39,6 +39,7 @@ import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
@@ -84,7 +85,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JButton runButt;
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(AssemblyControllerImpl controller) {
+    public AssemblyViewFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI();   // build widgets
@@ -103,10 +104,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     /**
-     * Initialize the MCV connections
-     * @param ctrl
+     * Initialize the MVC connections
+     * @param ctrl the controller for this view
      */
-    private void initMVC(AssemblyControllerImpl ctrl) {
+    private void initMVC(mvcController ctrl) {
         setController(ctrl);
     }
 
@@ -164,9 +165,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         this.toolBar = toolBar;
     }
 
+    /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
 
-        /** Tab switch: this will come in with the newly selected tab in place */
         @Override
         public void stateChanged(ChangeEvent e) {
             VgraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
@@ -744,9 +745,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void genericErrorReport(String title, String msg)
+    public void genericReport(int type, String title, String msg)
     {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, msg, title, type);
     }
     Transferable dragged;
 

@@ -17,12 +17,12 @@ import viskit.mvc.mvcRecentFileListener;
 public interface EventGraphController {
 
     /**
-     * start app
+     * Start app
      */
     void begin();
 
     /**
-     * user has clicked a button or menu item:
+     * User has clicked a button or menu item
      */
     void newNode();
 
@@ -31,7 +31,7 @@ public interface EventGraphController {
     void newStateVariable();
 
     /**
-     * user has established some entity parameters, model can create objects
+     * User has established some entity parameters, model can create objects
      *
      * @param p the graphical point of new node
      */
@@ -72,12 +72,18 @@ public interface EventGraphController {
 
     void runAssemblyEditor();
 
+    /** Show the XML form of an event graph */
     void showXML();
 
-    /* a component, e.g., model, wants to say something. */
+    /** A component, e.g., model, wants to say something.
+     * @param typ the type of message, i.e. ERROR, WARN, QUESTION, etc
+     * @param msg the message to transmit
+     */
     void messageUser(int typ, String msg);    // typ is one of JOptionPane types
 
-    /* requests to the controller to perform editing operations on existing entities */
+    /** Requests to the controller to perform editing operations on existing entities
+     * @param node the node to edit
+     */
     void nodeEdit(EventNode node);
 
     void arcEdit(SchedulingEdge ed);
@@ -164,5 +170,6 @@ public interface EventGraphController {
 
     Set<String> getRecentFileSet();
 
+    /** Clears the recent EG file list thus far generated */
     void clearRecentFileSet();
 }

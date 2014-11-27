@@ -51,6 +51,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.util.EventGraphCache;
 import viskit.VGlobals;
+import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.model.AssemblyNode;
 
@@ -993,7 +994,7 @@ public final class AnalystReportBuilder {
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
-        ((EventGraphController)VGlobals.instance().getEventGraphEditor().getController()).captureEventGraphImages(evc.getEventGraphFilesList(),
+        ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(evc.getEventGraphFilesList(),
                 evc.getEventGraphImagePathsList());
     }
 
@@ -1007,7 +1008,7 @@ public final class AnalystReportBuilder {
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
         String assyFileName = getAssemblyFile().getName();
         setAssemblyImageLocation(assemblyImageDir + "/" + assyFileName + ".png");
-        VGlobals.instance().getAssemblyController().captureAssemblyImage(getAssemblyImageLocation());
+        ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(getAssemblyImageLocation());
     }
 
     private void announceReportReadyToView() {

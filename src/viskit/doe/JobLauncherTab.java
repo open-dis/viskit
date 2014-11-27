@@ -35,27 +35,6 @@ package viskit.doe;
 import edu.nps.util.CryptoMethods;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.xmlrpc.XmlRpcClientLite;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Text;
-import viskit.util.OpenAssembly;
-import viskit.util.TitleListener;
-import viskit.gridlet.SessionManager;
-import viskit.xsd.bindings.assembly.Experiment;
-import viskit.xsd.bindings.assembly.SampleStatistics;
-import viskit.xsd.bindings.assembly.Schedule;
-import viskit.xsd.bindings.assembly.SimkitAssembly;
-
-import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -63,8 +42,28 @@ import java.net.URL;
 import java.security.Key;
 import java.util.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Text;
 import viskit.ViskitConfig;
+import viskit.gridlet.SessionManager;
+import viskit.util.OpenAssembly;
+import viskit.util.TitleListener;
+import viskit.xsd.bindings.assembly.Experiment;
+import viskit.xsd.bindings.assembly.SampleStatistics;
+import viskit.xsd.bindings.assembly.Schedule;
+import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**
  * MOVES Institute
@@ -74,6 +73,7 @@ import viskit.ViskitConfig;
  * @since Jul 21, 2005
  * @since 12:29:08 PM
  * @version $Id$
+ * @deprecated use {@link JobLauncherTab2}
  */
 public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
 

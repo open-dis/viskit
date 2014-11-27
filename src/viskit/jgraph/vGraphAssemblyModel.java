@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.SwingUtilities;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.ConnectionSet;
@@ -12,6 +11,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
 import org.jgraph.graph.GraphConstants;
 import viskit.VGlobals;
+import viskit.control.AssemblyController;
 import viskit.model.*;
 
 /**
@@ -153,7 +153,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         // so that the AssemblyControllerImpl can find it
         Vector<Object> ev = new Vector<>();
         ev.add(ae);
-        VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).selectNodeOrEdge(ev);
     }
 
     public void deleteAdapterEdge(AdapterEdge ae) {
@@ -242,6 +242,6 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         // so that the AssemblyControllerImpl can find it
         Vector<Object> ev = new Vector<>();
         ev.add(pce);
-        VGlobals.instance().getAssemblyController().selectNodeOrEdge(ev);
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).selectNodeOrEdge(ev);
     }
 }

@@ -52,6 +52,7 @@ import viskit.model.AdapterEdge;
 import viskit.model.EvGraphNode;
 import viskit.VGlobals;
 import viskit.Vstatics;
+import viskit.control.AssemblyController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -268,7 +269,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            VGlobals.instance().getAssemblyController().delete();
+            ((AssemblyController)VGlobals.instance().getAssemblyController()).delete();
             dispose();
         }
     }

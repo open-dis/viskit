@@ -51,6 +51,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileFilterEx;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -318,9 +319,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        FileHandler.FileFilterEx[] filter = {new FileHandler.FileFilterEx(".grd", "Doe files (*.grd)", true),
-                new FileHandler.FileFilterEx(".xml", "Assembly files (*.xml)", true)};
-        for (FileHandler.FileFilterEx filter1 : filter) {
+        FileFilterEx[] filter = {new FileFilterEx(".grd", "Doe files (*.grd)", true),
+                new FileFilterEx(".xml", "Assembly files (*.xml)", true)};
+        for (FileFilterEx filter1 : filter) {
             chooser.addChoosableFileFilter(filter1);
         }
 
@@ -328,9 +329,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     /**
-   * From save button;  this takes the data from the table...possibly edited and puts it into
-   * the jaxb SimkitAssembly object, ready to be marshalled with the next Assembly save;
-   */
+     * From save button;  this takes the data from the table...possibly edited and puts it into
+     * the jaxb SimkitAssembly object, ready to be marshalled with the next Assembly save;
+     */
     public void saveDoeParams() {
         saveDoeParmsNoNotify();
         OpenAssembly.inst().doSendAssyJaxbChanged(this);

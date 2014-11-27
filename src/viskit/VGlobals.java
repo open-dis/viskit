@@ -63,11 +63,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
+import viskit.control.AssemblyController;
 import viskit.doe.LocalBootLoader;
-import viskit.model.AssemblyModelImpl;
+import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
 import viskit.model.Model;
+import viskit.mvc.mvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -120,8 +122,8 @@ public class VGlobals {
 
     /* routines to manage the singleton-aspect of the views. */
     AssemblyViewFrame avf;
-    AssemblyControllerImpl acont;
-    public AssemblyModelImpl amod;
+    mvcController acont;
+    public AssemblyModel amod;
     boolean assyFirstRun = false;
 
     /**
@@ -150,16 +152,16 @@ public class VGlobals {
         return initAssemblyViewFrame(cont);
     }
 
-    private AssemblyViewFrame buildAssemblyViewFrame(AssemblyControllerImpl cont) {
+    private AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont) {
         initAssemblyViewFrame(cont);
         cont.begin();
         return avf;
     }
 
-    private AssemblyViewFrame initAssemblyViewFrame(AssemblyControllerImpl cont) {
-        acont = cont;
-        avf = new AssemblyViewFrame(cont);
-        cont.setView(avf);
+    private AssemblyViewFrame initAssemblyViewFrame(AssemblyController cont) {
+        acont = (mvcController) cont;
+        avf = new AssemblyViewFrame((mvcController) cont);
+        ((AssemblyControllerImpl)cont).setView(avf);
         return avf;
     }
 
@@ -167,11 +169,11 @@ public class VGlobals {
         avf.rebuildTreePanels();
     }
 
-    public AssemblyModelImpl getAssemblyModel() {
+    public AssemblyModel getActiveAssemblyModel() {
         return amod;
     }
 
-    public AssemblyControllerImpl getAssemblyController() {
+    public mvcController getAssemblyController() {
         return acont;
     }
 
@@ -189,7 +191,7 @@ public class VGlobals {
 
                 if (!assyFirstRun) {
                     assyFirstRun = true;
-                    acont.newAssembly();
+                    ((AssemblyController)acont).newAssembly();
                 }
             }
         });
@@ -227,6 +229,7 @@ public class VGlobals {
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
     EventGraphViewFrame egvf;
+    mvcController eContl;
 
     public EventGraphViewFrame getEventGraphEditor() {
         return egvf;
@@ -259,7 +262,12 @@ public class VGlobals {
     public EventGraphViewFrame initEventGraphViewFrame(EventGraphControllerImpl cont) {
         egvf = new EventGraphViewFrame(cont);
         cont.setView(egvf);
+        eContl = cont;
         return egvf;
+    }
+
+    public mvcController getEventGraphController() {
+        return eContl;
     }
 
     public Model getActiveEventGraphModel() {

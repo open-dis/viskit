@@ -17,14 +17,18 @@ import java.util.Collection;
  */
 public interface EventGraphView
 {
-  // permit user to edit existing entities
+  /** Permit user to edit existing entities *
+   *
+   * @param edge the canceling edge to edit
+   * @return successful or not
+   */
   boolean doEditCancelEdge   ( CancellingEdge edge );
   boolean doEditEdge         ( SchedulingEdge edge );
   boolean doEditNode         ( EventNode node );
   boolean doEditParameter    ( vParameter param );
   boolean doEditStateVariable( vStateVariable var);
 
-  /**
+  /** Question dialog
    * @param title
    * @param prompt
    * @return yes, no or cancel constants

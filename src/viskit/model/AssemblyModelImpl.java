@@ -528,7 +528,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         boolean retcode = true;
         if (!nameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate name detected: " + pclNode.getName() +
+                    "Duplicate name detected", pclNode.getName() +
                     "\nUnique name substituted.");
             manglePCLName(pclNode);
             retcode = false;
@@ -591,7 +591,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changeEvGraphNode(EvGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate name detected: " + evNode.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate name detected", evNode.getName() +
                     "\nUnique name substituted.");
             mangleEGName(evNode);
             retcode = false;
@@ -960,7 +960,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         if (!nameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML file contains duplicate event name: " + pNode.getName() +
+                    "XML file contains duplicate event name", pNode.getName() +
                     "\nUnique name substituted.");
             manglePCLName(pNode);
         }
@@ -997,7 +997,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         if (!nameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML file contains duplicate event name: " + en.getName() +
+                    "XML file contains duplicate event name", en.getName() +
                     "\nUnique name substituted.");
             mangleEGName(en);
         }

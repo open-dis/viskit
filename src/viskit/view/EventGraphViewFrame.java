@@ -24,9 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.apache.commons.configuration.XMLConfiguration;
 import viskit.control.EventGraphController;
-import viskit.control.EventGraphControllerImpl;
 import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.util.TitleListener;
@@ -39,6 +37,7 @@ import viskit.images.SchedArcIcon;
 import viskit.jgraph.vGraphModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
@@ -97,7 +96,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Constructor; lays out initial GUI objects
      * @param ctrl the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(EventGraphControllerImpl ctrl) {
+    public EventGraphViewFrame(mvcController ctrl) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(ctrl);   // set up mvc linkages
         initUI();    // build widgets
@@ -138,10 +137,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     /**
-     * Initialize the MCV connections
-     * @param ctrl the EventGraphControllerImpl
+     * Initialize the MVC connections
+     * @param ctrl the controller for this view
      */
-    private void initMVC(EventGraphControllerImpl ctrl) {
+    private void initMVC(mvcController ctrl) {
         setController(ctrl);
     }
 
@@ -194,11 +193,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         this.toolBar = toolBar;
     }
 
+    /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
 
-        /** Tab switch: this will come in with the newly selected tab in place */
         @Override
         public void stateChanged(ChangeEvent e) {
+
             VgraphComponentWrapper myVgcw = getCurrentVgcw();
 
             if (myVgcw == null) {     // last tab has been closed
@@ -206,8 +206,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 return;
             }
 
-            setModel((ModelImpl) myVgcw.model);        // hold on locally
+            // Make sure we save EGs if we wander off to another EG tab
+            if (((Model)getModel()).isDirty()) {
+                ((EventGraphController)getController()).save();
+            }
+
+            setModel((ModelImpl) myVgcw.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
+
             adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
 
             GraphMetaData gmd = ((Model) getModel()).getMetaData();
