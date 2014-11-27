@@ -51,9 +51,11 @@ public class ViskitConfig {
     public static final String EG_HISTORY_KEY = RECENT_EG_CLEAR_KEY + ".EventGraphFile";
     public static final String ASSY_HISTORY_KEY = RECENT_ASSY_CLEAR_KEY + ".AssemblyFile";
     public static final String PROJ_HISTORY_KEY = RECENT_PROJ_CLEAR_KEY + ".Project";
-    public static final String EG_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
+    public static final String EG_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
     public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String DOE_EDIT_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
+    public static final String CLUSTER_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
     public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
 

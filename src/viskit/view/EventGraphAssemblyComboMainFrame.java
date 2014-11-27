@@ -229,33 +229,38 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         /* DIFF between OA3302 branch and trunk */
 
         // Design of experiments
-        doeMain = DoeMain.main2();
-        DoeMainFrame doeFrame = doeMain.getMainFrame();
-        runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
-        runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
-        runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
-        menuBar = doeMain.getMenus();
-        if (menuBar == null) {
-            menuBar = new JMenuBar();
-            menuBar.add(new JMenu("File"));
+        DoeMainFrame doeFrame = null;
+        if (SettingsDialog.isDOEVisible()) {
+            doeMain = DoeMain.main2();
+            doeFrame = doeMain.getMainFrame();
+            runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
+            runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
+            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+            menuBar = doeMain.getMenus();
+            if (menuBar == null) {
+                menuBar = new JMenuBar();
+                menuBar.add(new JMenu("File"));
+            }
+            menus.add(menuBar);
+            doCommonHelp(menuBar);
+            doeFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
+            jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
         }
-        menus.add(menuBar);
-        doCommonHelp(menuBar);
-        doeFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
-        jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
 
         // Grid run panel
-        runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
-        doeFrame.getController().setJobLauncher(runGridComponent);
-        runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
-        runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
-        runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
-        menuBar = new JMenuBar();
-        menuBar.add(new JMenu("File"));
-        jamQuitHandler(null, myQuitAction, menuBar);
-        menus.add(menuBar);
-        doCommonHelp(menuBar);
-        runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
+        if (SettingsDialog.isClusterRunVisible()) {
+            runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
+            doeFrame.getController().setJobLauncher(runGridComponent);
+            runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
+            runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
+            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+            menuBar = new JMenuBar();
+            menuBar.add(new JMenu("File"));
+            jamQuitHandler(null, myQuitAction, menuBar);
+            menus.add(menuBar);
+            doCommonHelp(menuBar);
+            runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
+        }
 
         /* End DIFF between OA3302 branch and trunk */
 
@@ -265,7 +270,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
 
         /* DIFF between OA3302 branch and trunk */
-        assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
+        if (SettingsDialog.isDOEVisible())
+            assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
         /* End DIFF between OA3302 branch and trunk */
 
         assyCntlr.addAssemblyFileListener(runGridComponent);
@@ -278,7 +284,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
 
         /* DIFF between OA3302 branch and trunk */
-        egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
+        if (SettingsDialog.isDOEVisible())
+            egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
 
         // let the event graph controller establish the Viskit classpath and open
@@ -325,7 +332,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         public void stateChanged(ChangeEvent e) {
 
             // Make sure we save EGs if we wander off to another tab
-            if (VGlobals.instance().getActiveEventGraphModel().isDirty()) {
+            if (VGlobals.instance().getActiveEventGraphModel() != null && VGlobals.instance().getActiveEventGraphModel().isDirty()) {
                 ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
             }
 
@@ -449,9 +456,11 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
-                    runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
-                    if (!doeMain.getController().preQuit()) {
-                        break outer;
+                    if (SettingsDialog.isDOEVisible()) {
+                        runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
+                        if (!doeMain.getController().preQuit()) {
+                            break outer;
+                        }
                     }
                 }
                 /* End DIFF between OA3302 branch and trunk */
@@ -467,7 +476,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
+                if (SettingsDialog.isDOEVisible()) {
                     doeMain.getController().postQuit();
                 }
                 /* End DIFF between OA3302 branch and trunk */

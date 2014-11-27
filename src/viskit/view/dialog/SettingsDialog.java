@@ -79,6 +79,8 @@ public class SettingsDialog extends JDialog {
     private JCheckBox evGrCB;
     private JCheckBox assyCB;
     private JCheckBox runCB;
+    private JCheckBox doeCB;
+    private JCheckBox clusterRunCB;
     private JCheckBox analRptCB;
     private JCheckBox debugMsgsCB;
 
@@ -144,6 +146,8 @@ public class SettingsDialog extends JDialog {
         evGrCB.addActionListener(vis);
         assyCB.addActionListener(vis);
         runCB.addActionListener(vis);
+        doeCB.addActionListener(vis);
+        clusterRunCB.addActionListener(vis);
         analRptCB.addActionListener(vis);
         debugMsgsCB.addActionListener(vis);
 
@@ -214,13 +218,17 @@ public class SettingsDialog extends JDialog {
         JPanel innerP = new JPanel();
         innerP.setLayout(new BoxLayout(innerP, BoxLayout.Y_AXIS));
         innerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        evGrCB = new JCheckBox("Event graph editor");
+        evGrCB = new JCheckBox("Event Graph Editor");
         innerP.add(evGrCB);
-        assyCB = new JCheckBox("Assembly editor");
+        assyCB = new JCheckBox("Assembly Editor");
         innerP.add(assyCB);
-        runCB = new JCheckBox("Assembly run");
+        runCB = new JCheckBox("Assembly Run");
         innerP.add(runCB);
-        analRptCB = new JCheckBox("Analyst report");
+        doeCB = new JCheckBox("Design Of Experiments");
+        innerP.add(doeCB);
+        clusterRunCB = new JCheckBox("Cluster Run");
+        innerP.add(clusterRunCB);
+        analRptCB = new JCheckBox("Analyst Report");
         innerP.add(analRptCB);
         debugMsgsCB = new JCheckBox("Verbose debug messages");
         innerP.add(debugMsgsCB);
@@ -321,12 +329,12 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
-                appConfig.setProperty(ViskitConfig.EG_VISIBLE_KEY, evGrCB.isSelected());
+                appConfig.setProperty(ViskitConfig.EG_EDIT_VISIBLE_KEY, evGrCB.isSelected());
             } else if (src == assyCB) {
                 appConfig.setProperty(ViskitConfig.ASSY_EDIT_VISIBLE_KEY, assyCB.isSelected());
             } else if (src == runCB) {
                 if (runCB.isSelected()) {
-                    // if we turn on the assembly runner, we need also the assy editor
+                    // if we turn on the assembly runner, we also need the assy editor
                     if (!assyCB.isSelected()) {
                         assyCB.doClick();
                     } // reenter here
@@ -335,8 +343,12 @@ public class SettingsDialog extends JDialog {
             } else if (src == debugMsgsCB) {
                 appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
                 Vstatics.debug = debugMsgsCB.isSelected();
-            } else /* if(src == analRptCB) */ {
+            } else if (src == analRptCB) {
                 appConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
+            } else if (src == doeCB) {
+                appConfig.setProperty(ViskitConfig.DOE_EDIT_VISIBLE_KEY, doeCB.isSelected());
+            } else if (src == clusterRunCB) {
+                appConfig.setProperty(ViskitConfig.CLUSTER_RUN_VISIBLE_KEY, clusterRunCB.isSelected());
             }
         }
     }
@@ -440,6 +452,8 @@ public class SettingsDialog extends JDialog {
         evGrCB.setSelected(isEventGraphEditorVisible());
         assyCB.setSelected(isAssemblyEditorVisible());
         runCB.setSelected(isAssemblyRunVisible());
+        doeCB.setSelected(isDOEVisible());
+        clusterRunCB.setSelected(isClusterRunVisible());
         analRptCB.setSelected(isAnalystReportVisible());
         debugMsgsCB.setSelected(isVerboseDebug());
 
@@ -629,31 +643,76 @@ public class SettingsDialog extends JDialog {
         return extClassPathsUrls;
     }
 
+    /**
+     * Return the value for the platform look and feel
+     * @return the value for the platform look and feel
+     */
     public static String getLookAndFeel() {
         return ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
     }
 
+    /**
+     * Return the value for the given property
+     * @param prop the property who value is of interest
+     * @return the value for the given property
+     */
     public static boolean getVisibilitySense(String prop) {
         return Boolean.valueOf(ViskitConfig.instance().getVal(prop));
     }
 
+    /**
+     * Return if the EG Editor is to be visible
+     * @return if the EG Editor is to be visible
+     */
     public static boolean isEventGraphEditorVisible() {
-        return getVisibilitySense(ViskitConfig.EG_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfig.EG_EDIT_VISIBLE_KEY);
     }
 
+    /**
+     * Return if the Assy Editor is to be visible
+     * @return if the Assy Editor is to be visible
+     */
     public static boolean isAssemblyEditorVisible() {
         return getVisibilitySense(ViskitConfig.ASSY_EDIT_VISIBLE_KEY);
     }
 
+    /**
+     * Return if the Assy Runner is to be visible
+     * @return if the Assy Runner is to be visible
+     */
     public static boolean isAssemblyRunVisible() {
         return getVisibilitySense(ViskitConfig.ASSY_RUN_VISIBLE_KEY);
     }
 
+    /**
+     * Return if the Analyst Report Editor is to be visible
+     * @return if the Analyst Report Editor is to be visible
+     */
     public static boolean isAnalystReportVisible() {
         return getVisibilitySense(ViskitConfig.ANALYST_RPT_VISIBLE_KEY);
     }
 
+    /**
+     * Return if verbose debug message are to be printed
+     * @return if verbose debug message are to be printed
+     */
     public static boolean isVerboseDebug() {
-        return Boolean.valueOf(ViskitConfig.instance().getVal(ViskitConfig.DEBUG_MSGS_KEY));
+        return getVisibilitySense(ViskitConfig.DEBUG_MSGS_KEY);
+    }
+
+    /**
+     * Return if the Design of Experiments Editor is to be visible
+     * @return if the Design of Experiments Editor is to be visible
+     */
+    public static boolean isDOEVisible() {
+        return getVisibilitySense(ViskitConfig.DOE_EDIT_VISIBLE_KEY);
+    }
+
+    /**
+     * Return if the Cluster Runner is to be visible
+     * @return if the Cluster Runner is to be visible
+     */
+    public static boolean isClusterRunVisible() {
+        return getVisibilitySense(ViskitConfig.CLUSTER_RUN_VISIBLE_KEY);
     }
 }
