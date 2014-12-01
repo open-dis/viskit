@@ -32,7 +32,7 @@ import viskit.VGlobals;
  * by DOE time, and we'd like to run a DOE with little interaction from
  * Viskit other than the API's already used for Gridkit, so basically
  * 'logging in' to a local service. It should still build up class definitions
- * from the Assembly XML, since each replication, a new class definition
+ * from the Assembly XML since in each replication a new class definition
  * of the same type is used.
  *
  * Viskit caches all generated classes in the VGlobals workDirectory,
@@ -61,13 +61,13 @@ import viskit.VGlobals;
  * required to run Simkit and the ViskitAssembly.
  *
  * Each thread that uses a LocalBoot should set the contextClassLoader
- * to be its own LocalBoot's parent's parent; this should enable multiple threads to use
- * class methods in a unique context, eg. Schedule.reset();
+ * to be its own LocalBoot's parent's parent; this should enable multiple
+ * threads to use class methods in a unique context, eg. Schedule.reset();
  *
  * In order to do that, as in create a separate context for Simkit per Thread,
  * without running an external Process, everything must be read into a
  * ClassLoader that has the current Viskit running Thread's parent's
- * contextClassLoader, above from where simkit.jar got loaded in, ie, the
+ * contextClassLoader, above from where simkit.jar got loaded in, i.e., the
  * stage prior to reading in the lib directory during JVM initialization. Then
  * each new ClassLoader so constructed can have a unique Simkit run
  * simultaneously. Furthermore, it can now have a unique Assembly per Thread
