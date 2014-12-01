@@ -1,0 +1,91 @@
+Post release fixes:
+
+  Allow deselection of both the Design of Experiments (DOE) and Cluster Run
+  panels via the Files -> Settings dialog -> Tabs Visible
+
+  Ensure that when switching Event Graph tabs, or to the Assembly Editor, any
+  unsaved EGs will be saved, revalidated and re-compiled
+
+  Remember user set sizes for the main app frame so that it will restart at
+  those dimensions
+
+  Fix a long standing bug where modifications to EGs did not get re-validate
+  XML, generate java source, or re-compile.  Fix bug where a duplicate icon
+  could reappear in the EG node pallette
+
+  Fix UI issue where a node name could be changed for either an EG or Assy and
+  would not reflect until a mouse was re-clicked on the editor canvas
+
+  Refactor source code packaging to more closely resemble MVC organization
+
+
+Release: 0.7.0(November 14, 2014)
+-------------------------
+Major changes since 0.6.2:
+
+  Platform specific startup items are discerned at app startup, i.e. MAX OS X
+  "About Viskit"
+
+  Fix a long standing bug where local variables declared in an EG doRun method
+  where not being utilized as indicies for arrays in state transition changes
+
+  Enable a single click selection of a Viskit project icon w/o having to select
+  "OK"
+
+  Upgrade to JAXB v2.2.11
+
+  Fix issue where a single opened EG did not close when selecting another Viskit
+  project
+
+  If a user selects JVM exit and an EG, or Assy were modified, allow a cancel
+  closing Viskit when the save dialog appears
+
+  Always show what Viskit project is open in the app title bar
+
+  Implemented a nuke.dot.viskit Ant target.  This is an attempt to draconically
+  fix an issue where Viskit startup in an unknown state via its .viskit kept
+  config files and can't recover to usability
+
+  Fix bug to allow generically type arrays to be properly translated to java
+  source
+
+  Fix a NPE in the AssemblyControllerImpl
+
+  Had to break the "dirty Assembly" issue in the DOE's LocalBootLoader so as to
+  load generated and modified EGs and Assys from build/classes of each loaded
+  Viskit project.  The documentation for viskit.doe.LocalBootLoader explains the
+  requirement for multi-threaded Grid Design Point Experiments to run with fresh
+  ClassLoader contexts.  At this time, Grid (cluster) runs are disabled until
+  such time as we can re-implement using the Viskit Project paradigm
+
+  Annotate a note in the InternalAssemblyRunner where the RandomVariate seed was
+  is being reset via reflection.  This is critical in creating standalone
+  projects where they are run independently outside of the Viskit environment
+
+  Upgrade to JGrpah 5.14.0.  Improved threading on the drawing canvas, but need
+  to refine how the control points could make better scheduling edge arcs.
+
+  Upgrade JAXB to 2.2+
+
+  Fix EG node cancel cursor bug
+
+  Fix issue with generating a lot of temp files and jars and not cleaning up
+  after the main app shutsdown
+
+  Improve the whole Viskit app build process; must faster compile time
+
+  Ensure that a Viskit project /lib populated with jars is read upon startup in
+  order to resolve external classpaths selected in the Setting Dialog
+
+  Ensure the lib/ext can be ignored for pure Viskit operation, i.e. no
+  requirement for Diskit, or other advanced DES libs
+
+  Upgrade to JDom v2.0.5
+
+  Upgrade to Xerces v2.11.0
+
+  Upgrade Apache Commons libs to v3.2.1
+
+  Fix NPE on model property editor
+
+  Improve iZpack installer creation

@@ -4,7 +4,7 @@
 
   <skipIfNotSupported />
 
-  <programGroup defaultName="Viskit\Viskit-0.6.2" location="applications"/>
+  <programGroup defaultName="Viskit\Viskit-0.7.0" location="applications"/>
 
   <shortcut
      name="Viskit"
@@ -19,25 +19,25 @@
      iconFile="$INSTALL_PATH\images\ViskitIcon.ico"
      iconIndex="0"
      initialState="noShow">
-   
+
      <createForPack name="Core"/>
-     
+
    </shortcut>
 
    <shortcut
-     name="Viskit-0.6.2 Uninstaller"
+     name="Viskit-0.7.0 Uninstaller"
      programGroup="yes"
      desktop="no"
      applications="no"
      startMenu="no"
      startup="no"
-     target="$INSTALL_PATH\Uninstaller\uninstaller.jar"     
-     commandLine="" 
-     description="This uninstalls Viskit 0.6.2"
+     target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
+     commandLine=""
+     description="This uninstalls Viskit 0.7.0"
      iconFile="%SystemRoot%\system32\SHELL32.dll"
      iconIndex="31">
-     
+
      <createForPack name="Core" />
    </shortcut>
-   
+
 </shortcuts>
