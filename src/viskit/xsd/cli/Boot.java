@@ -38,8 +38,7 @@ public class Boot extends URLClassLoader implements Runnable {
     public URL baseJarURL;
 
     public Boot(URL[] urls) {
-        super(urls,Thread.currentThread().getContextClassLoader());
-        baseJarURL = urls[0];
+        this(urls,Thread.currentThread().getContextClassLoader());
     }
 
     public Boot(URL[] urls, ClassLoader cloader) {
@@ -140,7 +139,7 @@ public class Boot extends URLClassLoader implements Runnable {
                 //if ( !((jarURL.toString()).indexOf("tools") > 0))
                 //first time through would be the internal url which
                 //should be hopefully invalid
-                    super.addURL(jarURL);
+                super.addURL(jarURL);
 
                 while ( ( je = jis.getNextJarEntry() ) != null ) {
                     String name = je.getName();
@@ -201,21 +200,7 @@ public class Boot extends URLClassLoader implements Runnable {
             runner.start();
             runner.join();
 
-        } catch (ClassNotFoundException e) {
-            log.error(e);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-        } catch (InstantiationException e) {
-            log.error(e);
-        } catch (InterruptedException e) {
-            log.error(e);
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-        } catch (SecurityException e) {
-            log.error(e);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | InterruptedException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             log.error(e);
         }
     }

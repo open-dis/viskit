@@ -13,10 +13,10 @@ import java.util.List;
 public class EventArgument extends ViskitElement {
 
     private String stateVarType;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private String type;
     private String name;
-    private List<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<>();
     private String value;
     private boolean operation;
     private String operationOrAssignment;

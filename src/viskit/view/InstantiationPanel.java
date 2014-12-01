@@ -364,8 +364,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (vi == null) {
                 return;
             }
-            // oddly enough this is exactly what VInstantiator.indexOfArgNames(String type, List args)
-            //
             if (viskit.Vstatics.debug) {
                 System.out.println("setting data for " + vi.getType());
             }
@@ -472,7 +470,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 if (noClassAction) {
                     return;
                 }
-                Class c;
+                Class<?> c;
                 //String cName = factClassCB.getText().trim();
                 String cName = factClassCB.getSelectedItem().toString();
                 try {
@@ -499,7 +497,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
                 for (Method method : statMeths) {
                     int mods = method.getModifiers();
-                    Class retCl = method.getReturnType();
+                    Class<?> retCl = method.getReturnType();
                     if (Modifier.isStatic(mods)) {
                         if (retCl == myObjClass) {
                             String ts = method.toString();
@@ -558,7 +556,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
         String typ;
-        Class myObjClass;
+        Class<?> myObjClass;
 
         public void setType(String clName) throws ClassNotFoundException {
             typ = clName;

@@ -128,7 +128,4 @@ public interface AssemblyView {
 
     /** @return an array of open ViskitAssemblyModels */
     AssemblyModel[] getOpenModels();
-
-    /** Capture Assembly Editor user set Frame bounds */
-    void prepareToQuit();
 }

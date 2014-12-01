@@ -20,7 +20,7 @@ public class EvGraphNode extends AssemblyNode {
 
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;

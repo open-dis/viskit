@@ -12,10 +12,10 @@ import java.util.List;
  */
 public class vEdgeParameter extends ViskitElement {
 
-    private String stateVarType;    
-    private List<String> descriptionArray = new ArrayList<String>();
-    private String type;    
-    private String name;    
+    private String stateVarType;
+    private List<String> descriptionArray = new ArrayList<>();
+    private String type;
+    private String name;
     public String bogus; //todo fix
     private String value;
     private boolean operation;

@@ -118,6 +118,7 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
+     * @param hideGroups
      */
     public vAssemblyEgVertexRenderer(boolean hideGroups) {
         this();
@@ -293,7 +294,7 @@ public class vAssemblyEgVertexRenderer
     private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
         String[] nuts = new String[2];
         nuts[1] = s;
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         do {
             nuts = splitOnce(nuts[1], maxW, metrics);
             v.add(nuts[0]);
@@ -364,6 +365,7 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Provided for subclass users to paint a selection border.
+     * @param g
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
@@ -387,6 +389,10 @@ public class vAssemblyEgVertexRenderer
      * The specified point is expected not to intersect the bounds.
      *
      * TODO: Not currently used
+     * @param view
+     * @param source
+     * @param p
+     * @return
      */
     public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
         Rectangle2D bounds = view.getBounds();

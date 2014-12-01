@@ -817,11 +817,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    @Override
-    public void prepareToQuit() {
-        // Nothing
-    }
-
     // Some private classes to implement dnd and dynamic cursor update
     class vCursorHandler extends MouseAdapter {
 

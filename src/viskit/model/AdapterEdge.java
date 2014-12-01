@@ -19,7 +19,7 @@ public class AdapterEdge extends AssemblyEdge {
     private String sourceEvent;
     private String name;
     private String type;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -113,7 +113,7 @@ public class AdapterEdge extends AssemblyEdge {
     public boolean isOperation() {
         return operation;
     }
-    
+
     @Override
     public String getStateVarType() {
         return stateVarType;

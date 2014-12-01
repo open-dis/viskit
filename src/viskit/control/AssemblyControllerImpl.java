@@ -611,8 +611,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public boolean preQuit() {
 
-        ((AssemblyView) getView()).prepareToQuit();
-
         // Check for dirty models before exiting
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vmod : modAr) {
@@ -773,11 +771,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         switch (yn) {
             case JOptionPane.YES_OPTION:
                 save();
+
+                // TODO: Can't remember why this is here after a save?
                 if (((AssemblyModel) getModel()).isDirty()) {
                     return false;
                 } // we cancelled
                 return true;
             case JOptionPane.NO_OPTION:
+
+                // No need to recompile
+                if (((AssemblyModel) getModel()).isDirty()) {
+                    ((AssemblyModel) getModel()).setDirty(false);
+                }
                 return true;
             case JOptionPane.CANCEL_OPTION:
                 return false;

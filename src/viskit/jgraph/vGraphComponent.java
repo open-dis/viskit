@@ -39,7 +39,7 @@ import viskit.model.Edge;
  */
 public class vGraphComponent extends JGraph implements GraphModelListener {
 
-    vGraphModel model;
+    vGraphModel vGModel;
     EventGraphViewFrame parent;
     protected Action removeAction;
 
@@ -50,7 +50,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         vGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         //super.setDoubleBuffered(false); // test for mac
-        this.model = model;
+        this.vGModel = model;
         this.setBendable(true);
         this.setSizeable(false);
         this.setGridVisible(true);
@@ -202,7 +202,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphUI(this));    // we use our own for node/edge inspector editing
+        setUI(new vGraphUI());    // we use our own for node/edge inspector editing
         //setUI(new BasicGraphUI());  // test
         invalidate();
     }
@@ -221,36 +221,36 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         switch (ev.getID()) {
             case ModelEvent.NEWMODEL:
-                model.deleteAll();
+                vGModel.deleteAll();
                 break;
             case ModelEvent.EVENTADDED:
 
-                // Reclaimed from the model to here
+                // Reclaimed from the vGModel to here
                 insert((EventNode) ev.getSource());
                 break;
             case ModelEvent.EDGEADDED:
-                model.addEdge((SchedulingEdge) ev.getSource());
+                vGModel.addEdge((SchedulingEdge) ev.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGEADDED:
-                model.addCancelEdge((CancellingEdge) ev.getSource());
+                vGModel.addCancelEdge((CancellingEdge) ev.getSource());
                 break;
             case ModelEvent.EVENTCHANGED:
-                model.changeEvent((EventNode) ev.getSource());
+                vGModel.changeEvent((EventNode) ev.getSource());
                 break;
             case ModelEvent.EVENTDELETED:
-                model.deleteEventNode((EventNode) ev.getSource());
+                vGModel.deleteEventNode((EventNode) ev.getSource());
                 break;
             case ModelEvent.EDGECHANGED:
-                model.changeEdge((SchedulingEdge) ev.getSource());
+                vGModel.changeEdge((SchedulingEdge) ev.getSource());
                 break;
             case ModelEvent.EDGEDELETED:
-                model.deleteEdge((SchedulingEdge) ev.getSource());
+                vGModel.deleteEdge((SchedulingEdge) ev.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGECHANGED:
-                model.changeCancellingEdge((CancellingEdge) ev.getSource());
+                vGModel.changeCancellingEdge((CancellingEdge) ev.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGEDELETED:
-                model.deleteCancellingEdge((CancellingEdge) ev.getSource());
+                vGModel.deleteCancellingEdge((CancellingEdge) ev.getSource());
                 break;
             default:
                 //System.out.println("duh");
@@ -1097,7 +1097,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
             double ey = topCenterY;
             double ew = circleDiam;
             double eh = circleDiam;
-            arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start , extent
+            arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start, extent
             view.sharedPath = new GeneralPath(arc);
             view.sharedPath = new GeneralPath(view.sharedPath.createTransformedShape(rotater));
         } else {

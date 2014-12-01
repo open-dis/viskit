@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class CancellingEdge extends Edge {
     private String type;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private String name;
     private boolean operation;
     private String operationOrAssignment;
@@ -28,7 +28,7 @@ public class CancellingEdge extends Edge {
 
     CancellingEdge() //package-limited
     {
-        parameters = new ArrayList<ViskitElement>();
+        parameters = new ArrayList<>();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CancellingEdge extends Edge {
         ce.delay = delay;
         return ce;
     }
-    
+
     @Override
     public String getType() {
         return type;

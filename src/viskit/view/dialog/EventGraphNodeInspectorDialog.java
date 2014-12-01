@@ -57,13 +57,13 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             dialog = null;
             return false; // unmodified
         }
-        
+
         //Having trouble getting this beast to redraw with new data, at least on the Mac.
         //The following little bogosity works, plus the invalidate call down below.
         Dimension d = dialog.getSize();
         dialog.setSize(d.width+1, d.height+1);
         dialog.setSize(d);
-        
+
         dialog.setVisible(true);
         // above call blocks
         return modified;
@@ -95,9 +95,9 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         descLab = new JLabel("description", JLabel.TRAILING);
         descLab.setLabelFor(descField);
         verboseCheck = new JCheckBox("verbose output");
-        
+
         Vstatics.cloneSize(handleLab, descLab);    // make handle same size
-        
+
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
@@ -164,7 +164,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         dcont.add(Box.createHorizontalStrut(2));
         dcont.add(verboseCheck);
         //dcont.add(Box.createHorizontalGlue());
-       
+
         content.add(dcont);
         ip = new InstantiationPanel(this, lis, true);
 
@@ -175,16 +175,16 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         ip.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(ip);
         content.add(Box.createVerticalStrut(5));
-        content.add(buttPan);     
+        content.add(buttPan);
     }
-    
+
     private void fillWidgets() throws ClassNotFoundException {
         if (egNode != null) {
-            handleField.setText(egNode.getName()); 
+            handleField.setText(egNode.getName());
             outputCheck.setSelected(egNode.isOutputMarked());
             verboseCheck.setSelected(egNode.isVerboseMarked());
             descField.setText(egNode.getDescriptionString());
-            //ArrayList alis = egNode.getComments(); //? 
+            //ArrayList alis = egNode.getComments(); //?
             ip.setData(egNode.getInstantiator());
           } else {
             handleField.setText("egNode name");
@@ -211,6 +211,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
@@ -219,6 +220,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 unloadWidgets();
@@ -232,10 +234,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             common();
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             common();
         }
@@ -243,7 +247,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         {
             modified = true;
             okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);       
+            getRootPane().setDefaultButton(okButt);
         }
     }
 
@@ -252,7 +256,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
      * @return true = cancel close
      */
     boolean checkBlankFields() {
-        VInstantiator vi = null;
+        VInstantiator vi;
 
         if (egNode != null) {
             vi = egNode.getInstantiator();
@@ -267,17 +271,14 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             if (!vi.isValid()) {
                 break testLp;
             }
-            return false; // no blank fields , don't cancel close
+            return false; // no blank fields, don't cancel close
         }   // testLp
 
         // Here if we found a problem
         int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "All fields must be completed. Close anyway?",
                 "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (ret == JOptionPane.YES_OPTION) {
-            return false;  // don't cancel
-        } else {
-            return true;  // cancel close
-        }
+        return ret != JOptionPane.YES_OPTION; // don't cancel
+        // cancel close
     }
 
     class myCloseListener extends WindowAdapter {

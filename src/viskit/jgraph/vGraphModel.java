@@ -3,7 +3,6 @@ package viskit.jgraph;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
-import javax.swing.SwingUtilities;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.CancellingEdge;
@@ -34,6 +33,8 @@ public class vGraphModel extends DefaultGraphModel {
     private void initViskitStyle() {
 
         viskitEdgeStyle = new AttributeMap();
+
+        // common to 4 types
         GraphConstants.setDisconnectable(viskitEdgeStyle, false);
         GraphConstants.setLineEnd(viskitEdgeStyle, GraphConstants.ARROW_TECHNICAL);
         GraphConstants.setEndFill(viskitEdgeStyle, true);
@@ -47,14 +48,17 @@ public class vGraphModel extends DefaultGraphModel {
         GraphConstants.setForeground(viskitEdgeStyle, Color.black);
         GraphConstants.setRouting(viskitEdgeStyle, new vRouting());
 
+        // dup for cancel
         viskitCancelEdgeStyle = new AttributeMap();
         viskitCancelEdgeStyle.putAll(viskitEdgeStyle);
         GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[]{3, 3});
 
+        // dup for self edge
         viskitSelfRefEdge = new AttributeMap();
         viskitSelfRefEdge.putAll(viskitEdgeStyle);
         viskitSelfRefEdge.remove(GraphConstants.ROUTING);
 
+        // dup for cancel self edge
         viskitSelfRefCancel = new AttributeMap();
         viskitSelfRefCancel.putAll(viskitCancelEdgeStyle);
         viskitSelfRefCancel.remove(GraphConstants.ROUTING);
@@ -111,18 +115,18 @@ public class vGraphModel extends DefaultGraphModel {
 
     public void deleteEdge(SchedulingEdge edge) {
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
-        this.remove(new Object[]{e});
+        remove(new Object[]{e});
     }
 
     public void deleteCancellingEdge(CancellingEdge edge) {
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
-        this.remove(new Object[]{e});
+        remove(new Object[]{e});
     }
 
     public void deleteEventNode(EventNode en) {
         DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
         c.removeAllChildren();
-        this.remove(new Object[]{c});
+        remove(new Object[]{c});
     }
 
     public void addEdge(SchedulingEdge se) {

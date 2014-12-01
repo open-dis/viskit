@@ -15,11 +15,11 @@ import org.apache.log4j.Logger;
  * @author abuss
  */
 public class BrowserLauncher implements HyperlinkListener {
-    
+
     public static final String WINDOWS = "Windows";
     public static final String MAC = "Mac OS X";
     static Logger log = LogUtils.getLogger(BrowserLauncher.class);
-    
+
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == ACTIVATED) {
@@ -28,7 +28,7 @@ public class BrowserLauncher implements HyperlinkListener {
                 String osName = System.getProperty("os.name");
                 if (osName.startsWith(WINDOWS)) {
                     Runtime.getRuntime().exec(
-                            "rundll32 url.dll,FileProtocolHandler " + 
+                            "rundll32 url.dll,FileProtocolHandler " +
                             url);
                 } else if (osName.equals(MAC)) {
                     Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(
@@ -36,29 +36,10 @@ public class BrowserLauncher implements HyperlinkListener {
                     Method method = clazz.getMethod("openURL", String.class);
                     method.invoke(null, url.toString());
                 }
-            } 
-            catch (IOException ex ){
-                log.info(ex);
-                throw new RuntimeException(ex);
             }
-            catch (ClassNotFoundException ex) {
+            catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
                 log.error(ex);
-                throw new RuntimeException(ex);
             }
-            catch (NoSuchMethodException ex) {
-                log.error(ex);
-                throw new RuntimeException(ex);
-            }
-            catch (IllegalAccessException ex) {
-                log.error(ex);
-                throw new RuntimeException(ex);
-            }
-            catch (InvocationTargetException ex) {
-                log.error(ex.getTargetException());
-                throw new RuntimeException(ex.getTargetException());
-            }
-
         }
     }
-
 }

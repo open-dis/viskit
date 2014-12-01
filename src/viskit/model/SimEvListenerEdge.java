@@ -16,7 +16,7 @@ import java.util.List;
 public class SimEvListenerEdge extends AssemblyEdge {
     private String name;
     private String type;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -99,7 +99,7 @@ public class SimEvListenerEdge extends AssemblyEdge {
     public String getStateVarType() {
         return stateVarType;
     }
-    
+
     /*
     Object copyShallow()
     {

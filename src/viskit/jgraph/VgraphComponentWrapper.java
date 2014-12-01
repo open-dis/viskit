@@ -34,8 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.jgraph;
 
 import javax.swing.JSplitPane;
-import viskit.jgraph.vGraphComponent;
-import viskit.jgraph.vGraphModel;
 import viskit.model.Model;
 import viskit.view.CodeBlockPanel;
 import viskit.view.EventGraphViewFrame;

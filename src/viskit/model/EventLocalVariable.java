@@ -19,7 +19,7 @@ public class EventLocalVariable extends ViskitElement {
     private String comment = "";
     private String arrayType;
     private String[] arraySize;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private String indexingExpression;
     private String stateVarName;
     private boolean operation;
@@ -110,7 +110,7 @@ public class EventLocalVariable extends ViskitElement {
     public boolean isOperation() {
         return operation;
     }
-    
+
     @Override
     public String getStateVarType() {
         return stateVarType;

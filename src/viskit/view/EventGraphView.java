@@ -60,8 +60,6 @@ public interface EventGraphView
   void    showAndSaveSource(String className, String s, String filename);
   void    displayXML(File f);
 
-  void    prepareToQuit();
-
   // The following 2 may be implemented by the view in someother way that an official GUI Dialog
   String addParameterDialog();          // returns param name
   String addStateVariableDialog();      // returns statevar name

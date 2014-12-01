@@ -815,8 +815,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
-        for (Object o : vicon.getArgs()) {
-            VInstantiator vi = (VInstantiator) o;
+        for (Object vi : vicon.getArgs()) {
             mp.getParameters().add(buildParam(vi));
         }
         return mp;
@@ -838,7 +837,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(viarr.getType());
-
         for (Object vi : viarr.getInstantiators()) {
             mp.getParameters().add(buildParam(vi));
         }
@@ -904,7 +902,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose>verboseList) {
+    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose> verboseList) {
         for (SimEntity se : simEntities) {
             boolean isOutput = false;
             boolean isVerbose = false;
@@ -1008,8 +1006,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     /**
      * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s
-     * @return
+     * @param s the string to check for non-zero length
+     * @return the passed string if non-zero length, else null
      */
     private String nIe(String s) {
         if (s != null) {

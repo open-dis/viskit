@@ -35,7 +35,7 @@ import viskit.model.*;
  */
 public class vGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
-    vGraphAssemblyModel model;
+    vGraphAssemblyModel vGAModel;
     AssemblyViewFrame parent;
     protected Action removeAction;
 
@@ -46,7 +46,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         vGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         //super.setDoubleBuffered(false); // test for mac
-        this.model = model;
+        this.vGAModel = model;
         this.setBendable(true);
         this.setSizeable(false);
         this.setGridVisible(true);
@@ -206,7 +206,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphAssemblyUI(this));    // we use our own for node/edge inspector editting
+        setUI(new vGraphAssemblyUI());    // we use our own for node/edge inspector editting
         //setUI(new BasicGraphUI());   // test
         invalidate();
     }
@@ -218,60 +218,60 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         switch (ev.getID()) {
             case ModelEvent.NEWASSEMBLYMODEL:
-                model.deleteAll();
+                vGAModel.deleteAll();
                 break;
             case ModelEvent.EVENTGRAPHADDED:
 
-                // Reclaimed from the model to here
+                // Reclaimed from the vGAModel to here
                 insert((EvGraphNode) ev.getSource());
                 break;
             case ModelEvent.EVENTGRAPHDELETED:
-                model.deleteEGNode((EvGraphNode) ev.getSource());
+                vGAModel.deleteEGNode((EvGraphNode) ev.getSource());
                 break;
             case ModelEvent.EVENTGRAPHCHANGED:
-                model.changeEGNode((EvGraphNode) ev.getSource());
+                vGAModel.changeEGNode((EvGraphNode) ev.getSource());
                 break;
 
             case ModelEvent.PCLADDED:
 
-                // Reclaimed from the model to here
+                // Reclaimed from the vGAModel to here
                 insert((PropChangeListenerNode) ev.getSource());
                 break;
             case ModelEvent.PCLDELETED:
-                model.deletePCLNode((PropChangeListenerNode) ev.getSource());
+                vGAModel.deletePCLNode((PropChangeListenerNode) ev.getSource());
                 break;
             case ModelEvent.PCLCHANGED:
-                model.changePCLNode((PropChangeListenerNode) ev.getSource());
+                vGAModel.changePCLNode((PropChangeListenerNode) ev.getSource());
                 break;
 
             case ModelEvent.ADAPTEREDGEADDED:
-                model.addAdapterEdge((AdapterEdge) ev.getSource());
+                vGAModel.addAdapterEdge((AdapterEdge) ev.getSource());
                 break;
             case ModelEvent.ADAPTEREDGEDELETED:
-                model.deleteAdapterEdge((AdapterEdge) ev.getSource());
+                vGAModel.deleteAdapterEdge((AdapterEdge) ev.getSource());
                 break;
             case ModelEvent.ADAPTEREDGECHANGED:
-                model.changeAdapterEdge((AdapterEdge) ev.getSource());
+                vGAModel.changeAdapterEdge((AdapterEdge) ev.getSource());
                 break;
 
             case ModelEvent.SIMEVLISTEDGEADDED:
-                model.addSimEvListEdge((SimEvListenerEdge) ev.getSource());
+                vGAModel.addSimEvListEdge((SimEvListenerEdge) ev.getSource());
                 break;
             case ModelEvent.SIMEVLISTEDGEDELETED:
-                model.deleteSimEvListEdge((SimEvListenerEdge) ev.getSource());
+                vGAModel.deleteSimEvListEdge((SimEvListenerEdge) ev.getSource());
                 break;
             case ModelEvent.SIMEVLISTEDGECHANGED:
-                model.changeSimEvListEdge((SimEvListenerEdge) ev.getSource());
+                vGAModel.changeSimEvListEdge((SimEvListenerEdge) ev.getSource());
                 break;
 
             case ModelEvent.PCLEDGEADDED:
-                model.addPclEdge((PropChangeEdge) ev.getSource());
+                vGAModel.addPclEdge((PropChangeEdge) ev.getSource());
                 break;
             case ModelEvent.PCLEDGEDELETED:
-                model.deletePclEdge((PropChangeEdge) ev.getSource());
+                vGAModel.deletePclEdge((PropChangeEdge) ev.getSource());
                 break;
             case ModelEvent.PCLEDGECHANGED:
-                model.changePclEdge((PropChangeEdge) ev.getSource());
+                vGAModel.changePclEdge((PropChangeEdge) ev.getSource());
                 break;
 
             default:
@@ -285,7 +285,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
-        if (currentModelEvent != null && currentModelEvent.getSource() != this.model) // bail if this came from outside
+        if (currentModelEvent != null && currentModelEvent.getSource() != this.vGAModel) // bail if this came from outside
         {
             return;
         }  // this came in from outside, we don't have to inform anybody..prevent reentry

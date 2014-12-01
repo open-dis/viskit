@@ -18,7 +18,7 @@ public class PropChangeEdge extends AssemblyEdge {
     protected String property;
     private String name;
     private String type;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;

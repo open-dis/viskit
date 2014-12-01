@@ -9,12 +9,12 @@ import java.util.List;
  * @since Apr 1, 2004
  * @since 3:57:26 PM
  * @version $Id$
- * 
+ *
  * To change this template use File | Settings | File Templates.
  */
 public class ConstructorArgument extends ViskitElement {
     private String stateVarType;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private String name;
     private boolean operation;
     private String operationOrAssignment;
@@ -23,7 +23,7 @@ public class ConstructorArgument extends ViskitElement {
     private String stateVarName;
     private String type;
     private String value;
-    private List<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<>();
     private String comment;
 
     public List getComments() {

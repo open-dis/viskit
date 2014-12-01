@@ -17,8 +17,8 @@ import viskit.Vstatics;
  * An event as seen by the model (not the view)
  */
 public class PropChangeListenerNode extends AssemblyNode {
-    
-    private List<String> descriptionArray = new ArrayList<String>();
+
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String arrayType;
@@ -28,7 +28,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     private String comment;
     private String stateVarType;
     private boolean getMean = false;
-    private boolean getCount = false; 
+    private boolean getCount = false;
 
     PropChangeListenerNode(String name, String type) // package access on constructor
     {
@@ -59,9 +59,9 @@ public class PropChangeListenerNode extends AssemblyNode {
     public void setIsSampleStats(boolean b) {
         isSampleStatistics = b;
     }
-    
+
     private boolean clearStatsAfterEachRun = true; // bug 706
-    
+
     public boolean isClearStatsAfterEachRun() {
         return clearStatsAfterEachRun;
     }
@@ -69,7 +69,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     public void setClearStatsAfterEachRun(boolean b) {
         clearStatsAfterEachRun = b;
     }
-    
+
     public boolean isGetMean() {
         return getMean;
     }
@@ -77,7 +77,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     public void setGetMean(boolean b) {
         getMean = b;
     }
-    
+
     public boolean isGetCount() {
         return getCount;
     }

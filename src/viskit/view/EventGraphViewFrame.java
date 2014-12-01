@@ -1,14 +1,7 @@
 package viskit.view;
 
-import viskit.view.dialog.ParameterDialog;
-import viskit.view.dialog.EdgeInspectorDialog;
-import viskit.view.dialog.RecentFilesDialog;
-import viskit.view.dialog.StateVariableDialog;
-import viskit.view.dialog.EventInspectorDialog;
-import viskit.jgraph.VgraphComponentWrapper;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import viskit.util.EventGraphFileFilter;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
@@ -34,6 +27,7 @@ import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
+import viskit.jgraph.VgraphComponentWrapper;
 import viskit.jgraph.vGraphModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -41,6 +35,12 @@ import viskit.mvc.mvcController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
+import viskit.util.EventGraphFileFilter;
+import viskit.view.dialog.ParameterDialog;
+import viskit.view.dialog.EdgeInspectorDialog;
+import viskit.view.dialog.RecentFilesDialog;
+import viskit.view.dialog.StateVariableDialog;
+import viskit.view.dialog.EventInspectorDialog;
 
 /**
  * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
@@ -478,11 +478,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // tell the help screen where we are so he can center himself
         help.mainFrameLocated(this.getBounds());
-    }
-
-    @Override
-    public void prepareToQuit() {
-        // Nothing
     }
 
     /**

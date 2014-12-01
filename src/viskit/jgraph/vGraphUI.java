@@ -1,11 +1,7 @@
 package viskit.jgraph;
 
 import java.awt.event.MouseEvent;
-import java.util.Hashtable;
-import java.util.Map;
-import javax.swing.JDialog;
-import org.jgraph.graph.GraphCellEditor;
-import org.jgraph.graph.GraphConstants;
+import javax.swing.SwingUtilities;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.VGlobals;
 import viskit.control.EventGraphController;
@@ -25,94 +21,56 @@ import viskit.model.SchedulingEdge;
  * @version $Id$
  *
  * BasicGraphUI must be overridden to allow in node and edge editing.
- * This code is a copy of the appropriate part of EditorGraph.java, which is
+ * This code is a copy of the appropriate parts of EditorGraph.java, which is
  * part of JGraph examples.
  */
 public class vGraphUI extends BasicGraphUI {
 
-    private JDialog editDialog;
-    private vGraphComponent parent;
-
-    // This will force snap-to-grid, but it won't make the lines straight: that's
-    // due to the bezier line drawing code.
-    // protected boolean snapSelectedView = true;
-    public vGraphUI(vGraphComponent parent) {
-        this.parent = parent;
+    public vGraphUI() {
+        super();
     }
 
     @Override
     protected boolean startEditing(Object cell, MouseEvent event) {
+
+        // We're not concerned with the MouseEvent here
+
         completeEditing();
-        if (graph.isCellEditable(cell) && editDialog == null) {
-            createEditDialog(cell, event);
+
+        // We'll use our own editors here
+        if (graph.isCellEditable(cell)) {
+            createEditDialog(cell);
         }
 
-        return false;
+        return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
-    protected void createEditDialog(Object c, MouseEvent event) {
-        Object cell = c;
-
-        EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();     // todo fix this
-        if (cell instanceof vEdgeCell) {
-            Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
-            if (e instanceof SchedulingEdge) {
-                cntl.arcEdit((SchedulingEdge) e);
-            } else //if(e instanceof CancellingEdge)
-            {
-                cntl.canArcEdit((CancellingEdge) e);
-            }
-        } else if (cell instanceof CircleCell) {
-            EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
-            cntl.nodeEdit(en);
-        }
-    }
-
-    /**
-     * Stops the editing session. If messageStop is true the editor
-     * is messaged with stopEditing, if messageCancel is true the
-     * editor is messaged with cancelEditing. If messageGraph is true
-     * the graphModel is messaged with valueForCellChanged.
-     * @param messageStop
-     * @param messageCancel
-     * @param messageGraph
+    /** Our own implemented dialog editor scheme
+     *
+     * @param c the cell to edit
      */
-    @Override
-    protected void completeEditing(boolean messageStop,
-            boolean messageCancel,
-            boolean messageGraph) {
+    private void createEditDialog(Object c) {
+        final Object cell = c;
 
-        if (stopEditingInCompleteEditing && editingComponent != null && editDialog != null) {
-            Object oldCell = editingCell;
-            GraphCellEditor oldEditor = cellEditor;
-            Object newValue = oldEditor.getCellEditorValue();
-            boolean requestFocus =
-                    (graph != null && (graph.hasFocus() || editingComponent.hasFocus()));
-            editingCell = null;
-            editingComponent = null;
-            if (messageStop) {
-                oldEditor.stopCellEditing();
-            } else if (messageCancel) {
-                oldEditor.cancelCellEditing();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+
+                EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();     // todo fix this
+                if (cell instanceof vEdgeCell) {
+                    Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
+                    if (e instanceof SchedulingEdge) {
+                        cntl.arcEdit((SchedulingEdge) e);
+                    } else //if(e instanceof CancellingEdge)
+                    {
+                        cntl.canArcEdit((CancellingEdge) e);
+                    }
+                } else if (cell instanceof CircleCell) {
+                    EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
+                    cntl.nodeEdit(en);
+                }
             }
-            editDialog.dispose();
-            if (requestFocus) {
-                graph.requestFocus();
-            }
-            if (messageGraph) {
-                Map map = graphLayoutCache.createNestedMap();
-                GraphConstants.setValue(map, newValue);
-                Map<Object, Map> nested = new Hashtable<>();
-                nested.put(oldCell, map);
-                graphLayoutCache.edit(nested, null, null, null);
-            }
-            updateSize();
-            // Remove Editor Listener
-            if (cellEditorListener != null) {
-                oldEditor.removeCellEditorListener(cellEditorListener);
-            }
-            cellEditor = null;
-            editDialog = null;
-        }
+        });
     }
 }

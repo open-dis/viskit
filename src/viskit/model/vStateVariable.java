@@ -15,20 +15,20 @@ public class vStateVariable extends ViskitElement {
 
     /** Name of the state variable */
     private String variableName;
-    
+
     /** The variable type. This can be a primitive or a class name. */
     private String variableType;
-    
+
     /** The above field holds the size within the brackets **/
     private String arrayVariableType;
-    
+
     /** array size, for (multi-dim) array */
     private String[] arraySize;
-    
+
     /** Object that represents its current value */
     private Object currentValue;
     private String comment = "";
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -44,7 +44,7 @@ public class vStateVariable extends ViskitElement {
     /**
      * Constructor
      * @param pVariableName
-     * @param pVariableType 
+     * @param pVariableType
      */
     vStateVariable(String pVariableName, String pVariableType) {
         variableName = pVariableName;
@@ -122,7 +122,7 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Sets the current value of the state variable
-     * @param pCurrentValue 
+     * @param pCurrentValue
      */
     public void setCurrentValue(Object pCurrentValue) {
         currentValue = pCurrentValue;
@@ -171,7 +171,7 @@ public class vStateVariable extends ViskitElement {
     public boolean isOperation() {
         return operation;
     }
-    
+
     @Override
     public String getStateVarType() {
         return stateVarType;

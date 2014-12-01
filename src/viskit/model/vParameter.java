@@ -20,7 +20,7 @@ public class vParameter extends ViskitElement {
     private String comment = "";
     private String arrayType;
     private String[] arraySize;
-    private List<String> descriptionArray = new ArrayList<String>();
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -53,7 +53,7 @@ public class vParameter extends ViskitElement {
     public String getType() {
         return type;
     }
-    
+
     @Override
     public String getValue() {
         return value;
@@ -117,7 +117,7 @@ public class vParameter extends ViskitElement {
     public boolean isOperation() {
         return operation;
     }
-    
+
     @Override
     public String getStateVarType() {
         return stateVarType;

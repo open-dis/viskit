@@ -26,9 +26,40 @@ public class Launcher extends Thread implements Runnable {
     private boolean inGridlet = false;
 
     /**
-     *  args -A ssemblyFile [-E ventGraphFile]
+     * @param args -A ssemblyFile [-E ventGraphFile]
      */
-    public Launcher() {
+    public Launcher(String[] args) {
+        int a = 0;
+        // I'm in command line mode TBD
+        try {
+            URL u;
+            while (a < args.length - 1) {
+                switch (args[a]) {
+                    case "-A":
+                        u = new URL(args[a + 1]);
+                        setAssembly(u);
+                        a += 2;
+                        break;
+                    case "-E":
+                        u = new URL(args[a + 1]);
+                        addEventGraph(u);
+                        a += 2;
+                        break;
+                    default:
+                        throw new IllegalArgumentException(args[a] + " not a valid arg, exiting");
+                }
+            }
+
+            if (assemblyName == null) {
+                throw new IllegalArgumentException("Must supply fully qualified class name to run");
+            }
+            if (assembly == null) {
+                throw new IllegalArgumentException("Must supply at least one assembly URL");
+            }
+
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
     public void setup() {
@@ -135,40 +166,6 @@ public class Launcher extends Thread implements Runnable {
         }
     }
 
-    public Launcher(String[] args) {
-        int a = 0;
-        // I'm in command line mode TBD
-        try {
-            URL u;
-            while (a < args.length - 1) {
-                switch (args[a]) {
-                    case "-A":
-                        u = new URL(args[a + 1]);
-                        setAssembly(u);
-                        a += 2;
-                        break;
-                    case "-E":
-                        u = new URL(args[a + 1]);
-                        addEventGraph(u);
-                        a += 2;
-                        break;
-                    default:
-                        throw new IllegalArgumentException(args[a] + " not a valid arg, exiting");
-                }
-            }
-
-            if (assemblyName == null) {
-                throw new IllegalArgumentException("Must supply fully qualified class name to run");
-            }
-            if (assembly == null) {
-                throw new IllegalArgumentException("Must supply at least one assembly URL");
-            }
-
-        } catch (Exception e) {
-            log.error(e);
-        }
-    }
-
     /**
      * read in XML to String
      * @param assemblyURL
@@ -259,17 +256,7 @@ public class Launcher extends Thread implements Runnable {
             log.debug(xml.toString());
 
         // silent this may not be an event-graph xml
-        } catch (ClassNotFoundException e) {
-            log.error(e);
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-        } catch (SecurityException e) {
-            log.error(e);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             log.error(e);
         }
 
@@ -394,17 +381,7 @@ public class Launcher extends Thread implements Runnable {
                     //under BehaviorLibraries which could also
                     //include assemblies. must be caught though
                     //and ingored
-                } catch (NoSuchMethodException ex) {
-                    log.error(ex);
-                } catch (SecurityException ex) {
-                    log.error(ex);
-                } catch (InstantiationException ex) {
-                    log.error(ex);
-                } catch (IllegalAccessException ex) {
-                    log.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    log.error(ex);
-                } catch (InvocationTargetException ex) {
+                } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     log.error(ex);
                 }
             }
@@ -445,20 +422,8 @@ public class Launcher extends Thread implements Runnable {
             System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator + jarFromDir.getCanonicalPath());
             log.debug(System.getProperty("java.class.path"));
 
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-        } catch (SecurityException e) {
-            log.error(e);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-        } catch (InvocationTargetException e) {
-            log.error(e);
-        } catch (IOException e) {
-            log.error(e);
-        } catch (InstantiationException e) {
-            log.error(e);
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            log.error(ex);
         }
     }
 
@@ -561,20 +526,8 @@ public class Launcher extends Thread implements Runnable {
         //out = m.invoke(bsh, new Object[]{ "t" });
         //((Thread)out).start();
 
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-        } catch (SecurityException e) {
-            log.error(e);
-        } catch (InstantiationException e) {
-             log.error(e);
-        } catch (IllegalAccessException e) {
-             log.error(e);
-        } catch (IllegalArgumentException e) {
-             log.error(e);
-        } catch (InvocationTargetException e) {
-             log.error(e);
-        } catch (InterruptedException e) {
-             log.error(e);
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            log.error(ex);
         }
 
     /*
@@ -652,22 +605,7 @@ public class Launcher extends Thread implements Runnable {
             Class<?> viskitz = cloader.loadClass("viskit.Splash2");
             Method m = viskitz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"viskit.EventGraphAssemblyComboMain"}});
-        } catch (ClassNotFoundException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (SecurityException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             log.error(e);
             System.exit(1);
         }
@@ -695,22 +633,7 @@ public class Launcher extends Thread implements Runnable {
             Class<?> gridletz = cloader.loadClass("viskit.gridlet.Gridlet");
             Method m = gridletz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{}});
-        } catch (ClassNotFoundException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (SecurityException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             log.error(e);
             System.exit(1);
         }
@@ -721,22 +644,7 @@ public class Launcher extends Thread implements Runnable {
             Class<?> serverz = cloader.loadClass("viskit.gridlet.AssemblyServer");
             Method m = serverz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"-p", "" + port}});
-        } catch (ClassNotFoundException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (NoSuchMethodException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (SecurityException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalAccessException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (IllegalArgumentException e) {
-            log.error(e);
-            System.exit(1);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             log.error(e);
             System.exit(1);
         }

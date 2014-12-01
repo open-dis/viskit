@@ -11,8 +11,8 @@ import java.util.List;
  * @version $Id$
  */
 public class EventStateTransition extends ViskitElement {
-    
-    private List<String> descriptionArray = new ArrayList<String>();
+
+    private List<String> descriptionArray = new ArrayList<>();
     private String type;
     private String name;
     private String arrayType;
@@ -20,7 +20,7 @@ public class EventStateTransition extends ViskitElement {
     private String stateVarType = "";
     private String operationOrAssignment = "";
     private boolean isOperation = false;
-    private List<String> comments = new ArrayList<String>();
+    private List<String> comments = new ArrayList<>();
     private String indexingExpression = "";
     private String value;
     private String comment;

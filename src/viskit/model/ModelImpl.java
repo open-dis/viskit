@@ -509,8 +509,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Cancelling edge added"));
     }
 
-    private ArrayList<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
-        ArrayList<ViskitElement> alis = new ArrayList<>(3);
+    private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
+        List<ViskitElement> alis = new ArrayList<>(3);
         for (EdgeParameter ep : lis) {
             vEdgeParameter vep = new vEdgeParameter(ep.getValue());
             alis.add(vep);

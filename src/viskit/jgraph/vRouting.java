@@ -61,7 +61,7 @@ import viskit.model.ViskitElement;
  */
 public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
-    Map<String, Vector<Object>> nodePairs = new HashMap<String, Vector<Object>>();
+    Map<String, Vector<Object>> nodePairs = new HashMap<>();
 
     @Override
     @SuppressWarnings("unchecked") // JGraph not genericized
@@ -189,7 +189,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         Vector<Object> lis = nodePairs.get(masterKey);
         if (lis == null) {
             // never had an edge between these 2 before
-            Vector<Object> v = new Vector<Object>();
+            Vector<Object> v = new Vector<>();
             v.add(edgeKey);
             //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
             nodePairs.put(masterKey, v);

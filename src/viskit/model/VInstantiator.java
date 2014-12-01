@@ -29,7 +29,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @version $Id$
  */
 public abstract class VInstantiator {
-    
+
     static Logger log = LogUtils.getLogger(VInstantiator.class);
     private String type;
     private String name = "";
@@ -64,16 +64,14 @@ public abstract class VInstantiator {
     abstract public boolean isValid();
 
     public static List<Object> buildDummyInstantiators(Constructor con) {
-        Vector<Object> v = new Vector<Object>();
+        Vector<Object> v = new Vector<>();
         Class<?>[] cs = con.getParameterTypes();
-        for (int i = 0; i < cs.length; i++) {
-            if (cs[i].isArray()) {
-                VInstantiator.Array va = new VInstantiator.Array(Vstatics.convertClassName(cs[i].getName()),
-                        new Vector<Object>());
+        for (Class<?> c : cs) {
+            if (c.isArray()) {
+                VInstantiator.Array va = new VInstantiator.Array(Vstatics.convertClassName(c.getName()), new Vector<>());
                 v.add(va);
             } else {
-                VInstantiator.FreeF vff = new VInstantiator.FreeF(Vstatics.convertClassName(cs[i].getName()),
-                        "");
+                VInstantiator.FreeF vff = new VInstantiator.FreeF(Vstatics.convertClassName(c.getName()), "");
                 v.add(vff);
             }
         }
@@ -194,15 +192,15 @@ public abstract class VInstantiator {
                 if (params.size() != eparams[indx].size()) {
                     args = buildInstantiators(eparams[indx]);
                     if (viskit.Vstatics.debug) {
-                        System.err.println("Warning: VInstantiator.Constr tried 0 length when it was more");
+                        log.info("Warning: VInstantiator.Constr tried 0 length when it was more");
                     }
                 }
                 if (eparams[indx] != null) {
                     // now that the values, types, etc set, grab names from eg parameters
                     if (viskit.Vstatics.debug) {
                         log.info("args came back from buildInstantiators as: ");
-                        for (int i = 0; i < args.size(); i++) {
-                            log.info(args.get(i));
+                        for (Object arg : args) {
+                            log.info(arg);
                         }
                     }
                     if (args != null) {
@@ -240,12 +238,12 @@ public abstract class VInstantiator {
         }
 
         /**
-         * @param assemblyParameters 
+         * @param assemblyParameters
          * @return a List of VInstantiators given a List of Assembly Parameters
          */
         final List<Object> buildInstantiators(List<Object> assemblyParameters) {
 
-            ArrayList<Object> instr = new ArrayList<Object>();
+            List<Object> instr = new ArrayList<>();
             for (Object o : assemblyParameters) {
                 if (o instanceof TerminalParameter) {
                     instr.add(buildTerminalParameter((TerminalParameter) o));
@@ -256,7 +254,7 @@ public abstract class VInstantiator {
                 } else if (o instanceof Parameter) { // from InstantiationPanel Const getter
                     if (viskit.Vstatics.debug) {
                         log.info("Conversion from " + ((Parameter) o).getType());
-                    } // 
+                    } //
 
                     String type = ((Parameter) o).getType();
                     String name = ((Parameter) o).getName();
@@ -370,16 +368,16 @@ public abstract class VInstantiator {
                 if (viskit.Vstatics.debug) {
                     System.out.print("Type match " + aType + " to " + eType);
                 }
-                
+
                 // check if vType was assignable from pType.
 
                 Class<?> eClazz = Vstatics.classForName(eType);
                 Class<?> aClazz = Vstatics.classForName(aType);
                 Class<?>[] vInterfz = aClazz.getInterfaces();
                 boolean interfz = false;
-                for (int k = 0; k < vInterfz.length; k++) {
+                for (Class<?> vInterfz1 : vInterfz) {
                     //interfz |= vInterfz[k].isAssignableFrom(eClazz);
-                    interfz |= eClazz.isAssignableFrom(vInterfz[k]);
+                    interfz |= eClazz.isAssignableFrom(vInterfz1);
                 }
                 boolean match = (eClazz.isAssignableFrom(aClazz) | interfz);
                 if (!match) {
@@ -411,13 +409,13 @@ public abstract class VInstantiator {
 
         /** Find a constructor match in the ClassLoader of the given EG's parameters
          * @param type the EventGraph to parameter check
-         * @param args 
-         * @return the index into the found matching constructor 
+         * @param args
+         * @return the index into the found matching constructor
          */
         public int indexOfArgNames(String type, List<Object> args) {
             List<Object>[] parameters = Vstatics.resolveParameters(type);
             int indx = -1;
-            
+
             if (parameters == null) {
                 return indx;
             }
@@ -440,11 +438,11 @@ public abstract class VInstantiator {
                         }
                         String pType = Vstatics.convertClassName(((Parameter) (parameter.get(j))).getType());
                         String vType = ((VInstantiator) args.get(j)).getType();
-                        
+
                         // check if vType was assignable from pType.
 
                         Class<?> pClazz = Vstatics.classForName(pType);
-                        
+
                         if (pClazz == null) {
                             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                                     "Please check Event Graph <b>" + type + "</b> parameter(s) for compliance using" +
@@ -509,7 +507,7 @@ public abstract class VInstantiator {
 
                 //Introspector.flushCaches();
                 BeanInfo bi = Introspector.getBeanInfo(cls, cls.getSuperclass());
-                ArrayList<PropertyDescriptor> parms = new ArrayList<PropertyDescriptor>();
+                List<PropertyDescriptor> parms = new ArrayList<>();
                 PropertyDescriptor[] pd = bi.getPropertyDescriptors();
                 for (PropertyDescriptor descriptor : pd) {
                     if (descriptor.getReadMethod() != null &&
@@ -525,25 +523,25 @@ public abstract class VInstantiator {
             }
         }
 
-        private boolean unambiguousMatch(Class[] args, ArrayList<PropertyDescriptor> propDesc) {
+        private boolean unambiguousMatch(Class[] args, List<PropertyDescriptor> propDesc) {
             // if can find unambiguous match by type, put propDesc into proper order
             if (args.length <= 0 || propDesc.size() <= 0) {
                 return false;
             }
-            Vector<Integer> holder = new Vector<Integer>();
+            Vector<Integer> holder = new Vector<>();
             for (int i = 0; i < args.length; i++) {
                 holder.clear();
                 Class<?> c = args[i];
                 for (int j = 0; j < propDesc.size(); j++) {
                     PropertyDescriptor pd = propDesc.get(j);
                     if (typeMatch(c, pd)) {
-                        holder.add(new Integer(j));
+                        holder.add(j);
                     }
                 }
                 if (holder.size() != 1) {
                     return false;
                 }
-                int jj = holder.get(0).intValue();
+                int jj = holder.get(0);
                 // put pd at j into i
                 PropertyDescriptor i_ob = propDesc.get(i);
                 propDesc.set(i, propDesc.get(jj));
@@ -557,7 +555,7 @@ public abstract class VInstantiator {
             return pd.getPropertyType().equals(c);
         }
 
-        private void setNames(List<Object> instanc, ArrayList<PropertyDescriptor> propDesc) {
+        private void setNames(List<Object> instanc, List<PropertyDescriptor> propDesc) {
             for (int i = 0; i < instanc.size(); i++) {
                 VInstantiator vi = (VInstantiator) instanc.get(i);
                 vi.setName(propDesc.get(i).getName());
@@ -572,7 +570,7 @@ public abstract class VInstantiator {
                     return VInstantiator.buildDummyInstantiators(construct[0]);
                 }
             }
-            return new Vector<Object>(); // null
+            return new Vector<>(); // null
         }
 
         public List<Object> getArgs() {
@@ -592,7 +590,7 @@ public abstract class VInstantiator {
 
         @Override
         public VInstantiator vcopy() {
-            Vector<Object> lis = new Vector<Object>();
+            Vector<Object> lis = new Vector<>();
             for (Object o : getArgs()) {
                 VInstantiator vi = (VInstantiator) o;
                 lis.add(vi.vcopy());
@@ -638,11 +636,11 @@ public abstract class VInstantiator {
 
         @Override
         public VInstantiator vcopy() {
-            Vector<Object> lis = new Vector<Object>();
+            Vector<Object> lis = new Vector<>();
             for (Object vi : getInstantiators()) {
                 lis.add(((VInstantiator) vi).vcopy());
             }
-            VInstantiator rv = new VInstantiator.Array(getType(), getInstantiators());
+            VInstantiator rv = new VInstantiator.Array(getType(), lis);
             rv.setName(getName());
             rv.setDescription(getDescription());
             return rv;
@@ -728,7 +726,7 @@ public abstract class VInstantiator {
 
         @Override
         public VInstantiator vcopy() {
-            Vector<Object> lis = new Vector<Object>();
+            Vector<Object> lis = new Vector<>();
             for (Object o : getParams()) {
                 VInstantiator vi = (VInstantiator) o;
                 lis.add(vi.vcopy());

@@ -21,12 +21,12 @@ import viskit.xsd.bindings.eventgraph.Event;
 public class EventNode extends ViskitElement {
 
     private String name;
-    private Vector<ViskitElement> connections = new Vector<ViskitElement>();
-    private Vector<ViskitElement> localVariables = new Vector<ViskitElement>();
-    private List<String> comments = new ArrayList<String>();
-    private List<ViskitElement> transitions = new ArrayList<ViskitElement>();
-    private List<ViskitElement> arguments = new ArrayList<ViskitElement>();
-    private List<String> descriptionArray = new ArrayList<String>();
+    private Vector<ViskitElement> connections = new Vector<>();
+    private Vector<ViskitElement> localVariables = new Vector<>();
+    private List<String> comments = new ArrayList<>();
+    private List<ViskitElement> transitions = new ArrayList<>();
+    private List<ViskitElement> arguments = new ArrayList<>();
+    private List<String> descriptionArray = new ArrayList<>();
     private Point2D position = new Point2D.Double(0.d, 0.d);
     private String codeblock = "";
     private String type;

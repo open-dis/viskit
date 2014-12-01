@@ -19,7 +19,7 @@ import viskit.view.InstantiationPanel;
  * Time: 3:27:42 PM
  */
 
-public class ObjectInspector  extends JDialog implements ActionListener
+public class ObjectInspector extends JDialog implements ActionListener
 {
   public boolean modified = false;
   private JComponent locationComp;
