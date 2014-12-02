@@ -20,30 +20,30 @@
     <stayAlive>true</stayAlive>
     <icon>images/ViskitIcon.ico</icon>
     <jre>
-      <minVersion>1.6.0</minVersion>
-      <maxVersion>1.6.0_99</maxVersion>
+      <minVersion>1.7.0</minVersion>
+      <maxVersion>1.8.0_99</maxVersion>
       <jdkPreference>jdkOnly</jdkPreference>
       <!-- Heap sizes in MB, 0-use default -->
       <initialHeapSize>512</initialHeapSize>
       <maxHeapSize>1024</maxHeapSize>
       <args>-client</args>
     </jre>
-    
+
     <!--splash>
       <file>images/ViskitSplash2.bmp</file>
-      
+
       <waitForWindow>true</waitForWindow>
-      
+
       <timeout>600</timeout>
       <timeoutErr>false</timeoutErr>
     </splash-->
     <!--versionInfo>
-      <fileVersion>0.4.7</fileVersion>
-      <txtFileVersion>0.4.7</txtFileVersion>
+      <fileVersion>0.7.0</fileVersion>
+      <txtFileVersion>0.7.0</txtFileVersion>
       <fileDescription>Viskit, Windows installer</fileDescription>
       <copyright>Copyright Naval Postgraduate School 2006</copyright>
-      <productVersion>0.4.7</productVersion>
-      <txtProductVersion>0.4.7</txtProductVersion>
+      <productVersion>0.7.0</productVersion>
+      <txtProductVersion>0.7.0</txtProductVersion>
       <productName>Viskit, Windows Installer</productName>
       <companyName>Naval Postgraduate School</companyName>
       <internalName>viskit.jar</internalName>

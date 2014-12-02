@@ -29,7 +29,7 @@
             <key>MainClass</key>
             <string>viskit.Splash2</string>
             <key>JVMVersion</key>
-            <string>1.6+</string>
+            <string>1.7+</string>
             <key>ClassPath</key>
             <array>
                 <string>$JAVAROOT/jaxb/jaxb-impl.jar</string>

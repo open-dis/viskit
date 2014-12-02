@@ -9,10 +9,10 @@
 -->
 
 <installation version="1.0">
-    
+
     <variables>
-        <variable name="JDKPathPanel.minVersion" value="1.6.0" />
-        <variable name="JDKPathPanel.maxVersion" value="1.6.0_99" />
+        <variable name="JDKPathPanel.minVersion" value="1.7.0" />
+        <variable name="JDKPathPanel.maxVersion" value="1.8.0_99" />
         <variable name="JDKPathPanel.skipIfValid" value="yes" />
         <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
     </variables>
@@ -39,7 +39,7 @@
         <!-- Hopefully helps with Win Vista/7 installs -->
         <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
     </info>
-    
+
     <guiprefs height="600" width="800" resizable="yes">
         <laf name="liquid">
             <os family="unix,windows"/>
@@ -55,7 +55,7 @@
         <langpack iso3="jpn"/>
         <langpack iso3="ita"/>
     </locale>
-    
+
     <resources>
         <res id="Installer.image" src="images/ViskitLogo.png"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
@@ -63,7 +63,7 @@
         <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
         <res src="Unix_shortcutSpec.xml" id="Unix_shortcutSpec.xml"/>
     </resources>
-    
+
     <panels>
         <panel classname="HelloPanel" id="hellopanel"/>
         <panel classname="HTMLInfoPanel" id="infopanel" />

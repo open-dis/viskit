@@ -9,10 +9,10 @@
 -->
 
 <installation version="1.0">
-    
+
     <variables>
-        <variable name="JDKPathPanel.minVersion" value="1.6.0" />
-        <variable name="JDKPathPanel.maxVersion" value="1.6.0_99" />
+        <variable name="JDKPathPanel.minVersion" value="1.7.0" />
+        <variable name="JDKPathPanel.maxVersion" value="1.8.0_99" />
         <variable name="JDKPathPanel.skipIfValid" value="yes" />
     </variables>
     <info>
@@ -32,11 +32,11 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
-        <javaversion>1.6</javaversion>
+        <javaversion>1.7</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
     </info>
-    
+
     <guiprefs height="600" width="800" resizable="yes">
         <laf name="liquid">
             <os family="mac"/>
@@ -52,13 +52,13 @@
         <langpack iso3="jpn"/>
         <langpack iso3="ita"/>
     </locale>
-    
+
     <resources>
         <res id="Installer.image" src="images/ViskitLogo.png"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
     </resources>
-    
+
     <panels>
         <panel classname="HelloPanel" id="hellopanel"/>
         <panel classname="HTMLInfoPanel" id="infopanel" />
@@ -91,16 +91,16 @@
               <include name="viskit/**"/>
               <include name="intro_no_diskit.html"/>
           </fileset>
-          
+
           <fileset dir="stage"               targetdir="$USER_HOME">
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
           </fileset>
-          
+
           <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">
               <include name="viskitProject.xml"/>
           </fileset>
-          
+
           <!-- Apple specific files -->
           <file src="macosx/Info.plist"          targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/PkgInfo"             targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
@@ -108,7 +108,7 @@
           <file src="macosx/JavaApplicationStub" targetdir="$INSTALL_PATH/Viskit.app/Contents/MacOS"/>
 
           <executable targetfile="$INSTALL_PATH/Viskit.app/Contents/MacOS/JavaApplicationStub" stage="never" />
-          
+
         </pack>
     </packs>
 </installation>

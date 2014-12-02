@@ -1,4 +1,4 @@
-                         Welcome to Viskit codebase.
+Vis                         Welcome to Viskit codebase.
 
 If you have arrived at this file as a result of directly downloading the SVN
 archive, we suggest looking at Ant target "help".  This will
@@ -31,7 +31,7 @@ Documentation and Support
 The majority of documentation about Viskit is on a public website. This can
 be accessed at
 
-https://diana.nps.edu/Viskit
+https://savage.nps.edu/Savage/developers.html#DES
 
 There you will find some tutorials, a FAQ and general documentation about
 the project, contributors etc.

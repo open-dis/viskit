@@ -2,34 +2,244 @@ These are release notes for Viskit from 0.1 forward.  Each release will
 detail its functionality in meeting the applicable specifications and document
 any known issues.
 
-Release: 0.6.2(July 27, 2011)
----------------------------------
-Major changes since 0.6.1:
-
-
-
 Release: 0.6.1(May 10, 2011
 ---------------------------------
 Major changes since 0.6.0:
 
+  Implement a dedicated Viskit Project space "MyViskitProjects" in order to
+  properly designate a project space for specific user projects
+
+  Fix NPE when canceling out of creating a project
+
+  Fix bug where the Viskit Project file chooser was causing unnecessary
+  recursive calls
+
+  Implement a draconian runtime fix to nuke the ${user.home}/.viskit directory
+  incase of a startup failure that has historically rendered Viskit unusable
+  until .viskit was manually deleted anyway.  The goal will be to never have to
+  do this if configuration metadata was stable enough to continue usability.
+
+  Improve iZPack installer support for creating 64 bit installers.  Shoe-horned
+  is a USA flag to denote "English" as an install language vice the UK flag.
 
 
 Release: 0.6.0(October 8, 2010)
 ---------------------------------
 Major changes since 0.5.4:
 
+  Upgrade to Simkit v1.3.8
+
+  Provide for launching Viskit either standalone, or as a process within another
+  runtime application observing proper EDT protocol
+
+  Disable TRANG building of the EG and Assy Schema's from DTD.  These Schemas
+  are now solid on their own.
+
+  Fix bug where .svn folders would display on the LegosTree for SimEntities and
+  PropertyChangeListeners
+
+  Bugfix 1248
+
+  Improve parsing for BasicSimEntity subclasses in order to populate the
+  LegosTree
+
+  Display current Viskit Project name in the main app title bar
+
+  Improve EG caching scheme so that we don't recompile unnecessarily
+
+  Improve recently opened files and projects history caching
+
+  Fix NPE bug when opening an existing Project from a newly installed Viskit
+
+  Bugfix 706
+
+  Upgrade to JAXB v2.1.8
+
+  Improve output stream flushing when writing out to text at runtime
+
+  Fix bug where EG description fields were not rendering for a newly added EG
+  tab
+
+  Improve JDK shutdown if Viskit is a third-party lib within another app
+
+  Bugfix 1364
+
+  Viskit was becoming too tightly integrated with a specific project (Savage
+  Studio).  Broke up such dependencies and refactored to be a standalone app
+  that can be integrated into other applications.
+
+  Fix issue where Assembly Adapter and PropertyChangeListener edges behave
+  properly if the user cancels an edit function
+
+  The Assembly description field in not yet implemented and noted in source
+
+  Assembly properties (metadata) are now immediately reflected in the Assembly
+  Runner
+
+  The proper mode for a PropertyChangeListener is singular.  However, for back-
+  wards compatibility for older EG, allow plural as well
+
+  Fixed bug where improper GraphMetaData was being supplied to a new Assembly
+
+  Fix issue where EG and Assy Editor toolbars were not being made visible when
+  creating new EGs and Assys
+
+  Better resizing accomplished for the Assembly Editor to allow more weight to
+  the JGraph side of the splitpane
+
+  Implemented full XML validation for EGs and Assy XML files
+
+  Minor EG and Assy Schema modification to allow for SMAL metadata to be used
+  as CDATA entries
+
+  Implemented multi-file opening choice for EGs and Assys
+
+  Bugfixes 1396, 1398 & 1412
+
+  Fix issue to allow building of the ParameterMap and Constructor where no
+  concrete doRun or doReset methods were defined
+
+  Implement package creation when naming newly created EG and Assy files
+
+  Implement configuration awareness of current Viskit project
+
+  Added a "Verbose" checkbox on each Assembly Node editor which operates as a
+  "detailed output."
+
+  Clamp simulation output to 8M and truncate from the front if required
+
+  Implement dumping of Event List only if not in verbose, or reallyVerbose modes
+
+  Internal class checking to populate EG editors unable to discern unqualified
+  class names except java.lang.*
+
+  Viskit Project can now be stored and opened from any location on the local
+  machine
+
+  Bugfixes 1400 & 1407
 
 
 Release: 0.5.4(August 12, 2008)
 ----------------------------------------
 Major changes since 0.5.3:
 
+  Implement a clear recent files option to the File menus
+
+  Implement a "detailed output" checkbox option for EG node inspector dialog
+
+  Implement an incrementing trailing digit in node names when dragging new node
+  onto the Assembly editor canvas.  Add check for existing node name prompting
+  use of the incrementing trailing digit.
 
 
 Release: 0.5.3(August 5, 2008)
 ---------------------------------
 Major changes since 0.5.2:
 
+  Implement specific platform L&F options upon app startup
+
+  Fix issue in SimkitXML2Java translator when an interrupt would cause an unclosed
+  if block statement causing startup compile errors
+
+  Fix for issue where varargs can throw a mostly harmless compiler warning if
+  there is only one arg supplied to the SimkitXML2Java translator
+
+  Fix issue where the EG inspector dialog "Apply" button had no effect
+
+  Bugfix 1399
+
 
 Release: 0.5.2(June 11, 2008)
 -------------------------------
+Major changes since 0.4.8:
+
+  Bugfixes 1402 & 1405
+
+  Implement creating new projects from either the EG or Assy editor panel menus
+
+  Bugfix 1373
+
+  Announce any compile errors to output screens
+
+
+Release: 0.4.8(June 3, 2008)
+-------------------------------
+Major changes since 0.4.7:
+
+  Implement Log4J for debugging, output info status
+
+  Switch from Sun's Base64 encoder to Apache version
+
+  Fix NPE when user didn't check "Enabled Analyst Report" and attempted to view
+  anyway
+
+  Fix bug where a SimplePropertyDumper could not co-exist with a
+  SimpleStatsTimeVarying PCL defined on the same Assembly
+
+  Stricter BeanShell interpreter checking for EG and Assy authoring, esp. for
+  typed containers <SomeType>
+
+  Enable regression line fitting to scatter plot graphs generated for the
+  Analyst Report
+
+  Implement enabling of the Assembly Run panel only after a successful Assy
+  compilation and validation.
+
+  Implement firing property changes using state variable "getters".  Container
+  getters return a clone for the FPC in the doRun event.
+
+  Modify the Assembly DTD to offer a raw count or mean of raw count statistic
+  for all PCL dialogs
+
+  Implemented a "Number x of n Replications" output on the Assembly Runner
+
+  Update JFreeChart to v1.2.0.  Improve chart output by counting raw counts vice
+  the mean of raw counts for histogram charts
+
+  Fix issue where Assys were being compiled while the EG tree was still being
+  parsed for compilation causing conflicts
+
+  Upgrade Simkit to v1.3.4
+
+  Bugfix 1183
+
+  Improvements to Analyst Report building, editing, reopening and rendering in
+  HTML
+
+  Implement Ant targets to translate EGs and Assy XML files to Java source
+
+  Further decoupling of Diskit being too tightly integrated w/ Viskit for
+  convenience of another application
+
+  Refinements to external javac exec process for EGs and Assys
+
+  Implemented generics utilzing JAXB v2.1.  This is a whole Viskit upgrade
+  prompting tagging a pre-generics JAXB branch.
+
+  Authored a script to delete temp files and history, a hack to clean up cruft
+  left behind from Viskit multiple operation of quarantining separate
+  classpaths, keeping scratch EG and Assy files, and multiple compilations of
+  source code.
+
+  Implement notification of when an Analyst Report is ready to view at the end
+  of a local Assembly Run of 1 or more replications
+
+  Bugfixes 936, 1195, 1246, 1249 & 1260
+
+  Implement figure caption auto increment in the Analyst Report.  Xalan required
+  as 3rd party lib for this functionality
+
+  Implemented a cleaner exit strategy vice a blunt System.exit(0) scheme
+
+  Implemented image capturing of all opened EG and Assy files for PNG insertion
+  in the Analyst Report
+
+  Improved Analyst Report generation by consolidating all material required for
+  report in a project specific location.  Fix various bug discovered in AR
+  generation improvements.
+
+  ******************************************************************************
+  End of this report on Viskit history 26 SEP 2007.  Please see
+  doc/viskitSVNLogs.txt for previous developer commit log entries dating back to
+  10 NOV 2002 when Viskit migrated from CVS.
+  ******************************************************************************

@@ -67,10 +67,18 @@ Major changes since 0.6.2:
 
   Upgrade JAXB to 2.2+
 
-  Fix EG node cancel cursor bug
+  Fix EG node cancel cursor bug issue
+
+  Upgrade to Simkit v1.4.2
 
   Fix issue with generating a lot of temp files and jars and not cleaning up
   after the main app shutsdown
+
+  Implemented a completely enclosed runtime compilation scheme using the JDKs
+  runtime compiler for EG and Assy generated code from XML, thus removing the
+  requirement to have the current JDK's tools.jar in the runtime classpath.
+  This also removes the requirement to have the JDK installed.  Viskit can run
+  w/ JRE only.
 
   Improve the whole Viskit app build process; must faster compile time
 
