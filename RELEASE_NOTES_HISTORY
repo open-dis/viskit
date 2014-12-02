@@ -241,5 +241,5 @@ Major changes since 0.4.7:
   ******************************************************************************
   End of this report on Viskit history 26 SEP 2007.  Please see
   doc/viskitSVNLogs.txt for previous developer commit log entries dating back to
-  10 NOV 2002 when Viskit migrated from CVS.
+  18 NOV 2002 when Viskit migrated from CVS to SVN.
   ******************************************************************************
