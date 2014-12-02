@@ -11,15 +11,12 @@
 <installation version="1.0">
 
     <variables>
-        <variable name="JDKPathPanel.minVersion" value="1.7.0" />
-        <variable name="JDKPathPanel.maxVersion" value="1.8.0_99" />
-        <variable name="JDKPathPanel.skipIfValid" value="yes" />
         <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
     </variables>
     <info>
         <appname>@{product.Name}</appname>
-        <appversion>@{product.Version}</appversion>
-        <appsubpath>Viskit</appsubpath>
+        <appversion>v@{product.Version}</appversion>
+        <appsubpath>viskit-@{product.Version}</appsubpath>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
@@ -33,8 +30,8 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
-        <javaversion>1.6</javaversion>
-        <requiresjdk>yes</requiresjdk>
+        <javaversion>1.7</javaversion>
+        <requiresjdk>no</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
         <!-- Hopefully helps with Win Vista/7 installs -->
         <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
@@ -57,7 +54,7 @@
     </locale>
 
     <resources>
-        <res id="Installer.image" src="images/ViskitLogo.png"/>
+        <res src="images/ViskitLogo.png" id="Installer.image"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
         <res src="shortcutSpec.xml" id="shortcutSpec.xml"/>
@@ -90,17 +87,19 @@
                 <include name="Schemas/**"/>
                 <exclude name="Schemas/*.patch"/>
                 <include name="configuration/**"/>
+                <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
                 <include name="images/**"/>
+                <exclude name="images/american-flag.gif"/>
                 <include name="lib/**" />
                 <include name="license/**" />
                 <include name="viskit/**"/>
                 <include name="viskit-exe.jar"/>
-                <include name="intro_no_diskit.html"/>
             </fileset>
             <fileset dir="stage"               targetdir="$USER_HOME">
               <os family="windows"/>
               <os family="unix"/>
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
+              <exclude name="MyViskitProjects/DefaultProject/Assemblies/examples/TLCAssembly.xml"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
             </fileset>
             <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">

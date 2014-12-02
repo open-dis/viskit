@@ -342,19 +342,24 @@ their descpritions.
                            value="${Savage.url}"/>
                 <section name="edu.nps.util"/>
                 <section name="viskit"/>
+                <section name="viskit.assembly"/>
+                <section name="viskit.control"/>
                 <section name="viskit.doe"/>
+                <section name="viskit.gridlet"/>
                 <section name="viskit.images"/>
                 <section name="viskit.jgraph"/>
                 <section name="viskit.model"/>
                 <section name="viskit.mvc"/>
                 <section name="viskit.util"/>
-                <section name="viskit.xsd.assembly"/>
+                <section name="viskit.view"/>
+                <section name="viskit.view.dialog"/>
                 <section name="viskit.xsd.bindings.assembly"/>
                 <section name="viskit.xsd.bindings.assembly.stats"/>
                 <section name="viskit.xsd.bindings.cli"/>
                 <section name="viskit.xsd.bindings.eventgraph"/>
                 <section name="viskit.xsd.cli"/>
-                <section name="viskit.xsd.translator"/>
+                <section name="viskit.xsd.translator.assembly"/>
+                <section name="viskit.xsd.translator.eventgraph"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
@@ -386,61 +391,6 @@ their descpritions.
     <target name="build.viskit.no.extensions"
             depends="jar"
             description="Build viskit jar(s)"/>
-
-    <target name="jar.executable" depends="jar">
-        <pathconvert pathsep=" " property="launcher.jar.internal.classpath" refid="runtime.classpath">
-            <chainedmapper>
-                <flattenmapper/>
-                <globmapper from="*" to="lib/*"/>
-            </chainedmapper>
-        </pathconvert>
-
-        <jar basedir="${dir.build.classes}" compress="false" jarfile="${dir.build.lib}/viskit-exe.jar">
-            <manifest>
-                <attribute name="Built-By" value="${my.name}"/>
-                <attribute name="Specification-Title"
-                           value="${product.Name}"/>
-                <attribute name="Specification-Version"
-                           value="${product.version.major}.${product.version.minor}"/>
-                <attribute name="Specification-Vendor"
-                           value="${spec.vendor}"/>
-                <attribute name="Implementation-Title"
-                           value="${impl.title}"/>
-                <attribute name="Implementation-Version"
-                           value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
-                <attribute name="Implementation-Vendor"
-                           value="${nps}, ${moves.institute}, ${savage.research.group}"/>
-                <attribute name="Implementation-URL"
-                           value="${Savage.url}"/>
-            <section name="edu.nps.util"/>
-            <section name="viskit"/>
-            <section name="viskit.assembly"/>
-            <section name="viskit.control"/>
-            <section name="viskit.doe"/>
-            <section name="viskit.gridlet"/>
-            <section name="viskit.images"/>
-            <section name="viskit.jgraph"/>
-            <section name="viskit.model"/>
-            <section name="viskit.mvc"/>
-            <section name="viskit,reports"/>
-            <section name="viskit.util"/>
-            <section name="viskit.view.*"/>
-            <section name="viskit.xsd.bindings.assembly"/>
-            <section name="viskit.xsd.bindings.assembly.stats"/>
-            <section name="viskit.xsd.bindings.cli"/>
-            <section name="viskit.xsd.bindings.eventgraph"/>
-            <section name="viskit.xsd.cli"/>
-            <section name="viskit.xsd.translator.assembly"/>
-            <section name="viskit.xsd.translator.eventgraph"/>
-
-                <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2" />
-                <attribute name="Class-Path" value="${launcher.jar.internal.classpath}" />
-            </manifest>
-            <metainf file="license/lgpl.txt"/>
-            <metainf file="license/license.txt"/>
-        </jar>
-    </target>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
@@ -710,11 +660,11 @@ their descpritions.
 
     <target name="nuke.dot.viskit" description="Abolish an out of synch viskit metadata directory">
         <delete includeemptydirs="yes" dir="${user.home}/.viskit"/>
-        <delete file="${user.home}/.viskit_history.xml"/>
+        <delete includeemptydirs="yes" dir="${user.home}/MyViskitProjects"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
-         ${user.home}/.visit properties/config files -->
+         ${user.home}/.viskit properties/config files -->
 
     <target name="show.debug.log" depends="build.init">
         <concat>

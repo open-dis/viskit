@@ -43,9 +43,9 @@
     </target>
     <target name="getLaunch4j" depends="checkLaunch4j" unless="launch4j.exists" >
         <!-- only one of these should pass -->
-        <ant target="getLaunch4jWin32"/>
+        <!--ant target="getLaunch4jWin32"/>
         <ant target="getLaunch4jLinux"/>
-        <ant target="getLaunch4jMac"/>
+        <ant target="getLaunch4jMac"/-->
     </target>
 
     <target name="getLaunch4jWin32" if="build.host.windows">
@@ -69,10 +69,10 @@
     </target>
 
     <target name="check.viskit">
-        <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built"/>
+        <available file="${dir.build.lib}/viskit.jar" property="viskit.built"/>
     </target>
     <target name="no.extensions" depends="check.viskit" unless="viskit.built" >
-        <ant target="jar.executable"/>
+        <ant target="jar"/>
     </target>
     <target name="with.extensions" depends="no.extensions" unless="extensions.built">
         <ant target="runtime.extensions"/>
@@ -110,7 +110,7 @@
         <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
     </target>
-    
+
     <target name="installers.common">
         <copy todir="${installer}/stage/Schemas">
             <fileset dir="${basedir}/Schemas"/>
@@ -138,34 +138,34 @@
 
     <target name="make.win.unix.installer">
 
-        <taskdef name="launch4j"
+        <!--taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
+                 classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/-->
+
+        <!-- The last d/l gave me a fit about permissions -->
+        <!--chmod file="${launch4j}/bin/windres" perm="ugo+rx"/>
+        <chmod file="${launch4j}/bin/ld"      perm="ugo+rx"/-->
 
         <!-- for the sfx executable task -->
         <taskdef classpath="${orangevolt.jar}:${roxes.jar}"
                  resource="com/orangevolt/tools/ant/taskdefs.properties"/>
 
-        <!-- The last d/l gave me a fit about permissions -->
-        <chmod file="${launch4j}/bin/windres" perm="ugo+rx"/>
-        <chmod file="${launch4j}/bin/ld"      perm="ugo+rx"/>
-
-        <!-- Wrap the viskit-exe.jar in a native win32 executable -->
-        <launch4j configFile="${installer}/launch4jConfig.xml"/>
+        <!-- Wrap the viskit.jar in a native win32 executable -->
+        <!--launch4j configFile="${installer}/launch4jConfig.xml"/>
 
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
         </copy>
         <delete>
             <fileset refid="runtime.viskit.exe"/>
-        </delete>
+        </delete-->
 
         <echo message="Running IzPack to build the installers..."/>
 
         <!-- create an executable out of the jar file that installs Viskit and related files, assumes java exists,
             however once Viskit.exe actually runs it should check and download latest JDK -->
         <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstallWin32.jar"
+                output="${installer}/build/ViskitInstallWin.jar"
                 installerType="standard"
                 basedir="${installer}"
                 inheritAll="true"
@@ -180,16 +180,16 @@
                 compressionlevel="9"/>
 
         <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
-        <launch4j>
+        <!--launch4j>
             <config chdir="."
                     dontwrapjar="false"
-                    jar="${installer}/build/ViskitInstallWin32.jar"
+                    jar="${installer}/build/ViskitInstallWin.jar"
                     outfile="${installer}/build/ViskitInstallWin32.exe"
                     headertype="gui"
                     icon="${installer}/images/ViskitIcon.ico" >
-                <jre minVersion="1.6.0"/>
+                <jre minVersion="1.7.0"/>
             </config>
-        </launch4j>
+        </launch4j-->
     </target>
 
     <target name="make.mac.installer">

@@ -9,16 +9,10 @@
 -->
 
 <installation version="1.0">
-
-    <variables>
-        <variable name="JDKPathPanel.minVersion" value="1.7.0" />
-        <variable name="JDKPathPanel.maxVersion" value="1.8.0_99" />
-        <variable name="JDKPathPanel.skipIfValid" value="yes" />
-    </variables>
     <info>
         <appname>@{product.Name}</appname>
-        <appversion>@{product.Version}</appversion>
-        <appsubpath>Viskit</appsubpath>
+        <appversion>v@{product.Version}</appversion>
+        <appsubpath>viskit-@{product.Version}</appsubpath>
         <authors>
             <author name="Mike Bailey" email="jmbailey@nps.edu"/>
             <author name="Curt Blais" email="cblais@nps.edu"/>
@@ -33,7 +27,7 @@
         </authors>
         <url>@{product.url}</url>
         <javaversion>1.7</javaversion>
-        <requiresjdk>yes</requiresjdk>
+        <requiresjdk>no</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
     </info>
 
@@ -54,26 +48,29 @@
     </locale>
 
     <resources>
-        <res id="Installer.image" src="images/ViskitLogo.png"/>
+        <res src="images/ViskitLogo.png" id="Installer.image"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
+        <res src="macosx/LegacyJava6.html" id="HTMLInfoPanel.java"/>
     </resources>
 
     <panels>
         <panel classname="HelloPanel" id="hellopanel"/>
-        <panel classname="HTMLInfoPanel" id="infopanel" />
-        <panel classname="LicencePanel" id="licensepanel"/><!--not my english-->
-        <panel classname="PacksPanel" id="packspanel"/>
-        <panel classname="TargetPanel" id="targetpanel"/>
-        <panel classname="InstallPanel" id="installpanel"/>
-        <panel classname="ShortcutPanel" id="shortcutpanel"/>
-        <panel classname="SimpleFinishPanel" id="finishpanel"/>
+        <panel classname="HTMLInfoPanel" id="info" />
+        <panel classname="HTMLInfoPanel" id="java" />
+        <panel classname="LicencePanel" id="licence"/><!--not my english-->
+        <panel classname="PacksPanel" id="packs"/>
+        <panel classname="TargetPanel" id="target"/>
+        <panel classname="InstallPanel" id="install"/>
+        <panel classname="SimpleFinishPanel" id="finish"/>
     </panels>
+
     <listeners>
         <listener installer="SummaryLoggerInstallerListener">
             <os family="mac"/>
         </listener>
     </listeners>
+
     <packs>
         <pack name="Core" required="yes">
             <description>Core Viskit Application Files</description>
@@ -86,14 +83,16 @@
               <include name="Schemas/**"/>
               <exclude name="Schemas/*.patch"/>
               <include name="configuration/**"/>
+              <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
               <include name="images/**"/>
+              <exclude name="images/american-flag.gif"/>
               <include name="license/**"/>
               <include name="viskit/**"/>
-              <include name="intro_no_diskit.html"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$USER_HOME">
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
+              <exclude name="MyViskitProjects/DefaultProject/Assemblies/examples/TLCAssembly.xml"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
           </fileset>
 
@@ -102,12 +101,14 @@
           </fileset>
 
           <!-- Apple specific files -->
-          <file src="macosx/Info.plist"          targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
-          <file src="macosx/PkgInfo"             targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
-          <file src="macosx/ViskitLogo.icns"     targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources"/>
-          <file src="macosx/JavaApplicationStub" targetdir="$INSTALL_PATH/Viskit.app/Contents/MacOS"/>
+          <file src="macosx/LegacyJava6.html"             targetdir="$INSTALL_PATH/Viskit.app"/>
+          <file src="macosx/Info.plist"                   targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
+          <file src="macosx/PkgInfo"                      targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
+          <file src="macosx/ViskitLogo.icns"              targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources"/>
+          <file src="macosx/universalJavaApplicationStub" targetdir="$INSTALL_PATH/Viskit.app/Contents/MacOS"/>
 
-          <executable targetfile="$INSTALL_PATH/Viskit.app/Contents/MacOS/JavaApplicationStub" stage="never" />
+          <!-- Sets +x attributes to the stub -->
+          <executable targetfile="$INSTALL_PATH/Viskit.app/Contents/MacOS/universalJavaApplicationStub" stage="never" />
 
         </pack>
     </packs>
