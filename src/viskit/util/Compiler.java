@@ -14,11 +14,9 @@ import javax.tools.ToolProvider;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
-/** Using the java compiler now part of javax, we no longer have to
- * either ship tools.jar or require a jdk environment variable.
- * This class was based upon {@link viskit.view.SourceWindow}.
- * TBD refactor out from SourceWindow, the main difference being Compiler actually
- * creates .class files, where SourceWindow compiled to memory.
+/** Using the java compiler, now part of javax.tools, we no longer have to
+ * ship tools.jar or require a jdk environment variable.
+ * This class was based originally upon {@link viskit.view.SourceWindow}.
  *
  * @author Rick Goldberg
  * @version $Id$
