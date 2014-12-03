@@ -146,7 +146,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     /**
-     *
+     * Dialog operation
      * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
@@ -405,26 +405,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void messageUser(int typ, String msg) // typ is one of JOptionPane types
+    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
     {
-        String title;
-        switch (typ) {
-            case JOptionPane.WARNING_MESSAGE:
-                title = "Warning";
-                break;
-            case JOptionPane.ERROR_MESSAGE:
-                title = "Error";
-                break;
-            case JOptionPane.INFORMATION_MESSAGE:
-                title = "Information";
-                break;
-            case JOptionPane.PLAIN_MESSAGE:
-            case JOptionPane.QUESTION_MESSAGE:
-            default:
-                title = "";
-                break;
-        }
-        ((EventGraphView) getView()).genericErrorReport(title, msg);
+        ((EventGraphView) getView()).genericReport(typ, title, msg);
     }
 
     @Override
@@ -621,7 +604,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void copy() //----------------
     {
         if (!nodeSelected()) {
-            ((EventGraphView) getView()).genericErrorReport("Unsupported Action", "Edges cannot be copied.");
+            ((EventGraphView) getView()).genericReport(JOptionPane.WARNING_MESSAGE, "Unsupported Action", "Edges cannot be copied.");
             return;
         }
         copyVector = (Vector) selectionVector.clone();

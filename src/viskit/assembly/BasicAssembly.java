@@ -696,10 +696,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     JOptionPane.showMessageDialog(null, "Viskit has detected " +
                             "a possible error condition in the simulation " +
                             "entities. \nIt is possible that one of the " +
-                            "entities is instancing a SimEntity type unsafely," +
-                            " \nplease check that any internally created " +
+                            "entities is instancing a SimEntity type unsafely." +
+                            " \nPlease check that any internally created " +
                             "entities are handled appropriately. \nYou'll " +
-                            "probably have to restart Viskit, however Viskit " +
+                            "probably have to restart Viskit, however, Viskit " +
                             "will now try to swap in\n a new EventList for " +
                             "debugging purposes only.");
                     int newEventListId = Schedule.addNewEventList();

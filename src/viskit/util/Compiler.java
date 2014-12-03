@@ -4,9 +4,11 @@ import edu.nps.util.LogUtils;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import javax.swing.JOptionPane;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -15,8 +17,8 @@ import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
 /** Using the java compiler, now part of javax.tools, we no longer have to
- * ship tools.jar or require a jdk environment variable.
- * This class was based originally upon {@link viskit.view.SourceWindow}.
+ * ship tools.jar from the JDK install.
+ * This class was originally based in {@link viskit.view.SourceWindow}.
  *
  * @author Rick Goldberg
  * @version $Id$
@@ -36,14 +38,12 @@ public class Compiler {
      * @param pkg package containing java file
      * @param className name of the java file
      * @param src a string containing the full source code
-     * @return Diagnostic messages from compiler
+     * @return diagnostic messages from the compiler
      */
     public static String invoke(String pkg, String className, String src) {
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StringBuilder diagnosticMessages = new StringBuilder();
-
-        diag = new CompilerDiagnosticsListener(diagnosticMessages);
+        StandardJavaFileManager sjfm = null;
         StringBuilder classPaths;
         String cp;
 
@@ -52,10 +52,18 @@ public class Compiler {
         }
 
         try {
+
+            // NOTE: if the compiler is null, then likely on a Windoze system,
+            // the Oracle JRE's java.exe was placed on the Path first before the
+            // JDK's java.exe.  If so, correct the Path in Computer ->
+            // Properties -> Advanced system settings -> Environment variables
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            diag = new CompilerDiagnosticsListener(diagnosticMessages);
+            sjfm = compiler.getStandardFileManager(diag, null, null);
+
             JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
-            File workDir = VGlobals.instance().getWorkDirectory();
-            StandardJavaFileManager sjfm = compiler.getStandardFileManager(diag, null, null);
             Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
+            File workDir = VGlobals.instance().getWorkDirectory();
             String workDirPath = workDir.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if
@@ -73,6 +81,7 @@ public class Compiler {
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
             cp = classPaths.toString();
             log.debug("cp is: " + cp);
+
             String[] options = {
                 "-Xlint:unchecked",
                 "-Xlint:deprecation",
@@ -99,9 +108,31 @@ public class Compiler {
                 diagnosticMessages.append("No Compiler Errors");
             }
         } catch (Exception ex) {
+            if (ex instanceof NullPointerException) {
+
+                String msg = "Your environment variable for Path likely has the JRE's "
+                                + "java.exe in front of the JDK's java.exe.\n"
+                                + "Please reset your Path to have the JDKs "
+                                + "java.exe first in the Path";
+
+                // Inform the user about the JRE vs. JDK java.exe Path issue
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                        "Incorrect Path", msg);
+
+                log.error(msg);
+            }
             log.error(ex);
 //            log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
 //            log.info("Classpath is: " + cp);
+        } finally {
+
+            if (sjfm != null) {
+                try {
+                    sjfm.close();
+                } catch (IOException ex) {
+                    log.error(ex);
+                }
+            }
         }
         return diagnosticMessages.toString();
     }

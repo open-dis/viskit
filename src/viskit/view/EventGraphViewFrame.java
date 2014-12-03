@@ -1074,8 +1074,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (jfc.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION !=
-                        JOptionPane.showConfirmDialog(this, "File exists.  Overwrite?", "Confirm",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) {
+                        genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
@@ -1092,7 +1091,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             if (f.exists()) {
                 return f;
             } else {
-                JOptionPane.showMessageDialog(this, "File not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
             }
         }
         return null;
@@ -1145,8 +1144,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void genericErrorReport(String title, String msg) {
-        JOptionPane.showMessageDialog(this, msg, title, JOptionPane.ERROR_MESSAGE);
+    public void genericReport(int type, String title, String msg) {
+        JOptionPane.showMessageDialog(this, msg, title, type);
     }
 
     @Override
@@ -1217,7 +1216,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         try {
             xt = XTree.getTreeInPanel(f);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
         //xt.setVisibleRowCount(25);

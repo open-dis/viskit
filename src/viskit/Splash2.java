@@ -143,6 +143,11 @@ public class Splash2 extends JFrame {
             }
         });
 
+        // This is for the launch4j executable for Win & executable jar for Unix
+        if (args.length == 0) {
+            args = new String[] {"viskit.EventGraphAssemblyComboMain"};
+        }
+
         // First argument is main class
         String target = args[0];
         int newLen = args.length - 1;

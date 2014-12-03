@@ -122,6 +122,7 @@ public class XMLValidationTool {
 
             // Prepare error errorsLog with current DTG
             File errorsLog = new File(ViskitConfig.VISKIT_HOME_DIR + "/validationErrors.log");
+            errorsLog.setWritable(true, false);
 
             // New LogUtils.getLogger() each Viskit startup
             if (errorsLog.exists()) {errorsLog.delete();}

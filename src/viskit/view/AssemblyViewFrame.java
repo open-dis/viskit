@@ -972,7 +972,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             if (f.exists()) {
                 return f;
             } else {
-                JOptionPane.showMessageDialog(this, "File not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
             }
         }
         return null;
@@ -1060,8 +1060,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (jfc.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION !=
-                        JOptionPane.showConfirmDialog(this, "File exists.  Overwrite?", "Confirm",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) {
+                        genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
@@ -1091,7 +1090,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         try {
             xt = XTree.getTreeInPanel(f);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
         //xt.setVisibleRowCount(25);

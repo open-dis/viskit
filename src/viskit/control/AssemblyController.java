@@ -66,8 +66,8 @@ public interface AssemblyController {
 
     /** A component, e.g., vAMod, wants to say something.
      *
-     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
-     * @param title the title of the message
+     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
+     * @param title the title of the message in the dialog frame
      * @param msg the message to transmit
      */
     void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types

@@ -66,7 +66,7 @@ public abstract class ViskitSmallDialog extends JDialog {
     }
 
     protected int maxWidth(JComponent[] c) {
-        int tmpw = 0, maxw = 0;
+        int tmpw, maxw = 0;
         for (JComponent c1 : c) {
             tmpw = c1.getPreferredSize().width;
             if (tmpw > maxw) {

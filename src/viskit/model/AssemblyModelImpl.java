@@ -56,9 +56,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } catch (JAXBException e) {
-            JOptionPane.showMessageDialog(null, "Exception on JAXBContext instantiation" +
-                    "\n" + e.getMessage(),
-                    "XML Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "XML Error",
+                    "Exception on JAXBContext instantiation" +
+                    "\n" + e.getMessage()
+                    );
         }
     }
 
@@ -105,9 +107,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 } catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
-                    JOptionPane.showMessageDialog(null, "Use the event graph editor to" +
-                            "\n" + "work with this file.",
-                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
+                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                            "Wrong File Format",
+                            "Use the event graph editor to" +
+                            "\n" + "work with this file."
+                            );
                     return false;
                 }
 
@@ -132,11 +136,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
             } catch (JAXBException e) {
-                JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling of" +
+                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                        "XML I/O Error",
+                        "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
                             "\n" + e.getMessage() +
-                            "\nin AssemblyModel.newModel(File)",
-                            "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+                            "\nin AssemblyModel.newModel(File)"
+                            );
 
                 return false;
             }
@@ -161,9 +167,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Exception creating temporary file, AssemblyModel.saveModel():" +
-                    "\n" + e.getMessage(),
-                    "I/O Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "I/O Error",
+                    "Exception creating temporary file, AssemblyModel.saveModel():" +
+                    "\n" + e.getMessage()
+                    );
             return;
         }
 
@@ -195,15 +203,18 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             modelDirty = false;
             currentFile = f;
         } catch (JAXBException e) {
-            JOptionPane.showMessageDialog(null, "Exception on JAXB marshalling" +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "XML I/O Error",
+                    "Exception on JAXB marshalling" +
                     "\n" + f +
                     "\n" + e.getMessage() +
-                    "\n(check for blank data fields)",
-                    "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+                    "\n(check for blank data fields)"
+                    );
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
-                    "\n" + ex.getMessage(),
-                    "File I/O Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "File I/O Error",
+                    "Exception on writing " + f.getName() +
+                    "\n" + ex.getMessage());
         } finally {
             try {
                 if (fw != null)

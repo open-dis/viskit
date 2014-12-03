@@ -63,9 +63,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } catch (JAXBException e) {
-            JOptionPane.showMessageDialog(null, "Exception on JAXBContext instantiation" +
-                    "\n" + e.getMessage(),
-                    "XML Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "XML Error",
+                    "Exception on JAXBContext instantiation" +
+                    "\n" + e.getMessage()
+                    );
         }
     }
 
@@ -132,15 +134,19 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     Unmarshaller um = assyCtx.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.
-                    JOptionPane.showMessageDialog(null, "Use the assembly editor to" +
-                            "\n" + "work with this file.",
-                            "Wrong File Format", JOptionPane.ERROR_MESSAGE);
+                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                            "Wrong File Format",
+                            "Use the assembly editor to" +
+                            "\n" + "work with this file."
+                            );
                 } catch (JAXBException e) {
-                    JOptionPane.showMessageDialog(null, "Exception on JAXB unmarshalling of" +
+                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                            "XML I/O Error",
+                            "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
                             "\nError is: " + e.getMessage() +
-                            "\nin Model.newModel(File)",
-                            "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+                            "\nin Model.newModel(File)"
+                            );
                 }
                 return false;    // from either error case
             }
@@ -164,9 +170,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Exception creating temporary file, Model.saveModel():" +
-                    "\n" + e.getMessage(),
-                    "I/O Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "I/O Error",
+                    "Exception creating temporary file, Model.saveModel():" +
+                    "\n" + e.getMessage()
+                    );
             return;
         }
 
@@ -197,14 +205,18 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             setDirty(false);
             currentFile = f;
         } catch (JAXBException e) {
-            JOptionPane.showMessageDialog(null, "Exception on JAXB marshalling" +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "XML I/O Error",
+                    "Exception on JAXB marshalling" +
                     "\n" + f.getName() +
-                    "\n" + e.getMessage(),
-                    "XML I/O Error", JOptionPane.ERROR_MESSAGE);
+                    "\n" + e.getMessage()
+                    );
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Exception on writing " + f.getName() +
-                    "\n" + ex.getMessage(),
-                    "File I/O Error", JOptionPane.ERROR_MESSAGE);
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "File I/O Error",
+                    "Exception on writing " + f.getName() +
+                    "\n" + ex.getMessage()
+                    );
         } finally {
             try {
                 if (fw != null)
@@ -238,6 +250,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         if (!eventNameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Event Name",
                     "XML file contains duplicate event name: " + en.getName() +
                     "\nUnique name substituted.");
             mangleNodeName(en);
@@ -538,7 +551,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             stateVariables.add(v);
 
             if (!stateVarParamNameCheck()) {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE, "XML file contains duplicate state variable name." +
+                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                        "Duplicate Variable Name",
+                        "XML file contains duplicate state variable name." +
                         "\nUnique name substituted.");
                 mangleStateVarName(v);
             }
@@ -561,7 +576,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             simParameters.add(vp);
 
             if (!stateVarParamNameCheck()) {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE, "XML file contains duplicate parameter name." +
+                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                        "Duplicate Parameter Name",
+                        "XML file contains duplicate parameter name." +
                         "\nUnique name substituted.");
                 mangleParamName(vp);
             }
@@ -599,6 +616,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         if (!stateVarParamNameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Parameter Name",
                     "Duplicate parameter name detected: " + nm +
                     "\nUnique name substituted.");
             mangleParamName(vp);
@@ -643,7 +661,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeSimParameter(vParameter vp) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate parameter name detected: " + vp.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Parameter Name",
+                    "Duplicate parameter name detected: " + vp.getName() +
                     "\nUnique name substituted.");
             mangleParamName(vp);
             retcode = false;
@@ -672,6 +692,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         stateVariables.add(vsv);
         if (!stateVarParamNameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Variable Name",
                     "Duplicate state variable name detected: " + name +
                     "\nUnique name substituted.");
             mangleStateVarName(vsv);
@@ -706,7 +727,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeStateVariable(vStateVariable vsv) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate state variable name detected: " + vsv.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Variable Name",
+                    "Duplicate state variable name detected: " + vsv.getName() +
                     "\nUnique name substituted.");
             mangleStateVarName(vsv);
             retcode = false;
@@ -908,7 +931,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeEvent(EventNode node) {
         boolean retcode = true;
         if (!eventNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate event name detected: " + node.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate Event Name",
+                    "Duplicate event name detected: " + node.getName() +
                     "\nUnique name substituted.");
             mangleNodeName(node);
             retcode = false;

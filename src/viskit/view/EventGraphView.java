@@ -35,7 +35,14 @@ public interface EventGraphView
    */
   int     genericAsk             ( String title, String prompt );
   int     genericAskYN           (String title, String msg);
-  void    genericErrorReport     ( String title, String message );
+
+  /** A component, e.g., vMod, wants to say something.
+   *
+   * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
+   * @param title the title of the message in the dialog frame
+   * @param msg the message to transmit
+   */
+  void    genericReport (int typ, String title, String msg);
   String  promptForStringOrCancel( String title, String message, String initval);
 
   File[]  openFilesAsk();

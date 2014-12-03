@@ -75,11 +75,13 @@ public interface EventGraphController {
     /** Show the XML form of an event graph */
     void showXML();
 
-    /** A component, e.g., model, wants to say something.
-     * @param typ the type of message, i.e. ERROR, WARN, QUESTION, etc
+    /** A component, e.g., vMod, wants to say something.
+     * 
+     * @param typ the type of message, i.e. ERROR, WARN, INFO, QUESTION, etc.
+     * @param title the title of the message in the dialog frame
      * @param msg the message to transmit
      */
-    void messageUser(int typ, String msg);    // typ is one of JOptionPane types
+    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
     /** Requests to the controller to perform editing operations on existing entities
      * @param node the node to edit

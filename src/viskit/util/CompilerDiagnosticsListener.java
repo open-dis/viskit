@@ -1,15 +1,13 @@
-/*
- * Taken from viskit.SourceWindow. TBD completely factor out from SourceWindow.
- */
 package viskit.util;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
 
-/**
+/** Taken from viskit.view.SourceWindow to be more broadly used
  *
  * @author Rick Goldberg
+ * @version $Id:$
  */
 public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> {
 

@@ -1018,7 +1018,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         copyVector = (Vector<EvGraphNode>) selectionVector.clone();
         for (Object o : copyVector) {
             if (!(o instanceof EvGraphNode)) {
-                JOptionPane.showMessageDialog(null, "Please select an Event Graph");
+                messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
+                        "Please select an Event Graph");
                 return;
             }
             String className = ((ViskitElement) o).getType();
@@ -1031,7 +1032,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 }
             }
             if (f == null) {
-                JOptionPane.showMessageDialog(null,
+                messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
                         "Please select an XML Event Graph to load to EG Editor tab");
                 return;
             }
@@ -1443,9 +1444,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void compileAssemblyAndPrepSimRunner() {
         initAssemblyRun();
         if (execStrings == null) {
-            JOptionPane.showMessageDialog(null, "Compile not attempted, check LogUtils.getLogger() for details",
+            messageUser(JOptionPane.WARNING_MESSAGE,
                     "Assembly Source Generation Error",
-                    JOptionPane.WARNING_MESSAGE); //todo, more information
+                    "Compile not attempted, check ${user.home}/.viskit/debug.log for details"
+                    ); //todo, more information
         } else {
 
             // Ensure changes to the Assembly Properties dialog get saved
@@ -1640,9 +1642,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } catch (Exception ex) {
             LOGGER.error("EventGraph file: " + tempFile + " caused error: " + ex);
-            JOptionPane.showMessageDialog(VGlobals.instance().getEventGraphEditor(),
-                    "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading.",
-                    "EventGraph Opening Error", JOptionPane.WARNING_MESSAGE);
+            messageUser(JOptionPane.WARNING_MESSAGE,
+                    "EventGraph Opening Error",
+                    "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
+                    );
 //            ex.printStackTrace();
             closeAll();
         }
