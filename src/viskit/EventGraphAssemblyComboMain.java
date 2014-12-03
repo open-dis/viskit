@@ -37,13 +37,21 @@ import com.jgoodies.looks.Options;
 import com.jgoodies.looks.common.ShadowPopupFactory;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import edu.nps.util.LogUtils;
+import java.awt.Desktop;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Image;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import viskit.view.EventGraphAssemblyComboMainFrame;
 
 /**
@@ -94,23 +102,72 @@ public class EventGraphAssemblyComboMain {
 
             // if we got here, then we need to nuke the ${user.home}/.viskit dir
             // it will be recreated on next start up
-            nukeHomeDirectory();
+            if (e instanceof InterruptedException)
+                nukeDotViskit();
+
+            // Bugfix 1377
+            
+            // for copying style
+            JLabel label = new JLabel();
+            Font font = label.getFont();
+
+            // create some css from the label's font
+            StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+            style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
+            style.append("font-size:").append(font.getSize()).append("pt;");
+
+            URL url = null;
+            try {
+                url = new URL("mailto:viskit@www.movesinstitute.org?subject=Viskit%20startup%20error");
+            } catch (MalformedURLException ex) {
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
+            }
+
+            String msg = "Viskit has experienced a startup glitch.  <br/>Please "
+                    + "navigate to ${user.home}/.viskit/debug.log and "
+                    + "email the log to "
+                    + "<b><a href=\"" + url.toString() + "\">viskit@www.movesinstitute.org</a></b>";
+
+            // html content
+            JEditorPane ep = new JEditorPane("text/html",
+                    "<html><body style=\"" + style + "\">"
+                    + msg + "</body></html>");
+
+            final URL localUrl = url;
+
+            // handle link events to bring up mail client
+            ep.addHyperlinkListener(new HyperlinkListener() {
+                @Override
+                public void hyperlinkUpdate(HyperlinkEvent e) {
+                    try {
+                        if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                            Desktop.getDesktop().mail(localUrl.toURI());
+                        }
+                    } catch (IOException | URISyntaxException ex) {
+                        LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
+                    }
+                }
+            });
+            ep.setEditable(false);
+            ep.setBackground(label.getBackground());
+
+            JOptionPane.showMessageDialog(null, ep, e.toString(), JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private static void nukeHomeDirectory() {
-        java.io.File viskitDir = new java.io.File(System.getProperty("user.home") + "/.viskit");
-        if (viskitDir.exists()) {
+    private static void nukeDotViskit() {
+        java.io.File dotViskit = new java.io.File(System.getProperty("user.home") + "/.viskit");
+        if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
-            java.io.File[] files = viskitDir.listFiles();
+            java.io.File[] files = dotViskit.listFiles();
             for (java.io.File file : files) {
                 file.delete();
             }
-            boolean success = viskitDir.delete();
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + viskitDir.getPath() + " directory was found to be corrupted and will be deleted");
+            boolean success = dotViskit.delete();
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + dotViskit.getPath() + " directory was found to be corrupted and will be deleted");
             if (success)
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(viskitDir.getName() + " was found and deleted.");
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted.");
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }
