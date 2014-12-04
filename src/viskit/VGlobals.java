@@ -842,6 +842,11 @@ public class VGlobals {
 
     private ClassLoader workLoader;
 
+    /**
+     * Retrieve Viskit's working ClassLoader.  It may be reset from time to
+     * time if extra classpaths are loaded
+     * @return Viskit's working ClassLoader
+     */
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
             URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
@@ -858,18 +863,6 @@ public class VGlobals {
 
     public void resetWorkClassLoader() {
         workLoader = null;
-    }
-
-    /**
-     * Returns a reset classloader.  Use very carefully.
-     * Warning - Can cause unwanted recursive jar creation for every EG found
-     * if reset causing JVM bog down.
-     * @param reboot if true, reset the working class loader
-     * @return a reset classloader
-     */
-    public ClassLoader getResetWorkClassLoader(boolean reboot) {
-        if (reboot) {resetWorkClassLoader();}
-        return getWorkClassLoader();
     }
 
     /** @return a model to print a stack trace of calling classes and their methods */

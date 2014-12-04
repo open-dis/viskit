@@ -26,10 +26,10 @@ import viskit.doe.FileHandler;
  */
 public class ViskitConfig {
 
-    public static final File VISKIT_HOME_DIR = new File(System.getProperty("user.home"), ".viskit");
-    public static final File V_CONFIG_FILE = new File(VISKIT_HOME_DIR, "vconfig.xml");
-    public static final File C_APP_FILE = new File(VISKIT_HOME_DIR, "c_app.xml");
-    public static final File C_GUI_FILE = new File(VISKIT_HOME_DIR, "c_gui.xml");
+    public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
+    public static final File V_CONFIG_FILE = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
+    public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
+    public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";
@@ -85,7 +85,7 @@ public class ViskitConfig {
 
     static {
         LOG.info("Welcome to the Viskit Discrete Event Simulation (DES) suite");
-        LOG.info("VISKIT_HOME_DIR: " + VISKIT_HOME_DIR + " " + VISKIT_HOME_DIR.exists() + "\n");
+        LOG.info("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " " + VISKIT_CONFIG_DIR.exists() + "\n");
     }
 
     public static synchronized ViskitConfig instance() {
@@ -97,9 +97,9 @@ public class ViskitConfig {
 
     private ViskitConfig() {
         try {
-            if (!VISKIT_HOME_DIR.exists()) {
-                VISKIT_HOME_DIR.mkdirs();
-                LOG.info("Created dir: " + VISKIT_HOME_DIR);
+            if (!VISKIT_CONFIG_DIR.exists()) {
+                VISKIT_CONFIG_DIR.mkdirs();
+                LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
             }
             File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
             if (!V_CONFIG_FILE.exists()) {

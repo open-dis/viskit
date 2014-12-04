@@ -13,6 +13,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 
 public class Launcher extends Thread implements Runnable {
 
@@ -67,7 +68,7 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
 
-            cloader = Thread.currentThread().getContextClassLoader();
+            cloader = VGlobals.instance().getWorkClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

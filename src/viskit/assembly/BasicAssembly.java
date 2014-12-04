@@ -53,6 +53,7 @@ import simkit.SimEvent;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
+import viskit.VGlobals;
 import viskit.model.AssemblyNode;
 
 /**
@@ -805,7 +806,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initReportFile();
 
-            ClassLoader localLoader = Thread.currentThread().getContextClassLoader();
+            ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.reports.AnalystReportBuilder");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);

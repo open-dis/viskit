@@ -44,6 +44,7 @@ import java.util.Properties;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
+import viskit.VGlobals;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.assembly.ViskitAssembly;
 import viskit.xsd.bindings.assembly.*;
@@ -114,7 +115,7 @@ public class BshGridlet extends Thread {
                 // TODO: fix generics
                 v = (Vector) xmlrpc.execute("gridkit.getJars", v);
                 Enumeration e = v.elements();
-                ClassLoader boot = currentThread().getContextClassLoader();
+                ClassLoader boot = VGlobals.instance().getWorkClassLoader();
                 if (boot instanceof Boot) {
                     while (e.hasMoreElements()) {
                         ((Boot) boot).addJar(new URL((String) e.nextElement()));

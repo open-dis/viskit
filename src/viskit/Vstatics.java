@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import viskit.control.FileBasedClassManager;
-import viskit.view.dialog.SettingsDialog;
 import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
@@ -48,7 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
-import viskit.doe.LocalBootLoader;
+import viskit.control.FileBasedClassManager;
+import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -194,27 +193,6 @@ public class Vstatics {
             return e.getMessage();
         }
         return null;
-    }
-
-    /**
-     * Retrieve this app's classpath as one string.  The order of the class path
-     * is 1) existing classpath, 2) extra paths, 3) work dir
-     * (project build/classes)
-     *
-     * @return this app's classpath as one string
-     */
-    public static String getClassPathAsString() {
-
-        String sep = getPathSeparator();
-        StringBuilder cPath = new StringBuilder();
-
-        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
-        for (String path : loader.getClassPath()) {
-            cPath.append(path);
-            cPath.append(sep);
-        }
-
-        return cPath.toString();
     }
 
     static String[] getExtraClassPathArray() {

@@ -95,17 +95,21 @@ public class EventGraphAssemblyComboMain {
         } catch (InterruptedException | InvocationTargetException e) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
-            // If we encounter this case, then uncomment printStackTrace() to
-            // drill down on the cause.  Easier than setting a breakpoint and
-            // debugging!
-            e.printStackTrace();
+            if (e instanceof InvocationTargetException) {
 
-            // if we got here, then we need to nuke the ${user.home}/.viskit dir
-            // it will be recreated on next start up
-            if (e instanceof InterruptedException)
-                nukeDotViskit();
+                // not convinced we need to do this anymore.  A corrupted
+                // viskitProject can cause an InvocationTargetException.  The
+                // Apache Commons config files have behaved rather well and don't
+                // need to be nuked as of late: 03 DEC 2014.
+//                nukeDotViskit();
 
-            // Bugfix 1377
+                // If we encounter this case, then uncomment printStackTrace() to
+                // drill down on the cause.  Easier than setting a breakpoint and
+                // debugging!
+                e.printStackTrace();
+            }
+
+            // \/ Bugfix 1377 \/
 
             // for copying style
             JLabel label = new JLabel();

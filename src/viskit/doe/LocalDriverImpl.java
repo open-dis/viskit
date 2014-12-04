@@ -12,7 +12,7 @@ import java.util.List;
 
 /**Implements a Local Doe Driver, to be interchangeable with the remote
  * (Grid Engine) Driver
- * 
+ *
  * @since January 8, 2007, 2:17 PM
  * @author Rick Goldberg
  * @version $Id$
@@ -26,12 +26,11 @@ public class LocalDriverImpl implements DoeRunDriver {
 
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        loader = new LocalBootLoader(new URL[] {}, Thread.currentThread().getContextClassLoader(), viskit.VGlobals.instance().getWorkDirectory());
-        initGridRunner(loader);
+        this(new URL[] {}, viskit.VGlobals.instance().getWorkDirectory());
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
-        loader = new LocalBootLoader(extClassPaths, Thread.currentThread().getContextClassLoader(), workDir);
+        loader = new LocalBootLoader(extClassPaths, viskit.VGlobals.instance().getWorkClassLoader(), workDir);
         initGridRunner(loader);
     }
 

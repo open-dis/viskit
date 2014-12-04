@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -38,7 +39,7 @@ public class Boot extends URLClassLoader implements Runnable {
     public URL baseJarURL;
 
     public Boot(URL[] urls) {
-        this(urls,Thread.currentThread().getContextClassLoader());
+        this(urls,VGlobals.instance().getWorkClassLoader());
     }
 
     public Boot(URL[] urls, ClassLoader cloader) {

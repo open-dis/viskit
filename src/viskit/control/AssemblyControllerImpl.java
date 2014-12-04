@@ -1427,19 +1427,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String clNam = f.getName().substring(0, f.getName().indexOf('.'));
             clNam = paf.pkg + "." + clNam;
 
-            // TODO: Don't think this is necessary since we don't invoke
+            // no longer necessary since we don't invoke
             // Runtime.exec to compile anymore
-            String classPath = getClassPathString();
+            String classPath = "";
 
             execStrings = buildExecStrings(clNam, classPath);
         } else {
             execStrings = null;
         }
-    }
-
-    static String getClassPathString() {
-        VGlobals.instance().resetWorkClassLoader();
-        return Vstatics.getClassPathAsString();
     }
 
     @Override
@@ -1449,7 +1444,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "Assembly Source Generation Error",
                     "Compile not attempted, check ${user.home}/.viskit/debug.log for details"
-                    ); //todo, more information
+                    );
         } else {
 
             // Ensure changes to the Assembly Properties dialog get saved
@@ -1466,16 +1461,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    public static final int EXEC_JAVACMD = 0;
-    public static final int EXEC_VMARG0 = 1;
-    public static final int EXEC_VMARG1 = 2;
-    public static final int EXEC_VMARG3 = 3;
-    public static final int EXEC_DASH_CP = 4;
-    public static final int EXEC_CLASSPATH = 5;
+    // No longer invoking a Runtime.Exec for compilation
+//    public static final int EXEC_JAVACMD = 0;
+//    public static final int EXEC_VMARG0 = 1;
+//    public static final int EXEC_VMARG1 = 2;
+//    public static final int EXEC_VMARG3 = 3;
+//    public static final int EXEC_DASH_CP = 4;
+//    public static final int EXEC_CLASSPATH = 5;
     public static final int EXEC_TARGET_CLASS_NAME = 6;
     public static final int EXEC_VERBOSE_SWITCH = 7;
     public static final int EXEC_STOPTIME_SWITCH = 8;
-    public static final int EXEC_FIRST_ENTITY_NAME = 9;
+//    public static final int EXEC_FIRST_ENTITY_NAME = 9;
 
     /** Prepare for the compilation of the loaded assembly file from java source.
      * Maintain the above statics to match the order below.

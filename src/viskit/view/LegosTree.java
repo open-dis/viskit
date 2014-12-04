@@ -54,6 +54,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     private Vector<String> recurseNogoList;
     private String genericTableToolTip = "Drag onto canvas";
 
+    String userDir = System.getProperty("user.dir");
+    String userHome = System.getProperty("user.home");
+    String name;
+
     /** Constructor for Listener Event Graph Object Tree
      *
      * @param className a class to evaluate as a LEGO
@@ -260,7 +264,18 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         int idx = parent.getIndex(myNode);
                         mod.nodesWereInserted(parent, new int[] {idx});
                     } else {
-                        myNode = new DefaultMutableTreeNode(f.getPath());
+
+                        // Shorten long path names
+                        // TODO: use VConfig to get the project path
+                        if (f.getPath().contains(userDir)) {
+                            name = f.getPath().substring(userDir.length() + 1, f.getPath().length());
+                        } else if (f.getPath().contains(userHome)) {
+                            name = f.getPath().substring(userHome.length() + 1, f.getPath().length());
+                        } else {
+                            name = f.getPath();
+                        }
+
+                        myNode = new DefaultMutableTreeNode(name);
                         rootNode.add(myNode);
                         rootVector.add(myNode); // for later pruning
                         directoryRoots.put(f.getPath(), myNode);
@@ -465,12 +480,22 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             Vstatics.putParameterList(c.getName(), plist);
         }
 
+        // Shorten long path names
+        // TODO: use VConfig to get the project path
+        if (jarFile.getName().contains(userDir)) {
+            name = jarFile.getName().substring(userDir.length()+1, jarFile.getName().length());
+        } else if (jarFile.getName().contains(userHome)) {
+            name = jarFile.getName().substring(userHome.length()+1, jarFile.getName().length());
+        } else {
+            name = jarFile.getName();
+        }
+
         if (list == null || list.isEmpty()) {
-            log.warn("No classes of type " + targetClassName + " found in " + jarFile.getName());
-            log.info(jarFile.getName() + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+            log.warn("No classes of type " + targetClassName + " found in " + name);
+            log.info(name + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
         } else {
 
-            DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(jarFile.getName());
+            DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
             mod.insertNodeInto(localRoot, rootNode, 0);
 
             for (Class<?> c : list) {

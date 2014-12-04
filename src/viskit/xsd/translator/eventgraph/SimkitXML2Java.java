@@ -995,7 +995,7 @@ public class SimkitXML2Java {
         Class<?> aClass = null;
 
         try {
-            aClass = Thread.currentThread().getContextClassLoader().loadClass(c);
+            aClass = VGlobals.instance().getWorkClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
 //            log.error(cnfe);
         }

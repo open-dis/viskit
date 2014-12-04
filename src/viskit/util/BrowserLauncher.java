@@ -9,6 +9,7 @@ import javax.swing.event.HyperlinkEvent;
 import static javax.swing.event.HyperlinkEvent.EventType.ACTIVATED;
 import javax.swing.event.HyperlinkListener;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 
 /**
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $
@@ -31,7 +32,7 @@ public class BrowserLauncher implements HyperlinkListener {
                             "rundll32 url.dll,FileProtocolHandler " +
                             url);
                 } else if (osName.equals(MAC)) {
-                    Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(
+                    Class<?> clazz = VGlobals.instance().getWorkClassLoader().loadClass(
                             "com.apple.eio.FileManager");
                     Method method = clazz.getMethod("openURL", String.class);
                     method.invoke(null, url.toString());

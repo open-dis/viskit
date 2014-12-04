@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 
@@ -72,7 +73,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 return true;
             }
         } else if ((Boolean) o) {
-            Object parent = Thread.currentThread().getContextClassLoader();
+            Object parent = VGlobals.instance().getWorkClassLoader();
             Class<?> parentz = parent.getClass();
             try {
                 Method getExtUrls = parentz.getMethod("getExtUrls");

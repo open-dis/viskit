@@ -92,10 +92,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private String analystReportTempFile = null;
     FileOutputStream fos;
     FileInputStream fis;
-    LocalBootLoader loader;
     Class<?> targetClass;
     Object assemblyObj, targetObject;
     private static int mutex = 0;
+    private LocalBootLoader loader;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
     long seed;
@@ -153,8 +153,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     /**
-     * Get param indices from AssemblyControllerImpl statics
-     * @param params command line arguments to initialize the Assembly runner
+     * Parameterize this runner for a sim run
+     * @param params arguments to initialize the Assembly runner
      */
     public void initParams(String[] params) {
 
@@ -184,8 +184,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private void fillRepWidgetsFromBasicAssemblyObject(String clName, boolean verbose, double stopTime) throws Throwable {
 
-        // Assembly has been compiled by now
-        lastLoaderNoReset = VGlobals.instance().getResetWorkClassLoader(true);
+        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         targetClass = Vstatics.classForName(clName);
@@ -195,8 +194,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         targetObject = targetClass.newInstance();
 
         /* in order to see BasicAssembly this thread has to have
-         * the same loader as the one used to compile this entity since they
-         * don't share the same simkit or viskit.  Used in the verboseListener
+         * the same ClassLoader as the one used to compile this entity since
+         * they don't share the same simkit or viskit.  Used in the
+         * verboseListener
          */
         assembly = (BasicAssembly) targetObject;
 
@@ -237,23 +237,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
-            // Must reset the Classloader to free this assembly run from any
-            // previously initialized static references thereby ensuring an
-            // independent sim run
-            loader = (LocalBootLoader) VGlobals.instance().getResetWorkClassLoader(true); // true->reboot
-            Class<?> obj = loader.loadClass("java.lang.Object");
+            // Initialize an Object so that we have it's ClassLoader as the
+            // parent of our about to be reset one
+            Class<?> obj = lastLoaderNoReset.loadClass("java.lang.Object");
 
-            // Forcing the extra classpaths here bug fix 1237
+            // Forcing exposure of extra classpaths here.  Bugfix 1237
             loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
-            loader = loader.init(true);
-            Thread.currentThread().setContextClassLoader(loader);
+            lastLoaderWithReset = loader.init(true);
+            Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
             // Test for Bug 1237
 //            for (String s : loader.getClassPath()) {
 //                log.info(s);
 //            }
-            lastLoaderWithReset = loader;
-            targetClass = loader.loadClass(targetClass.getName());
+            targetClass = lastLoaderWithReset.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
 
             Method setOutputStream = targetClass.getMethod("setOutputStream", OutputStream.class);
@@ -269,11 +266,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // Resetting the seed
-            Class<?> RVFactClass = loader.loadClass("simkit.random.RandomVariateFactory");
+            Class<?> RVFactClass = lastLoaderWithReset.loadClass("simkit.random.RandomVariateFactory");
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
 
-            Class<?> RNClass = loader.loadClass("simkit.random.RandomNumber");
+            Class<?> RNClass = lastLoaderWithReset.loadClass("simkit.random.RandomNumber");
             Method setSeed = RNClass.getMethod("setSeed", long.class);
             setSeed.invoke(rn, seed);
 
@@ -300,7 +297,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             simRunner = new Thread(assemblyRunnable);
             new SimThreadMonitor(simRunner).start();
 
-            // Restore Viskit's JVM ClassLoader
+            // Restore Viskit's working ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
