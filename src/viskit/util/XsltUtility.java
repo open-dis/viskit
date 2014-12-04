@@ -7,8 +7,8 @@ import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-/** This class was written by CDR Duane Davis for work on the AUV Workbench.
- * It was copied to this application to perform XSLT conversions.
+/** This class was written by CDR Duane Davis for the AUV Workbench.
+ * It was copied to this application to perform handy XSLT conversions.
  *
  * @author Duane Davis
  * @since March 11, 2004, 4:55 PM

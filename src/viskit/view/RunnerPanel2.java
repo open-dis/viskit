@@ -77,13 +77,18 @@ public class RunnerPanel2 extends JPanel {
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     private JLabel titl;
+    private boolean aRPanelVisible;
 
-    public RunnerPanel2(boolean verbose, boolean skipCloseButt) {
-        this(null, skipCloseButt);
-        vcrVerbose.setSelected(verbose);
-    }
-
-    public RunnerPanel2(String title, boolean skipCloseButt) {
+    /**
+     * Create an Assembly Runner panel
+     * @param title the title of this panel
+     * @param skipCloseButt if ture, don't supply rewind or pause buttons on VCR,
+     * not hooked up, or working right.  A false will enable all VCR buttons.
+     * Currently, only start and stop work
+     * @param aRPanelVisible if true, will enable the analyst report check box
+     */
+    public RunnerPanel2(String title, boolean skipCloseButt, boolean aRPanelVisible) {
+        this.aRPanelVisible = aRPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         if (title != null) {
@@ -93,7 +98,6 @@ public class RunnerPanel2 extends JPanel {
         }
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSplit;
-
 
         soutTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
@@ -204,6 +208,7 @@ public class RunnerPanel2 extends JPanel {
 
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable Analyst Reports");
+        analystReportCB.setEnabled(aRPanelVisible);
         flowPan.add(analystReportCB);
 
 //        resetSeedCB = new JCheckBox("Reset seed each rerun");
@@ -223,7 +228,6 @@ public class RunnerPanel2 extends JPanel {
         vcrStop.setEnabled(false);
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
         vcrStop.setText(null);
-//        vcrStop.addActionListener(new FileChaserStopper());
         buttPan.add(vcrStop);
 
         vcrRewind = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Rewind24.gif")));

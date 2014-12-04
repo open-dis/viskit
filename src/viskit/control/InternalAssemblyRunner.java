@@ -102,7 +102,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private boolean inRegressionMode;
     AnalystReportPanel reportPanel;
 
-    public InternalAssemblyRunner() {
+    /**
+     * The internal logic for the Assembly Runner panel
+     * @param aRPanelVisible if true, the analyst report panel will be visible
+     */
+    public InternalAssemblyRunner(boolean aRPanelVisible) {
         inRegressionMode = false;
 
         saver = new saveListener();
@@ -110,7 +114,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right
         // false will enable all VCR buttons.  Currently, only start and stop work
-        runPanel = new RunnerPanel2(null, true);
+        runPanel = new RunnerPanel2("Assembly Runner", true, aRPanelVisible);
         doMenus();
         runPanel.vcrStop.addActionListener(new stopListener());
         runPanel.vcrPlay.addActionListener(new startResumeListener());

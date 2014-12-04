@@ -190,8 +190,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = tabbedPaneIdx;
 
         // Analyst report
-        boolean analystReportVisible = SettingsDialog.isAnalystReportVisible();
-        if (analystReportVisible) {
+        boolean aRPanelVisible = SettingsDialog.isAnalystReportVisible();
+        if (aRPanelVisible) {
             tabbedPane.add(reportPanel = new AnalystReportPanel());
             int idx = tabbedPane.indexOfComponent(reportPanel);
             tabbedPane.setTitleAt(idx, "Analyst Report");
@@ -211,7 +211,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
 
         // Assembly runner
-        asyRunComponent = new InternalAssemblyRunner();
+        asyRunComponent = new InternalAssemblyRunner(aRPanelVisible);
         runTabbedPane.add(asyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
@@ -275,7 +275,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         /* End DIFF between OA3302 branch and trunk */
 
         assyCntlr.addAssemblyFileListener(runGridComponent);
-        if (analystReportVisible) {
+        if (aRPanelVisible) {
             assyCntlr.addAssemblyFileListener(reportPanel);
         }
 
