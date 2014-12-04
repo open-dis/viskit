@@ -1,5 +1,15 @@
 Post release fixes:
 
+  Better Mac OS X installer support by upgrading the javaApplicationStub to work
+  better with Oracle's JDK 8+.  Better Windows installer support by actually
+  getting it to work with the executable jar's Class-Path header.  Still need to
+  fully test on Unix though.
+
+  Implemented better message pop-up reporting for the user to better determine
+  what errors have occurred
+
+  Bugfix 1377
+
   Allow deselection of both the Design of Experiments (DOE) and Cluster Run
   panels via the Files -> Settings dialog -> Tabs Visible
 
@@ -72,13 +82,12 @@ Major changes since 0.6.2:
   Upgrade to Simkit v1.4.2
 
   Fix issue with generating a lot of temp files and jars and not cleaning up
-  after the main app shutsdown
+  after the main app shuts down
 
-  Implemented a completely enclosed runtime compilation scheme using the JDKs
-  runtime compiler for EG and Assy generated code from XML, thus removing the
-  requirement to have the current JDK's tools.jar in the runtime classpath.
-  This also removes the requirement to have the JDK installed.  Viskit can run
-  w/ JRE only.
+  Implemented a completely enclosed runtime compilation scheme using the JDK's
+  runtime compiler for EG and Assy generated source code, thus removing the
+  requirement to ship the current JDK's tools.jar with the installers.  A JDK is
+  still required to run Viskit though.
 
   Improve the whole Viskit app build process; must faster compile time
 
