@@ -61,29 +61,17 @@
     <!-- access to local environment variables -->
     <property environment="env"/>
 
-    <path id="runtime.extension.classes.path">
-        <fileset dir="${dir.lib.ext}" includes="**/*.jar"/>
+    <path id="jaxb.compile.path">
+        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar"/>
     </path>
 
     <path id="jaxb.runtime.path">
         <fileset dir="${dir.lib.xml}" includes="**/*.jar" excludes="jaxb-xjc.jar" id="jaxb.classes"/>
     </path>
 
-    <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar"/>
+    <path id="runtime.extension.classes.path">
+        <fileset dir="${dir.lib.ext}" includes="**/*.jar"/>
     </path>
-
-    <!-- The following used for the IzPack installer routine -->
-    <fileset dir="${dir.lib}" id="runtime.lib" >
-        <!-- could use restrictions in current runtime.classpath -->
-        <include name="**/*.jar"/>
-        <exclude name="izpack/**"/>
-        <exclude name="support/**"/>
-        <exclude name="jaxb/jaxb-xjc.jar"/>
-    </fileset>
-    <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >
-        <include name="**/*.jar"/>
-    </fileset>
 
     <path id="compile.classpath">
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -124,12 +112,27 @@
         <pathelement location="${dir.lib}/support/junit.jar"/>
     </path>
 
+    <!-- For the launch4j installers -->
+    <fileset file="${dist.exe.jar}" id="runtime.viskit.exe"/>
+
+    <!-- The following filesets are used for the IzPack installer routine -->
+    <fileset dir="${dir.lib}" id="runtime.lib" >
+        <!-- could use restrictions in current runtime.classpath -->
+        <include name="**/*.jar"/>
+        <exclude name="izpack/**"/>
+        <exclude name="support/**"/>
+        <exclude name="jaxb/jaxb-xjc.jar"/>
+    </fileset>
+    <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >
+        <include name="**/*.jar"/>
+    </fileset>
+
     <!-- TaskDefs -->
     <taskdef classname="com.sun.tools.xjc.XJCTask"
              name="xjc"
              classpathref="jaxb.compile.path"/>
 
-    <!-- Legacy task (no longer used) -->
+    <!-- @deprecated legacy task (no longer used) -->
     <taskdef classname="net.amadan.trang.ant.TrangTask" name="trang">
         <classpath>
             <fileset dir="${dir.lib}/support" includes="trang*.jar"/>
@@ -340,6 +343,102 @@ their descpritions.
                            value="${nps}, ${moves.institute}, ${savage.research.group}"/>
                 <attribute name="Implementation-URL"
                            value="${Savage.url}"/>
+
+                <section name="edu.nps.util"/>
+                <section name="viskit"/>
+                <section name="viskit.assembly"/>
+                <section name="viskit.control"/>
+                <section name="viskit.doe"/>
+                <section name="viskit.gridlet"/>
+                <section name="viskit.images"/>
+                <section name="viskit.jgraph"/>
+                <section name="viskit.model"/>
+                <section name="viskit.mvc"/>
+                <section name="viskit.util"/>
+                <section name="viskit.view"/>
+                <section name="viskit.view.dialog"/>
+                <section name="viskit.xsd.bindings.assembly"/>
+                <section name="viskit.xsd.bindings.assembly.stats"/>
+                <section name="viskit.xsd.bindings.cli"/>
+                <section name="viskit.xsd.bindings.eventgraph"/>
+                <section name="viskit.xsd.cli"/>
+                <section name="viskit.xsd.translator.assembly"/>
+                <section name="viskit.xsd.translator.eventgraph"/>
+            </manifest>
+            <metainf file="license/lgpl.txt"/>
+            <metainf file="license/license.txt"/>
+        </jar>
+    </target>
+
+    <target name="make.classpath"
+            depends="make.classpath.win,make.classpath.unix,make.classpath.mac"
+            description="Platform specific Class-Path header for the executable jar"/>
+
+    <target name="make.classpath.win" if="isWindows">
+        <pathconvert dirsep="/"
+                     pathsep=" "
+                     property="launcher.classpath"
+                     refid="runtime.classpath">
+            <map from="*${dir.build.classes}" to=""/>
+            <mapper>
+                <globmapper from="${basedir}\lib\*" to="lib/*"/>
+            </mapper>
+        </pathconvert>
+    </target>
+
+    <target name="make.classpath.unix" if="isUnixNotMac">
+        <pathconvert dirsep="/"
+                     pathsep=" "
+                     property="launcher.classpath"
+                     refid="runtime.classpath">
+            <map from="*${dir.build.classes}" to=""/>
+            <mapper>
+                <globmapper from="${basedir}/lib/*" to="lib/*"/>
+            </mapper>
+        </pathconvert>
+    </target>
+
+    <target name="make.classpath.mac" if="isMac">
+        <pathconvert dirsep="/"
+                     pathsep=" "
+                     property="launcher.classpath"
+                     refid="runtime.classpath">
+            <map from="*${dir.build.classes}" to=""/>
+            <mapper>
+                <globmapper from="${basedir}/lib/*" to="lib/*"/>
+            </mapper>
+        </pathconvert>
+    </target>
+
+    <target name="jar.executable" depends="jar,make.classpath">
+
+        <echo message="${toString:runtime.classpath}"/>
+        <echo message="${launcher.classpath}"/>
+
+        <jar basedir="${dir.build.classes}"
+             compress="false"
+             destfile="${dist.exe.jar}">
+            <manifest>
+                <attribute name="Built-By" value="${my.name}"/>
+                <attribute name="Specification-Title"
+                           value="${product.Name}"/>
+                <attribute name="Specification-Version"
+                           value="${product.version.major}.${product.version.minor}"/>
+                <attribute name="Specification-Vendor"
+                           value="${spec.vendor}"/>
+                <attribute name="Implementation-Title"
+                           value="${impl.title}"/>
+                <attribute name="Implementation-Version"
+                           value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
+                <attribute name="Implementation-Vendor"
+                           value="${nps}, ${moves.institute}, ${savage.research.group}"/>
+                <attribute name="Implementation-URL"
+                           value="${Savage.url}"/>
+
+                <!-- used by native launcher, see launch4j -->
+                <attribute name="Main-Class" value="viskit.Splash2" />
+                <attribute name="Class-Path" value="${launcher.classpath}" />
+
                 <section name="edu.nps.util"/>
                 <section name="viskit"/>
                 <section name="viskit.assembly"/>
@@ -372,8 +471,8 @@ their descpritions.
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/>
         <copy todir="${dir.lib.ext}">
             <fileset dir="${dir.diskit}/lib">
-                <include name="open-dis_4.06.jar"/>
-                <include name="dis-enums.jar"/>
+                <include name="open-dis_4.08.jar"/>
+                <include name="dis-enums_1.1.jar"/>
                 <include name="hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
             </fileset>
         </copy>
@@ -390,7 +489,7 @@ their descpritions.
 
     <target name="build.viskit.no.extensions"
             depends="jar"
-            description="Build viskit jar(s)"/>
+            description="Build viskit jar only, no DES extenstions"/>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
@@ -555,8 +654,8 @@ their descpritions.
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
-	    <jvmarg line="${common.run.args}"/>
 
+	    <jvmarg line="${common.run.args}"/>
             <jvmarg value="-Xdock:name=${product.shortname}"/>
             <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
             <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
@@ -564,9 +663,35 @@ their descpritions.
         </java>
     </target>
 
+    <target name="debug.viskit.exe.jar"
+            depends="jar.executable"
+            description="Test the ${dist.exe.jar}">
+
+        <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
+            <classpath refid="runtime.classpath"/>
+        </nbjpdastart>
+
+        <copy todir="${basedir}">
+            <fileset refid="runtime.viskit.exe"/>
+        </copy>
+
+        <java jar="viskit-exe.jar"
+              fork="true"
+              failonerror="true">
+
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xnoagent"/>
+            <jvmarg value="-Djava.compiler=none"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg line="${common.run.args}"/>
+        </java>
+
+    </target>
+
     <target depends="compile,quick.debug" description="Debug Project" name="debug"/>
 
-    <!-- TARGET: Quick Debug don't check dependencies, TBD ant should be able to not rebuild if not needed -->
+    <!-- TARGET: Quick Debug don't check dependencies -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
 
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
@@ -656,11 +781,11 @@ their descpritions.
         <delete dir="${dir.lib.ext}">
             <include name="*.jar"/>
         </delete>
+        <delete file="viskit-exe.jar"/>
     </target>
 
     <target name="nuke.dot.viskit" description="Abolish an out of synch viskit metadata directory">
         <delete includeemptydirs="yes" dir="${user.home}/.viskit"/>
-        <delete includeemptydirs="yes" dir="${user.home}/MyViskitProjects"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
@@ -668,31 +793,31 @@ their descpritions.
 
     <target name="show.debug.log" depends="build.init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="debug.log"/>
+            <fileset dir="${user.home}/.viskit" includes="debug.log"/>
         </concat>
     </target>
 
     <target name="show.app.xml" depends="build.init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="c_app.xml"/>
+            <fileset dir="${user.home}/.viskit" includes="c_app.xml"/>
         </concat>
     </target>
 
     <target name="show.gui.xml" depends="build.init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="c_gui.xml"/>
+            <fileset dir="${user.home}/.viskit" includes="c_gui.xml"/>
         </concat>
     </target>
 
     <target name="show.passwd.xml" depends="build.init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="passwd.xml"/>
+            <fileset dir="${user.home}/.viskit" includes="passwd.xml"/>
         </concat>
     </target>
 
     <target name="show.validation.errors" depends="build.init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="validationErrors.log"/>
+            <fileset dir="${user.home}/.viskit" includes="validationErrors.log"/>
         </concat>
     </target>
 

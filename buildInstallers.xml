@@ -12,8 +12,6 @@
     <property name="SVNId" value="$Id$"/>
     <property name="installer" value="${basedir}/installer"/>
     <property name="launch4j" value="${user.home}/launch4j"/>
-    <property name="orangevolt.jar" value="${dir.lib}/izpack/orangevolt-ant-tasks-1.3.8.jar"/>
-    <property name="roxes.jar" value="${dir.lib}/izpack/roxes-win32forjava-1.1.1.jar"/>
 
     <!-- get all izpack related packages -->
     <condition property="build.host.linux">
@@ -43,19 +41,19 @@
     </target>
     <target name="getLaunch4j" depends="checkLaunch4j" unless="launch4j.exists" >
         <!-- only one of these should pass -->
-        <!--ant target="getLaunch4jWin32"/>
+        <ant target="getLaunch4jWin"/>
         <ant target="getLaunch4jLinux"/>
-        <ant target="getLaunch4jMac"/-->
+        <ant target="getLaunch4jMac"/>
     </target>
 
-    <target name="getLaunch4jWin32" if="build.host.windows">
-        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-win32.zip" dest="${launch4j}.zip" />
+    <target name="getLaunch4jWin" if="build.host.windows">
+        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-win32.zip" dest="${launch4j}.zip" />
         <unzip src="${user.home}/launch4j.zip" dest="${user.home}"/>
         <delete file="${launch4j}.zip"/>
     </target>
 
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-linux.tgz" dest="${launch4j}.tgz" />
+        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-linux.tgz" dest="${launch4j}.tgz" />
         <untar src="${launch4j}.tgz" dest="${user.home}" compression="gzip"/>
         <chmod file="${launch4j}/bin/windres" perm="a+x"/>
         <chmod file="${launch4j}/bin/ld" perm="a+x"/>
@@ -63,16 +61,18 @@
     </target>
 
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://downloads.sourceforge.net/project/launch4j/launch4j-3/3.0.1/launch4j-3.0.1-macosx.tgz" dest="${launch4j}.tgz" />
+        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-macosx-x86-10.8.tgz" dest="${launch4j}.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}" compression="gzip"/>
+        <chmod file="${launch4j}/bin/windres" perm="a+x"/>
+        <chmod file="${launch4j}/bin/ld"      perm="a+x"/>
         <delete file="${launch4j}.tgz"/>
     </target>
 
     <target name="check.viskit">
-        <available file="${dir.build.lib}/viskit.jar" property="viskit.built"/>
+        <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built"/>
     </target>
     <target name="no.extensions" depends="check.viskit" unless="viskit.built" >
-        <ant target="jar"/>
+        <ant target="jar.executable"/>
     </target>
     <target name="with.extensions" depends="no.extensions" unless="extensions.built">
         <ant target="runtime.extensions"/>
@@ -138,27 +138,19 @@
 
     <target name="make.win.unix.installer">
 
-        <!--taskdef name="launch4j"
+        <taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/-->
+                 classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
 
-        <!-- The last d/l gave me a fit about permissions -->
-        <!--chmod file="${launch4j}/bin/windres" perm="ugo+rx"/>
-        <chmod file="${launch4j}/bin/ld"      perm="ugo+rx"/-->
-
-        <!-- for the sfx executable task -->
-        <taskdef classpath="${orangevolt.jar}:${roxes.jar}"
-                 resource="com/orangevolt/tools/ant/taskdefs.properties"/>
-
-        <!-- Wrap the viskit.jar in a native win32 executable -->
-        <!--launch4j configFile="${installer}/launch4jConfig.xml"/>
+        <!-- Associate the viskit-exe.jar with a native win executable -->
+        <launch4j configFile="${installer}/launch4jConfig.xml"/>
 
         <copy todir="${installer}/stage">
             <fileset refid="runtime.viskit.exe"/>
         </copy>
         <delete>
             <fileset refid="runtime.viskit.exe"/>
-        </delete-->
+        </delete>
 
         <echo message="Running IzPack to build the installers..."/>
 
@@ -179,17 +171,17 @@
                 compression="deflate"
                 compressionlevel="9"/>
 
-        <!-- create native win32 wrapper in case java doesn't exist yet to bootstrap ViskitInstall.jar as .exe -->
-        <!--launch4j>
+        <!-- create native installer wrapping the ViskitInstallWin.jar as .exe -->
+        <launch4j>
             <config chdir="."
                     dontwrapjar="false"
                     jar="${installer}/build/ViskitInstallWin.jar"
-                    outfile="${installer}/build/ViskitInstallWin32.exe"
+                    outfile="${installer}/build/ViskitInstallWin.exe"
                     headertype="gui"
-                    icon="${installer}/images/ViskitIcon.ico" >
+                    icon="${installer}/images/ViskitIcon.ico">
                 <jre minVersion="1.7.0"/>
             </config>
-        </launch4j-->
+        </launch4j>
     </target>
 
     <target name="make.mac.installer">
