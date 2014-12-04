@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly package="examples" version="1.0" name="ServerAssembly3" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <TerminalParameter type="double" value="1.7" link="interarrivalTime_2_1_1" name="interarrivalTime_2_1_1">
-        <DoubleRange highValue="2.0" lowValue="1.0"/>
+<SimkitAssembly name="ServerAssembly3" version="1.0" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <TerminalParameter name="interarrivalTime_2_1_1" link="interarrivalTime_2_1_1" value="1.7" type="double">
+        <DoubleRange lowValue="1.0" highValue="2.0"/>
     </TerminalParameter>
-    <TerminalParameter type="double" value="2.1" link="serviceTime_2_1_1" name="serviceTime_2_1_1">
-        <DoubleRange highValue="3.0" lowValue="2.0"/>
+    <TerminalParameter name="serviceTime_2_1_1" link="serviceTime_2_1_1" value="2.1" type="double">
+        <DoubleRange lowValue="2.0" highValue="3.0"/>
     </TerminalParameter>
-    <TerminalParameter type="double" value="2.3" link="serviceTime_2_2_1" name="serviceTime_2_2_1">
-        <DoubleRange highValue="4.0" lowValue="3.0"/>
+    <TerminalParameter name="serviceTime_2_2_1" link="serviceTime_2_2_1" value="2.3" type="double">
+        <DoubleRange lowValue="3.0" highValue="4.0"/>
     </TerminalParameter>
-    <SimEntity type="examples.ArrivalProcess" name="arrival">
-        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory" name="interarrivalTime">
-            <TerminalParameter type="java.lang.String" value="Exponential"/>
+    <SimEntity name="arrival" type="examples.ArrivalProcess">
+        <FactoryParameter name="interarrivalTime" factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter value="Exponential" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter type="double" value="1.7" linkRef="interarrivalTime_2_1_1" name="interarrivalTime_2_1_1"/>
+                    <TerminalParameter name="interarrivalTime_2_1_1" linkRef="interarrivalTime_2_1_1" value="1.7" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate y="90" x="90"/>
+        <Coordinate x="90" y="90"/>
     </SimEntity>
-    <SimEntity type="examples.SimpleServer" name="server">
-        <FactoryParameter type="simkit.random.RandomVariate" factory="simkit.random.RandomVariateFactory" name="serviceTime">
-            <TerminalParameter type="java.lang.String" value="Gamma"/>
+    <SimEntity name="server" type="examples.SimpleServer">
+        <FactoryParameter name="serviceTime" factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter value="Gamma" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter type="double" value="2.1" linkRef="serviceTime_2_1_1" name="serviceTime_2_1_1"/>
+                    <TerminalParameter name="serviceTime_2_1_1" linkRef="serviceTime_2_1_1" value="2.1" type="double"/>
                 </MultiParameter>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter type="double" value="2.3" linkRef="serviceTime_2_2_1" name="serviceTime_2_2_1"/>
+                    <TerminalParameter name="serviceTime_2_2_1" linkRef="serviceTime_2_2_1" value="2.3" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <TerminalParameter type="int" value="2" name="totalNumberServers"/>
-        <Coordinate y="90" x="280"/>
+        <TerminalParameter name="totalNumberServers" value="2" type="int"/>
+        <Coordinate x="280" y="90"/>
     </SimEntity>
-    <PropertyChangeListener mode="replicationStat" type="simkit.stat.SimpleStatsTimeVarying" name="numInQueueStat">
-        <TerminalParameter type="java.lang.String" value="numberInQueue"/>
-        <Coordinate y="230" x="210"/>
+    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
+        <TerminalParameter value="numberInQueue" type="java.lang.String"/>
+        <Coordinate x="210" y="230"/>
     </PropertyChangeListener>
-    <PropertyChangeListener mode="replicationStat" type="simkit.stat.SimpleStatsTimeVarying" name="numAvailServersStat">
-        <TerminalParameter type="java.lang.String" value="numberAvailableServers"/>
-        <Coordinate y="230" x="350"/>
+    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
+        <TerminalParameter value="numberAvailableServers" type="java.lang.String"/>
+        <Coordinate x="350" y="230"/>
     </PropertyChangeListener>
-    <PropertyChangeListener type="simkit.util.SimplePropertyDumper" name="simplePropertyDumper">
-        <Coordinate y="290" x="280"/>
+    <PropertyChangeListener name="simplePropertyDumper" type="simkit.util.SimplePropertyDumper">
+        <Coordinate x="280" y="290"/>
     </PropertyChangeListener>
-    <PropertyChangeListenerConnection source="server" listener="numInQueueStat"/>
-    <PropertyChangeListenerConnection source="server" listener="numAvailServersStat"/>
-    <PropertyChangeListenerConnection source="server" listener="simplePropertyDumper"/>
-    <Adapter to="server" from="arrival" eventSent="Arrival" eventHeard="Arrival" name="adptr_3"/>
+    <PropertyChangeListenerConnection listener="numInQueueStat" source="server"/>
+    <PropertyChangeListenerConnection listener="numAvailServersStat" source="server"/>
+    <PropertyChangeListenerConnection listener="simplePropertyDumper" source="server"/>
+    <Adapter name="adptr_3" eventHeard="Arrival" eventSent="Arrival" from="arrival" to="server"/>
     <Output entity="arrival"/>
     <Output entity="server"/>
-    <Schedule verbose="true" stopTime="1000.0"/>
-    <Experiment timeout="5000" totalSamples="5" replicationsPerDesignPoint="2"/>
+    <Schedule stopTime="1000.0" verbose="true"/>
+    <Experiment replicationsPerDesignPoint="2" totalSamples="5" timeout="5000"/>
 </SimkitAssembly>
