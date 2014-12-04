@@ -175,7 +175,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
 //        Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
-        Class<?> obj = null;
+        Class<?> obj;
 
         try {
 
