@@ -526,7 +526,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != 0) {
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
-                asyRunComponent.initParams(execStrings);
+                asyRunComponent.preInitRun(execStrings);
             }
         }
     }

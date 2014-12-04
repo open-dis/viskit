@@ -153,10 +153,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     /**
-     * Parameterize this runner for a sim run
+     * Pre-initialization this runner for a sim run
      * @param params arguments to initialize the Assembly runner
      */
-    public void initParams(String[] params) {
+    public void preInitRun(String[] params) {
 
 //        for (String s : params) {
 //            log.info("VM argument is: " + s);
@@ -171,8 +171,34 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
+
+        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
+//        Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+
+        Class<?> obj = null;
+
         try {
-            fillRepWidgetsFromBasicAssemblyObject(targetClassName, defaultVerbose, defaultStopTime);
+
+            // Initialize an Object so that we have it's ClassLoader as the
+            // parent of our about to be reset LocalBootLoader
+            obj = lastLoaderNoReset.loadClass("java.lang.Object");
+        } catch (ClassNotFoundException e) {
+            LogUtils.getLogger(InternalAssemblyRunner.class).error(e);
+            return;
+        }
+
+        // Forcing exposure of extra classpaths here.  Bugfix 1237
+        loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
+        lastLoaderWithReset = loader.init(true);
+        Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+
+            // Test for Bug 1237
+//            for (String s : loader.getClassPath()) {
+//                log.info(s);
+//            }
+
+        try {
+            fillRepWidgetsFromBasicAssemblyObject(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
             JOptionPane.showMessageDialog(runPanel, "Error initializing Assembly object:\n" + throwable.getMessage(), "Java Error", JOptionPane.ERROR_MESSAGE);
             twiddleButtons(OFF);
@@ -182,12 +208,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(InternalAssemblyRunner.REWIND);
     }
 
-    private void fillRepWidgetsFromBasicAssemblyObject(String clName, boolean verbose, double stopTime) throws Throwable {
+    private void fillRepWidgetsFromBasicAssemblyObject(boolean verbose, double stopTime) throws Throwable {
 
-        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
-        Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-
-        targetClass = Vstatics.classForName(clName);
+        targetClass = Vstatics.classForName(targetClassName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }
@@ -237,19 +260,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
-            // Initialize an Object so that we have it's ClassLoader as the
-            // parent of our about to be reset one
-            Class<?> obj = lastLoaderNoReset.loadClass("java.lang.Object");
-
-            // Forcing exposure of extra classpaths here.  Bugfix 1237
-            loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
-            lastLoaderWithReset = loader.init(true);
-            Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-
-            // Test for Bug 1237
-//            for (String s : loader.getClassPath()) {
-//                log.info(s);
-//            }
             targetClass = lastLoaderWithReset.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
 
