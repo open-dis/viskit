@@ -27,6 +27,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -45,14 +46,14 @@ public class TestGridkitServerAssembly3 extends Thread {
     /** Creates a new instance of TestGridkitServerAssembly3 */
     public TestGridkitServerAssembly3(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server,port);
-        args = new Vector<Object>();
+        args = new Vector<>();
         buffer = new ByteArrayOutputStream();
 
         // calculate the base directory, hack, know examples is next to lib
         // this of course only works in a development workspace
 
         // get the jarurl path to viskit.EventGraphAssemblyComboMain
-        URL u = Thread.currentThread().getContextClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
+        URL u = VGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
         log.info(u);
 
@@ -324,8 +325,8 @@ public class TestGridkitServerAssembly3 extends Thread {
                         int designPtIndex = i % 3; // can also just use getResultByTaskID(int)
                         args.clear();
                         args.add(usid);
-                        args.add(new Integer(sampleIndex));
-                        args.add(new Integer(designPtIndex));
+                        args.add(sampleIndex);
+                        args.add(designPtIndex);
                         // this is reallllly verbose, you may wish to consider
                         // not getting the output logs unless there is a problem
                         // even so at that point the design points can be run
@@ -344,9 +345,9 @@ public class TestGridkitServerAssembly3 extends Thread {
                             System.out.println("ReplicationStats from task "+(i+1)+" replication "+j);
                             args.clear();
                             args.add(usid);
-                            args.add(new Integer(sampleIndex));
-                            args.add(new Integer(designPtIndex));
-                            args.add(new Integer(j));
+                            args.add(sampleIndex);
+                            args.add(designPtIndex);
+                            args.add(j);
                             ret = xmlrpc.execute("gridkit.getReplicationStats",args);
                             System.out.println(ret);
                         }

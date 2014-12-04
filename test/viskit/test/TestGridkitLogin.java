@@ -15,6 +15,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
+import viskit.VGlobals;
 
 /**
  *
@@ -36,7 +37,7 @@ public class TestGridkitLogin extends Thread {
 
     @Override
     public void run() {
-        Vector<Object> params = new Vector<Object>();
+        Vector<Object> params = new Vector<>();
         String user = "admin";
         String usid;
         Object ret;
@@ -110,7 +111,7 @@ public class TestGridkitLogin extends Thread {
             params.add(usid);
             params.add("newbie");
             ret = xmlrpc.execute("gridkit.addUser", params);
-            LOG.info("bogus addUser attempt returned " + ret + ((((Boolean) ret).booleanValue()) ? " which is not cool" : " which is cool"));
+            LOG.info("bogus addUser attempt returned " + ret + (((Boolean) ret) ? " which is not cool" : " which is cool"));
 
             // now login as admin to create newbie
             params.clear();
@@ -141,7 +142,7 @@ public class TestGridkitLogin extends Thread {
 
             // now send a jar to newbies new session
 
-            URL u = Thread.currentThread().getContextClassLoader().getResource("diskit/DISMover3D.class");
+            URL u = VGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
             LOG.info("Opening " + u);
             u = new URL((u.getFile().split("!"))[0].trim());
             File jar = new File(u.getFile());
@@ -174,7 +175,7 @@ public class TestGridkitLogin extends Thread {
                 LOG.info("read in " + readIn);
 
                 params.add(outBuf);
-                params.add(new Integer(chunks));
+                params.add(chunks);
                 ret = xmlrpc.execute("gridkit.transferJar", params);
                 LOG.info("Transferred " + ret + " bytes in chunk # " + chunks);
                 chunks--;
