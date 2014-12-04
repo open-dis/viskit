@@ -168,12 +168,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // TODO: should this be editable?
         runPanel.vcrSimTime.setText("0.0");
 
+        // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
-
+        // Viskit's current working ClassLoader
         lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
-//        Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         Class<?> obj;
 
@@ -190,12 +190,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // Forcing exposure of extra classpaths here.  Bugfix 1237
         loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
         lastLoaderWithReset = loader.init(true);
+
+        // Set a fresh ClassLoader for this thread to be free of any static
+        // state set from the Viskit working ClassLoader
         Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
-            // Test for Bug 1237
-//            for (String s : loader.getClassPath()) {
-//                log.info(s);
-//            }
+        // Test for Bug 1237
+//        for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
+//            log.info(s);
+//        }
+//        log.info("\n");
 
         try {
             fillRepWidgetsFromBasicAssemblyObject(defaultVerbose, defaultStopTime);
@@ -236,6 +240,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
         runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
+
+        // Set the run panel according to what's XML values
         setVerbose.invoke(targetObject, verbose);
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
         setStopTime.invoke(targetObject, stopTime);
@@ -296,8 +302,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setEnableAnalystReports.invoke(assemblyObj, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
+            // Allow panel values to override XML set values
             setStopTime.invoke(assemblyObj, getStopTime());
-            setVerbose.invoke(assemblyObj, runPanel.vcrVerbose.isSelected());
+            setVerbose.invoke(assemblyObj, getVerbose());
+
             setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
             setPclNodeCache.invoke(assemblyObj, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListener.invoke(assemblyObj, this);
@@ -419,9 +427,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    /**
-     * TODO: not sure this is required.  setVerbose gets set in initRun()
-     */
+    /** Allow for overriding XML set value via the Run panel setting */
     class verboseListener implements ActionListener {
 
         @Override
@@ -505,10 +511,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
+    /** Allow for overriding XML set value via the Run panel setting
+     * @return overridden XML set value via the Run panel setting
+     */
     double getStopTime() {
         return Double.parseDouble(runPanel.vcrStopTime.getText());
     }
 
+    /** Allow for overriding XML set value via the Run panel setting
+     * @return overridden XML set value via the Run panel setting
+     */
     boolean getVerbose() {
         return runPanel.vcrVerbose.isSelected();
     }
