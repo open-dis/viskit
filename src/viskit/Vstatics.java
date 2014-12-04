@@ -196,8 +196,15 @@ public class Vstatics {
         return null;
     }
 
+    /**
+     * Retrieve this app's classpath as one string.  The order of the class path
+     * is 1) existing classpath, 2) extra paths, 3) work dir
+     * (project build/classes)
+     *
+     * @return this app's classpath as one string
+     */
     public static String getClassPathAsString() {
-        // The order of the class path is 1) existing classpath, 2) extra paths, 3) work dir
+
         String sep = getPathSeparator();
         StringBuilder cPath = new StringBuilder();
 

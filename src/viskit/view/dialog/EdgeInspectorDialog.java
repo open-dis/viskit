@@ -1,8 +1,5 @@
 package viskit.view.dialog;
 
-import viskit.view.dialog.EdgeParameterDialog;
-import viskit.view.ConditionalExpressionPanel;
-import viskit.view.EdgeParametersPanel;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.CaretEvent;
@@ -13,14 +10,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.regex.Pattern;
 import java.util.Vector;
 import java.util.ArrayList;
 
 import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.LogUtils;
-import java.util.regex.Pattern;
 import simkit.Priority;
 import viskit.VGlobals;
+import viskit.Vstatics;
 import viskit.model.EventNode;
 import viskit.model.Edge;
 import viskit.model.ModelImpl;
@@ -321,7 +319,7 @@ public class EdgeInspectorDialog extends JDialog {
         priorityNames = new Vector<>(10);
         priorityList = new ArrayList<>(10);
         try {
-            Class<?> c = Class.forName("simkit.Priority");
+            Class<?> c = Vstatics.classForName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
@@ -335,13 +333,7 @@ public class EdgeInspectorDialog extends JDialog {
             JComboBox<String> jcb = new JComboBox<>(priorityNames);
             jcb.setEditable(true); // this allows anything to be intered
             return jcb;
-        } catch (ClassNotFoundException e) {
-            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
-        } catch (SecurityException e) {
-            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
-        } catch (IllegalArgumentException e) {
-            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
-        } catch (IllegalAccessException e) {
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
         }
         return new JComboBox<>(new String[] {"simkit package not in class path"});

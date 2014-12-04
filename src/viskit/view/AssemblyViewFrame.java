@@ -710,8 +710,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         VGlobals vGlobals = VGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
 
-        // The viskit.util.Compiler will call a fresh (reset) LocalBootLoader
-        // here when compiling EGs for the first time
+        // A fresh (reset) LocalBootLoader will be instantiated
+        // here when compiling EGs for the first time, or when the 
+        // SimkitXML2Java translator attempts to resolve a ParameterMap
         addToEventGraphPallette(vkp.getEventGraphsDir(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to

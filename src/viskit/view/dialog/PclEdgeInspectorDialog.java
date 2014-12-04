@@ -243,13 +243,12 @@ public class PclEdgeInspectorDialog extends JDialog {
             }
 
             try {
-                ClassLoader cl = VGlobals.instance().getWorkClassLoader();
-                Class<?> c = Class.forName(classname, false, cl);
+                Class<?> c = Vstatics.classForName(classname);
                 if (c == null) {
                     throw new ClassNotFoundException(classname + " not found");
                 }
 
-                Class stopClass = Class.forName("simkit.BasicSimEntity", false, cl);
+                Class stopClass = Vstatics.classForName("simkit.BasicSimEntity");
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {

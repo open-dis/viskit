@@ -1427,6 +1427,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String clNam = f.getName().substring(0, f.getName().indexOf('.'));
             clNam = paf.pkg + "." + clNam;
 
+            // TODO: Don't think this is necessary since we don't invoke
+            // Runtime.exec to compile anymore
             String classPath = getClassPathString();
 
             execStrings = buildExecStrings(clNam, classPath);

@@ -1,18 +1,20 @@
 package viskit.doe;
 
 import edu.nps.util.LogUtils;
+import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Iterator;
+import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-
-import edu.nps.util.TempFileManager;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
 
@@ -88,9 +90,9 @@ public class LocalBootLoader extends URLClassLoader {
     private boolean reloadSimkit = false;
 
     /** Creates a new instance of LocalBootLoader
-     * @param classes
-     * @param parent
-     * @param workDir
+     * @param classes external classpath urls
+     * @param parent the parent Classloader to this one
+     * @param workDir the current project working directory
      */
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[] {}, parent);
@@ -99,16 +101,14 @@ public class LocalBootLoader extends URLClassLoader {
         LogUtils.getLogger(LocalBootLoader.class).debug(VGlobals.instance().printCallerLog());
     }
 
-    /** Create a context with viskit's libs along with
-     * the generated eventgraphs, takes two stages
-     * the returned LocalBootLoader can be used
-     * as an isolated context, i.e., where static methods
-     * and variables from one class don't interfere with
-     * one another or between LocalBootLoaders, here
-     * done by setting threads' contextClassLoaders to
-     * their own LocalBootLoaders
+    /** Create a context with viskit's libs along with the generated
+     * eventgraphs, takes two stages the returned LocalBootLoader can be used as
+     * an isolated context, i.e., where static methods and variables from one
+     * class don't interfere with one another or between LocalBootLoaders, here
+     * by setting threads' contextClassLoaders to their own LocalBootLoaders.
+     *
      * @param allowAssembly
-     * @return a LocalBootLoader instance
+     * @return an isolated Context Class Loader instance
      */
     public LocalBootLoader init(boolean allowAssembly) {
         this.allowAssembly = allowAssembly;
@@ -117,19 +117,12 @@ public class LocalBootLoader extends URLClassLoader {
 
     /** @return a custom ClassLoader */
     public LocalBootLoader init() {
-        File jar;
+        File jar = null;
 
-        //System.out.println("Stage1 start init ");
         // Capture the current runtime classpath
         initStage1();
 
         stage1.allowAssembly = this.allowAssembly;
-
-        //stage1 gets dirty during bring up of clean jar <-- Why?
-        //reboot it with cleanWorkJar
-        //System.out.println("Stage1 reinit ");
-//        initStage1();
-        //System.out.println("Adding cleaned jar "+jar);
 
         // Now add any external classpaths
         for (URL ext : extUrls) {
@@ -145,9 +138,9 @@ public class LocalBootLoader extends URLClassLoader {
         }
 
         // TODO: Clearly, adding build/classes to the classpath violates the
-        // dirty assembly in the classpath issue that we are attempting to
+        // dirty assembly in the classpath issue that we were attempting to
         // mitigate with the buildCleanWorkJar call below, but something doesn't
-        // go quite right if we are building a project from scratch with where
+        // go quite right if we are building a project from scratch  where
         // we have no build/classes compiled, and/or have no cached EGs in the
         // viskitProject.xml.  So, leaving commeted out for now and will need
         // to reopen this issue when we need strict design points for DOE.
@@ -168,7 +161,13 @@ public class LocalBootLoader extends URLClassLoader {
             LOG.error(ex);
         }
 
-//        jar = buildCleanWorkJar();
+//        jar = buildCleanWorkJar(); // See TODO note above
+
+        // stage1 gets dirty during bring up of clean jar <-- Why?
+        // reboot it with cleanWorkJar
+        LOG.debug("Stage1 reinit");
+//        initStage1();
+        LOG.debug("Adding cleaned jar "+jar);
 
         // Now add our tmp jars containing compiled EGs and Assemblies
 //        try {
@@ -203,11 +202,19 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /**
-     *
-     * @param u
+     * Convenience method for the DOE local driver
+     * @param u the URL to add to this ClassLoader
      */
     public void doAddURL(URL u) {
         super.addURL(u);
+    }
+
+    /**
+     * Convenience method for the DOE local driver
+     * @return a URL[] of External ClassPath paths
+     */
+    public URL[] getExtUrls() {
+        return extUrls;
     }
 
     /** @return a custom classpath String [] */
@@ -219,22 +226,6 @@ public class LocalBootLoader extends URLClassLoader {
 //        }
 //        log.info("End ClassPath entries\n");
         return classPath;
-    }
-
-    /** @param cp our java classpath in String[] form */
-    public void setClassPath(String[] cp) {
-        classPath = cp;
-    }
-
-    /** @return a URL[] of External ClassPath paths */
-    public URL[] getExtUrls() {
-        return extUrls;
-    }
-
-    @Override
-    protected void addURL(URL u) {
-        super.addURL(u);
-    //System.out.println("Adding url "+u);
     }
 
     /** @return the working class directory for this project */
@@ -259,11 +250,37 @@ public class LocalBootLoader extends URLClassLoader {
 
     /** Creates new instances of the stage1 LocalBootLoader */
     private void initStage1() {
+
         String classPathProp = System.getProperty("java.class.path");
-        String pathSep = System.getProperty("path.separator");
-        setClassPath(classPathProp.split(pathSep));
+        String sep = System.getProperty("path.separator");
+        StringBuilder cPath = new StringBuilder();
+
+        // Handle case where we launch a viskit-exe.jar with a Class-Path header
+        // defined in order to find simkit.jar
+        if (!classPathProp.toLowerCase().contains("simkit.jar")) {
+            URL url;
+            JarURLConnection uc;
+            Attributes attr;
+            try {
+                url = new URL("jar:file:" + classPathProp + "!/");
+                uc = (JarURLConnection)url.openConnection();
+                attr = uc.getMainAttributes();
+
+                cPath.append(classPathProp);
+
+                for (String path : attr.getValue(Attributes.Name.CLASS_PATH).split(" ")) {
+                    cPath.append(sep);
+                    cPath.append(path);
+                }
+
+            } catch (IOException | NullPointerException ex) {
+                LOG.error(ex);
+            }
+        }
+
+        classPath = cPath.toString().split(sep);
+
         ClassLoader parentClassLoader = getParent();
-        //System.out.println("LocalBootLoader initStage1 reboot..."+workDir);
 
         stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
         boolean loop = !allowAssembly;
@@ -271,8 +288,8 @@ public class LocalBootLoader extends URLClassLoader {
         // if each LocalBootLoader individually has to read from
         // a file, then each instance of the loader will have its own
         // context in terms of static variables from the read-in classes,
-        // eg. simkit.Schedule.reset() in one thread will not reset another.
-        // see sample case StaticsTest
+        // eg. simkit.Schedule.reset() in one thread which will not reset
+        // another. See sample case StaticsTest
         while (loop) {
             try {
                 if (reloadSimkit) {
@@ -287,18 +304,21 @@ public class LocalBootLoader extends URLClassLoader {
                 loop = false;
             }
         }
+
+        // build up stage1 libs
         for (String path : getClassPath()) {
             try {
-                // build up stage1 libs
                 stage1.addURL(new File(path).toURI().toURL());
-            //System.out.println("Added "+ new File(path).toURL().toString() );
             } catch (MalformedURLException ex) {
                 LOG.error(ex);
             }
-            stage1.classPath = getClassPath();
         }
     }
 
+    /**
+     * Make clean jars for each thread each with its own isolated ClassLoader
+     * @return a clean jar file for each thread each with its own isolated ClassLoader
+     */
     private File buildCleanWorkJar() {
         File newJar = null;
         try {
@@ -387,7 +407,7 @@ public class LocalBootLoader extends URLClassLoader {
                             isEventGraph = false;
                         }
                     } catch (ClassNotFoundException ex) {
-                        System.err.println("Check viskit.jar has jaxb bindings, or: " + entryClass);
+                        System.err.println("Check that viskit.jar has jaxb bindings, or: " + entryClass);
                         LOG.error(ex);
                     }
 

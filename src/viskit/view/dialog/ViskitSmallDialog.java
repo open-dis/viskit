@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -32,15 +33,15 @@ public abstract class ViskitSmallDialog extends JDialog {
     protected static boolean showDialog(String className, JFrame f, Component comp, Object var) {
         if (dialog == null) {
             try {
-                Class[] args = new Class[] {Class.forName("javax.swing.JFrame"),
-                    Class.forName("java.awt.Component"),
-                    Class.forName("java.lang.Object")
+                Class[] args = new Class[] {Vstatics.classForName("javax.swing.JFrame"),
+                    Vstatics.classForName("java.awt.Component"),
+                    Vstatics.classForName("java.lang.Object")
                 };
                 Class<?> c = Vstatics.classForName("viskit." + className);
                 Constructor constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, comp, var});
-            } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-                e.printStackTrace();
+            } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+                LogUtils.getLogger(ViskitSmallDialog.class).error(e);
             }
         } else {
             dialog.setParams(comp, var);

@@ -11,13 +11,14 @@
 package viskit.util;
 import java.lang.reflect.Method;
 import javax.swing.JOptionPane;
+import viskit.Vstatics;
 public class BareBonesBrowserLaunch {
     private static final String errMsg = "Error attempting to launch web browser";
     public static void openURL(String url) {
         String osName = System.getProperty("os.name");
         try {
             if (osName.startsWith("Mac OS")) {
-                Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
+                Class<?> fileMgr = Vstatics.classForName("com.apple.eio.FileManager");
                 Method openURL = fileMgr.getDeclaredMethod("openURL",
                         new Class<?>[]{String.class});
                 openURL.invoke(null, new Object[]{url});

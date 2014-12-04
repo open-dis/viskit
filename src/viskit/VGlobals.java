@@ -849,6 +849,8 @@ public class VGlobals {
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());
+
+            // Allow Assembly files in the ClassLoader
             workLoader = loader.init(true);
         }
         return workLoader;

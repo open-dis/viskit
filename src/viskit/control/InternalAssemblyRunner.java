@@ -183,6 +183,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     private void fillRepWidgetsFromBasicAssemblyObject(String clName, boolean verbose, double stopTime) throws Throwable {
+
         // Assembly has been compiled by now
         lastLoaderNoReset = VGlobals.instance().getResetWorkClassLoader(true);
         Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
@@ -194,8 +195,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         targetObject = targetClass.newInstance();
 
         /* in order to see BasicAssembly this thread has to have
-         * the same loader as the one used since they don't
-         * share the same simkit or viskit.
+         * the same loader as the one used to compile this entity since they
+         * don't share the same simkit or viskit.  Used in the verboseListener
          */
         assembly = (BasicAssembly) targetObject;
 
@@ -302,19 +303,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // Restore Viskit's JVM ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
-        } catch (IllegalAccessException ex) {
-            log.error(ex);
-        } catch (IllegalArgumentException ex) {
-            log.error(ex);
-        } catch (InvocationTargetException ex) {
-            log.error(ex);
-        } catch (NoSuchMethodException ex) {
-            log.error(ex);
-        } catch (SecurityException ex) {
-            log.error(ex);
-        } catch (InstantiationException ex) {
-           log.error(ex);
-        } catch (ClassNotFoundException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex);
         }
     }
@@ -344,15 +333,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             try {
                 Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
-            } catch (SecurityException ex) {
-                log.fatal(ex);
-            } catch (NoSuchMethodException ex) {
-                log.fatal(ex);
-            } catch (IllegalArgumentException ex) {
-                log.fatal(ex);
-            } catch (IllegalAccessException ex) {
-                log.fatal(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                 log.fatal(ex);
             }
             signalReportReady();

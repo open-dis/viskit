@@ -11,6 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.VGlobals;
+import viskit.Vstatics;
 import viskit.xsd.bindings.eventgraph.*;
 
 /**
@@ -69,12 +70,8 @@ public class SimkitXML2Java {
      */
     public SimkitXML2Java(String xmlFile) {
         this();
-        try {
-            fileBaseName = baseNameOf(xmlFile);
-            fileInputStream = Class.forName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
-        } catch (ClassNotFoundException cnfe) {
-            log.error(cnfe);
-        }
+        fileBaseName = baseNameOf(xmlFile);
+        fileInputStream = Vstatics.classForName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
     }
 
     public SimkitXML2Java(InputStream stream) {
@@ -895,6 +892,7 @@ public class SimkitXML2Java {
             // the extendz field may also contain an implemnts
             // tail.
 
+            // TODO: Can we use Vstatics.classForName here?
             Class<?> c = Class.forName(extendz.split("\\s")[0], true, VGlobals.instance().getWorkClassLoader());
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;

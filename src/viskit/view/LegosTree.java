@@ -81,13 +81,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         targetClassName = className;
         genericTableToolTip = tooltip;
 
-        try {
-            targetClass = Class.forName(targetClassName, false, this.getClass().getClassLoader()); //"simkit.BasicSimEntity");
-        } catch (ClassNotFoundException e) {
-            log.error("Need simkit classes in classpath");
-//            e.printStackTrace();
-            return;
-        }
+        targetClass = Vstatics.classForName(targetClassName);
 
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 

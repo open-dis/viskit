@@ -106,7 +106,7 @@ public class EventGraphAssemblyComboMain {
                 nukeDotViskit();
 
             // Bugfix 1377
-            
+
             // for copying style
             JLabel label = new JLabel();
             Font font = label.getFont();
@@ -229,7 +229,7 @@ public class EventGraphAssemblyComboMain {
 
     private static void setupMacGUI() {
         try {
-            Class<?> applicationListener = Class.forName("com.apple.eawt.ApplicationListener");
+            Class<?> applicationListener = Vstatics.classForName("com.apple.eawt.ApplicationListener");
             Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
 
                 @Override
@@ -242,10 +242,10 @@ public class EventGraphAssemblyComboMain {
                             try {
                                 Help help = new Help(VGlobals.instance().getMainAppWindow());
                                 help.aboutEventGraphEditor();
-                                Class<?> applicationEventClass = Class.forName("com.apple.eawt.ApplicationEvent");
+                                Class<?> applicationEventClass = Vstatics.classForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
-                            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 System.err.println("Error showing About Box: " + ex);
                             }   break;
                     }
@@ -253,7 +253,7 @@ public class EventGraphAssemblyComboMain {
                 }
             });
 
-            Class<?> applicationClass = Class.forName("com.apple.eawt.Application");
+            Class<?> applicationClass = Vstatics.classForName("com.apple.eawt.Application");
             Object applicationInstance = applicationClass.newInstance();
 
             Method m = applicationClass.getMethod("addApplicationListener", applicationListener);
@@ -267,7 +267,7 @@ public class EventGraphAssemblyComboMain {
                     System.err.println("Error showing aboutIcon in dock " + ex);
                 }
             }
-        } catch (ClassNotFoundException | IllegalArgumentException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
+        } catch (IllegalArgumentException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
             System.err.println("Error defining Apple Quit & About handlers: " + ex);
         }
     }

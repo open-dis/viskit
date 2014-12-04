@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-/**Implements a Local Doe Driver, to be interchangeable with the
- * Remote (Grid Engine) Driver
+/**Implements a Local Doe Driver, to be interchangeable with the remote
+ * (Grid Engine) Driver
+ * 
  * @since January 8, 2007, 2:17 PM
  * @author Rick Goldberg
  * @version $Id$

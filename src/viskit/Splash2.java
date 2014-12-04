@@ -168,11 +168,11 @@ public class Splash2 extends JFrame {
             Object[] arguments = new Object[] {newArgs};
             Class[] parameterTypes = new Class[] {newArgs.getClass()};
 
-            Class<?> mainClass = Class.forName(target);
+            Class<?> mainClass = Vstatics.classForName(target);
 
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
-        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             LogUtils.getLogger(Splash2.class).error(ex);
         }
         progressBar.setString("Complete");

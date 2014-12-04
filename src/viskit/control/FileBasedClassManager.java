@@ -163,7 +163,7 @@ public class FileBasedClassManager implements Runnable {
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = VGlobals.instance().getResetWorkClassLoader(false);
+        ClassLoader loader = VGlobals.instance().getWorkClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
