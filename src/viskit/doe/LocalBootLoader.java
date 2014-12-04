@@ -11,7 +11,6 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Iterator;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -276,9 +275,12 @@ public class LocalBootLoader extends URLClassLoader {
             } catch (IOException | NullPointerException ex) {
                 LOG.error(ex);
             }
-        }
 
-        classPath = cPath.toString().split(sep);
+            classPath = cPath.toString().split(sep);
+
+        } else {
+            classPath = classPathProp.split(sep);
+        }
 
         ClassLoader parentClassLoader = getParent();
 
