@@ -6,7 +6,7 @@ Release: 0.6.1(May 10, 2011
 ---------------------------------
 Major changes since 0.6.0:
 
-  Implement a dedicated Viskit Project space "MyViskitProjects" in order to
+  Implemented a dedicated Viskit Project space "MyViskitProjects" in order to
   properly designate a project space for specific user projects
 
   Fix NPE when canceling out of creating a project
@@ -14,12 +14,12 @@ Major changes since 0.6.0:
   Fix bug where the Viskit Project file chooser was causing unnecessary
   recursive calls
 
-  Implement a draconian runtime fix to nuke the ${user.home}/.viskit directory
+  Implemented a draconian runtime fix to nuke the ${user.home}/.viskit directory
   incase of a startup failure that has historically rendered Viskit unusable
   until .viskit was manually deleted anyway.  The goal will be to never have to
   do this if configuration metadata was stable enough to continue usability.
 
-  Improve iZPack installer support for creating 64 bit installers.  Shoe-horned
+  Improved iZPack installer support for creating 64 bit installers.  Shoe-horned
   is a USA flag to denote "English" as an install language vice the UK flag.
 
 
@@ -40,14 +40,14 @@ Major changes since 0.5.4:
 
   Bugfix 1248
 
-  Improve parsing for BasicSimEntity subclasses in order to populate the
+  Improved parsing for BasicSimEntity subclasses in order to populate the
   LegosTree
 
   Display current Viskit Project name in the main app title bar
 
-  Improve EG caching scheme so that we don't recompile unnecessarily
+  Improved EG caching scheme so that we don't recompile unnecessarily
 
-  Improve recently opened files and projects history caching
+  Improved recently opened files and projects history caching
 
   Fix NPE bug when opening an existing Project from a newly installed Viskit
 
@@ -55,12 +55,12 @@ Major changes since 0.5.4:
 
   Upgrade to JAXB v2.1.8
 
-  Improve output stream flushing when writing out to text at runtime
+  Improved output stream flushing when writing out to text at runtime
 
   Fix bug where EG description fields were not rendering for a newly added EG
   tab
 
-  Improve JDK shutdown if Viskit is a third-party lib within another app
+  Improved JDK shutdown if Viskit is a third-party lib within another app
 
   Bugfix 1364
 
@@ -99,16 +99,16 @@ Major changes since 0.5.4:
   Fix issue to allow building of the ParameterMap and Constructor where no
   concrete doRun or doReset methods were defined
 
-  Implement package creation when naming newly created EG and Assy files
+  Implemented package creation when naming newly created EG and Assy files
 
-  Implement configuration awareness of current Viskit project
+  Implemented configuration awareness of current Viskit project
 
   Added a "Verbose" checkbox on each Assembly Node editor which operates as a
   "detailed output."
 
   Clamp simulation output to 8M and truncate from the front if required
 
-  Implement dumping of Event List only if not in verbose, or reallyVerbose modes
+  Implemented dumping of Event List only if not in verbose, or reallyVerbose modes
 
   Internal class checking to populate EG editors unable to discern unqualified
   class names except java.lang.*
@@ -136,7 +136,7 @@ Release: 0.5.3(August 5, 2008)
 ---------------------------------
 Major changes since 0.5.2:
 
-  Implement specific platform L&F options upon app startup
+  Implemented specific platform L&F options upon app startup
 
   Fix issue in SimkitXML2Java translator when an interrupt would cause an unclosed
   if block statement causing startup compile errors
@@ -155,7 +155,7 @@ Major changes since 0.4.8:
 
   Bugfixes 1402 & 1405
 
-  Implement creating new projects from either the EG or Assy editor panel menus
+  Implemented creating new projects from either the EG or Assy editor panel menus
 
   Bugfix 1373
 
@@ -166,7 +166,7 @@ Release: 0.4.8(June 3, 2008)
 -------------------------------
 Major changes since 0.4.7:
 
-  Implement Log4J for debugging, output info status
+  Implemented Log4J for debugging, output info status
 
   Switch from Sun's Base64 encoder to Apache version
 
@@ -182,10 +182,10 @@ Major changes since 0.4.7:
   Enable regression line fitting to scatter plot graphs generated for the
   Analyst Report
 
-  Implement enabling of the Assembly Run panel only after a successful Assy
+  Implemented enabling of the Assembly Run panel only after a successful Assy
   compilation and validation.
 
-  Implement firing property changes using state variable "getters".  Container
+  Implemented firing property changes using state variable "getters".  Container
   getters return a clone for the FPC in the doRun event.
 
   Modify the Assembly DTD to offer a raw count or mean of raw count statistic
@@ -206,7 +206,7 @@ Major changes since 0.4.7:
   Improvements to Analyst Report building, editing, reopening and rendering in
   HTML
 
-  Implement Ant targets to translate EGs and Assy XML files to Java source
+  Implemented Ant targets to translate EGs and Assy XML files to Java source
 
   Further decoupling of Diskit being too tightly integrated w/ Viskit for
   convenience of another application
@@ -221,12 +221,12 @@ Major changes since 0.4.7:
   classpaths, keeping scratch EG and Assy files, and multiple compilations of
   source code.
 
-  Implement notification of when an Analyst Report is ready to view at the end
+  Implemented notification of when an Analyst Report is ready to view at the end
   of a local Assembly Run of 1 or more replications
 
   Bugfixes 936, 1195, 1246, 1249 & 1260
 
-  Implement figure caption auto increment in the Analyst Report.  Xalan required
+  Implemented figure caption auto increment in the Analyst Report.  Xalan required
   as 3rd party lib for this functionality
 
   Implemented a cleaner exit strategy vice a blunt System.exit(0) scheme
