@@ -27,7 +27,7 @@
         </authors>
         <url>@{product.url}</url>
         <javaversion>1.7</javaversion>
-        <requiresjdk>no</requiresjdk>
+        <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
     </info>
 
@@ -55,14 +55,14 @@
     </resources>
 
     <panels>
-        <panel classname="HelloPanel" id="hellopanel"/>
+        <panel classname="HelloPanel"/>
         <panel classname="HTMLInfoPanel" id="info" />
         <panel classname="HTMLInfoPanel" id="java" />
         <panel classname="LicencePanel" id="licence"/><!--not my english-->
-        <panel classname="PacksPanel" id="packs"/>
-        <panel classname="TargetPanel" id="target"/>
-        <panel classname="InstallPanel" id="install"/>
-        <panel classname="SimpleFinishPanel" id="finish"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="SimpleFinishPanel"/>
     </panels>
 
     <listeners>
@@ -77,6 +77,7 @@
 
           <fileset dir="stage/lib"           targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources/Java">
               <include name="**/*.jar"/>
+              <exclude name="viskit-exe.jar"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$INSTALL_PATH">
