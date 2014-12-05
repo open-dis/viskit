@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
-import viskit.util.ParameterMap;
+import viskit.ParameterMap;
 import viskit.Vstatics;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -396,7 +396,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                 }
 
-                ParameterMap param = constr[i].getAnnotation(viskit.util.ParameterMap.class);
+                ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
                 // possible that a class inherited a parameterMap, check if annotated first
                 if (param != null) {
                     String[] names = param.names();

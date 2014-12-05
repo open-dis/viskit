@@ -20,7 +20,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.FindClassesForInterface;
-import viskit.util.ParameterMap;
+import viskit.ParameterMap;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.Vstatics;
@@ -487,7 +487,7 @@ public class FileBasedClassManager implements Runnable {
                     throw new RuntimeException("Only one Annotation per constructor");
                 }
                 l = newListObjectTypeArray(ArrayList.class, 1);
-                ParameterMap param = constr[j].getAnnotation(viskit.util.ParameterMap.class);
+                ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
 
                 if (param != null) {
                     String[] names = param.names();
