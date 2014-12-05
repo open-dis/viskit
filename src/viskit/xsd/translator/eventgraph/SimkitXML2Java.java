@@ -406,7 +406,7 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
 
         pw.println();
-        pw.println(sp4 + "@viskit.util.ParameterMap" + sp + lp);
+        pw.println(sp4 + "@viskit.ParameterMap" + sp + lp);
         pw.print(sp8 + "names =" + sp + ob);
         for (Parameter pt : liParams) {
             pw.print(qu + pt.getName() + qu);
