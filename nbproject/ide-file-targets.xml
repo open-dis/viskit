@@ -14,8 +14,8 @@
     </target>
 
     <!-- Can use this to perfrom manual Viskit XML -> Java translations -->
-    <!-- EG translator is viskit.xsd.translator.SimkitXML2Java -->
-    <!-- Assy translator is viskit.xsd.assembly.SimkitAssemblyXML2Java -->
+    <!-- EG translator is viskit.xsd.translator.eventgraph.SimkitXML2Java -->
+    <!-- Assy translator is viskit.xsd.translator.assembly.SimkitAssemblyXML2Java -->
     <target depends="init" name="run-selected-file-in-src">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
@@ -31,8 +31,8 @@
     </target>
 
     <!-- Can use this to debug manual Viskit XML -> Java translations -->
-    <!-- EG translator is viskit.xsd.translator.SimkitXML2Java -->
-    <!-- Assy translator is viskit.xsd.assembly.SimkitAssemblyXML2Java -->
+    <!-- EG translator is viskit.xsd.translator.eventgraph.SimkitXML2Java -->
+    <!-- Assy translator is viskit.xsd.translator.assembly.SimkitAssemblyXML2Java -->
     <target name="debug-selected-file-in-src">
         <fail unless="debug.class">Must set property 'debug.class'</fail>
         <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">

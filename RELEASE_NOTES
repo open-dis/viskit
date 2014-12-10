@@ -1,5 +1,9 @@
 Post release fixes:
 
+  Shortened the path names for the LEGOs tree to be more readable.  If the user
+  does not select the Analyst Report tab to be visible, then the Enable Analyst
+  Report checkbox on the Assembly Runner panel will not be enabled.
+
   Better Mac OS X installer support by upgrading the javaApplicationStub to work
   better with Oracle's JDK 8+.  Better Windows installer support by actually
   getting it to work with the executable jar's Class-Path header.  Still need to
