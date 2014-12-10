@@ -56,7 +56,7 @@ public class EventInspectorDialog extends JDialog {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
-     * 
+     *
      * @param f parent frame
      * @param comp location component
      * @param node EventNode to edit
@@ -407,7 +407,7 @@ public class EventInspectorDialog extends JDialog {
                     }
                 }
                 String ps = parseThis.toString().trim();
-                if (ps.length() > 0 && ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+                if (ps.length() > 0 && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
                     String parseResults = VGlobals.instance().parseCode(evn, ps);
                     if (parseResults != null) {
                         boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);

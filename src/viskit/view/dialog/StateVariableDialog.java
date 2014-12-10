@@ -228,11 +228,11 @@ public class StateVariableDialog extends ViskitSmallDialog {
         Matcher m = p.matcher(s);
         return m.matches();
     }
-    
+
     private boolean isGeneric(String typ) {
         return (typ.contains("<K,V>") || typ.contains("<E>"));
     }
-    
+
     // Little classes to move the focus around
     private sizeFieldFocus sizeFocus = new sizeFieldFocus();
     private commentFieldFocus commentFocus = new commentFieldFocus();
@@ -322,12 +322,12 @@ public class StateVariableDialog extends ViskitSmallDialog {
                             "Data entry error", JOptionPane.ERROR_MESSAGE);
                     return;
                 } else if (isGeneric(typ)) {
-                    JOptionPane.showMessageDialog(StateVariableDialog.this, 
+                    JOptionPane.showMessageDialog(StateVariableDialog.this,
                             "Actual Keys, Values or Element types must replace " +
                             "the K,V or E between the <> for Collection Objects.",
                             "Data entry error", JOptionPane.ERROR_MESSAGE);
                     return;
-                }                    
+                }
 
                 /* Do a beanshell test for array declaration
                  * isPrimitive returns false for arrays
@@ -337,14 +337,14 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     String s = typ + " " + nam + " = new " + typ;
                     s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
-                    if (ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
+                    if (ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
                         String result = VGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);
                             if (ret == false) // don't ignore
                             {
                                 return;
-                            }                        
+                            }
                         }
                     }
                 }
