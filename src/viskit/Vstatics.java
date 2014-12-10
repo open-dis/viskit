@@ -221,6 +221,8 @@ public class Vstatics {
         return c;
     }
 
+    // TODO: Need a dialog informing of the need to rebuild Viskit with
+    // extensions if a diskit class is being looked for
     static Class<?> cForName(String s, ClassLoader clsLoader) {
         Class<?> c;
         try {

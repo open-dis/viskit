@@ -655,7 +655,6 @@ public class SettingsDialog extends JDialog {
      */
     public static boolean getVisibilitySense(String prop) {
         return appConfig.getBoolean(prop);
-//        return Boolean.valueOf(ViskitConfig.instance().getVal(prop));
     }
 
     /**
@@ -695,7 +694,7 @@ public class SettingsDialog extends JDialog {
      * @return if verbose debug message are to be printed
      */
     public static boolean isVerboseDebug() {
-        return getVisibilitySense(ViskitConfig.DEBUG_MSGS_KEY);
+        return Boolean.valueOf(ViskitConfig.instance().getVal(ViskitConfig.DEBUG_MSGS_KEY));
     }
 
     /**
