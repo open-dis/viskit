@@ -230,7 +230,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         // Design of experiments
         DoeMainFrame doeFrame = null;
-        if (SettingsDialog.isDOEVisible()) {
+        boolean isDOEVisible = SettingsDialog.isDOEVisible();
+        if (isDOEVisible) {
             doeMain = DoeMain.main2();
             doeFrame = doeMain.getMainFrame();
             runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
@@ -270,7 +271,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
 
         /* DIFF between OA3302 branch and trunk */
-        if (SettingsDialog.isDOEVisible())
+        if (isDOEVisible)
             assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
         /* End DIFF between OA3302 branch and trunk */
 
@@ -284,7 +285,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
 
         /* DIFF between OA3302 branch and trunk */
-        if (SettingsDialog.isDOEVisible())
+        if (isDOEVisible)
             egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
 
@@ -456,8 +457,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
-                    if (SettingsDialog.isDOEVisible()) {
-                        runTabbedPane.setSelectedIndex(TAB1_DOE_IDX);
+                    if (doeMain != null) {
                         if (!doeMain.getController().preQuit()) {
                             break outer;
                         }
@@ -476,7 +476,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (SettingsDialog.isDOEVisible()) {
+                if (doeMain != null) {
                     doeMain.getController().postQuit();
                 }
                 /* End DIFF between OA3302 branch and trunk */

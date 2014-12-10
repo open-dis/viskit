@@ -150,9 +150,6 @@ public class SettingsDialog extends JDialog {
         clusterRunCB.addActionListener(vis);
         analRptCB.addActionListener(vis);
         debugMsgsCB.addActionListener(vis);
-
-        // post process anything
-        Vstatics.debug = isVerboseDebug();
     }
 
     private void setParams() {
@@ -455,7 +452,7 @@ public class SettingsDialog extends JDialog {
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
         analRptCB.setSelected(isAnalystReportVisible());
-        debugMsgsCB.setSelected(isVerboseDebug());
+        debugMsgsCB.setSelected(Vstatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
         if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {
@@ -652,12 +649,13 @@ public class SettingsDialog extends JDialog {
     }
 
     /**
-     * Return the value for the given property
-     * @param prop the property who value is of interest
-     * @return the value for the given property
+     * Return the value for tab visibility
+     * @param prop the tab of interest
+     * @return the value for tab visibility
      */
     public static boolean getVisibilitySense(String prop) {
-        return Boolean.valueOf(ViskitConfig.instance().getVal(prop));
+        return appConfig.getBoolean(prop);
+//        return Boolean.valueOf(ViskitConfig.instance().getVal(prop));
     }
 
     /**

@@ -279,8 +279,8 @@ public class ViskitProject {
     }
 
     /**
-     * Load an existing Viskit project file
-     * @param inputProjectFile an existing Viskit project file
+     * Load a Viskit project file
+     * @param inputProjectFile a Viskit project file
      */
     private void loadProjectFromFile(File inputProjectFile) {
         try {
@@ -292,10 +292,7 @@ public class ViskitProject {
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }
             projectFileExists = true;
-        } catch (JDOMException ex) {
-            log.error(ex);
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
+        } catch (JDOMException | IOException ex) {
             log.error(ex);
             throw new RuntimeException(ex);
         }
