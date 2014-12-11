@@ -291,14 +291,14 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
-        runLater(500L, new Runnable() {
+        runLater(0L, new Runnable() {
             @Override
             public void run() {
                 egCntlr.begin();
             }
         });
 
-        runLater(0L, new Runnable() {
+        runLater(500L, new Runnable() {
             @Override
             public void run() {
                 assyCntlr.begin();
