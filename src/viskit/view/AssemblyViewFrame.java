@@ -186,7 +186,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
             if (mod.getLastFile() != null) {
 
-                // Also, tell the Design of Experiments Panel to update
                 VGlobals.instance().amod = mod;
                 ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
@@ -711,7 +710,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
-        // here when compiling EGs for the first time, or when the 
+        // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
         addToEventGraphPallette(vkp.getEventGraphsDir(), true);
 

@@ -125,9 +125,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         _setProjFileSet();
     }
 
-    /**
-     *
-     */
     @Override
     public void runEventGraphEditor() {
         if (VGlobals.instance().getEventGraphEditor() == null) {
@@ -148,15 +145,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return openAssemblies;
     }
 
-    /**
-     * @param runTabbedPane a hook to the Assembly Run panel
-     * @param idx the index of the Assembly Run Tab
-     */
     @Override
     public void setRunTabbedPane(JComponent runTabbedPane, int idx) {
         this.runTabbedPane = (JTabbedPane) runTabbedPane;
         this.runTabbedPaneIdx = idx;
-        this.runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, false);
+        this.getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, false);
+    }
+
+    @Override
+    public JTabbedPane getRunTabbedPane() {
+        return runTabbedPane;
+    }
+
+    @Override
+    public int getRunTabbledPanelIdx() {
+        return runTabbedPaneIdx;
     }
 
     private boolean checkSaveIfDirty() {
@@ -260,8 +263,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             initOpenAssyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
 
-            if (runTabbedPane.isEnabledAt(this.runTabbedPaneIdx)) {
-                runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, false);
+            if (getRunTabbedPane().isEnabledAt(this.runTabbedPaneIdx)) {
+                getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, false);
             }
         } else {
             vaw.delTab(mod);
@@ -337,7 +340,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         }
                     }
 
-                    runTabbedPane.setEnabledAt(runTabbedPaneIdx, false);
+                    getRunTabbedPane().setEnabledAt(runTabbedPaneIdx, false);
                     break;
 
                 default:
@@ -1457,7 +1460,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     "----------------------" + rp2.lineEnd);
 
             runner.exec(execStrings);
-            runTabbedPane.setEnabledAt(this.runTabbedPaneIdx, true);
+            getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, true);
         }
     }
 

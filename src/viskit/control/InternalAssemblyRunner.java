@@ -101,6 +101,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     long seed;
     private boolean inRegressionMode;
     AnalystReportPanel reportPanel;
+    private stopListener assemblyRunStopListener;
 
     /**
      * The internal logic for the Assembly Runner panel
@@ -116,7 +117,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // false will enable all VCR buttons.  Currently, only start and stop work
         runPanel = new RunnerPanel2("Assembly Runner", true, aRPanelVisible);
         doMenus();
-        runPanel.vcrStop.addActionListener(new stopListener());
+        runPanel.vcrStop.addActionListener(assemblyRunStopListener = new stopListener());
         runPanel.vcrPlay.addActionListener(new startResumeListener());
         runPanel.vcrRewind.addActionListener(new rewindListener());
         runPanel.vcrStep.addActionListener(new stepListener());
@@ -363,8 +364,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             System.out.println("Simulation ended");
             System.out.println("----------------");
             runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
-            new stopListener().actionPerformed(null);
+            assemblyRunStopListener.actionPerformed(null);
         }
+    }
+
+    public ActionListener getAssemblyRunStopListener() {
+        return assemblyRunStopListener;
     }
 
     /**
@@ -402,24 +407,38 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class stopListener implements ActionListener {
+    /** Restores the Viskit default ClassLoader after an Assembly compile and
+     * run.  Performs a Schedule.coldReset() to clear Simkit for the next run.
+     */
+    public class stopListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             Method setStopRun;
             try {
-                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset))
+                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+
                 setStopRun = targetClass.getMethod("setStopRun", boolean.class);
-                setStopRun.invoke(assemblyObj, true);
+
+                if (assemblyObj != null)
+                    setStopRun.invoke(assemblyObj, true);
+
                 Schedule.coldReset();
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+
+                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
+                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                 log.error(ex);
             }
 
             twiddleButtons(InternalAssemblyRunner.STOP);
-            textAreaOutputStream.kill();
-            mutex--;
+
+            if (assemblyObj != null) {
+                textAreaOutputStream.kill();
+                mutex--;
+            }
         }
     }
 

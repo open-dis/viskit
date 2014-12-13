@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.JComponent;
+import javax.swing.JTabbedPane;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
@@ -58,7 +59,23 @@ public interface AssemblyController {
      */
     void newProject();
 
+    /**
+     * Sets the Assembly Run tabbed panel
+     * @param runTabbedPane the parent of the Assembly Run panel
+     * @param idx the index to retrieve the Run Panel
+     */
     void setRunTabbedPane(JComponent runTabbedPane, int idx);
+
+    /** Retrieves the parent of the Assembly Run Panel
+     *
+     * @return the parent of the Assembly Run Panel
+     */
+    JTabbedPane getRunTabbedPane();
+
+    /** Retrieves the index of the Assembly Run Panel within the RunTabbedPane
+     * @return the index of the Assembly Run Panel within the RunTabbedPane
+     */
+    int getRunTabbledPanelIdx();
 
     void runEventGraphEditor();
 

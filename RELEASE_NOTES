@@ -1,5 +1,15 @@
 Post release fixes:
 
+  Fixed issue where if we had already compiled an Assembly, then the ClassLoader
+  has changed, and we need to go back and fix something in the Assembly.  Switch
+  back to the Viskit ClassLoader and disable the Assembly Run tab until the
+  Assy is recompiled.
+
+  Fixed timing issue when an Assembly file is given as an argument at startup
+  which firsts loads associated Event Graphs, but the Assembly was being
+  compiled before the Event Graphs finished causing ClassLoader issues due to
+  the Assembly being compiled in a separate ClassLoader.
+
   Shortened the path names for the LEGOs tree to be more readable.  If the user
   does not select the Analyst Report tab to be visible, then the Enable Analyst
   Report checkbox on the Assembly Runner panel will not be enabled.
