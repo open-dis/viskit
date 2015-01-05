@@ -139,6 +139,9 @@
         </classpath>
     </taskdef>
 
+    <!--  === TARGET: all === -->
+    <target name="all" description="clean then build everything" depends="dist" />
+
     <!--  === TARGET: help === -->
     <target name="help"
             depends="javahelp"
@@ -489,7 +492,7 @@ their descpritions.
 
     <target name="build.viskit.no.extensions"
             depends="jar"
-            description="Build viskit jar only, no DES extenstions"/>
+            description="Build viskit jar only, no DES extensions"/>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
