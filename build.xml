@@ -733,8 +733,14 @@ their descpritions.
 
     </target>
 
+    <target name="test" depends="test-code-format" description="run all working tests">
+        <!-- TODO add other test targets and other tests when ready -->
+    </target>
+
     <target name="test-code-format" depends="compile.test" description="TestCodeFormat runner">
-        <java classname="viskit.test.TestCodeFormat" classpathref="runtime.test.classpath" fork="true">
+        <echo message="viskit.test.TestCodeFormat test/ArrayTester.xml"/>
+        <!-- TODO improve output formatting -->
+        <java classname="viskit.test.TestCodeFormat" classpathref="runtime.test.classpath" fork="true" failonerror="true">
             <arg value="test/ArrayTester.xml"/>
         </java>
     </target>
