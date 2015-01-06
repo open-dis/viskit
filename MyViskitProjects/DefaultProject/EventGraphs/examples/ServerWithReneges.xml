@@ -11,7 +11,7 @@
         <Comment>as a Java int.</Comment>
     </StateVariable>
     <Event name="Run">
-        <Comment>blah</Comment>
+        <Comment></Comment>
         <StateTransition state="numberAvailableServers">
             <Assignment value="getNumberServers()"/>
         </StateTransition>
@@ -25,7 +25,7 @@
             <Assignment value="0"/>
         </StateTransition>
         <Code></Code>
-        <Coordinate x="60.0" y="60.0"/>
+        <Coordinate x="70.0" y="70.0"/>
     </Event>
     <Event name="Arrival">
         <Comment></Comment>
@@ -38,7 +38,7 @@
         </Schedule>
         <Schedule delay="0.0" event="StartService" condition="getNumberAvailableServers() &gt; 0" priority="DEFAULT"/>
         <Code></Code>
-        <Coordinate x="60.0" y="150.0"/>
+        <Coordinate x="65.0" y="155.0"/>
     </Event>
     <Event name="StartService">
         <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()">
@@ -56,7 +56,7 @@
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT">
             <EdgeParameter value="customer"/>
         </Schedule>
-        <Coordinate x="200.0" y="150.0"/>
+        <Coordinate x="205.0" y="155.0"/>
     </Event>
     <Event name="EndService">
         <Argument name="customer1" type="java.lang.Integer"/>
@@ -67,7 +67,7 @@
             <Assignment value="numberServed+1"/>
         </StateTransition>
         <Schedule event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
-        <Coordinate x="330.0" y="150.0"/>
+        <Coordinate x="335.0" y="155.0"/>
     </Event>
     <Event name="Renege">
         <Argument name="customer2" type="java.lang.Integer"/>
@@ -77,6 +77,6 @@
         <StateTransition state="numberReneges">
             <Assignment value="numberReneges+1"/>
         </StateTransition>
-        <Coordinate x="130.0" y="270.0"/>
+        <Coordinate x="135.0" y="275.0"/>
     </Event>
 </SimEntity>
