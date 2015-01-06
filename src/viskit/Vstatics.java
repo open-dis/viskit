@@ -223,8 +223,12 @@ public class Vstatics {
         return c;
     }
 
-    // TODO: Need a dialog informing of the need to rebuild Viskit with
-    // extensions if a diskit class is being looked for
+    /** Last chance for resolving a sought after class on the classpath
+     *
+     * @param s the name of the class to search for
+     * @param clsLoader the class loader to search
+     * @return a non instantiated class object from the given name
+     */
     static Class<?> cForName(String s, ClassLoader clsLoader) {
         Class<?> c = null;
         try {
