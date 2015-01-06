@@ -19,8 +19,8 @@ Post release fixes:
   getting it to work with the executable jar's Class-Path header.  Still need to
   fully test on Unix though.
 
-  Implemented better message pop-up reporting for the user to better determine
-  what errors have occurred
+  Implemented better message pop-up reporting during EG and Assy loading for the
+  user to better determine what errors have occurred
 
   Bugfix 1377
 
@@ -82,8 +82,8 @@ Major changes since 0.6.2:
   ClassLoader contexts.  At this time, Grid (cluster) runs are disabled until
   such time as we can re-implement using the Viskit Project paradigm
 
-  Annotate a note in the InternalAssemblyRunner where the RandomVariate seed was
-  is being reset via reflection.  This is critical in creating standalone
+  Annotated a note in the InternalAssemblyRunner where the RandomVariate seed
+  was is being reset via reflection.  This is critical in creating standalone
   projects where they are run independently outside of the Viskit environment
 
   Upgrade to JGrpah 5.14.0.  Improved threading on the drawing canvas, but need
