@@ -83,6 +83,7 @@ import viskit.mvc.mvcController;
  */
 public class VGlobals {
 
+    private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     static Logger log = LogUtils.getLogger(VGlobals.class);
     private static VGlobals me;
     private Interpreter interpreter;
@@ -329,8 +330,11 @@ public class VGlobals {
     /* Beanshell code */
     /******/
     private void initBeanShell() {
-        interpreter = new Interpreter();
-        interpreter.setStrictJava(true);       // no loose typeing
+
+        if (interpreter == null) {
+            interpreter = new Interpreter();
+            interpreter.setStrictJava(true);       // no loose typing
+        }
 
         String[] workCP = Vstatics.getExtraClassPathArray();
         if (workCP != null && workCP.length > 0) {
@@ -351,8 +355,13 @@ public class VGlobals {
         ns.importPackage("simkit.util.*");
         ns.importPackage("diskit.*");         // 17 Nov 2004
     }
-    String bshErr = "BeanShell eval error";
 
+    /** Use BeanShell for code parsing to detect potential errors
+     *
+     * @param node the SimEntity node being evaluated
+     * @param interpretString the code block to check
+     * @return any indication of a parsing error.  A null means all is good.
+     */
     public String parseCode(EventNode node, String interpretString) {
         initBeanShell();
         // Load the interpreter with the state variables and the sim parameters
@@ -379,7 +388,8 @@ public class VGlobals {
                 }
                 if (result != null) {
                     clearNamespace();
-                    return bshErr + "\n" + result;
+                    clearClassPath();
+                    return BEAN_SHELL_ERROR + "\n" + result;
                 }
             }
 
@@ -390,7 +400,8 @@ public class VGlobals {
                 String result = handleNameType(name, type);
                 if (result != null) {
                     clearNamespace();
-                    return bshErr + "\n" + result;
+                    clearClassPath();
+                    return BEAN_SHELL_ERROR + "\n" + result;
                 }
             }
         }
@@ -409,7 +420,8 @@ public class VGlobals {
             // The news is bad....
             if (result != null) {
                 clearNamespace();
-                return bshErr + "\n" + result;
+                clearClassPath();
+                return BEAN_SHELL_ERROR + "\n" + result;
             }
         }
 
@@ -425,28 +437,35 @@ public class VGlobals {
             }
             if (result != null) {
                 clearNamespace();
-                return bshErr + "\n" + result;
+                clearClassPath();
+                return BEAN_SHELL_ERROR + "\n" + result;
             }
         }
 
-        /* see if we can parse it.  We've initted all arrays to size = 1, so
-         * ignore outofbounds exceptions, bugfix 1183
-         */
-        try {
-            /* Ignore anything that is assigned from "getter" and setter as we
-             * are not giving beanShell the whole EG picture.
-             */
-            if(!noCRs.contains("get") && !noCRs.contains("set")) {
-                Object o = interpreter.eval(noCRs);
-                log.debug("Interpreter evaluation result: " + o);
-            }
-        } catch (EvalError evalError) {
-            if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
-                clearNamespace();
-                return bshErr + "\n" + evalError.getMessage();
-            } // else fall through the catch
-        }
+        // Unfortunately, since we are not giving BeanShell the full access to
+        // source code, we can not check things like adding and removing from
+        // Lists as the variable name for the list is unknown just from the code
+        // snippet.  Therefore, we comment this sectout out.
+//        /* see if we can parse it.  We've initted all arrays to size = 1, so
+//         * ignore outofbounds exceptions, bugfix 1183
+//         */
+//        try {
+//            /* Ignore anything that is assigned from "getter" and "setter" as we
+//             * are not giving beanShell the whole EG picture.
+//             */
+//            if(!noCRs.contains("get") && !noCRs.contains("set")) {
+//                Object o = interpreter.eval(noCRs);
+//                log.debug("Interpreter evaluation result: " + o);
+//            }
+//        } catch (EvalError evalError) {
+//            if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
+//                clearNamespace();
+//                clearClassPath();
+//                return BEAN_SHELL_ERROR + "\n" + evalError.getMessage();
+//            } // else fall through the catch
+//        }
         clearNamespace();
+        clearClassPath();
         return null;    // null means good parse!
     }
 
@@ -457,6 +476,10 @@ public class VGlobals {
     // TODO: Fix the logic here, it doesn't seem to get used correctly
     private void clearNamespace() {
         interpreter.getNameSpace().clear();
+    }
+
+    private void clearClassPath() {
+        interpreter.getClassManager().reset();
     }
 
     private String handleNameType(String name, String typ) {
@@ -489,7 +512,6 @@ public class VGlobals {
              */
 
         } catch (Exception ex) {
-            clearNamespace();
             returnString =  ex.getMessage();
             log.error(returnString);
         }
@@ -624,7 +646,7 @@ public class VGlobals {
                 return true;
             }
         } catch (EvalError evalError) {
-            log.error(bshErr);
+            log.error(evalError);
 //            evalError.printStackTrace();
         }
         return false;

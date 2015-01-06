@@ -1,4 +1,16 @@
-Post release fixes:
+Post release fixes / upgrades / issues:
+
+  ***** ISSUES:
+
+  BeanShell checking of code snippets was a good idea in the beginning, but
+  since we are only giving BeanShell a snippet and not the whole source file, it
+  can only perform very minor primitive checking and some instantiating checks
+  of generic containers.  The compiler will notify of any errors at which time
+  the user can investigate and fix during EG or Assy authoring.
+
+  ****** FIXES / UPGRADES:
+
+  More gracefully handle and inform the user of a missing third party library
 
   Fixed issue where if we had already compiled an Assembly, then the ClassLoader
   has changed, and we need to go back and fix something in the Assembly.  Switch

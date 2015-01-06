@@ -57,45 +57,21 @@ public class vStateVariable extends ViskitElement {
         this.comment = comment;
     }
 
-    /**
-     * Returns the name of the state variable.
-     *
-     * @return name of state variable
-     */
     @Override
     public String getName() {
         return variableName;
     }
 
-    /**
-     * Sets the state variable name.
-     *
-     * @param pVariableName what the state variable name will become
-     */
     @Override
     public void setName(String pVariableName) {
         variableName = pVariableName;
     }
 
-    /**
-     * Returns a string representation of the type of the variable. This may
-     * be a primitive type (int, double, float, etc) or an Object (String,
-     * container, etc.).
-     *
-     * @return string representation of the type of the variable
-     */
     @Override
     public String getType() {
         return variableType;
     }
 
-    /**
-     * Sets the type of the state variable. There is no checking that the
-     * type is valid; this will happily accept a class name string that
-     * does not exist.
-     *
-     * @param pVariableType representation of the type of the state variable
-     */
     @Override
     public final void setType(String pVariableType) {
         variableType = pVariableType;
