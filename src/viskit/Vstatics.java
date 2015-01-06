@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
@@ -224,7 +226,7 @@ public class Vstatics {
     // TODO: Need a dialog informing of the need to rebuild Viskit with
     // extensions if a diskit class is being looked for
     static Class<?> cForName(String s, ClassLoader clsLoader) {
-        Class<?> c;
+        Class<?> c = null;
         try {
             c = Class.forName(s, false, clsLoader);
         } catch (ClassNotFoundException e) {
@@ -238,9 +240,16 @@ public class Vstatics {
                         if (debug) {
                             System.err.println("Vstatics what to do here... " + s);
                         } // ? sometimes happens but appears harmless
+                        throw new NoClassDefFoundError(cnfe.getMessage());
                     }
                 }
             }
+        } catch (NoClassDefFoundError e) {
+            ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+                    JOptionPane.ERROR_MESSAGE,
+                    "Missng: " + e.getMessage(),
+                    "Please make sure that the library for: " + s
+                            + "\nis in the project classpath, then restart Viskit");
         }
         return c;
     }
@@ -390,7 +399,7 @@ public class Vstatics {
             Class<?> c = classForName(type);
             if (c == null) {
                 LogUtils.getLogger(Vstatics.class).warn("Class file for: " + type + " was not found on the classpath");
-                return resolved;
+                return null;
             }
             if (debug) {
                 System.out.println("adding " + c.getName());

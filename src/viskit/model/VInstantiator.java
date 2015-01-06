@@ -322,7 +322,13 @@ public abstract class VInstantiator {
                 List<Object> tmp = p.getParameters();
 
                 if (tmp.isEmpty()) {
-                    tmp = Vstatics.resolveParameters(p.getType())[0];
+
+                    // Likely, Diskit, or another library is not on the classpath
+                    if (Vstatics.resolveParameters(p.getType()) == null) {
+                        return null;
+                    } else {
+                        tmp = Vstatics.resolveParameters(p.getType())[0];
+                    }
                 }
                 Iterator li = tmp.iterator();
                 if (Vstatics.debug) {
