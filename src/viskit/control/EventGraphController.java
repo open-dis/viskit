@@ -28,6 +28,7 @@ public interface EventGraphController {
 
     void newSimParameter();
 
+    /** Comes in from plus button on State Variables panel */
     void newStateVariable();
 
     /**
@@ -76,7 +77,7 @@ public interface EventGraphController {
     void showXML();
 
     /** A component, e.g., vMod, wants to say something.
-     * 
+     *
      * @param typ the type of message, i.e. ERROR, WARN, INFO, QUESTION, etc.
      * @param title the title of the message in the dialog frame
      * @param msg the message to transmit

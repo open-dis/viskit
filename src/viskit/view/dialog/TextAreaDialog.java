@@ -177,6 +177,7 @@ public class TextAreaDialog extends JDialog
 
   class cancelButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       modified = false;    // for the caller
@@ -186,6 +187,7 @@ public class TextAreaDialog extends JDialog
 
   class applyButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       if (modified)
@@ -196,6 +198,7 @@ public class TextAreaDialog extends JDialog
 
   class enableApplyButtonListener implements CaretListener, ActionListener
   {
+    @Override
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
@@ -203,6 +206,7 @@ public class TextAreaDialog extends JDialog
       getRootPane().setDefaultButton(okButt);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       caretUpdate(null);
@@ -230,6 +234,7 @@ public class TextAreaDialog extends JDialog
 
   class myCloseListener extends WindowAdapter
   {
+    @Override
     public void windowClosing(WindowEvent e)
     {
       if (modified) {

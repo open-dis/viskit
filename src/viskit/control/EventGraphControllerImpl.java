@@ -575,7 +575,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    // Comes in from plus button
     @Override
     public void newStateVariable() {
         ((EventGraphView) getView()).addStateVariableDialog();

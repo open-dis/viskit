@@ -33,11 +33,12 @@ public abstract class ViskitSmallDialog extends JDialog {
     protected static boolean showDialog(String className, JFrame f, Component comp, Object var) {
         if (dialog == null) {
             try {
-                Class[] args = new Class[] {Vstatics.classForName("javax.swing.JFrame"),
+                Class[] args = new Class[] {
+                    Vstatics.classForName("javax.swing.JFrame"),
                     Vstatics.classForName("java.awt.Component"),
                     Vstatics.classForName("java.lang.Object")
                 };
-                Class<?> c = Vstatics.classForName("viskit." + className);
+                Class<?> c = Vstatics.classForName(className);
                 Constructor constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, comp, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {

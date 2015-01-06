@@ -41,7 +41,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
     private Component myTyperComponent;       // i.e., the editor of the type JComboBox
 
     public static boolean showDialog(JFrame f, Component comp, vStateVariable var) {
-        return ViskitSmallDialog.showDialog("StateVariableDialog", f, comp, var);
+        return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, comp, var);
     }
 
     protected StateVariableDialog(JFrame parent, Component comp, Object param) {
