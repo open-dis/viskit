@@ -934,10 +934,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } while (!done);
     }
 
-    /**
-     *
-     * @param evNode
-     */
     @Override
     public void evGraphEdit(EvGraphNode evNode) {
         boolean done;
@@ -989,10 +985,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private Vector<Object> selectionVector = new Vector<>();
 
-    /**
-     *
-     * @param v
-     */
     @Override
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;

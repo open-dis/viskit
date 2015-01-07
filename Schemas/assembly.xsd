@@ -62,7 +62,8 @@
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
+      <!-- Bugfix 1425 (xs:ID) -->
+      <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
@@ -107,7 +108,7 @@
   <!--
      The proper mode for a PropertyChangeListener is singular, however, for
     backwards compatibility with older EventGraphs, we allow both singular and
-    plural modes (tdn 16 SEP 2008
+    plural modes (tdn 16 SEP 2008)
   -->
   <xs:element name="PropertyChangeListener">
     <xs:complexType>

@@ -89,6 +89,10 @@ public interface AssemblyController {
      */
     void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
+    /** Handles UI selection of nodes and edges
+     *
+     * @param v a Vector of nodes and edges
+     */
     void selectNodeOrEdge(Vector<Object> v);
 
     /**
@@ -104,6 +108,10 @@ public interface AssemblyController {
 
     void pcListenerEdit(PropChangeListenerNode pclNode);
 
+    /** Handles editing of Event Graph nodes
+     *
+     * @param evNode the node to edit
+     */
     void evGraphEdit(EvGraphNode evNode);
 
     void pcListenerEdgeEdit(PropChangeEdge pclEdge);

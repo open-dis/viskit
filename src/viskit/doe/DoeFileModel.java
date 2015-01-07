@@ -3,7 +3,7 @@ Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
- 
+
      * Redistributions of source code must retain the above copyright
        notice, this list of conditions and the following disclaimer.
      * Redistributions in binary form must reproduce the above copyright
@@ -63,10 +63,10 @@ public class DoeFileModel {
     public Document jdomDocument;
     public boolean dirty = false;
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
-    
+
     private List<SimEntity> simEntities;
-    private Map<String, Integer> nameSpace = new HashMap<String, Integer>();
-    
+    private Map<String, Integer> nameSpace = new HashMap<>();
+
     public File marshallJaxb() throws Exception {
         File f = TempFileManager.createTempFile("DOEtemp", ".xml");
         return marshallJaxb(f);
@@ -86,7 +86,7 @@ public class DoeFileModel {
             try {
 
                 FileReader fr = new FileReader(f);
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 char[] cbuf = new char[4096];
                 int retc;
                 while ((retc = fr.read(cbuf)) != -1) {
@@ -144,7 +144,7 @@ public class DoeFileModel {
                 tp.setValue(val);
             }
 
-            if (((Boolean) rData[ParamTableModel.FACTOR_COL]).booleanValue()) {
+            if (((Boolean) rData[ParamTableModel.FACTOR_COL])) {
                 String name = (String) rData[ParamTableModel.NAME_COL];
                 name = name.replace('.', '_');  // periods illegal in java identifiers
                 tp.setName(name);
@@ -160,7 +160,7 @@ public class DoeFileModel {
                 tp.setName(name + "_" + cnt);
                 // Create a designpoint TP with a name
                 TerminalParameter newTP = factory.createTerminalParameter();
-               
+
                 newTP.setName(name + "_" + cnt.toString());
                 newTP.setLink(name + "_" + cnt.toString());
                 newTP.setType(tp.getType());
@@ -181,7 +181,7 @@ public class DoeFileModel {
 
                 ValueRange dr = new ValueRange();
                 JAXBElement<ValueRange> jevr = factory.createDoubleRange(dr);
-                
+
                 dr.setLowValue(lowRange);
                 dr.setHighValue(highRange);
                 newTP.setValueRange(jevr);
@@ -200,6 +200,6 @@ public class DoeFileModel {
 
     public void setSimEntities(List<SimEntity> se) {
         simEntities = se;   //jdom
-        seTerminalParamsHM = new HashMap<SimEntity, TerminalParameter>(se.size());
+        seTerminalParamsHM = new HashMap<>(se.size());
     }
 }

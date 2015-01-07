@@ -159,8 +159,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             f = currentFile;
         }
 
-        // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
-        // file on a marshal error.
+        // Do the marshalling into a temporary file so as to avoid possible
+        // deletion of existing file on a marshal error.
 
         File tmpF;
         FileWriter fw = null;
@@ -184,7 +184,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
             jaxbRoot.setPackage(nIe(metaData.packageName));
-            
+
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(oFactory.createSchedule());
             }

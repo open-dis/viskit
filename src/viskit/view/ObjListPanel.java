@@ -23,10 +23,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import viskit.VGlobals;
 import viskit.model.VInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
 import viskit.Vstatics;
+import viskit.control.AssemblyController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -215,7 +217,10 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             } catch (ClassNotFoundException e1) {
                 String msg = "An object type specified in this element (probably " + vinst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
-                JOptionPane.showMessageDialog(parent, msg, "Class Definition Not Found", JOptionPane.ERROR_MESSAGE);
+                ((AssemblyController)VGlobals.instance().getAssemblyEditor().getController()).messageUser(
+                        JOptionPane.ERROR_MESSAGE,
+                        "Class Definition Not Found",
+                        msg);
                 return;
             }
             oi.setVisible(true); // blocks

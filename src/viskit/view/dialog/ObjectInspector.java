@@ -18,7 +18,6 @@ import viskit.view.InstantiationPanel;
  * Date: Jun 16, 2004
  * Time: 3:27:42 PM
  */
-
 public class ObjectInspector extends JDialog implements ActionListener
 {
   public boolean modified = false;
@@ -41,6 +40,7 @@ public class ObjectInspector extends JDialog implements ActionListener
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
     canButt = new JButton("Cancel");
     okButt = new JButton("Apply changes");
+    okButt.setEnabled(false);
     buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
     buttPan.add(canButt);
     buttPan.add(okButt);
@@ -49,7 +49,6 @@ public class ObjectInspector extends JDialog implements ActionListener
     lis = new enableApplyButtonListener();
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
-    okButt.setEnabled(false);
   }
 
   public void setType(String typ)

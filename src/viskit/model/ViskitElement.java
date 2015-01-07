@@ -37,16 +37,16 @@ abstract public class ViskitElement {
     }
 
     /**
-     * Returns the name of the state variable.
+     * Returns the name of the node variable.
      *
-     * @return name of state variable
+     * @return name of node variable
      */
     public abstract String getName();
 
     /**
-     * Sets the state variable name.
+     * Sets the node variable name.
      *
-     * @param name what the state variable name will become
+     * @param name what the node variable name will become
      */
     public abstract void setName(String name);
 
@@ -60,7 +60,7 @@ abstract public class ViskitElement {
     public abstract String getType();
 
     /**
-     * Sets the type of the state variable. There is no checking that the
+     * Sets the type of the node variable. There is no checking that the
      * type is valid; this will happily accept a class name string that
      * does not exist.
      *
@@ -72,8 +72,18 @@ abstract public class ViskitElement {
 
     public abstract String getIndexingExpression();
 
+    /**
+     * Returns the name of the state variable.
+     *
+     * @return name of state variable
+     */
     public abstract String getStateVarName();
 
+    /**
+     * Returns the type of the state variable.
+     *
+     * @return type of state variable
+     */
     public abstract String getStateVarType();
 
     public abstract String getValue();

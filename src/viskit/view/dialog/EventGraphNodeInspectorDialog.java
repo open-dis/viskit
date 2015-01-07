@@ -3,12 +3,12 @@ package viskit.view.dialog;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 
 import viskit.model.EvGraphNode;
 import viskit.model.VInstantiator;
@@ -119,8 +119,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
-        handleField.addKeyListener(lis);
-        descField.addKeyListener(lis);
+        handleField.addCaretListener(lis);
+        descField.addCaretListener(lis);
         outputCheck.addActionListener(lis);
         verboseCheck.addActionListener(lis);
     }
@@ -223,17 +223,18 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener extends KeyAdapter implements ActionListener {
+    class enableApplyButtonListener implements CaretListener, ActionListener {
 
         @Override
-        public void keyTyped(KeyEvent e) {
+        public void caretUpdate(CaretEvent event) {
             common();
         }
+
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (event != null && !event.getActionCommand().equals("modified"))
-                common();
+            common();
         }
+
         private void common()
         {
             modified = true;
