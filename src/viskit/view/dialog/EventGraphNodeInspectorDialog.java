@@ -102,6 +102,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
+        okButt.setEnabled(false);
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttPan.add(canButt);
         buttPan.add(okButt);
@@ -175,7 +176,6 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             outputCheck.setSelected(egNode.isOutputMarked());
             verboseCheck.setSelected(egNode.isVerboseMarked());
             descField.setText(egNode.getDescriptionString());
-            //ArrayList alis = egNode.getComments(); //?
             ip.setData(egNode.getInstantiator());
           } else {
             handleField.setText("egNode name");
@@ -231,7 +231,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
         @Override
         public void actionPerformed(ActionEvent event) {
-            common();
+            if (event != null && !event.getActionCommand().equals("modified"))
+                common();
         }
         private void common()
         {

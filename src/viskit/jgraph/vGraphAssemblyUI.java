@@ -1,7 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.event.MouseEvent;
-import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.VGlobals;
