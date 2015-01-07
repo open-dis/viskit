@@ -1,17 +1,17 @@
 package viskit.view.dialog;
 
-import viskit.model.EvGraphNode;
-import viskit.model.VInstantiator;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
+import viskit.model.EvGraphNode;
+import viskit.model.VInstantiator;
 import viskit.Vstatics;
 import viskit.view.InstantiationPanel;
 
@@ -35,7 +35,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private static boolean modified = false;
     private EvGraphNode egNode;
     private Component locationComp;
-    private JButton okButt,  canButt;
+    private JButton okButt, canButt;
     private enableApplyButtonListener lis;
     private JPanel buttPan;
     public static String newName;
@@ -109,9 +109,6 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         placeWidgets();
         fillWidgets();     // put the data into the widgets
 
-        modified = (lv == null);     // if it's a new egNode, they can always accept defaults with no typing
-        okButt.setEnabled(lv == null);
-
         getRootPane().setDefaultButton(canButt);
 
         pack();     // do this prior to next
@@ -121,8 +118,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
-        handleField.addCaretListener(lis);
-        descField.addCaretListener(lis);
+        handleField.addKeyListener(lis);
+        descField.addKeyListener(lis);
         outputCheck.addActionListener(lis);
         verboseCheck.addActionListener(lis);
     }
@@ -133,12 +130,6 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         fillWidgets();
         getContentPane().invalidate();
-        modified = (p == null);
-        okButt.setEnabled(p == null);
-
-        //getRootPane().setDefaultButton(canButt);
-        //pack();
-        //this.setLocationRelativeTo(c);
     }
 
     private void placeWidgets()
@@ -232,13 +223,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener implements CaretListener, ActionListener {
+    class enableApplyButtonListener extends KeyAdapter implements ActionListener {
 
         @Override
-        public void caretUpdate(CaretEvent event) {
+        public void keyTyped(KeyEvent e) {
             common();
         }
-
         @Override
         public void actionPerformed(ActionEvent event) {
             common();
@@ -285,7 +275,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            if (modified == true) {
+            if (modified) {
                 int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
@@ -299,5 +289,3 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
     }
 }
-
-

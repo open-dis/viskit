@@ -1506,7 +1506,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         Vector<String> vec = ((AssemblyModel) getModel()).getDetailedOutputEntityNames();
         for (String s : vec) {
-            v.add(s);                                                         // 9+
+            v.add(s);                                                   // 9+
         }
 
         String[] ra = new String[v.size()];

@@ -184,6 +184,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
             jaxbRoot.setPackage(nIe(metaData.packageName));
+            
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(oFactory.createSchedule());
             }

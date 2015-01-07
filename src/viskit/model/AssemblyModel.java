@@ -88,8 +88,16 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     void deleteSimEvLisEdge(SimEvListenerEdge sele);
 
+    /** Retrieve a list of detailed output entity names
+     *
+     * @return a list of detailed output entity names
+     */
     Vector<String> getDetailedOutputEntityNames();
 
+    /** Retrieve a list of verbose output entity names
+     *
+     * @return a list of verbose output entity names
+     */
     Vector<String> getVerboseOutputEntityNames();
 
     /** NOTE: Not currently used
@@ -98,5 +106,10 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     void externalClassesChanged(Vector<String> v);
 
+    /** Check for the existence of a SimEntity name
+     *
+     * @param name the name to check
+     * @return true if this name already exists
+     */
     boolean nameExists(String name);
 }
