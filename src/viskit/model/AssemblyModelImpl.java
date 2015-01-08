@@ -673,7 +673,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private void removeFromVerboseList(SimEntity se) {
         List<Verbose> vTL = jaxbRoot.getVerbose();
         for (Verbose v : vTL) {
-            if (v.getEntity() == se) {
+            if (v.getEntity().equals(se.getName())) {
                 vTL.remove(v);
                 return;
             }
@@ -695,12 +695,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private void addToVerboseList(SimEntity se) {
         List<Verbose> vTL = jaxbRoot.getVerbose();
         for (Verbose v : vTL) {
-            if (v.getEntity() == se) {
+            if (v.getEntity().equals(se.getName())) {
                 return;
             }
         }
         Verbose op = oFactory.createVerbose();
-        op.setEntity(se);
+        op.setEntity(se.getName());
         vTL.add(op);
     }
 
@@ -928,8 +928,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 }
             }
             for (Verbose v : verboseList) {
-                SimEntity simE = (SimEntity) v.getEntity();
-                if (simE == se) {
+                String simE = v.getEntity();
+                if (simE.equals(se.getName())) {
                     isVerbose = true;
                     break;
                 }
