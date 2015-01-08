@@ -62,8 +62,7 @@
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <!-- Bugfix 1425 (xs:ID) -->
-      <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="name" use="required"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
@@ -170,7 +169,8 @@
   </xs:element>
   <xs:element name="Verbose">
     <xs:complexType>
-      <xs:attribute name="entity" use="required" type="xs:IDREF"/>
+      <!-- Bugfix 1425 (xs:NMTOKEN) -->
+      <xs:attribute name="entity" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Schedule">
