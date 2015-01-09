@@ -241,10 +241,9 @@ public class Vstatics {
                     try {
                         c = Thread.currentThread().getContextClassLoader().loadClass(s);
                     } catch (ClassNotFoundException cnfe) {
-                        if (debug) {
-                            System.err.println("Vstatics what to do here... " + s);
-                        } // ? sometimes happens but appears harmless
-                        throw new NoClassDefFoundError(cnfe.getMessage());
+                        // sometimes happens but appears harmless.  Just let
+                        // the NoClassDefFoundError handle the reporting to
+                        // the user
                     }
                 }
             }
