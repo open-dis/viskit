@@ -159,7 +159,6 @@ public class vGraphModel extends DefaultGraphModel {
         cs.connect(edge, source.getFirstChild(), target.getFirstChild());
 
         Map atts = new Hashtable();
-        atts.put(edge, edgeStyle);
 
         if (enfrom == ento) {// self referential overwrite
             if (ed instanceof SchedulingEdge) {
@@ -167,6 +166,8 @@ public class vGraphModel extends DefaultGraphModel {
             } else {
                 atts.put(edge, viskitSelfRefCancel);
             }
+        } else {
+            atts.put(edge, edgeStyle);
         }
 
         insert(new Object[]{edge}, atts, cs, null, null);
