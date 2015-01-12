@@ -50,7 +50,6 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
 import viskit.control.InternalAssemblyRunner;
-import viskit.control.InternalAssemblyRunner.stopListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;

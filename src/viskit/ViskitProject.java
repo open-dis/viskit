@@ -436,6 +436,10 @@ public class ViskitProject {
         this.analystReportsDir = analystReportsDir;
     }
 
+    /** Retrieve the project's src directory (located in build)
+     *
+     * @return the project's src directory (located in build)
+     */
     public File getSrcDir() {
         return srcDir;
     }

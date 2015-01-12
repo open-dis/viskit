@@ -317,14 +317,10 @@ public class SimkitXML2Java {
 
     private void buildToString(StringWriter toStringBlock) {
         PrintWriter pw = new PrintWriter(toStringBlock);
-        pw.println(sp4 + "/** Override the toString() method of java.lang.Object */");
         pw.println(sp4 + "@Override");
         pw.print(sp4 + "public String toString");
         pw.println(lp + rp + sp + ob);
-//        pw.println(sp8 + "super.toString()" + sc);
-        pw.println(sp8 + "return" + sp + "this.getClass().getName()" + sc);
-//        pw.println(sp8 + "return" + localSuperParams + "super.toString()" + localSuperParams + "+" + localSuperParams +
-//                qu + " :: " + qu + localSuperParams + "+" + localSuperParams + "this.getClass().getName()" + sc);
+        pw.println(sp8 + "return" + sp + "getClass().getName()" + sc);
         pw.println(sp4 + cb);
     }
 

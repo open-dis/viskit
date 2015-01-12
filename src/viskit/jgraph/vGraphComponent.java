@@ -43,6 +43,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     EventGraphViewFrame parent;
     protected Action removeAction;
 
+    /** Sets up JGraph to render nodes and edges for DES
+     *
+     * @param model a model of the node with its specific edges
+     * @param frame the main view frame canvas to render to
+     */
     public vGraphComponent(vGraphModel model, EventGraphViewFrame frame) {
         super(model);
         parent = frame;

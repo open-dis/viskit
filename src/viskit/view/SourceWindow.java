@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.log4j.Logger;
-import viskit.ViskitProject;
+import viskit.VGlobals;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -43,7 +43,7 @@ public class SourceWindow extends JFrame {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
-            saveChooser.setCurrentDirectory(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+            saveChooser.setCurrentDirectory(VGlobals.instance().getCurrentViskitProject().getSrcDir());
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);

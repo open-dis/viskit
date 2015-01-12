@@ -1196,18 +1196,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    /**
-     * Called by the controller after source has been generated.
-     * Show to the user and provide him with the option to save.
-     * @param className
-     * @param s Java source
-     * @param filename
-     */
     @Override
     public void showAndSaveSource(String className, String s, String filename) {
-        JFrame f = new SourceWindow(this, className, s);
+        final JFrame f = new SourceWindow(this, className, s);
         f.setTitle("Generated source from " + filename);
-        f.setVisible(true);
+
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                f.setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(r);
     }
 
     @Override
