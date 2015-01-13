@@ -1154,10 +1154,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 null, null, initval);
     }
 
-    /**
-     * This is where the "master" model (viskit.model.ModelImpl) updates the view.
-     * @param event
-     */
     @Override
     public void modelChanged(mvcModelEvent event) {
         VgraphComponentWrapper vgcw = getCurrentVgcw();
@@ -1242,13 +1238,28 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         //jf.pack();
         jf.setSize(475, 500);
         jf.setLocationRelativeTo(this);
-        jf.setVisible(true);
+
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                jf.setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(r);
 
         closeButt.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                jf.dispose();
+                Runnable r = new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        jf.dispose();
+                    }
+                };
+                SwingUtilities.invokeLater(r);
             }
         });
     }

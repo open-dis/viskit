@@ -52,6 +52,10 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     File getLastFile();
 
+    /** Retrieve the meta data for this Assembly
+     *
+     * @return the meta data for this Assembly
+     */
     GraphMetaData getMetaData();
 
     void changeMetaData(GraphMetaData gmd);

@@ -8,7 +8,7 @@ package viskit.assembly;
 public interface AssemblyRunnerPlug {
 
     /**
-     * Execute and assembly with the give args
+     * Execute and assembly with the given args
      * @param execStrings the args to supply for execution
      */
     void exec(String[] execStrings);

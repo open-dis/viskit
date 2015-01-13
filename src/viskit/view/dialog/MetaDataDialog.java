@@ -144,6 +144,7 @@ abstract public class MetaDataDialog extends JDialog {
 
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
+        getRootPane().setDefaultButton(okButt);
         buttPan.add(Box.createHorizontalGlue());
         buttPan.add(canButt);
         buttPan.add(okButt);
@@ -187,7 +188,12 @@ abstract public class MetaDataDialog extends JDialog {
     private void unloadWidgets() {
         param.author = authorTf.getText().trim();
         param.description = descriptionTextArea.getText().trim();
-        param.name = nameTf.getText().trim();
+
+        if (this instanceof AssemblyMetaDataDialog) {
+            param.name = nameTf.getText().trim() + "Assembly";
+        } else {
+            param.name = nameTf.getText().trim();
+        }
         param.packageName = packageTf.getText().trim();
         param.version = versionTf.getText().trim();
         param.extendsPackageName = extendsTf.getText().trim();
@@ -215,7 +221,7 @@ abstract public class MetaDataDialog extends JDialog {
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
             if (modified) {
-                if (nameTf.getText().trim().length() <= 0) {
+                if (nameTf.getText().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(MetaDataDialog.this, "Must have a non-zero length name.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     nameTf.requestFocus();

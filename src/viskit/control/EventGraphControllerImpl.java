@@ -226,7 +226,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
-            adjustRecentList(file);
+            adjustRecentSet(file);
 
             // Mark every vAMod opened as "open"
             openAlready = viskitView.getOpenModels();
@@ -335,9 +335,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
-     * @param file
+     * @param file an event graph file to add to the list
      */
-    private void adjustRecentList(File file) {
+    private void adjustRecentSet(File file) {
         String s = file.getAbsolutePath().replaceAll("\\\\", "/");
         recentFileSet.remove(s);
         recentFileSet.add(s);      // to the top
@@ -539,7 +539,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             view.setSelectedEventGraphName(gmd.name);
 
             fileWatchSave(saveFile);
-            adjustRecentList(saveFile);
+            adjustRecentSet(saveFile);
         }
     }
 
@@ -638,7 +638,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void paste() //-----------------
     {
-        if (copyVector.size() <= 0) {
+        if (copyVector.isEmpty()) {
             return;
         }
         int x = 100, y = 100;
@@ -657,7 +657,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void cut() //---------------
     {
-        if (selectionVector != null && selectionVector.size() > 0) {
+        if (!selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
             int localNodeCount = 0;  // different msg for edge delete

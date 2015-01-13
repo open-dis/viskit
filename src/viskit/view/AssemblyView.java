@@ -107,7 +107,7 @@ public interface AssemblyView {
      * Called by the controller after source has been generated.  Show to the
      * user and provide the option to save.
      *
-     * @param className
+     * @param className the class name of the source file
      * @param s Java source
      */
     void showAndSaveSource(String className, String s);

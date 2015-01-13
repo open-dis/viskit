@@ -96,7 +96,7 @@ public interface EventGraphView {
 
     void displayXML(File f);
 
-    // The following 2 may be implemented by the view in someother way that an official GUI Dialog
+    // The following 2 may be implemented by the view in some other way that an official GUI Dialog
     String addParameterDialog();          // returns param name
 
     String addStateVariableDialog();      // returns statevar name

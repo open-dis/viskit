@@ -1076,6 +1076,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         f.setTitle("Generated source from " + filename);
 
         Runnable r = new Runnable() {
+
             @Override
             public void run() {
                 f.setVisible(true);
@@ -1117,6 +1118,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         jf.setLocationRelativeTo(this);
 
         Runnable r = new Runnable() {
+
             @Override
             public void run() {
                 jf.setVisible(true);
@@ -1130,6 +1132,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             public void actionPerformed(ActionEvent e) {
 
                 Runnable r = new Runnable() {
+
                     @Override
                     public void run() {
                         jf.dispose();

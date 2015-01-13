@@ -76,7 +76,9 @@ public final class AssemblyFileFilter extends FileFilter {
      *
      * @param contains file must contain this String. Case Insensitive.
      */
-    public AssemblyFileFilter(String contains) {this.contains = contains.toLowerCase();}
+    public AssemblyFileFilter(String contains) {
+        this.contains = contains.toLowerCase();
+    }
 
     /**
      * Select only files containing our String.  Does expose directories
@@ -97,6 +99,8 @@ public final class AssemblyFileFilter extends FileFilter {
 
     /** @return a fileview description of the filter */
     @Override
-    public String getDescription() {return "Viskit Assembly XML Files Only";}
+    public String getDescription() {
+        return "Viskit Assembly XML Files Only";
+    }
 
 } // end class file AssemblyFileFilter.java

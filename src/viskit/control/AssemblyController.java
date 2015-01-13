@@ -177,6 +177,7 @@ public interface AssemblyController {
      */
     void close();
 
+    /** Closes all open Assy files and their corresponding EG files */
     void closeAll();
 
     /**
