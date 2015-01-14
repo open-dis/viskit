@@ -17,7 +17,8 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.VGlobals;
 import viskit.xsd.bindings.assembly.*;
 
-/**
+/** A generator of source code from Assembly XML
+ *
  * @author  Rick Goldberg
  * @since April 1, 2004, 10:09 AM
  * @version $Id$
@@ -54,12 +55,9 @@ public class SimkitAssemblyXML2Java {
     public SimkitAssemblyXML2Java() {
         try {
             this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
-        } catch (JAXBException je) {
-//            try {
-//                this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader());
-//            } catch (JAXBException jae) {
-//                jae.printStackTrace();
-//            }
+        } catch (JAXBException ex) {
+            log.error(ex);
+            error(ex.getMessage());
         }
     }
 
@@ -70,9 +68,9 @@ public class SimkitAssemblyXML2Java {
 
     /**
      * Creates a new instance of SimkitAssemblyXML2Java
-     * when used from another class, instance this
+     * when used from another class.  Instance this
      * with a String for the name of the xmlFile.
-     * @param xmlFile
+     * @param xmlFile the name of the Assembly XML file
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
@@ -832,32 +830,17 @@ public class SimkitAssemblyXML2Java {
             Class<?> classParams[] = { params[0].getClass() };
             Method mainMethod = assembly.getDeclaredMethod("main", classParams);
             mainMethod.invoke(null, params);
-        } catch (MalformedURLException e) {
-            error(e.toString()); }
-        catch (ClassNotFoundException e) {
-            error(e.toString());
-        } catch (NoSuchMethodException e) {
-            error(e.toString());
-        } catch (SecurityException e) {
-            error(e.toString());
-        } catch (IllegalAccessException e) {
-            error(e.toString());
-        } catch (IllegalArgumentException e) {
-            error(e.toString());
-        } catch (InvocationTargetException e) {
+        } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             error(e.toString());
         }
     }
 
-    void error(String desc) {
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        pw.println("error :");
-        pw.println(desc);
-
-        System.err.println(sw.toString());
+    /** Report and exit the JVM
+     *
+     * @param desc a description of the encountered error
+     */
+    private void error(String desc) {
+        log.error(desc);
         System.exit(1);
     }
 
@@ -887,7 +870,8 @@ public class SimkitAssemblyXML2Java {
                         port = Integer.parseInt(a);
                     } else {
                         usage();
-                    }   break;
+                    }
+                    break;
                 case "-f":
                 case "--file":
                     // Dummy forward looking next()
@@ -897,7 +881,8 @@ public class SimkitAssemblyXML2Java {
                         fileName = fileName.replaceAll("\\\\", "/");
                     } else {
                         usage();
-                }   break;
+                    }
+                    break;
             }
         }
 
@@ -905,14 +890,17 @@ public class SimkitAssemblyXML2Java {
         log.info("Generating Java Source...");
 
         if (port == 0) {
-            if ( fileName == null ) {
+            if (fileName == null) {
                 usage();
             } else {
                 try {
                     sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
-                } catch (FileNotFoundException ex) {log.error(ex);}
-                if (sax2j != null)
+                } catch (FileNotFoundException ex) {
+                    log.error(ex);
+                }
+                if (sax2j != null) {
                     sax2j.unmarshal();
+                }
             }
         } else {
             if (fileName == null) {
@@ -945,8 +933,8 @@ public class SimkitAssemblyXML2Java {
     }
 
     static void usage() {
-        System.out.println("Check args, you need at least a port or a file in grid mode");
-        System.out.println("usage: Assembly [-p port | --port port | -f file | --file file]");
+        System.err.println("Check args, you need at least a port or a file in grid mode");
+        System.err.println("usage: Assembly [-p port | --port port | -f file | --file file]");
         System.exit(1);
     }
 }
