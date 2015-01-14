@@ -1253,7 +1253,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             @Override
             public void actionPerformed(ActionEvent e) {
                 Runnable r = new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         jf.dispose();

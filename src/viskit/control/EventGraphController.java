@@ -121,6 +121,7 @@ public interface EventGraphController {
      */
     void closeAll();
 
+    /** Performs the paste operation CNTL-V or CMD-V */
     void paste();
 
     /**

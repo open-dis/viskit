@@ -592,7 +592,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void selectNodeOrEdge(Vector v) //------------------------------------
     {
         selectionVector = v;
-        boolean ccbool = (selectionVector.size() > 0);
+        boolean ccbool = !selectionVector.isEmpty();
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
         ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
         ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
@@ -625,14 +625,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private boolean nodeInVector(Vector v) {
-        for (Iterator itr = v.iterator(); itr.hasNext();) {
-            Object o = itr.next();
+        for (Object o : v) {
             if (o instanceof EventNode) {
                 return true;
             }
         }
         return false;
-
     }
 
     @Override

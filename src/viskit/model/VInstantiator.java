@@ -167,7 +167,7 @@ public abstract class VInstantiator {
                 }
             }
             // gets lists of EventGraph parameters for type if top-level
-            // or null if type is a basic class ie. java.lang.Double
+            // or null if type is a basic class i.e., java.lang.Double
             // todo use same block as LegosTree to resolve any type
             List<Object>[] eparams = Vstatics.resolveParameters(type);
             int indx = 0;
@@ -415,7 +415,7 @@ public abstract class VInstantiator {
 
         /** Find a constructor match in the ClassLoader of the given EG's parameters
          * @param type the EventGraph to parameter check
-         * @param args
+         * @param args a list of EG parameters
          * @return the index into the found matching constructor
          */
         public int indexOfArgNames(String type, List<Object> args) {

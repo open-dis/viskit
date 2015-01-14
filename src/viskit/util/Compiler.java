@@ -25,6 +25,9 @@ import viskit.VGlobals;
  */
 public class Compiler {
 
+    /** Diagnostic message when we have a successful compilation */
+    public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
+
     static Logger log = LogUtils.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
@@ -105,14 +108,14 @@ public class Compiler {
 
             // Check for errors
             if (diagnosticMessages.toString().isEmpty()) {
-                diagnosticMessages.append("No Compiler Errors");
+                diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
             }
         } catch (Exception ex) {
             if (ex instanceof NullPointerException) {
 
                 String msg = "Your environment variable for Path likely has the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
-                                + "Please reset your Path to have the JDKs "
+                                + "Please reset your Path to have the JDK's "
                                 + "java.exe first in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue

@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.log4j.Logger;
+import viskit.util.Compiler;
 import viskit.VGlobals;
 
 /**
@@ -154,21 +155,21 @@ public class SourceWindow extends JFrame {
 
                 // An error stream to write additional error info out to
                 ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-                viskit.util.Compiler.setOutPutStream(baosOut);
+                Compiler.setOutPutStream(baosOut);
 
                 try {
-                    String diagnostic = viskit.util.Compiler.invoke("", className, src);
+                    String diagnostic = Compiler.invoke("", className, src);
 
                     sb.append(baosOut.toString());
                     sb.append(diagnostic);
 
                     sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
-                    if (!diagnostic.contains("No Compiler Errors")) {
+                    if (!diagnostic.contains(Compiler.COMPILE_SUCCESS_MESSAGE)) {
                         ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.PINK);
-                        int startOffset = (int) viskit.util.Compiler.getDiagnostic().lineNumber * 5 + (int) viskit.util.Compiler.getDiagnostic().startOffset;
-                        int endOffset = (int) viskit.util.Compiler.getDiagnostic().lineNumber * 5 + (int) viskit.util.Compiler.getDiagnostic().endOffset;
-                        int columnNumber = (int) viskit.util.Compiler.getDiagnostic().columnNumber;
+                        int startOffset = (int) Compiler.getDiagnostic().lineNumber * 5 + (int) Compiler.getDiagnostic().startOffset;
+                        int endOffset = (int) Compiler.getDiagnostic().lineNumber * 5 + (int) Compiler.getDiagnostic().endOffset;
+                        int columnNumber = (int) Compiler.getDiagnostic().columnNumber;
                         if (startOffset == endOffset) {
                             startOffset = endOffset - columnNumber;
                         }
@@ -181,6 +182,9 @@ public class SourceWindow extends JFrame {
                 } catch (Exception ex) {
                     LOGGER.error(ex);
                 }
+
+                // Reset the message buffer for the next compilation
+                sb.setLength(0);
             }
         });
 

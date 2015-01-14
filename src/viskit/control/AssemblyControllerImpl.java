@@ -49,7 +49,6 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
@@ -988,19 +987,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
-        boolean ccbool = (!selectionVector.isEmpty());
-        ActionIntrospector.getAction(this, "copy").setEnabled(ccbool);
-        ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
-        int egCount = 0;
-        for (Object o : selectionVector) {
+        ActionIntrospector.getAction(this, "copy").setEnabled(nodeOrEdgeSelected());
+        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());
+        ActionIntrospector.getAction(this, "edit").setEnabled(nodeOrEdgeSelected());
+    }
+
+    private boolean nodeOrEdgeSelected() {
+        return nodeOrEdgeInVector(selectionVector);
+    }
+
+    private boolean nodeOrEdgeInVector(Vector v) {
+        for (Object o : v) {
             if (o instanceof EvGraphNode) {
-                ActionIntrospector.getAction(this, "edit").setEnabled(true);
-                egCount++;
+                return true;
+            }
+            if (o instanceof AssemblyEdge) {
+                return true;
             }
         }
-        if (egCount == 0) {
-            ActionIntrospector.getAction(this, "edit").setEnabled(false);
-        }
+        return false;
     }
 
     private Vector<EvGraphNode> copyVector = new Vector<>();
@@ -1305,7 +1310,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
-            if (diagnostic.contains("No Compiler Errors")) {
+            if (diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE)) {
                 LOGGER.info(diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
             } else {

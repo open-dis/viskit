@@ -391,6 +391,11 @@ public class Vstatics {
         parameterMap.put(type, p);
     }
 
+    /**
+     * For the given class type EG, return its specific ParameterMap
+     * @param type the EG class name
+     * @return a List of parameter map object arrays
+     */
     static public List<Object>[] resolveParameters(String type) {
         List<Object>[] resolved = parameterMap.get(type);
         if (debug) {
@@ -414,7 +419,7 @@ public class Vstatics {
             // at this point, there should be loaded classes
             // from LegosTree, however, addJarFileCommon is only
             // looking for SimEntity types (TBD could refactor this better
-            // as this code block is directly from LegosTree.addJarFileCommon()
+            // as this code block is directly from LegosTree.addJarFileCommon())
             Field f = null;
             try {
                 f = c.getField("parameterMap");
@@ -432,7 +437,7 @@ public class Vstatics {
                     //  { "type0","name0", ... }
                     //  ...
                     // }
-                    String[][] paramMap = (String[][]) (f.get(new String[0][0]));
+                    String[][] paramMap = (String[][]) f.get(new String[0][0]);
                     int numConstrs = paramMap.length;
 
                     for (int n = 0; n < numConstrs; n++) {
@@ -546,7 +551,10 @@ public class Vstatics {
         return type.equals("byte") | type.equals("boolean") | type.equals("char") | type.equals("double") | type.equals("float") | type.equals("int") | type.equals("short") | type.equals("long");
     }
 
-    // returns number of constructors, checks is [] type
+    /**
+     * @param type the type class for searching constructors
+     * @return number of constructors, checks is [] type
+     */
     public static int numConstructors(String type) {
         //
         if (debug) {
