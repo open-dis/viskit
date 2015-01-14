@@ -14,7 +14,8 @@ import viskit.VGlobals;
 import viskit.Vstatics;
 import viskit.xsd.bindings.eventgraph.*;
 
-/**
+/** A generator of source code from Event Graph XML
+ *
  * @author Rick Goldberg
  * @since March 23, 2004, 4:59 PM
  * @version $Id$
@@ -59,6 +60,7 @@ public class SimkitXML2Java {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         } catch (JAXBException ex) {
             log.error(ex);
+            error(ex.getMessage());
         }
     }
 
@@ -425,9 +427,18 @@ public class SimkitXML2Java {
         pw.println(cb);
         pw.println(sp4 + rp);
         pw.println();
-        pw.println(sp4 + "/** Creates a new instance of " + this.root.getName() + " */");
-        pw.print(sp4 + "public " + this.root.getName() + lp);
+        pw.println(sp4 + "/** Creates a new default instance of " + this.root.getName() + " */");
 
+        // Generate a zero parameter (default) constructor in addition to a
+        // parameterized constroctor
+        if (!liParams.isEmpty()) {
+            pw.println(sp4 + "public " + this.root.getName() + lp + rp + sp + ob);
+            pw.println(sp4 + cb);
+            pw.println();
+        }
+
+        // Now, generate the parameterized or zero parameter consructor
+        pw.print(sp4 + "public " + this.root.getName() + lp);
         for (Parameter pt : liParams) {
 
             pw.print(pt.getType() + sp + shortinate(pt.getName()));
@@ -1006,23 +1017,20 @@ public class SimkitXML2Java {
         return (c.indexOf(rb) > 0);
     }
 
-    void error(String desc) {
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-
-        pw.println("error :");
-        pw.println(desc);
-
-        System.err.println(sw.toString());
+    /** Report and exit the JVM
+     *
+     * @param desc a description of the encountered error
+     */
+    private void error(String desc) {
+        log.error(desc);
         System.exit(1);
     }
 
     /**
-     * @param args the command line arguments
-     * args[0] - XML file to translate
-     * follow this pattern to use this class from another,
+     * Follow this pattern to use this class from another,
      * otherwise this can be used stand alone from CLI
+     *
+     * @param args the command line arguments args[0] - XML file to translate
      */
     public static void main(String[] args) {
 
