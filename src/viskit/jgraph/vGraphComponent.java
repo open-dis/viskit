@@ -310,7 +310,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     Edge se = (Edge) vc.getUserObject();
 
                     if (se instanceof SchedulingEdge) {
-                        sb.append("<center>Schedule</center>");
+                        sb.append("<center>Scheduling Edge</center>");
                         if (se.conditionalDescription != null) {
                             String cmt = se.conditionalDescription.trim();
                             if (cmt.length() > 0) {
@@ -353,7 +353,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                             }
                         }
                     } else {
-                        sb.append("<center>Cancel</center>");
+                        sb.append("<center>Canceling Edge</center>");
                         if (se.conditionalDescription != null) {
                             String cmt = se.conditionalDescription.trim();
                             if (cmt.length() > 0) {
