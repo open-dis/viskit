@@ -30,9 +30,11 @@ public interface Model {
 
     /**
      * Save existing model to specified file.  If null, save to last file.  If no last file, error.
+     * 
      * @param f File to save to.
+     * @return indication of success or failure
      */
-    void saveModel(File f);
+    boolean saveModel(File f);
 
     /** @return a File object representing the last one passed to the two methods above */
     File getLastFile();
@@ -90,6 +92,11 @@ public interface Model {
 
     void changeMetaData(GraphMetaData gmd);
 
+    /**
+     * Notify of a change to an Event Node
+     * @param en the event node that changed
+     * @return true if a change occurred
+     */
     boolean changeEvent(EventNode en);
 
     void newStateVariable(String name, String type, String initVal, String comment);

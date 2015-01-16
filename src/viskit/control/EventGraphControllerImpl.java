@@ -152,29 +152,31 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private boolean askToSaveAndContinue() {
         int yn = (((EventGraphView) getView()).genericAsk("Question", "Save modified graph?"));
 
+        boolean retVal;
+
         switch (yn) {
             case JOptionPane.YES_OPTION:
                 save();
-
-                // TODO: Can't remember why this is here after a save?
-                if (((Model) getModel()).isDirty()) {
-                    return false;
-                } // we cancelled
-                return true;
+                retVal = true;
+                break;
             case JOptionPane.NO_OPTION:
 
                 // No need to recompile
                 if (((Model) getModel()).isDirty()) {
                     ((Model) getModel()).setDirty(false);
                 }
-                return true;
+                retVal = true;
+                break;
             case JOptionPane.CANCEL_OPTION:
-                return false;
+                retVal = false;
+                break;
 
             // Something funny if we're here
             default:
-                return false;
+                retVal = false;
+                break;
         }
+        return retVal;
     }
 
     @Override
@@ -262,14 +264,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     /**
-     * Save and recompile our modified EG
-     * @param f the EG to save / recompile
+     * Creates a new temporary EG as a scratch pad
+     * @param f the EG to watch
      */
     private void fileWatchSave(File f) {
-
-        // We don't need to recurse since we know this is a file, but make sure
-        // it's re-compiled and re-validated
-        VGlobals.instance().getAssemblyEditor().addToEventGraphPallette(f, false);
         fileWatchOpen(f);
     }
 
@@ -510,8 +508,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (localLastFile == null) {
             saveAs();
         } else {
-            ((Model) getModel()).saveModel(localLastFile);
-            fileWatchSave(localLastFile);
+            handleCompileAndSave(mod, localLastFile);
         }
     }
 
@@ -533,13 +530,33 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 n = n.substring(0, n.length() - 4);
             }
             gmd.name = n;
+            view.setSelectedEventGraphName(gmd.name);
             mod.changeMetaData(gmd); // might have renamed
 
-            mod.saveModel(saveFile);
-            view.setSelectedEventGraphName(gmd.name);
-
-            fileWatchSave(saveFile);
+            handleCompileAndSave(mod, saveFile);
             adjustRecentSet(saveFile);
+        }
+    }
+
+    /**
+     * Handles whether an XML EG file gets its java source compiled and watched
+     *
+     * @param m the model of the XML EG
+     * @param f the XML file name to save to
+     */
+    private void handleCompileAndSave(Model m, File f) {
+
+        if (m.saveModel(f)) {
+
+            // We don't need to recurse since we know this is a file, but make sure
+            // it's re-compiled and re-validated.  model.isDirty will be set from
+            // this call.
+            VGlobals.instance().getAssemblyEditor().addToEventGraphPallette(f, false);
+        }
+
+        // Don't watch a an XML file whose source couldn't be compiled correctly
+        if (!m.isDirty()) {
+            fileWatchSave(f);
         }
     }
 

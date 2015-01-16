@@ -145,7 +145,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void setRunTabbedPane(JComponent runTabbedPane, int idx) {
+    public void setAssemblyRunPane(JComponent runTabbedPane, int idx) {
         this.runTabbedPane = (JTabbedPane) runTabbedPane;
         this.runTabbedPaneIdx = idx;
         this.getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, false);
@@ -1310,22 +1310,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
-            if (diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE)) {
+            boolean compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
+            if (compileSuccess) {
+
                 LOGGER.info(diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
             } else {
+
                 LOGGER.error(diagnostic + "\n");
                 if (!baosOut.toString().isEmpty()) {
                     LOGGER.error(baosOut.toString() + "\n");
                 }
             }
+
+            // Indicate compile results via visual cue on the EG tab
+            VGlobals.instance().getActiveEventGraphModel().setDirty(!compileSuccess);
+
         } catch (IOException ioe) {
             LOGGER.error(ioe);
         } finally {
             try {
                 if (fw != null)
                     fw.close();
-            } catch (IOException ioe) {}
+            } catch (IOException e) {}
         }
         return null;
     }

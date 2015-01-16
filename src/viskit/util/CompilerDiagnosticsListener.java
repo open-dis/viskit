@@ -7,7 +7,7 @@ import javax.tools.JavaFileObject;
 /** Taken from viskit.view.SourceWindow to be more broadly used
  *
  * @author Rick Goldberg
- * @version $Id:$
+ * @version $Id$
  */
 public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> {
 
@@ -26,7 +26,32 @@ public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileO
     public void report(Diagnostic<? extends JavaFileObject> message) {
         String msg = message.getMessage(null);
 
-        messageString.append("Viskit has detected ").append(msg).append('\n').append("Code: ").append(message.getCode()).append('\n').append("Kind: ").append(message.getKind()).append('\n').append("Line Number: ").append(message.getLineNumber()).append('\n').append("Column Number: ").append(message.getColumnNumber()).append('\n').append("Position: ").append(message.getPosition()).append('\n').append("Start Position: ").append(message.getStartPosition()).append('\n').append("End Position: ").append(message.getEndPosition()).append('\n').append("Source: ").append(message.getSource()).append('\n');
+        messageString.append(msg);
+        messageString.append('\n');
+        messageString.append("Code: ");
+        messageString.append(message.getCode());
+        messageString.append('\n');
+        messageString.append("Kind: ");
+        messageString.append(message.getKind());
+        messageString.append('\n');
+        messageString.append("Line Number: ");
+        messageString.append(message.getLineNumber());
+        messageString.append('\n');
+        messageString.append("Column Number: ");
+        messageString.append(message.getColumnNumber());
+        messageString.append('\n');
+        messageString.append("Position: ");
+        messageString.append(message.getPosition());
+        messageString.append('\n');
+        messageString.append("Start Position: ");
+        messageString.append(message.getStartPosition());
+        messageString.append('\n');
+        messageString.append("End Position: ");
+        messageString.append(message.getEndPosition());
+        messageString.append('\n');
+        messageString.append("Source: ");
+        messageString.append(message.getSource());
+        messageString.append('\n');
 
         if (startOffset == -1) {
             startOffset = message.getStartPosition();

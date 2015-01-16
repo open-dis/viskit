@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import viskit.VGlobals;
 import viskit.control.EventGraphController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -79,6 +80,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public void setDirty(boolean dirt) {
         modelDirty = dirt;
+
+        // Indicate the state of modelDirty on each EG tab
+        VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
     }
 
     @Override
@@ -152,12 +156,15 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
         }
         currentFile = f;
+
+        // required for initial file loading
         setDirty(false);
         return true;
     }
 
     @Override
-    public void saveModel(File f) {
+    public boolean saveModel(File f) {
+        boolean retVal;
         if (f == null) {
             f = currentFile;
         }
@@ -175,7 +182,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     "Exception creating temporary file, Model.saveModel():" +
                     "\n" + e.getMessage()
                     );
-            return;
+            return false;
         }
 
         try {
@@ -204,6 +211,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
             setDirty(false);
             currentFile = f;
+            retVal = true;
         } catch (JAXBException e) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
@@ -211,18 +219,21 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     "\n" + f.getName() +
                     "\n" + e.getMessage()
                     );
+            retVal = false;
         } catch (IOException ex) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage()
                     );
+            retVal = false;
         } finally {
             try {
                 if (fw != null)
                     fw.close();
             } catch (IOException ioe) {}
         }
+        return retVal;
     }
 
     @Override

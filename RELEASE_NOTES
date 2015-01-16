@@ -10,6 +10,15 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+If an EG XML file save goes bad, or its corresponding source code
+compilation reveals an error, the tab that represents the EG will change from
+a green color (signifying good XML, good source compilation) to red which
+signifies either an XML save, or its source compilation went bad.  The user will
+be unable to advance to the Assembly Editor tab until the problem is corrected.
+If an EG compilation went bad, any previously compiled byte code *.class files
+of the same name will be deleted to prevent prior source code from being found
+on the classpath for as Assy run event.
+
   Bugfix 1425
 
   More gracefully handle and inform the user of a missing third party library

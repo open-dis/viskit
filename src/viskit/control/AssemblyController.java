@@ -60,11 +60,11 @@ public interface AssemblyController {
     void newProject();
 
     /**
-     * Sets the Assembly Run tabbed panel
-     * @param runTabbedPane the parent of the Assembly Run panel
-     * @param idx the index to retrieve the Run Panel
+     * Sets the Assembly Run panel
+     * @param runPane the parent of the Assembly Run panel
+     * @param idx the index to retrieve the Run Pane
      */
-    void setRunTabbedPane(JComponent runTabbedPane, int idx);
+    void setAssemblyRunPane(JComponent runPane, int idx);
 
     /** Retrieves the parent of the Assembly Run Panel
      *

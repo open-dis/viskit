@@ -19,8 +19,18 @@ package viskit.mvc;
  */
 public interface mvcController
 {
-  void setModel(mvcModel model);
-  void setView (mvcView  view);
+
+    /** Set the model for this controller
+     *
+     * @param model the model for this controller
+     */
+    void setModel(mvcModel model);
+
+    /** Set the view for this controller
+     *
+     * @param view the view for this controller
+     */
+    void setView (mvcView  view);
 
   mvcModel getModel();
   mvcView  getView();

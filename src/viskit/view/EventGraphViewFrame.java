@@ -43,26 +43,26 @@ import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
 
 /**
- * Main "view" of the Viskit app.  This class controls a 3-paneled JFrame
- showing a jgraph on the left and state variables and sim parameters panels on
- the right, with menus and a toolbar.  To fully implement application-level
- MVC, events like the dragging and dropping of a node on the screen are first
- recognized in this class, but the GUI is not yet changed.  Instead, this
- class (the View) messages the controller class (EventGraphControllerImpl -- by
- means of the EventGraphController i/f).  The controller then informs the model
- (ModelImpl), which then updates itself and "broadcasts" that fact.  This class is
- a model listener, so it gets the report, then updates the GUI.  A round trip.
-
- 20 SEP 2005: Updated to show multiple open eventgraphs.  The controller is
- largely unchanged.  To understand the flow, understand that
- 1) The tab "ChangeListener" plays a key role;
- 2) When the ChangeListener is hit, the controller.setModel() method installs
- the appropriate model for the newly-selected eventgraph.
-
- OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey CA
- * www.nps.edu
+ * Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
+ * a jgraph on the left and state variables and sim parameters panels on the
+ * right, with menus and a toolbar. To fully implement application-level MVC,
+ * events like the dragging and dropping of a node on the screen are first
+ * recognized in this class, but the GUI is not yet changed. Instead, this class
+ * (the View) messages the controller class (EventGraphControllerImpl -- by
+ * means of the EventGraphController i/f). The controller then informs the model
+ * (ModelImpl), which then updates itself and "broadcasts" that fact. This class
+ * is a model listener, so it gets the report, then updates the GUI. A round
+ * trip.
+ *
+ * 20 SEP 2005: Updated to show multiple open eventgraphs. The controller is
+ * largely unchanged. To understand the flow, understand that 1) The tab
+ * "ChangeListener" plays a key role; 2) When the ChangeListener is hit, the
+ * controller.setModel() method installs the appropriate model for the
+ * newly-selected eventgraph.
+ *
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
+ * Naval Postgraduate School, Monterey CA www.nps.edu
+ *
  * @author Mike Bailey
  * @since Mar 2, 2004
  * @since 12:52:59 PM
@@ -206,10 +206,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 return;
             }
 
-            // Make sure we save EGs if we wander off to another EG tab
-            if (((Model)getModel()).isDirty()) {
-                ((EventGraphController)getController()).save();
-            }
+            // NOTE: Although a somewhat good idea, perhaps the user does not
+            // wish to have work saved when merely switching between tabs on
+            // the EG pallete.  However, when switching to the Assy pallete, we
+            // will save all EGs that have been modified
+//            if (((Model)getModel()).isDirty()) {
+//                ((EventGraphController)getController()).save();
+//            }
 
             setModel((ModelImpl) myVgcw.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
@@ -435,7 +438,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
 
         // Now expose the EventGraph toolbar
-        getToolBar().setVisible(true);
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                getToolBar().setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(r);
     }
 
     @Override
@@ -452,7 +461,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
                 // Don't allow operation of tools with no Event Graph tab in view (NPEs)
                 if (tabbedPane.getTabCount() == 0) {
-                    getToolBar().setVisible(false);
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            getToolBar().setVisible(false);
+                        }
+                    };
+                    SwingUtilities.invokeLater(r);
                 }
                 return;
             }
@@ -510,9 +525,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     /**
-     * Do menu layout work here.  These menus, and the toggle buttons which
-     * follow, make use of the "actions" package, which
-     * @param mod
+     * Do menu layout work here
+     * @param mod the current model of our EG view
      */
     private void adjustMenus(Model mod) {
         //todo
@@ -829,7 +843,30 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     }
 
-    // Some private classes to implement dnd and dynamic cursor update
+    /** Changes the background color of EG tabs depending on model.isDirty()
+     * status to give the user an indication of a good/bad save & compile
+     * operation
+     */
+    public void toggleEgStatusIndicators() {
+
+        int selected = tabbedPane.getSelectedIndex();
+
+        for (Component c : tabbedPane.getComponents()) {
+            JSplitPane jsplt = (JSplitPane) c;
+            tabbedPane.setSelectedComponent(c);
+            JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
+            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            if (vgcw.model.isDirty()) {
+                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+            } else {
+                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+            }
+        }
+        
+        tabbedPane.setSelectedIndex(selected);
+    }
+
+    /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
     class vCursorHandler extends MouseAdapter {
 
         Cursor select;

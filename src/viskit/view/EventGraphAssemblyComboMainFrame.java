@@ -53,6 +53,8 @@ import viskit.control.InternalAssemblyRunner;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
+import viskit.model.Model;
+import viskit.mvc.mvcModel;
 import viskit.view.dialog.SettingsDialog;
 
 /**
@@ -267,7 +269,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         // Now setup the assembly file change listener(s)
         final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
-        assyCntlr.setRunTabbedPane(tabbedPane, tabbedPaneIdx);
+        assyCntlr.setAssemblyRunPane(tabbedPane, tabbedPaneIdx);
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
 
         /* DIFF between OA3302 branch and trunk */
@@ -332,9 +334,19 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            // Make sure we save EGs if we wander off to another tab
-            if (VGlobals.instance().getActiveEventGraphModel() != null && VGlobals.instance().getActiveEventGraphModel().isDirty()) {
-                ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
+            // Make sure we save modified EGs if we wander off to the Assy tab
+            Model[] mods = VGlobals.instance().getEventGraphEditor().getOpenModels();
+            for (Model mod : mods) {
+                if (mod.isDirty()) {
+                    VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
+                    ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
+                }
+
+                // If XML save, or compilation went bad, don't advance to the Assembly Editor
+                if (mod.isDirty()) {
+                    tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
+                    return;
+                }
             }
 
             int i = tabbedPane.getSelectedIndex();
@@ -357,7 +369,6 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 // Reset the to the Viskit ClassLoader
                 assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
             }
-
         }
     }
 
