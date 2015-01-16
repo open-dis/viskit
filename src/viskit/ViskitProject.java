@@ -373,6 +373,7 @@ public class ViskitProject {
 
     public void closeProject() {
         ViskitConfig vConfig = ViskitConfig.instance();
+        ViskitConfig.instance().getViskitGuiConfig().setProperty(ViskitConfig.PROJECT_TITLE_NAME, "");
         vConfig.cleanup();
         vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
         setProjectOpen(false);
