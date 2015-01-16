@@ -297,8 +297,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 // This call generates the source, compiles and validates EG XML files
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
-                // If an Assembly, or non simkit.BasicSimEntity type class was
-                // encountered by the FBCM, just return for convenience
                 if (fban != null) {
                     myNode = new DefaultMutableTreeNode(fban);
                     DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
@@ -312,9 +310,8 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                         mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
-                    clear();
-                    log.warn("No extension of " + targetClassName + " found in " + f.getName());
-                    log.info(f.getName() + " will not be listed in the Event Graphs node tree\n");
+                    log.warn("Compile problem encountered with generated source code for " + f.getName());
+                    log.warn(f.getName() + " will not be listed in the Event Graphs node tree\n");
                 }
             } catch (Throwable throwable) {
 
@@ -668,6 +665,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         return null;
     }
 
+    /** Clear the queue of all SimEntities and Property Change Listeners */
     public void clear() {
         rootNode.removeAllChildren();
         if (directoryRoots != null) {
