@@ -238,7 +238,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                     markConfigOpen(modelPath);
                 }
             }
-            fileWatchOpen(file);
+
+            // Check for good compilation
+            handleCompileAndSave(mod, file);
         } else {
             viskitView.delTab(mod);   // Not a good open, tell view
         }

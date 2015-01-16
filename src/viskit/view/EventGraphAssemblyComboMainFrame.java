@@ -54,7 +54,6 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
-import viskit.mvc.mvcModel;
 import viskit.view.dialog.SettingsDialog;
 
 /**
@@ -337,8 +336,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             // Make sure we save modified EGs if we wander off to the Assy tab
             Model[] mods = VGlobals.instance().getEventGraphEditor().getOpenModels();
             for (Model mod : mods) {
+
                 if (mod.isDirty()) {
-                    VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
                     ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
                 }
 

@@ -272,7 +272,7 @@ public class VGlobals {
     }
 
     public Model getActiveEventGraphModel() {
-        return (Model) egvf.getModel();
+        return (Model) eContl.getModel();
     }
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {

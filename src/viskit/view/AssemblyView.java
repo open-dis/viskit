@@ -36,9 +36,12 @@ public interface AssemblyView {
     Object getSelectedEventGraph();
 
     /**
-     * Add a path to SimEntities in the LEGO tree
+     * Add a path to SimEntities in the LEGO tree.  This call will check
+     * compilation of EGs
+     * 
      * @param f the path to evaluate for SimEntites
-     * @param b flag to indicate recursion checking of the given path
+     * @param b flag to indicate recursion checking of the given path if a known
+     * directory
      */
     void addToEventGraphPallette(File f, boolean b);
 

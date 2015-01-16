@@ -1284,6 +1284,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         baseName = sa[0];
 
         FileWriter fw = null;
+        boolean compileSuccess = false;
         try {
 
             // Should always have a live ViskitProject
@@ -1310,7 +1311,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
-            boolean compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
+            compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
             if (compileSuccess) {
 
                 LOGGER.info(diagnostic + "\n");
@@ -1323,12 +1324,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 }
             }
 
-            // Indicate compile results via visual cue on the EG tab
-            VGlobals.instance().getActiveEventGraphModel().setDirty(!compileSuccess);
-
         } catch (IOException ioe) {
             LOGGER.error(ioe);
         } finally {
+
+            // Indicate compile results via visual cue on the EG tab.  However,
+            // on initial startup with valid XML, but bad compilation, it won't
+            // get checked here b/c the graph model is null
+            if (VGlobals.instance().getActiveEventGraphModel() != null)
+                VGlobals.instance().getActiveEventGraphModel().setDirty(!compileSuccess);
+
             try {
                 if (fw != null)
                     fw.close();

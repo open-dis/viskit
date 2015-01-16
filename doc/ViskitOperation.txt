@@ -125,9 +125,10 @@ a green color (signifying good XML, good source compilation) to red which
 signifies either an XML save, or its source compilation went bad.  The user will
 be unable to advance to the Assembly Editor tab until the problem is corrected.
 If an EG compilation went bad, any previously compiled byte code *.class files
-of the same name will be deleted to prevent prior source code from being found
-on the classpath for as Assy run event.  A bad compile will remove the EG MD5
-hash entry from the project's viskitProject.xml file.
+of the same name will be deleted preventing inclusion the classpath.  A bad
+compile will also cause removal of the EG MD5 hash entry from the project's
+viskitProject.xml file.  If upon start up, an XML passes validation, but fails
+compilation, the user will again be unable to advance to the Assy Editor tab.
 
 5) When an Assembly file is opened, the Design of Experiments (DOE) panel is
 initialized with the Assembly and a /tmp DOE input file is created and passed to
