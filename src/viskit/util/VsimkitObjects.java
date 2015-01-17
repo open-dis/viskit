@@ -7,7 +7,7 @@ import java.util.Map;
 
 import edu.nps.util.LogUtils;
 import simkit.random.*;
-import viskit.Vstatics;
+import viskit.VStatics;
 
 /**
  * A class to provide the beanshell parser in viskit with sample, throw-away
@@ -35,7 +35,7 @@ public class VsimkitObjects {
 
     static {
         try {
-            Class<?> c = Vstatics.classForName("viskit.VsimkitObjects");
+            Class<?> c = VStatics.classForName("viskit.VsimkitObjects");
             Method[] meths = c.getDeclaredMethods();
             for (Method method : meths) {
                 String name = method.getName();

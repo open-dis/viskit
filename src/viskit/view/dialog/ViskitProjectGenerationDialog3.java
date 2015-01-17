@@ -8,15 +8,15 @@ package viskit.view.dialog;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import viskit.ViskitProject;
 
-/**
+/** Dialog to assist in generating a new viskit project directory space
  *
  * @author  mike
+ * @version $Id:$
  */
 public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
 
@@ -213,27 +213,15 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     dialog.dispose();
 }//GEN-LAST:event_createButtActionPerformed
 
-JFileChooser chooser;
 private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtActionPerformed
 
-    // TODO: replace with ViskitProject.newProjectPath(JFrame, String)
-    if (chooser == null) {
-        chooser = new JFileChooser();
-        chooser.setMultiSelectionEnabled(false);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle("Select Project Location");
-        File f = new File(locationTF.getText().trim());
-        if (f.exists() && f.isDirectory()) {
-            chooser.setCurrentDirectory(f);
-        }
-    }
+    File file = ViskitProject.newProjectPath(this, System.getProperty("user.home"));
 
-    int ret = chooser.showOpenDialog(this);
-    if (ret == JFileChooser.CANCEL_OPTION) {
+    if (file == null) {
         return;
     }
 
-    locationTF.setText(chooser.getSelectedFile().getAbsolutePath().replaceAll("\\\\", "/"));
+    locationTF.setText(file.getAbsolutePath().replaceAll("\\\\", "/"));
 }//GEN-LAST:event_browseButtActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButt;

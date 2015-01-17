@@ -38,7 +38,7 @@ import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import viskit.VGlobals;
-import viskit.ViskitConfig;
+import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
@@ -59,6 +59,10 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
         dialog = new JDialog((Dialog) null, true);  // modal
         dialog.setContentPane(panel);
         dialog.pack();
+
+        // We don't want a JVM exit when the user closes this dialog and merely
+        // disposing doesn't kill the JVM.  Will need to force user the use the
+        // Exit button, or chose another project open or creation option
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Dialog will appear in center screen
@@ -69,14 +73,6 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
     /** Creates new form ViskitProjectButtonPanel */
     public ViskitProjectButtonPanel() {
         initComponents();
-    }
-
-    private void setupViskitProject(File projFile) {
-        if (projFile == null) return;
-        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }
 
     /** This method is called from within the constructor to
@@ -146,6 +142,12 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     static boolean firstTime = true;
+    /** I'm not happy about one minor aspect and that is if the user selects
+     * this option, then cancels, Viskit will automatically create and open a
+     * ${user.home}/MyViskitProjects/DefaultProject space
+     *
+     * @param evt the open and existing project event button pushed
+     */
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
     File file = null;
     if (!firstTime) {
@@ -165,7 +167,9 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
 
     defaultButtActionPerformed(null);
-    setupViskitProject(file);
+
+    if (file != null)
+        VStatics.initProjectDirectories(file);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
@@ -176,6 +180,10 @@ private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
     File projF;
+
+    // What we wish to do here is force the user to create a new project space
+    // before letting them move on, or, open and exiskiting project, or the only
+    // other option is to exit
     do {
         ViskitProjectGenerationDialog3.showDialog();
         if (ViskitProjectGenerationDialog3.cancelled) {
@@ -192,7 +200,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
-    setupViskitProject(projF);
+    VStatics.initProjectDirectories(projF);
 
     // The work directory will have already been created by default as VGlobals.init
     // was already called which creates the directory ${user.home}/.viskit

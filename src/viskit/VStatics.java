@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,10 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
+import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -64,9 +65,21 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:27:07 AM
  * @version $Id$
  */
-public class Vstatics {
+public class VStatics {
 
     public static boolean debug = false;
+
+    /** Utility method to initialize and configure Viskit for a specific project
+     * space
+     *
+     * @param projFile the base directory of a Viskit project
+     */
+    public static void initProjectDirectories(File projFile) {
+        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
+        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
+        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+    }
 
     /**
      * Convert a class name to human readable form.  (See Class.getName());
@@ -212,13 +225,13 @@ public class Vstatics {
 
         c = cForName(s, VGlobals.instance().getWorkClassLoader());
         if (c == null) {
-            c = cForName(s, Vstatics.class.getClassLoader());
+            c = cForName(s, VStatics.class.getClassLoader());
         }
         if (c == null) {
             c = FileBasedClassManager.instance().getFileClass(s);
         }
         if (c == null) {
-            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(Vstatics.class.getClassLoader(), getExtraClassPathArray()));
+            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), getExtraClassPathArray()));
         }
         return c;
     }
@@ -406,7 +419,7 @@ public class Vstatics {
         if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
             Class<?> c = classForName(type);
             if (c == null) {
-                LogUtils.getLogger(Vstatics.class).warn("Class file for: " + type + " was not found on the classpath");
+                LogUtils.getLogger(VStatics.class).warn("Class file for: " + type + " was not found on the classpath");
                 return null;
             }
             if (debug) {
@@ -414,7 +427,7 @@ public class Vstatics {
             }
             ObjectFactory of = new ObjectFactory();
             Constructor[] constr = c.getConstructors();
-            List<Object>[] plist = newListObjectTypeArray(ArrayList.class, constr.length);
+            List<Object>[] plist = GenericConversion.newListObjectTypeArray(ArrayList.class, constr.length);
 
             // at this point, there should be loaded classes
             // from LegosTree, however, addJarFileCommon is only
@@ -424,7 +437,7 @@ public class Vstatics {
             try {
                 f = c.getField("parameterMap");
             } catch (SecurityException ex) {
-                LogUtils.getLogger(Vstatics.class).error(ex);
+                LogUtils.getLogger(VStatics.class).error(ex);
             } catch (NoSuchFieldException ex) {}
             if (f != null) { // these would be base classes not arrays
                 if (debug) {
@@ -457,13 +470,13 @@ public class Vstatics {
                                         System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                                     }
                                 } catch (Exception e) {
-                                    LogUtils.getLogger(Vstatics.class).error(e);
+                                    LogUtils.getLogger(VStatics.class).error(e);
                                 }
                             }
                         }
                     }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    LogUtils.getLogger(Vstatics.class).error(ex);
+                    LogUtils.getLogger(VStatics.class).error(ex);
                 }
             } else {
                 if (debug) {
@@ -532,7 +545,7 @@ public class Vstatics {
                                 System.out.println("\t " + p.getName() + p.getType());
                             }
                         } catch (Exception e) {
-                            LogUtils.getLogger(Vstatics.class).error(e);
+                            LogUtils.getLogger(VStatics.class).error(e);
                         }
                     }
                 }

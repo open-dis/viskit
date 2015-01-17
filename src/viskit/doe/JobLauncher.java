@@ -305,19 +305,19 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         // temp:
         switch (action) {
             case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: " + " " + file.getAbsolutePath());
                 }
                 setFile(null, null);
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
@@ -587,7 +587,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
         Element propCh = el.getChild("PropertyChange");
         if (propCh == null) {
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
             }
             return res;
@@ -597,7 +597,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         java.util.List propertyContent = propCh.getContent();
         Text txt = (Text) propertyContent.get(0);
         String cstr = txt.getTextTrim();
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("got back " + cstr);
         }
         String[] sa = cstr.split("\n");

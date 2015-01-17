@@ -609,12 +609,13 @@ public class ViskitProject {
         }
     }
 
-    /** Not currently used
+    /** Used to aid in new project path creation
+     *
      * @param parent the component to center the FileChooser against
      * @param startingDirPath a path to start looking
      * @return a selected file
      */
-    public static File newProjectPath(JFrame parent, String startingDirPath) {
+    public static File newProjectPath(JComponent parent, String startingDirPath) {
         initializeProjectChooser(startingDirPath);
 
         projectChooser.setDialogTitle("New Viskit Project Directory");
@@ -625,7 +626,8 @@ public class ViskitProject {
         return projectChooser.getSelectedFile();
     }
 
-    /** Provide file chooser to select project directory
+    /** Utility method to aid in Viskit specific project directory selection
+     * 
      * @param parent the component parent for JOptionPane orientation
      * @param startingDirPath a path to start looking from in the chooser
      * @return a path to a valid project directory

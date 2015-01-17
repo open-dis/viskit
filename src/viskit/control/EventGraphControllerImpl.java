@@ -24,7 +24,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -65,10 +65,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void begin() {
         java.util.List<String> lis = getOpenFileSet(false);
 
-        // don't default to new event graph
-        if (lis.isEmpty()) {
-            LOGGER.debug("In begin() (if) of EventGraphController");
-        } else {
+        if (!lis.isEmpty()) {
 
             // If EventGraphs were already open without a corresponding Assembly
             // file open, then open them upon Viskit starting, else, let the
@@ -84,6 +81,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                         }
                     }
                 }
+            }
+        } else {
+
+            // For a brand new empty project open a default EG
+            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            if (egFiles.length == 0) {
+                newEventGraph();
             }
         }
     }
@@ -229,20 +233,24 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
             adjustRecentSet(file);
-
-            // Mark every vAMod opened as "open"
-            openAlready = viskitView.getOpenModels();
-            for (Model vMod : openAlready) {
-                if (vMod.getLastFile() != null) {
-                    String modelPath = vMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                    markConfigOpen(modelPath);
-                }
-            }
+            markEgFilesAsOpened();
 
             // Check for good compilation
             handleCompileAndSave(mod, file);
         } else {
             viskitView.delTab(mod);   // Not a good open, tell view
+        }
+    }
+
+    /** Mark every EG file opened as "open" in the app config file */
+    public void markEgFilesAsOpened() {
+
+        Model[] openAlready = ((EventGraphView) getView()).getOpenModels();
+        for (Model vMod : openAlready) {
+            if (vMod.getLastFile() != null) {
+                String modelPath = vMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
+                markConfigOpen(modelPath);
+            }
         }
     }
 
@@ -519,7 +527,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetaData gmd = mod.getMetaData();
-        File saveFile = view.saveFileAsk(gmd.packageName + Vstatics.getFileSeparator() + gmd.name + ".xml", false);
+        File saveFile = view.saveFileAsk(gmd.packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();
@@ -537,6 +545,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             handleCompileAndSave(mod, saveFile);
             adjustRecentSet(saveFile);
+            markEgFilesAsOpened();
         }
     }
 
@@ -786,7 +795,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void eventList() {
         // not used
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("EventListAction in " + this);
         }
     }

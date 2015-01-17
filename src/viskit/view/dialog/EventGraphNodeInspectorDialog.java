@@ -12,7 +12,7 @@ import javax.swing.event.CaretListener;
 
 import viskit.model.EvGraphNode;
 import viskit.model.VInstantiator;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -84,19 +84,19 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         handleField = new JTextField();
-        Vstatics.clampHeight(handleField);
+        VStatics.clampHeight(handleField);
         handleLab = new JLabel("name", JLabel.TRAILING);
         handleLab.setLabelFor(handleField);
         //outputLab = new JLabel("detailed output",JLabel.TRAILING);
         outputCheck = new JCheckBox("detailed output");
 
         descField = new JTextField();
-        Vstatics.clampHeight(descField);
+        VStatics.clampHeight(descField);
         descLab = new JLabel("description", JLabel.TRAILING);
         descLab.setLabelFor(descField);
         verboseCheck = new JCheckBox("verbose output");
 
-        Vstatics.cloneSize(handleLab, descLab);    // make handle same size
+        VStatics.cloneSize(handleLab, descLab);    // make handle same size
 
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));

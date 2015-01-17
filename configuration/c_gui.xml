@@ -9,7 +9,7 @@
       <question>Ignore and continue?</question>
       <sessioncheckbox>Hide warnings for current session</sessioncheckbox>
       <preferencescheckbox>Hide warnings permanently</preferencescheckbox>
-      <preferencestooltip>Set permanent options in File-&gt;Preferences</preferencestooltip>
+      <preferencestooltip>A very primitive Java compile warning indicator</preferencestooltip>
     </beanshellerrordialog>
     <title>
       <projecthome>
@@ -29,6 +29,6 @@
     <projecttitle>
         <name value=""/>
     </projecttitle>
-    <lookandfeel>default</lookandfeel>
+    <lookandfeel>platform</lookandfeel>
   </gui>
 </ViskitConfig>

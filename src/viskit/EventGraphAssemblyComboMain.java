@@ -159,7 +159,10 @@ public class EventGraphAssemblyComboMain {
         }
     }
 
-    private static void nukeDotViskit() {
+    /** Draconian process for restoring from a possibly corrupt, or out if synch
+     * .viskit config directory in the user's profile space
+     */
+    public static void nukeDotViskit() {
         java.io.File dotViskit = new java.io.File(System.getProperty("user.home") + "/.viskit");
         if (dotViskit.exists()) {
 
@@ -168,10 +171,8 @@ public class EventGraphAssemblyComboMain {
             for (java.io.File file : files) {
                 file.delete();
             }
-            boolean success = dotViskit.delete();
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).warn("The contents of your " + dotViskit.getPath() + " directory was found to be corrupted and will be deleted");
-            if (success)
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted.");
+            if (dotViskit.delete())
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }
@@ -185,7 +186,7 @@ public class EventGraphAssemblyComboMain {
             initialFile = args[0];
         }
 
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("***Inside EventGraphAssembly main: " + args.length);
         }
         setLandFandFonts();
@@ -233,7 +234,7 @@ public class EventGraphAssemblyComboMain {
 
     private static void setupMacGUI() {
         try {
-            Class<?> applicationListener = Vstatics.classForName("com.apple.eawt.ApplicationListener");
+            Class<?> applicationListener = VStatics.classForName("com.apple.eawt.ApplicationListener");
             Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
 
                 @Override
@@ -246,7 +247,7 @@ public class EventGraphAssemblyComboMain {
                             try {
                                 Help help = new Help(VGlobals.instance().getMainAppWindow());
                                 help.aboutEventGraphEditor();
-                                Class<?> applicationEventClass = Vstatics.classForName("com.apple.eawt.ApplicationEvent");
+                                Class<?> applicationEventClass = VStatics.classForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -257,7 +258,7 @@ public class EventGraphAssemblyComboMain {
                 }
             });
 
-            Class<?> applicationClass = Vstatics.classForName("com.apple.eawt.Application");
+            Class<?> applicationClass = VStatics.classForName("com.apple.eawt.Application");
             Object applicationInstance = applicationClass.newInstance();
 
             Method m = applicationClass.getMethod("addApplicationListener", applicationListener);

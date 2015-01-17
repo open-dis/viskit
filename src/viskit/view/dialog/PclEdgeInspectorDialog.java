@@ -18,7 +18,7 @@ import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.VGlobals;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EvGraphNode;
 import viskit.model.PropChangeEdge;
@@ -127,7 +127,7 @@ public class PclEdgeInspectorDialog extends JDialog {
     }
 
     private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
-        Vstatics.clampHeight(tf);
+        VStatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
             ((JTextComponent) tf).setEditable(edit);
@@ -243,12 +243,12 @@ public class PclEdgeInspectorDialog extends JDialog {
             }
 
             try {
-                Class<?> c = Vstatics.classForName(classname);
+                Class<?> c = VStatics.classForName(classname);
                 if (c == null) {
                     throw new ClassNotFoundException(classname + " not found");
                 }
 
-                Class stopClass = Vstatics.classForName("simkit.BasicSimEntity");
+                Class stopClass = VStatics.classForName("simkit.BasicSimEntity");
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {

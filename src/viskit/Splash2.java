@@ -127,7 +127,7 @@ public class Splash2 extends JFrame {
 
     public static void main(String[] args) {
 
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println(System.getProperty("java.class.path"));
         }
 
@@ -168,7 +168,7 @@ public class Splash2 extends JFrame {
             Object[] arguments = new Object[] {newArgs};
             Class[] parameterTypes = new Class[] {newArgs.getClass()};
 
-            Class<?> mainClass = Vstatics.classForName(target);
+            Class<?> mainClass = VStatics.classForName(target);
 
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);

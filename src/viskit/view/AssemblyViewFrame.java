@@ -193,7 +193,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             GraphMetaData gmd = myVgacw.assyModel.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
-            } else if (viskit.Vstatics.debug) {
+            } else if (viskit.VStatics.debug) {
                 System.err.println("error: AssemblyViewFrame gmd null..");
             }
         }
@@ -988,18 +988,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void openProject() {
-        int ret;
-        AssemblyController aController = ((AssemblyController) getController());
-        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
-            String msg = "Are you sure you want to close your current Viskit Project?";
-            String title = "Close Current Project?";
+        AssemblyControllerImpl aController = ((AssemblyControllerImpl) getController());
 
-            ret = genericAskYN(title, msg);
-            if (ret == JOptionPane.YES_OPTION) {
-                aController.doProjectCleanup();
-            } else {
-                return;
-            }
+        if (!aController.handleProjectClosing()) {
+            return;
         }
 
         File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);

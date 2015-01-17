@@ -689,7 +689,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
                 //if(sa.length == 2)
                 //  dataS = sa[1].trim();
                 args.add(dataS);
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println(dataS);
                 }
                 writeStatus("Sending job file to " + localClusterDNS);
@@ -901,7 +901,7 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
         List content = propCh.getContent();
         Text txt = (Text) content.get(0);
         String cstr = txt.getTextTrim();
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
@@ -1212,17 +1212,17 @@ public class JobLauncherTab extends JPanel implements Runnable, OpenAssembly.Ass
      * @param s
      */
     private void addDesignPointStatsToGraphs(Hashtable ret, int d, int s) {
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("StatsGraph: addDesignPointStatsToGraphs at designPoint " + d + " sample " + s);
         }
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println(ret);
         }
         java.util.Enumeration stats = ret.elements();
         while (stats.hasMoreElements()) {
             String statsData = (String) stats.nextElement();
             try {
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("\tAdding data " + statsData);
                 }
                 SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(statsData.getBytes()));

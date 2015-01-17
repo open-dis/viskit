@@ -11,7 +11,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.VGlobals;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.xsd.bindings.eventgraph.*;
 
 /** A generator of source code from Event Graph XML
@@ -73,7 +73,7 @@ public class SimkitXML2Java {
     public SimkitXML2Java(String xmlFile) {
         this();
         fileBaseName = baseNameOf(xmlFile);
-        fileInputStream = Vstatics.classForName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
+        fileInputStream = VStatics.classForName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
     }
 
     public SimkitXML2Java(InputStream stream) {
@@ -899,7 +899,7 @@ public class SimkitXML2Java {
             // the extendz field may also contain an implemnts
             // tail.
 
-            // TODO: Can we use Vstatics.classForName here?
+            // TODO: Can we use VStatics.classForName here?
             Class<?> c = Class.forName(extendz.split("\\s")[0], true, VGlobals.instance().getWorkClassLoader());
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;

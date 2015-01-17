@@ -161,27 +161,27 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         //clusPan.setBorder(new EtchedBorder());
 
         JLabel clusLab = new JLabel("Target grid engine");
-        Vstatics.clampHeight(clusLab);
+        VStatics.clampHeight(clusLab);
         clusterTF = new ttJTextField(15);
         clusterTF.setText(serverCfg);//clusterDNS);
         clusterTF.setToolTipText("dummy"); // overridden
-        Vstatics.clampHeight(clusterTF);
+        VStatics.clampHeight(clusterTF);
         JLabel portLab = new JLabel("RPC port");
-        Vstatics.clampHeight(portLab);
+        VStatics.clampHeight(portLab);
         portTF = new ttJTextField(10);
         portTF.setToolTipText("dummy"); // overridden
         portTF.setText(portCfg);
-        Vstatics.clampHeight(portTF);
+        VStatics.clampHeight(portTF);
         JLabel unameLab = new JLabel("User name");
-        Vstatics.clampHeight(unameLab);
-        Vstatics.clampMaxSize(unameLab);
+        VStatics.clampHeight(unameLab);
+        VStatics.clampMaxSize(unameLab);
         unameTF = new JTextField(10);
         unameTF.setText(unameDecrCfg);
-        Vstatics.clampHeight(unameTF);
+        VStatics.clampHeight(unameTF);
         JLabel upwLab = new JLabel("Password");
         upwPF = new JPasswordField(10);
         upwPF.setText(pwordDecrCfg);
-        Vstatics.clampHeight(upwPF);
+        VStatics.clampHeight(upwPF);
         JPanel adminPan = new JPanel();
         adminButt = new JButton("admin");
         adminPan.setLayout(new BoxLayout(adminPan, BoxLayout.X_AXIS));
@@ -842,7 +842,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
                     doe.setAssembly(dataS);
 
-                    if (viskit.Vstatics.debug) {
+                    if (viskit.VStatics.debug) {
                         writeStatus(dataS);
                     }
 
@@ -1035,7 +1035,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         List content = propCh.getContent();
         Text txt = (Text) content.get(0);
         String cstr = txt.getTextTrim();
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
@@ -1386,7 +1386,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         // creating an unmarshaller each time here is supposed to be more thread safe
                         // if slower, however, this only gets hit by the swing thread
                         // unmarshaller = jaxbCtx.createUnmarshaller();
-                        if (viskit.Vstatics.debug) {
+                        if (viskit.VStatics.debug) {
                             System.out.println("\tAdding data " + data);
                         }
                         SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));

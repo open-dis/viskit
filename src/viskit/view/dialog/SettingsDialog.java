@@ -55,7 +55,7 @@ import viskit.control.EventGraphController;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.control.AssemblyController;
 
 /**
@@ -258,12 +258,12 @@ public class SettingsDialog extends JDialog {
         otherPan.add(otherLafRB);
         otherPan.add(Box.createHorizontalStrut(5));
         otherTF = new JTextField();
-        Vstatics.clampHeight(otherTF);
+        VStatics.clampHeight(otherTF);
         otherPan.add(otherTF);
         otherPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(otherPan);
         lAndFeelInnerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3,3,3,3)));
-        Vstatics.clampHeight(lAndFeelInnerP);
+        VStatics.clampHeight(lAndFeelInnerP);
         lookAndFeelP.add(lAndFeelInnerP);
         lookAndFeelP.add(Box.createVerticalStrut(3));
         lab = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
@@ -339,7 +339,7 @@ public class SettingsDialog extends JDialog {
                 appConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
             } else if (src == debugMsgsCB) {
                 appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
-                Vstatics.debug = debugMsgsCB.isSelected();
+                VStatics.debug = debugMsgsCB.isSelected();
             } else if (src == analRptCB) {
                 appConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
             } else if (src == doeCB) {
@@ -377,6 +377,9 @@ public class SettingsDialog extends JDialog {
     static JDialog progressDialog;
     static JProgressBar progress = new JProgressBar(0, 100);
 
+    /** Method to facilitate putting project/lib entries on the classpath
+     * @param lis a list of classpath (jar) entries to include on the classpath
+     */
     public static void saveExtraClassPathEntries(String[] lis) {
         clearClassPathEntries();
 
@@ -452,7 +455,7 @@ public class SettingsDialog extends JDialog {
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
         analRptCB.setSelected(isAnalystReportVisible());
-        debugMsgsCB.setSelected(Vstatics.debug = isVerboseDebug());
+        debugMsgsCB.setSelected(VStatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
         if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {

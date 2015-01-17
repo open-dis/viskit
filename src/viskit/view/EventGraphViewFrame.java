@@ -223,7 +223,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
-            } else if (viskit.Vstatics.debug) {
+            } else if (viskit.VStatics.debug) {
                 System.out.println("error: EventGraphViewFrame gmd null..");
             }
         }

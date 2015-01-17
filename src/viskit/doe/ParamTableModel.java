@@ -108,7 +108,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("Sending paramlocally editted from ParamTableModel");
         }
         OpenAssembly.inst().doParamLocallyEditted(dummyListener);

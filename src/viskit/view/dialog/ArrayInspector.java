@@ -9,7 +9,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.model.VInstantiator;
 import viskit.view.ObjListPanel;
 
@@ -47,11 +47,11 @@ public class ArrayInspector extends JDialog {
         JLabel typeLab = new JLabel("Array type", JLabel.TRAILING);
         typeTF = new JTextField();
         typeTF.setEditable(false);
-        Vstatics.clampHeight(typeTF);
+        VStatics.clampHeight(typeTF);
         typeLab.setLabelFor(typeTF);
         JLabel countLab = new JLabel("Array length", JLabel.TRAILING);
         sizeTF = new JTextField();
-        Vstatics.clampHeight(sizeTF);
+        VStatics.clampHeight(sizeTF);
         countLab.setLabelFor(sizeTF);
 
         JLabel helpLab = new JLabel("");
@@ -115,8 +115,8 @@ public class ArrayInspector extends JDialog {
 
     public void setType(String typ) {
         myArrTyp = typ;
-        Class c = Vstatics.classForName(typ);
-        myTyp = Vstatics.convertClassName(c.getComponentType().getName());
+        Class c = VStatics.classForName(typ);
+        myTyp = VStatics.convertClassName(c.getComponentType().getName());
         typeTF.setText(typ);
     }
 

@@ -56,7 +56,7 @@ import simkit.random.RandomVariateFactory;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitProject;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
 import viskit.doe.LocalBootLoader;
@@ -219,7 +219,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private void fillRepWidgetsFromBasicAssemblyObject(boolean verbose, double stopTime) throws Throwable {
 
-        targetClass = Vstatics.classForName(targetClassName);
+        targetClass = VStatics.classForName(targetClassName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }

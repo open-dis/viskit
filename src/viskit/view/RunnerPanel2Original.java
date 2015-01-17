@@ -49,7 +49,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.io.*;
-import viskit.Vstatics;
+import viskit.VStatics;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -168,7 +168,7 @@ public class RunnerPanel2Original extends JPanel {
         // TODO:  is this used elsewhere, or else can it simply be removed?
         vcrSimTime = new JTextField(10);
         vcrSimTime.setEditable(false);
-        Vstatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
+        VStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
         JPanel labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrSimTimeLab);
@@ -179,7 +179,7 @@ public class RunnerPanel2Original extends JPanel {
         JLabel vcrStopTimeLabel = new JLabel("Sim stop time:");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
-        Vstatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
+        VStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrStopTimeLabel);
@@ -199,7 +199,7 @@ public class RunnerPanel2Original extends JPanel {
                     }
                 }
             });
-        Vstatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
+        VStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
         JLabel numRepsLab = new JLabel("# replications:");
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
@@ -213,7 +213,7 @@ public class RunnerPanel2Original extends JPanel {
         flowPan.add(vcrVerbose);
 
         verboseRepNumberTF = new JTextField(7);
-        Vstatics.clampSize(verboseRepNumberTF);
+        VStatics.clampSize(verboseRepNumberTF);
         verboseRepNumberTF.setToolTipText("Select a single replication number (0..N) to be verbose");
         flowPan.add(verboseRepNumberTF);
 

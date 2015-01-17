@@ -336,7 +336,7 @@ public class VGlobals {
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = Vstatics.getExtraClassPathArray();
+        String[] workCP = VStatics.getExtraClassPathArray();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {
@@ -524,6 +524,10 @@ public class VGlobals {
         return (type.contains("<") && type.contains(">"));
     }
 
+    /** The entry point for Viskit startup.  This method will either identify a
+     * recorded project space, or launch a dialog asking the user to either
+     * create a new project space, or open another existing one, or exit Viskit
+     */
     public final void initProjectHome() {
 
         ViskitConfig vConfig = ViskitConfig.instance();
@@ -548,7 +552,7 @@ public class VGlobals {
             isArr = true;
         }
         try {
-            Class<?> c = Vstatics.classForName(type);
+            Class<?> c = VStatics.classForName(type);
             if (c == null) {throw new Exception("Class not found: " + type);}
 
             Constructor<?>[] constructors = c.getConstructors();
@@ -830,8 +834,8 @@ public class VGlobals {
     }
 
     /**
-     * @return a working directory which is now non null and exists in the
-     * filesystem
+     * @return a working directory which is typically an open project's build/
+     * classes directory
      */
     public File getWorkDirectory() {
         return workDirectory;
@@ -839,7 +843,7 @@ public class VGlobals {
 
     /**
      * Not the best Java Bean convention, but performs as a no argument setter
-     * for the Viskit working directory
+     * for the an open project's working directory (build/classes)
      */
     public final void createWorkDirectory() {
         ViskitConfig vConfig = ViskitConfig.instance();

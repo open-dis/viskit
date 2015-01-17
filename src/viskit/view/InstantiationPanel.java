@@ -29,7 +29,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.model.VInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -242,7 +242,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             value = new JTextField("");
             value.addCaretListener(FFPanel.this);
             value.setAlignmentX(Box.CENTER_ALIGNMENT);
-            Vstatics.clampHeight(value);
+            VStatics.clampHeight(value);
 
             add(value);
             add(Box.createVerticalGlue());
@@ -258,7 +258,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String typ) throws ClassNotFoundException {
             this.typ = typ;
-            if (Vstatics.classForName(typ) == null) // just to check exception
+            if (VStatics.classForName(typ) == null) // just to check exception
             {
                 throw new ClassNotFoundException(typ);
             }
@@ -298,7 +298,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String clName) throws ClassNotFoundException {
             LogUtils.getLogger(InstantiationPanel.class).debug("Constructor for class " + clName);
-            List<Object>[] parameters = Vstatics.resolveParameters(clName);
+            List<Object>[] parameters = VStatics.resolveParameters(clName);
             typ = clName;
             removeAll();
             tp.removeAll();
@@ -364,12 +364,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (vi == null) {
                 return;
             }
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("setting data for " + vi.getType());
             }
 
             int indx = vi.indexOfArgNames(vi.getType(), vi.getArgs());
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("found a matching constructor at " + indx);
             }
             if(indx != -1) {
@@ -406,7 +406,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             // this is wierd, I want it's height to be the one for a non-editable CB
             //  factClassCB.setEditable(false);
             factClassCB.setEditable(true);
-            Vstatics.clampHeight(factClassCB);
+            VStatics.clampHeight(factClassCB);
             factClassLab.setLabelFor(factClassCB);
 
             JLabel dummy = new JLabel("");
@@ -416,14 +416,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             factMethodLab = new JLabel("Class method", JLabel.TRAILING);
             factMethodTF = new JTextField();
-            Vstatics.clampHeight(factMethodTF);
+            VStatics.clampHeight(factMethodTF);
             factMethodLab.setLabelFor(factMethodTF);
             JPanel tinyP = new JPanel();
             tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
             tinyP.add(factMethodTF);
             factMethodButt = new JButton("...");
             factMethodButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-            Vstatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
+            VStatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
             tinyP.add(factMethodButt);
             topP.add(factClassLab);
             topP.add(factClassCB);
@@ -474,7 +474,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 //String cName = factClassCB.getText().trim();
                 String cName = factClassCB.getSelectedItem().toString();
                 try {
-                    c = Vstatics.classForName(cName);
+                    c = VStatics.classForName(cName);
                     if (c == null) {
                         throw new ClassNotFoundException();
                     }
@@ -533,9 +533,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 Vector<Object> vc = new Vector<>();
                 for (Class cl : pc) {
                     if (cl.isArray()) {
-                        vc.add(new VInstantiator.Array(Vstatics.convertClassName(cl.getName()), new ArrayList<>()));
+                        vc.add(new VInstantiator.Array(VStatics.convertClassName(cl.getName()), new ArrayList<>()));
                     } else {
-                        vc.add(new VInstantiator.FreeF(Vstatics.convertClassName(cl.getName()), ""));
+                        vc.add(new VInstantiator.FreeF(VStatics.convertClassName(cl.getName()), ""));
                     }
                 }
 
@@ -560,7 +560,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String clName) throws ClassNotFoundException {
             typ = clName;
-            myObjClass = Vstatics.classForName(typ);
+            myObjClass = VStatics.classForName(typ);
             if (myObjClass == null) {
                 throw new ClassNotFoundException(typ);
             }

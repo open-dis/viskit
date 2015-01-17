@@ -46,6 +46,9 @@ package edu.nps.util;
 /** Interface to handle JVM exiting */
 public interface SysExitHandler {
 
-    /** @param status the JVM exiting status integer */
+    /** Perform a customized JVM exit
+     *
+     * @param status the JVM exiting status integer
+     */
     void doSysExit(int status);
 }

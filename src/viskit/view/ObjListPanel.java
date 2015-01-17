@@ -27,7 +27,7 @@ import viskit.VGlobals;
 import viskit.model.VInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.control.AssemblyController;
 
 /**
@@ -66,7 +66,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         shadow = new VInstantiator[sz];
         JComponent[] contentObj = new JComponent[sz];
 
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
@@ -81,7 +81,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
             nameLab[i].setOpaque(true);
             nameLab[i].setBackground(new Color(255, 255, 255, 64));
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("really set label " + s);
             }
             //}
@@ -94,11 +94,11 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
 
             entryTF[i] = new JTextField(8);
-            Vstatics.clampHeight(entryTF[i]);
+            VStatics.clampHeight(entryTF[i]);
             entryTF[i].setText(inst.toString());
             entryTF[i].addCaretListener(this);
 
-            Class<?> c = Vstatics.classForName(inst.getType());
+            Class<?> c = VStatics.classForName(inst.getType());
             if (c == null) {
                 System.err.println("what to do here... " + inst.getType());
             }
@@ -110,7 +110,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     tinyP.add(entryTF[i]);
                     JButton b = new JButton("...");
                     b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-                    Vstatics.clampSize(b, entryTF[i], b);
+                    VStatics.clampSize(b, entryTF[i], b);
 
                     tinyP.add(b);
                     if (showLabels) {
@@ -182,9 +182,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
         VInstantiator vinst = shadow[idx].vcopy();
         //VInstantiator vinst = shadow[idx];
-        //List[] params = Vstatics.resolveParameters(vinst.getType()); //
+        //List[] params = VStatics.resolveParameters(vinst.getType()); //
         //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ???
-        Class<?> c = Vstatics.classForName(vinst.getType());
+        Class<?> c = VStatics.classForName(vinst.getType());
         if (c.isArray()) {
             ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
             ai.setType(vinst.getType());
@@ -202,7 +202,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             ObjectInspector oi = new ObjectInspector(parent, this);     // "this" could be locComp
             oi.setType(vinst.getType());
             // use default constructor if exists
-            Class<?> clazz = Vstatics.classForName(vinst.getType());
+            Class<?> clazz = VStatics.classForName(vinst.getType());
             if (clazz != null) {
                 java.lang.reflect.Constructor[] construct = clazz.getConstructors();
                 if (construct != null && construct.length > 0) {

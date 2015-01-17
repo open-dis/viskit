@@ -506,7 +506,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("in actionPerformed of exit");
                 }
 

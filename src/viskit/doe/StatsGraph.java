@@ -99,7 +99,7 @@ public class StatsGraph extends JPanel {
         this.samples = samples;
         tabbedPane.removeAll();
         for (String prop : properties) {
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("StatsGraph: createDataSets for " + prop);
             }
             createDataSets(prop);
@@ -120,7 +120,7 @@ public class StatsGraph extends JPanel {
         String name = sample.getName();
         DefaultStatisticalCategoryDataset statsData = meanAndStandardDeviations.get(name);
         DefaultIntervalCategoryDataset minMax = minMaxs.get(name);
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("SampleStatisticType name: " + sample.getName());
         }
         statsData.add(Double.parseDouble(sample.getMean()),Double.parseDouble(sample.getStandardDeviation()), "Design Point " + d, "Sample " + s);

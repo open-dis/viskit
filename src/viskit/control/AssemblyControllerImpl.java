@@ -32,7 +32,7 @@ import viskit.util.OpenAssembly;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.doe.LocalBootLoader;
 import viskit.model.*;
@@ -78,7 +78,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param fil the assy file to initially open upon startup
      */
     public void setInitialFile(String fil) {
-        if (viskit.Vstatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("Initial file set: " + fil);
         }
         initialFile = fil;
@@ -443,7 +443,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView view = (AssemblyView) getView();
         GraphMetaData gmd = model.getMetaData();
-        File saveFile = view.saveFileAsk(gmd.packageName + Vstatics.getFileSeparator() + gmd.name + ".xml", false);
+        File saveFile = view.saveFileAsk(gmd.packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
 
@@ -532,6 +532,24 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void newProject() {
+        if (handleProjectClosing()) {
+            VGlobals.instance().initProjectHome();
+            VGlobals.instance().createWorkDirectory();
+
+            // For a brand new empty project open a default EG
+            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            if (egFiles.length == 0) {
+                ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
+            }
+        }
+    }
+
+    /** Common method between the AssyView and this AssyController
+     *
+     * @return indication of continue or cancel
+     */
+    public boolean handleProjectClosing() {
+        boolean retVal = true;
         if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";
@@ -540,10 +558,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (ret == JOptionPane.YES_OPTION) {
                 doProjectCleanup();
             } else {
-                return;
+                retVal = false;
             }
         }
-        VGlobals.instance().initProjectHome();
+        return retVal;
     }
 
     @Override
@@ -558,11 +576,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void openProject(File file) {
-        ViskitConfig vConfig = ViskitConfig.instance();
-        ViskitProject.MY_VISKIT_PROJECTS_DIR = file.getParent().replaceAll("\\\\", "/");
-        vConfig.setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        ViskitProject.DEFAULT_PROJECT_NAME = file.getName();
-        vConfig.setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+        VStatics.initProjectDirectories(file);
         VGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
@@ -864,7 +878,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     Class<?> findClass(AssemblyNode o) {
-        return Vstatics.classForName(o.getType());
+        return VStatics.classForName(o.getType());
     }
 
     AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
@@ -873,10 +887,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // we don't know if the workClassLoader is the same instance
         // as it used to be when these were originally loaded
         // the tbd here is to see if there can be a shared root loader
-        simEvSrcClass = Vstatics.classForName("simkit.SimEventSource");
-        simEvLisClass = Vstatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
         if (propChgSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (propChgSrcClass.isAssignableFrom(cb)) {
@@ -896,10 +910,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
         AssemblyNode[] obArr = new AssemblyNode[2];
-        simEvSrcClass = Vstatics.classForName("simkit.SimEventSource");
-        simEvLisClass = Vstatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = Vstatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = Vstatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
         if (simEvSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (simEvSrcClass.isAssignableFrom(cb)) {
@@ -1027,7 +1041,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             try {
                 f = FileBasedClassManager.instance().getFile(className);
             } catch (Exception e) {
-                if (viskit.Vstatics.debug) {
+                if (viskit.VStatics.debug) {
                     LOGGER.error(e);
                 }
             }
@@ -1053,9 +1067,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
     int copyCount = 0;
 
-    /**
-     *
-     */
     @Override
     public void paste() //-----------------
     {
@@ -1493,7 +1504,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     private String[] buildExecStrings(String className, String classPath) {
         Vector<String> v = new Vector<>();
-        String fsep = Vstatics.getFileSeparator();
+        String fsep = VStatics.getFileSeparator();
 
         StringBuilder sb = new StringBuilder();
         sb.append(System.getProperty("java.home"));

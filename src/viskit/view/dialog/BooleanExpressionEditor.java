@@ -195,7 +195,7 @@ public class BooleanExpressionEditor extends JDialog {
 
         @Override
         public void stateChanged(ChangeEvent event) {
-            if (viskit.Vstatics.debug) {
+            if (viskit.VStatics.debug) {
                 System.out.println("stateChanged");
             }
             modified = true;

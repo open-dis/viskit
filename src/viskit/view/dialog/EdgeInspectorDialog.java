@@ -18,7 +18,7 @@ import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.LogUtils;
 import simkit.Priority;
 import viskit.VGlobals;
-import viskit.Vstatics;
+import viskit.VStatics;
 import viskit.model.EventNode;
 import viskit.model.Edge;
 import viskit.model.ModelImpl;
@@ -319,7 +319,7 @@ public class EdgeInspectorDialog extends JDialog {
         priorityNames = new Vector<>(10);
         priorityList = new ArrayList<>(10);
         try {
-            Class<?> c = Vstatics.classForName("simkit.Priority");
+            Class<?> c = VStatics.classForName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
