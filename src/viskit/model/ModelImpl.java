@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.VGlobals;
 import viskit.control.EventGraphController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -80,9 +79,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public void setDirty(boolean dirt) {
         modelDirty = dirt;
-
-        // Indicate the state of modelDirty on each EG tab
-        VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
     }
 
     @Override

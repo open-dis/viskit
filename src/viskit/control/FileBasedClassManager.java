@@ -114,7 +114,7 @@ public class FileBasedClassManager implements Runnable {
                     // This will compile first time found EGs via an external JVM compile run
                     paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
-                    // Tried to compile an Assembly as an EventGraph, so just return here
+                    // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
                         return null;
                     }

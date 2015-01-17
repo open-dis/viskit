@@ -40,7 +40,6 @@ import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
-import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.util.AssemblyFileFilter;
@@ -621,15 +620,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             LogUtils.getLogger(AssemblyViewFrame.class).error(tmle);
         }
 
+        // the view holds only one assyModel, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed assyModel
+        // by virtue of calling stateChanged()
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
-        // the view holds only one assyModel, so it gets overwritten with each tab
-        // but this call serves also to register the view with the passed assyModel
-        setModel((mvcModel) mod);
-
         // Now expose the Assembly toolbar
-        getToolBar().setVisible(true);
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                getToolBar().setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(r);
     }
 
     @Override
@@ -646,7 +650,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
                 // Don't allow operation of tools with no Assembly tab in view (NPEs)
                 if (tabbedPane.getTabCount() == 0) {
-                    getToolBar().setVisible(false);
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            getToolBar().setVisible(false);
+                        }
+                    };
+                    SwingUtilities.invokeLater(r);
                 }
                 return;
             }

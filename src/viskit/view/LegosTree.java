@@ -24,6 +24,7 @@ import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
 import viskit.ParameterMap;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -312,7 +313,19 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 } else {
                     log.warn("Compile problem encountered with generated source code for " + f.getName());
                     log.warn(f.getName() + " will not be listed in the Event Graphs node tree\n");
+
                 }
+
+                // Note:
+                // On initial startup with valid XML, but bad compilation,
+                // dirty won't get set b/c the graph model is null until the
+                // model tab is created and the EG file is opened.  First pass
+                // is only for inclusion on in the LEGOs tree
+                if (VGlobals.instance().getActiveEventGraphModel() != null) {
+                    VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
+                    VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
+                }
+
             } catch (Throwable throwable) {
 
                 // Uncomment to reveal common reason for Exceptions

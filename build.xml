@@ -793,7 +793,7 @@ their descpritions.
         <delete file="viskit-exe.jar"/>
     </target>
 
-    <target name="nuke.dot.viskit" description="Abolish an out of synch viskit metadata directory">
+    <target name="nuke.dot.viskit" description="Abolish an out of synch confituration and metadata directory">
         <delete includeemptydirs="yes" dir="${user.home}/.viskit"/>
     </target>
 

@@ -1260,7 +1260,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Create and test compile our EventGraphs and Assemblies from XML
      * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
-     * @return a reference to *.class files of our compiled sources
+     * @return a reference to *.class files of our compiled sources or null if
+     * a compile failure occurred
      */
     public static File compileJavaClassFromString(String src) {
         String baseName;
@@ -1295,7 +1296,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         baseName = sa[0];
 
         FileWriter fw = null;
-        boolean compileSuccess = false;
+        boolean compileSuccess;
         try {
 
             // Should always have a live ViskitProject
@@ -1338,13 +1339,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } catch (IOException ioe) {
             LOGGER.error(ioe);
         } finally {
-
-            // Indicate compile results via visual cue on the EG tab.  However,
-            // on initial startup with valid XML, but bad compilation, it won't
-            // get checked here b/c the graph model is null
-            if (VGlobals.instance().getActiveEventGraphModel() != null)
-                VGlobals.instance().getActiveEventGraphModel().setDirty(!compileSuccess);
-
             try {
                 if (fw != null)
                     fw.close();
@@ -1662,12 +1656,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(tempFile);
             }
         } catch (Exception ex) {
-            LOGGER.error("EventGraph file: " + tempFile + " caused error: " + ex);
+            LOGGER.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
                     );
-//            ex.printStackTrace();
             closeAll();
         }
     }

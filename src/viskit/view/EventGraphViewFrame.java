@@ -32,7 +32,6 @@ import viskit.jgraph.vGraphModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
-import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.util.EventGraphFileFilter;
@@ -102,6 +101,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         initUI();    // build widgets
     }
 
+    /** @return the JPanel which is the content of this JFrame */
     public JComponent getContent() {
         return eventGraphViewerContent;
     }
@@ -430,11 +430,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // the view holds only one model, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed model
-        setModel((mvcModel) mod);
-
+        // by virtue of calling stateChanged()
         tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);
 
-        // Bring the JGraph component to front
+        // Bring the JGraph component to front. Also, allows models their own
+        // canvas to draw prevent a NPE
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
 
         // Now expose the EventGraph toolbar
@@ -449,14 +449,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void delTab(Model mod) {
-        Component[] ca = tabbedPane.getComponents();
-
-        for (int i = 0; i < ca.length; i++) {
-            JSplitPane jsplt = (JSplitPane) ca[i];
+        for (Component c : tabbedPane.getComponents()) {
+            JSplitPane jsplt = (JSplitPane) c;
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
             VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgcw.model == mod) {
-                tabbedPane.remove(i);
+                tabbedPane.remove(c);
                 vgcw.isActive = false;
 
                 // Don't allow operation of tools with no Event Graph tab in view (NPEs)
@@ -852,19 +850,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         int selectedTab = tabbedPane.getSelectedIndex();
 
         for (Component c : tabbedPane.getComponents()) {
-            JSplitPane jsplt = (JSplitPane) c;
+
+            // This will fire a call to stateChanged() which also sets the
+            // current model
             tabbedPane.setSelectedComponent(c);
-            JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
-            setModel((mvcModel) vgcw.model);
-            if (vgcw.model.isDirty()) {
+
+            if (((Model) getModel()).isDirty()) {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
             } else {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
             }
         }
 
-        // Ensure the tab and model we started with is the one we still see
+        // Restore active tab and model by virtue of firing a call to stateChanged()
         tabbedPane.setSelectedIndex(selectedTab);
     }
 
@@ -1228,6 +1226,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             // Changes the graph needs to know about
             default:
                 vgcw.viskitModelChanged((ModelEvent) event);
+                toggleEgStatusIndicators();
+                break;
         }
     }
 

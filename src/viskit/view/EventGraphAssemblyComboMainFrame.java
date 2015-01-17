@@ -54,6 +54,7 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
+import viskit.mvc.mvcModel;
 import viskit.view.dialog.SettingsDialog;
 
 /**
@@ -333,19 +334,24 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            // Make sure we save modified EGs if we wander off to the Assy tab
             Model[] mods = VGlobals.instance().getEventGraphEditor().getOpenModels();
+            Model dirtyMod = null;
+
+            // Make sure we save modified EGs if we wander off to the Assy tab
             for (Model mod : mods) {
 
                 if (mod.isDirty()) {
+                    dirtyMod = mod;
+                    VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
                     ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
                 }
+            }
 
-                // If XML save, or compilation went bad, don't advance to the Assembly Editor
-                if (mod.isDirty()) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
-                    return;
-                }
+            if (dirtyMod != null && dirtyMod.isDirty()) {
+
+                // This will fire another call stateChanged()
+                tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
+                return;
             }
 
             int i = tabbedPane.getSelectedIndex();
