@@ -90,7 +90,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private TitleListener titlList;
     private int titlKey;
     private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
-    private final static boolean IS_WIN = System.getProperty("os.name").toLowerCase().contains("windows");
+    private static final String LOOK_AND_FEEL = ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
 
     /**
      * Constructor; lays out initial GUI objects
@@ -844,7 +844,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     /** Changes the background color of EG tabs depending on model.isDirty()
      * status to give the user an indication of a good/bad save & compile
-     * operation
+     * operation.  Of note is that the default L&F on must be selected for
+     * Windoze machines, else no color will be visible.  On Macs, the platform
+     * L&F works best.
      */
     public void toggleEgStatusIndicators() {
 
@@ -858,16 +860,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             if (((Model) getModel()).isDirty()) {
 
-                if (IS_WIN)
-                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
-                else
-                    tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+
+                if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
+                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
             } else {
 
-                if (IS_WIN)
+                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+
+                if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
-                else
-                    tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
             }
         }
 
