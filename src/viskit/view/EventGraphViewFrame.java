@@ -90,6 +90,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private TitleListener titlList;
     private int titlKey;
     private final static String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
+    private final static boolean IS_WIN = System.getProperty("os.name").toLowerCase().contains("windows");
 
     /**
      * Constructor; lays out initial GUI objects
@@ -856,11 +857,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             tabbedPane.setSelectedComponent(c);
 
             if (((Model) getModel()).isDirty()) {
-                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
-                tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+
+                if (IS_WIN)
+                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+                else
+                   tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
             } else {
-                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
-                tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+
+                if (IS_WIN)
+                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
+                else
+                    tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
             }
         }
 
