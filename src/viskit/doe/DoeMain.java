@@ -126,20 +126,11 @@ public class DoeMain implements DoeEvents {
         if (os.contains("windows")) {
             laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         } else {
-            /*if (os.indexOf("mac") != -1)*/ laf = "javax.swing.plaf.metal.MetalLookAndFeel";
+            laf = "javax.swing.plaf.metal.MetalLookAndFeel";
         }
 
-        /*
-        LookAndFeel laf = new Plastic3DLookAndFeel();
-        Options.setUseNarrowButtons(true);
-        Plastic3DLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer()); //SkyBluerTahoma()); //SkyBluerTahoma()); //new DesertBlue()); //new ExperienceBlue());
-        Plastic3DLookAndFeel.setTabStyle(com.jgoodies.looks.plastic.Plastic3DLookAndFeel.TAB_STYLE_METAL_VALUE);
-        Plastic3DLookAndFeel.setHighContrastFocusColorsEnabled(true);
-         */
         try {
             UIManager.setLookAndFeel(laf);
-        //ShadowPopupFactory.uninstall(); // to get around 1.3.1 heavyweight popup bug
-        //Wrapper.wrap(); //Force all widgets to go anti-aliased
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             System.err.println("can't change l&f");
         }

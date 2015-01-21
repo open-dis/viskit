@@ -857,8 +857,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             if (((Model) getModel()).isDirty()) {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+                tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
             } else {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+                tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
             }
         }
 

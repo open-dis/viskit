@@ -29,6 +29,6 @@
     <projecttitle>
         <name value=""/>
     </projecttitle>
-    <lookandfeel>platform</lookandfeel>
+    <lookandfeel>devault</lookandfeel>
   </gui>
 </ViskitConfig>

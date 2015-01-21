@@ -33,9 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import com.jgoodies.looks.Options;
-import com.jgoodies.looks.common.ShadowPopupFactory;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import edu.nps.util.LogUtils;
 import java.awt.Desktop;
 import java.awt.EventQueue;
@@ -211,25 +208,15 @@ public class EventGraphAssemblyComboMain {
         String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
         try {
             if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
-                setJGoodies();
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } else if (s.equalsIgnoreCase("platform")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } else {
+            } else if (!s.isEmpty()) {
                 UIManager.setLookAndFeel(s);
             }
-        } catch (Exception ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             System.err.println("Error setting Look and Feel to " + s);
         }
-    }
-
-    private static void setJGoodies() throws Exception{
-        LookAndFeel laf = new PlasticLookAndFeel();
-        Options.setUseNarrowButtons(true);
-        PlasticLookAndFeel.setMyCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());
-        PlasticLookAndFeel.setHighContrastFocusColorsEnabled(true);
-
-        UIManager.setLookAndFeel(laf);
-        ShadowPopupFactory.uninstall();
     }
 
     private static void setupMacGUI() {
