@@ -81,7 +81,7 @@
 
   <mapID target="hContents"    url="Pages/Menus/helpContents.html" />
   <mapID target="hSearch"      url="Pages/Menus/helpSearch.html" />
-  <mapID target="hTutorial"    url="Pages/tutorial.html" /> <!--"Pages/Menus/helpTutorial.html" /> -->
+  <mapID target="hTutorial"    url="Pages/Menus/helpTutorial.html" />
   <mapID target="hAbout"       url="Pages/Menus/helpAbout.html" />
 
 
