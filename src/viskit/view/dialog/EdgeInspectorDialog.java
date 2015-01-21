@@ -177,8 +177,8 @@ public class EdgeInspectorDialog extends JDialog {
             }
         });
 
-        KeyListener keyListener = new myKeyListener();
-        descriptionJta.addKeyListener(keyListener);
+        myChangeListener chlis = new myChangeListener();
+        descriptionJta.addKeyListener(chlis);
 
         conditionalExpressionPanel = new ConditionalExpressionPanel(edge, schedulingType);
         edgeInspectorPanel.add(conditionalExpressionPanel);
@@ -233,10 +233,6 @@ public class EdgeInspectorDialog extends JDialog {
         addDescriptionButton = new JButton("description"); //add description");
         addConditionalButton = new JButton("conditional"); //add conditional");
 
-//        Font defButtFont = addConditionalButton.getFont();
-//        int defButtFontSize = defButtFont.getSize();
-//        addConditionalButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
-//        addDescriptionButton.setFont(addConditionalButton.getFont());
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
         addButtonPanel.add(addConditionalButton);
@@ -268,7 +264,6 @@ public class EdgeInspectorDialog extends JDialog {
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
-        myChangeListener chlis = new myChangeListener();
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
         delay.addCaretListener(chlis);
@@ -600,7 +595,6 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void keyTyped(KeyEvent e) {
             stateChanged(null);
-            // TODO:  update OK button when description field modified, rather than waiting to select another field
         }
     }
 
@@ -631,10 +625,6 @@ public class EdgeInspectorDialog extends JDialog {
     }
     private ChangeListener changeListener;
 
-    public void addChangeListener(ChangeListener listener) {
-        this.changeListener = listener;
-    }
-
     class myCloseListener extends WindowAdapter {
 
         @Override
@@ -653,12 +643,4 @@ public class EdgeInspectorDialog extends JDialog {
         }
     }
 
-    class myKeyListener extends KeyAdapter {
-
-        @Override
-        public void keyTyped(KeyEvent e) {
-            modified = true;
-            okButt.setEnabled(true);
-        }
-    }
 }
