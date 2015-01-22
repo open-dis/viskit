@@ -71,8 +71,8 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     public static final int MAX_COL = 5;
     Object[][] mydata = new Object[0][0];
     Vector<Object[]> rows;
-    public Set<Integer> noEditRows = new HashSet<Integer>();
-    public Set<Integer> multiRows = new HashSet<Integer>();
+    public Set<Integer> noEditRows = new HashSet<>();
+    public Set<Integer> multiRows = new HashSet<>();
     public boolean dirty = false;
 
     /**
@@ -84,7 +84,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         super(0, 0);
 
         initBeanShell();
-        rows = new Vector<Object[]>();
+        rows = new Vector<>();
 
         int i = 0;
         for (SimEntity se : simEntitiesJaxb) {
@@ -148,8 +148,8 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         ns.importPackage("simkit.util.*");
         ns.importPackage("diskit.*");         // 17 Nov 2004
     }
-    Map<String, Integer> termHashMap = new HashMap<String, Integer>();
-    List<Object> elementsByRow = new ArrayList<Object>();
+    Map<String, Integer> termHashMap = new HashMap<>();
+    List<Object> elementsByRow = new ArrayList<>();
 
     private void processRow(Object obj, String defaultName) {
         Object[] oa = new Object[6];

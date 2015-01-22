@@ -413,7 +413,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
             }
 
-            ArrayList<String> cmt = new ArrayList<>();
+            List<String> cmt = new ArrayList<>();
             cmt.addAll(sv.getComment());
             est.setComments(cmt);
 
@@ -762,8 +762,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         if (p == null) {
             node.setPosition(new Point2D.Double(100, 100));
         } else {
-            double x = ((p.getX() + 5) / 10) * 10;    //round
-            double y = ((p.getY() + 5) / 10) * 10;
+
+            // snap to grid
+            int gridScale = 10;
+            double x = ((p.getX() + (gridScale/2)) / gridScale) * gridScale;    // round
+            double y = ((p.getY() + (gridScale/2)) / gridScale) * gridScale;
             p.setLocation(x, y);
             node.setPosition(p);
         }
@@ -938,10 +941,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeEvent(EventNode node) {
         boolean retcode = true;
         if (!eventNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
                     "Duplicate Event Name",
                     "Duplicate event name detected: " + node.getName() +
-                    "\nUnique name substituted.");
+                    "\nUnique name will be substituted.");
             mangleNodeName(node);
             retcode = false;
         }
@@ -950,16 +953,18 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         jaxbEv.setName(node.getName());
 
-        Coordinate coor = oFactory.createCoordinate();
+        // TODO: This causes the whole EG node cluster to annoyingly keep moving
+        // down and to the right on the editor grid
 
         // rudimentary snap to grid - this works on saved file only, not the live position in the node.  reload to enjoy.
-        int GridScale = 10;
-        double x = ((node.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
-        double y = ((node.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
-        coor.setX("" + x);
-        coor.setY("" + y);
-        node.getPosition().setLocation(x, y);
-        jaxbEv.setCoordinate(coor);
+//        int gridScale = 10;
+//        double x = ((node.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
+//        double y = ((node.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
+//        Coordinate coor = oFactory.createCoordinate();
+//        coor.setX("" + x);
+//        coor.setY("" + y);
+//        node.getPosition().setLocation(x, y);
+//        jaxbEv.setCoordinate(coor);
 
         cloneComments(jaxbEv.getComment(), node.getComments());
         cloneArguments(jaxbEv.getArgument(), node.getArguments());

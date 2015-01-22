@@ -303,8 +303,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (p == null) {
             node.setPosition(new Point2D.Double(100, 100));
         } else {
-            double x = ((p.getX() + 5) / 10) * 10;    // round
-            double y = ((p.getY() + 5) / 10) * 10;
+
+            // snap to grid
+            int gridScale = 10;
+            double x = ((p.getX() + (gridScale/2)) / gridScale) * gridScale;    // round
+            double y = ((p.getY() + (gridScale/2)) / gridScale) * gridScale;
             p.setLocation(x, y);
             node.setPosition(p);
         }
@@ -565,15 +568,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         statistics = pclNode.isGetMean() ? "true" : "false";
         jaxBPcl.setMeanStatistics(statistics);
 
-        Coordinate coor = oFactory.createCoordinate();
+        // TODO: This causes the whole node cluster to annoyingly keep moving
+        // down and to the right on the editor grid
 
-        int GridScale = 10;
-        double x = ((pclNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
-        double y = ((pclNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
-        coor.setX("" + x);
-        coor.setY("" + y);
-        pclNode.getPosition().setLocation(x, y);
-        jaxBPcl.setCoordinate(coor);
+//        int gridScale = 10;
+//        double x = ((pclNode.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
+//        double y = ((pclNode.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
+//        Coordinate coor = oFactory.createCoordinate();
+//        coor.setX("" + x);
+//        coor.setY("" + y);
+//        pclNode.getPosition().setLocation(x, y);
+//        jaxBPcl.setCoordinate(coor);
 
         List<Object> lis = jaxBPcl.getParameters();
         lis.clear();
@@ -614,15 +619,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSE.setType(evNode.getType());
         jaxbSE.setDescription(evNode.getDescriptionString());
 
-        Coordinate coor = oFactory.createCoordinate();
+        // TODO: This causes the whole node cluster to annoyingly keep moving
+        // down and to the right on the editor grid
 
-        int GridScale = 10;
-        double x = ((evNode.getPosition().getX() + GridScale / 2) / GridScale) * GridScale;
-        double y = ((evNode.getPosition().getY() + GridScale / 2) / GridScale) * GridScale;
-        coor.setX("" + x);
-        coor.setY("" + y);
-        evNode.getPosition().setLocation(x, y);
-        jaxbSE.setCoordinate(coor);
+//        int gridScale = 10;
+//        double x = ((evNode.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
+//        double y = ((evNode.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
+//        Coordinate coor = oFactory.createCoordinate();
+//        coor.setX("" + x);
+//        coor.setY("" + y);
+//        evNode.getPosition().setLocation(x, y);
+//        jaxbSE.setCoordinate(coor);
 
         List<Object> lis = jaxbSE.getParameters();
         lis.clear();
