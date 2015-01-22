@@ -1029,7 +1029,10 @@ public class VGlobals {
                 JComboBox cb = (JComboBox) o;
                 pending = cb;
                 if (cb.getSelectedItem().toString().equals(moreTypesString)) {
-                    popup.show(cb, 0, 0);
+
+                    // NOTE: was getting an IllegalComponentStateException for component not showing
+                    if (popup.isShowing())
+                        popup.show(cb, 0, 0);
                 }
             } else {
                 MyJMenuItem mi = (MyJMenuItem) o;

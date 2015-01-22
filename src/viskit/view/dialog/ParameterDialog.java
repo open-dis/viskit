@@ -47,6 +47,7 @@ public class ParameterDialog extends JDialog {
 
         dialog.setVisible(true);
         // above call blocks
+
         return modified;
     }
 
@@ -109,8 +110,8 @@ public class ParameterDialog extends JDialog {
 
         fillWidgets();     // put the data into the widgets
 
-        modified = (param == null ? true : false);     // if it's a new param, they can always accept defaults with no typing
-        okButt.setEnabled((param == null ? true : false));
+        modified = (param == null);     // if it's a new param, they can always accept defaults with no typing
+        okButt.setEnabled(param == null);
 
         getRootPane().setDefaultButton(canButt);
 
@@ -129,9 +130,9 @@ public class ParameterDialog extends JDialog {
     }
 
     private int maxWidth(JComponent[] c) {
-        int tmpw = 0, maxw = 0;
-        for (int j = 0; j < c.length; j++) {
-            tmpw = c[j].getPreferredSize().width;
+        int tmpw, maxw = 0;
+        for (JComponent c1 : c) {
+            tmpw = c1.getPreferredSize().width;
             if (tmpw > maxw) {
                 maxw = tmpw;
             }
@@ -151,8 +152,8 @@ public class ParameterDialog extends JDialog {
 
         fillWidgets();
 
-        modified = (p == null ? true : false);
-        okButt.setEnabled((p == null ? true : false));
+        modified = (p == null);
+        okButt.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
 
@@ -178,7 +179,7 @@ public class ParameterDialog extends JDialog {
         nm = nm.replaceAll("\\s", "");
         if (param != null) {
             param.setName(nm);
-            // 
+            //
             if (ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
                 ty = "java.lang." + ty;
             }
@@ -193,6 +194,7 @@ public class ParameterDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
@@ -201,6 +203,7 @@ public class ParameterDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 unloadWidgets();
@@ -211,12 +214,14 @@ public class ParameterDialog extends JDialog {
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
+        @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }
