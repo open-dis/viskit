@@ -700,7 +700,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }  // remove leading stuff
 
             String specialNodeMsg = (localNodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
-            if (((EventGraphView) getView()).genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
+            if (((EventGraphView) getView()).genericAskYN("Cut element(s)?", "Confirm cut " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
                 // do edges first?
                 copyVector = (Vector) selectionVector.clone();
                 for (Object elem : copyVector) {

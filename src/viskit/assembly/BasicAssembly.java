@@ -472,7 +472,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             try {
                 Schedule.reset();
             } catch (java.util.ConcurrentModificationException cme) {
-                System.out.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
+                System.err.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
             }
         }
     }

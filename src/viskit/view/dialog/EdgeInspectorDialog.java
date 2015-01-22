@@ -539,34 +539,6 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
-                // todo fix beanshell syntax checking.  I don't know if this was ever complete enough.  The example to test it
-                // against is the edge from Run to Arrival in examples/ArrivalProcess.  The time delay is "interarrivalTime.generate()",
-                // which is good syntax if the state variable "RandomVariate interarrivalTime" is already in the beanshell context,
-                // which I don't think it is.  Must make the beanshell error checking smarter. 19 Jan 2007
-
-                /*
-                StringBuffer sb = new StringBuffer();
-                if(edge instanceof SchedulingEdge) {
-                sb.append("double delay = ");
-                sb.append(delay.getText());
-                sb.append(";\n");
-                }
-                sb.append("if(");
-                sb.append(conditionalExpressionPanel.getText());
-                sb.append("){;}");
-                if(ViskitConfig.instance().getVal("app.beanshell.warning").equalsIgnoreCase("true")) {
-                String parseResults = VGlobals.instance().parseCode(edge.from,sb.toString()); //pre+conditionalExpressionPanel.getText()+post);
-                if(parseResults != null) {
-                boolean ret = BeanshellErrorDialog.showDialog(parseResults,EdgeInspectorDialog.this);
-                if(!ret) // don't ignore
-                return;
-                //  int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this,"Java language error:\n"+parseResults+"\nIgnore and continue?",
-                //                                "Warning",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
-                //  if(ret != JOptionPane.YES_OPTION)
-                //    return;
-                }
-                }
-                 */
                 unloadWidgets();
             }
             dispose();

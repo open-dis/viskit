@@ -48,7 +48,7 @@ public class PclEdgeInspectorDialog extends JDialog {
     private JButton propButt;
     private JPanel buttPan;
     private enableApplyButtonListener lis;
-    //public static String newProperty;
+
     public static boolean showDialog(JFrame f, PropChangeEdge parm) {
         if (dialog == null) {
             dialog = new PclEdgeInspectorDialog(f, parm);
@@ -198,7 +198,6 @@ public class PclEdgeInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            ((AssemblyController)VGlobals.instance().getAssemblyController()).delete();
             dispose();
         }
     }
@@ -278,8 +277,8 @@ public class PclEdgeInspectorDialog extends JDialog {
                     propertyTF.setText(nms[which][0]);
                 }
             } catch (ClassNotFoundException | IntrospectionException | HeadlessException e1) {
-                System.out.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
-                System.out.println(System.getProperty("java.class.path"));
+                System.err.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
+                System.err.println(System.getProperty("java.class.path"));
             }
         }
     }

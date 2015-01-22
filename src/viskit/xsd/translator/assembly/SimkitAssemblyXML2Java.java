@@ -813,10 +813,6 @@ public class SimkitAssemblyXML2Java {
         source.append(output.getBuffer()).append(verbose.getBuffer()). append(tail.getBuffer());
     }
 
-    public void writeOut(String data, java.io.PrintStream out) {
-        out.println(data);
-    }
-
     private String baseNameOf(String s) {
         return s.substring(0, s.indexOf(pd));
     }

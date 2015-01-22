@@ -828,10 +828,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
     }
 
-    /**
-     *
-     * @param nodes
-     */
     @Override
     public void newSimEvListArc(Object[] nodes) {
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
@@ -846,10 +842,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
     }
 
-    /**
-     *
-     * @param nodes
-     */
     @Override
     public void newPropChangeListArc(Object[] nodes) {
         // One and only one has to be a prop change listener
@@ -960,10 +952,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     }
 
-    /**
-     *
-     * @param pclEdge
-     */
     @Override
     public void pcListenerEdgeEdit(PropChangeEdge pclEdge) {
         boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
@@ -972,10 +960,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    /**
-     *
-     * @param aEdge
-     */
     @Override
     public void adapterEdgeEdit(AdapterEdge aEdge) {
         boolean modified = ((AssemblyView) getView()).doEditAdapterEdge(aEdge);
@@ -984,10 +968,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    /**
-     *
-     * @param seEdge
-     */
     @Override
     public void simEvListenerEdgeEdit(SimEvListenerEdge seEdge) {
         boolean modified = ((AssemblyView) getView()).doEditSimEvListEdge(seEdge);
@@ -1070,11 +1050,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void paste() //-----------------
     {
-        if (copyVector.size() <= 0) {
+        if (copyVector.isEmpty()) {
             return;
         }
         int x = 100,
-                y = 100;
+            y = 100;
         int n = 0;
         for (Object o : copyVector) {
             if (o instanceof AssemblyEdge) {
@@ -1108,7 +1088,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 msg += ", \n" + s;
             }
             String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be deleted.)" : "";
-            if (((AssemblyView) getView()).genericAsk("Delete element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
+            if (((AssemblyView) getView()).genericAsk("Cut element(s)?", "Confirm cut" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
                 // do edges first?
                 delete();
             }

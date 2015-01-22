@@ -114,11 +114,23 @@ public interface AssemblyController {
      */
     void evGraphEdit(EvGraphNode evNode);
 
+    /** Edits the PropertyChangeListner edge
+     *
+     * @param pclEdge the PCL edite to edit
+     */
     void pcListenerEdgeEdit(PropChangeEdge pclEdge);
 
-    void adapterEdgeEdit(AdapterEdge edgeObj);
+    /** Edits the Adapter edge
+     *
+     * @param aEdge the Adapter edge to edit
+     */
+    void adapterEdgeEdit(AdapterEdge aEdge);
 
-    void simEvListenerEdgeEdit(SimEvListenerEdge edgeObj);
+    /** Edits the selected SimEvent listener edge
+     *
+     * @param seEdge the SimEvent edge to edit
+     */
+    void simEvListenerEdgeEdit(SimEvListenerEdge seEdge);
 
     /**
      * menu selections

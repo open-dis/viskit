@@ -762,9 +762,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
     } // End of Editor.MyMarqueeHandler
 
-    // NOTE: Not currently used
-    // PopupMenu
-    //
+    // TODO: Not currently used
     public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
         JPopupMenu menu = new JPopupMenu();
         if (cell != null) {
@@ -800,7 +798,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         return menu;
     }
 
-    // Insert a new Edge between source and target
+    /** Insert a new Edge between source and target
+     * @param source the "from" of the connection
+     * @param target the "to" of the connection
+     */
     public void connect(Port source, Port target) {
         DefaultGraphCell src = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(source);
         DefaultGraphCell tar = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(target);

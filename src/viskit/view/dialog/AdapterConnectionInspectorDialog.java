@@ -269,7 +269,6 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            ((AssemblyController)VGlobals.instance().getAssemblyController()).delete();
             dispose();
         }
     }

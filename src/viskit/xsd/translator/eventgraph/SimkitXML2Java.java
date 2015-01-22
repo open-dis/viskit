@@ -127,7 +127,7 @@ public class SimkitXML2Java {
         StringWriter parameterMapAndConstructor = new StringWriter();
         StringWriter runBlock = new StringWriter();
         StringWriter eventBlock = new StringWriter();
-        StringWriter tail = new StringWriter();
+        StringWriter codeBlock = new StringWriter();
 
         buildHead(head);
         buildVars(vars, accessorBlock);
@@ -135,10 +135,9 @@ public class SimkitXML2Java {
         buildParameterMapAndConstructor(parameterMapAndConstructor);
         buildEventBlock(runBlock, eventBlock);
 
-        // TODO: Rename?  This is actually the code block builder
-        buildTail(tail);
+        buildCodeBlock(codeBlock);
 
-        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, toStringBlock, tail);
+        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, toStringBlock, codeBlock);
 
         return source.toString();
     }
@@ -154,15 +153,6 @@ public class SimkitXML2Java {
      */
     public void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
-    }
-
-    /**
-     *
-     * @param data
-     * @param out
-     */
-    public void writeOut(String data, PrintStream out) {
-        out.println(data);
     }
 
     /** @return the XML root of this SimEntity */
@@ -835,7 +825,7 @@ public class SimkitXML2Java {
         }
     }
 
-    void buildTail(StringWriter t) {
+    void buildCodeBlock(StringWriter t) {
         PrintWriter pw = new PrintWriter(t);
         String code = root.getCode();
         if (code != null) {
@@ -851,14 +841,14 @@ public class SimkitXML2Java {
 
     void buildSource(StringBuilder source, StringWriter head, StringWriter vars,
             StringWriter parameterMapAndConstructor, StringWriter runBlock,
-            StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter tail) {
+            StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter codeBlock) {
 
         source.append(head.getBuffer()).append(vars.getBuffer());
         source.append(parameterMapAndConstructor.getBuffer());
         source.append(runBlock.getBuffer());
         source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer());
         source.append(toStringBlock);
-        source.append(tail.getBuffer());
+        source.append(codeBlock.getBuffer());
     }
 
     private String capitalize(String s) {
@@ -897,7 +887,7 @@ public class SimkitXML2Java {
 
         try {
             // the extendz field may also contain an implemnts
-            // tail.
+            // codeBlock.
 
             // TODO: Can we use VStatics.classForName here?
             Class<?> c = Class.forName(extendz.split("\\s")[0], true, VGlobals.instance().getWorkClassLoader());

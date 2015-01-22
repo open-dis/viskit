@@ -61,9 +61,9 @@ import viskit.VGlobals;
  * the LocalBootLoader class. The zero'th stage is adding all classes
  * required to run Simkit and the ViskitAssembly.
  *
- * Each thread that uses a LocalBoot should set the contextClassLoader
- * to be its own LocalBoot's parent's parent; this should enable multiple
- * threads to use class methods in a unique context, eg. Schedule.reset();
+ * Each thread that uses a LocalBootLoader should set the contextClassLoader
+ * to be its own LocalBootLoaders's parent's parent; this should enable multiple
+ * threads to use class methods in a unique context, e.g. Schedule.reset();
  *
  * In order to do that, as in create a separate context for Simkit per Thread,
  * without running an external Process, everything must be read into a
@@ -290,8 +290,8 @@ public class LocalBootLoader extends URLClassLoader {
         // if each LocalBootLoader individually has to read from
         // a file, then each instance of the loader will have its own
         // context in terms of static variables from the read-in classes,
-        // eg. simkit.Schedule.reset() in one thread which will not reset
-        // another. See sample case StaticsTest
+        // e.g. simkit.Schedule.reset() in one thread which will not reset
+        // another.  See sample case StaticsTest
         while (loop) {
             try {
                 if (reloadSimkit) {
