@@ -304,10 +304,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (p == null) {
             node.setPosition(pointLess);
         } else {
-
-            double x = snapToGrid(p)[0];    // round
-            double y = snapToGrid(p)[1];
-            p.setLocation(x, y);
             node.setPosition(p);
         }
 
@@ -320,10 +316,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
 
         // TODO: Don't allow placement of a bad SimEntity on the Assembly palette
-        // Bad check here b/c the types are null, of course an arg name won't be found, duh!
-//        if (!vc.isArgNameFound()) {
-//            return;
-//        }
+        
         node.setInstantiator(vc);
 
         getNodeCache().put(node.getName(), node);   // key = ev
@@ -336,20 +329,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
-    }
-
-    private static final int GRID_SCALE = 10;
-
-    /** Rudimentary snap to grid - this works on saved file only, not the live
-     * position in the node.  reload to enjoy.
-     * @param p the Point2D to snap to the grid
-     * @return the (x, y) pair snapped to the grid
-     */
-    private double[] snapToGrid(Point2D p) {
-        double[] retVal = new double[2];
-        retVal[0] = ((p.getX() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
-        retVal[1] = ((p.getY() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
-        return retVal;
     }
 
     @Override
@@ -581,8 +560,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         statistics = pclNode.isGetMean() ? "true" : "false";
         jaxBPcl.setMeanStatistics(statistics);
 
-        double x = snapToGrid(pclNode.getPosition())[0];    // round
-        double y = snapToGrid(pclNode.getPosition())[1];
+        double x = pclNode.getPosition().getX();
+        double y = pclNode.getPosition().getY();
         Coordinate coor = oFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
@@ -628,8 +607,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSE.setType(evNode.getType());
         jaxbSE.setDescription(evNode.getDescriptionString());
 
-        double x = snapToGrid(evNode.getPosition())[0];    // round
-        double y = snapToGrid(evNode.getPosition())[1];
+        double x = evNode.getPosition().getX();
+        double y = evNode.getPosition().getY();
         Coordinate coor = oFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
