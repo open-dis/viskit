@@ -373,7 +373,7 @@ public class ViskitProject {
 
     public void closeProject() {
         ViskitConfig vConfig = ViskitConfig.instance();
-        ViskitConfig.instance().getViskitGuiConfig().setProperty(ViskitConfig.PROJECT_TITLE_NAME, "");
+        vConfig.getViskitGuiConfig().setProperty(ViskitConfig.PROJECT_TITLE_NAME, "");
         vConfig.cleanup();
         vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
         setProjectOpen(false);
@@ -627,7 +627,7 @@ public class ViskitProject {
     }
 
     /** Utility method to aid in Viskit specific project directory selection
-     * 
+     *
      * @param parent the component parent for JOptionPane orientation
      * @param startingDirPath a path to start looking from in the chooser
      * @return a path to a valid project directory

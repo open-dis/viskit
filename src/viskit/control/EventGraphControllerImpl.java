@@ -105,6 +105,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void newEventGraph() {
+
+        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+
         GraphMetaData oldGmd = null;
         Model viskitModel = (Model) getModel();
         if (viskitModel != null) {
