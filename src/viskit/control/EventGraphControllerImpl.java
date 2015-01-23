@@ -628,6 +628,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private Vector<Object> copyVector = new Vector<>();
 
     @Override
+    @SuppressWarnings("unchecked")
     public void copy() //----------------
     {
         if (!nodeSelected()) {
