@@ -10,6 +10,9 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed an issue with not being able to use normal java package naming
+  conventions when crafting EG package names
+
   Fixed an issue with cut & paste where the selected cache was not being cleared
   after a confirmed delete by the user.
 
