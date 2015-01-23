@@ -985,6 +985,28 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());
         ActionIntrospector.getAction(this, "edit").setEnabled(nodeOrEdgeSelected());
     }
+    private Vector<Object> copyVector = new Vector<>();
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void copy() {
+        if (selectionVector.isEmpty()) {
+            return;
+        }
+        copyVector = (Vector<Object>) selectionVector.clone();
+
+        // Paste only works for node, check to enable/disable paste menu item
+        handlePasteMenuItem();
+    }
+
+    private void handlePasteMenuItem() {
+        ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
+    }
+
+    private boolean nodeCopied() {
+        return nodeOrEdgeInVector(copyVector);
+    }
+    int copyCount = 0;
 
     private boolean nodeOrEdgeSelected() {
         return nodeOrEdgeInVector(selectionVector);
@@ -1002,14 +1024,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return false;
     }
 
-    private Vector<EvGraphNode> copyVector = new Vector<>();
-
     @SuppressWarnings("unchecked")
     public void edit() {
         if (selectionVector.isEmpty()) {
             return;
         }
-        copyVector = (Vector<EvGraphNode>) selectionVector.clone();
+        copyVector = (Vector<Object>) selectionVector.clone();
         for (Object o : copyVector) {
             if (!(o instanceof EvGraphNode)) {
                 messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
@@ -1027,7 +1047,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
             if (f == null) {
                 messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
-                        "Please select an XML Event Graph to load to EG Editor tab");
+                        "Please select an XML Event Graph to load onto EG Editor tab");
                 return;
             }
 
@@ -1035,17 +1055,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(f);
         }
     }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void copy() {
-        if (selectionVector.isEmpty()) {
-            return;
-        }
-        copyVector = (Vector<EvGraphNode>) selectionVector.clone();
-        ActionIntrospector.getAction(this, "paste").setEnabled(true);
-    }
-    int copyCount = 0;
 
     @Override
     public void paste() //-----------------
@@ -1092,14 +1101,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 // do edges first?
                 delete();
             }
+            handlePasteMenuItem();
         }
     }
 
-    @Override
+    /** Permanently delete selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    public void delete() {
-        Vector<Object> localV = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
-        for (Object elem : localV) {
+    private void delete() {
+        copyVector = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
+        for (Object elem : copyVector) {
             if (elem instanceof AssemblyEdge) {
                 killEdge((AssemblyEdge) elem);
             } else if (elem instanceof EvGraphNode) {
@@ -1116,6 +1126,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((AssemblyModel) getModel()).deletePCLNode(en);
             }
         }
+
+        // Clear the cache after a delete to prevent unnecessary buildup
+        selectionVector.clear();
     }
 
     private void killEdge(AssemblyEdge e) {

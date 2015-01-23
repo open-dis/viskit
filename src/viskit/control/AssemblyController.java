@@ -143,11 +143,6 @@ public interface AssemblyController {
     void cut();        // to remove nodes and edges
 
     /**
-     * Performs a delete function for selected edges and nodes
-     */
-    void delete();
-
-    /**
      * Opens a Viskit Project Assembly File
      */
     void open();

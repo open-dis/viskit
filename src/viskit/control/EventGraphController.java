@@ -136,7 +136,7 @@ public interface EventGraphController {
      */
     void saveAs();
 
-    void selectNodeOrEdge(Vector v);
+    void selectNodeOrEdge(Vector<Object> v);
 
     void settings();
 

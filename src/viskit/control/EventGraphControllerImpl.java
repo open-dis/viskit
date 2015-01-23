@@ -614,10 +614,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     {
         ((viskit.model.Model) getModel()).newStateVariable(name, type, initVal, comment);
     }
-    private Vector selectionVector = new Vector();
+    private Vector<Object> selectionVector = new Vector<>();
 
     @Override
-    public void selectNodeOrEdge(Vector v) //------------------------------------
+    public void selectNodeOrEdge(Vector<Object> v) //------------------------------------
     {
         selectionVector = v;
         boolean ccbool = !selectionVector.isEmpty();
@@ -625,7 +625,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
         ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
     }
-    private Vector copyVector = new Vector();
+    private Vector<Object> copyVector = new Vector<>();
 
     @Override
     public void copy() //----------------
@@ -634,7 +634,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             ((EventGraphView) getView()).genericReport(JOptionPane.WARNING_MESSAGE, "Unsupported Action", "Edges cannot be copied.");
             return;
         }
-        copyVector = (Vector) selectionVector.clone();
+        copyVector = (Vector<Object>) selectionVector.clone();
 
         // Paste only works for node, check to enable/disable paste menu item
         handlePasteMenuItem();
@@ -699,24 +699,33 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 msg = msg.substring(3);
             }  // remove leading stuff
 
-            String specialNodeMsg = (localNodeCount > 0 ? "\n(Events remain in paste buffer, but attached edges are permanently deleted.)" : "");
+            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected but attached edges are permanently deleted.)" : "");
             if (((EventGraphView) getView()).genericAskYN("Cut element(s)?", "Confirm cut " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
                 // do edges first?
-                copyVector = (Vector) selectionVector.clone();
-                for (Object elem : copyVector) {
-                    if (elem instanceof Edge) {
-                        killEdge((Edge) elem);
-                    } else if (elem instanceof EventNode) {
-                        EventNode en = (EventNode) elem;
-                        for (ViskitElement ed : en.getConnections()) {
-                            killEdge((Edge) ed);
-                        }
-                        ((Model) getModel()).deleteEvent(en);
-                    }
-                }
+                delete();
             }
             handlePasteMenuItem();
         }
+    }
+
+    /** Permanently delete selected nodes and attached edges from the cache */
+    @SuppressWarnings("unchecked")
+    private void delete() {
+        copyVector = (Vector<Object>) selectionVector.clone();
+        for (Object elem : copyVector) {
+            if (elem instanceof Edge) {
+                killEdge((Edge) elem);
+            } else if (elem instanceof EventNode) {
+                EventNode en = (EventNode) elem;
+                for (ViskitElement ed : en.getConnections()) {
+                    killEdge((Edge) ed);
+                }
+                ((Model) getModel()).deleteEvent(en);
+            }
+        }
+
+        // Clear the cache after a delete to prevent unnecessary buildup
+        selectionVector.clear();
     }
 
     private void killEdge(Edge e) {
