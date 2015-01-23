@@ -237,8 +237,9 @@ public class FileBasedClassManager implements Runnable {
         }
     }
 
-    /** Creates an MD5 message digest composed of files, if either changes
- there will be a mismatch in the new digest, so delete cacheXML etc.
+    /** Creates an MD5 message digest composed of file contents.  If contents
+     * change there will be a mismatch in the new digest, so delete cacheXML
+     * etc.
      * @param files the varargs containing files to evaluate
      * @return a String representation of the message digest
      */
@@ -252,9 +253,6 @@ public class FileBasedClassManager implements Runnable {
                         is.read(buf);
                         md.update(buf);
                     }
-                } catch (MalformedURLException ex) {
-                    log.error(ex);
-//                    ex.printStackTrace();
                 } catch (IOException ex) {
                     log.error(ex);
 //                    ex.printStackTrace();

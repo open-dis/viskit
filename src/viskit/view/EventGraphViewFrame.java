@@ -1097,12 +1097,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return fil;
     }
 
-    /** Saves the current Event Graph "as" desired by the user
-     *
-     * @param suggName the package and file name of the EG
-     * @param showUniqueName show EG name only
-     * @return a File object of the saved EG
-     */
     @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
         if (jfc == null) {

@@ -443,7 +443,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView view = (AssemblyView) getView();
         GraphMetaData gmd = model.getMetaData();
-        File saveFile = view.saveFileAsk(gmd.packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
+
+        // Allow the user to type specific package names
+        String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
 
@@ -1252,8 +1255,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Create and test compile our EventGraphs and Assemblies from XML
+     *
      * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
-     * @return a reference to *.class files of our compiled sources or null if
+     * @return a reference to a successfully compiled *.class file or null if
      * a compile failure occurred
      */
     public static File compileJavaClassFromString(String src) {
@@ -1296,7 +1300,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProj.getSrcDir(), pkg);
+            File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
             if (!srcPkg.isDirectory()) {
                 srcPkg.mkdirs();
             }
@@ -1341,7 +1345,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /**
-     * Known modelPath for EventGraph compilation
+     * Known modelPath for EventGraph compilation.  Called whenever an XML file
+     * loads for the first time, or is saved during an edit
+     *
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
@@ -1385,6 +1391,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Path for EG and Assy compilation
+     *
      * @param source the raw source to write to file
      * @return a package and file pair
      */

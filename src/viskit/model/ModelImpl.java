@@ -165,8 +165,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             f = currentFile;
         }
 
-        // Do the marshalling into a temporary file, so as to avoid possible deletion of existing
-        // file on a marshal error.
+        // Do the marshalling into a temporary file, so as to avoid possible
+        // deletion of existing file on a marshal error.
 
         File tmpF;
         FileWriter fw = null;

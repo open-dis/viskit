@@ -66,9 +66,9 @@ public class SimkitXML2Java {
 
     /**
      * Creates a new instance of SimkitXML2Java
-     * when used from another class, instance this
+     * when used from another class.  Instance this
      * with a String for the className of the xmlFile
-     * @param xmlFile
+     * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
         this();

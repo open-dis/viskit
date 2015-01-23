@@ -22,7 +22,8 @@ public interface Model {
     void init();
 
     /**
-     * Messaged by controller when a new Model should be loaded.
+     * Messaged by controller when a new Model should be created, or an existing
+     * model is loading at startup.
      * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
      * @return for good open
      */
@@ -30,7 +31,7 @@ public interface Model {
 
     /**
      * Save existing model to specified file.  If null, save to last file.  If no last file, error.
-     * 
+     *
      * @param f File to save to.
      * @return indication of success or failure
      */
@@ -90,6 +91,10 @@ public interface Model {
 
     void changeCancelEdge(CancellingEdge e);
 
+    /** Modifies the properties of this EG model
+     *
+     * @param gmd the meta data that contains changes to record
+     */
     void changeMetaData(GraphMetaData gmd);
 
     /**

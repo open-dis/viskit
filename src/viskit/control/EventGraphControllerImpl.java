@@ -119,7 +119,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // when TabbedPane changelistener detects a tab change.
         ((EventGraphView) getView()).addTab(mod);
 
-        GraphMetaData gmd = new GraphMetaData(mod);
+        // If we have models already opened, then use their package names for
+        // this new EG
+        GraphMetaData gmd = mod.getMetaData();
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
@@ -127,7 +129,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         boolean modified =
                 EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
         if (modified) {
-            ((Model) getModel()).changeMetaData(gmd);
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
@@ -499,7 +500,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    // The open attribute is zeroed out for all recent files the first time a file is opened
+    // NOTE: The open attribute is zeroed out for all recent files the first
+    // time a file is opened
     private void markConfigOpen(String path) {
         int idx = 0;
         for (String key : recentFileSet) {
@@ -527,7 +529,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetaData gmd = mod.getMetaData();
-        File saveFile = view.saveFileAsk(gmd.packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
+
+        // Allow the user to type specific package names
+        String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();

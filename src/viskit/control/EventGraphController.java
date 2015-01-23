@@ -62,7 +62,7 @@ public interface EventGraphController {
     void editGraphMetaData();
 
     /**
-     * Create a new blank EventGraph model
+     * Creates a new blank EventGraph model
      */
     void newEventGraph();
 
@@ -129,6 +129,9 @@ public interface EventGraphController {
      */
     void quit();
 
+    /**
+     * Save the current EventGraph model to file
+     */
     void save();
 
     /**

@@ -293,8 +293,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
-        // This is not needed
-        //todo yank out all the FileBasedAssyNode stuff
         newEventGraph(widgetName, node.loadedClass, p);
     }
 
@@ -316,7 +314,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
 
         // TODO: Don't allow placement of a bad SimEntity on the Assembly palette
-        
+
         node.setInstantiator(vc);
 
         getNodeCache().put(node.getName(), node);   // key = ev
