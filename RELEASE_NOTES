@@ -10,6 +10,16 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed an issue with cut & paste where the selected cache was not being cleared
+  after a confirmed delete by the user.
+
+  Fixed a bug where canceling the edit on any of the Assembly edge dialogs
+  caused that edge to delete.
+
+  Fixed an issue where a good intention to have nodes snap to grid on either
+  editor pallette caused the node cluster to keep positioning down and to the
+  right upon every file save.
+
 If an EG XML file save goes bad, or its corresponding source code
 compilation reveals an error, the tab that represents the EG will change from
 a green color (signifying good XML, good source compilation) to red which
@@ -21,6 +31,9 @@ compile will also cause removal of the EG MD5 hash entry from the project's
 viskitProject.xml file.  If upon start up, a previously opened XML file passes
 validation, but fails compilation, the user will again be unable to advance to
 the Assy Editor tab.
+
+  Fixed an issue where if a EG did not compile correctly, the whole EG LEGO tree
+  for would dissappear
 
   Bugfix 1425
 
