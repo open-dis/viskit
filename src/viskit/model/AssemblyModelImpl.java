@@ -41,10 +41,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     /** We require specific order on this Map's contents */
     private Map<String, AssemblyNode> nodeCache;
     private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
-    private Point2D.Double pointLess = new Point2D.Double(100, 100);
+    private Point2D.Double pointLess;
     private AssemblyController controller;
 
     public AssemblyModelImpl(AssemblyController cont) {
+        pointLess = new Point2D.Double(10, 10);
         controller = cont;
         metaData = new GraphMetaData(this);
         setNodeCache(new LinkedHashMap<String, AssemblyNode>());
@@ -93,7 +94,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean newModel(File f) {
         getNodeCache().clear();
-        pointLess = new Point2D.Double(100, 100);
+        pointLess = new Point2D.Double(10, 10);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
         if (f == null) {
@@ -301,13 +302,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void newEventGraph(String widgetName, String className, Point2D p) {
         EvGraphNode node = new EvGraphNode(widgetName, className);
         if (p == null) {
-            node.setPosition(new Point2D.Double(100, 100));
+            node.setPosition(pointLess);
         } else {
 
-            // snap to grid
-            int gridScale = 10;
-            double x = ((p.getX() + (gridScale/2)) / gridScale) * gridScale;    // round
-            double y = ((p.getY() + (gridScale/2)) / gridScale) * gridScale;
+            double x = snapToGrid(p)[0];    // round
+            double y = snapToGrid(p)[1];
             p.setLocation(x, y);
             node.setPosition(p);
         }
@@ -339,11 +338,25 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
     }
 
+    private static final int GRID_SCALE = 10;
+
+    /** Rudimentary snap to grid - this works on saved file only, not the live
+     * position in the node.  reload to enjoy.
+     * @param p the Point2D to snap to the grid
+     * @return the (x, y) pair snapped to the grid
+     */
+    private double[] snapToGrid(Point2D p) {
+        double[] retVal = new double[2];
+        retVal[0] = ((p.getX() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
+        retVal[1] = ((p.getY() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
+        return retVal;
+    }
+
     @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
         PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
         if (p == null) {
-            pcNode.setPosition(new Point2D.Double(100, 100));
+            pcNode.setPosition(pointLess);
         } else {
             pcNode.setPosition(p);
         }
@@ -568,17 +581,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         statistics = pclNode.isGetMean() ? "true" : "false";
         jaxBPcl.setMeanStatistics(statistics);
 
-        // TODO: This causes the whole node cluster to annoyingly keep moving
-        // down and to the right on the editor grid
-
-//        int gridScale = 10;
-//        double x = ((pclNode.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
-//        double y = ((pclNode.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
-//        Coordinate coor = oFactory.createCoordinate();
-//        coor.setX("" + x);
-//        coor.setY("" + y);
-//        pclNode.getPosition().setLocation(x, y);
-//        jaxBPcl.setCoordinate(coor);
+        double x = snapToGrid(pclNode.getPosition())[0];    // round
+        double y = snapToGrid(pclNode.getPosition())[1];
+        Coordinate coor = oFactory.createCoordinate();
+        coor.setX("" + x);
+        coor.setY("" + y);
+        pclNode.getPosition().setLocation(x, y);
+        jaxBPcl.setCoordinate(coor);
 
         List<Object> lis = jaxBPcl.getParameters();
         lis.clear();
@@ -619,17 +628,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSE.setType(evNode.getType());
         jaxbSE.setDescription(evNode.getDescriptionString());
 
-        // TODO: This causes the whole node cluster to annoyingly keep moving
-        // down and to the right on the editor grid
-
-//        int gridScale = 10;
-//        double x = ((evNode.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
-//        double y = ((evNode.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
-//        Coordinate coor = oFactory.createCoordinate();
-//        coor.setX("" + x);
-//        coor.setY("" + y);
-//        evNode.getPosition().setLocation(x, y);
-//        jaxbSE.setCoordinate(coor);
+        double x = snapToGrid(evNode.getPosition())[0];    // round
+        double y = snapToGrid(evNode.getPosition())[1];
+        Coordinate coor = oFactory.createCoordinate();
+        coor.setX("" + x);
+        coor.setY("" + y);
+        evNode.getPosition().setLocation(x, y);
+        jaxbSE.setCoordinate(coor);
 
         List<Object> lis = jaxbSE.getParameters();
         lis.clear();

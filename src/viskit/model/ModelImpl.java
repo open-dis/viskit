@@ -760,13 +760,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void newEvent(String nodeName, Point2D p) {
         EventNode node = new EventNode(nodeName);
         if (p == null) {
-            node.setPosition(new Point2D.Double(100, 100));
+            node.setPosition(new Point2D.Double(10, 10));
         } else {
 
-            // snap to grid
-            int gridScale = 10;
-            double x = ((p.getX() + (gridScale/2)) / gridScale) * gridScale;    // round
-            double y = ((p.getY() + (gridScale/2)) / gridScale) * gridScale;
+            double x = snapToGrid(p)[0];    // round
+            double y = snapToGrid(p)[1];
             p.setLocation(x, y);
             node.setPosition(p);
         }
@@ -937,6 +935,20 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
     }
 
+    private static final int GRID_SCALE = 10;
+
+    /** Rudimentary snap to grid - this works on saved file only, not the live
+     * position in the node.  reload to enjoy.
+     * @param p the Point2D to snap to the grid
+     * @return the (x, y) pair snapped to the grid
+     */
+    private double[] snapToGrid(Point2D p) {
+        double[] retVal = new double[2];
+        retVal[0] = ((p.getX() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
+        retVal[1] = ((p.getY() + GRID_SCALE / 2) / GRID_SCALE) * GRID_SCALE;
+        return retVal;
+    }
+
     @Override
     public boolean changeEvent(EventNode node) {
         boolean retcode = true;
@@ -953,18 +965,13 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         jaxbEv.setName(node.getName());
 
-        // TODO: This causes the whole EG node cluster to annoyingly keep moving
-        // down and to the right on the editor grid
-
-        // rudimentary snap to grid - this works on saved file only, not the live position in the node.  reload to enjoy.
-//        int gridScale = 10;
-//        double x = ((node.getPosition().getX() + gridScale / 2) / gridScale) * gridScale;
-//        double y = ((node.getPosition().getY() + gridScale / 2) / gridScale) * gridScale;
-//        Coordinate coor = oFactory.createCoordinate();
-//        coor.setX("" + x);
-//        coor.setY("" + y);
-//        node.getPosition().setLocation(x, y);
-//        jaxbEv.setCoordinate(coor);
+        double x = snapToGrid(node.getPosition())[0];
+        double y = snapToGrid(node.getPosition())[1];
+        Coordinate coor = oFactory.createCoordinate();
+        coor.setX("" + x);
+        coor.setY("" + y);
+        node.getPosition().setLocation(x, y);
+        jaxbEv.setCoordinate(coor);
 
         cloneComments(jaxbEv.getComment(), node.getComments());
         cloneArguments(jaxbEv.getArgument(), node.getArguments());
