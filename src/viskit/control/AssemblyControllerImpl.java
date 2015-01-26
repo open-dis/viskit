@@ -1369,6 +1369,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             String src = buildJavaEventGraphSource(x2j);
 
+            /* We may have forgotten a parameter required for a super class */
+            if (src == null) {
+                String msg = xmlFile + " did not compile.  Please check that you have provided the correct parameters for any super classes";
+                LOGGER.error(xmlFile + " " + msg);
+                messageUser(JOptionPane.ERROR, "Source code compilation error", msg);
+                return null;
+            }
+
             // If using plain Vanilla Viskit, don't compile diskit extended EGs
             // as diskit.jar won't be available
             String[] classPath = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader()).getClassPath();
@@ -1379,6 +1387,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     break;
                 }
             }
+
             if (src.contains("diskit") && !foundDiskit) {
                 FileBasedClassManager.instance().addCacheMiss(xmlFile);
 
