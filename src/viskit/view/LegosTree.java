@@ -313,7 +313,6 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                 } else {
                     log.warn("Compile problem encountered with generated source code for " + f.getName());
                     log.warn(f.getName() + " will not be listed in the Event Graphs node tree\n");
-
                 }
 
                 // Note:
@@ -329,7 +328,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             } catch (Throwable throwable) {
 
                 // Uncomment to reveal common reason for Exceptions
-//                throwable.printStackTrace();
+                throwable.printStackTrace();
                 log.error(throwable);
                 if (recurseNogoList != null) {
                     recurseNogoList.add(f.getName());

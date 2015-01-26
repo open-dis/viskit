@@ -23,29 +23,36 @@ import viskit.xsd.bindings.eventgraph.*;
 public class SimkitXML2Java {
 
     static Logger log = LogUtils.getLogger(SimkitXML2Java.class);
+
+    /* convenience Strings for formatting */
+    private final static String SP = " ";
+    private final static String SP_4 = SP + SP + SP + SP;
+    private final static String SP_8 = SP_4 + SP_4;
+    private final static String SP_12 = SP_8 + SP_4;
+    private final static String OB = "{";
+    private final static String CB = "}";
+    private final static String SC = ";";
+    private final static String CM = ",";
+    private final static String LP = "(";
+    private final static String RP = ")";
+    private final static String EQ = "=";
+    private final static String PD = ".";
+    private final static String QU = "\"";
+    private final static String LB = "[";
+    private final static String RB = "]";
+    private final static String JDO = "/**";
+    private final static String JDC = "*/";
+    private final static String PUBLIC = "public";
+    private final static String PROTECTED = "protected";
+    private final static String PRIVATE = "private";
+    private final static String SIM_ENTITY_BASE = "SimEntityBase";
+
     private SimEntity root;
     InputStream fileInputStream;
     private String fileBaseName;
     JAXBContext jaxbCtx;
     private Unmarshaller unMarshaller;
     private Object unMarshalledObject;
-
-    /* convenience Strings for formatting */
-    private final String sp = " ";
-    private final String sp4 = sp + sp + sp + sp;
-    private final String sp8 = sp4 + sp4;
-    private final String sp12 = sp8 + sp4;
-    private final String ob = "{";
-    private final String cb = "}";
-    private final String sc = ";";
-    private final String cm = ",";
-    private final String lp = "(";
-    private final String rp = ")";
-    private final String eq = "=";
-    private final String pd = ".";
-    private final String qu = "\"";
-    private final String lb = "[";
-    private final String rb = "]";
 
     private String extendz = "";
     private String className = "";
@@ -174,10 +181,10 @@ public class SimkitXML2Java {
         // if none exists with template methods, and
         // Events for any "do" methods if none exists.
         if (implementz != null) {
-            extendz += sp + "implements" + sp + implementz;
+            extendz += SP + "implements" + SP + implementz;
         }
 
-        pw.println("package " + packageName + sc);
+        pw.println("package " + packageName + SC);
         pw.println();
         pw.println("// Standard library imports");
         pw.println("import java.util.*;");
@@ -189,7 +196,7 @@ public class SimkitXML2Java {
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
         pw.println();
-        pw.println("public class " + className + sp + "extends" + sp + extendz + sp + ob);
+        pw.println("public class " + className + SP + "extends" + SP + extendz + SP + OB);
         pw.println();
     }
 
@@ -204,48 +211,68 @@ public class SimkitXML2Java {
 //        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
-        pw.println(sp4 + "/* Simulation Parameters */");
+        pw.println(SP_4 + "/* Simulation Parameters */");
+        pw.println();
         for (Parameter p : liParams) {
 
             if (!superParams.contains(p)) {
-                pw.println(sp4 + "private" + sp + p.getType() + sp + p.getName() + sc);
-            } else {
-                pw.println(sp4 + "/* inherited parameter " + p.getType() + sp + p.getName() + " */");
+                if (!p.getComment().isEmpty()) {
+                    pw.print(SP_4 + JDO + SP);
+                    for (String comment : p.getComment()) {
+                        pw.print(comment);
+                    }
+                    pw.println(SP + JDC);
+                }
+                pw.println(SP_4 + PRIVATE + SP + p.getType() + SP + p.getName() + SC);
+                pw.println();
             }
 
-            if (extendz.contains("SimEntityBase")) {
+            if (extendz.contains(SIM_ENTITY_BASE)) {
                 buildParameterAccessor(p, accessorBlock);
             } else if (!superParams.contains(p)) {
                 buildParameterAccessor(p, accessorBlock);
             }
         }
 
-        pw.println();
-
         List<StateVariable> liStateV = this.root.getStateVariable();
 
-        pw.println(sp4 + "/* Simulation State Variables */");
+        pw.println(SP_4 + "/* Simulation State Variables */");
+        pw.println();
         for (StateVariable s : liStateV) {
 
             Class<?> c = null;
 
-            // TODO: use better checking for primitive types i.e. Class.isPrimitive()
-
             // TODO: Determine if encountering generics that contain array types
             if (isGeneric(s.getType())) {
-                pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
+                if (!s.getComment().isEmpty()) {
+                    pw.print(SP_4 + JDO + SP);
+                    for (String comment : s.getComment()) {
+                        pw.print(comment);
+                    }
+                    pw.println(SP + JDC);
+                }
+                pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
             } else {
 
-                // TODO: This seems a baaad way to write out a non-generic varible
-                try {
-                    c = Class.forName(s.getType(), true, VGlobals.instance().getWorkClassLoader());
-                } catch (ClassNotFoundException cnfe) {
-//                log.error(cnfe);
-                    pw.println(sp4 + "protected" + sp + stripLength(s.getType()) + sp + s.getName() + sc);
+                c = VStatics.classForName(s.getType());
+
+                if (c == null || c.isPrimitive()) {
+                    if (!s.getComment().isEmpty()) {
+                        pw.print(SP_4 + JDO + SP);
+                        for (String comment : s.getComment()) {
+                            pw.print(comment);
+                        }
+                        pw.println(SP + JDC);
+                    }
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
+                } else {
+                    pw.println(SP_4 + "/*" + SP + "inherited state variable" + SP + s.getType() + SP + s.getName() + SP + JDC);
                 }
+
+                pw.println();
             }
 
-            if (c != null) {
+            if (c != null && !c.isPrimitive()) {
                 Constructor<?> cst = null;
 
                 try {
@@ -254,13 +281,25 @@ public class SimkitXML2Java {
 //                    log.error(nsme);
                 }
 
+                if (!s.getComment().isEmpty()) {
+                    pw.print(SP_4 + JDO + SP);
+                    for (String comment : s.getComment()) {
+                        pw.print(comment);
+                    }
+                    pw.println(SP + JDC);
+                }
+
                 if (cst != null) {
-                    pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
+                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
                 } else { // really not a bad case, most likely will be set by the reset()
-                    pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "null" + sc);
+                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
                 }
             }
             buildStateVariableAccessor(s, accessorBlock);
+        }
+        if (liStateV.isEmpty()) {
+            pw.println(SP_4 + "/* None */");
+            pw.println();
         }
     }
 
@@ -269,18 +308,18 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(sw);
 
-        pw.print(sp4 + "public void set" + capitalize(p.getName()) + lp);
-        pw.println(p.getType() + sp + shortinate(p.getName()) + rp + sp + ob);
-        pw.print(sp8 + "this" + pd + p.getName() + sp + eq + sp);
+        pw.print(SP_4 + "public void set" + capitalize(p.getName()) + LP);
+        pw.println(p.getType() + SP + shortinate(p.getName()) + RP + SP + OB);
+        pw.print(SP_8 + "this" + PD + p.getName() + SP + EQ + SP);
 
         if (isArray(p.getType()) || isGeneric(p.getType())) {
 
             pw.print(shortinate(p.getName()));
-            pw.println(pd + "clone" + lp + rp + sc);
+            pw.println(PD + "clone" + LP + RP + SC);
         } else {
-            pw.println(shortinate(p.getName()) + sc);
+            pw.println(shortinate(p.getName()) + SC);
         }
-        pw.println(sp4 + cb);
+        pw.println(SP_4 + CB);
         pw.println();
 
         /* also provide indexed set/getters, may be multidimensional, however,
@@ -289,25 +328,25 @@ public class SimkitXML2Java {
         if (isArray(p.getType())) {
             int d = dims(p.getType());
 
-            pw.print(sp4 + "public void set" + capitalize(p.getName()) + lp + indx(d));
-            pw.println(baseOf(p.getType()) + sp + shortinate(p.getName()) + rp + sp + ob);
-            pw.println(sp8 + "this" + pd + p.getName() + indxbr(d) + sp + eq + sp + shortinate(p.getName()) + sc);
-            pw.println(sp4 + cb);
+            pw.print(SP_4 + "public void set" + capitalize(p.getName()) + LP + indx(d));
+            pw.println(baseOf(p.getType()) + SP + shortinate(p.getName()) + RP + SP + OB);
+            pw.println(SP_8 + "this" + PD + p.getName() + indxbr(d) + SP + EQ + SP + shortinate(p.getName()) + SC);
+            pw.println(SP_4 + CB);
             pw.println();
 
 
-            pw.print(sp4 + "public" + sp + baseOf(p.getType()) + sp + "get");
-            pw.print(capitalize(p.getName()) + lp + indxncm(d));
-            pw.println(rp + sp + ob);
-            pw.println(sp8 + "return" + sp + p.getName() + indxbr(d) + sc);
-            pw.println(sp4 + cb);
+            pw.print(SP_4 + PUBLIC + SP + baseOf(p.getType()) + SP + "get");
+            pw.print(capitalize(p.getName()) + LP + indxncm(d));
+            pw.println(RP + SP + OB);
+            pw.println(SP_8 + "return" + SP + p.getName() + indxbr(d) + SC);
+            pw.println(SP_4 + CB);
             pw.println();
         }
 
-        pw.print(sp4 + "public " + p.getType() + sp + "get" + capitalize(p.getName()));
-        pw.println(lp + rp + sp + ob);
-        pw.println(sp8 + "return" + sp + p.getName() + sc);
-        pw.println(sp4 + cb);
+        pw.print(SP_4 + "public " + p.getType() + SP + "get" + capitalize(p.getName()));
+        pw.println(LP + RP + SP + OB);
+        pw.println(SP_8 + "return" + SP + p.getName() + SC);
+        pw.println(SP_4 + CB);
         pw.println();
     }
 
@@ -315,14 +354,14 @@ public class SimkitXML2Java {
 
         // Assume this is a subclass of some SimEntityBase which should already
         // have a toString()
-        if (!extendz.contains("SimEntityBase")) {return;}
+        if (!extendz.contains(SIM_ENTITY_BASE)) {return;}
 
         PrintWriter pw = new PrintWriter(toStringBlock);
-        pw.println(sp4 + "@Override");
-        pw.print(sp4 + "public String toString");
-        pw.println(lp + rp + sp + ob);
-        pw.println(sp8 + "return" + sp + "getClass().getName()" + sc);
-        pw.println(sp4 + cb);
+        pw.println(SP_4 + "@Override");
+        pw.print(SP_4 + "public String toString");
+        pw.println(LP + RP + SP + OB);
+        pw.println(SP_8 + "return" + SP + "getClass().getName()" + SC);
+        pw.println(SP_4 + CB);
     }
 
     private int dims(String t) {
@@ -340,7 +379,7 @@ public class SimkitXML2Java {
         String inds = "";
 
         for (int k = 0; k < dims; k++) {
-            inds += "int" + sp + "i" + k + cm + sp;
+            inds += "int" + SP + "i" + k + CM + SP;
         }
         return inds;
     }
@@ -356,7 +395,7 @@ public class SimkitXML2Java {
         String inds = "";
 
         for (int k = 0; k < dims; k++) {
-            inds += lb + "i" + k + rb;
+            inds += LB + "i" + k + RB;
         }
         return inds;
     }
@@ -372,28 +411,28 @@ public class SimkitXML2Java {
             clStr = ".clone()";
 
             if (!isArray(s.getType()) || isGeneric(s.getType())) {
-                tyStr = lp + stripLength(s.getType()) + rp;
+                tyStr = LP + stripLength(s.getType()) + RP;
             }
 
             // Supress warning call to unchecked cast
             if (isGeneric(s.getType())) {
-                pw.println(sp4 + "@SuppressWarnings(\"unchecked\")");
+                pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
             }
         }
 
         if (isArray(s.getType()) && !isGeneric(s.getType())) {
             int d = dims(s.getType());
-            pw.print(sp4 + "public" + sp + baseOf(s.getType()) + sp + "get");
-            pw.print(capitalize(s.getName()) + lp + indxncm(d));
-            pw.println(rp + sp + ob);
-            pw.println(sp8 + "return" + sp + s.getName() + indxbr(d) + sc);
-            pw.println(sp4 + cb);
+            pw.print(SP_4 + PUBLIC + SP + baseOf(s.getType()) + SP + "get");
+            pw.print(capitalize(s.getName()) + LP + indxncm(d));
+            pw.println(RP + SP + OB);
+            pw.println(SP_8 + "return" + SP + s.getName() + indxbr(d) + SC);
+            pw.println(SP_4 + CB);
             pw.println();
         } else {
-            pw.print(sp4 + "public " + stripLength(s.getType()) + sp + "get" + capitalize(s.getName()));
-            pw.println(lp + rp + sp + ob);
-            pw.println(sp8 + "return" + sp + (tyStr + sp + s.getName() + clStr).trim() + sc);
-            pw.println(sp4 + cb);
+            pw.print(SP_4 + "public " + stripLength(s.getType()) + SP + "get" + capitalize(s.getName()));
+            pw.println(LP + RP + SP + OB);
+            pw.println(SP_8 + "return" + SP + (tyStr + SP + s.getName() + clStr).trim() + SC);
+            pw.println(SP_4 + CB);
             pw.println();
         }
     }
@@ -402,74 +441,73 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
 
-        pw.println();
-        pw.println(sp4 + "@viskit.ParameterMap" + sp + lp);
-        pw.print(sp8 + "names =" + sp + ob);
+        pw.println(SP_4 + "@viskit.ParameterMap" + SP + LP);
+        pw.print(SP_8 + "names =" + SP + OB);
         for (Parameter pt : liParams) {
-            pw.print(qu + pt.getName() + qu);
+            pw.print(QU + pt.getName() + QU);
             if (liParams.indexOf(pt) < liParams.size() - 1) {
-                pw.print(cm);
+                pw.print(CM);
                 pw.println();
-                pw.print(sp8 + sp4);
+                pw.print(SP_8 + SP_4);
             }
         }
-        pw.println(cb + cm);
-        pw.print(sp8 + "types =" + sp + ob);
+        pw.println(CB + CM);
+        pw.print(SP_8 + "types =" + SP + OB);
         for (Parameter pt : liParams) {
-            pw.print(qu + pt.getType() + qu);
+            pw.print(QU + pt.getType() + QU);
             if (liParams.indexOf(pt) < liParams.size() - 1) {
-                pw.print(cm);
+                pw.print(CM);
                 pw.println();
-                pw.print(sp8 + sp4);
+                pw.print(SP_8 + SP_4);
             }
         }
-        pw.println(cb);
-        pw.println(sp4 + rp);
+        pw.println(CB);
+        pw.println(SP_4 + RP);
         pw.println();
-        pw.println(sp4 + "/** Creates a new default instance of " + this.root.getName() + " */");
+        pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
 
         // Generate a zero parameter (default) constructor in addition to a
         // parameterized constroctor
         if (!liParams.isEmpty()) {
-            pw.println(sp4 + "public " + this.root.getName() + lp + rp + sp + ob);
-            pw.println(sp4 + cb);
+            pw.println(SP_4 + "public " + this.root.getName() + LP + RP + SP + OB);
+            pw.println(SP_4 + CB);
             pw.println();
         }
 
         // Now, generate the parameterized or zero parameter consructor
-        pw.print(sp4 + "public " + this.root.getName() + lp);
+        pw.print(SP_4 + "public " + this.root.getName() + LP);
         for (Parameter pt : liParams) {
 
-            pw.print(pt.getType() + sp + shortinate(pt.getName()));
+            pw.print(pt.getType() + SP + shortinate(pt.getName()));
 
             if (liParams.size() > 1) {
                 if (liParams.indexOf(pt) < liParams.size() - 1) {
-                    pw.print(cm);
+                    pw.print(CM);
                     pw.println();
-                    pw.print(sp8 + sp4);
+                    pw.print(SP_8 + SP_4);
                 }
             }
         }
 
-        pw.println(rp + sp + ob);
+        pw.println(RP + SP + OB);
 
-        if (!extendz.contains("SimEntityBase")) {
+        if (!extendz.contains(SIM_ENTITY_BASE)) {
 
-            pw.print(sp8 + "super" + lp);
+            pw.print(SP_8 + "super" + LP);
             for (Parameter pt : superParams) {
                 pw.print(shortinate(pt.getName()));
                 if ((superParams.size() > 1) && (superParams.indexOf(pt) < superParams.size() - 1)) {
-                    pw.print(cm);
+                    pw.print(CM);
                 }
             }
-            pw.println(rp + sc);
+            pw.println(RP + SC);
         }
 
         // skip over any sets that would get done in the superclass
         for (int l = superParams.size(); l < liParams.size(); l++) {
 
             Parameter pt = liParams.get(l);
-            pw.println(sp8 + "set" + capitalize(pt.getName()) + lp + shortinate(pt.getName()) + rp + sc);
+            pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
         }
 
         // create new arrays, if any
@@ -482,11 +520,11 @@ public class SimkitXML2Java {
          */
         for (StateVariable st : liStateV) {
             if (isArray(st.getType()) && !isGeneric(st.getType())) {
-                pw.println(sp8 + st.getName() + sp + eq + sp + "new" + sp + st.getType() + sc);
+                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + st.getType() + SC);
             }
         }
 
-        pw.println(sp4 + cb);
+        pw.println(SP_4 + CB);
         pw.println();
     }
 
@@ -512,19 +550,19 @@ public class SimkitXML2Java {
 
         /* Handle the reset method */
 
-        pw.println(sp4 + "/** Set initial values of all state variables */");
-        pw.println(sp4 + "@Override");
-        pw.println(sp4 + "public void reset() {");
-        pw.println(sp8 + "super.reset()" + sc);
+        pw.println(SP_4 + JDO + SP + "Sets initial values of all state variables" + SP + JDC);
+        pw.println(SP_4 + "@Override");
+        pw.println(SP_4 + "public void reset() {");
+        pw.println(SP_8 + "super.reset()" + SC);
 
         pw.println();
 
         for (LocalVariable local : liLocalV) {
-            pw.println(sp8 + local.getType() + sp + local.getName() + sc);
+            pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
 
         pw.println();
-        pw.println(sp8 + "/* StateTransitions for the Run Event */");
+        pw.println(SP_8 + "/* StateTransitions for the Run Event */");
 
         List<StateTransition> liStateT = run.getStateTransition();
 
@@ -537,56 +575,57 @@ public class SimkitXML2Java {
              * array types.
              */
             boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
-            String sps = isar ? sp12 : sp8;
+            String sps = isar ? SP_12 : SP_8;
             String in = indexFrom(st);
 
             if (isar) {
-                pw.print(sp8 + "for (" + in + sp + eq + sp + "0; " + in + " < " + sv.getName() + pd + "length");
-                pw.println(sc + sp + in + "++" + rp + sp + ob);
-                pw.print(sps + sv.getName() + lb + in + rb);
+                pw.print(SP_8 + "for (" + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length");
+                pw.println(SC + SP + in + "++" + RP + SP + OB);
+                pw.print(sps + sv.getName() + LB + in + RB);
             } else {
                 pw.print(sps + sv.getName());
             }
 
             if (ops != null) {
-                pw.println(pd + ops.getMethod() + sc);
+                pw.println(PD + ops.getMethod() + SC);
             } else if (asg != null) {
-                pw.println(sp + eq + sp + asg.getValue() + sc);
+                pw.println(SP + EQ + SP + asg.getValue() + SC);
             }
 
             if (isar) {
-                pw.println(sp8 + cb);
+                pw.println(SP_8 + CB);
             }
         }
 
-        pw.println(sp4 + cb);
+        pw.println(SP_4 + CB);
         pw.println();
 
         /* Handle the doRun method */
 
-        Class<?> sup = resolveExtensionClass();
         Method doRun = null;
 
         // check if super has a doRun()
-        if (!extendz.contains("SimEntityBase")) {
+        if (!extendz.contains(SIM_ENTITY_BASE)) {
 
             try {
+                Class<?> sup = resolveExtensionClass();
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
             } catch (NoSuchMethodException cnfe) {
 //                log.error(cnfe);
             }
         }
 
+        pw.println(SP_4 + JDO + SP + "Resets initial values of all state variables" + SP + JDC);
         if (doRun != null) {
-            pw.println(sp4 + "@Override");
-            pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
-            pw.println(sp8 + "super.doRun" + lp + rp + sc);
+            pw.println(SP_4 + "@Override");
+            pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
+            pw.println(SP_8 + "super.doRun" + LP + RP + SC);
         } else {
-            pw.println(sp4 + "public void doRun" + lp + rp + sp + ob);
+            pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
         }
 
         for (LocalVariable local : liLocalV) {
-            pw.println(sp8 + local.getType() + sp + local.getName() + (local.getValue() != null ? sp + eq + sp + local.getValue() + sc : sc));
+            pw.println(SP_8 + local.getType() + SP + local.getName() + (local.getValue() != null ? SP + EQ + SP + local.getValue() + SC : SC));
         }
 
         pw.println();
@@ -598,23 +637,23 @@ public class SimkitXML2Java {
 
             boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
 
-            pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu);
+            pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU);
 
             // Give these FPC "getters" as arguments
             String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
-            String stateVariableGetter = "get" + stateVariableName + lp;
+            String stateVariableGetter = "get" + stateVariableName + LP;
 
             if (isar) {
                 if (ops != null) {
-                    stateVariableGetter += rp + pd + ops.getMethod();
+                    stateVariableGetter += RP + PD + ops.getMethod();
                 } else if (asg != null) {
-                    stateVariableGetter += asg.getValue() + rp;
+                    stateVariableGetter += asg.getValue() + RP;
                 }
             } else {
-                stateVariableGetter += rp;
+                stateVariableGetter += RP;
             }
 
-            pw.println(cm + sp + stateVariableGetter + rp + sc);
+            pw.println(CM + SP + stateVariableGetter + RP + SC);
         }
 
         for (Object o : liSchedCanc) {
@@ -629,8 +668,8 @@ public class SimkitXML2Java {
         if (run.getCode() != null) {
             x = run.getCode();
         }
-        pw.println(sp8 + x);
-        pw.println(sp4 + cb);
+        pw.println(SP_8 + x);
+        pw.println(SP_4 + CB);
         pw.println();
     }
 
@@ -646,32 +685,35 @@ public class SimkitXML2Java {
         List<LocalVariable> liLocalV = e.getLocalVariable();
         List<Object> liSchedCanc = e.getScheduleOrCancel();
 
-        Class<?> sup = resolveExtensionClass();
         Method superMethod = null;
 
-        try {
-            superMethod = sup.getDeclaredMethod("do" + e.getName(), new Class<?>[]{});
-        } catch (NoSuchMethodException cnfe) {
+        // check if super has a doEventName()
+        if (!extendz.contains(SIM_ENTITY_BASE)) {
+            try {
+                Class<?> sup = resolveExtensionClass();
+                superMethod = sup.getDeclaredMethod("do" + e.getName(), new Class<?>[]{});
+            } catch (NoSuchMethodException cnfe) {
 //            log.error(cnfe);
+            }
         }
 
         if (superMethod != null) {
-            pw.println(sp4 + "@Override");
-            pw.println(sp4 + "public void do" + e.getName() + lp + rp + sp + ob);
-            pw.println(sp8 + "super.do" + e.getName() + lp + rp + sc);
+            pw.println(SP_4 + "@Override");
+            pw.println(SP_4 + "public void do" + e.getName() + LP + RP + SP + OB);
+            pw.println(SP_8 + "super.do" + e.getName() + LP + RP + SC);
             pw.println();
         } else {
-            pw.print(sp4 + "public void do" + e.getName() + lp);
+            pw.print(SP_4 + "public void do" + e.getName() + LP);
 
             for (Argument a : liArgs) {
-                pw.print(a.getType() + sp + a.getName());
+                pw.print(a.getType() + SP + a.getName());
                 if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
-                    pw.print(cm + sp);
+                    pw.print(CM + SP);
                 }
             }
 
             // finish the method decl
-            pw.println(rp + sp + ob);
+            pw.println(RP + SP + OB);
         }
 
         // local variable decls
@@ -681,12 +723,12 @@ public class SimkitXML2Java {
             if (!("".equals(value))) {
                 lines = value.split("\\;");
             }
-            pw.print(sp8 + local.getType() + sp + local.getName() + sp + eq);
+            pw.print(SP_8 + local.getType() + SP + local.getName() + SP + EQ);
 
             // reduce redundant casts
-            pw.println(sp + lines[0].trim() + sc);
+            pw.println(SP + lines[0].trim() + SC);
             for (int i = 1; i < lines.length; i++) {
-                pw.println(sp8 + lines[i].trim() + sc);
+                pw.println(SP_8 + lines[i].trim() + SC);
             }
         }
 
@@ -695,12 +737,12 @@ public class SimkitXML2Java {
         }
 
         if (e.getCode() != null) {
-            pw.println(sp8 + "/* Code insertion for Event " + e.getName() + " */");
+            pw.println(SP_8 + "/* Code insertion for Event " + e.getName() + " */");
             String[] lines = e.getCode().split("\\n");
             for (String line : lines) {
-                pw.println(sp8 + line);
+                pw.println(SP_8 + line);
             }
-            pw.println(sp8 + "/* End Code insertion */");
+            pw.println(SP_8 + "/* End Code insertion */");
             pw.println();
         }
 
@@ -713,9 +755,9 @@ public class SimkitXML2Java {
             String olds = ""; // old decl line Bar oldFoo ...
             String oldName = sv.getName(); // oldFoo
             if (ops != null) {
-                change = pd + ops.getMethod() + sc;
+                change = PD + ops.getMethod() + SC;
             } else if (asg != null) {
-                change = sp + eq + sp + asg.getValue() + sc;
+                change = SP + EQ + SP + asg.getValue() + SC;
             }
             oldName = "_old_" + oldName.substring(0, 1).toUpperCase() + oldName.substring(1);
             if (!decls.contains(oldName)) {
@@ -728,13 +770,13 @@ public class SimkitXML2Java {
                     baseName = olds.split("\\[");
                     olds = baseName[0];
                 }
-                olds += sp;
+                olds += SP;
             }
 
             // by now, olds is "Bar" ( not Bar[] )
             // or nothing if alreadyDecld
             // now build up "Bar oldFoo = getFoo()"
-            String getter = oldName + sp + eq + sp + "get" + oldName.substring(5) + lp;
+            String getter = oldName + SP + EQ + SP + "get" + oldName.substring(5) + LP;
             if ("".equals(olds)) {
                 olds = getter;
             } else {
@@ -746,27 +788,27 @@ public class SimkitXML2Java {
             if (isArray(sv.getType()) && !isGeneric(olds)) {
                 olds += indexFrom(st);
             }
-            olds += rp + sc;
+            olds += RP + SC;
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
-            olds += sv.getName() + ((isArray(sv.getType()) && !isGeneric(sv.getType())) ? lb + indexFrom(st) + rb : "") + change;
+            olds += sv.getName() + ((isArray(sv.getType()) && !isGeneric(sv.getType())) ? LB + indexFrom(st) + RB : "") + change;
             String[] lines = olds.split("\\;");
             // format it
             for (int i = 0; i < lines.length; i++) {
                 if (i == 0) {
-                    pw.println(sp8 + "/* StateTransition for " + sv.getName() + " */");
+                    pw.println(SP_8 + "/* StateTransition for " + sv.getName() + " */");
                 } else if (i == 2) {
-                    pw.println(sp8 + "/* Code block for pre-transition */");
+                    pw.println(SP_8 + "/* Code block for pre-transition */");
                 }
-                pw.println(sp8 + lines[i] + sc);
+                pw.println(SP_8 + lines[i] + SC);
             }
             if (isArray(sv.getType()) && !isGeneric(sv.getType())) {
-                pw.print(sp8 + "fireIndexedPropertyChange" + lp + indexFrom(st));
-                pw.print(cm + sp + qu + sv.getName() + qu + cm);
-                pw.println(oldName + cm + sp + "get" + oldName.substring(5) + lp + indexFrom(st) + rp + rp + sc);
+                pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(st));
+                pw.print(CM + SP + QU + sv.getName() + QU + CM);
+                pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + indexFrom(st) + RP + RP + SC);
             } else {
-                pw.print(sp8 + "firePropertyChange" + lp + qu + sv.getName() + qu + cm + sp);
-                pw.println(oldName + cm + sp + "get" + oldName.substring(5) + lp + rp + rp + sc);
+                pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU + CM + SP);
+                pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + RP + RP + SC);
             }
             pw.println();
         }
@@ -779,7 +821,7 @@ public class SimkitXML2Java {
                 doCancel((Cancel) o, e, pw);
             }
         }
-        pw.println(sp4 + cb);
+        pw.println(SP_4 + CB);
         pw.println();
     }
 
@@ -787,11 +829,11 @@ public class SimkitXML2Java {
         String condent = "";
 
         if (s.getCondition() != null) {
-            condent = sp4;
-            pw.println(sp8 + "if" + sp + lp + s.getCondition() + rp + sp + ob);
+            condent = SP_4;
+            pw.println(SP_8 + "if" + SP + LP + s.getCondition() + RP + SP + OB);
         }
 
-        pw.print(sp8 + condent + "waitDelay" + lp + qu + ((Event) s.getEvent()).getName() + qu + cm + sp);
+        pw.print(SP_8 + condent + "waitDelay" + LP + QU + ((Event) s.getEvent()).getName() + QU + CM + SP);
 
         // according to schema to meet Priority class definition, the following
         // tags should be permitted:
@@ -799,28 +841,28 @@ public class SimkitXML2Java {
         // however, historically these could be numbers.
 
         // Bugfix 1400: These should now be eneumerations instead of FP values
-        pw.print(s.getDelay() + cm + " Priority" + pd + s.getPriority());
+        pw.print(s.getDelay() + CM + " Priority" + PD + s.getPriority());
 
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
         for (EdgeParameter ep : s.getEdgeParameter()) {
-            pw.print(cm + " (Object) ");
+            pw.print(CM + " (Object) ");
 
             String epValue = ep.getValue();
 
             // Cover case where there is a "+ 1" increment, or "-1" decrement on a value
             if (epValue.contains("+") || epValue.contains("-")) {
-                pw.print(lp + ep.getValue() + rp);
+                pw.print(LP + ep.getValue() + RP);
             } else {
                 pw.print(ep.getValue());
             }
         }
 
-        pw.println(rp + sc);
+        pw.println(RP + SC);
 
         if (s.getCondition() != null) {
-            pw.println(sp8 + cb);
+            pw.println(SP_8 + CB);
         }
     }
 
@@ -830,18 +872,18 @@ public class SimkitXML2Java {
         Event event = (Event) c.getEvent();
 
         if (c.getCondition() != null) {
-            condent = sp4;
-            pw.println(sp8 + "if" + sp + lp + c.getCondition() + rp + sp + ob);
+            condent = SP_4;
+            pw.println(SP_8 + "if" + SP + LP + c.getCondition() + RP + SP + OB);
         }
 
-        pw.print(sp8 + condent + "interrupt" + lp + qu + event.getName() + qu);
+        pw.print(SP_8 + condent + "interrupt" + LP + QU + event.getName() + QU);
         for (EdgeParameter ep : liEdgeP) {
-            pw.print(cm + sp + "(Object)" + ep.getValue());
+            pw.print(CM + SP + "(Object)" + ep.getValue());
         }
-        pw.print(rp + sc);
+        pw.print(RP + SC);
         pw.println();
         if (c.getCondition() != null) {
-            pw.println(sp8 + cb);
+            pw.println(SP_8 + CB);
         }
     }
 
@@ -849,14 +891,14 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(t);
         String code = root.getCode();
         if (code != null) {
-            pw.println(sp4 + "/* Inserted code for " + this.root.getName() + " */");
+            pw.println(SP_4 + "/* Inserted code for " + this.root.getName() + " */");
             String[] lines = code.split("\\n");
             for (String codeLines : lines) {
-                pw.println(sp4 + codeLines);
+                pw.println(SP_4 + codeLines);
             }
-            pw.println(sp4 + "/* End inserted code */");
+            pw.println(SP_4 + "/* End inserted code */");
         }
-        pw.println(cb);
+        pw.println(CB);
     }
 
     void buildSource(StringBuilder source, StringWriter head, StringWriter vars,
@@ -890,8 +932,8 @@ public class SimkitXML2Java {
         if (!isArray(s)) {
             return s;
         }
-        left = s.indexOf(lb);
-        right = s.indexOf(rb);
+        left = s.indexOf(LB);
+        right = s.indexOf(RB);
         return s.substring(0, left + 1) + s.substring(right);
     }
 
@@ -918,7 +960,7 @@ public class SimkitXML2Java {
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> localSuperParams = new ArrayList<>();
-        if (extendz.contains("SimEntityBase") || extendz.contains("BasicSimEntity")) {
+        if (extendz.contains(SIM_ENTITY_BASE) || extendz.contains("BasicSimEntity")) {
             return localSuperParams;
         }
 
@@ -993,15 +1035,15 @@ public class SimkitXML2Java {
     }
 
     private String baseOf(String s) {
-        return s.substring(0, s.indexOf(lb));
+        return s.substring(0, s.indexOf(LB));
     }
 
     private String indexIn(String s) {
-        return s.substring(s.indexOf(lb) + 1, s.indexOf(rb) - 1);
+        return s.substring(s.indexOf(LB) + 1, s.indexOf(RB) - 1);
     }
 
     private String baseNameOf(String s) {
-        return s.substring(0, s.indexOf(pd));
+        return s.substring(0, s.indexOf(PD));
     }
 
     private boolean isCloneable(String c) {
@@ -1021,7 +1063,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isArray(String c) {
-        return (c.indexOf(rb) > 0);
+        return (c.indexOf(RB) > 0);
     }
 
     /** Report and exit the JVM
