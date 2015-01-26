@@ -236,8 +236,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.EDGEADDED:
                 vGModel.addEdge((SchedulingEdge) ev.getSource());
                 break;
-            case ModelEvent.CANCELLINGEDGEADDED:
-                vGModel.addCancelEdge((CancellingEdge) ev.getSource());
+            case ModelEvent.CANCELINGEDGEADDED:
+                vGModel.addCancelEdge((CancelingEdge) ev.getSource());
                 break;
             case ModelEvent.EVENTCHANGED:
                 vGModel.changeEvent((EventNode) ev.getSource());
@@ -251,11 +251,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.EDGEDELETED:
                 vGModel.deleteEdge((SchedulingEdge) ev.getSource());
                 break;
-            case ModelEvent.CANCELLINGEDGECHANGED:
-                vGModel.changeCancellingEdge((CancellingEdge) ev.getSource());
+            case ModelEvent.CANCELINGEDGECHANGED:
+                vGModel.changeCancelingEdge((CancelingEdge) ev.getSource());
                 break;
-            case ModelEvent.CANCELLINGEDGEDELETED:
-                vGModel.deleteCancellingEdge((CancellingEdge) ev.getSource());
+            case ModelEvent.CANCELINGEDGEDELETED:
+                vGModel.deleteCancelingEdge((CancelingEdge) ev.getSource());
                 break;
             default:
                 //System.out.println("duh");
@@ -514,7 +514,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     return null;
                 }
                 return null;  // bug 675 "S";
-            } else if (e instanceof CancellingEdge) // should always be one of these 2 except for proto examples
+            } else if (e instanceof CancelingEdge) // should always be one of these 2 except for proto examples
             {
                 return null;
             }
@@ -864,7 +864,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         return menu;
     }
 
-    // Insert a new Edge between source and target
+    /** Inserts a new Edge between source and target nodes
+     *
+     * @param source the source node
+     * @param target the target node
+     */
     public void connect(Port source, Port target) {
 
         DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
@@ -872,9 +876,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         Object[] oa = new Object[]{src, tar};
         EventGraphController controller = (EventGraphController) parent.getController();
         if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
-            controller.buildNewCancelArc(oa);
+            controller.buildNewCancelingArc(oa);
         } else {
-            controller.buildNewArc(oa);
+            controller.buildNewSchedulingArc(oa);
         }
     }
 

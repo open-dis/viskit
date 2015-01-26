@@ -10,6 +10,16 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Implemented a self-referential drag and drop, or menu selected canceling edge
+  option for the EG editor.
+
+  Implemented an extension feature for EGs.  Instead of extending the default
+  SimEntityBase, type in your SimEntityBase subclass name instead when creating
+  a new event graph, i.e. extends ArrivalProcess.
+
+  Fixed an issue where and IllegalStateException would occur when added a
+  simkit.random.RandomVariate to the parameter list
+
   Fixed an issue with not being able to use normal java package naming
   conventions when crafting EG package names
 
@@ -49,8 +59,8 @@ the Assy Editor tab.
 
   Fixed timing issue when an Assembly file is given as an argument at startup
   which firsts loads associated Event Graphs, but the Assembly was being
-  compiled before the Event Graphs finished causing ClassLoader issues due to
-  the Assembly being compiled in a separate ClassLoader.
+  compiled before the Event Graphs finished loading causing ClassLoader issues
+  due to the Assembly being compiled in a separate ClassLoader.
 
   Shortened the path names for the LEGOs tree to be more readable.  If the user
   does not select the Analyst Report tab to be visible, then the Enable Analyst

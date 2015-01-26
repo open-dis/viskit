@@ -72,9 +72,14 @@ public interface Model {
      */
     void newEvent(String nodeName, Point2D p);
 
-    void newEdge(EventNode src, EventNode target);
+    /** Models a scheduling edge between two nodes
+     *
+     * @param src the source node
+     * @param target the target node
+     */
+    void newSchedulingEdge(EventNode src, EventNode target);
 
-    void newCancelEdge(EventNode src, EventNode target);
+    void newCancelingEdge(EventNode src, EventNode target);
 
     /**
      * Delete the referenced event, also deleting attached edges.
@@ -83,13 +88,13 @@ public interface Model {
      */
     void deleteEvent(EventNode node);
 
-    void deleteEdge(SchedulingEdge edge);
+    void deleteSchedulingEdge(SchedulingEdge edge);
 
-    void deleteCancelEdge(CancellingEdge edge);
+    void deleteCancelingEdge(CancelingEdge edge);
 
-    void changeEdge(SchedulingEdge e);
+    void changeSchedulingEdge(SchedulingEdge e);
 
-    void changeCancelEdge(CancellingEdge e);
+    void changeCancelingEdge(CancelingEdge e);
 
     /** Modifies the properties of this EG model
      *

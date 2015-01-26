@@ -13,7 +13,7 @@ import java.util.List;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class CancellingEdge extends Edge {
+public class CancelingEdge extends Edge {
     private String type;
     private List<String> descriptionArray = new ArrayList<>();
     private String name;
@@ -26,14 +26,14 @@ public class CancellingEdge extends Edge {
     private String comment;
     private String stateVarType;
 
-    CancellingEdge() //package-limited
+    CancelingEdge() //package-limited
     {
         parameters = new ArrayList<>();
     }
 
     @Override
     Object copyShallow() {
-        CancellingEdge ce = new CancellingEdge();
+        CancelingEdge ce = new CancelingEdge();
         ce.opaqueViewObject = opaqueViewObject;
         ce.to = to;
         ce.from = from;

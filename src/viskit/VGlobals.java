@@ -798,7 +798,7 @@ public class VGlobals {
         JMenuItem mi;
 
         for (int i = 0; i < morePackages.length; i++) {
-            if (moreClasses[i].length <= 0) {           // if no classes, make the "package selectable
+            if (moreClasses[i].length <= 0) {           // if no classes, make the "package" selectable
                 mi = new MyJMenuItem(morePackages[i], null);
                 mi.addActionListener(myListener);
                 popup.add(mi);
@@ -1026,13 +1026,23 @@ public class VGlobals {
         public void actionPerformed(ActionEvent e) {
             Object o = e.getSource();
             if (o instanceof JComboBox) {
-                JComboBox cb = (JComboBox) o;
+                final JComboBox cb = (JComboBox) o;
                 pending = cb;
                 if (cb.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
-                    if (popup.isShowing())
+                    if (!popup.isShowing()) {
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run() {
+                                popup.setVisible(true);
+                                popup.show(cb, 0, 0);
+                            }
+                        };
+                        SwingUtilities.invokeLater(r);
+                    } else {
                         popup.show(cb, 0, 0);
+                    }
                 }
             } else {
                 MyJMenuItem mi = (MyJMenuItem) o;

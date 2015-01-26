@@ -592,7 +592,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // Don't allow a new event graph to be created is a current project is
         // not open
         if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
-        
+
         GraphMetaData oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
         if (viskitAssemblyModel != null) {
@@ -782,7 +782,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
-
     }
 
     /**

@@ -201,6 +201,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
     }
 
+    /** to be called after all entities have been added as a super()
+     *  note not using template version of ArrayList...
+     */
     protected abstract void createSimEntities();
 
     protected abstract void createReplicationStats();
@@ -245,15 +248,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     designPointStats[ix] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[ix]).getName() + typeStat);
                     LOG.debug(designPointStats[ix]);
                     ix++;
-                } catch (NoSuchMethodException ex) {
-                    LOG.error(ex);
-                } catch (SecurityException ex) {
-                    LOG.error(ex);
-                } catch (IllegalAccessException ex) {
-                    LOG.error(ex);
-                } catch (IllegalArgumentException ex) {
-                    LOG.error(ex);
-                } catch (InvocationTargetException ex) {
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     LOG.error(ex);
                 }
             }
@@ -596,7 +591,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         System.out.println("\nStopping at time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
-        Schedule.setVerbose(isVerbose());
+
         if (isSingleStep()) {
             Schedule.setSingleStep(isSingleStep());
         }
@@ -618,30 +613,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         SimEntity scenarioManager = null;
 
         runEntities = Schedule.getReruns();
+
+        // Convenience for Diskit if on the classpath
         for (SimEntity entity : runEntities) {
+
             if (entity.getName().equals("Clock") || entity.getName().equals("DISPinger")) {
                 timer = entity;
-
-            // Convenience for Diskit
             } else if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
                 // access the SM's numberOfReplications parameter setter
                 try {
                     Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
                     setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
-                } catch (IllegalArgumentException ex) {
-                    //ex.printStackTrace(); // nop, this is the default case
-                } catch (InvocationTargetException ex) {
-//                    ex.printStackTrace();
+                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error(ex);
-                } catch (IllegalAccessException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
-                } catch (SecurityException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
-                } catch (NoSuchMethodException ex) {
-                    //ex.printStackTrace(); // nop, this is the default case
                 }
             }
         }
@@ -652,7 +637,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             if (clockChecker && getVerboseReplication() >= 0) {
                 timer.waitDelay("Stop", 0.0);
             }
-            if (replication == getVerboseReplication()) {
+            if ((replication + 1) == getVerboseReplication()) {
                 Schedule.setVerbose(true);
                 Schedule.setReallyVerbose(true);
                 if (clockChecker) {
@@ -708,7 +693,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     for (SimEntity entity : simEntity) {
                         entity.setEventListID(newEventListId);
                     }
-                    Schedule.setReallyVerbose(true);
+
                     Schedule.stopSimulation();
                     Schedule.clearRerun();
                     for (SimEntity entity : runEntities) {
@@ -751,15 +736,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                     fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
                                 }
                                 ix++;
-                            } catch (NoSuchMethodException ex) {
-                                LOG.error(ex);
-                            } catch (SecurityException ex) {
-                                LOG.error(ex);
-                            } catch (IllegalAccessException ex) {
-                                LOG.error(ex);
-                            } catch (IllegalArgumentException ex) {
-                                LOG.error(ex);
-                            } catch (InvocationTargetException ex) {
+                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 LOG.error(ex);
                             }
                         }
@@ -778,18 +755,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Method doStop = scenarioManager.getClass().getMethod("doStopSimulation");
                     doStop.invoke(scenarioManager, getNumberReplications());
-                } catch (IllegalArgumentException ex) {
-                    //ex.printStackTrace();
-                } catch (InvocationTargetException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
-                } catch (IllegalAccessException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
-                } catch (SecurityException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
-                } catch (NoSuchMethodException ex) {
+                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
 //                    ex.printStackTrace();
                     LOG.error(ex);
                 }
@@ -813,19 +779,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), getPclNodeCache());
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);
-            } catch (ClassNotFoundException ex) {
-                LOG.error(ex);
-            } catch (InstantiationException ex) {
-                LOG.error(ex);
-            } catch (IllegalAccessException ex) {
-                LOG.error(ex);
-            } catch (SecurityException ex) {
-                LOG.error(ex);
-            } catch (NoSuchMethodException ex) {
-                LOG.error(ex);
-            } catch (IllegalArgumentException ex) {
-                LOG.error(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
                 LOG.error(ex);
 //                ex.printStackTrace();
             }

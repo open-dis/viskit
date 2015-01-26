@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
-import viskit.model.CancellingEdge;
+import viskit.model.CancelingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.SchedulingEdge;
@@ -75,7 +75,7 @@ public class vGraphModel extends DefaultGraphModel {
         changeEitherEdge(ed);
     }
 
-    public void changeCancellingEdge(CancellingEdge ed) {
+    public void changeCancelingEdge(CancelingEdge ed) {
         changeEitherEdge(ed);
     }
 
@@ -118,7 +118,7 @@ public class vGraphModel extends DefaultGraphModel {
         remove(new Object[]{e});
     }
 
-    public void deleteCancellingEdge(CancellingEdge edge) {
+    public void deleteCancelingEdge(CancelingEdge edge) {
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
         remove(new Object[]{e});
     }
@@ -133,7 +133,7 @@ public class vGraphModel extends DefaultGraphModel {
         _addEdgeCommon(se, viskitEdgeStyle);
     }
 
-    public void addCancelEdge(CancellingEdge ce) {
+    public void addCancelEdge(CancelingEdge ce) {
         _addEdgeCommon(ce, viskitCancelEdgeStyle);
     }
 

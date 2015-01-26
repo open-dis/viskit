@@ -68,17 +68,20 @@ import viskit.view.dialog.EventInspectorDialog;
  * @version $Id$
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
+
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE = 0;
     public final static int ADD_NODE_MODE = 1;
     public final static int ARC_MODE = 2;
     public final static int CANCEL_ARC_MODE = 3;
     public final static int SELF_REF_MODE = 4;
+    public final static int SELF_REF_CANCEL_MODE = 5;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar
     private JLabel addEvent;
     private JLabel addSelfRef;
+    private JLabel addSelfCancelRef;
     private JToggleButton selectMode;
     private JToggleButton arcMode;
     private JToggleButton cancelArcMode;
@@ -123,16 +126,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (selectMode.isSelected()) {
             return SELECT_MODE;
         }
-        //if (addEvent.isSelected() == true) return ADD_NODE_MODE;
         if (arcMode.isSelected()) {
             return ARC_MODE;
         }
         if (cancelArcMode.isSelected()) {
             return CANCEL_ARC_MODE;
         }
-        //if (selfRefMode.isSelected() == true) return SELF_REF_MODE;
-        // If none of them are selected we're in serious trouble.
-        //assert false : "getCurrentMode()";
+
         System.err.println("assert false : \"getCurrentMode()\"");
         return 0;
     }
@@ -620,8 +620,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         fileMenu.addSeparator();
         fileMenu.add(buildMenuItem(vcontroller, "settings", "Settings", null, null));
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit",
-                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
+        fileMenu.add(quitMenuItem = buildMenuItem(vcontroller, "quit", "Exit", KeyEvent.VK_Q, KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
@@ -644,10 +643,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         editMenu.add(buildMenuItem(vcontroller, "newNode", "Add Event Node", KeyEvent.VK_N, null));
         editMenu.add(buildMenuItem(vcontroller, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S, null));
         editMenu.add(buildMenuItem(vcontroller, "newStateVariable", "Add State Variable...", KeyEvent.VK_V, null));
-        editMenu.add(buildMenuItem(vcontroller, "newSelfRefEdge", "Add Self-Referential Edge...", KeyEvent.VK_R, null));
+        editMenu.add(buildMenuItem(vcontroller, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_R, null));
+        editMenu.add(buildMenuItem(vcontroller, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // This starts off being disabled, until something is selectedTab
-        ActionIntrospector.getAction(vcontroller, "newSelfRefEdge").setEnabled(false);
+        ActionIntrospector.getAction(vcontroller, "newSelfRefSchedulingEdge").setEnabled(false);
+        ActionIntrospector.getAction(vcontroller, "newSelfRefCancelingEdge").setEnabled(false);
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(vcontroller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
@@ -741,19 +743,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
         addEvent.setIcon(new EventNodeIcon());
+
         addSelfRef = makeJLabel("viskit/images/selfArc.png",
                 "Drag onto an existing event node to add a self-referential scheduling edge");
-
         addSelfRef.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
+
+        addSelfCancelRef = makeJLabel("viskit/images/selfCancelArc.png",
+                "Drag onto an existing event node to add a self-referential caceling edge");
+        addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEtchedBorder(),
+                BorderFactory.createEmptyBorder(4, 4, 4, 4)));
+
         selectMode = makeJTButton(null, "viskit/images/selectNode.png",
                 "Select items on the graph");
+
         arcMode = makeJTButton(null, "viskit/images/schedArc.png",
                 "Connect nodes with a scheduling edge");
-        // TODO:  self-referential canceling edge?
-
         arcMode.setIcon(new SchedArcIcon());
+
         cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
                 "Connect nodes with a cancelling edge");
         cancelArcMode.setIcon(new CanArcIcon());
@@ -775,6 +784,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().add(addEvent);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(addSelfRef);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(addSelfCancelRef);
 
         getToolBar().addSeparator(new Dimension(24, 24));
 
@@ -813,6 +824,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         addEvent.addMouseListener(new DragMouseAdapter());
         addSelfRef.setTransferHandler(new TransferHandler("text"));
         addSelfRef.addMouseListener(new DragMouseAdapter());
+        addSelfCancelRef.setTransferHandler(new TransferHandler("text"));
+        addSelfCancelRef.addMouseListener(new DragMouseAdapter());
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
@@ -983,9 +996,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
     }
+
     final static int NODE_DRAG = 0;
     final static int SELF_REF_DRAG = 1;
+    final static int SELF_REF_CANCEL_DRAG = 2;
     private int dragger;
+
     // Two classes to support dragging and dropping on the graph
     class DragMouseAdapter extends MouseAdapter {
 
@@ -994,6 +1010,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             JComponent c = (JComponent) e.getSource();
             if (c == EventGraphViewFrame.this.addSelfRef) {
                 dragger = SELF_REF_DRAG;
+            } else if (c == EventGraphViewFrame.this.addSelfCancelRef) {
+                dragger = SELF_REF_CANCEL_DRAG;
             } else {
                 dragger = NODE_DRAG;
             }
@@ -1016,18 +1034,28 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void drop(DropTargetDropEvent e) {
             Point p = e.getLocation();  // subtract the size of the label
+
+            // get the node in question from the graph
+            Object o = getCurrentVgcw().getViskitElementAt(p);
+
             if (dragger == NODE_DRAG) {
                 Point pp = new Point(
                         p.x - addEvent.getWidth(),
                         p.y - addEvent.getHeight());
                 ((EventGraphController) getController()).buildNewNode(pp);
-            } else {
-                // get the node in question from the graph
-                Object o = getCurrentVgcw().getViskitElementAt(p);
+            } else if (dragger == SELF_REF_CANCEL_DRAG) {
+
                 if (o != null && o instanceof EventNode) {
                     EventNode en = (EventNode) o;
                     // We're making a self-referential arc
-                    ((EventGraphController) getController()).buildNewArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                    ((EventGraphController) getController()).buildNewCancelingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                }
+            } else {
+
+                if (o != null && o instanceof EventNode) {
+                    EventNode en = (EventNode) o;
+                    // We're making a self-referential arc
+                    ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
                 }
             }
         }
@@ -1160,7 +1188,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public boolean doEditCancelEdge(CancellingEdge edge) {
+    public boolean doEditCancelEdge(CancelingEdge edge) {
         selectMode.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), edge); // blocks
     }

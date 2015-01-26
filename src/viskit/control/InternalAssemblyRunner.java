@@ -428,7 +428,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
                 if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
                     Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-                
+
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                 log.error(ex);
             }

@@ -47,10 +47,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     public void createObjects() {
-        createSimEntities();
-        createReplicationStats();
-        createDesignPointStats();
-        createPropertyChangeListeners();
+        super.createObjects();
 
         /* After all PCLs have been created pass the LHMap to the super so that the
          * keys can be extracted for data output indexing. This method is used by
@@ -59,8 +56,6 @@ public class ViskitAssembly extends BasicAssembly {
         setStatisticsKeyValues(replicationStatistics);
     }
 
-    /** to be called after all entities have been added as a super() */
-    /*  note not using template version of ArrayList... */
     @Override
     protected void createSimEntities() {
         if (entities != null) {
@@ -96,11 +91,6 @@ public class ViskitAssembly extends BasicAssembly {
         for (PropertyChangeListener pcl : propertyChangeListener) {
             LOG.debug(pcl + " propertyChangeListener created");
         }
-    }
-
-    @Override
-    public void performHookups() {
-        super.performHookups();
     }
 
     @Override
@@ -173,7 +163,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
 
-     void connectSimEventListener(String listener, String source) {
+    void connectSimEventListener(String listener, String source) {
         getSimEntityByName(source).addSimEventListener(getSimEntityByName(listener));
     }
 

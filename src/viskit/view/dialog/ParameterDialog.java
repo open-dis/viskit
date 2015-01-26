@@ -86,10 +86,6 @@ public class ParameterDialog extends JDialog {
 
         parameterTypeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
-        //parameterTypeCombo = new JComboBox();
-        //parameterTypeCombo.setModel(VGlobals.instance().getTypeCBModel(parameterTypeCombo));
-        //                                       setMaxHeight(parameterTypeCombo);
-        //parameterTypeCombo.setEditable(true);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
         fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));

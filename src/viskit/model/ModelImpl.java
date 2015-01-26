@@ -500,7 +500,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private void buildCancelEdgeFromJaxb(EventNode src, Cancel ed) {
-        CancellingEdge ce = new CancellingEdge();
+        CancelingEdge ce = new CancelingEdge();
         ce.opaqueModelObject = ed;
         ce.conditional = ed.getCondition();
 
@@ -526,7 +526,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         edgeCache.put(ed, ce);
         setDirty(true);
 
-        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Cancelling edge added"));
+        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling edge added"));
     }
 
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
@@ -971,7 +971,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     // ---------
 
     @Override
-    public void newEdge(EventNode src, EventNode target) {
+    public void newSchedulingEdge(EventNode src, EventNode target) {
         SchedulingEdge se = new SchedulingEdge();
         se.from = src;
         se.to = target;
@@ -1005,8 +1005,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void newCancelEdge(EventNode src, EventNode target) {
-        CancellingEdge ce = new CancellingEdge();
+    public void newCancelingEdge(EventNode src, EventNode target) {
+        CancelingEdge ce = new CancelingEdge();
         ce.from = src;
         ce.to = target;
         src.getConnections().add(ce);
@@ -1033,11 +1033,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         this.edgeCache.put(can, ce);
         setDirty(true);
 
-        this.notifyChanged(new ModelEvent(ce, ModelEvent.CANCELLINGEDGEADDED, "Edge added"));
+        this.notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Edge added"));
     }
 
     @Override
-    public void deleteEdge(SchedulingEdge edge) {
+    public void deleteSchedulingEdge(SchedulingEdge edge) {
         _commonEdgeDelete(edge);
 
         setDirty(true);
@@ -1057,15 +1057,15 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void deleteCancelEdge(CancellingEdge edge) {
+    public void deleteCancelingEdge(CancelingEdge edge) {
         _commonEdgeDelete(edge);
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGEDELETED, "Cancelling edge deleted"));
+        this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
     }
 
     @Override
-    public void changeEdge(SchedulingEdge e) {
+    public void changeSchedulingEdge(SchedulingEdge e) {
         Schedule sch = (Schedule) e.opaqueModelObject;
         sch.setCondition(e.conditional);
         sch.getComment().clear();
@@ -1088,7 +1088,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void changeCancelEdge(CancellingEdge e) {
+    public void changeCancelingEdge(CancelingEdge e) {
         Cancel can = (Cancel) e.opaqueModelObject;
         can.setCondition(e.conditional);
         can.setEvent(e.to.opaqueModelObject);
@@ -1103,7 +1103,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELLINGEDGECHANGED, "Cancelling edge changed"));
+        this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELINGEDGECHANGED, "Canceling edge changed"));
     }
 
     /**

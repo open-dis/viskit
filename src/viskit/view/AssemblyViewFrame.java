@@ -336,7 +336,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // TODO: Unknown what this exactly does
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
@@ -345,7 +345,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
 
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK)));
+        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q, KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");

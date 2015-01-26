@@ -35,9 +35,9 @@ public class ModelEvent extends mvcModelEvent
   public static final int EDGEDELETED = 11;
   public static final int EDGECHANGED = 12;
 
-  public static final int CANCELLINGEDGEADDED = 13;
-  public static final int CANCELLINGEDGEDELETED = 14;
-  public static final int CANCELLINGEDGECHANGED = 15;
+  public static final int CANCELINGEDGEADDED = 13;
+  public static final int CANCELINGEDGEDELETED = 14;
+  public static final int CANCELINGEDGECHANGED = 15;
 
   public static final int CODEBLOCKCHANGED = 16;
 

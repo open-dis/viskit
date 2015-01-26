@@ -118,7 +118,7 @@ public class EdgeInspectorDialog extends JDialog {
         typePanel.add(Box.createHorizontalStrut(15));
         schedulingLabel = new JLabel("<html><b>Scheduling");
         BoxLayoutUtils.clampWidth(schedulingLabel);
-        cancellingLabel = new JLabel("<html><b>Cancelling");
+        cancellingLabel = new JLabel("<html><b>Canceling");
         BoxLayoutUtils.clampWidth(cancellingLabel);
         typePanel.add(schedulingLabel);
         typePanel.add(cancellingLabel);

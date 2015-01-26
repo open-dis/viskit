@@ -23,7 +23,7 @@ public interface EventGraphView {
      * @param edge the canceling edge to edit
      * @return successful or not
      */
-    boolean doEditCancelEdge(CancellingEdge edge);
+    boolean doEditCancelEdge(CancelingEdge edge);
 
     boolean doEditEdge(SchedulingEdge edge);
 

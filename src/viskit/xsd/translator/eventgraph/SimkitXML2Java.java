@@ -49,6 +49,7 @@ public class SimkitXML2Java {
 
     private String extendz = "";
     private String className = "";
+    private String packageName = "";
     private File eventGraphFile;
 
     private List<Parameter> superParams;
@@ -64,6 +65,11 @@ public class SimkitXML2Java {
         }
     }
 
+    public SimkitXML2Java(InputStream stream) {
+        this();
+        fileInputStream = stream;
+    }
+
     /**
      * Creates a new instance of SimkitXML2Java
      * when used from another class.  Instance this
@@ -71,19 +77,14 @@ public class SimkitXML2Java {
      * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
-        this();
-        fileBaseName = baseNameOf(xmlFile);
-        fileInputStream = VStatics.classForName(getClass().getName()).getClassLoader().getResourceAsStream(xmlFile);
-    }
-
-    public SimkitXML2Java(InputStream stream) {
-        this();
-        fileInputStream = stream;
+        this(VStatics.classForName(SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        setFileBaseName(new File(baseNameOf(xmlFile)).getName());
+        setEventGraphFile(new File(xmlFile));
     }
 
     public SimkitXML2Java(File f) throws FileNotFoundException {
         this(new FileInputStream(f));
-        fileBaseName = baseNameOf(f.getName());
+        setFileBaseName(baseNameOf(f.getName()));
         setEventGraphFile(f);
     }
 
@@ -148,10 +149,10 @@ public class SimkitXML2Java {
     }
 
     /**
-     *
-     * @param fileBaseName
+     * Set the base name of this XML file
+     * @param fileBaseName the base name of this XML file
      */
-    public void setFileBaseName(String fileBaseName) {
+    public final void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
     }
 
@@ -164,9 +165,10 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(head);
         className = this.root.getName();
-        String pkg = this.root.getPackage();
+        packageName = this.root.getPackage();
         extendz = this.root.getExtend();
         String implementz = this.root.getImplement();
+
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
         // if none exists with template methods, and
@@ -175,7 +177,7 @@ public class SimkitXML2Java {
             extendz += sp + "implements" + sp + implementz;
         }
 
-        pw.println("package " + pkg + sc);
+        pw.println("package " + packageName + sc);
         pw.println();
         pw.println("// Standard library imports");
         pw.println("import java.util.*;");
@@ -233,6 +235,8 @@ public class SimkitXML2Java {
             if (isGeneric(s.getType())) {
                 pw.println(sp4 + "protected" + sp + s.getType() + sp + s.getName() + sp + eq + sp + "new" + sp + s.getType() + lp + rp + sc);
             } else {
+
+                // TODO: This seems a baaad way to write out a non-generic varible
                 try {
                     c = Class.forName(s.getType(), true, VGlobals.instance().getWorkClassLoader());
                 } catch (ClassNotFoundException cnfe) {
@@ -308,6 +312,11 @@ public class SimkitXML2Java {
     }
 
     private void buildToString(StringWriter toStringBlock) {
+
+        // Assume this is a subclass of some SimEntityBase which should already
+        // have a toString()
+        if (!extendz.contains("SimEntityBase")) {return;}
+
         PrintWriter pw = new PrintWriter(toStringBlock);
         pw.println(sp4 + "@Override");
         pw.print(sp4 + "public String toString");
@@ -555,20 +564,14 @@ public class SimkitXML2Java {
 
         /* Handle the doRun method */
 
+        Class<?> sup = resolveExtensionClass();
         Method doRun = null;
 
         // check if super has a doRun()
         if (!extendz.contains("SimEntityBase")) {
 
             try {
-                Class<?> sup = Class.forName(extendz, true, VGlobals.instance().getWorkClassLoader());
                 doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
-            } catch (ClassNotFoundException cnfe) {
-
-                // If using plain Vanilla Viskit, don't report on diskit extended EGs
-                if (!cnfe.getMessage().contains("diskit")) {
-//                    log.error(cnfe);
-                }
             } catch (NoSuchMethodException cnfe) {
 //                log.error(cnfe);
             }
@@ -643,17 +646,33 @@ public class SimkitXML2Java {
         List<LocalVariable> liLocalV = e.getLocalVariable();
         List<Object> liSchedCanc = e.getScheduleOrCancel();
 
-        pw.print(sp4 + "public void do" + e.getName() + lp);
+        Class<?> sup = resolveExtensionClass();
+        Method superMethod = null;
 
-        for (Argument a : liArgs) {
-            pw.print(a.getType() + sp + a.getName());
-            if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
-                pw.print(cm + sp);
-            }
+        try {
+            superMethod = sup.getDeclaredMethod("do" + e.getName(), new Class<?>[]{});
+        } catch (NoSuchMethodException cnfe) {
+//            log.error(cnfe);
         }
 
-        // finish the method decl
-        pw.println(rp + sp + ob);
+        if (superMethod != null) {
+            pw.println(sp4 + "@Override");
+            pw.println(sp4 + "public void do" + e.getName() + lp + rp + sp + ob);
+            pw.println(sp8 + "super.do" + e.getName() + lp + rp + sc);
+            pw.println();
+        } else {
+            pw.print(sp4 + "public void do" + e.getName() + lp);
+
+            for (Argument a : liArgs) {
+                pw.print(a.getType() + sp + a.getName());
+                if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+                    pw.print(cm + sp);
+                }
+            }
+
+            // finish the method decl
+            pw.println(rp + sp + ob);
+        }
 
         // local variable decls
         for (LocalVariable local : liLocalV) {
@@ -685,7 +704,7 @@ public class SimkitXML2Java {
             pw.println();
         }
 
-        LinkedList<String> decls = new LinkedList<>();
+        List<String> decls = new LinkedList<>();
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
@@ -711,9 +730,10 @@ public class SimkitXML2Java {
                 }
                 olds += sp;
             }
+
             // by now, olds is "Bar" ( not Bar[] )
             // or nothing if alreadyDecld
-            // now build up "Bar oldFoo = getFoo("
+            // now build up "Bar oldFoo = getFoo()"
             String getter = oldName + sp + eq + sp + "get" + oldName.substring(5) + lp;
             if ("".equals(olds)) {
                 olds = getter;
@@ -875,27 +895,45 @@ public class SimkitXML2Java {
         return s.substring(0, left + 1) + s.substring(right);
     }
 
+    /** Resolves for either qualified, or unqualified extension name
+     *
+     * @return the resolved extension class type
+     */
+    private Class<?> resolveExtensionClass() {
+
+        String unqualifiedExtends;
+        Class<?> c;
+        if (!extendz.contains(".")) {
+            unqualifiedExtends = packageName + "." + extendz;
+            c = VStatics.classForName(unqualifiedExtends.split("\\s")[0]);
+        } else {
+            c = VStatics.classForName(extendz.split("\\s")[0]);
+        }
+        return c;
+    }
+
     // find the maximal set that the subclass parameters
     // can cover of the superclass's available constructors
     // note a subclass should have at least the superclass's
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> localSuperParams = new ArrayList<>();
-        if (extendz.equals("simkit.SimEntityBase") || extendz.equals("simkit.BasicSimEntity")) {
+        if (extendz.contains("SimEntityBase") || extendz.contains("BasicSimEntity")) {
             return localSuperParams;
         }
 
-        try {
-            // the extendz field may also contain an implemnts
-            // codeBlock.
+        // the extendz field may also contain an implements
+        // codeBlock.
 
-            // TODO: Can we use VStatics.classForName here?
-            Class<?> c = Class.forName(extendz.split("\\s")[0], true, VGlobals.instance().getWorkClassLoader());
+        Class<?> c = resolveExtensionClass();
+
+        if (c != null) {
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
             for (int i = 0; i < ca.length; i++) {
-                //find largest fitting array of super parameters constructor
+
+                // find largest fitting array of super parameters constructor
                 int tmpCount = (ca[i].getParameterTypes()).length;
                 if (tmpCount > maxParamCount && tmpCount <= params.size()) {
                     maxParamCount = tmpCount;
@@ -905,28 +943,33 @@ public class SimkitXML2Java {
 
             Parameter[] parray = new Parameter[maxParamCount];
             int pi = 0;
+            Class<?>[] sparams = ca[maxIndex].getParameterTypes();
+
+            outer:
             for (Parameter p : params) {
-                Class<?>[] sparams = ca[maxIndex].getParameterTypes();
                 for (int i = pi; i < sparams.length; i++) {
                     if (unqualifiedMatch(p.getType(), sparams[i].getName()) && pi < maxParamCount) {
                         parray[pi] = p;
                         ++pi;
-                        break;
+                        break outer;
                     }
                 }
             }
 
             localSuperParams = Arrays.asList(parray);
-
-        } catch (java.lang.ClassNotFoundException cnfe) {
-            if (extendz.equals("simkit.SimEntityBase")) {
-                log.error(extendz + " not in classpath ");
-            }
+        } else {
+            log.error(extendz + " was not found on the working classpath");
         }
+
         return localSuperParams;
     }
 
-    // check equivalence of eg. java.lang.Integer vs. Integer
+    /** Check equivalence of e.g. java.lang.Integer vs. Integer
+     *
+     * @param fromXml the subclass parameter to check
+     * @param fromClazz the superclass parameter to check
+     * @return indication of a match
+     */
     private boolean unqualifiedMatch(String fromXml, String fromClazz) {
         if (fromXml.equals(fromClazz)) {
             return true;
@@ -938,32 +981,6 @@ public class SimkitXML2Java {
             }
         }
         return false;
-    }
-
-    // returns List of params from super that match
-    // should be the number of params for the constructor,
-    // or 0 for an oddball constructor. typically constructor
-    // list size should be at minimum the same set as the super.
-    // unused?
-    private List<Parameter> paramsInSuper(Constructor<?> c, List<Parameter> params) {
-        Class<?>[] cTypes = c.getParameterTypes();
-        Vector<String> pTypes = new Vector<>();
-        Vector<String> superPTypes = new Vector<>();
-        Vector<Parameter> subset = new Vector<>();
-        for (Parameter p : params) {
-            pTypes.addElement(p.getType());
-        }
-        for (Class<?> cType : cTypes) {
-            superPTypes.addElement(cType.getName());
-        }
-        if (pTypes.containsAll(superPTypes)) {
-            for (Parameter p : params) {
-                if (superPTypes.contains(p.getType())) {
-                    subset.addElement(p);
-                }
-            }
-        }
-        return subset;
     }
 
     // bug fix 1183
@@ -998,7 +1015,7 @@ public class SimkitXML2Java {
         }
 
         if (aClass != null) {
-            return java.lang.Cloneable.class.isAssignableFrom(aClass);
+            return Cloneable.class.isAssignableFrom(aClass);
         }
         return isArray(c) || isGeneric(c);
     }
@@ -1036,6 +1053,7 @@ public class SimkitXML2Java {
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
         sx2j.setFileBaseName(baseName.getName());
+        sx2j.setEventGraphFile(new File(xmlFile));
         sx2j.unmarshal();
         String dotJava = sx2j.translate();
         if (dotJava != null && !dotJava.isEmpty()) {

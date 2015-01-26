@@ -633,7 +633,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         boolean ccbool = !selectionVector.isEmpty();
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
         ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
-        ActionIntrospector.getAction(this, "newSelfRefEdge").setEnabled(ccbool);
+        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(ccbool);
+        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(ccbool);
     }
     private Vector<Object> copyVector = new Vector<>();
 
@@ -741,9 +742,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private void killEdge(Edge e) {
         if (e instanceof SchedulingEdge) {
-            ((Model) getModel()).deleteEdge((SchedulingEdge) e);
+            ((Model) getModel()).deleteSchedulingEdge((SchedulingEdge) e);
         } else {
-            ((Model) getModel()).deleteCancelEdge((CancellingEdge) e);
+            ((Model) getModel()).deleteCancelingEdge((CancelingEdge) e);
         }
     }
 
@@ -840,30 +841,41 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void buildNewArc(Object[] nodes) //--------------------------------
+    public void buildNewSchedulingArc(Object[] nodes) //--------------------------------
     {
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
-        ((Model) getModel()).newEdge(src, tar);
+        ((Model) getModel()).newSchedulingEdge(src, tar);
     }
 
     @Override
-    public void buildNewCancelArc(Object[] nodes) //--------------------------------------
+    public void buildNewCancelingArc(Object[] nodes) //--------------------------------------
     {
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
-        ((Model) getModel()).newCancelEdge(src, tar);
+        ((Model) getModel()).newCancelingEdge(src, tar);
     }
 
-    public void newSelfRefEdge() //--------------------------
+    /** Handles the menu selection for a new self-referential scheduling edge */
+    public void newSelfRefSchedulingEdge() //--------------------------
     {
         if (selectionVector != null && selectionVector.size() > 0) {
-            for (Iterator itr = selectionVector.iterator(); itr.hasNext();) {
-                Object o = itr.next();
+            for (Object o : selectionVector) {
                 if (o instanceof EventNode) {
-                    ((Model) getModel()).newEdge((EventNode) o, (EventNode) o);
+                    ((Model) getModel()).newSchedulingEdge((EventNode) o, (EventNode) o);
+                }
+            }
+        }
+    }
+
+    /** Handles the menu selection for a new self-referential canceling edge */
+    public void newSelfRefCancelingEdge() {  //--------------------------
+        if (selectionVector != null && selectionVector.size() > 0) {
+            for (Object o : selectionVector) {
+                if (o instanceof EventNode) {
+                    ((Model) getModel()).newCancelingEdge((EventNode) o, (EventNode) o);
                 }
             }
         }
@@ -899,18 +911,18 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void arcEdit(viskit.model.SchedulingEdge ed) {
+    public void schedulingArcEdit(viskit.model.SchedulingEdge ed) {
         boolean modified = ((EventGraphView) getView()).doEditEdge(ed);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeEdge(ed);
+            ((viskit.model.Model) getModel()).changeSchedulingEdge(ed);
         }
     }
 
     @Override
-    public void canArcEdit(viskit.model.CancellingEdge ed) {
+    public void cancellingArcEdit(viskit.model.CancelingEdge ed) {
         boolean modified = ((EventGraphView) getView()).doEditCancelEdge(ed);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeCancelEdge(ed);
+            ((viskit.model.Model) getModel()).changeCancelingEdge(ed);
         }
     }
     private String imgSaveCount = "";

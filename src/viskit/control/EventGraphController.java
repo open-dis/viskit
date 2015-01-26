@@ -44,9 +44,17 @@ public interface EventGraphController {
 
     void buildNewStateVariable(String name, String type, String initVal, String comment);
 
-    void buildNewArc(Object[] nodes);
+    /** Connect a scheduling edge between two nodes
+     *
+     * @param nodes an array of source and target nodes
+     */
+    void buildNewSchedulingArc(Object[] nodes);
 
-    void buildNewCancelArc(Object[] nodes);
+    /** Connect a canceling edge between two nodes
+     *
+     * @param nodes an array of source and target nodes
+     */
+    void buildNewCancelingArc(Object[] nodes);
 
     /**
      * Provides an automatic capture of all Event Graphs images used in an
@@ -89,9 +97,9 @@ public interface EventGraphController {
      */
     void nodeEdit(EventNode node);
 
-    void arcEdit(SchedulingEdge ed);
+    void schedulingArcEdit(SchedulingEdge ed);
 
-    void canArcEdit(CancellingEdge ed);
+    void cancellingArcEdit(CancelingEdge ed);
 
     void simParameterEdit(vParameter param);
 

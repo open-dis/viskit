@@ -65,7 +65,7 @@ public class ConditionalExpressionPanel extends JPanel {
 // TODO:  detect cancelling edge...
 //      if (edge instanceof SchedulingEdge)
 //           rightParen = new JLabel(") then schedule target event");
-//      else if (edge instanceof CancellingEdge) 
+//      else if (edge instanceof CancelingEdge) 
 //           rightParen = new JLabel(") then cancel target event");
 //      else
 //          rightParen = new JLabel(") then schedule/cancel target event");
