@@ -334,7 +334,6 @@ public class SimkitXML2Java {
             pw.println(SP_4 + CB);
             pw.println();
 
-
             pw.print(SP_4 + PUBLIC + SP + baseOf(p.getType()) + SP + "get");
             pw.print(capitalize(p.getName()) + LP + indxncm(d));
             pw.println(RP + SP + OB);
@@ -550,7 +549,6 @@ public class SimkitXML2Java {
 
         /* Handle the reset method */
 
-        pw.println(SP_4 + JDO + SP + "Sets initial values of all state variables" + SP + JDC);
         pw.println(SP_4 + "@Override");
         pw.println(SP_4 + "public void reset() {");
         pw.println(SP_8 + "super.reset()" + SC);
@@ -561,8 +559,7 @@ public class SimkitXML2Java {
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
 
-        pw.println();
-        pw.println(SP_8 + "/* StateTransitions for the Run Event */");
+        if (!liLocalV.isEmpty()) {pw.println();}
 
         List<StateTransition> liStateT = run.getStateTransition();
 
@@ -615,12 +612,12 @@ public class SimkitXML2Java {
             }
         }
 
-        pw.println(SP_4 + JDO + SP + "Resets initial values of all state variables" + SP + JDC);
         if (doRun != null) {
             pw.println(SP_4 + "@Override");
             pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
             pw.println(SP_8 + "super.doRun" + LP + RP + SC);
         } else {
+            pw.println(SP_4 + JDO + SP + "Bootstraps the first simulation event" + SP + JDC);
             pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
         }
 
