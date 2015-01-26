@@ -184,9 +184,7 @@ public class FileBasedClassManager implements Runnable {
 
             log.debug("Put " + fclass.getName() + simEntity.getParameter());
 
-        } catch (JAXBException e) {
-            log.error(e);
-        } catch (ClassNotFoundException e) {
+        } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
             log.error(e);
         }
     }
