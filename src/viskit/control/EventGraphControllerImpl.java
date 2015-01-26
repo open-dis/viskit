@@ -386,7 +386,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // The value's modelPath is already delimited with "/"
         for (String value : recentFiles) {
+            String op = getHistoryConfig().getString(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@open]");
             getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@open]", op);
             ix++;
         }
         getHistoryConfig().getDocument().normalize();

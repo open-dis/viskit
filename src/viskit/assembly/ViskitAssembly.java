@@ -168,8 +168,10 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     void connectPropertyChangeListener(String listener, PropertyConnector pc) {
-        if ( pc.property.equals("null") ) {
+        if ( "null".equals(pc.property) ) {
             pc.property = "";
+        }
+        if (pc.property.isEmpty()) {
             getSimEntityByName(pc.source).addPropertyChangeListener(getPropertyChangeListenerByName(listener));
         } else {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
@@ -186,14 +188,15 @@ public class ViskitAssembly extends BasicAssembly {
         if (debug) {
             LOG.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
         }
-        if ( "".equals(pc.property) ) {
+        
+        if (pc.property.isEmpty()) {
             pc.property = getReplicationStatsByName(listener).getName().trim();
             if (debug) {
                 LOG.info("Property unspecified, attempting with lookup " + pc.property);
             }
         }
 
-        if ( "".equals(pc.property) ) {
+        if (pc.property.isEmpty()) {
             if (debug) {
                 LOG.info("Null property, replicationStats connecting "+pc.source+" to "+listener);
             }

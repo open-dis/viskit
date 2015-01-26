@@ -17,12 +17,12 @@ import java.awt.event.WindowEvent;
  * close box, the caller retrieves the "buttonChosen" variable from
  * the object to determine the choice. If the user clicked "OK", the
  * caller can retrieve various choices from the object.
- * 
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
- * @author Mike Bailey * 
+ * @author Mike Bailey *
  * @author DMcG
  * @since June 2, 2004
  * @since 9:19:41 AM
@@ -104,7 +104,7 @@ public class PropertyListDialog extends JDialog {
 
         this.setLocationRelativeTo(c);
     }
-    
+
     String[] colNames = {"property name", "property type"};
 
     private void fillWidgets() {
@@ -130,6 +130,7 @@ public class PropertyListDialog extends JDialog {
 
     class cancelButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             selection = -1;
             dispose();
@@ -138,6 +139,7 @@ public class PropertyListDialog extends JDialog {
 
     class applyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             dispose();
         }
@@ -145,6 +147,7 @@ public class PropertyListDialog extends JDialog {
 
     class mySelectionListener implements ListSelectionListener {
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             //Ignore extra messages.
             if (e.getValueIsAdjusting()) {
@@ -152,9 +155,7 @@ public class PropertyListDialog extends JDialog {
             }
 
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-            if (lsm.isSelectionEmpty()) {
-                return;
-            } else {
+            if (!lsm.isSelectionEmpty()) {
                 selection = lsm.getMinSelectionIndex();
                 okButt.setEnabled(true);
                 getRootPane().setDefaultButton(okButt);

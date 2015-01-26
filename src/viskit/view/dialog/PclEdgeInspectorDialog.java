@@ -247,11 +247,13 @@ public class PclEdgeInspectorDialog extends JDialog {
                     throw new ClassNotFoundException(classname + " not found");
                 }
 
-                Class stopClass = VStatics.classForName("simkit.BasicSimEntity");
+                Class<?> stopClass = VStatics.classForName("simkit.BasicSimEntity");
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    JOptionPane.showMessageDialog(PclEdgeInspectorDialog.this, "No properties found in " + classname + ".\n" +
+                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
+                            JOptionPane.INFORMATION_MESSAGE,
+                            "No properties found in " + classname,
                             "Enter name manually.");
                     return;
                 }
@@ -262,6 +264,8 @@ public class PclEdgeInspectorDialog extends JDialog {
                         // want getters but no setter
                         continue;
                     }
+
+                    // NOTE: The introspector will return property names in lower case
                     nams.add(pd.getName());
                     typs.add(pd.getPropertyType().getName());
                 }

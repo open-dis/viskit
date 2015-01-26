@@ -1753,7 +1753,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The value's modelPath is already delimited with "/"
         for (String value : recentFiles) {
+            String op = getHistoryConfig().getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
             getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value);
+            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", op);
             idx++;
         }
         getHistoryConfig().getDocument().normalize();

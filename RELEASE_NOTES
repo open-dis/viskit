@@ -2,6 +2,12 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  If one strays from the Java Bean convention of naming variables by starting
+  with a lower case letter, then, be prepared to manually enter variable names
+  of interest when parameterizing a PropertyChangeListener edge such as a
+  SimplePropertyDumper as the PropertyDescriptor returned by the Introspector
+  will force lower case, i.e. variable int N will be returned as "n"
+
   BeanShell checking of code snippets was a good idea in the beginning, but
   since we are only giving BeanShell a snippet and not the whole source file, it
   can only perform very minor primitive checking and some instantiating checks
@@ -9,6 +15,11 @@ Post release fixes / upgrades / issues:
   the user can investigate and fix during EG or Assy authoring.
 
   ****** FIXES / UPGRADES:
+
+  Fixed an issue where EG and Assy file open history was not being preserved
+
+  Fixed an issue where a PropertyChangeListener edge with no selected property
+  was forcing a "" (empty string) property which is non-existent.  
 
   Implemented a self-referential drag and drop, or menu selected canceling edge
   option for the EG editor.
