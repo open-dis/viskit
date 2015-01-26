@@ -245,18 +245,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (mod.newModel(file) && !isOpenAlready) {
 
             vaw.setSelectedAssemblyName(mod.getMetaData().name);
-
             // TODO: Implement an Assembly descrition block set here
-            adjustRecentAssySet(file);
 
-            // Mark every vAMod opened as "open"
-            openAlready = vaw.getOpenModels();
-            for (AssemblyModel vAMod : openAlready) {
-                if (vAMod.getLastFile() != null) {
-                    String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                    markAssyConfigOpen(modelPath);
-                }
-            }
+            adjustRecentAssySet(file);
+            markAssyFilesOpened();
 
             // replaces old fileWatchOpen(file);
             initOpenAssyWatch(file, mod.getJaxbRoot());
@@ -267,6 +259,19 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } else {
             vaw.delTab(mod);
+        }
+    }
+
+    /** Mark every Assy file opened as "open" in the app config file */
+    private void markAssyFilesOpened() {
+
+        // Mark every vAMod opened as "open"
+        AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
+        for (AssemblyModel vAMod : openAlready) {
+            if (vAMod.getLastFile() != null) {
+                String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
+                markAssyConfigOpen(modelPath);
+            }
         }
     }
 
@@ -460,6 +465,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
             adjustRecentAssySet(saveFile);
+            markAssyFilesOpened();
         }
     }
 
@@ -697,7 +703,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName())) {
-                getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -710,8 +716,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (String tempPath : recentAssyFileSet) {
 
             if (tempPath.equals(path)) {
-                getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-                getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", path);
+                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
@@ -1710,19 +1715,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
-    private java.util.List<String> openAssemblies;
 
+    private java.util.List<String> openAssemblies;
     private void _setAssyFileSet() {
         openAssemblies = new ArrayList<>(4);
-        if (getHistoryConfig() == null) {
-            return;
-        }
-        String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
+        if (historyConfig == null) {return;}
+        String[] valueAr = historyConfig.getStringArray(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
         LOGGER.debug("_setAssyFileLists() valueAr size is: " + valueAr.length);
         int idx = 0;
         for (String s : valueAr) {
             if (recentAssyFileSet.add(s)) {
-                String op = getHistoryConfig().getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
+                String op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openAssemblies.add(s);
@@ -1735,10 +1738,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private void _setProjFileSet() {
-        if (getHistoryConfig() == null) {
+        if (historyConfig == null) {
             return;
         }
-        String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        String[] valueAr = historyConfig.getStringArray(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
         LOGGER.debug("_setProjFileLists() valueAr size is: " + valueAr.length);
         for (String value : valueAr) {
             value = value.replaceAll("\\\\", "/");
@@ -1753,12 +1756,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The value's modelPath is already delimited with "/"
         for (String value : recentFiles) {
-            String op = getHistoryConfig().getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
-            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value);
-            getHistoryConfig().setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", op);
+            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value);
             idx++;
         }
-        getHistoryConfig().getDocument().normalize();
+        historyConfig.getDocument().normalize();
     }
 
     /** Always keep our project Hx until a user clears it manually
@@ -1769,10 +1770,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         int ix = 0;
         for (String value : recentFiles) {
             value = value.replaceAll("\\\\", "/");
-            getHistoryConfig().setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value);
+            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value);
             ix++;
         }
-        getHistoryConfig().getDocument().normalize();
+        historyConfig.getDocument().normalize();
     }
 
     @Override
@@ -1823,9 +1824,5 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             LOGGER.warn("Recent file saving disabled");
             historyConfig = null;
         }
-    }
-
-    private XMLConfiguration getHistoryConfig() {
-        return historyConfig;
     }
 }

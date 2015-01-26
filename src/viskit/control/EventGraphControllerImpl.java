@@ -249,7 +249,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     /** Mark every EG file opened as "open" in the app config file */
-    public void markEgFilesAsOpened() {
+    private void markEgFilesAsOpened() {
 
         Model[] openAlready = ((EventGraphView) getView()).getOpenModels();
         for (Model vMod : openAlready) {
@@ -364,11 +364,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private void _setFileSet() {
         openEventGraphs = new ArrayList<>(4);
         if (historyConfig == null) {return;}
-        String[] valueAr = getHistoryConfig().getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
+        String[] valueAr = historyConfig.getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
             if (recentFileSet.add(s)) {
-                String op = getHistoryConfig().getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
+                String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openEventGraphs.add(s);
@@ -381,17 +381,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private void saveHistoryXML(Set<String> recentFiles) {
-        getHistoryConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         int ix = 0;
 
         // The value's modelPath is already delimited with "/"
         for (String value : recentFiles) {
-            String op = getHistoryConfig().getString(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@open]");
-            getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
-            getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@open]", op);
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value);
             ix++;
         }
-        getHistoryConfig().getDocument().normalize();
+        historyConfig.getDocument().normalize();
     }
 
     @Override
@@ -501,7 +499,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         int idx = 0;
         for (String key : recentFileSet) {
             if (key.contains(f.getName())) {
-                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -513,8 +511,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         int idx = 0;
         for (String key : recentFileSet) {
             if (key.contains(path)) {
-                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-                getHistoryConfig().setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", path);
+                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
@@ -1061,9 +1058,5 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOGGER.warn("Recent file saving disabled");
             historyConfig = null;
         }
-    }
-
-    private XMLConfiguration getHistoryConfig() {
-        return historyConfig;
     }
 }
