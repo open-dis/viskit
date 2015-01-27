@@ -267,12 +267,14 @@ public class PclEdgeInspectorDialog extends JDialog {
 
                     // NOTE: The introspector will return property names in lower case
                     nams.add(pd.getName());
-                    typs.add(pd.getPropertyType().getName());
+
+                    if (pd.getPropertyType() != null)
+                        typs.add(pd.getPropertyType().getName());
                 }
                 String[][] nms = new String[nams.size()][2];
                 for (int i = 0; i < nams.size(); i++) {
                     nms[i][0] = nams.get(i);
-                    nms[i][1] = typs.get(i);
+                    nms[i][1] = (!typs.isEmpty()) ? typs.get(i) : "";
                 }
                 int which = PropertyListDialog.showDialog(PclEdgeInspectorDialog.this, PclEdgeInspectorDialog.this,
                         classname + " Properties", nms);
