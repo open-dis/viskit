@@ -412,6 +412,12 @@ public class SimkitXML2Java {
             if (!isArray(s.getType()) || isGeneric(s.getType())) {
                 tyStr = LP + stripLength(s.getType()) + RP;
             }
+
+            // Supress warning call to unchecked cast since we return a clone
+            // of Objects vice the desired type
+            if (isGeneric(s.getType())) {
+                pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
+            }
         }
 
         if (isArray(s.getType()) && !isGeneric(s.getType())) {
