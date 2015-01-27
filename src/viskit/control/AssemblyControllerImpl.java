@@ -1155,8 +1155,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
-    {
-        ((AssemblyView) getView()).genericReport(typ, title, msg);
+    {   AssemblyView view = (AssemblyView) getView();
+        if (view != null)
+            ((AssemblyView) getView()).genericReport(typ, title, msg);
+        else {
+            JOptionPane.showMessageDialog(null, msg, title, typ);
+        }
     }
 
     /********************************/
@@ -1376,9 +1380,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             /* We may have forgotten a parameter required for a super class */
             if (src == null) {
-                String msg = xmlFile + " did not compile.  Please check that you have provided the correct parameters for any super classes";
+                String msg = xmlFile + " did not compile.\n" +
+                        "Please check that you have provided the correct parameters for any super classes";
                 LOGGER.error(xmlFile + " " + msg);
-                messageUser(JOptionPane.ERROR, "Source code compilation error", msg);
+                messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
             }
 
