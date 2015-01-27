@@ -15,7 +15,9 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.xsd.bindings.assembly.*;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /** A generator of source code from Assembly XML
  *
@@ -25,31 +27,30 @@ import viskit.xsd.bindings.assembly.*;
  */
 public class SimkitAssemblyXML2Java {
 
-    SimkitAssembly root;
-    InputStream fileInputStream;
-    private String fileBaseName;
-    File inputFile;
-    JAXBContext jaxbCtx;
     static final boolean debug = false;
     static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
-
-    final private String sp  = " ";
+    final private String sp  = SimkitXML2Java.SP;
     final private String sp4 = sp+sp+sp+sp;
     final private String sp8 = sp4+sp4;
     final private String sp12 = sp8+sp4;
     final private String sp16 = sp8+sp8;
-    final private String ob  = "{";
-    final private String cb  = "}";
-    final private String sc  = ";";
-    final private String cm  = ",";
-    final private String lp  = "(";
-    final private String rp  = ")";
-    final private String eq  = "=";
-    final private String pd  = ".";
-    final private String qu  = "\"";
+    final private String ob  = SimkitXML2Java.OB;
+    final private String cb  = SimkitXML2Java.CB;
+    final private String sc  = SimkitXML2Java.SC;
+    final private String cm  = SimkitXML2Java.CM;
+    final private String lp  = SimkitXML2Java.LP;
+    final private String rp  = SimkitXML2Java.RP;
+    final private String eq  = SimkitXML2Java.EQ;
+    final private String pd  = SimkitXML2Java.PD;
+    final private String qu  = SimkitXML2Java.QU;
     final private String nw = "new";
+
+    SimkitAssembly root;
+    InputStream fileInputStream;
+    private String fileBaseName;
+    JAXBContext jaxbCtx;
 
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
@@ -61,9 +62,9 @@ public class SimkitAssemblyXML2Java {
         }
     }
 
-    public SimkitAssemblyXML2Java(SimkitAssembly root) {
+    public SimkitAssemblyXML2Java(InputStream is) {
         this();
-        this.root = root;
+        fileInputStream = is;
     }
 
     /**
@@ -74,7 +75,8 @@ public class SimkitAssemblyXML2Java {
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
-        this(new File(xmlFile));
+        this(VStatics.classForName(SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        setFileBaseName(new File(baseNameOf(xmlFile)).getName());
     }
 
     /** Used by Viskit
@@ -83,13 +85,7 @@ public class SimkitAssemblyXML2Java {
      */
     public SimkitAssemblyXML2Java(File f) throws FileNotFoundException {
         this(new FileInputStream(f));
-        this.fileBaseName = baseNameOf(f.getName());
-        this.inputFile = f;
-    }
-
-    public SimkitAssemblyXML2Java(InputStream is) {
-        this();
-        fileInputStream = is;
+        setFileBaseName(baseNameOf(f.getName()));
     }
 
     public void unmarshal() {
@@ -112,7 +108,7 @@ public class SimkitAssemblyXML2Java {
         return fileBaseName;
     }
 
-    public void setFileBaseName(String fileBaseName) {
+    public final void setFileBaseName(String fileBaseName) {
         this.fileBaseName = fileBaseName;
     }
 
@@ -635,20 +631,20 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
 
         for (PropertyChangeListener pcl : propertyChangeListeners.values()) {
-                              List<Object> pl = pcl.getParameters();
-                  pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcl.getName() + qu + cm);
-                  pw.print(sp12 + nw + sp + pcl.getType() + lp);
+            List<Object> pl = pcl.getParameters();
+            pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcl.getName() + qu + cm);
+            pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
-                  if (pl.size() > 0) {
-                      pw.println();
-                      for (Object o : pl) {
-                          doParameter(pl, o, sp16, pw);
-                      }
-                      pw.println(sp12 + rp);
-                  } else {
-                      pw.println(rp);
-                  }
-                  pw.println(sp8 + rp + sc);
+            if (pl.size() > 0) {
+                pw.println();
+                for (Object o : pl) {
+                    doParameter(pl, o, sp16, pw);
+                }
+                pw.println(sp12 + rp);
+            } else {
+                pw.println(rp);
+            }
+            pw.println(sp8 + rp + sc);
         }
 
         for (String propChangeListener : propertyChangeListenerConnections.keySet()) {
@@ -794,7 +790,7 @@ public class SimkitAssemblyXML2Java {
         PrintWriter pw = new PrintWriter(t);
         String nAsm = nameAsm();
 
-        // The main method doesn't need to dump the outputs, since their done at object init time now
+        // The main method doesn't need to dump the outputs, since they are done at object init time now
         pw.println(sp4 + "public static void main(String[] args) {");
         pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
