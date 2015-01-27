@@ -885,6 +885,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
         }
     }
 
