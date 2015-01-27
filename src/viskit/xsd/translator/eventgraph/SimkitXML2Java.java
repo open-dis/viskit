@@ -268,8 +268,6 @@ public class SimkitXML2Java {
                 } else {
                     pw.println(SP_4 + "/*" + SP + "inherited state variable" + SP + s.getType() + SP + s.getName() + SP + JDC);
                 }
-
-                pw.println();
             }
 
             if (c != null && !c.isPrimitive()) {
@@ -296,6 +294,8 @@ public class SimkitXML2Java {
                 }
             }
             buildStateVariableAccessor(s, accessorBlock);
+
+            pw.println();
         }
         if (liStateV.isEmpty()) {
             pw.println(SP_4 + "/* None */");
@@ -411,11 +411,6 @@ public class SimkitXML2Java {
 
             if (!isArray(s.getType()) || isGeneric(s.getType())) {
                 tyStr = LP + stripLength(s.getType()) + RP;
-            }
-
-            // Supress warning call to unchecked cast
-            if (isGeneric(s.getType())) {
-                pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
             }
         }
 

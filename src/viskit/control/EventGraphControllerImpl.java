@@ -67,21 +67,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         if (!lis.isEmpty()) {
 
-            // If EventGraphs were already open without a corresponding Assembly
-            // file open, then open them upon Viskit starting, else, let the
-            // Assembly file tell which EGs to open
-            if (VGlobals.instance().getAssemblyController() != null) {
-                java.util.List<String> al = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).getOpenAssyFileList(false);
-                if (al.isEmpty()) {
-                    LOGGER.debug("In begin() (else) of EventGraphController");
-                    for (String s : lis) {
-                        File f = new File(s);
-                        if (f.exists()) {
-                            _doOpen(f);
-                        }
-                    }
+            // Open whatever EG were marked open on last closing
+            for (String s : lis) {
+                File f = new File(s);
+                if (f.exists()) {
+                    _doOpen(f);
                 }
             }
+
         } else {
 
             // For a brand new empty project open a default EG

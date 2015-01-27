@@ -1031,11 +1031,12 @@ public class VGlobals {
                 if (cb.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
-                    if (!popup.isShowing()) {
+                    if (!popup.isShowing() || !cb.isShowing()) {
                         Runnable r = new Runnable() {
                             @Override
                             public void run() {
                                 popup.setVisible(true);
+                                cb.setVisible(true);
                                 popup.show(cb, 0, 0);
                             }
                         };
