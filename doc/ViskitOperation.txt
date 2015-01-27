@@ -150,7 +150,10 @@ advanced process and not necessary for pure vanilla Viskit operation.
 
 6) All corresponding EGs are opened in the Event Graph Editor panel when an
 Assembly file is opened in the Assembly Editor panel.  However, if any EGs are
-subclassed from other EGs, these will not open automatically.
+subclassed from other EGs, these will not open automatically.  Also, if the last
+remaining Assy file will closed, all open EGs will close including
+non-associated EG files.  This is due to the EG caching system that relies on
+parsing SimEntities of Assy files to know which EG to keep open
 
 7) At this point, the paths of the any opened Assembly and EG files are recorded
 in the .viskit/c_app.xml file and will be opened upon next Viskit launch.  The

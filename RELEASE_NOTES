@@ -2,6 +2,10 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  If a single Assy file was closed, it will close all open EGs file including
+  non-associated EGs.  This happens due to the EG caching system that relies on
+  parsing SimEntities of Assy files to know which EG to keep open
+
   If one strays from the Java Bean convention of naming variables by starting
   with a lower case letter, then, be prepared to manually enter variable names
   of interest when parameterizing a PropertyChangeListener edge such as a
@@ -19,7 +23,7 @@ Post release fixes / upgrades / issues:
   Fixed an issue where EG and Assy file open history was not being preserved
 
   Fixed an issue where a PropertyChangeListener edge with no selected property
-  was forcing a "" (empty string) property which is non-existent.  
+  was forcing a "" (empty string) property which is non-existent.
 
   Implemented a self-referential drag and drop, or menu selected canceling edge
   option for the EG editor.
