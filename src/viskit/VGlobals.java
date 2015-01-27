@@ -1031,19 +1031,14 @@ public class VGlobals {
                 if (cb.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
-                    if (!popup.isShowing() || !cb.isShowing()) {
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run() {
-                                popup.setVisible(true);
-                                cb.setVisible(true);
+                    Runnable r = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (cb.isShowing())
                                 popup.show(cb, 0, 0);
-                            }
-                        };
-                        SwingUtilities.invokeLater(r);
-                    } else {
-                        popup.show(cb, 0, 0);
-                    }
+                        }
+                    };
+                    SwingUtilities.invokeLater(r);
                 }
             } else {
                 MyJMenuItem mi = (MyJMenuItem) o;
