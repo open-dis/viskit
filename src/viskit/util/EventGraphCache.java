@@ -109,9 +109,9 @@ public class EventGraphCache {
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
-    private List<String> eventGraphNamesList  = new LinkedList<>();
-    private List<File> eventGraphFilesList  = new LinkedList<>();
-    private List<String> eventGraphImagePathsList = new LinkedList<>();
+    private List<String> eventGraphNamesList;
+    private List<File> eventGraphFilesList;
+    private List<String> eventGraphImagePathsList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
             VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir() + "/";
@@ -189,9 +189,7 @@ public class EventGraphCache {
         try {
             SAXBuilder builder = new SAXBuilder();
             doc = builder.build(xmlFile);
-        } catch (JDOMException ex) {
-            log.error(ex);
-        } catch (IOException ex) {
+        } catch (JDOMException | IOException ex) {
             log.error(ex);
         }
         return doc;
@@ -221,8 +219,6 @@ public class EventGraphCache {
         }
 
         String fileTypePackageToPath = fileType.substring(0, idx) + "/";
-
-        // TODO: Move ARs to project folders.  That's where they should be
         String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
         log.debug("EventGraph Name: " + eventGraphName);
 

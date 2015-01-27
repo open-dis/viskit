@@ -325,20 +325,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
+
                     ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
 
-                    AssemblyModel vmod = (AssemblyModel) getModel();
-                    markAssyConfigClosed(vmod.getLastFile());
+                    AssemblyModel vAMod = (AssemblyModel) getModel();
+                    markAssyConfigClosed(vAMod.getLastFile());
 
                     AssemblyView view = (AssemblyView) getView();
-                    view.delTab(vmod);
+                    view.delTab(vAMod);
 
-                    // Keep all other Assemblies' EGs open
+                    // NOTE: This doesn't work quite right.  If no Assy is open,
+                    // then any non-associated EGs that were also open will
+                    // annoyingly close from the closeAll call above.  We are
+                    // using an open EG cache system that relies on parsling an
+                    // Assy file to find its associated EGs to open
                     if (!isCloseAll()) {
 
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(vmod)) {
+                            if (!mod.equals(vAMod)) {
                                 openEventGraphs(mod.getLastFile());
                             }
                         }
@@ -1665,7 +1670,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Opens each EG associated with this Assembly
-     * @param f the Assembly File to open EventGraphs for
+     * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
         File tempFile = null;
