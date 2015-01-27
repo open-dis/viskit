@@ -25,27 +25,27 @@ public class SimkitXML2Java {
     static Logger log = LogUtils.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
-    private final static String SP = " ";
-    private final static String SP_4 = SP + SP + SP + SP;
-    private final static String SP_8 = SP_4 + SP_4;
-    private final static String SP_12 = SP_8 + SP_4;
-    private final static String OB = "{";
-    private final static String CB = "}";
-    private final static String SC = ";";
-    private final static String CM = ",";
-    private final static String LP = "(";
-    private final static String RP = ")";
-    private final static String EQ = "=";
-    private final static String PD = ".";
-    private final static String QU = "\"";
-    private final static String LB = "[";
-    private final static String RB = "]";
-    private final static String JDO = "/**";
-    private final static String JDC = "*/";
-    private final static String PUBLIC = "public";
-    private final static String PROTECTED = "protected";
-    private final static String PRIVATE = "private";
-    private final static String SIM_ENTITY_BASE = "SimEntityBase";
+    public final static String SP = " ";
+    public final static String SP_4 = SP + SP + SP + SP;
+    public final static String SP_8 = SP_4 + SP_4;
+    public final static String SP_12 = SP_8 + SP_4;
+    public final static String OB = "{";
+    public final static String CB = "}";
+    public final static String SC = ";";
+    public final static String CM = ",";
+    public final static String LP = "(";
+    public final static String RP = ")";
+    public final static String EQ = "=";
+    public final static String PD = ".";
+    public final static String QU = "\"";
+    public final static String LB = "[";
+    public final static String RB = "]";
+    public final static String JDO = "/**";
+    public final static String JDC = "*/";
+    public final static String PUBLIC = "public";
+    public final static String PROTECTED = "protected";
+    public final static String PRIVATE = "private";
+    public final static String SIM_ENTITY_BASE = "SimEntityBase";
 
     private SimEntity root;
     InputStream fileInputStream;
@@ -256,7 +256,7 @@ public class SimkitXML2Java {
 
                 c = VStatics.classForName(s.getType());
 
-                if (c == null || c.isPrimitive()) {
+                if (c == null || c.isPrimitive() || isArray(s.getType())) {
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
                         for (String comment : s.getComment()) {
@@ -270,7 +270,7 @@ public class SimkitXML2Java {
                 }
             }
 
-            if (c != null && !c.isPrimitive()) {
+            if (c != null && !c.isPrimitive() && !isArray(s.getType())) {
                 Constructor<?> cst = null;
 
                 try {
@@ -1060,8 +1060,8 @@ public class SimkitXML2Java {
         return isArray(c) || isGeneric(c);
     }
 
-    private boolean isArray(String c) {
-        return (c.indexOf(RB) > 0);
+    private boolean isArray(String a) {
+        return (a.contains(RB));
     }
 
     /** Report and exit the JVM
