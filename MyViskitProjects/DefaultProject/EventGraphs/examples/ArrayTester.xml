@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity extend="SimEntityBase" author="Terry D. Norbraten" version="1.0" package="examples" name="ArrayTester" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Comment>Test Viskit's capability to create primative type arrays</Comment>
     <Parameter name="param_0" type="int[]">
         <Comment></Comment>
@@ -8,24 +8,24 @@
         <Comment></Comment>
     </StateVariable>
     <Event name="Run">
-        <Schedule priority="DEFAULT" condition="true" event="Initialize" delay="0.0">
+        <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT">
             <Comment></Comment>
             <EdgeParameter value="0"/>
         </Schedule>
         <Code></Code>
-        <Coordinate y="30" x="30"/>
+        <Coordinate x="30.0" y="30.0"/>
     </Event>
-    <Event name="Initialize">
+    <Event name="Init">
         <Comment></Comment>
         <Argument name="i" type="int"/>
-        <StateTransition index="i" state="state_0">
+        <StateTransition state="state_0" index="i">
             <Assignment value="param_0[i]"/>
         </StateTransition>
-        <Schedule priority="DEFAULT" condition="i &lt; (param_0.length - 1)" event="Initialize" delay="0.0">
+        <Schedule delay="0.0" event="Init" condition="i &lt; (param_0.length - 1)" priority="DEFAULT">
             <Comment></Comment>
             <EdgeParameter value="i + 1"/>
         </Schedule>
         <Code></Code>
-        <Coordinate y="30" x="180"/>
+        <Coordinate x="180.0" y="30.0"/>
     </Event>
 </SimEntity>
