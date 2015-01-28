@@ -256,7 +256,7 @@ public class SimkitXML2Java {
 
                 c = VStatics.classForName(s.getType());
 
-                if (c == null || c.isPrimitive() || isArray(s.getType())) {
+                if (c == null || VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
                         for (String comment : s.getComment()) {
@@ -270,7 +270,7 @@ public class SimkitXML2Java {
                 }
             }
 
-            if (c != null && !c.isPrimitive() && !isArray(s.getType())) {
+            if (c != null && !VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
                 Constructor<?> cst = null;
 
                 try {
@@ -1061,7 +1061,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isArray(String a) {
-        return (a.contains(RB));
+        return VGlobals.instance().isArray(a);
     }
 
     /** Report and exit the JVM
