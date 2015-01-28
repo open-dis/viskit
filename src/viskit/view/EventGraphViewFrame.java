@@ -225,7 +225,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
             } else if (viskit.VStatics.debug) {
-                System.out.println("error: EventGraphViewFrame gmd null..");
+                System.err.println("error: EventGraphViewFrame gmd null..");
             }
         }
     }
@@ -385,6 +385,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         p.setMaximumSize(d);
 
         return p;
+    }
+
+    @Override
+    public void setSelectedEventGraphName(String s) {
+        boolean nullString = !(s != null && s.length() > 0);
+        if (!nullString) {
+            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
+        }
     }
 
     @Override
@@ -1165,14 +1173,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
         return null;
-    }
-
-    @Override
-    public void setSelectedEventGraphName(String s) {
-        boolean nullString = !(s != null && s.length() > 0);
-        if (!nullString) {
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
-        }
     }
 
     @Override
