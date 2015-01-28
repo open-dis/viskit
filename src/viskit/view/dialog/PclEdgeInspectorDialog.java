@@ -293,7 +293,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            if (modified == true) {
+            if (modified) {
                 int ret = JOptionPane.showConfirmDialog(PclEdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {

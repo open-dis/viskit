@@ -117,7 +117,7 @@ public class RecentFilesDialog extends JDialog {
         p.add(closeButt);
         cont.add(p);
 
-        jlist = new JList<String>();
+        jlist = new JList<>();
         jlist.setBorder(new EmptyBorder(0, 3, 0, 3));
         jlist.addMouseListener(new myMM());
         cont.add(jlist);

@@ -50,9 +50,7 @@ import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.model.AdapterEdge;
 import viskit.model.EvGraphNode;
-import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.control.AssemblyController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -374,7 +372,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            if (modified == true) {
+            if (modified) {
                 int ret = JOptionPane.showConfirmDialog(AdapterConnectionInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {

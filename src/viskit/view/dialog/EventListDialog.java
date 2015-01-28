@@ -58,7 +58,7 @@ public class EventListDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        list = new JList<String>();
+        list = new JList<>();
         list.getSelectionModel().addListSelectionListener(new mySelectionListener());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

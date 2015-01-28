@@ -59,7 +59,7 @@ public class EventCommentDialog extends JDialog
     commentArea = new JTextArea(10,40);
     commentArea.setLineWrap(true);
     commentArea.setWrapStyleWord(true);
-    
+
     JScrollPane jsp = new JScrollPane(commentArea);
     cont.add(jsp);
        cont.add(Box.createVerticalStrut(5));
@@ -75,8 +75,8 @@ public class EventCommentDialog extends JDialog
 
     fillWidgets();     // put the data into the widgets
 
-    modified        = (param==null?true:false);     // if it's a new myEA, they can always accept defaults with no typing
-    okButt.setEnabled((param==null?true:false));
+    modified        = (param==null);     // if it's a new myEA, they can always accept defaults with no typing
+    okButt.setEnabled((param==null));
 
     getRootPane().setDefaultButton(canButt);
 
@@ -98,8 +98,8 @@ public class EventCommentDialog extends JDialog
 
     fillWidgets();
 
-    modified        = (p.length()==0?true:false);
-    okButt.setEnabled((p.length()==0?true:false));
+    modified        = (p.length()==0);
+    okButt.setEnabled((p.length()==0));
 
     getRootPane().setDefaultButton(canButt);
 
@@ -127,6 +127,7 @@ public class EventCommentDialog extends JDialog
 
   class cancelButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       modified = false;    // for the caller
@@ -136,6 +137,7 @@ public class EventCommentDialog extends JDialog
 
   class applyButtonListener implements ActionListener
   {
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       if(modified)
@@ -146,6 +148,7 @@ public class EventCommentDialog extends JDialog
 
   class enableApplyButtonListener implements CaretListener,ActionListener
   {
+    @Override
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
@@ -153,6 +156,7 @@ public class EventCommentDialog extends JDialog
       getRootPane().setDefaultButton(okButt);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event)
     {
       caretUpdate(null);
@@ -180,9 +184,10 @@ public class EventCommentDialog extends JDialog
 
   class myCloseListener extends WindowAdapter
   {
+    @Override
     public void windowClosing(WindowEvent e)
     {
-      if(modified == true) {
+      if(modified) {
         int ret = JOptionPane.showConfirmDialog(EventCommentDialog.this,"Apply changes?",
             "Question",JOptionPane.YES_NO_OPTION,JOptionPane.WARNING_MESSAGE);
         if(ret == JOptionPane.YES_OPTION)
