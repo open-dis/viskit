@@ -1259,9 +1259,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             // Changes the graph needs to know about
             default:
                 vgcw.viskitModelChanged((ModelEvent) event);
-                toggleEgStatusIndicators();
                 break;
         }
+
+        // Let model.isDirty() determine status color
+        toggleEgStatusIndicators();
     }
 
     @Override
