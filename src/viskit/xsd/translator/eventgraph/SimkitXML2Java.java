@@ -308,7 +308,7 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(sw);
 
-        pw.print(SP_4 + "public void set" + capitalize(p.getName()) + LP);
+        pw.print(SP_4 + "public final void set" + capitalize(p.getName()) + LP);
         pw.println(p.getType() + SP + shortinate(p.getName()) + RP + SP + OB);
         pw.print(SP_8 + "this" + PD + p.getName() + SP + EQ + SP);
 
@@ -328,7 +328,7 @@ public class SimkitXML2Java {
         if (isArray(p.getType())) {
             int d = dims(p.getType());
 
-            pw.print(SP_4 + "public void set" + capitalize(p.getName()) + LP + indx(d));
+            pw.print(SP_4 + "public final void set" + capitalize(p.getName()) + LP + indx(d));
             pw.println(baseOf(p.getType()) + SP + shortinate(p.getName()) + RP + SP + OB);
             pw.println(SP_8 + "this" + PD + p.getName() + indxbr(d) + SP + EQ + SP + shortinate(p.getName()) + SC);
             pw.println(SP_4 + CB);
@@ -802,7 +802,7 @@ public class SimkitXML2Java {
             }
             if (isArray(sv.getType()) && !isGeneric(sv.getType())) {
                 pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(st));
-                pw.print(CM + SP + QU + sv.getName() + QU + CM);
+                pw.print(CM + SP + QU + sv.getName() + QU + CM + SP);
                 pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + indexFrom(st) + RP + RP + SC);
             } else {
                 pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU + CM + SP);

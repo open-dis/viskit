@@ -64,6 +64,8 @@ public class ModelEvent extends mvcModelEvent
   public static final int PCLEDGEDELETED = 31;
   public static final int PCLEDGECHANGED = 32;
 
+  public static final int METADATA_CHANGED = 33;
+
   public ModelEvent(Object obj, int id, String message)
   {
     super(obj,id,message);

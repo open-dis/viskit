@@ -90,6 +90,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void changeMetaData(GraphMetaData gmd) {
         metaData = gmd;
         setDirty(true);
+        notifyChanged(new ModelEvent(gmd, ModelEvent.METADATA_CHANGED, "Metadata changed"));
     }
 
     @Override
