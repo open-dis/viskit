@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
+import viskit.control.EventGraphControllerImpl;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -115,10 +116,6 @@ public class StateVariableDialog extends ViskitSmallDialog {
             getRootPane().setDefaultButton(canButt);
         }
 
-        arrSizeLab.setEnabled(false);
-        arraySizeField.setEnabled(false);
-        arraySizeField.setEditable(false);     // grays background if false
-
         pack();     // do this prior to next
         this.setLocationRelativeTo(locationComp);
 
@@ -137,6 +134,17 @@ public class StateVariableDialog extends ViskitSmallDialog {
         addWindowListener(new WindowClosingListener(this, okButt, canButt));
     }
 
+    /** Toggle these fields appropriately
+     *
+     * @param b if true, then enable
+     */
+    private void toggleArraySizeFields(boolean b) {
+        arrSizeLab.setEnabled(b);
+        arraySizeField.setEnabled(b);
+        arraySizeField.setEditable(b);     // grays background if false
+    }
+
+    @Override
     void setParams(Component c, Object p) {
         stVar = (vStateVariable) p;
         locationComp = c;
@@ -179,23 +187,20 @@ public class StateVariableDialog extends ViskitSmallDialog {
             arraySizeField.setText(getArraySize(ty));
             commentField.setText(stVar.getComment());
             boolean isArray = VGlobals.instance().isArray(stVar.getType());
-            arraySizeField.setEditable(isArray);   // grays background if false
-            arraySizeField.setEnabled(isArray);
-            arrSizeLab.setEnabled(isArray);
+            toggleArraySizeFields(isArray);
         } else {
             stateVarNameField.setText(((Model) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             String ty = (String) stateVarTypeCombo.getSelectedItem();
             boolean isArray = VGlobals.instance().isArray(ty);
             commentField.setText("");
             arraySizeField.setText("");
-            arraySizeField.setEditable(isArray); // grays out background
-            arraySizeField.setEnabled(isArray);
-            arrSizeLab.setEnabled(isArray);
+            toggleArraySizeFields(isArray);
         }
         stateVarNameField.requestFocus();
         stateVarNameField.selectAll();
     }
 
+    @Override
     void unloadWidgets() {
         // make sure there are no spaces
         String ty = (String) stateVarTypeCombo.getSelectedItem();
@@ -233,23 +238,22 @@ public class StateVariableDialog extends ViskitSmallDialog {
         return (typ.contains("<K,V>") || typ.contains("<E>"));
     }
 
-    // Little classes to move the focus around
-    private sizeFieldFocus sizeFocus = new sizeFieldFocus();
-    private commentFieldFocus commentFocus = new commentFieldFocus();
+    // Little runnables to move the focus around
+    private Runnable sizeFieldFocus = new Runnable() {
 
-    class sizeFieldFocus implements Runnable {
-
+        @Override
         public void run() {
             arraySizeField.requestFocus();
         }
-    }
+    };
 
-    class commentFieldFocus implements Runnable {
+    private Runnable commentFieldFocus = new Runnable() {
 
+        @Override
         public void run() {
             commentField.requestFocus();
         }
-    }
+    };
 
     class myFocusListener extends FocusAdapter {
 
@@ -268,21 +272,19 @@ public class StateVariableDialog extends ViskitSmallDialog {
         private void handleArrayFieldEnable() {
             String s = (String) stateVarTypeCombo.getEditor().getItem();
             boolean isAr = VGlobals.instance().isArray(s);
-            arraySizeField.setEditable(isAr); // grays background if false
-            arraySizeField.setEnabled(isAr);
-            arrSizeLab.setEnabled(isAr);
+            toggleArraySizeFields(isAr);
 
             // Do this this way to shake out all the pending focus events before twiddling focus.
             if (isAr) {
-                SwingUtilities.invokeLater(sizeFocus);
+                SwingUtilities.invokeLater(sizeFieldFocus);
             } else {
-                SwingUtilities.invokeLater(commentFocus);
+                SwingUtilities.invokeLater(commentFieldFocus);
             }
         }
 
         /**
          * select the text in whatever comes in
-         * @param c
+         * @param c the component containing text
          */
         private void handleSelect(Component c) {
             if (c instanceof ComboBoxEditor) {
@@ -293,14 +295,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
                 ((JTextComponent) c).selectAll();
             } else if (c instanceof ComboBoxEditor) {
                 ((ComboBoxEditor) c).selectAll();
-            } else if (c instanceof JButton) {
-                ;
             }
         }
     }
 
     class StateVarApplyButtonListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 String typ = ((String) stateVarTypeCombo.getSelectedItem()).trim();
@@ -310,22 +311,25 @@ public class StateVariableDialog extends ViskitSmallDialog {
                 if (nam.length() <= 0 ||
                         typ.length() <= 0 ||
                         (VGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
-                    JOptionPane.showMessageDialog(StateVariableDialog.this, "Name, type and (if array) array size must be entered.",
-                            "Data entry error", JOptionPane.ERROR_MESSAGE);
-                    arrSizeLab.setEnabled(true);
-                    arraySizeField.setEnabled(true);
-                    arraySizeField.setEditable(true);
+                    ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                            JOptionPane.ERROR_MESSAGE,
+                            "Data entry error",
+                            "Name, type and (if array) array size must be entered.");
+                    toggleArraySizeFields(true);
                     arraySizeField.requestFocus();
                     return;
                 } else if (VGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
-                    JOptionPane.showMessageDialog(StateVariableDialog.this, "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.",
-                            "Data entry error", JOptionPane.ERROR_MESSAGE);
+                    ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                            JOptionPane.ERROR_MESSAGE,
+                            "Data entry error",
+                            "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.");
                     return;
                 } else if (isGeneric(typ)) {
-                    JOptionPane.showMessageDialog(StateVariableDialog.this,
+                    ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                            JOptionPane.ERROR_MESSAGE,
+                            "Data entry error",
                             "Actual Keys, Values or Element types must replace " +
-                            "the K,V or E between the <> for Collection Objects.",
-                            "Data entry error", JOptionPane.ERROR_MESSAGE);
+                            "the K,V or E between the <> for Collection Objects.");
                     return;
                 }
 
@@ -341,7 +345,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                         String result = VGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);
-                            if (ret == false) // don't ignore
+                            if (!ret) // don't ignore
                             {
                                 return;
                             }
