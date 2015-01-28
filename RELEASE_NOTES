@@ -20,6 +20,14 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed issue with the StateVariableDialog where if an array type was entered in
+  the type field, the array length field was still disabled
+
+  Fixed issue of the metadata description field not updating after an edit
+
+  Fixed potential NPE in the PclEdgeInspectorDialog when the Introspector can't
+  determine a property type
+
   Fixed an issue where EG and Assy file open history was not being preserved
 
   Fixed an issue where a PropertyChangeListener edge with no selected property
