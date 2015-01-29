@@ -233,6 +233,10 @@ public class SimkitXML2Java {
                 buildParameterAccessor(p, accessorBlock);
             }
         }
+        if (liParams.isEmpty()) {
+            pw.println(SP_4 + "/* None */");
+            pw.println();
+        }
 
         List<StateVariable> liStateV = this.root.getStateVariable();
 
@@ -551,7 +555,7 @@ public class SimkitXML2Java {
         /* Handle the reset method */
 
         pw.println(SP_4 + "@Override");
-        pw.println(SP_4 + "public void reset() {");
+        pw.println(SP_4 + "public void reset() " + OB);
         pw.println(SP_8 + "super.reset()" + SC);
 
         pw.println();
@@ -577,8 +581,7 @@ public class SimkitXML2Java {
             String in = indexFrom(st);
 
             if (isar) {
-                pw.print(SP_8 + "for (" + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length");
-                pw.println(SC + SP + in + "++" + RP + SP + OB);
+                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
                 pw.print(sps + sv.getName() + LB + in + RB);
             } else {
                 pw.print(sps + sv.getName());
@@ -623,7 +626,7 @@ public class SimkitXML2Java {
         }
 
         for (LocalVariable local : liLocalV) {
-            pw.println(SP_8 + local.getType() + SP + local.getName() + (local.getValue() != null ? SP + EQ + SP + local.getValue() + SC : SC));
+            pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
 
         pw.println();
@@ -634,10 +637,17 @@ public class SimkitXML2Java {
             Operation ops = st.getOperation();
 
             boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
+            String sps = isar ? SP_12 : SP_8;
+            String in = indexFrom(st);
 
-            pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU);
+            if (isar) {
+                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
+                pw.print(sps + "fireIndexedPropertyChange" + LP + in + CM + SP + QU + sv.getName() + QU);
+            } else {
+                pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU);
+            }
 
-            // Give these FPC "getters" as arguments
+            // Give these FPCs "getters" as arguments
             String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
             String stateVariableGetter = "get" + stateVariableName + LP;
 
@@ -652,7 +662,13 @@ public class SimkitXML2Java {
             }
 
             pw.println(CM + SP + stateVariableGetter + RP + SC);
+
+            if (isar) {
+                pw.println(SP_8 + CB);
+            }
         }
+
+        pw.println();
 
         for (Object o : liSchedCanc) {
             if (o instanceof Schedule) {
