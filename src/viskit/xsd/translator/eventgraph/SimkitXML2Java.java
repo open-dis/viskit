@@ -138,11 +138,11 @@ public class SimkitXML2Java {
         StringWriter codeBlock = new StringWriter();
 
         buildHead(head);
-        buildVars(vars, accessorBlock);
-        buildToString(toStringBlock);
+        buildParameters(vars, accessorBlock);
+        buildStateVars(vars, accessorBlock);
         buildParameterMapAndConstructor(parameterMapAndConstructor);
         buildEventBlock(runBlock, eventBlock);
-
+        buildToString(toStringBlock);
         buildCodeBlock(codeBlock);
 
         buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, toStringBlock, codeBlock);
@@ -200,8 +200,7 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    void buildVars(StringWriter vars, StringWriter accessorBlock) {
-
+    void buildParameters(StringWriter vars, StringWriter accessorBlock) {
         PrintWriter pw = new PrintWriter(vars);
 
         liParams = this.root.getParameter();
@@ -228,15 +227,23 @@ public class SimkitXML2Java {
             }
 
             if (extendz.contains(SIM_ENTITY_BASE)) {
-                buildParameterAccessor(p, accessorBlock);
+                buildParameterModifierAndAccessor(p, accessorBlock);
             } else if (!superParams.contains(p)) {
-                buildParameterAccessor(p, accessorBlock);
+                buildParameterModifierAndAccessor(p, accessorBlock);
             }
         }
         if (liParams.isEmpty()) {
             pw.println(SP_4 + "/* None */");
             pw.println();
         }
+    }
+
+    void buildStateVars(StringWriter vars, StringWriter accessorBlock) {
+
+        PrintWriter pw = new PrintWriter(vars);
+
+        liParams = this.root.getParameter();
+        superParams = resolveSuperParams(liParams);
 
         List<StateVariable> liStateV = this.root.getStateVariable();
 
@@ -308,7 +315,7 @@ public class SimkitXML2Java {
     }
 
     // TODO: May have to check for generic containers of array types
-    void buildParameterAccessor(Parameter p, StringWriter sw) {
+    void buildParameterModifierAndAccessor(Parameter p, StringWriter sw) {
 
         PrintWriter pw = new PrintWriter(sw);
 
@@ -326,17 +333,11 @@ public class SimkitXML2Java {
         pw.println(SP_4 + CB);
         pw.println();
 
-        /* also provide indexed set/getters, may be multidimensional, however,
+        /* also provide indexed getters, may be multidimensional, however,
          * not expected to actually be multidimensional
          */
         if (isArray(p.getType())) {
             int d = dims(p.getType());
-
-            pw.print(SP_4 + "public final void set" + capitalize(p.getName()) + LP + indx(d));
-            pw.println(baseOf(p.getType()) + SP + shortinate(p.getName()) + RP + SP + OB);
-            pw.println(SP_8 + "this" + PD + p.getName() + indxbr(d) + SP + EQ + SP + shortinate(p.getName()) + SC);
-            pw.println(SP_4 + CB);
-            pw.println();
 
             pw.print(SP_4 + PUBLIC + SP + baseOf(p.getType()) + SP + "get");
             pw.print(capitalize(p.getName()) + LP + indxncm(d));
@@ -539,6 +540,7 @@ public class SimkitXML2Java {
         // Bugfix 1398
         for (Event e : events) {
             if (e.getName().equals("Run")) {
+                doResetBlock(e, runBlock);
                 doRunBlock(e, runBlock);
             } else {
                 doEventBlock(e, eventBlock);
@@ -546,13 +548,10 @@ public class SimkitXML2Java {
         }
     }
 
-    void doRunBlock(Event run, StringWriter runBlock) {
+    void doResetBlock(Event run, StringWriter runBlock) {
 
         PrintWriter pw = new PrintWriter(runBlock);
         List<LocalVariable> liLocalV = run.getLocalVariable();
-        List<Object> liSchedCanc = run.getScheduleOrCancel();
-
-        /* Handle the reset method */
 
         pw.println(SP_4 + "@Override");
         pw.println(SP_4 + "public void reset() " + OB);
@@ -600,8 +599,13 @@ public class SimkitXML2Java {
 
         pw.println(SP_4 + CB);
         pw.println();
+    }
 
-        /* Handle the doRun method */
+    void doRunBlock(Event run, StringWriter runBlock) {
+
+        PrintWriter pw = new PrintWriter(runBlock);
+        List<LocalVariable> liLocalV = run.getLocalVariable();
+        List<Object> liSchedCanc = run.getScheduleOrCancel();
 
         Method doRun = null;
 
@@ -625,11 +629,15 @@ public class SimkitXML2Java {
             pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
         }
 
+        pw.println();
+
         for (LocalVariable local : liLocalV) {
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
 
-        pw.println();
+        if (!liLocalV.isEmpty()) {pw.println();}
+
+        List<StateTransition> liStateT = run.getStateTransition();
 
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
@@ -648,7 +656,7 @@ public class SimkitXML2Java {
             }
 
             // Give these FPCs "getters" as arguments
-            String stateVariableName = sv.getName().substring(0, 1).toUpperCase() + sv.getName().substring(1);
+            String stateVariableName = capitalize(sv.getName());
             String stateVariableGetter = "get" + stateVariableName + LP;
 
             if (isar) {
@@ -729,6 +737,8 @@ public class SimkitXML2Java {
             // finish the method decl
             pw.println(RP + SP + OB);
         }
+
+        pw.println();
 
         // local variable decls
         for (LocalVariable local : liLocalV) {
