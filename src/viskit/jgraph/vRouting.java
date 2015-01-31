@@ -118,7 +118,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
         // Handle beginning Edge point placement (not worried about AssemblyEdge)
         Object ed = edge.getSource();
-        vPortCell vCell;
+        vPortCell vCell = null;
         if (ed instanceof PortView) {
             if (((PortView) ed).getCell() instanceof vPortCell) {
                 vCell = (vPortCell) ((PortView) ed).getCell();
@@ -148,7 +148,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         for (int i = 0; i < routed.length; i++) {
 
             // This call gets SEs & CEs to draw in a parabola
-            if (points.contains(routed[i])) {continue;}
+            if (vCell != null && points.contains(routed[i])) {continue;}
 
             if (points.size() > i + 2) {
                 points.set(i + 1, routed[i]);
