@@ -759,7 +759,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
         addSelfCancelRef = makeJLabel("viskit/images/selfCancelArc.png",
-                "Drag onto an existing event node to add a self-referential caceling edge");
+                "Drag onto an existing event node to add a self-referential canceling edge");
         addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
