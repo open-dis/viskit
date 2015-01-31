@@ -140,6 +140,7 @@ public class vAssemblyPclVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
+     * @param hideGroups
      */
     public vAssemblyPclVertexRenderer(boolean hideGroups) {
         this();
@@ -287,7 +288,7 @@ public class vAssemblyPclVertexRenderer
     private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
         String[] nuts = new String[2];
         nuts[1] = s;
-        Vector<String> v = new Vector<String>();
+        Vector<String> v = new Vector<>();
         do {
             nuts = splitOnce(nuts[1], maxW, metrics);
             v.add(nuts[0]);
@@ -343,6 +344,7 @@ public class vAssemblyPclVertexRenderer
 
     /**
      * Provided for subclasses to paint a selection border.
+     * @param g
      */
     protected void paintSelectionBorder(Graphics g) {
         //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
@@ -361,11 +363,16 @@ public class vAssemblyPclVertexRenderer
     }
 
     /**
+     * TODO: Not currently used.
+     *
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
      *
-     * TODO: Not currently used
+     * @param view
+     * @param source
+     * @param p
+     * @return
      */
     public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
         Rectangle2D bounds = view.getBounds();

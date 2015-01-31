@@ -384,11 +384,11 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
+     * TODO: Not currently used.
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
      *
-     * TODO: Not currently used
      * @param view
      * @param source
      * @param p

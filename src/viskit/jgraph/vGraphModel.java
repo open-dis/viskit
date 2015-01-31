@@ -5,7 +5,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
-import viskit.model.CancelingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.SchedulingEdge;
@@ -40,7 +39,9 @@ public class vGraphModel extends DefaultGraphModel {
         GraphConstants.setEndFill(viskitEdgeStyle, true);
         GraphConstants.setEndSize(viskitEdgeStyle, 10);
         GraphConstants.setFont(viskitEdgeStyle, GraphConstants.DEFAULTFONT.deriveFont(10));
-        GraphConstants.setBendable(viskitEdgeStyle, true);
+
+        // This setting critical to getting the start and end points offset from
+        // the center of the node
         GraphConstants.setLineStyle(viskitEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
         GraphConstants.setLineWidth(viskitEdgeStyle, 1);
         GraphConstants.setOpaque(viskitEdgeStyle, true);
@@ -71,11 +72,11 @@ public class vGraphModel extends DefaultGraphModel {
         reDrawNodes(); // jmb try...yes, I thought the stopEditing would do the same thing
     }
 
-    public void changeEdge(SchedulingEdge ed) {
+    public void changeEdge(Edge ed) {
         changeEitherEdge(ed);
     }
 
-    public void changeCancelingEdge(CancelingEdge ed) {
+    public void changeCancelingEdge(Edge ed) {
         changeEitherEdge(ed);
     }
 
@@ -101,7 +102,6 @@ public class vGraphModel extends DefaultGraphModel {
     }
 
     public void deleteAll() {
-        //remove(getRoots(this));
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
             if (localRoot instanceof CircleCell) {
@@ -113,14 +113,13 @@ public class vGraphModel extends DefaultGraphModel {
         remove(localRoots);
     }
 
-    public void deleteEdge(SchedulingEdge edge) {
+    public void deleteEdge(Edge edge) {
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
         remove(new Object[]{e});
     }
 
-    public void deleteCancelingEdge(CancelingEdge edge) {
-        DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
-        remove(new Object[]{e});
+    public void deleteCancelingEdge(Edge edge) {
+        deleteEdge(edge);
     }
 
     public void deleteEventNode(EventNode en) {
@@ -129,17 +128,17 @@ public class vGraphModel extends DefaultGraphModel {
         remove(new Object[]{c});
     }
 
-    public void addEdge(SchedulingEdge se) {
-        _addEdgeCommon(se, viskitEdgeStyle);
+    public void addEdge(Edge e) {
+        _addEdgeCommon(e, viskitEdgeStyle);
     }
 
-    public void addCancelEdge(CancelingEdge ce) {
-        _addEdgeCommon(ce, viskitCancelEdgeStyle);
+    public void addCancelEdge(Edge e) {
+        _addEdgeCommon(e, viskitCancelEdgeStyle);
     }
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    private void _addEdgeCommon(viskit.model.Edge ed, Map edgeStyle) {
+    private void _addEdgeCommon(Edge ed, Map edgeStyle) {
         EventNode enfrom = ed.from;
         EventNode ento = ed.to;
         DefaultGraphCell source = (DefaultGraphCell) enfrom.opaqueViewObject;

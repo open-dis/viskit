@@ -13,9 +13,14 @@ import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 
 /**
+ * This overridden JGraph class's main purpose is to render customized text in
+ * each of the CircleCell instances that represent nodes
+ *
+ * <p>
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
+ * </p>
  * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 3:40:51 PM

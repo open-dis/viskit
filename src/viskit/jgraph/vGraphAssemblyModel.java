@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.ConnectionSet;
+import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.DefaultGraphCell;
 import org.jgraph.graph.DefaultGraphModel;
 import org.jgraph.graph.GraphConstants;
@@ -41,7 +42,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setLineBegin(viskitAssyAdapterEdgeStyle, GraphConstants.ARROW_TECHNICAL);  // arrow not drawn
         GraphConstants.setBeginFill(viskitAssyAdapterEdgeStyle, false);
         GraphConstants.setBeginSize(viskitAssyAdapterEdgeStyle, 16);
-        GraphConstants.setBendable(viskitAssyAdapterEdgeStyle, true);
+
+        // This setting critical to getting the start and end points offset from
+        // the center of the node
         GraphConstants.setLineStyle(viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
         GraphConstants.setOpaque(viskitAssyAdapterEdgeStyle, true);
         GraphConstants.setForeground(viskitAssyAdapterEdgeStyle, Color.black);
@@ -80,7 +83,6 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     }
 
     public void deleteAll() {
-        //remove(getRoots(this));
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
             if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropListCell) {
@@ -92,46 +94,34 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         remove(localRoots);
     }
 
-    public void deleteEGNode(EvGraphNode egn) {
+    public void deleteEGNode(AssemblyNode egn) {
         DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
         c.removeAllChildren();
         this.remove(new Object[]{c});
     }
 
-    public void changeEGNode(EvGraphNode egn) {
-        AssemblyCircleCell c = (AssemblyCircleCell) egn.opaqueViewObject;
+    public void changeEGNode(AssemblyNode egn) {
+        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
         c.setUserObject(egn);
         reDrawNodes();
     }
 
-    public void deletePCLNode(PropChangeListenerNode pcln) {
-        DefaultGraphCell c = (DefaultGraphCell) pcln.opaqueViewObject;
-        c.removeAllChildren();
-        this.remove(new Object[]{c});
+    public void deletePCLNode(AssemblyNode pcln) {
+        deleteEGNode(pcln);
     }
 
-    public void changePCLNode(PropChangeListenerNode pcln) {
-        AssemblyPropListCell c = (AssemblyPropListCell) pcln.opaqueViewObject;
-        c.setUserObject(pcln);
-        reDrawNodes();
+    public void changePCLNode(AssemblyNode pcln) {
+        changeEGNode(pcln);
     }
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    public void addAdapterEdge(AdapterEdge ae) {
+    public void addAdapterEdge(AssemblyEdge ae) {
         Object frO = ae.getFrom();
         Object toO = ae.getTo();
         DefaultGraphCell from, to;
-        if (frO instanceof EvGraphNode) {
-            from = (DefaultGraphCell) ((EvGraphNode) frO).opaqueViewObject;
-        } else {
-            from = (DefaultGraphCell) ((PropChangeListenerNode) frO).opaqueViewObject;
-        }
-        if (toO instanceof EvGraphNode) {
-            to = (DefaultGraphCell) ((EvGraphNode) toO).opaqueViewObject;
-        } else {
-            to = (DefaultGraphCell) ((PropChangeListenerNode) toO).opaqueViewObject;
-        }
+        from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
+        to = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
 
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         ae.opaqueViewObject = edge;
@@ -147,8 +137,13 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         toBack(new Object[]{edge});
     }
 
-    public void deleteAdapterEdge(AdapterEdge ae) {
-        this.remove(new Object[]{ae.opaqueViewObject});
+    public void changeAdapterEdge(AssemblyEdge ae) {
+        changeAnyEdge(ae);
+    }
+
+    public void deleteAdapterEdge(AssemblyEdge ae) {
+        DefaultEdge c = (DefaultEdge) ae.opaqueViewObject;
+        this.remove(new Object[]{c});
     }
 
     public void changeAnyEdge(AssemblyEdge asEd) {
@@ -157,26 +152,22 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         reDrawNodes();
     }
 
-    public void changeAdapterEdge(AdapterEdge ae) {
-        changeAnyEdge(ae);
+    public void deleteSimEvListEdge(AssemblyEdge sele) {
+        deleteAdapterEdge(sele);
+    }
+
+    public void changeSimEvListEdge(AssemblyEdge sele) {
+        changeAnyEdge(sele);
     }
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    public void addSimEvListEdge(SimEvListenerEdge sele) {
+    public void addSimEvListEdge(AssemblyEdge sele) {
         Object frO = sele.getFrom();
         Object toO = sele.getTo();
         DefaultGraphCell from, to;
-        if (frO instanceof EvGraphNode) {
-            from = (DefaultGraphCell) ((EvGraphNode) frO).opaqueViewObject;
-        } else {
-            from = (DefaultGraphCell) ((PropChangeListenerNode) frO).opaqueViewObject;
-        }
-        if (toO instanceof EvGraphNode) {
-            to = (DefaultGraphCell) ((EvGraphNode) toO).opaqueViewObject;
-        } else {
-            to = (DefaultGraphCell) ((PropChangeListenerNode) toO).opaqueViewObject;
-        }
+        from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
+        to = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
 
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         sele.opaqueViewObject = edge;
@@ -192,26 +183,18 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         toBack(new Object[]{edge});
     }
 
-    public void deleteSimEvListEdge(SimEvListenerEdge sele) {
-        this.remove(new Object[]{sele.opaqueViewObject});
+    public void deletePclEdge(AssemblyEdge pce) {
+        deleteAdapterEdge(pce);
     }
 
-    public void changeSimEvListEdge(SimEvListenerEdge sele) {
-        changeAnyEdge(sele);
-    }
-
-    public void deletePclEdge(PropChangeEdge pce) {
-        this.remove(new Object[]{pce.opaqueViewObject});
-    }
-
-    public void changePclEdge(PropChangeEdge pce) {
+    public void changePclEdge(AssemblyEdge pce) {
         changeAnyEdge(pce);
     }
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    public void addPclEdge(PropChangeEdge pce) {
-        EvGraphNode egn = (EvGraphNode) pce.getFrom();
+    public void addPclEdge(AssemblyEdge pce) {
+        AssemblyNode egn = (AssemblyNode) pce.getFrom();
         //PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
         AssemblyNode pcln = (AssemblyNode) pce.getTo();
         DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;

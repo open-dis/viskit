@@ -46,6 +46,7 @@ import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.PortView;
 import viskit.model.AssemblyEdge;
+import viskit.model.Edge;
 import viskit.model.EvGraphNode;
 import viskit.model.EventNode;
 import viskit.model.PropChangeListenerNode;
@@ -55,6 +56,7 @@ import viskit.model.ViskitElement;
  * A replacement class to tweak the routing slightly so that the edges come into
  * the node from other directions than NSE and W. Also, support offsetting edges
  * between the same two nodes.
+ *
  * @author Mike Bailey
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitRouting">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
@@ -101,6 +103,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             adjustFactor = getFactor(toKey, fromKey, edge);
         }
 
+        // Not sure what this block does is relevant, but it's not hurting anything
         int sig = adjustFactor % 2;
         adjustFactor++;
         adjustFactor /= 2;
@@ -108,33 +111,50 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             adjustFactor *= -1;
         }
 
-        int adjustment = 35 * adjustFactor;       // little bias
-
         double dx = Math.abs(from.getX() - to.getX());
         double dy = Math.abs(from.getY() - to.getY());
         double x2 = from.getX() + ((to.getX() - from.getX()) / 2);
         double y2 = from.getY() + ((to.getY() - from.getY()) / 2);
+
+        // Handle beginning Edge point placement (not worried about AssemblyEdge)
+        Object ed = edge.getSource();
+        vPortCell vCell;
+        if (ed instanceof PortView) {
+            if (((PortView) ed).getCell() instanceof vPortCell) {
+                vCell = (vPortCell) ((PortView) ed).getCell();
+
+                // If we have more than one edge to/from this node, then bias
+                // the parabolic control point
+                if (vCell.getEdges().size() > 1) {
+                    if (adjustFactor == 0) {
+                        adjustFactor -= 1;
+                    }
+                }
+            }
+        }
+
+        int adjustment = 55 * adjustFactor;       // bias control for parabola
+
         Point2D[] routed = new Point2D[2];
         if (dx > dy) {
             routed[0] = edge.getAllAttributes().createPoint(x2, from.getY() + adjustment);
-            routed[1] = edge.getAllAttributes().createPoint(x2, to.getY() - adjustment);
+            routed[1] = edge.getAllAttributes().createPoint(x2, to.getY() + adjustment);
         } else {
-            routed[0] = edge.getAllAttributes().createPoint(from.getX() - adjustment, y2);
+            routed[0] = edge.getAllAttributes().createPoint(from.getX() + adjustment, y2);
             routed[1] = edge.getAllAttributes().createPoint(to.getX() + adjustment, y2);
         }
 
-        // Set/Add Points
+        // Set/Add unique control points
         for (int i = 0; i < routed.length; i++) {
+
+            // This call gets SEs & CEs to draw in a parabola
+            if (points.contains(routed[i])) {continue;}
+
             if (points.size() > i + 2) {
                 points.set(i + 1, routed[i]);
             } else {
                 points.add(i + 1, routed[i]);
             }
-        }
-
-        // Remove spare points
-        while (points.size() > routed.length + 2) {
-            points.remove(points.size() - 2);
         }
 
         return points;
@@ -174,17 +194,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             masterKey = toStr + "-" + fromStr;
         }
 
-        DefaultEdge vec;
-        ViskitElement edg = null;
-        if (ev.getCell() instanceof vEdgeCell) {
-            vec = (vEdgeCell) ev.getCell();
-            edg = (viskit.model.Edge) vec.getUserObject();
-        } else if (ev.getCell() instanceof vAssemblyEdgeCell) {
-            vec = (vAssemblyEdgeCell) ev.getCell();
-            edg = (AssemblyEdge) vec.getUserObject();
-        }
-
-        Object edgeKey = edg.getModelKey();
+        Object edgeKey = getElement(ev).getModelKey();
 
         Vector<Object> lis = nodePairs.get(masterKey);
         if (lis == null) {
@@ -193,8 +203,9 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             v.add(edgeKey);
             //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
             nodePairs.put(masterKey, v);
-            return 0;
+                return 0;
         }
+
         // Here if there has been a previous edge between the 2, maybe just this one
         if (!lis.contains(edgeKey)) {
             lis.add(edgeKey);
@@ -203,6 +214,20 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         return lis.indexOf(edgeKey);
     }
 
+    private ViskitElement getElement(EdgeView ev) {
+        DefaultEdge vec;
+        ViskitElement edg = null;
+        if (ev.getCell() instanceof vEdgeCell) {
+            vec = (vEdgeCell) ev.getCell();
+            edg = (Edge) vec.getUserObject();
+        } else if (ev.getCell() instanceof vAssemblyEdgeCell) {
+            vec = (vAssemblyEdgeCell) ev.getCell();
+            edg = (AssemblyEdge) vec.getUserObject();
+        }
+        return edg;
+    }
+
+    // NOTE: This preference ensures bendable edges
     @Override
     public int getPreferredLineStyle(EdgeView ev) {
         return GraphConstants.STYLE_SPLINE;

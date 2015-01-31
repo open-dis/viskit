@@ -23,19 +23,21 @@ public class vEdgeRenderer extends EdgeRenderer {
     double[] coo = new double[6];
 
     /**
-     * Override only to use a different way of positioning the label on the edge.  The default method
-     * doesn't do such a good job on quadratic edges.
+     * Override only to use a different way of positioning the label on the edge.
+     * The default method doesn't do such a good job on quadratic edges.
      * @param view EdgeView for this edge
      * @return Center point of label
      */
     @Override
     public Point2D getLabelPosition(EdgeView view) {
-        super.getLabelPosition(view);  // incase of side effects, but forget the return
-        //view.sharedPath.
 
         Shape s = view.sharedPath;
         Point2D src = null;
         Point2D aim;
+
+        if (s == null) {
+            return super.getLabelPosition(view);
+        }
 
         for (PathIterator pi = s.getPathIterator(null); !pi.isDone();) {
             int ret = pi.currentSegment(coo);
@@ -50,14 +52,6 @@ public class vEdgeRenderer extends EdgeRenderer {
                 double newX = src.getX() + (Math.cos(theta) * 25);
                 double newY = src.getY() + (Math.sin(theta) * 25);
                 return new Point2D.Double(newX, newY);
-
-
-            // make it the midpoint of the straight line between the control points
-/*
-            int dx = (int)coo[2] - (int) coo[0];
-            int dy = (int)coo[3] - (int) coo[1];
-            return new Point((int)coo[0] + dx/2,(int)coo[1] + dy/2);
-             */
             }
 
             pi.next();

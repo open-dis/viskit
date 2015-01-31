@@ -54,13 +54,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         vGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
-        //super.setDoubleBuffered(false); // test for mac
         this.vGModel = model;
-        this.setBendable(true);
         this.setSizeable(false);
         this.setGridVisible(true);
-        //this.setGridMode(JGraph.CROSS_GRID_MODE);
-        //this.setGridMode(JGraph.DOT_GRID_MODE);
         this.setGridMode(JGraph.LINE_GRID_MODE);
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
@@ -70,6 +66,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         // Set the Tolerance to 2 Pixel
         setTolerance(2);
+
         // Jump to default port on connect
         setJumpToDefaultPort(true);
 
@@ -233,29 +230,29 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 // Reclaimed from the vGModel to here
                 insert((EventNode) ev.getSource());
                 break;
-            case ModelEvent.EDGEADDED:
-                vGModel.addEdge((SchedulingEdge) ev.getSource());
-                break;
-            case ModelEvent.CANCELINGEDGEADDED:
-                vGModel.addCancelEdge((CancelingEdge) ev.getSource());
-                break;
             case ModelEvent.EVENTCHANGED:
                 vGModel.changeEvent((EventNode) ev.getSource());
                 break;
             case ModelEvent.EVENTDELETED:
                 vGModel.deleteEventNode((EventNode) ev.getSource());
                 break;
+            case ModelEvent.EDGEADDED:
+                vGModel.addEdge((Edge) ev.getSource());
+                break;
             case ModelEvent.EDGECHANGED:
-                vGModel.changeEdge((SchedulingEdge) ev.getSource());
+                vGModel.changeEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.EDGEDELETED:
-                vGModel.deleteEdge((SchedulingEdge) ev.getSource());
+                vGModel.deleteEdge((Edge) ev.getSource());
+                break;
+            case ModelEvent.CANCELINGEDGEADDED:
+                vGModel.addCancelEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.CANCELINGEDGECHANGED:
-                vGModel.changeCancelingEdge((CancelingEdge) ev.getSource());
+                vGModel.changeCancelingEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.CANCELINGEDGEDELETED:
-                vGModel.deleteCancelingEdge((CancelingEdge) ev.getSource());
+                vGModel.deleteCancelingEdge((Edge) ev.getSource());
                 break;
             default:
                 //System.out.println("duh");
@@ -1079,15 +1076,6 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
     private double circleDiam = 30.0d;
     private Arc2D arc;
 
-    /**
-     * Returns the shape that represents the current edge
-     * in the context of the current graph.
-     * This method sets the global beginShape, lineShape
-     * and endShape variables as a side-effect.
-     *
-     * @return the shape that represents the current edge
-     * in the context of the current graph
-     */
     @Override
     protected Shape createShape() {
         CircleView myCircle = (CircleView) view.getSource().getParentView();
@@ -1142,18 +1130,23 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
     }
 
     /**
-     * Defines how much we increment the angle calculated in getAngle() for each self-referential edge discovered.
-     * Since we want to advance 3/8 of a circle for each edge, the value below should be 2Pi * 3/8.
-     * But since the iterator in getAngle discovers each edge twice (since the node has a connection to
-     * both its head and tail, the math works out to rotate only half that much.
+     * Defines how much we increment the angle calculated in getAngle() for each
+     * self-referential edge discovered.  Since we want to advance 3/8 of
+     * a circle for each edge, the value below should be Pi that increments by
+     * Pi * 3/8.
+     * But since the iterator in getAngle discovers each edge twice (since the
+     * edge has a connection to both its head and tail, the math works out to
+     * rotate only half that much.
      */
-    private static double rotIncr = Math.PI * 3.d / 8.d;
+    private final static double ROT_INCR = Math.PI;
 
     /**
-     * This class will determine if there are other self-referential edges attached to this
-     * node, and try to return a different angle for different edges, so they will be rendered
-     * at different "clock" points around the node circle.
-     * @return a different angle for different edges
+     * This class will determine if there are other self-referential edges
+     * attached to this node and try to return a different angle for different
+     * edges, so they will be rendered at different "clock" points around the
+     * node circle.
+     *
+     * @return a different angle for each self-referential edge
      */
     private double getAngle() {
         vEdgeCell vec = (vEdgeCell) view.getCell();
@@ -1161,14 +1154,14 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
 
         CircleCell vcc = (CircleCell) view.getSource().getParentView().getCell();
         EventNode en = (EventNode) vcc.getUserObject();
-        double retd = -rotIncr;
+        double retd = ROT_INCR;
         for (ViskitElement ve : en.getConnections()) {
             Edge e = (Edge) ve;
             if (e.to == en && e.from == en) {
-                retd += rotIncr;
+                retd += (ROT_INCR * 3/8);
                 if (e == edg) {
                     return retd;
-                }
+                 }
             }
         }
         return 0.0d;      // should always find one

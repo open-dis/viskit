@@ -2,6 +2,10 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  If the CNTL key is held down while attempting to drag and edge control point
+  a IOOBE will be thrown by JGraph v5.14.0.  This may be fixed in a subsequent
+  release of JGraph should we decide to upgrade.
+
   If a single Assy file was closed, it will close all open EGs file including
   non-associated EGs.  This happens due to the EG caching system that relies on
   parsing SimEntities of Assy files to know which EG to keep open
@@ -19,6 +23,11 @@ Post release fixes / upgrades / issues:
   the user can investigate and fix during EG or Assy authoring.
 
   ****** FIXES / UPGRADES:
+
+  JGraph extended and overridden components now behave like actual DES EG nodes
+  in that EG node edges take on the classic parabolic shape when two edges
+  connect between nodes.  Self-referential edges now begin hear the top of the
+  node instead of at the bottom and form around the node in a clockwise fashion.
 
   Fixed issue with the StateVariableDialog where if an array type was entered in
   the type field, the array length field was still disabled
