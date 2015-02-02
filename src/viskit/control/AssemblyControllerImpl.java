@@ -488,7 +488,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
         }
     }
-
+    private int egNodeCount = 0;
+    private int adptrNodeCount = 0;
+    private int pclNodeCount = 0;    // A little experiment in class introspection
     private static Field egCountField;
     private static Field adptrCountField;
     private static Field pclCountField;
