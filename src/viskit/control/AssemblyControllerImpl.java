@@ -488,13 +488,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
         }
     }
-    private int egNodeCount = 0;
-    private int adptrNodeCount = 0;
-    private int pclNodeCount = 0;    // A little experiment in class introspection
+
     private static Field egCountField;
     private static Field adptrCountField;
     private static Field pclCountField;
-
 
     static { // do at class init time
         try {
@@ -999,8 +996,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeOrEdgeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());
-        ActionIntrospector.getAction(this, "edit").setEnabled(nodeOrEdgeSelected());
+        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());;
     }
     private Vector<Object> copyVector = new Vector<>();
 
@@ -1039,38 +1035,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         return false;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void edit() {
-        if (selectionVector.isEmpty()) {
-            return;
-        }
-        copyVector = (Vector<Object>) selectionVector.clone();
-        for (Object o : copyVector) {
-            if (!(o instanceof EvGraphNode)) {
-                messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
-                        "Please select an Event Graph");
-                return;
-            }
-            String className = ((ViskitElement) o).getType();
-            File f = null;
-            try {
-                f = FileBasedClassManager.instance().getFile(className);
-            } catch (Exception e) {
-                if (viskit.VStatics.debug) {
-                    LOGGER.error(e);
-                }
-            }
-            if (f == null) {
-                messageUser(JOptionPane.INFORMATION_MESSAGE, "Make Selection",
-                        "Please select an XML Event Graph to load onto EG Editor tab");
-                return;
-            }
-
-            // _doOpen checks if a tab is already opened
-            ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(f);
-        }
     }
 
     @Override

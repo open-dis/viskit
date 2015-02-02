@@ -355,16 +355,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
         editMenu.add(buildMenuItem(controller, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(controller, "paste", "Paste", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(controller, "paste", "Paste Nodes", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editMenu.add(buildMenuItem(controller, "edit", "Load an EG Editor Tab", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
         // These 4 start off being disabled, until something is selected
         ActionIntrospector.getAction(controller, "cut").setEnabled(false);
         ActionIntrospector.getAction(controller, "copy").setEnabled(false);
         ActionIntrospector.getAction(controller, "paste").setEnabled(false);
-        ActionIntrospector.getAction(controller, "edit").setEnabled(false);
 
         editMenu.addSeparator();
 
