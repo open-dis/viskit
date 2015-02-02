@@ -139,7 +139,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
             boolean dirty = false;
             if (ret == JOptionPane.YES_OPTION) {
-                buildNewNode(new Point(30, 30), "Run");
+                buildNewNode(new Point(30, 60), "Run");
                 dirty = true;
             }
             ((Model) getModel()).setDirty(dirty);

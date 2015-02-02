@@ -45,7 +45,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private AssemblyController controller;
 
     public AssemblyModelImpl(AssemblyController cont) {
-        pointLess = new Point2D.Double(10, 10);
+        pointLess = new Point2D.Double(30, 60);
         controller = cont;
         metaData = new GraphMetaData(this);
         setNodeCache(new LinkedHashMap<String, AssemblyNode>());
@@ -94,7 +94,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean newModel(File f) {
         getNodeCache().clear();
-        pointLess = new Point2D.Double(10, 10);
+        pointLess = new Point2D.Double(30, 60);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
         if (f == null) {

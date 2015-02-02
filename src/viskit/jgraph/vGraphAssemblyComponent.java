@@ -1040,7 +1040,7 @@ class vAssyPclEdgeView extends vEdgeView {
 class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
 
     /**
-     * Paint the vapvr. Overridden to do a double line and paint over the end
+     * Paint the vaaer. Overridden to do a double line and paint over the end
      * shape
      */
     @Override

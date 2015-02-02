@@ -120,6 +120,8 @@ public class vGraphModel extends DefaultGraphModel {
     public void deleteEdge(Edge edge) {
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
         remove(new Object[]{e});
+
+        reDrawNodes();
     }
 
     public void deleteCancelingEdge(Edge edge) {
@@ -174,5 +176,7 @@ public class vGraphModel extends DefaultGraphModel {
         }
 
         insert(new Object[]{edge}, atts, cs, null, null);
+
+        reDrawNodes();
     }
 }

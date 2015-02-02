@@ -761,7 +761,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void newEvent(String nodeName, Point2D p) {
         EventNode node = new EventNode(nodeName);
         if (p == null) {
-            p = new Point2D.Double(10, 10);
+            p = new Point2D.Double(30, 60);
         }
         node.setPosition(p);
         Event jaxbEv = oFactory.createEvent();

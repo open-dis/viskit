@@ -144,11 +144,14 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void deleteAdapterEdge(AssemblyEdge ae) {
         DefaultEdge c = (DefaultEdge) ae.opaqueViewObject;
         this.remove(new Object[]{c});
+        
+        reDrawNodes();
     }
 
     public void changeAnyEdge(AssemblyEdge asEd) {
         DefaultGraphCell c = (DefaultGraphCell) asEd.opaqueViewObject;
         c.setUserObject(asEd);
+
         reDrawNodes();
     }
 
@@ -211,5 +214,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
         insert(new Object[] {edge}, atts, cs, null, null);
         toBack(new Object[] {edge});
+
+        reDrawNodes();
     }
 }

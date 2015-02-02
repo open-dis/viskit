@@ -54,8 +54,10 @@ import viskit.model.ViskitElement;
 
 /**
  * A replacement class to tweak the routing slightly so that the edges come into
- * the node from other directions than NSE and W. Also, support offsetting edges
- * between the same two nodes.
+ * the node from directions other than NSE and W if there are more than one edge
+ * to/from a node.  This class will also provide a unique control point to give
+ * a distinctive parabolic shape the edge when there are more than one edge to/
+ * from a node.
  *
  * @author Mike Bailey
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitRouting">Terry Norbraten, NPS MOVES</a>
@@ -123,9 +125,9 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             if (((PortView) ed).getCell() instanceof vPortCell) {
                 vCell = (vPortCell) ((PortView) ed).getCell();
 
-                // If we have more than one edge to/from this node, then bias
-                // the parabolic control point
-                if (vCell.getEdges().size() > 1) {
+                // If we have more than two edges to/from this node, then bias
+                // the parabolic control points
+                if (vCell.getEdges().size() > 2) {
                     if (adjustFactor == 0) {
                         adjustFactor -= 1;
                     }
@@ -140,8 +142,8 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             routed[0] = edge.getAllAttributes().createPoint(x2, from.getY() + adjustment);
             routed[1] = edge.getAllAttributes().createPoint(x2, to.getY() + adjustment);
         } else {
-            routed[0] = edge.getAllAttributes().createPoint(from.getX() + adjustment, y2);
-            routed[1] = edge.getAllAttributes().createPoint(to.getX() + adjustment, y2);
+            routed[0] = edge.getAllAttributes().createPoint(from.getX(), y2 + adjustment);
+            routed[1] = edge.getAllAttributes().createPoint(to.getX(), y2 + adjustment);
         }
 
         // Set/Add unique control points
@@ -227,10 +229,10 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         return edg;
     }
 
-    // NOTE: This preference ensures bendable edges
+    // NOTE: This preference ensures symmetric, bendable edges
     @Override
     public int getPreferredLineStyle(EdgeView ev) {
-        return GraphConstants.STYLE_SPLINE;
+        return GraphConstants.STYLE_BEZIER;
     }
 
 } // end class file vRouting.java
