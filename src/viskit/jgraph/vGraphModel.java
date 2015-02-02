@@ -57,11 +57,15 @@ public class vGraphModel extends DefaultGraphModel {
         // dup for self edge
         viskitSelfRefEdge = new AttributeMap();
         viskitSelfRefEdge.putAll(viskitEdgeStyle);
+
+        // JGraph loop routing is assigned by default
         viskitSelfRefEdge.remove(GraphConstants.ROUTING);
 
         // dup for cancel self edge
         viskitSelfRefCancel = new AttributeMap();
         viskitSelfRefCancel.putAll(viskitCancelEdgeStyle);
+
+        // JGraph loop routing is assigned by default
         viskitSelfRefCancel.remove(GraphConstants.ROUTING);
     }
 
