@@ -734,9 +734,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private void killEdge(Edge e) {
         if (e instanceof SchedulingEdge) {
-            ((Model) getModel()).deleteSchedulingEdge((SchedulingEdge) e);
+            ((Model) getModel()).deleteSchedulingEdge(e);
         } else {
-            ((Model) getModel()).deleteCancelingEdge((CancelingEdge) e);
+            ((Model) getModel()).deleteCancelingEdge(e);
         }
     }
 
