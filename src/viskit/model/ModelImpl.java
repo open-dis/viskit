@@ -1038,7 +1038,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void deleteSchedulingEdge(SchedulingEdge edge) {
+    public void deleteSchedulingEdge(Edge edge) {
         _commonEdgeDelete(edge);
 
         setDirty(true);
@@ -1058,7 +1058,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void deleteCancelingEdge(CancelingEdge edge) {
+    public void deleteCancelingEdge(Edge edge) {
         _commonEdgeDelete(edge);
 
         setDirty(true);
@@ -1066,7 +1066,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void changeSchedulingEdge(SchedulingEdge e) {
+    public void changeSchedulingEdge(Edge e) {
         Schedule sch = (Schedule) e.opaqueModelObject;
         sch.setCondition(e.conditional);
         sch.getComment().clear();
@@ -1074,7 +1074,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         sch.setDelay("" + e.delay);
 
         sch.setEvent(e.to.opaqueModelObject);
-        sch.setPriority(e.priority);
+        sch.setPriority(((SchedulingEdge)e).priority);
         sch.getEdgeParameter().clear();
 
         // Bug 1373: This is where an edge parameter gets written out to XML
@@ -1089,7 +1089,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void changeCancelingEdge(CancelingEdge e) {
+    public void changeCancelingEdge(Edge e) {
         Cancel can = (Cancel) e.opaqueModelObject;
         can.setCondition(e.conditional);
         can.setEvent(e.to.opaqueModelObject);

@@ -88,13 +88,29 @@ public interface Model {
      */
     void deleteEvent(EventNode node);
 
-    void deleteSchedulingEdge(SchedulingEdge edge);
+    /** Deletes the given edge from the canvas
+     *
+     * @param edge the edge to delete
+     */
+    void deleteSchedulingEdge(Edge edge);
 
-    void deleteCancelingEdge(CancelingEdge edge);
+    /** Deletes the given edge from the canvas
+     *
+     * @param edge the edge to delete
+     */
+    void deleteCancelingEdge(Edge edge);
 
-    void changeSchedulingEdge(SchedulingEdge e);
+    /** Changes the given edge on the canvas
+     *
+     * @param e the edge to delete
+     */
+    void changeSchedulingEdge(Edge e);
 
-    void changeCancelingEdge(CancelingEdge e);
+    /** Changes the given edge on the canvas
+     *
+     * @param e the edge to delete
+     */
+    void changeCancelingEdge(Edge e);
 
     /** Modifies the properties of this EG model
      *
