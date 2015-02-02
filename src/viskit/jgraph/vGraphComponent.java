@@ -301,7 +301,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         if (event != null) {
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
             if (c != null) {
-                StringBuilder sb = new StringBuilder("<HTML>");
+                StringBuilder sb = new StringBuilder("<html>");
                 if (c instanceof vEdgeCell) {
                     vEdgeCell vc = (vEdgeCell) c;
                     Edge se = (Edge) vc.getUserObject();
@@ -386,7 +386,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
                         sb.setLength(sb.length() - 4);
                     }
-                    sb.append("</HTML>");
+                    sb.append("</html>");
                     return sb.toString();
 
                 } else if (c instanceof CircleCell) {
@@ -458,7 +458,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
                         sb.setLength(sb.length() - 4);
                     }
-                    sb.append("</HTML>");
+                    sb.append("</html>");
                     return sb.toString();
                 }
             }
