@@ -190,7 +190,10 @@ abstract public class MetaDataDialog extends JDialog {
         param.description = descriptionTextArea.getText().trim();
 
         if (this instanceof AssemblyMetaDataDialog) {
-            param.name = nameTf.getText().trim() + "Assembly";
+            if (!param.name.contains("Assembly"))
+                param.name = nameTf.getText().trim() + "Assembly";
+            else
+                param.name = nameTf.getText().trim();
         } else {
             param.name = nameTf.getText().trim();
         }
