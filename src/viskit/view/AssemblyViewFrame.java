@@ -1058,15 +1058,31 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         int retv = jfc.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (jfc.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION !=
-                        genericAskYN("File Exists",  "Overwrite? Confirm")) {
+                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
             return jfc.getSelectedFile();
         }
+
+        // We canceled
+        deleteCanceledSave(fil.getParentFile());
         jfc = null;
         return null;
+    }
+
+    /** Handles a canceled new EG file creation
+     *
+     * @param file to candidate EG file
+     */
+    private void deleteCanceledSave(File file) {
+        if (file.exists()) {
+            if (file.delete()) {
+                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
+                    deleteCanceledSave(file.getParentFile());
+                }
+            }
+        }
     }
 
     @Override
