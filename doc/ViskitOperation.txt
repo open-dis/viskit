@@ -175,7 +175,9 @@ Viskit is currently running.  This is to eliminate any in memory static
 references to the any previously initialized Assembly parameters thereby giving
 the current Assembly a clean slate to run an independent sim.  The main Thread
 run method for each XML Assembly file is via subclass of ViskitAssembly which
-subclasses BasicAssembly which contains the run method.
+subclasses BasicAssembly which contains the run method.  Subsequent selection of
+the VCR run button will produce the exact same results if nothing in the Assy.
+has been altered.
 
 10) The simulation can be immediately stopped via the VCR stop button, or it can
 run until its sim. stop time has been reached for the number of replications
