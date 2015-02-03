@@ -1138,6 +1138,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
         }
+        jfc.setDialogTitle("Save Event Graph");
 
         File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
