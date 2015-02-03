@@ -2,9 +2,14 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  Currently, because of the inability to check method signatures when naming
+  EG Nodes, we are not able to have similar method names, i.e. Arrival, even
+  with differing method signatures.  As such, subclassing is still possible, but
+  code blocks will be required to schedule unique events w/ parameters.
+
   If the CNTL key is held down while attempting to drag and edge control point
   a IOOBE will be thrown by JGraph v5.14.0.  This may be fixed in a subsequent
-  release of JGraph should we decide to upgrade.
+  release of JGraphX (new code base name) should we decide to upgrade to v6+.
 
   If a single Assy file was closed, it will close all open EGs file including
   non-associated EGs.  This happens due to the EG caching system that relies on

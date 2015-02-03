@@ -272,7 +272,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private boolean nameCheck() {
-        HashSet<String> hs = new HashSet<>(10);
+        Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
                 return false;

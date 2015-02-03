@@ -39,7 +39,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     SimEntity jaxbRoot;
     File currentFile;
     Map<Event, EventNode> evNodeCache = new HashMap<>();
-    Map<Object, Object> edgeCache = new HashMap<>();
+    Map<Object, Edge> edgeCache = new HashMap<>();
     Vector<ViskitElement> stateVariables = new Vector<>();
     Vector<ViskitElement> simParameters = new Vector<>();
     private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
@@ -322,7 +322,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private boolean eventNameCheck() {
-        HashSet<String> hs = new HashSet<>(10);
+        Set<String> hs = new HashSet<>(10);
         for (EventNode en : evNodeCache.values()) {
             if (!hs.add(en.getName())) {
                 return false;
@@ -341,7 +341,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private boolean stateVarParamNameCheck() {
-        HashSet<String> hs = new HashSet<>(10);
+        Set<String> hs = new HashSet<>(10);
         for (ViskitElement sv : stateVariables) {
             if (!hs.add(sv.getName())) {
                 return false;
