@@ -61,6 +61,7 @@ abstract public class MetaDataDialog extends JDialog {
 
         JLabel pkgLab = new JLabel("package", JLabel.TRAILING);
         packageTf = new JTextField(20);
+        packageTf.setToolTipText("Use standard Java dot notation for package naming");
         pkgLab.setLabelFor(packageTf);
         textFieldPanel.add(pkgLab);
         textFieldPanel.add(packageTf);
