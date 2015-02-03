@@ -271,6 +271,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
+            // Set a specific clean class loader for this sim run
+            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset)) {
+                lastLoaderWithReset = loader.init();
+                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+            }
+
             targetClass = lastLoaderWithReset.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
 
@@ -321,11 +327,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             new SimThreadMonitor(simRunner).start();
 
             // Restore Viskit's working ClassLoader
-            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
+                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex);
         }
+
     }
 
     /** Class to perform end of simulation run cleanup items */

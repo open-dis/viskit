@@ -123,10 +123,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         setNumberReplications(1);
         hookupsCalled = false;
 
-        //Creates a report stats config object and names it based on the name of this
-        //Assembly.
-        //TODO MIKE: instead of this.getName() We may not need to worry about the name of
-        //the stats report file. Should discuss though.
+        // Creates a report stats config object and names it based on the name
+        // of this Assembly.
         statsConfig = new ReportStatisticsConfig(this.getName());
     }
 
@@ -494,9 +492,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         for (int i = 0; i < clonedReplicationStats.length; i++) {
             buf.append(System.getProperty("line.separator"));
             buf.append(((SampleStatistics) clonedReplicationStats[i]).getName());
-//            buf.append('[');
-//            buf.append(i);
-//            buf.append(']');
             if (!(((SampleStatistics) clonedReplicationStats[i]).getName().length() > 20)) {
                 buf.append('\t');
             }
@@ -675,7 +670,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
-                System.out.println("Starting Replication #" + (replication + 1) + " with random seed " + seed + " for:");
+                System.out.println("Starting Replication #" + (replication + 1) + " with random seed: " + seed);
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
@@ -746,9 +741,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     printWriter.println(getReplicationReport(replication));
                     printWriter.flush();
                 }
-
-                System.runFinalization();
-                System.gc();
             }
 
             if (scenarioManager != null) {
@@ -784,10 +776,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //                ex.printStackTrace();
             }
         }
-
-        // TODO: Determine if these actually work they way are intended too?
-        System.runFinalization();
-        System.gc();
     }
 
     /**
