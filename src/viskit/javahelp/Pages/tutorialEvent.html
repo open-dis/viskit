@@ -2,10 +2,10 @@
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<HEAD>
-    <TITLE>VisKit - Tutorial</title>
-    <meta http-equiv=Content-Type content="text/html; charset=windows-1252">
-    <link rel="stylesheet" type="text/css" href="../basicStyle.css" >
+<head>
+    <title>Viskit - Tutorial</title>
+    <meta http-equiv=Content-Type content="text/html; charset=windows-1252"/>
+    <link rel="stylesheet" type="text/css" href="../basicStyle.css"/>
 </head>
 
 <body bgcolor="#FFFFCC">
@@ -17,7 +17,7 @@
 <h2>Contents</h2><ol>
 <li><a href='#Intro'>Introduction</a></li>
 <li><a href='#Event'>Creating Event Graph</a><ol>
-<li><a href='#EventArrival'>Arrival Process</a></li>
+<li><a href='#EventArrival'>SimpleArrivalProcess</a></li>
 <li><a href='#EventEvntParameters'>Event Parameters</a></li>
 <li><a href='#EventStParameters'>State Parameters</a></li>
 <li><a href='#EventNodes'>Event Nodes</a></li>
@@ -36,32 +36,32 @@ provided in the appendix.</p>
 
 <p>Henceforth it will be assumed that the reader has
 knowledge of the mechanics of the DES, including how state variables change
-value, how events arte scheduled, and how the Event List processes events and
+value, how events are scheduled, and how the Event List processes events and
 advances time.</p>
 
 <h2><a name='Event'>2. Creating a Simple Event Graph Component</a></h2>
 
 <p>It is best to start with a very simple example. One of
-the simplest Event Graphs is the "Arrival Process," a component that has one
+the simplest Event Graphs is the SimpleArrivalProcess, a component that has one
 parameter, one state variable, and one event.  This Event Graph may be defined
 in a manner that is independent of the implementing programming language or
 even of its Viskit representation.</p>
 
-<h3>2.1. The Arrival Process Event Graph Component</h3>
+<h3>2.1. The SimpleArrivalProcess Event Graph Component</h3>
 
-<p>The Arrival Process is a generalization of the Poisson
+<p>The SimpleArrivalProcess is a generalization of the Poisson
 Process.  The differences is that the times between arrivals are allowed to be
 any arbitrary non-negative values.  </p>
 
-<p class=MsoBodyTextIndent>Parameter: {t<sub>A</sub>} = sequence of
+<p>Parameter: {t<sub>A</sub>} = sequence of
 non-negative interarrival times.</p>
 
-<p class=MsoBodyTextIndent>State Variable: N = number of arrivals (initially 0)</p>
+<p>State Variable: N = number of arrivals (initially 0)</p>
 
-<p class=MsoBodyTextIndent>Event Graph (Figure 1):</p>
+<p>Event Graph (Figure 1):</p>
 
 <p class=BodyTextCentered><img width=188 height=115 src="Tutorial_files/eventImage001.gif"></p>
-<p class="caption">Figure 1. Arrival Process Event Graph</p>
+<p class="caption">Figure 1. SimpleArrivalProcess Event Graph</p>
 
 <p>The state variable N is equivalent to the counting process
 associated with a Poisson Process.  Unlike the Poisson Process, however, the
@@ -72,21 +72,21 @@ iid sequence of non-negative random variables), a periodically recurring
 sequence (making {t<sub>A</sub>} all identical values), or a correlated
 sequence of non-negative random variables.</p>
 
-<p>Before walking through the building of the Arrival Process
+<p>Before walking through the building of the SimpleArrivalProcess
 component, let us first see what the finished model looks like in Viskit.</p>
 
-<h3><a name='EventArrival'>2.2. The Arrival Process Component in Viskit</a></h3>
+<h3><a name='EventArrival'>2.2. The SimpleArrivalProcess Component in Viskit</a></h3>
 
 <p>Start the Viskit Event Graph Editor and dismiss the Event
 Graph Properties panel.  Select <span class='menu'>File <img src='Tutorial_files/iconMenu.png' width='12' height='9'> Open</span> from the menu bar, navigate to
 Viskit’s examples directory (2 levels up from the initial location), select the file
-"ArrivalProcess.xml" and click "Open."  This will open the Arrival Process component in the Event Graph
+"ArrivalProcess.xml" and click "Open."  This will open the SimpleArrivalProcess component in the Event Graph
 editor, which should look like Figure 2.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/eventImage002.png"></p>
-<p class="caption">Figure 2. Arrival Process in Event Graph Editor</p>
+<p class="caption">Figure 2. SimpleArrivalProcess in Event Graph Editor</p>
 
-<p>Note the similarity between the abstract Arrival Process Event
+<p>Note the similarity between the abstract SimpleArrivalProcess Event
 Graph of Figure 1 and the Event Graph drawing in the left panel of
 Figure 2.  In general, any Event Graph component can be simply drawn
 as-is in the Event Graph Editor.</p>
@@ -109,7 +109,7 @@ Edit&nbsp;Graph&nbsp;Properties...</span>, which will bring up
 the dialog box of Figure 3 again.</p>
 
 <p class=BodyTextCentered><img src="Tutorial_files/eventImage003.png"> </p>
-<p class="caption">Figure 3. Properties for New Arrival Process</p>
+<p class="caption">Figure 3. Properties for New SimpleArrivalProcess</p>
 
 <p>When creating an Event Graph Component initially, it is
 best to start by defining parameters, then state variables, and finally drawing
@@ -172,7 +172,7 @@ adding a State Variable brings up a State Variable Inspector (Figure 9).</p>
 <p class="caption">Figure 9. State Variable Inspector</p>
 
 <p>In this case, the RandomVariate type is "left over" from
-the parameter declaration.  For the Arrival Process model,
+the parameter declaration.  For the SimpleArrivalProcess model,
 the state variable (numberArrivals)  is of type int. Enter
 this information (Figure 10).  Click Apply Changes to go back
 to the Event Graph Editor window.</p>
@@ -349,7 +349,7 @@ view the generated XML (File | View Saved XML, Figure 25).  You can also generat
 
 <p>Congratulations!  You have created your first Event Graph
 component.  Although this is about the simplest possible Event Graph Component,
-the Arrival Process is nevertheless a very useful and reusable component.  A
+the SimpleArrivalProcess is nevertheless a very useful and reusable component.  A
 DES model can be created in the Assembly Editor using only this component, and
 that is what we will do next.</p>
 
