@@ -256,6 +256,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         evNodeCache.put(ev, en);   // key = ev
 
+        // Ensure a unique Event name
         if (!eventNameCheck()) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "Duplicate Event Name",
@@ -768,6 +769,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         evNodeCache.put(jaxbEv, node);   // key = ev
 
+        // Ensure a unique Event name
         if (!eventNameCheck()) {
             mangleNodeName(node);
         }
@@ -934,6 +936,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public boolean changeEvent(EventNode node) {
         boolean retcode = true;
+
+        // Ensure a unique Event name
         if (!eventNameCheck()) {
             controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
                     "Duplicate Event Name",
@@ -942,7 +946,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             mangleNodeName(node);
             retcode = false;
         }
-
         Event jaxbEv = (Event) node.opaqueModelObject;
 
         jaxbEv.setName(node.getName());
