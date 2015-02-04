@@ -89,7 +89,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             //nameLab = null; // if one is bad, disable all
 
             s = inst.getDescription();
-            if (s != null && s.length() > 0) {
+            if (s != null && !s.isEmpty()) {
                 nameLab[i].setToolTipText(s);
             }
 
