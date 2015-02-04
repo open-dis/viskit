@@ -163,7 +163,15 @@ in the .viskit/c_app.xml file and will be opened upon next Viskit launch.  The
 last open Viskit project, as well as its history of Assy and EG files will be
 listed in the File -> Recents menu selections for each editor.
 
-8) When it is time to run an Assy file, the Initialize assembly runner button is
+8) Opened Assy files can now be modified, or new Assy files can be created.  EG
+(blue) and PCL (pink) nodes can be dragged across from the LEGOs tree panel, or
+menu items can be invoked to do the same.  EG nodes are parameterized via dialog
+wizards.  RandomVariates are instantiated via the RV Factory static getInstance
+method utilizing the RV parameter.  Adapters, SimEventListeners and PCSs are
+the last to be selected, connected and initialized before an Assy run is
+initiated.
+
+9) When it is time to run an Assy file, the Initialize assembly runner button is
 selected from the Assy Editor which fires off a few events:
 - a Directory Watch is set for the Assy file
 - validate and compile the Assy
@@ -172,7 +180,7 @@ selected from the Assy Editor which fires off a few events:
 - populate the Assy Run panel with replication selections, reset Sim start time to 0.0
 - switch panel view to the Assy Run panel
 
-9) When the Simulation Run VCR button is selected, the Assembly is launched via
+10) When the Simulation Run VCR button is selected, the Assembly is launched via
 a Thread who's ClassLoader context is separate (new) from the ClassLoader that
 Viskit is currently running.  This is to eliminate any in memory static
 references to the any previously initialized Assembly parameters thereby giving
@@ -182,7 +190,7 @@ subclasses BasicAssembly which contains the run method.  Subsequent selection of
 the VCR run button will produce the exact same results if nothing in the Assy.
 has been altered.
 
-10) The simulation can be immediately stopped via the VCR stop button, or it can
+11) The simulation can be immediately stopped via the VCR stop button, or it can
 run until its sim. stop time has been reached for the number of replications
 selected.  Step-through and rewind buttons are implemented, but not working
 quite right, so, they are disabled upon instantiation from the
