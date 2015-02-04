@@ -594,7 +594,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changeEvGraphNode(EvGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE, "Duplicate name detected", evNode.getName() +
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "Duplicate name detected", evNode.getName() +
                     "\nUnique name substituted.");
             mangleEGName(evNode);
             retcode = false;
