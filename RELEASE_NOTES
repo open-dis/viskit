@@ -2,10 +2,11 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
-  Currently, because of the inability to check method signatures when naming
-  EG Nodes, we are not able to have similar method names, i.e. Arrival, even
-  with differing method signatures.  As such, subclassing is still possible, but
-  code blocks will be required to schedule unique events w/ parameters.
+  Because of the unique nature of XML IDs, we are not able to have similar
+  method names, i.e. Arrival, in the same EG file even with differing method
+  signatures.  As such, subclassing is still possible, but the user will have
+  to manually track which similar Event to schedule/cancel, i.e. Arrival,
+  Arrival2, etc.
 
   If the CNTL key is held down while attempting to drag and edge control point
   a IOOBE will be thrown by JGraph v5.14.0.  This may be fixed in a subsequent
