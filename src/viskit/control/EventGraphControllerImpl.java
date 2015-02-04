@@ -894,9 +894,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     //----------------------------------
     {
         boolean done;
+        boolean modified;
         do {
             done = true;
-            boolean modified = ((EventGraphView) getView()).doEditNode(node);
+            modified = ((EventGraphView) getView()).doEditNode(node);
             if (modified) {
                 done = ((viskit.model.Model) getModel()).changeEvent(node);
             }
