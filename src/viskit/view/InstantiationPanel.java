@@ -503,12 +503,16 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             String ts = method.toString();
                             int strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
                             ts = ts.substring(strt + 1, ts.length());
-                            hm.put(ts, method);
-                            vn.add(ts);
+
+                            // We only want to promote the RandomVariate parameter of getInstance() only
+                            if (ts.contains("RandomVariate")) {
+                                hm.put(ts, method);
+                                vn.add(ts);
+                            }
                         }
                     }
                 }
-                if (vn.size() <= 0) {
+                if (vn.isEmpty()) {
                     JOptionPane.showMessageDialog(ip, "<html><center>" + cName + " contains no static methods<br>returning " + typ + ".");
                     factClassCB.requestFocus();
                     //factClassCB.selectAll();
