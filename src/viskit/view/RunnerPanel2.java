@@ -215,11 +215,6 @@ public class RunnerPanel2 extends JPanel {
 //        flowPan.add(resetSeedCB);
         /* End DIFF between OA3302 branch and trunk */
 
-//        searchB = new JButton("Search...");
-//        searchKey = new JTextField();
-//        flowPan.add(searchB);
-//        searchB.addActionListener(new Searcher(this));
-
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
 

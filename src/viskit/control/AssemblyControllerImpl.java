@@ -998,7 +998,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeOrEdgeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());;
+        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());
     }
     private Vector<Object> copyVector = new Vector<>();
 
@@ -1181,7 +1181,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /**
-     * Build the actual source code from the Assembly XML
+     * Builds the actual source code from the Assembly XML after a successful
+     * XML validation
+     *
      * @param f the Assembly file to produce source from
      * @return a string of Assembly source code
      */
@@ -1210,7 +1212,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     // NOTE: above are routines to operate on current assembly
 
     /**
-     * Build the actual source code from the Event Graph XML
+     * Build the actual source code from the Event Graph XML after a successful
+     * XML validation
+     *
      * @param x2j the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
@@ -1450,6 +1454,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void compileAssemblyAndPrepSimRunner() {
+
+        // Prevent double clicking which will cause potential ClassLoader issues
+        ((AssemblyViewFrame)getView()).runButt.setEnabled(false);
+
         initAssemblyRun();
         if (execStrings == null) {
             messageUser(JOptionPane.WARNING_MESSAGE,
@@ -1470,6 +1478,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             runner.exec(execStrings);
             getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, true);
         }
+
+        ((AssemblyViewFrame)getView()).runButt.setEnabled(true);
     }
 
     // No longer invoking a Runtime.Exec for compilation

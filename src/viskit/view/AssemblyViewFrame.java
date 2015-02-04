@@ -81,7 +81,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JPanel assemblyEditorContent;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
-    private JButton runButt;
+
+    // The view needs access to this
+    public JButton runButt;
     private int untitledCount = 0;
 
     public AssemblyViewFrame(mvcController controller) {
