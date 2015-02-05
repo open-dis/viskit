@@ -521,7 +521,7 @@ public class VGlobals {
     }
 
     public boolean isGeneric(String type) {
-        return (type.contains("<") && type.contains(">"));
+        return type.contains("<") && type.contains(">");
     }
 
     /** The entry point for Viskit startup.  This method will either identify a

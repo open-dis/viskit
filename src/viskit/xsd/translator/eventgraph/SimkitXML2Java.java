@@ -40,6 +40,8 @@ public class SimkitXML2Java {
     public final static String QU = "\"";
     public final static String LB = "[";
     public final static String RB = "]";
+    public final static String RA = ">";
+    public final static String LA = "<";
     public final static String JDO = "/**";
     public final static String JDC = "*/";
     public final static String PUBLIC = "public";
@@ -253,7 +255,7 @@ public class SimkitXML2Java {
 
             Class<?> c = null;
 
-            // TODO: Determine if encountering generics that contain array types
+            // Non array type generics
             if (isGeneric(s.getType())) {
                 if (!s.getComment().isEmpty()) {
                     pw.print(SP_4 + JDO + SP);
@@ -262,11 +264,15 @@ public class SimkitXML2Java {
                     }
                     pw.println(SP + JDC);
                 }
-                pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
+                if (!isArray(s.getType()))
+                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
+                else
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
             } else {
 
                 c = VStatics.classForName(s.getType());
 
+                // Non-super type, primitive, primitive[] or another type array
                 if (c == null || VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
@@ -281,7 +287,7 @@ public class SimkitXML2Java {
                 }
             }
 
-            if (c != null && !VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
+            if (c != null && !VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType()) && !isArray(s.getType())) {
                 Constructor<?> cst = null;
 
                 try {
@@ -314,7 +320,6 @@ public class SimkitXML2Java {
         }
     }
 
-    // TODO: May have to check for generic containers of array types
     void buildParameterModifierAndAccessor(Parameter p, StringWriter sw) {
 
         PrintWriter pw = new PrintWriter(sw);
@@ -425,7 +430,7 @@ public class SimkitXML2Java {
             }
         }
 
-        if (isArray(s.getType()) && !isGeneric(s.getType())) {
+        if (isArray(s.getType())) {
             int d = dims(s.getType());
             pw.print(SP_4 + PUBLIC + SP + baseOf(s.getType()) + SP + "get");
             pw.print(capitalize(s.getName()) + LP + indxncm(d));
@@ -442,10 +447,12 @@ public class SimkitXML2Java {
         }
     }
 
+    // TODO: break out building the ParameterMap
     void buildParameterMapAndConstructor(StringWriter parameterMapAndConstructor) {
 
         PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
 
+        // ParameterMap
         pw.println(SP_4 + "@viskit.ParameterMap" + SP + LP);
         pw.print(SP_8 + "names =" + SP + OB);
         for (Parameter pt : liParams) {
@@ -469,6 +476,8 @@ public class SimkitXML2Java {
         pw.println(CB);
         pw.println(SP_4 + RP);
         pw.println();
+
+        // Constructors
         pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
 
         // Generate a zero parameter (default) constructor in addition to a
@@ -477,6 +486,21 @@ public class SimkitXML2Java {
             pw.println(SP_4 + "public " + this.root.getName() + LP + RP + SP + OB);
             pw.println(SP_4 + CB);
             pw.println();
+        }
+
+        // create new arrays, if any
+        // note: have to assume that the length of parameter arrays
+        // is consistent
+        List<StateVariable> liStateV = this.root.getStateVariable();
+
+        for (StateVariable st : liStateV) {
+
+            // Supress warning call to unchecked cast since we return a clone
+            // of Objects vice the desired type
+            if (isGeneric(st.getType())) {
+                pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
+                break;
+            }
         }
 
         // Now, generate the parameterized or zero parameter consructor
@@ -510,22 +534,13 @@ public class SimkitXML2Java {
 
         // skip over any sets that would get done in the superclass
         for (int l = superParams.size(); l < liParams.size(); l++) {
-
             Parameter pt = liParams.get(l);
             pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
         }
 
-        // create new arrays, if any
-        // note: have to assume that the length of parameter arrays
-        // is consistent
-        List<StateVariable> liStateV = this.root.getStateVariable();
-
-        /* Prevent generic containers of arrays from getting instantiated twice.
-         * Already done in the state variable declarations
-         */
         for (StateVariable st : liStateV) {
-            if (isArray(st.getType()) && !isGeneric(st.getType())) {
-                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + st.getType() + SC);
+            if (isArray(st.getType())) {
+                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripType(st.getType()) + SC);
             }
         }
 
@@ -533,7 +548,22 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-   void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
+    /** Convenience method for stripping the generic type from a generic array declaration
+     *
+     * @param type the generic type to strip
+     * @return a stripped generic type, i.e. remove &lt;type&gt;
+     */
+    private String stripType(String type) {
+        int left, right;
+        if (!isGeneric(type)) {
+            return type;
+        }
+        left = type.indexOf(LA);
+        right = type.indexOf(RA);
+        return type.substring(0, left) + type.substring(right + 1);
+    }
+
+    void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
 
         List<Event> events = this.root.getEvent();
 
@@ -572,10 +602,7 @@ public class SimkitXML2Java {
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
 
-            /* Prevent generic containers of arrays from getting initialized as
-             * array types.
-             */
-            boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
+            boolean isar = isArray(sv.getType());
             String sps = isar ? SP_12 : SP_8;
             String in = indexFrom(st);
 
@@ -644,7 +671,7 @@ public class SimkitXML2Java {
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
 
-            boolean isar = isArray(sv.getType()) && !isGeneric(sv.getType());
+            boolean isar = isArray(sv.getType());
             String sps = isar ? SP_12 : SP_8;
             String in = indexFrom(st);
 
@@ -663,7 +690,7 @@ public class SimkitXML2Java {
                 if (ops != null) {
                     stateVariableGetter += RP + PD + ops.getMethod();
                 } else if (asg != null) {
-                    stateVariableGetter += asg.getValue() + RP;
+                    stateVariableGetter += in + RP;
                 }
             } else {
                 stateVariableGetter += RP;
@@ -783,13 +810,12 @@ public class SimkitXML2Java {
             } else if (asg != null) {
                 change = SP + EQ + SP + asg.getValue() + SC;
             }
-            oldName = "_old_" + oldName.substring(0, 1).toUpperCase() + oldName.substring(1);
+            oldName = "_old_" + capitalize(oldName);
             if (!decls.contains(oldName)) {
                 olds = sv.getType();
                 decls.add(oldName);
 
-                // Prevent calling a generic container of arrays with an index
-                if (isArray(olds) && !isGeneric(olds)) {
+                if (isArray(olds)) {
                     String[] baseName;
                     baseName = olds.split("\\[");
                     olds = baseName[0];
@@ -807,15 +833,13 @@ public class SimkitXML2Java {
                 olds += getter;
             }
 
-            // Prevent accessing an array index for generic containers of array types
-            // check need _idxvar_from(st)
-            if (isArray(sv.getType()) && !isGeneric(olds)) {
+            if (isArray(sv.getType())) {
                 olds += indexFrom(st);
             }
             olds += RP + SC;
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
-            olds += sv.getName() + ((isArray(sv.getType()) && !isGeneric(sv.getType())) ? LB + indexFrom(st) + RB : "") + change;
+            olds += sv.getName() + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "") + change;
             String[] lines = olds.split("\\;");
             // format it
             for (int i = 0; i < lines.length; i++) {
@@ -826,7 +850,7 @@ public class SimkitXML2Java {
                 }
                 pw.println(SP_8 + lines[i] + SC);
             }
-            if (isArray(sv.getType()) && !isGeneric(sv.getType())) {
+            if (isArray(sv.getType())) {
                 pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(st));
                 pw.print(CM + SP + QU + sv.getName() + QU + CM + SP);
                 pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + indexFrom(st) + RP + RP + SC);
@@ -942,7 +966,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isGeneric(String type) {
-        return type.contains("<") && type.contains(">");
+        return VGlobals.instance().isGeneric(type);
     }
 
     public File getEventGraphFile() {return eventGraphFile;}
