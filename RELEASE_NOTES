@@ -30,6 +30,10 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  The translator for generation of Event Graph XML to Java now handles generic
+  array types as well as primitive array types, generic containers, and of
+  course, primitive types.
+
   JGraph extended and overridden components now behave like actual DES EG nodes
   in that EG node edges take on the classic parabolic shape when two edges
   connect between nodes.  Self-referential edges now begin hear the top of the
