@@ -893,7 +893,7 @@ public class SimkitXML2Java {
     void doSchedule(Schedule s, Event e, PrintWriter pw) {
         String condent = "";
 
-        if (s.getCondition() != null) {
+        if (s.getCondition() != null && !s.getCondition().equals("true")) {
             condent = SP_4;
             pw.println(SP_8 + "if" + SP + LP + s.getCondition() + RP + SP + OB);
         }
@@ -926,7 +926,7 @@ public class SimkitXML2Java {
 
         pw.println(RP + SC);
 
-        if (s.getCondition() != null) {
+        if (s.getCondition() != null && !s.getCondition().equals("true")) {
             pw.println(SP_8 + CB);
         }
     }
@@ -936,7 +936,7 @@ public class SimkitXML2Java {
         String condent = "";
         Event event = (Event) c.getEvent();
 
-        if (c.getCondition() != null) {
+        if (c.getCondition() != null && !c.getCondition().equals("true")) {
             condent = SP_4;
             pw.println(SP_8 + "if" + SP + LP + c.getCondition() + RP + SP + OB);
         }
@@ -952,7 +952,7 @@ public class SimkitXML2Java {
 
         pw.println(RP + SC);
 
-        if (c.getCondition() != null) {
+        if (c.getCondition() != null && !c.getCondition().equals("true")) {
             pw.println(SP_8 + CB);
         }
     }
