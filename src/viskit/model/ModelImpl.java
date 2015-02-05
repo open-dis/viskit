@@ -388,7 +388,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             ea.setName(arg.getName());
             ea.setType(arg.getType());
 
-            ArrayList<String> com = new ArrayList<>();
+            List<String> com = new ArrayList<>();
             com.addAll(arg.getComment());
             ea.setComments(com);
             ea.opaqueModelObject = arg;
@@ -775,6 +775,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         jaxbEv.setName(nIe(nodeName));
+
+        if ("Run".equals(nIe(nodeName))) {
+            jaxbEv.setDescription("This event is fired first to facilitate initialization of all simulation state variables");
+        }
         node.opaqueModelObject = jaxbEv;
         jaxbRoot.getEvent().add(jaxbEv);
 
