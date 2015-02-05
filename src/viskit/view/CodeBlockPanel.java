@@ -43,7 +43,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-/**
+/** Supports literal Java code snippets to be written to an Event method
+ *
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
@@ -58,6 +59,7 @@ public class CodeBlockPanel extends JPanel {
     private Window owner;
     private String title;
     private JButton editButt;
+    private static final String TOOL_TIP = "Please remember to enter full Java statements including semi-colons";
 
     public CodeBlockPanel(Window owner, boolean multilined, String title) {
         this.owner = owner;
@@ -74,21 +76,15 @@ public class CodeBlockPanel extends JPanel {
         jtc.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         jtc.setToolTipText("bogus");
 
-        jtc.addKeyListener(new KeyListener() {
+        jtc.addKeyListener(new KeyAdapter() {
 
+            @Override
             public void keyTyped(KeyEvent e) {
                 if (updateListener != null) {
                     updateListener.actionPerformed(new ActionEvent(jtc.getText(), 0, ""));
                 }
             }
-
-            public void keyPressed(KeyEvent e) {
-            }
-
-            public void keyReleased(KeyEvent e) {
-            }
         });
-
 
         add(jtc);
         add(Box.createHorizontalStrut(3));
@@ -113,7 +109,7 @@ public class CodeBlockPanel extends JPanel {
     /**
      * This sets the preferredSize of the codeblock panel to borders plus
      * number of lines specified
-     * @param n
+     * @param n the number of lines desired
      */
     public void setVisibleLines(int n) {
         if (jtc instanceof JTextArea) {
@@ -133,10 +129,7 @@ public class CodeBlockPanel extends JPanel {
 
     public String getData() {
         String s = jtc.getText();
-        if (s == null) {
-            s = "";
-        }
-        return s;
+        return (s == null) ? "" : s;
     }
 
     public void setData(String s) {
@@ -145,13 +138,14 @@ public class CodeBlockPanel extends JPanel {
 
     class buttListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             StringBuffer sb = new StringBuffer(jtc.getText().trim());
             boolean modded;
             if (owner instanceof JDialog) {
-                modded = TextAreaDialog.showTitledDialog(title, (JDialog) owner, owner, sb);
+                modded = TextAreaDialog.showTitledDialog(title, owner, owner, sb);
             } else {
-                modded = TextAreaDialog.showTitledDialog(title, (JFrame) owner, (JFrame) owner, sb);
+                modded = TextAreaDialog.showTitledDialog(title, owner, owner, sb);
             }
             if (modded) {
                 jtc.setText(sb.toString().trim());
@@ -168,34 +162,29 @@ public class CodeBlockPanel extends JPanel {
         public myJTextArea() {
             super();
             setPreferredSize(new Dimension(50, 50));
-            getDocument().addDocumentListener(this);
+            getDocument().addDocumentListener(myJTextArea.this);
         }
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            String txt = getText();
-            if (txt == null || txt.length() <= 0) {
-                return null;
-            }
-            return "<html><pre>" + txt;
+            return "<html><pre>" + TOOL_TIP + "</pre></html>";
         }
 
+        @Override
         public void changedUpdate(DocumentEvent documentEvent) {
             if (updateListener != null) {
                 updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
             }
         }
 
+        @Override
         public void insertUpdate(DocumentEvent documentEvent) {
-            if (updateListener != null) {
-                updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
-            }
+            changedUpdate(documentEvent);
         }
 
+        @Override
         public void removeUpdate(DocumentEvent documentEvent) {
-            if (updateListener != null) {
-                updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
-            }
+            changedUpdate(documentEvent);
         }
     }
 
@@ -203,34 +192,29 @@ public class CodeBlockPanel extends JPanel {
 
         public myJTextField(String s) {
             super(s);
-            getDocument().addDocumentListener(this);
+            getDocument().addDocumentListener(myJTextField.this);
         }
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            String txt = getText();
-            if (txt == null || txt.length() <= 0) {
-                return null;
-            }
-            return "<html><pre>" + txt;
+            return "<html><pre>" + TOOL_TIP + "</pre></html>";
         }
 
+        @Override
         public void changedUpdate(DocumentEvent documentEvent) {
             if (updateListener != null) {
                 updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
             }
         }
 
+        @Override
         public void insertUpdate(DocumentEvent documentEvent) {
-            if (updateListener != null) {
-                updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
-            }
+            changedUpdate(documentEvent);
         }
 
+        @Override
         public void removeUpdate(DocumentEvent documentEvent) {
-            if (updateListener != null) {
-                updateListener.actionPerformed(new ActionEvent(getText(), 0, ""));
-            }
+            changedUpdate(documentEvent);
         }
     }
 }

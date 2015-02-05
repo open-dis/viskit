@@ -362,7 +362,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             public void actionPerformed(ActionEvent e) {
                 String s = (String) e.getSource();
                 if (s != null) {
-                    ((EventGraphController) getController()).codeBlockEdit((String) e.getSource());
+                    ((EventGraphController) getController()).codeBlockEdit(s);
                 }
             }
         });
