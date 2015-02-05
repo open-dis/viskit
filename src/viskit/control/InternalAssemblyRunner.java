@@ -475,7 +475,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+                saveChooser = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
             }
             File fil = getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
