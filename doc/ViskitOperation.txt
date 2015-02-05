@@ -146,6 +146,9 @@ from the project's viskitProject.xml file.  If upon start up, a previously
 opened XML file passes validation, but fails compilation, the user will again be
 unable to advance to the Assy Editor tab.
 
+Of note is that to ensure all intended entries are made to each node and edge,
+be sure to mouse over each and review the tooltip for correct entries.
+
 5) When an Assembly file is opened, the Design of Experiments (DOE) panel is
 initialized with the Assembly and a /tmp DOE input file is created and passed to
 the DOE Job Launcher.  This file saves the DOE inputs for future use.  DOE is an
