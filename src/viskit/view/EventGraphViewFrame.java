@@ -622,7 +622,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         fileMenu.add(buildMenuItem(vcontroller, "saveAs", "Save as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
         fileMenu.add(buildMenuItem(vcontroller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J, null));
+        fileMenu.add(buildMenuItem(vcontroller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         fileMenu.addSeparator();
