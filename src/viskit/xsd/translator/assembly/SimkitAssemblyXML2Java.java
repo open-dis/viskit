@@ -748,12 +748,12 @@ public class SimkitAssemblyXML2Java {
         if(!outputs.isEmpty()) {
             pw.println(sp4 + "@Override");
             pw.println(sp4 + "public void printInfo() {");
+            pw.println(sp4 + "System.out.println" + lp + rp + sc);
             pw.println(sp8 + "System.out.println" + lp + qu + "Entity Details" + qu + rp + sc);
             pw.println(sp8 + "System.out.println" + lp + qu + "--------------" + qu + rp + sc);
-            dumpEntities(outputs,pw);
+            dumpEntities(outputs, pw);
             pw.println(sp8 + "System.out.println" + lp + qu + "--------------" + qu + rp + sc);
             pw.println(sp4 + cb);
-            pw.println();
             pw.println();
         }
     }

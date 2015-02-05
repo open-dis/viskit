@@ -35,6 +35,11 @@ public class EvGraphNode extends AssemblyNode {
         super(name, type);
     }
 
+    /** Enable an extra verbose dump of all entity details
+     *
+     * @return indication of the detailed checkbox selected for the entity
+     * on the EventGraphNodeInspectorDialog
+     */
     public boolean isOutputMarked() {
         return outputMarked;
     }
@@ -43,6 +48,11 @@ public class EvGraphNode extends AssemblyNode {
         this.outputMarked = outputMarked;
     }
 
+    /** NOT USED
+     *
+     * @return indication of the verbose checkbox selected for the entity
+     * on the EventGraphNodeInspectorDialog
+     */
     public boolean isVerboseMarked() {
         return verboseMarked;
     }
