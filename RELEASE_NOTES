@@ -30,6 +30,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Improved EG Node tooltips by including code blocks
+
   The translator for generation of Event Graph XML to Java now handles generic
   array types as well as primitive array types, generic containers, and of
   course, primitive types.
