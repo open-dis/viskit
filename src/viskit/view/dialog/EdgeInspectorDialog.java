@@ -374,17 +374,24 @@ public class EdgeInspectorDialog extends JDialog {
         myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
-        if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
-            myParmPanel.setVisible(false);
-        } else {
-            parameters.setArgumentList(edge.to.getArguments());
-            parameters.setData(edge.parameters);
-            myParmPanel.setVisible(true);
-        }
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
+                    myParmPanel.setVisible(false);
+                } else {
+                    parameters.setArgumentList(edge.to.getArguments());
+                    parameters.setData(edge.parameters);
+                    myParmPanel.setVisible(true);
+                }
+            }
+        };
+        SwingUtilities.invokeLater(r);
 
         if (edge instanceof SchedulingEdge) {
             if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
-                conditionalExpressionPanel.setText("true");
+                conditionalExpressionPanel.setText("");
                 hideShowConditionals(false);
             } else {
                 conditionalExpressionPanel.setText(edge.conditional);
@@ -410,7 +417,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         } else {
             if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
-                conditionalExpressionPanel.setText("true");
+                conditionalExpressionPanel.setText("");
             } else {
                 conditionalExpressionPanel.setText(edge.conditional);
             }
@@ -465,7 +472,7 @@ public class EdgeInspectorDialog extends JDialog {
         edge.delay = (delaySt == null || delaySt.trim().isEmpty()) ? "0.0" : delay.getText();
 
         String condSt = conditionalExpressionPanel.getText();
-        edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? "true" : conditionalExpressionPanel.getText();
+        edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText();
 
         edge.conditionalDescription = getDescription();
         if (!edge.parameters.isEmpty()) {
