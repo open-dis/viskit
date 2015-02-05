@@ -828,12 +828,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         });
 
-        addEvent.setTransferHandler(new TransferHandler("text"));
-        addEvent.addMouseListener(new DragMouseAdapter());
-        addSelfRef.setTransferHandler(new TransferHandler("text"));
-        addSelfRef.addMouseListener(new DragMouseAdapter());
-        addSelfCancelRef.setTransferHandler(new TransferHandler("text"));
-        addSelfCancelRef.addMouseListener(new DragMouseAdapter());
+        TransferHandler th = new TransferHandler("text");
+        DragMouseAdapter dma = new DragMouseAdapter();
+        addEvent.setTransferHandler(th);
+        addEvent.addMouseListener(dma);
+        addSelfRef.setTransferHandler(th);
+        addSelfRef.addMouseListener(dma);
+        addSelfCancelRef.setTransferHandler(th);
+        addSelfCancelRef.addMouseListener(dma);
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
