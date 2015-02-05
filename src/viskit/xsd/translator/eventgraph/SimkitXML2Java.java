@@ -63,6 +63,7 @@ public class SimkitXML2Java {
 
     private List<Parameter> superParams;
     private List<Parameter> liParams;
+    private List<StateVariable> liStateV;
 
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
@@ -74,6 +75,10 @@ public class SimkitXML2Java {
         }
     }
 
+    /** Instance that facilitates code generation via the given input stream
+     *
+     * @param stream the file stream to generate code from
+     */
     public SimkitXML2Java(InputStream stream) {
         this();
         fileInputStream = stream;
@@ -83,6 +88,7 @@ public class SimkitXML2Java {
      * Creates a new instance of SimkitXML2Java
      * when used from another class.  Instance this
      * with a String for the className of the xmlFile
+     *
      * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
@@ -131,23 +137,28 @@ public class SimkitXML2Java {
 
         StringBuilder source = new StringBuilder();
         StringWriter head = new StringWriter();
-        StringWriter vars = new StringWriter();
+        StringWriter parameters = new StringWriter();
+        StringWriter stateVars = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
-        StringWriter toStringBlock = new StringWriter();
-        StringWriter parameterMapAndConstructor = new StringWriter();
+        StringWriter parameterMap = new StringWriter();
+        StringWriter constructors = new StringWriter();
         StringWriter runBlock = new StringWriter();
         StringWriter eventBlock = new StringWriter();
+        StringWriter toStringBlock = new StringWriter();
         StringWriter codeBlock = new StringWriter();
 
         buildHead(head);
-        buildParameters(vars, accessorBlock);
-        buildStateVars(vars, accessorBlock);
-        buildParameterMapAndConstructor(parameterMapAndConstructor);
+        buildParameters(parameters, accessorBlock);
+        buildStateVars(stateVars, accessorBlock);
+        buildParameterMap(parameterMap);
+        buildConstructors(constructors);
         buildEventBlock(runBlock, eventBlock);
         buildToString(toStringBlock);
         buildCodeBlock(codeBlock);
 
-        buildSource(source, head, vars, parameterMapAndConstructor, runBlock, eventBlock, accessorBlock, toStringBlock, codeBlock);
+        buildSource(source, head, parameters, stateVars, parameterMap,
+                constructors, runBlock, eventBlock, accessorBlock,
+                toStringBlock, codeBlock);
 
         return source.toString();
     }
@@ -170,9 +181,18 @@ public class SimkitXML2Java {
         return root;
     }
 
+    public File getEventGraphFile() {
+        return eventGraphFile;
+    }
+
+    public final void setEventGraphFile(File f) {
+        eventGraphFile = f;
+    }
+
     void buildHead(StringWriter head) {
 
         PrintWriter pw = new PrintWriter(head);
+
         className = this.root.getName();
         packageName = this.root.getPackage();
         extendz = this.root.getExtend();
@@ -247,7 +267,7 @@ public class SimkitXML2Java {
         liParams = this.root.getParameter();
         superParams = resolveSuperParams(liParams);
 
-        List<StateVariable> liStateV = this.root.getStateVariable();
+        liStateV = this.root.getStateVariable();
 
         pw.println(SP_4 + "/* Simulation State Variables */");
         pw.println();
@@ -265,7 +285,7 @@ public class SimkitXML2Java {
                     pw.println(SP + JDC);
                 }
                 if (!isArray(s.getType()))
-                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
+                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + stripType(s.getType()) + LP + RP + SC);
                 else
                     pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
             } else {
@@ -320,6 +340,21 @@ public class SimkitXML2Java {
         }
     }
 
+    /** Convenience method for stripping the type from between generic angle brackets
+     *
+     * @param s the generic type to strip
+     * @return a stripped type from between generic angle brackets
+     */
+    private String stripType(String s) {
+        int left, right;
+        if (!isGeneric(s)) {
+            return s;
+        }
+        left = s.indexOf(LA);
+        right = s.indexOf(RA);
+        return s.substring(0, left + 1) + s.substring(right);
+    }
+
     void buildParameterModifierAndAccessor(Parameter p, StringWriter sw) {
 
         PrintWriter pw = new PrintWriter(sw);
@@ -357,20 +392,6 @@ public class SimkitXML2Java {
         pw.println(SP_8 + "return" + SP + p.getName() + SC);
         pw.println(SP_4 + CB);
         pw.println();
-    }
-
-    private void buildToString(StringWriter toStringBlock) {
-
-        // Assume this is a subclass of some SimEntityBase which should already
-        // have a toString()
-        if (!extendz.contains(SIM_ENTITY_BASE)) {return;}
-
-        PrintWriter pw = new PrintWriter(toStringBlock);
-        pw.println(SP_4 + "@Override");
-        pw.print(SP_4 + "public String toString");
-        pw.println(LP + RP + SP + OB);
-        pw.println(SP_8 + "return" + SP + "getClass().getName()" + SC);
-        pw.println(SP_4 + CB);
     }
 
     private int dims(String t) {
@@ -447,12 +468,9 @@ public class SimkitXML2Java {
         }
     }
 
-    // TODO: break out building the ParameterMap
-    void buildParameterMapAndConstructor(StringWriter parameterMapAndConstructor) {
+    void buildParameterMap(StringWriter parameterMap) {
+        PrintWriter pw = new PrintWriter(parameterMap);
 
-        PrintWriter pw = new PrintWriter(parameterMapAndConstructor);
-
-        // ParameterMap
         pw.println(SP_4 + "@viskit.ParameterMap" + SP + LP);
         pw.print(SP_8 + "names =" + SP + OB);
         for (Parameter pt : liParams) {
@@ -476,8 +494,12 @@ public class SimkitXML2Java {
         pw.println(CB);
         pw.println(SP_4 + RP);
         pw.println();
+    }
 
-        // Constructors
+    void buildConstructors(StringWriter constructors) {
+
+        PrintWriter pw = new PrintWriter(constructors);
+
         pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
 
         // Generate a zero parameter (default) constructor in addition to a
@@ -487,11 +509,6 @@ public class SimkitXML2Java {
             pw.println(SP_4 + CB);
             pw.println();
         }
-
-        // create new arrays, if any
-        // note: have to assume that the length of parameter arrays
-        // is consistent
-        List<StateVariable> liStateV = this.root.getStateVariable();
 
         for (StateVariable st : liStateV) {
 
@@ -540,7 +557,7 @@ public class SimkitXML2Java {
 
         for (StateVariable st : liStateV) {
             if (isArray(st.getType())) {
-                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripType(st.getType()) + SC);
+                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripGenerics(st.getType()) + SC);
             }
         }
 
@@ -548,12 +565,13 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    /** Convenience method for stripping the generic type from a generic array declaration
+    /** Convenience method for stripping the angle brackets and type from a
+     * generic array declaration
      *
      * @param type the generic type to strip
      * @return a stripped generic type, i.e. remove &lt;type&gt;
      */
-    private String stripType(String type) {
+    private String stripGenerics(String type) {
         int left, right;
         if (!isGeneric(type)) {
             return type;
@@ -587,15 +605,15 @@ public class SimkitXML2Java {
         pw.println(SP_4 + "public void reset() " + OB);
         pw.println(SP_8 + "super.reset()" + SC);
 
-        pw.println();
+        List<StateTransition> liStateT = run.getStateTransition();
+
+        if (!liStateT.isEmpty()) {pw.println();}
 
         for (LocalVariable local : liLocalV) {
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
 
         if (!liLocalV.isEmpty()) {pw.println();}
-
-        List<StateTransition> liStateT = run.getStateTransition();
 
         for (StateTransition st : liStateT) {
             StateVariable sv = (StateVariable) st.getState();
@@ -703,7 +721,7 @@ public class SimkitXML2Java {
             }
         }
 
-        pw.println();
+        if(!liStateT.isEmpty()) {pw.println();}
 
         for (Object o : liSchedCanc) {
             if (o instanceof Schedule) {
@@ -713,11 +731,10 @@ public class SimkitXML2Java {
             }
         }
 
-        String x = "";
-        if (run.getCode() != null) {
-            x = run.getCode();
+        String x = run.getCode();
+        if (!x.isEmpty()) {
+            pw.println(SP_8 + x);
         }
-        pw.println(SP_8 + x);
         pw.println(SP_4 + CB);
         pw.println();
     }
@@ -883,7 +900,7 @@ public class SimkitXML2Java {
 
         pw.print(SP_8 + condent + "waitDelay" + LP + QU + ((Event) s.getEvent()).getName() + QU + CM + SP);
 
-        // according to schema to meet Priority class definition, the following
+        // according to schema, to meet Priority class definition, the following
         // tags should be permitted:
         // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
         // however, historically these could be numbers.
@@ -925,14 +942,33 @@ public class SimkitXML2Java {
         }
 
         pw.print(SP_8 + condent + "interrupt" + LP + QU + event.getName() + QU);
+
+        // Note: The following loop covers all possibilities with the
+        // interim "fix" that all parameters are cast to (Object) whether
+        // they need to be or not.
         for (EdgeParameter ep : liEdgeP) {
             pw.print(CM + SP + "(Object)" + ep.getValue());
         }
-        pw.print(RP + SC);
-        pw.println();
+
+        pw.println(RP + SC);
+
         if (c.getCondition() != null) {
             pw.println(SP_8 + CB);
         }
+    }
+
+    void buildToString(StringWriter toStringBlock) {
+
+        // Assume this is a subclass of some SimEntityBase which should already
+        // have a toString()
+        if (!extendz.contains(SIM_ENTITY_BASE)) {return;}
+
+        PrintWriter pw = new PrintWriter(toStringBlock);
+        pw.println(SP_4 + "@Override");
+        pw.print(SP_4 + "public String toString");
+        pw.println(LP + RP + SP + OB);
+        pw.println(SP_8 + "return" + SP + "getClass().getName()" + SC);
+        pw.println(SP_4 + CB);
     }
 
     void buildCodeBlock(StringWriter t) {
@@ -949,14 +985,21 @@ public class SimkitXML2Java {
         pw.println(CB);
     }
 
-    void buildSource(StringBuilder source, StringWriter head, StringWriter vars,
-            StringWriter parameterMapAndConstructor, StringWriter runBlock,
-            StringWriter eventBlock, StringWriter accessorBlock, StringWriter toStringBlock, StringWriter codeBlock) {
+    void buildSource(StringBuilder source, StringWriter head,
+            StringWriter parameters, StringWriter stateVars,
+            StringWriter parameterMap, StringWriter constructors,
+            StringWriter runBlock, StringWriter eventBlock,
+            StringWriter accessorBlock, StringWriter toStringBlock,
+            StringWriter codeBlock) {
 
-        source.append(head.getBuffer()).append(vars.getBuffer());
-        source.append(parameterMapAndConstructor.getBuffer());
+        source.append(head.getBuffer());
+        source.append(parameters.getBuffer());
+        source.append(stateVars.getBuffer());
+        source.append(parameterMap.getBuffer());
+        source.append(constructors.getBuffer());
         source.append(runBlock.getBuffer());
-        source.append(eventBlock.getBuffer()).append(accessorBlock.getBuffer());
+        source.append(eventBlock.getBuffer());
+        source.append(accessorBlock.getBuffer());
         source.append(toStringBlock);
         source.append(codeBlock.getBuffer());
     }
@@ -967,12 +1010,6 @@ public class SimkitXML2Java {
 
     private boolean isGeneric(String type) {
         return VGlobals.instance().isGeneric(type);
-    }
-
-    public File getEventGraphFile() {return eventGraphFile;}
-
-    public final void setEventGraphFile(File f) {
-        eventGraphFile = f;
     }
 
     private String stripLength(String s) {
