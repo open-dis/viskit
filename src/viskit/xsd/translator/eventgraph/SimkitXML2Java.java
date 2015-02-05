@@ -804,7 +804,7 @@ public class SimkitXML2Java {
             pw.println();
         }
 
-        if (e.getCode() != null) {
+        if (e.getCode() != null && !e.getCode().isEmpty()) {
             pw.println(SP_8 + "/* Code insertion for Event " + e.getName() + " */");
             String[] lines = e.getCode().split("\\n");
             for (String line : lines) {
