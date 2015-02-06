@@ -270,14 +270,18 @@ public class PclEdgeInspectorDialog extends JDialog {
 
                     if (pd.getPropertyType() != null)
                         typs.add(pd.getPropertyType().getName());
+                    else
+                        typs.add("");
                 }
                 String[][] nms = new String[nams.size()][2];
                 for (int i = 0; i < nams.size(); i++) {
                     nms[i][0] = nams.get(i);
-                    nms[i][1] = (!typs.isEmpty()) ? typs.get(i) : "";
+                    nms[i][1] = typs.get(i);
                 }
-                int which = PropertyListDialog.showDialog(PclEdgeInspectorDialog.this, PclEdgeInspectorDialog.this,
-                        classname + " Properties", nms);
+                int which = PropertyListDialog.showDialog(PclEdgeInspectorDialog.this,
+                        PclEdgeInspectorDialog.this,
+                        classname + " Properties",
+                        nms);
                 if (which != -1) {
                     modified = true;
                     propertyTF.setText(nms[which][0]);
