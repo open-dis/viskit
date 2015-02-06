@@ -418,7 +418,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 // between the Assy editor and the Assy runner panel, but it
                 // won't impede a correct Assy run.  Catch the
                 // IllegalArgumentException and move on.
-                log.error(ex);
+//                log.error(ex);
 //                ex.printStackTrace();
             }
 

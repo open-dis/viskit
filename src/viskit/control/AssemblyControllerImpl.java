@@ -63,6 +63,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
 
     static final Logger LOGGER = LogUtils.getLogger(AssemblyControllerImpl.class);
+    private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
     private JTabbedPane runTabbedPane;
@@ -1458,6 +1459,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void compileAssemblyAndPrepSimRunner() {
 
+        // Prevent multiple pushes of the initialize sim run button
+        mutex++;
+        if (mutex > 1) {
+            return;
+        }
+
         // Prevent double clicking which will cause potential ClassLoader issues
         Runnable r = new Runnable() {
 
@@ -1512,6 +1519,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     LOGGER.error(e);
                 } finally {
                     ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
+                    mutex--;
                 }
             }
         };
