@@ -113,7 +113,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
                 myQuitAction.actionPerformed(null);
             }
         });
-        ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
+        ImageIcon icon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         this.setIconImage(icon.getImage());
     }
 
@@ -238,7 +238,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             doeFrame = doeMain.getMainFrame();
             runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
             runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
-            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
             menuBar = doeMain.getMenus();
             if (menuBar == null) {
                 menuBar = new JMenuBar();
@@ -256,7 +256,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             doeFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
             runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
-            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
             menuBar = new JMenuBar();
             menuBar.add(new JMenu("File"));
             jamQuitHandler(null, myQuitAction, menuBar);
@@ -371,7 +371,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             if (assyCont.getRunTabbedPane().isEnabledAt(assyCont.getRunTabbledPanelIdx())) {
                 assyCont.getRunTabbedPane().setEnabledAt(assyCont.getRunTabbledPanelIdx(), false);
 
-                // Reset the to the Viskit ClassLoader
+                // Resets the Viskit ClassLoader
                 assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
             }
         }
@@ -540,19 +540,20 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
     };
 
+    /** Runs the Assy with a fresh class loader free of artifacts for a
+     * completely independent run
+     */
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
 
-        /** The default version of this does a RuntimeExec("java"....) to
-         * spawn a new VM as we want to run the assembly in a new VM, not
-         * the GUI's VM.
-         *
-         * @param execStrings command line VM arguments
-         */
         @Override
         public void exec(String[] execStrings) {
             if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != 0) {
+
+                // toggles a tab change listener
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
+
+                // initializes a fresh class loader
                 assyRunComponent.preInitRun(execStrings);
             }
         }

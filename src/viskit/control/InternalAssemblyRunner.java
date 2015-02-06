@@ -312,7 +312,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             new SimThreadMonitor(simRunner).start();
 
             // Restore Viskit's working ClassLoader
-            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
+                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex);
@@ -407,10 +408,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e) {
             try {
 
-                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset))
-                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-
                 if (assemblyObj != null) {
+                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
                     Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
                     setStopRun.invoke(assemblyObj, true);
                     textAreaOutputStream.kill();
@@ -419,10 +418,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
                 Schedule.coldReset();
 
+            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
                 Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-                log.error(ex);
+
+                // Some screwy stuff can happen here if a user jams around with
+                // the initialize Assy run button and tabs back and forth
+                // between the Assy editor and the Assy runner panel, but it
+                // won't impede a correct Assy run.  Catch the
+                // IllegalArgumentException and move on.
+//                log.error(ex);
+//                ex.printStackTrace();
             }
 
             twiddleButtons(InternalAssemblyRunner.STOP);

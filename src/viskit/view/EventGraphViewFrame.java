@@ -727,7 +727,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
+        b.setIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(icPath)));
         b.setToolTipText(tt);
         b.setBorder(BorderFactory.createEtchedBorder());
         b.setText(null);
@@ -735,7 +735,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     private JLabel makeJLabel(String icPath, String tt) {
-        JLabel jlab = new JLabel(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
+        JLabel jlab = new JLabel(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(icPath)));
         jlab.setToolTipText(tt);
         return jlab;
     }
@@ -913,7 +913,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             select = Cursor.getDefaultCursor();
             //select    = new Cursor(Cursor.MOVE_CURSOR);
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
-            Image img = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
+            Image img = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);

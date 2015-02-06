@@ -347,14 +347,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JPanel vPan = new JPanel();
         vPan.setLayout(new BoxLayout(vPan, BoxLayout.X_AXIS));
-        canButt = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Stop24.gif")));
+        canButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         canButt.setToolTipText("Stop the Grid run");
         canButt.setEnabled(false);
         canButt.setBorder(BorderFactory.createEtchedBorder());
         canButt.setText(null);
         vPan.add(canButt);
 
-        runButt = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Play24.gif")));
+        runButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
         runButt.setToolTipText("Begin the Grid run");
         runButt.setBorder(BorderFactory.createEtchedBorder());
         runButt.setText(null);

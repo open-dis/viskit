@@ -90,7 +90,7 @@ public class Help {
     public Help(Component parent) {
         this.parent = parent;
         icon = new ImageIcon(
-                Thread.currentThread().getContextClassLoader().getResource(
+                VGlobals.instance().getWorkClassLoader().getResource(
                 "viskit/images/ViskitLogo.png"));
         aboutEGEditorPane = new JEditorPane();
 

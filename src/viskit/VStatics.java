@@ -252,7 +252,7 @@ public class VStatics {
                 c = tryCommonClasses(s, clsLoader);
                 if (c == null) {
                     try {
-                        c = Thread.currentThread().getContextClassLoader().loadClass(s);
+                        c = VGlobals.instance().getWorkClassLoader().loadClass(s);
                     } catch (ClassNotFoundException cnfe) {
                         // sometimes happens but appears harmless.  Just let
                         // the NoClassDefFoundError handle the reporting to

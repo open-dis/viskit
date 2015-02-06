@@ -35,7 +35,7 @@ public class Splash2 extends JFrame {
         super();
         setUndecorated(true);
 
-        ImageIcon icon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitSplash2.png"));
+        ImageIcon icon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         JLabel label = new JLabel(icon);
         label.setOpaque(false);
         progressBar = new JProgressBar();

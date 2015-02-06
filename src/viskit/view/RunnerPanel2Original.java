@@ -49,6 +49,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.io.*;
+import viskit.VGlobals;
 import viskit.VStatics;
 
 /**
@@ -138,7 +139,7 @@ public class RunnerPanel2Original extends JPanel {
 
         JComponent vcrPanel = makeVCRPanel(skipCloseButt);
 
-        Icon npsIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
+        Icon npsIcon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
         String npsString = "";
 
         npsLabel = new JLabel(npsString, npsIcon, JLabel.CENTER);
@@ -246,7 +247,7 @@ public class RunnerPanel2Original extends JPanel {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
 
-        vcrStop = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Stop24.gif")));
+        vcrStop = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStop.setToolTipText("Stop the simulation run");
         vcrStop.setEnabled(false);
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
@@ -254,7 +255,7 @@ public class RunnerPanel2Original extends JPanel {
         //vcrStop.addActionListener(new FileChaserStopper());
         buttPan.add(vcrStop);
 
-        vcrRewind = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Rewind24.gif")));
+        vcrRewind = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Rewind24.gif")));
         vcrRewind.setToolTipText("Reset the simulation run");
         vcrRewind.setEnabled(false);
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
@@ -263,7 +264,7 @@ public class RunnerPanel2Original extends JPanel {
             buttPan.add(vcrRewind);
         }
 
-        vcrPlay = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/Play24.gif")));
+        vcrPlay = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
         vcrPlay.setToolTipText("Begin or resume the simulation run");
         if (skipCloseButt) {
             vcrPlay.setToolTipText("Begin the simulation run");
@@ -272,7 +273,7 @@ public class RunnerPanel2Original extends JPanel {
         vcrPlay.setText(null);
         buttPan.add(vcrPlay);
 
-        vcrStep = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/StepForward24.gif")));
+        vcrStep = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStep.setToolTipText("Step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);

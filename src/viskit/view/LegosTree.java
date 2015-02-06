@@ -67,7 +67,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
      * @param tooltip description for this LEGO tree
      */
     LegosTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
-        this(className, new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(iconPath)), dslis, tooltip);
+        this(className, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
     /** Constructor for Listener Event Graph Object Tree

@@ -579,7 +579,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource(icPath)));
+        b.setIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(icPath)));
         return buttonCommon2(b, tt);
     }
 
@@ -840,7 +840,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             //select    = new Cursor(Cursor.MOVE_CURSOR);
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
-            Image img = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
+            Image img = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
             cancel = Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(0, 0), "CancelArcCursor");
         }
 

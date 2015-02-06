@@ -209,7 +209,7 @@ public class Boot extends URLClassLoader implements Runnable {
     private String getJavaRev() {
         String rev = "java15";
         try {
-            ClassLoader cloader = Thread.currentThread().getContextClassLoader();
+            ClassLoader cloader = VGlobals.instance().getWorkClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import viskit.VGlobals;
 import viskit.model.ViskitElement;
 
 /**
@@ -95,7 +96,7 @@ public abstract class ViskitTablePanel extends JPanel {
             buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
             buttPan.add(Box.createHorizontalGlue());
             // add button
-            plusButt = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/plus.png")));
+            plusButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
             plusButt.setBorder(null);
             plusButt.setText(null);
             plusButt.setToolTipText(getPlusToolTip());
@@ -105,8 +106,8 @@ public abstract class ViskitTablePanel extends JPanel {
             plusButt.setActionCommand("p");
             buttPan.add(plusButt);
             // delete button
-            minusButt = new JButton(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/minus.png")));
-            minusButt.setDisabledIcon(new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/minusGrey.png")));
+            minusButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
+            minusButt.setDisabledIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
             minusButt.setBorder(null);
             minusButt.setText(null);
             minusButt.setToolTipText(getMinusToolTip());

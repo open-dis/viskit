@@ -679,7 +679,7 @@ public class ViskitProject {
         Icon viskitProjIcon;
 
         public ViskitProjectFileView() {
-            viskitProjIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
+            viskitProjIcon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitIcon.gif"));
         }
 
         @Override

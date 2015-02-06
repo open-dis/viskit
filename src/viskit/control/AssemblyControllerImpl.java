@@ -18,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -87,6 +88,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** This method is for introducing Assemblies to compile from outside of
      * Viskit itself, i.e. from SavageStudio.  This method is not used from
      * Viskit and must be here for external use.
+     *
      * @param assyPath an assembly file to compile
      */
     public void compileAssembly(String assyPath) {
@@ -106,10 +108,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // from the command line
         if (initialFile != null) {
             LOGGER.debug("Loading initial file: " + initialFile);
-            f = new File(initialFile);
-
-            _doOpen(f);
-            compileAssemblyAndPrepSimRunner();
+            compileAssembly(initialFile);
         } else {
             java.util.List<String> lis = getOpenAssyFileList(false);
             LOGGER.debug("Inside begin() and lis.size() is: " + lis.size());
@@ -1435,7 +1434,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
     private String[] execStrings;
 
-    /** Known modelPath for Assy compilation */
+    // Known modelPath for Assy compilation
     @Override
     public void initAssemblyRun() {
         String src = produceJavaAssemblyClass(); // asks to save
@@ -1460,30 +1459,63 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void compileAssemblyAndPrepSimRunner() {
 
         // Prevent double clicking which will cause potential ClassLoader issues
-        ((AssemblyViewFrame)getView()).runButt.setEnabled(false);
+        Runnable r = new Runnable() {
 
-        initAssemblyRun();
-        if (execStrings == null) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
-                    "Assembly Source Generation Error",
-                    "Compile not attempted, check ${user.home}/.viskit/debug.log for details"
+            @Override
+            public void run() {
+                ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
+            }
+        };
+        SwingUtilities.invokeLater(r);
+
+        SwingWorker worker = new SwingWorker<Void, Void>() {
+
+            @Override
+            public Void doInBackground() {
+
+                // Compile and prep the execStrings
+                initAssemblyRun();
+
+                if (execStrings == null) {
+                    messageUser(JOptionPane.WARNING_MESSAGE,
+                            "Assembly Source Generation Error",
+                            "Compile not attempted, check ${user.home}/.viskit/debug.log for details"
                     );
-        } else {
+                } else {
 
-            // Ensure changes to the Assembly Properties dialog get saved
-            save();
+                    // Ensure a cleared Assembly Run panel upon every Assembly compile
+                    RunnerPanel2 rp2 = VGlobals.instance().getRunPanel();
+                    rp2.soutTA.setText(null);
+                    rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
+                            + "----------------------" + rp2.lineEnd);
 
-            // Ensure a cleared Assembly Run panel upon every Assembly compile
-            RunnerPanel2 rp2 = VGlobals.instance().getRunPanel();
-            rp2.soutTA.setText(null);
-            rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd +
-                    "----------------------" + rp2.lineEnd);
+                    getRunTabbedPane().setEnabledAt(AssemblyControllerImpl.this.runTabbedPaneIdx, true);
 
-            runner.exec(execStrings);
-            getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, true);
-        }
+                    // Ensure changes to the Assembly Properties dialog get saved
+                    save();
 
-        ((AssemblyViewFrame)getView()).runButt.setEnabled(true);
+                    // Initializes a fresh class loader
+                    runner.exec(execStrings);
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+
+                    // Wait for the compile, save and Assy preps to finish
+                    get();
+
+                } catch (InterruptedException | ExecutionException e) {
+                    LOGGER.error(e);
+                } finally {
+                    ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
+                }
+            }
+        };
+        worker.execute();
     }
 
     // No longer invoking a Runtime.Exec for compilation
