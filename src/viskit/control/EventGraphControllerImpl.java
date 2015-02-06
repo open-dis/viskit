@@ -489,6 +489,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private void markConfigClosed(File f) {
+
+        // Someone may try to close a file that hasn't been saved
+        if (f == null) {return;}
+
         int idx = 0;
         for (String key : recentFileSet) {
             if (key.contains(f.getName())) {

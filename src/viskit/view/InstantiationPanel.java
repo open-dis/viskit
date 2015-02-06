@@ -81,7 +81,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 methodCB.actionPerformed(e);
             }
         });

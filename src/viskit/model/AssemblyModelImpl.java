@@ -917,6 +917,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     break;
                 }
             }
+
+            // Verbose shouldn't populated since the verbose check box has been disabled
             for (Verbose v : verboseList) {
                 String simE = v.getEntity();
                 if (simE.equals(se.getName())) {

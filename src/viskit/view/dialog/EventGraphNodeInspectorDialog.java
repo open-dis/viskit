@@ -147,7 +147,6 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         bcont.add(handleField);
         bcont.add(Box.createHorizontalStrut(2));
         bcont.add(outputCheck);
-        //bcont.add(Box.createHorizontalGlue());
         content.add(bcont);
 
         JPanel dcont = new JPanel();
@@ -163,7 +162,6 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
-
 
         ip.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(ip);

@@ -704,6 +704,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private void markAssyConfigClosed(File f) {
+
+        // Someone may try to close a file that hasn't been saved
+        if (f == null) {return;}
+
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName())) {
