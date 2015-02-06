@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.control;
 
 import viskit.view.RunnerPanel2;
-import viskit.view.dialog.SettingsDialog;
 import viskit.view.AnalystReportPanel;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
@@ -55,7 +54,6 @@ import simkit.Schedule;
 import simkit.random.RandomVariateFactory;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
-import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
@@ -128,6 +126,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrStep.setEnabled(false);
         seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
         twiddleButtons(OFF);
+
+        // Viskit's current working ClassLoader
+        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
     }
 
     /**
@@ -170,31 +171,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         targetClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(targetClassName);
 
-        // TODO: should this be editable?
         runPanel.vcrSimTime.setText("0.0");
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
-        // Viskit's current working ClassLoader
-        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
-
-        Class<?> obj;
-
-        try {
-
-            // Initialize an Object so that we have it's ClassLoader as the
-            // parent of our about to be reset LocalBootLoader
-            obj = lastLoaderNoReset.loadClass("java.lang.Object");
-        } catch (ClassNotFoundException e) {
-            LogUtils.getLogger(InternalAssemblyRunner.class).error(e);
-            return;
-        }
-
-        // Forcing exposure of extra classpaths here.  Bugfix 1237
-        loader = new LocalBootLoader(SettingsDialog.getExtraClassPathArraytoURLArray(), obj.getClassLoader(), VGlobals.instance().getWorkDirectory());
-        lastLoaderWithReset = loader.init(true);
+        VGlobals.instance().resetFreshClassLoader();
+        lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
 
         // Set a fresh ClassLoader for this thread to be free of any static
         // state set from the Viskit working ClassLoader
@@ -209,7 +193,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         try {
             fillRepWidgetsFromBasicAssemblyObject(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
-            JOptionPane.showMessageDialog(runPanel, "Error initializing Assembly object:\n" + throwable.getMessage(), "Java Error", JOptionPane.ERROR_MESSAGE);
+            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).messageUser(
+                    JOptionPane.ERROR_MESSAGE,
+                    "Java Error",
+                    "Error initializing Assembly:\n" + throwable.getMessage());
             twiddleButtons(OFF);
 //            throwable.printStackTrace();
             return;
@@ -251,8 +238,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
         setStopTime.invoke(targetObject, stopTime);
         runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
-
-        Schedule.coldReset();
     }
 
     File tmpFile;
@@ -273,7 +258,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             // Set a specific clean class loader for this sim run
             if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset)) {
-                lastLoaderWithReset = loader.init();
+                lastLoaderWithReset = ((LocalBootLoader)lastLoaderWithReset).init(true);
                 Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
             }
 
@@ -327,13 +312,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             new SimThreadMonitor(simRunner).start();
 
             // Restore Viskit's working ClassLoader
-            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex);
         }
-
     }
 
     /** Class to perform end of simulation run cleanup items */
@@ -422,31 +405,27 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Method setStopRun;
             try {
+
                 if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset))
                     Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
-                setStopRun = targetClass.getMethod("setStopRun", boolean.class);
-
-                if (assemblyObj != null)
+                if (assemblyObj != null) {
+                    Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
                     setStopRun.invoke(assemblyObj, true);
+                    textAreaOutputStream.kill();
+                    mutex--;
+                }
 
                 Schedule.coldReset();
 
-                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
-                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                 log.error(ex);
             }
 
             twiddleButtons(InternalAssemblyRunner.STOP);
-
-            if (assemblyObj != null) {
-                textAreaOutputStream.kill();
-                mutex--;
-            }
         }
     }
 
