@@ -194,6 +194,8 @@ abstract public class MetaDataDialog extends JDialog {
 
             // The default names are AssemblyName, or EventGraphName
             if (!param.name.contains("Assembly") || param.name.equals("AssemblyName"))
+
+                // Note: we need to force "Assembly" in the file name for special recognition
                 param.name = nameTf.getText().trim() + "Assembly";
             else
                 param.name = nameTf.getText().trim();
