@@ -93,7 +93,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     Class<?> targetClass;
     Object assemblyObj, targetObject;
     private static int mutex = 0;
-    private LocalBootLoader loader;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
     long seed;
@@ -177,19 +176,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
-        VGlobals.instance().resetFreshClassLoader();
-        lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
-
-        // Set a fresh ClassLoader for this thread to be free of any static
-        // state set from the Viskit working ClassLoader
-        Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-
-        // Test for Bug 1237
-//        for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
-//            log.info(s);
-//        }
-//        log.info("\n");
-
         try {
             fillRepWidgetsFromBasicAssemblyObject(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
@@ -206,17 +192,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private void fillRepWidgetsFromBasicAssemblyObject(boolean verbose, double stopTime) throws Throwable {
 
+        /* in order to resolve the target assy as a BasicAssembly, it must be
+         * resolved using the the same ClassLoader as the one used to compile
+         * it.  Used in the verboseListener within the working Viskit
+         * ClassLoader
+         */
         targetClass = VStatics.classForName(targetClassName);
         if (targetClass == null) {
             throw new ClassNotFoundException();
         }
         targetObject = targetClass.newInstance();
 
-        /* in order to see BasicAssembly this thread has to have
-         * the same ClassLoader as the one used to compile this entity since
-         * they don't share the same simkit or viskit.  Used in the
-         * verboseListener
-         */
         assembly = (BasicAssembly) targetObject;
 
         Method getNumberReplications = targetClass.getMethod("getNumberReplications");
@@ -256,11 +242,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
-            // Set a specific clean class loader for this sim run
-            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderWithReset)) {
-                lastLoaderWithReset = ((LocalBootLoader)lastLoaderWithReset).init(true);
-                Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
-            }
+            VGlobals.instance().resetFreshClassLoader();
+            lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
+
+            // Test for Bug 1237
+//            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
+//                log.info(s);
+//            }
+//            log.info("\n");
 
             targetClass = lastLoaderWithReset.loadClass(targetClass.getName());
             assemblyObj = targetClass.newInstance();
@@ -312,8 +301,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             new SimThreadMonitor(simRunner).start();
 
             // Restore Viskit's working ClassLoader
-            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             log.error(ex);
@@ -409,7 +397,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             try {
 
                 if (assemblyObj != null) {
+
                     Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+
                     Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
                     setStopRun.invoke(assemblyObj, true);
                     textAreaOutputStream.kill();
@@ -418,8 +408,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
                 Schedule.coldReset();
 
-            if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
-                Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
+                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
@@ -428,7 +418,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 // between the Assy editor and the Assy runner panel, but it
                 // won't impede a correct Assy run.  Catch the
                 // IllegalArgumentException and move on.
-//                log.error(ex);
+                log.error(ex);
 //                ex.printStackTrace();
             }
 

@@ -884,6 +884,8 @@ public class VGlobals {
 
             // Allow Assembly files in the ClassLoader
             workLoader = loader.init(true);
+
+            Thread.currentThread().setContextClassLoader(workLoader);
         }
         return workLoader;
     }
@@ -909,6 +911,10 @@ public class VGlobals {
 
             // Allow Assembly files in the ClassLoader
             freshLoader = loader.init(true);
+
+            // Set a fresh ClassLoader for this thread to be free of any static
+            // state set from the Viskit working ClassLoader
+            Thread.currentThread().setContextClassLoader(freshLoader);
         }
         return freshLoader;
     }
