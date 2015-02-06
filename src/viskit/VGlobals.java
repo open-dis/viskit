@@ -866,11 +866,12 @@ public class VGlobals {
         workDirectory = currentViskitProject.getClassesDir();
     }
 
-    private ClassLoader workLoader;
+    private ClassLoader workLoader, freshLoader;
 
     /**
      * Retrieve Viskit's working ClassLoader.  It may be reset from time to
      * time if extra classpaths are loaded
+     *
      * @return Viskit's working ClassLoader
      */
     public ClassLoader getWorkClassLoader() {
@@ -889,6 +890,31 @@ public class VGlobals {
 
     public void resetWorkClassLoader() {
         workLoader = null;
+    }
+
+    /** This class loader is specific to Assembly running in that it is
+     * pristine from the working class loader in use for normal Viskit operations
+     *
+     * @return a pristine class loader for Assembly runs
+     */
+    public ClassLoader getFreshClassLoader() {
+        if (freshLoader == null) {
+
+            // Forcing exposure of extra classpaths here.  Bugfix 1237
+            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
+
+            LocalBootLoader loader = new LocalBootLoader(urlArray,
+                    null,
+                    getWorkDirectory());
+
+            // Allow Assembly files in the ClassLoader
+            freshLoader = loader.init(true);
+        }
+        return freshLoader;
+    }
+
+    public void resetFreshClassLoader() {
+        freshLoader = null;
     }
 
     /** @return a model to print a stack trace of calling classes and their methods */
