@@ -99,11 +99,6 @@ public final class AnalystReportBuilder {
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
 
-    /** Build a default AnalystReport object */
-    public AnalystReportBuilder() {
-        initDocument();
-    }
-
     /** <p>Build an AnalystReport object from an existing statisticsReport
      * document.  This is done from viskit.BasicAssembly via reflection.</p>
      * @param statisticsReportPath the path to the statistics generated report
@@ -112,7 +107,6 @@ public final class AnalystReportBuilder {
      */
     public AnalystReportBuilder(String statisticsReportPath, Map<String, AssemblyNode> map) {
 
-        this();
         try {
             Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
             setStatsReportPath(statisticsReportPath);
@@ -1160,14 +1154,6 @@ public final class AnalystReportBuilder {
 
     public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
-    }
-
-    /** Command line entry point
-     *
-     * @param args command line arguments if any (not used)
-     */
-    public static void main(String[] args) {
-        new AnalystReportBuilder();
     }
 
 } // end class file AnalystReportBuilder.java
