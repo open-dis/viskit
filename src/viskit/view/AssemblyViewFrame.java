@@ -93,7 +93,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     public JComponent getContent() {
-        return assemblyEditorContent;
+        return (JComponent) getContentPane();
     }
 
     public JMenuBar getMenus() {
@@ -128,14 +128,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // the main splitpane underneath.
 
         // assemblyEditorContent level panel
-        assemblyEditorContent = new JPanel();
-        assemblyEditorContent.setLayout(new BorderLayout());
-        assemblyEditorContent.add(getToolBar(), BorderLayout.NORTH);
+        getContent().setLayout(new BorderLayout());
+        getContent().add(getToolBar(), BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new TabSelectionHandler());
-        assemblyEditorContent.add(tabbedPane, BorderLayout.CENTER);
-        assemblyEditorContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        getContent().add(tabbedPane, BorderLayout.CENTER);
+        getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
@@ -182,16 +182,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
             setModel((AssemblyModelImpl) myVgacw.assyModel);          // hold on locally
-            getController().setModel((AssemblyModelImpl) myVgacw.assyModel);  // tell controller
+            getController().setModel(getModel());  // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null) {
-
-                VGlobals.instance().amod = mod;
                 ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetaData gmd = myVgacw.assyModel.getMetaData();
+            GraphMetaData gmd = mod.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
             } else if (viskit.VStatics.debug) {
@@ -676,7 +674,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         return vm;
     }
 
-    public void rebuildTreePanels() {
+    /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
+    public void rebuildLEGOTreePanels() {
         lTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);

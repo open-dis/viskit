@@ -203,6 +203,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
     protected void _doOpen(File file) {
+
         EventGraphView viskitView = (EventGraphView) getView();
         ModelImpl mod = new ModelImpl(this);
         mod.init();

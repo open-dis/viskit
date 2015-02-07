@@ -221,7 +221,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyView vaw = (AssemblyView) getView();
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
         mod.init();
-        VGlobals.instance().amod = mod;
         vaw.addTab(mod);
 
         // these may init to null on startup, check
@@ -612,7 +611,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
         mod.init();
         mod.newModel(null);
-        VGlobals.instance().amod = mod;
 
         // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.

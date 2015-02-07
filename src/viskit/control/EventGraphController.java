@@ -79,6 +79,7 @@ public interface EventGraphController {
      */
     void newProject();
 
+    /** NOT USED */
     void runAssemblyEditor();
 
     /** Show the XML form of an event graph */

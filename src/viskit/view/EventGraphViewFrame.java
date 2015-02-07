@@ -87,7 +87,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JToggleButton cancelArcMode;
     public Help help;
     private JTabbedPane tabbedPane;
-    private JPanel eventGraphViewerContent;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private TitleListener titlList;
@@ -107,7 +106,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     /** @return the JPanel which is the content of this JFrame */
     public JComponent getContent() {
-        return eventGraphViewerContent;
+        return (JComponent) getContentPane();
     }
 
     public JMenuBar getMenus() {
@@ -160,15 +159,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // has a border layout, and contains the toolbar on the eventGraphViewerContent and
         // the main splitpane underneath.
 
-        eventGraphViewerContent = new JPanel();
-        eventGraphViewerContent.setLayout(new BorderLayout());
-        eventGraphViewerContent.add(getToolBar(), BorderLayout.NORTH);
+        getContent().setLayout(new BorderLayout());
+        getContent().add(getToolBar(), BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new TabSelectionHandler());
 
-        eventGraphViewerContent.add(tabbedPane, BorderLayout.CENTER);
-        eventGraphViewerContent.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        getContent().add(tabbedPane, BorderLayout.CENTER);
+        getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
     private VgraphComponentWrapper getCurrentVgcw() {

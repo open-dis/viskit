@@ -421,7 +421,7 @@ public class SettingsDialog extends JDialog {
 
             // Incase we have custom jars, need to add these to the ClassLoader
             VGlobals.instance().resetWorkClassLoader();
-            VGlobals.instance().rebuildTreePanels();
+            VGlobals.instance().rebuildLEGOTreePanels();
             return null;
         }
 

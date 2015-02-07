@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.control;
 
 import viskit.view.RunnerPanel2;
-import viskit.view.AnalystReportPanel;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
@@ -57,7 +56,6 @@ import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
-import viskit.doe.LocalBootLoader;
 import viskit.model.AssemblyModelImpl;
 
 /** Controller for the Assembly Run panel
@@ -97,7 +95,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private ClassLoader lastLoaderWithReset;
     long seed;
     private boolean inRegressionMode;
-    AnalystReportPanel reportPanel;
     private stopListener assemblyRunStopListener;
 
     /**
@@ -151,10 +148,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     public JMenuItem getQuitMenuItem() {
         return null;
-    }
-
-    public void setAnalystReportGUI(AnalystReportPanel pan) {
-        reportPanel = pan;
     }
 
     /**
@@ -329,7 +322,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             end();
 
-            // Grab the temp analyst report and signal the AnalystReportPanel
+            // Grab the temp analyst report and signal the AnalystReportFrame
             try {
                 Method getAnalystReport = targetClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
@@ -506,8 +499,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             return;
         }
 
-        if (reportPanel != null) {
-            reportPanel.setReportXML(analystReportTempFile);
+        AnalystReportController cont = (AnalystReportController) VGlobals.instance().getAnalystReportController();
+        if (cont != null) {
+            cont.setReportXML(analystReportTempFile);
         } else {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +

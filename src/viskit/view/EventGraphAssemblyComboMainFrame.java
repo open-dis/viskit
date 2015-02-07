@@ -54,6 +54,7 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
+import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.view.dialog.SettingsDialog;
 
@@ -74,7 +75,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     AssemblyViewFrame assyFrame;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
-    AnalystReportPanel reportPanel;
+    mvcAbstractJFrameView reportPanel;
     public Action myQuitAction;
     private DoeMain doeMain;
 
@@ -136,7 +137,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         myQuitAction = new ExitAction("Exit");
 
         // Tabbed event graph editor
-        egFrame = VGlobals.instance().initEventGraphViewFrame();
+        egFrame = (EventGraphViewFrame) VGlobals.instance().initEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(egFrame.getContent());
             int idx = tabbedPane.indexOfComponent(egFrame.getContent());
@@ -155,7 +156,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
 
         // Assembly editor
-        assyFrame = VGlobals.instance().initAssemblyViewFrame();
+        assyFrame = (AssemblyViewFrame) VGlobals.instance().initAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(assyFrame.getContent());
             int idx = tabbedPane.indexOfComponent(assyFrame.getContent());
@@ -194,18 +195,19 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         // Analyst report
         boolean aRPanelVisible = SettingsDialog.isAnalystReportVisible();
         if (aRPanelVisible) {
-            tabbedPane.add(reportPanel = new AnalystReportPanel());
-            int idx = tabbedPane.indexOfComponent(reportPanel);
+            reportPanel = VGlobals.instance().buildAnalystReportFrame();
+            tabbedPane.add(reportPanel.getContentPane());
+            int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
             tabbedPane.setToolTipTextAt(idx, "Support analyst assessment and produce report");
-            menuBar = reportPanel.getMenus();
+            menuBar = ((AnalystReportFrame)reportPanel).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
             if (getJMenuBar() == null) {
                 setJMenuBar(menuBar);
             }
-            reportPanel.setTitleListener(myTitleListener, idx);
+            ((AnalystReportFrame)reportPanel).setTitleListener(myTitleListener, idx);
             jamQuitHandler(null, myQuitAction, menuBar);
             tabIndices[TAB0_ANAL_REPORT_IDX] = idx;
         } else {
@@ -226,7 +228,6 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assyFrame.getController());
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
-        assyRunComponent.setAnalystReportGUI(reportPanel);
 
         /* DIFF between OA3302 branch and trunk */
 
@@ -279,7 +280,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         assyCntlr.addAssemblyFileListener(runGridComponent);
         if (aRPanelVisible) {
-            assyCntlr.addAssemblyFileListener(reportPanel);
+            assyCntlr.addAssemblyFileListener((AnalystReportFrame) reportPanel);
         }
 
         // Now setup the open-event graph listener(s)

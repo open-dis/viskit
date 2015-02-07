@@ -40,8 +40,8 @@ import java.io.FileWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.*;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -57,8 +57,8 @@ import viskit.model.AssemblyNode;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
- * assembly file, and event graph files as well as customizable items (images,
- * comments) to construct a report that is saved in XML and html formats.
+ * assembly file and event graph files as well as customizable items (images,
+ * comments) to construct a report that is saved in XML and HTML formats.
  *
  * @author Patrick Sullivan
  * @since July 18, 2006, 7:04 PM
@@ -94,7 +94,7 @@ public final class AnalystReportBuilder {
     private Element concRec;
 
     /** Reference to the Analyst Report JPanel for JProgressBar */
-    private JPanel aRPanel;
+    private JFrame aRPanel;
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -129,12 +129,12 @@ public final class AnalystReportBuilder {
      * This done after the statistic report is incorporated into the basic
      * Analyst Report and further annotations are to be written by the analyst
      * to finalize the report.</p>
-     * @param aRPanel a reference to the Analyst Report JPanel
+     * @param aRPanel a reference to the Analyst Report Frame
      * @param xmlFile an existing temp Analyst Report
      * @param assyFile the current assembly file to process a report from
      * @throws java.lang.Exception
      */
-    public AnalystReportBuilder(JPanel aRPanel, File xmlFile, File assyFile) throws Exception {
+    public AnalystReportBuilder(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
         this(xmlFile);
         this.aRPanel = aRPanel;
         log.debug("Successful parseXML");

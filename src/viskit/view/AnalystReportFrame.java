@@ -31,6 +31,42 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+package viskit.view;
+
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
+import edu.nps.util.LogUtils;
+import edu.nps.util.SpringUtilities;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import org.apache.log4j.Logger;
+import viskit.util.OpenAssembly;
+import viskit.util.TitleListener;
+import viskit.control.AnalystReportController;
+import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcController;
+import viskit.mvc.mvcModelEvent;
+import viskit.reports.AnalystReportBuilder;
 
 /**
  * MOVES Institute
@@ -41,45 +77,11 @@ POSSIBILITY OF SUCH DAMAGE.
  * @since 2:47:03 PM
  * @version $Id$
  */
-package viskit.view;
+public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssyChangeListener {
 
-import edu.nps.util.FileIO;
-import edu.nps.util.LogUtils;
-import edu.nps.util.SpringUtilities;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import org.apache.log4j.Logger;
-import viskit.util.OpenAssembly;
-import viskit.util.TitleListener;
-import viskit.VGlobals;
-import viskit.reports.AnalystReportBuilder;
-import viskit.util.XsltUtility;
-
-public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChangeListener {
-
-    static Logger log = LogUtils.getLogger(AnalystReportPanel.class);
+    static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
+    private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
     private AnalystReportBuilder arb;
-    private File reportFile;
 
     /**
      * TODO: rewire this functionality?
@@ -89,7 +91,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
 
-    public AnalystReportPanel() {
+    public AnalystReportFrame(mvcController controller) {
+        super(FRAME_DEFAULT_TITLE);
+        initMVC(controller);
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
         doMenus();
@@ -102,6 +106,10 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
+    private void initMVC(mvcController cntlr) {
+        setController(cntlr);
+    }
+
     /** Captures the name of the assembly file
      * @param action the action that led us here
      * @param source the listener source
@@ -112,9 +120,8 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;
-                if (arb != null) {
-                    arb.setAssemblyFile(currentAssyFile);
-                }
+                AnalystReportController cntlr = (AnalystReportController) getController();
+                cntlr.setCurrentAssyFile(currentAssyFile);
                 break;
 
             case CLOSE_ASSY:
@@ -123,7 +130,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
                 break;
 
             default:
-                log.error("Program error InternalAssemblyRunner.assyChanged");
+                LOG.error("Program error AnalystReportFrame.assyChanged");
         }
     }
 
@@ -136,73 +143,20 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         return myMenuBar;
     }
 
-    /** Called from the InternalAssemblyRunner when the temp Analyst report is
-     * filled out and ready to copy
-     * @param path the path to the temp Analyst Report that will be copied
-     */
-    public void setReportXML(String path) {
-
-        log.debug("Path of temp Analyst Report: " + path);
-        File srcFil = new File(path);
-
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-        String output = formatter.format(new Date()); // today
-
-        String usr = System.getProperty("user.name");
-        String outputFile = (usr + "AnalystReport_" + output + ".xml");
-
-        File targetFile = new File(aRDir, outputFile);
-        try {
-            FileIO.copyFile(srcFil, targetFile, true);
-            srcFil.deleteOnExit();
-        } catch (IOException ioe) {
-            log.fatal(ioe);
-        }
-
-        doTitle(targetFile.getName());
-        buildArb(targetFile);
+    public boolean isReportDirty() {
+        return dirty;
     }
 
-    private void buildArb(File targetFile) {
-        log.debug("TargetFile is: " + targetFile);
-        AnalystReportBuilder arbLocal;
-        try {
-            arbLocal = new AnalystReportBuilder(this, targetFile, currentAssyFile);
-        } catch (Exception e) {
-            log.error("Error parsing analyst report: " + e.getMessage());
-//            e.printStackTrace();
-            return;
-        }
-        setContent(arbLocal);
-        reportFile = targetFile;
-        dirty = false;
+    public void setReportDirty(boolean b) {
+        dirty = b;
     }
 
-    private void openAnalystReport(File selectedFile) {
-          AnalystReportBuilder arbLocal = new AnalystReportBuilder(selectedFile);
-          setContent(arbLocal);
-          reportFile = selectedFile;
-          dirty = false;
+    public void setReportBuilder(AnalystReportBuilder b) {
+        arb = b;
     }
 
-    public void setContent(AnalystReportBuilder arb) {
-        if (arb != null && dirty) {
-            int resp = JOptionPane.showConfirmDialog(this, "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
-                    "The current report data has not been saved. Save current report before continuing?</p></body></html>",
-                    "Save Report", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (resp == JOptionPane.YES_OPTION) {
-                saveReport();
-            }
-        }
-        dirty = false;
+    public void fillLayout() {
 
-        this.arb = arb;
-        fillLayout();
-    }
-
-    private void fillLayout() {
         // We don't always come in on the swing thread.
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -223,7 +177,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         fillConclusionsRecommendationsPanel();
     }
 
-    private void unFillLayout() {
+    public void unFillLayout() {
         unFillHeader();
         unFillExecSumm();
         unFillSimulationLocation();
@@ -254,7 +208,9 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
     }
 
     private void setLayout() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
         JTabbedPane tabs = new JTabbedPane();
 
         JPanel headerPanel = new JPanel(new SpringLayout());
@@ -654,7 +610,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         arb.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
         arb.setPrintEventGraphImages(doBehaviorImages.isSelected());
 
-    // tables are uneditable
+        // tables are uneditable
     }
 
     private void fillBehaviors() {
@@ -724,7 +680,6 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
             behaviorTabs.add(behaviorName, p);
         }
-
     }
     JCheckBox wantStatisticsDescriptionAnalysis;
     JCheckBox wantStatsReplications;
@@ -895,180 +850,66 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         arb.setRecommendations(conRecRecsTA.getText());
     }
 
-    private void saveReport() {
-        saveReport(reportFile);
-    }
-
-    private void saveReport(File f) {
-        try {
-            arb.writeToXMLFile(f);
-            dirty = false;
-        } catch (Exception e) {
-            log.error(e);
-        }
-    }
-
     private void doMenus() {
+
+        AnalystReportController controller = (AnalystReportController) getController();
+
+        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+        // Setup the File Menu
         myMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-        JMenuItem open = new JMenuItem("Open another analyst report XML");
-        open.setMnemonic(KeyEvent.VK_O);
+
+        fileMenu.add(buildMenuItem(controller,
+                "openAnalystReport",
+                "Open another analyst report",
+                KeyEvent.VK_O,
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
+
         JMenuItem view = new JMenuItem("View analyst report XML");
         view.setMnemonic(KeyEvent.VK_V);
+        view.setToolTipText("Currently not implemented");
         view.setEnabled(false); // TODO:  implement listener and view functionality
-        JMenuItem save = new JMenuItem("Save analyst report XML");
-        save.setMnemonic(KeyEvent.VK_S);
-        JMenuItem generateViewHtml = new JMenuItem("Display analyst report HTML");
-        generateViewHtml.setMnemonic(KeyEvent.VK_D);
 
-        fileMenu.add(open);
         fileMenu.add(view);
-        fileMenu.add(save);
-        fileMenu.add(generateViewHtml);
+        fileMenu.add(buildMenuItem(controller,
+                "saveAnalystReport",
+                "Save analyst report XML",
+                KeyEvent.VK_S,
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
+
+        fileMenu.add(buildMenuItem(controller,
+                "generateHtmlReport",
+                "Display analyst report HTML",
+                KeyEvent.VK_D,
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+
         myMenuBar.add(fileMenu);
-
-        open.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dirty) {
-                    int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this, "Save current simulation data and analyst report annotations?",
-                            "Confirm", JOptionPane.WARNING_MESSAGE);
-                    switch (result) {
-                        case JOptionPane.OK_OPTION:
-                            saveReport();
-                            break;
-                        case JOptionPane.CANCEL_OPTION:
-                        case JOptionPane.NO_OPTION:
-                        default:
-                            break;
-                    }
-                }
-
-                File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
-                JFileChooser openChooser = new JFileChooser(aRDir);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
-                openChooser.setFileFilter(filter);
-                openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-                int resp = openChooser.showOpenDialog(AnalystReportPanel.this);
-                if (resp != JFileChooser.APPROVE_OPTION) {
-                    return;
-                }
-
-                openAnalystReport(openChooser.getSelectedFile());
-            }
-        });
-
-        ActionListener saveAsLis = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
-                saveChooser.setSelectedFile(reportFile);
-                saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-                int resp = saveChooser.showSaveDialog(AnalystReportPanel.this);
-
-                if (resp != JFileChooser.APPROVE_OPTION) {
-                    return;
-                }
-
-                unFillLayout();
-
-                // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
-                reportFile = saveChooser.getSelectedFile();
-                saveReport(reportFile);
-                String outFile = reportFile.getAbsolutePath();
-                int idx = outFile.lastIndexOf(".");
-
-                outFile = outFile.substring(0, idx) + ".html";
-                XsltUtility.runXslt(reportFile.getAbsolutePath(),
-                        outFile, "configuration/AnalystReportXMLtoHTML.xslt");
-
-            }
-        };
-        save.addActionListener(saveAsLis);
-
-        ActionListener generateViewHtmlListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
-                        JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
-                        "The checkbox for <code>Enable Analyst Reports </code>is not" +
-                        " currently selected.  Please select on the <code>Assembly Run </code>panel," +
-                        " re-run the experiment and the report will then be available to " +
-                        "view.</p></body></html>", "Enable Analyst Reports not selected",
-                        JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-
-                unFillLayout(); // wondering why this is needed?
-                saveReport(reportFile);
-
-//                        // TODO:  change XML input to temp file, rather than final file, if possible
-//                        if (true) { // TODO:  check if analyst report data is 'dirty' to avoid unnecessary saves
-//                            int result = JOptionPane.showConfirmDialog(AnalystReportPanel.this,
-//                                    "Save current analyst report data?",
-//                                    "Confirm", JOptionPane.WARNING_MESSAGE);
-//                            switch (result) {
-//                                case JOptionPane.YES_OPTION:
-//                                    log.info ("saving analyst report data from generateViewHtmlListener()...");
-//                                    saveReport();
-//                                    break;
-//                                case JOptionPane.CANCEL_OPTION:
-//                                case JOptionPane.NO_OPTION:
-//                                default:
-//                                    break; // skip viewing analyst report, must save all data first
-//                            }
-//                        }
-                String outFile = reportFile.getAbsolutePath();
-                int idx = outFile.lastIndexOf(".");
-
-                outFile = outFile.substring(0, idx) + ".html";
-
-                File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
-                JFileChooser genChooser = new JFileChooser(aRDir);
-                genChooser.setSelectedFile(new File(outFile));
-                genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-                if (JOptionPane.YES_OPTION ==
-                    JOptionPane.showConfirmDialog(AnalystReportPanel.this,
-                    "Rename analyst report output?",
-                    "Confirm", JOptionPane.YES_NO_OPTION)) {
-                    genChooser.showSaveDialog(AnalystReportPanel.this);
-                }
-
-                // always generate new report before display, regardless of old or new name
-                // TODO:  change XML input to temp file, rather than final file, if possible
-                XsltUtility.runXslt(reportFile.getAbsolutePath(),       // XML  input
-                        genChooser.getSelectedFile().getAbsolutePath(), // HTML output
-                        "configuration/AnalystReportXMLtoHTML.xslt");  // stylesheet
-
-                // always show latest report, they asked for it
-                showHtmlViewer(genChooser.getSelectedFile());
-
-            }
-        };
-        generateViewHtml.addActionListener(generateViewHtmlListener);
     }
 
-    private void showHtmlViewer(File f) {
-        String errMsg = null;
-        // pop up the system html viewer, or send currently running browser to html page
-        try {
-            viskit.util.BareBonesBrowserLaunch.openURL(f.toURI().toURL().toString());
-        } catch (java.net.MalformedURLException mue) {
-            errMsg = f + " : malformed path error.";
+    // Use the actions package
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+        Action a = ActionIntrospector.getAction(source, method);
+        Map<String, Object> map = new HashMap<>();
+        if (mn != null) {
+            map.put(Action.MNEMONIC_KEY, mn);
+        }
+        if (accel != null) {
+            map.put(Action.ACCELERATOR_KEY, accel);
+        }
+        if (name != null) {
+            map.put(Action.NAME, name);
+        }
+        if (!map.isEmpty()) {
+            ActionUtilities.decorateAction(a, map);
         }
 
-        if (errMsg != null) {
-            JOptionPane.showMessageDialog(this, "<html><center>Error displaying HTML:<br>" + errMsg, "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        return ActionUtilities.createMenuItem(a);
     }
+
+    @Override
+    public void modelChanged(mvcModelEvent event) {}
 
     class fileChoiceListener implements ActionListener {
 
@@ -1080,7 +921,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int resp = locationImageFileChooser.showOpenDialog(AnalystReportPanel.this);
+            int resp = locationImageFileChooser.showOpenDialog(AnalystReportFrame.this);
             if (resp == JFileChooser.APPROVE_OPTION) {
                 tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
             }
@@ -1094,12 +935,11 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         titlkey = key;
         doTitle(null);
     }
-    private String namePrefix = "Viskit Analyst Report Editor";
-    private String currentTitle = namePrefix;
+    private String currentTitle = FRAME_DEFAULT_TITLE;
 
-    private void doTitle(String nm) {
+    public void doTitle(String nm) {
         if (nm != null && nm.length() > 0) {
-            currentTitle = namePrefix + ": " + nm;
+            currentTitle = FRAME_DEFAULT_TITLE + ": " + nm;
         }
 
         if (titlList != null) {
@@ -1107,6 +947,7 @@ public class AnalystReportPanel extends JPanel implements OpenAssembly.AssyChang
         }
     }
 }
+
 class WrappingTextArea extends JTextArea {
 
     WrappingTextArea() {

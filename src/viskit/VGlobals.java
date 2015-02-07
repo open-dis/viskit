@@ -63,13 +63,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
+import viskit.control.AnalystReportController;
 import viskit.control.AssemblyController;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
 import viskit.model.Model;
+import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
+import viskit.mvc.mvcModel;
+import viskit.view.AnalystReportFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -122,9 +126,8 @@ public class VGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    AssemblyViewFrame avf;
+    mvcAbstractJFrameView avf;
     mvcController acont;
-    public AssemblyModel amod;
     boolean assyFirstRun = false;
 
     /**
@@ -132,46 +135,47 @@ public class VGlobals {
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
     public AssemblyViewFrame getAssemblyEditor() {
-        return avf;
+        return (AssemblyViewFrame) avf;
     }
 
     /** Used only if a call to {@link #getAssemblyEditor()} ever returns null
      *
      * @return the component AssemblyViewFrame
      */
-    public AssemblyViewFrame buildAssemblyViewFrame() {
-        AssemblyControllerImpl cont = new AssemblyControllerImpl();
+    public mvcAbstractJFrameView buildAssemblyViewFrame() {
+        mvcController cont = new AssemblyControllerImpl();
         return buildAssemblyViewFrame(cont);
     }
 
-    /** Called from the EventGraphAssemblyComboMainFrame to initialize UI startup
+    /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
      * @return the component AssemblyViewFrame
      */
-    public AssemblyViewFrame initAssemblyViewFrame() {
+    public mvcAbstractJFrameView initAssemblyViewFrame() {
         AssemblyControllerImpl cont = new AssemblyControllerImpl();
         return initAssemblyViewFrame(cont);
     }
 
-    private AssemblyViewFrame buildAssemblyViewFrame(AssemblyController cont) {
+    private mvcAbstractJFrameView buildAssemblyViewFrame(mvcController cont) {
         initAssemblyViewFrame(cont);
-        cont.begin();
+        ((AssemblyControllerImpl)cont).begin();
         return avf;
     }
 
-    private AssemblyViewFrame initAssemblyViewFrame(AssemblyController cont) {
-        acont = (mvcController) cont;
-        avf = new AssemblyViewFrame((mvcController) cont);
-        ((AssemblyControllerImpl)cont).setView(avf);
+    private mvcAbstractJFrameView initAssemblyViewFrame(mvcController cont) {
+        acont = cont;
+        avf = new AssemblyViewFrame(cont);
+        acont.setView(avf);
         return avf;
     }
 
-    public void rebuildTreePanels() {
-        avf.rebuildTreePanels();
+    /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
+    public void rebuildLEGOTreePanels() {
+        ((AssemblyViewFrame)avf).rebuildLEGOTreePanels();
     }
 
     public AssemblyModel getActiveAssemblyModel() {
-        return amod;
+        return (AssemblyModel) acont.getModel();
     }
 
     public mvcController getAssemblyController() {
@@ -229,20 +233,20 @@ public class VGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    EventGraphViewFrame egvf;
+    mvcAbstractJFrameView egvf;
     mvcController eContl;
 
     public EventGraphViewFrame getEventGraphEditor() {
-        return egvf;
+        return (EventGraphViewFrame) egvf;
     }
 
-    public EventGraphViewFrame buildEventGraphViewFrame() {
+    public mvcAbstractJFrameView buildEventGraphViewFrame() {
         return buildEventGraphViewFrame(new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame buildEventGraphViewFrame(EventGraphControllerImpl cont) {
+    public mvcAbstractJFrameView buildEventGraphViewFrame(mvcController cont) {
         initEventGraphViewFrame(cont);
-        cont.begin();
+        ((EventGraphControllerImpl)cont).begin();
         return egvf;
     }
 
@@ -256,11 +260,11 @@ public class VGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public EventGraphViewFrame initEventGraphViewFrame() {
+    public mvcAbstractJFrameView initEventGraphViewFrame() {
         return initEventGraphViewFrame(new EventGraphControllerImpl());
     }
 
-    public EventGraphViewFrame initEventGraphViewFrame(EventGraphControllerImpl cont) {
+    public mvcAbstractJFrameView initEventGraphViewFrame(mvcController cont) {
         egvf = new EventGraphViewFrame(cont);
         cont.setView(egvf);
         eContl = cont;
@@ -324,6 +328,59 @@ public class VGlobals {
 
     public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
         return new DefaultComboBoxModel<>(getStateVarsList());
+    }
+
+    /* AnalystReport model / view / controller */
+
+    /* routines to manage the singleton-aspect of the view */
+    mvcAbstractJFrameView aRf;
+    mvcController aRcont;
+
+    /**
+     * Get a reference to the analyst report view.
+     * @return a reference to the analyst report view or null if yet unbuilt.
+     */
+    public AnalystReportFrame getAnalystReportEditor() {
+        return (AnalystReportFrame) aRf;
+    }
+
+    /** Used only if a call to {@link #getAnalystReportEditor()} ever returns null
+     *
+     * @return the component AnalystReportFrame
+     */
+    public mvcAbstractJFrameView buildAnalystReportFrame() {
+        mvcController cont = new AnalystReportController();
+        return buildAnalystReportFrame(cont);
+    }
+
+    /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
+     *
+     * @return the component AnalystReportFrame
+     */
+    public mvcAbstractJFrameView initAnalystReportFrame() {
+        mvcController cont = new AnalystReportController();
+        return initAnalystReportFrame(cont);
+    }
+
+    private mvcAbstractJFrameView buildAnalystReportFrame(mvcController cont) {
+        initAnalystReportFrame(cont);
+        return aRf;
+    }
+
+    private mvcAbstractJFrameView initAnalystReportFrame(mvcController cont) {
+        aRcont = cont;
+        aRf = new AnalystReportFrame(cont);
+        cont.setView(aRf);
+        return aRf;
+    }
+
+    // The model is the builder, but not very functional as a model
+//    public mvcModel getAnalystReoprtModel() {
+//        return aRcont.getModel();
+//    }
+
+    public mvcController getAnalystReportController() {
+        return aRcont;
     }
 
     /******/
