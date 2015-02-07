@@ -1654,14 +1654,22 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // display a scaled version
             if (display) {
-                JFrame frame = new JFrame("Saved as " + fil.getName());
+                final JFrame frame = new JFrame("Saved as " + fil.getName());
                 ImageIcon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
                 frame.getContentPane().add(lab, BorderLayout.CENTER);
                 frame.pack();
                 frame.setLocationRelativeTo((Component) getView());
-                frame.setVisible(true);
+                
+                Runnable r = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        frame.setVisible(true);
+                    }
+                };
+                SwingUtilities.invokeLater(r);
             }
         }
     }

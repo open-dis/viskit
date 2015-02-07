@@ -30,6 +30,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Corrected issue with EG image capture being stuck on the last showing EG
+
   Improved EG Node tooltips by including code blocks
 
   The translator for generation of Event Graph XML to Java now handles generic

@@ -441,7 +441,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);
 
         // Bring the JGraph component to front. Also, allows models their own
-        // canvas to draw prevent a NPE
+        // canvas to draw to prevent a NPE
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
 
         // Now expose the EventGraph toolbar

@@ -994,7 +994,8 @@ public final class AnalystReportBuilder {
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
-        ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(evc.getEventGraphFilesList(),
+        ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(
+                evc.getEventGraphFilesList(),
                 evc.getEventGraphImagePathsList());
     }
 
@@ -1008,7 +1009,8 @@ public final class AnalystReportBuilder {
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
         String assyFileName = getAssemblyFile().getName();
         setAssemblyImageLocation(assemblyImageDir + "/" + assyFileName + ".png");
-        ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(getAssemblyImageLocation());
+        ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(
+                getAssemblyImageLocation());
     }
 
     private void announceReportReadyToView() {

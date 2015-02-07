@@ -965,9 +965,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // create and save the image
         EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
 
-        // Get only the jgraph part
-        Component component = egvf.getCurrentJgraphComponent();
-
         /* If another run is to be performed with the intention of generating
          * an Analyst Report, prevent the last Event Graph open (from prior group
          * if any open) from being the dominant (only) screen shot taken.  In
@@ -987,7 +984,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 eventGraphImage = itr.next();
                 eventGraphImageFile = new File(eventGraphImage);
                 LOGGER.debug("eventGraphImage is: " + eventGraphImage);
-                tcb = new TimerCallback(eventGraphImageFile, false, egvf, component);
+                tcb = new TimerCallback(eventGraphImageFile, false, egvf, egvf.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
                 if (!eventGraphImageFile.getParentFile().isDirectory()) {
@@ -1036,14 +1033,22 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // display a scaled version
             if (display) {
-                JFrame localFrame = new JFrame("Saved as " + fil.getName());
+                final JFrame frame = new JFrame("Saved as " + fil.getName());
                 ImageIcon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
-                localFrame.getContentPane().setLayout(new BorderLayout());
-                localFrame.getContentPane().add(lab, BorderLayout.CENTER);
-                localFrame.pack();
-                localFrame.setLocationRelativeTo((Component) getView());
-                localFrame.setVisible(true);
+                frame.getContentPane().setLayout(new BorderLayout());
+                frame.getContentPane().add(lab, BorderLayout.CENTER);
+                frame.pack();
+                frame.setLocationRelativeTo((Component) getView());
+
+                Runnable r = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        frame.setVisible(true);
+                    }
+                };
+                SwingUtilities.invokeLater(r);
             }
         }
     }
