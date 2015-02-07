@@ -30,7 +30,11 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
-  Corrected issue with EG image capture being stuck on the last showing EG
+  Fixed and issue where super type more than one level up were not being
+  resolved in the EG to Java translator
+
+  Corrected issue with EG image capture being stuck on the last showing EG and
+  not cycling through open EG tabs
 
   Improved EG Node tooltips by including code blocks
 
