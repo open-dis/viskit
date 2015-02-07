@@ -245,8 +245,10 @@ public class SimkitXML2Java {
                     pw.println(SP + JDC);
                 }
                 pw.println(SP_4 + PRIVATE + SP + p.getType() + SP + p.getName() + SC);
-                pw.println();
+            } else {
+                pw.println(SP_4 + "/* inherited parameter " + p.getType() + SP + p.getName() + " */");
             }
+            pw.println();
 
             if (extendz.contains(SIM_ENTITY_BASE)) {
                 buildParameterModifierAndAccessor(p, accessorBlock);
@@ -302,8 +304,6 @@ public class SimkitXML2Java {
                         pw.println(SP + JDC);
                     }
                     pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
-                } else {
-                    pw.println(SP_4 + "/*" + SP + "inherited state variable" + SP + s.getType() + SP + s.getName() + SP + JDC);
                 }
             }
 
@@ -364,7 +364,6 @@ public class SimkitXML2Java {
         pw.print(SP_8 + "this" + PD + p.getName() + SP + EQ + SP);
 
         if (isArray(p.getType()) || isGeneric(p.getType())) {
-
             pw.print(shortinate(p.getName()));
             pw.println(PD + "clone" + LP + RP + SC);
         } else {
@@ -500,69 +499,70 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(constructors);
 
-        pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
-
         // Generate a zero parameter (default) constructor in addition to a
-        // parameterized constroctor
-        if (!liParams.isEmpty()) {
+        // parameterized constructor if we are not an extension
+        if (superParams.isEmpty()) {
+            pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
             pw.println(SP_4 + "public " + this.root.getName() + LP + RP + SP + OB);
             pw.println(SP_4 + CB);
             pw.println();
         }
 
-        for (StateVariable st : liStateV) {
+        if (!liParams.isEmpty()) {
+            for (StateVariable st : liStateV) {
 
             // Supress warning call to unchecked cast since we return a clone
-            // of Objects vice the desired type
-            if (isGeneric(st.getType())) {
-                pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
-                break;
-            }
-        }
-
-        // Now, generate the parameterized or zero parameter consructor
-        pw.print(SP_4 + "public " + this.root.getName() + LP);
-        for (Parameter pt : liParams) {
-
-            pw.print(pt.getType() + SP + shortinate(pt.getName()));
-
-            if (liParams.size() > 1) {
-                if (liParams.indexOf(pt) < liParams.size() - 1) {
-                    pw.print(CM);
-                    pw.println();
-                    pw.print(SP_8 + SP_4);
+                // of Objects vice the desired type
+                if (isGeneric(st.getType())) {
+                    pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
+                    break;
                 }
             }
-        }
 
-        pw.println(RP + SP + OB);
+            // Now, generate the parameterized consructor
+            pw.print(SP_4 + "public " + this.root.getName() + LP);
+            for (Parameter pt : liParams) {
 
-        if (!extendz.contains(SIM_ENTITY_BASE)) {
+                pw.print(pt.getType() + SP + shortinate(pt.getName()));
 
-            pw.print(SP_8 + "super" + LP);
-            for (Parameter pt : superParams) {
-                pw.print(shortinate(pt.getName()));
-                if ((superParams.size() > 1) && (superParams.indexOf(pt) < superParams.size() - 1)) {
-                    pw.print(CM);
+                if (liParams.size() > 1) {
+                    if (liParams.indexOf(pt) < liParams.size() - 1) {
+                        pw.print(CM);
+                        pw.println();
+                        pw.print(SP_8 + SP_4);
+                    }
                 }
             }
-            pw.println(RP + SC);
-        }
 
-        // skip over any sets that would get done in the superclass
-        for (int l = superParams.size(); l < liParams.size(); l++) {
-            Parameter pt = liParams.get(l);
-            pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
-        }
+            pw.println(RP + SP + OB);
 
-        for (StateVariable st : liStateV) {
-            if (isArray(st.getType())) {
-                pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripGenerics(st.getType()) + SC);
+            if (!extendz.contains(SIM_ENTITY_BASE)) {
+
+                pw.print(SP_8 + "super" + LP);
+                for (Parameter pt : superParams) {
+                    pw.print(shortinate(pt.getName()));
+                    if ((superParams.size() > 1) && (superParams.indexOf(pt) < superParams.size() - 1)) {
+                        pw.print(CM + SP);
+                    }
+                }
+                pw.println(RP + SC);
             }
-        }
 
-        pw.println(SP_4 + CB);
-        pw.println();
+            // skip over any sets that would get done in the superclass
+            for (int l = superParams.size(); l < liParams.size(); l++) {
+                Parameter pt = liParams.get(l);
+                pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
+            }
+
+            for (StateVariable st : liStateV) {
+                if (isArray(st.getType())) {
+                    pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripGenerics(st.getType()) + SC);
+                }
+            }
+
+            pw.println(SP_4 + CB);
+            pw.println();
+        }
     }
 
     /** Convenience method for stripping the angle brackets and type from a
@@ -652,23 +652,25 @@ public class SimkitXML2Java {
         List<LocalVariable> liLocalV = run.getLocalVariable();
         List<Object> liSchedCanc = run.getScheduleOrCancel();
 
-        Method doRun = null;
+        String doRun = null;
 
-        // check if super has a doRun()
+        // check if any super has a doRun()
         if (!extendz.contains(SIM_ENTITY_BASE)) {
 
-            try {
-                Class<?> sup = resolveExtensionClass();
-                doRun = sup.getDeclaredMethod("doRun", new Class<?>[] {});
-            } catch (NoSuchMethodException cnfe) {
-//                log.error(cnfe);
+            Class<?> sup = resolveExtensionClass();
+            Method[] methods = sup.getMethods();
+            for (Method m : methods) {
+                if ("doRun".equals(m.getName()) && m.getParameterCount() == 0) {
+                    doRun = m.getName();
+                    break;
+                }
             }
         }
 
         if (doRun != null) {
             pw.println(SP_4 + "@Override");
-            pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
-            pw.println(SP_8 + "super.doRun" + LP + RP + SC);
+            pw.println(SP_4 + "public void " + doRun + LP + RP + SP + OB);
+            pw.println(SP_8 + "super." + doRun + LP + RP + SC);
         } else {
             pw.println(SP_4 + JDO + SP + "Bootstraps the first simulation event" + SP + JDC);
             pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
@@ -751,35 +753,48 @@ public class SimkitXML2Java {
         List<LocalVariable> liLocalV = e.getLocalVariable();
         List<Object> liSchedCanc = e.getScheduleOrCancel();
 
-        Method superMethod = null;
+        String doEvent = null;
 
-        // check if super has a doEventName()
+        // check if any super has a doEventName()
         if (!extendz.contains(SIM_ENTITY_BASE)) {
-            try {
-                Class<?> sup = resolveExtensionClass();
-                superMethod = sup.getDeclaredMethod("do" + e.getName(), new Class<?>[]{});
-            } catch (NoSuchMethodException cnfe) {
-//            log.error(cnfe);
+
+            Class<?> sup = resolveExtensionClass();
+            Method[] methods = sup.getMethods();
+            for (Method m : methods) {
+                if (("do"+e.getName()).equals(m.getName()) && m.getParameterCount() == liArgs.size()) {
+                    doEvent = m.getName();
+                    break;
+                }
             }
         }
 
-        if (superMethod != null) {
+        if (doEvent != null) {
             pw.println(SP_4 + "@Override");
-            pw.println(SP_4 + "public void do" + e.getName() + LP + RP + SP + OB);
-            pw.println(SP_8 + "super.do" + e.getName() + LP + RP + SC);
-            pw.println();
-        } else {
-            pw.print(SP_4 + "public void do" + e.getName() + LP);
+        }
 
+        pw.print(SP_4 + "public void do" + e.getName() + LP);
+
+        for (Argument a : liArgs) {
+            pw.print(a.getType() + SP + a.getName());
+            if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+                pw.print(CM + SP);
+            }
+        }
+
+        // finish the method decl
+        pw.println(RP + SP + OB);
+
+        if (doEvent != null) {
+            pw.print(SP_8 + "super." + doEvent + LP);
             for (Argument a : liArgs) {
-                pw.print(a.getType() + SP + a.getName());
+                pw.print(a.getName());
                 if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
                     pw.print(CM + SP);
                 }
             }
 
-            // finish the method decl
-            pw.println(RP + SP + OB);
+            // finish the super decl
+            pw.println(RP + SC);
         }
 
         pw.println();
@@ -1072,13 +1087,12 @@ public class SimkitXML2Java {
             int pi = 0;
             Class<?>[] sparams = ca[maxIndex].getParameterTypes();
 
-            outer:
             for (Parameter p : params) {
                 for (int i = pi; i < sparams.length; i++) {
                     if (unqualifiedMatch(p.getType(), sparams[i].getName()) && pi < maxParamCount) {
                         parray[pi] = p;
                         ++pi;
-                        break outer;
+                        break;
                     }
                 }
             }
