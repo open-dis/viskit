@@ -679,7 +679,10 @@ public class ViskitProject {
         Icon viskitProjIcon;
 
         public ViskitProjectFileView() {
-            viskitProjIcon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitIcon.gif"));
+
+            // Can't use VGlobals.instance().getWorkClassLoader() b/c it will
+            // hang if this is the first frest startup of Viskit
+            viskitProjIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
         }
 
         @Override
