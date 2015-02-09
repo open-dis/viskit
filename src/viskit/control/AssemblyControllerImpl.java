@@ -1114,6 +1114,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Clear the cache after a delete to prevent unnecessary buildup
         selectionVector.clear();
+        copyVector.clear();
     }
 
     private void killEdge(AssemblyEdge e) {
@@ -1661,7 +1662,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 frame.getContentPane().add(lab, BorderLayout.CENTER);
                 frame.pack();
                 frame.setLocationRelativeTo((Component) getView());
-                
+
                 Runnable r = new Runnable() {
 
                     @Override

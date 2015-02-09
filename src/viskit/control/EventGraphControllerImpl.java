@@ -627,11 +627,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void selectNodeOrEdge(Vector<Object> v) //------------------------------------
     {
         selectionVector = v;
-        boolean ccbool = !selectionVector.isEmpty();
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(ccbool);
-        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(ccbool);
-        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(ccbool);
+        ActionIntrospector.getAction(this, "cut").setEnabled(nodeSelected());
+        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(nodeSelected());
+        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(nodeSelected());
     }
     private Vector<Object> copyVector = new Vector<>();
 
@@ -640,7 +639,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void copy() //----------------
     {
         if (!nodeSelected()) {
-            ((EventGraphView) getView()).genericReport(JOptionPane.WARNING_MESSAGE, "Unsupported Action", "Edges cannot be copied.");
+            messageUser(JOptionPane.WARNING_MESSAGE,
+                    "Unsupported Action",
+                    "Edges cannot be copied.");
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
@@ -735,6 +736,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Clear the cache after a delete to prevent unnecessary buildup
         selectionVector.clear();
+        copyVector.clear();
     }
 
     private void killEdge(Edge e) {
@@ -947,7 +949,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        final Timer tim = new Timer(100, new TimerCallback(fil, true, egvf, component));
+        final Timer tim = new Timer(100, new TimerCallback(fil, true, component));
         tim.setRepeats(false);
         tim.start();
 
@@ -984,7 +986,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 eventGraphImage = itr.next();
                 eventGraphImageFile = new File(eventGraphImage);
                 LOGGER.debug("eventGraphImage is: " + eventGraphImage);
-                tcb = new TimerCallback(eventGraphImageFile, false, egvf, egvf.getCurrentJgraphComponent());
+                tcb = new TimerCallback(eventGraphImageFile, false, egvf.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
                 if (!eventGraphImageFile.getParentFile().isDirectory()) {
@@ -1006,10 +1008,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         JFrame frame;
         Component component;
 
-        TimerCallback(File f, boolean b, JFrame frame, Component component) {
+        TimerCallback(File f, boolean b, Component component) {
             fil = f;
             display = b;
-            this.frame = frame;
             this.component = component;
         }
 
@@ -1033,7 +1034,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // display a scaled version
             if (display) {
-                final JFrame frame = new JFrame("Saved as " + fil.getName());
+                frame = new JFrame("Saved as " + fil.getName());
                 ImageIcon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());

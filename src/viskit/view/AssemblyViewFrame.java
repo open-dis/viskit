@@ -309,8 +309,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // Set up file menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
@@ -329,8 +330,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "save", "Save", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
         fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
-
         fileMenu.addSeparator();
+
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
@@ -341,12 +342,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         // TODO: Unknown what this exactly does
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
-
         fileMenu.addSeparator();
+
         fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
-
         fileMenu.addSeparator();
-        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q, KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+
+        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
@@ -363,12 +365,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         ActionIntrospector.getAction(controller, "cut").setEnabled(false);
         ActionIntrospector.getAction(controller, "copy").setEnabled(false);
         ActionIntrospector.getAction(controller, "paste").setEnabled(false);
-
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
         editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
-
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,

@@ -559,7 +559,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         }
     }
 
-    // MarqueeHandler that Connects Vertices and Displays PopupMenus
+    /** MarqueeHandler that Connects Vertices and Displays PopupMenus */
     public class MyMarqueeHandler extends BasicMarqueeHandler {
 
         // Holds the Start and the Current Point
@@ -794,31 +794,38 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
          * Highlights the given cell view or removes the highlight if no cell
          * view is specified.
          *
-         * @param graph
-         * @param cellView
+         * @param graph the JGraph panel
+         * @param cellView the view to highlight
          */
-        protected void highlight(JGraph graph, CellView cellView) {
-            if (cellView != null) {
-                highlight.setBounds(getHighlightBounds(graph, cellView));
+        protected void highlight(final JGraph graph, final CellView cellView) {
+            Runnable r = new Runnable() {
 
-                if (highlight.getParent() == null) {
-                    graph.add(highlight);
-                    highlight.setVisible(true);
+                @Override
+                public void run() {
+                    if (cellView != null) {
+                        highlight.setBounds(getHighlightBounds(graph, cellView));
+
+                        if (highlight.getParent() == null) {
+                            graph.add(highlight);
+                            highlight.setVisible(true);
+                        }
+                    } else {
+                        if (highlight.getParent() != null) {
+                            highlight.setVisible(false);
+                            highlight.getParent().remove(highlight);
+                        }
+                    }
                 }
-            } else {
-                if (highlight.getParent() != null) {
-                    highlight.setVisible(false);
-                    highlight.getParent().remove(highlight);
-                }
-            }
+            };
+            SwingUtilities.invokeLater(r);
         }
 
         /**
          * Returns the bounds to be used to highlight the given cell view.
          *
-         * @param graph
-         * @param cellView
-         * @return
+         * @param graph the JGraph panel
+         * @param cellView the view to highlight
+         * @return the bounds of the view to highlight
          */
         protected Rectangle getHighlightBounds(JGraph graph, CellView cellView) {
             boolean offset = (GraphConstants.getOffset(cellView.getAllAttributes()) != null);
