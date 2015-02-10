@@ -241,6 +241,9 @@ public class FileBasedClassManager implements Runnable {
      * @return a String representation of the message digest
      */
     public String createMessageDigest(File... files) {
+
+        String retVal = "";
+
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             for (File file : files) {
@@ -251,7 +254,10 @@ public class FileBasedClassManager implements Runnable {
                         md.update(buf);
                     }
                 } catch (IOException ex) {
-                    log.error(ex);
+
+                    // This can happen if the build/classes directory got nuked
+                    // so, ignore
+//                    log.error(ex);
 //                    ex.printStackTrace();
                 }
             }
@@ -259,12 +265,12 @@ public class FileBasedClassManager implements Runnable {
             if (viskit.VStatics.debug) {
                 log.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
-            return new BigInteger(hash).toString(16);
+            retVal = new BigInteger(hash).toString(16);
         } catch (NoSuchAlgorithmException ex) {
             log.error(ex);
 //            ex.printStackTrace();
         }
-        return "";
+        return retVal;
     }
 
     public boolean isCached(File file) {
