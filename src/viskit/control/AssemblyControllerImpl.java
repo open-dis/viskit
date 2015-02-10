@@ -628,6 +628,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // update title bar
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+
+            // TODO: Implement this
+//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
         } else {
             ((AssemblyView) getView()).delTab(mod);
         }

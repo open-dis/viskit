@@ -130,6 +130,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
 
             // Bugfix 1398
             String msg =
