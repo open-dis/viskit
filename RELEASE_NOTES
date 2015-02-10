@@ -2,6 +2,11 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  We can create local arguments, but must be assign values.  We can create
+  method parameters, schedule events and initiate state variable changes, but
+  we have no way of calling void return type methods, therefore we must use the
+  code block to perform these types of method calls.
+
   Because of the unique nature of XML IDs, we are not able to have similar
   method names, i.e. Arrival, in the same EG file even with differing method
   signatures.  As such, subclassing is still possible, but the user will have
