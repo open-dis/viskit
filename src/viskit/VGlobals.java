@@ -720,17 +720,16 @@ public class VGlobals {
             "Double",
             "String",
             moreTypesString};
-    private String[] morePackages = {"primitives", "java.lang", "java.util", "cancel"};
+    private String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
 
     // these are for the moreClasses array
     private final int PRIMITIVES_INDEX = 0;
-    private final int JAVA_LANG_INDEX = 1;
-    private final int JAVA_UTIL_INDEX = 2;
 
     private String[][] moreClasses =
             {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
             {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuilder"},
             {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
+            {"RandomNumber", "RandomVariate"},
             {}
     };
 
@@ -751,31 +750,6 @@ public class VGlobals {
     public boolean isPrimitive(String ty) {
         for (String s : moreClasses[PRIMITIVES_INDEX]) {
             if (ty.equals(s)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** @param ty the type to check if member of java.lang.*
-     * @return true if member of java.lang.*
-     */
-    public boolean isJavaDotLang(String ty) {
-        for (String s : moreClasses[JAVA_LANG_INDEX]) {
-            if (s.contains(ty)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** The simple (basic) class name is required for this
-     * @param ty the type to check if member of java.util.*
-     * @return true if member of java.util.*
-     */
-    public boolean isJavaDotUtil(String ty) {
-        for (String s : moreClasses[JAVA_UTIL_INDEX]) {
-            if (s.contains(ty)) {
                 return true;
             }
         }
