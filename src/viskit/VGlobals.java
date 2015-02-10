@@ -72,7 +72,6 @@ import viskit.model.ViskitElement;
 import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
-import viskit.mvc.mvcModel;
 import viskit.view.AnalystReportFrame;
 
 /**
@@ -601,9 +600,6 @@ public class VGlobals {
         Object o = null;
         boolean isArr = false;
 
-        // TODO: Have to get viskit.VsimkitObjects to work first
-        if (isSimkitDotRandom(type)) {return o;}
-
         if (type.contains("[")) {
             type = type.substring(0, type.length() - "[]".length());
             isArr = true;
@@ -724,17 +720,18 @@ public class VGlobals {
             "Double",
             "String",
             moreTypesString};
-    private String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
-    private final int PRIMITIVES_INDEX = 0; // for moreClasses array
-    private final int JAVA_LANG_INDEX = 1; // for moreClasses array
-    private final int JAVA_UTIL_INDEX = 2; // for moreClasses array
-    private final int SIMKIT_RANDOM_INDEX = 3; // for moreClasses array
+    private String[] morePackages = {"primitives", "java.lang", "java.util", "cancel"};
+
+    // these are for the moreClasses array
+    private final int PRIMITIVES_INDEX = 0;
+    private final int JAVA_LANG_INDEX = 1;
+    private final int JAVA_UTIL_INDEX = 2;
 
     private String[][] moreClasses =
             {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
-            {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuffer"},
+            {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuilder"},
             {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
-            {"RandomNumber", "RandomVariate"}, {}
+            {}
     };
 
     /** @param ty the type to check if primitive or array
@@ -778,18 +775,6 @@ public class VGlobals {
      */
     public boolean isJavaDotUtil(String ty) {
         for (String s : moreClasses[JAVA_UTIL_INDEX]) {
-            if (s.contains(ty)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**@param ty the type to check if member of simkit.random.*
-     * @return true if member of simkit.random.*
-     */
-    public boolean isSimkitDotRandom(String ty) {
-        for (String s : moreClasses[SIMKIT_RANDOM_INDEX]) {
             if (s.contains(ty)) {
                 return true;
             }

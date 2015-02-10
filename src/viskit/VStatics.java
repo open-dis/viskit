@@ -286,17 +286,45 @@ public class VStatics {
         }
     }
 
+    /** Convenience method for expanding unqualified (common) types used in Viskit
+     *
+     * @param s the string of the unqualified type
+     * @return the qualified type
+     */
     static String commonExpansions(String s) {
-        if (s.equals("String")) {
-            return "java.lang.String";
+        String retVal;
+
+        switch (s) {
+
+            case "String":
+                retVal = "java.lang.String";
+                break;
+
+            case "Object":
+                retVal = "java.lang.Object";
+                break;
+
+            case "Queue":
+                retVal = "java.util.Queue";
+                break;
+
+            case "RandomNumber":
+                retVal = "simkit.random.RandomNumber";
+                break;
+
+            case "RandomVariate":
+                retVal = "simkit.random.RandomVariate";
+                break;
+
+            case "Entity":
+                retVal = "simkit.Entity";
+                break;
+
+            default:
+                retVal = null;
         }
-        if (s.equals("Object")) {
-            return "java.lang.Object";
-        }
-        if (s.equals("Queue")) {
-            return "java.util.Queue";
-        }
-        return null;
+
+        return retVal;
     }
 
     static Class<?> tryPrimitive(String s) {
