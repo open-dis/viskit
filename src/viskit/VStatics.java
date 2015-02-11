@@ -236,11 +236,12 @@ public class VStatics {
         return c;
     }
 
-    /** Last chance for resolving a sought after class on the classpath
+    /** Convenience method in a series of chains for resolving a class that is
+     * hopefully on the classpath
      *
      * @param s the name of the class to search for
      * @param clsLoader the class loader to search
-     * @return a non instantiated class object from the given name
+     * @return an instantiated class object from the given name
      */
     static Class<?> cForName(String s, ClassLoader clsLoader) {
         Class<?> c = null;
@@ -254,9 +255,7 @@ public class VStatics {
                     try {
                         c = VGlobals.instance().getWorkClassLoader().loadClass(s);
                     } catch (ClassNotFoundException cnfe) {
-                        // sometimes happens but appears harmless.  Just let
-                        // the NoClassDefFoundError handle the reporting to
-                        // the user
+                        // sometimes happens, ignore
                     }
                 }
             }
