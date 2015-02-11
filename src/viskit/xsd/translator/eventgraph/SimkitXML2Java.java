@@ -149,7 +149,7 @@ public class SimkitXML2Java {
 
         buildHead(head);
         buildParameters(parameters, accessorBlock);
-        buildStateVars(stateVars, accessorBlock);
+        buildStateVariables(stateVars, accessorBlock);
         buildParameterMap(parameterMap);
         buildConstructors(constructors);
         buildEventBlock(runBlock, eventBlock);
@@ -262,7 +262,7 @@ public class SimkitXML2Java {
         }
     }
 
-    void buildStateVars(StringWriter vars, StringWriter accessorBlock) {
+    void buildStateVariables(StringWriter vars, StringWriter accessorBlock) {
 
         PrintWriter pw = new PrintWriter(vars);
 
@@ -275,6 +275,7 @@ public class SimkitXML2Java {
         pw.println();
 
         Class<?> c = null;
+        Constructor<?> cst;
         for (StateVariable s : liStateV) {
 
             // Non array type generics
@@ -308,7 +309,9 @@ public class SimkitXML2Java {
             }
 
             if (c != null && !VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType()) && !isArray(s.getType())) {
-                Constructor<?> cst = null;
+
+                // reset
+                cst = null;
 
                 try {
                     cst = c.getConstructor(new Class<?>[] {});
@@ -330,8 +333,10 @@ public class SimkitXML2Java {
                     pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
                 }
             }
-            buildStateVariableAccessor(s, accessorBlock);
 
+            // reset
+            c = null;
+            buildStateVariableAccessor(s, accessorBlock);
             pw.println();
         }
         if (liStateV.isEmpty()) {
