@@ -600,27 +600,28 @@ public class VGlobals {
         Object o = null;
         boolean isArr = false;
 
-        if (type.contains("[")) {
+        if (isArray(type)) {
             type = type.substring(0, type.length() - "[]".length());
             isArr = true;
         }
         try {
             Class<?> c = VStatics.classForName(type);
-            if (c == null) {throw new Exception("Class not found: " + type);}
+            if (c != null) {
 
-            Constructor<?>[] constructors = c.getConstructors();
+                Constructor<?>[] constructors = c.getConstructors();
 
-            // The first constructor should be the default, no argument one
-            for (Constructor<?> constructor : constructors) {
-                if (constructor.getParameterTypes().length == 0) {
-                    if (isArr) {
-                        o = Array.newInstance(c, 1);
-                    } else {
-                        o = c.newInstance();
+                // The first constructor should be the default, no argument one
+                for (Constructor<?> constructor : constructors) {
+                    if (constructor.getParameterTypes().length == 0) {
+                        if (isArr) {
+                            o = Array.newInstance(c, 1);
+                        } else {
+                            o = c.newInstance();
+                        }
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SecurityException | NegativeArraySizeException | InstantiationException | IllegalAccessException e) {
             log.error(e);
         }
 

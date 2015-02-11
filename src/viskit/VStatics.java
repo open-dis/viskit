@@ -315,10 +315,6 @@ public class VStatics {
                 retVal = "simkit.random.RandomVariate";
                 break;
 
-            case "Entity":
-                retVal = "simkit.Entity";
-                break;
-
             default:
                 retVal = null;
         }
