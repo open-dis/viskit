@@ -274,7 +274,7 @@ public class SimkitXML2Java {
         pw.println(SP_4 + "/* Simulation State Variables */");
         pw.println();
 
-        Class<?> c = null;
+        Class<?> c;
         Constructor<?> cst;
         for (StateVariable s : liStateV) {
 
@@ -297,6 +297,7 @@ public class SimkitXML2Java {
 
                 // Non-super type, primitive, primitive[] or another type array
                 if (c == null || VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
+
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
                         for (String comment : s.getComment()) {
@@ -304,38 +305,37 @@ public class SimkitXML2Java {
                         }
                         pw.println(SP + JDC);
                     }
+
                     pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
-                }
-            }
 
-            if (c != null && !VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType()) && !isArray(s.getType())) {
+                } else if (!isArray(s.getType())) {
 
-                // reset
-                cst = null;
-
-                try {
-                    cst = c.getConstructor(new Class<?>[] {});
-                } catch (NoSuchMethodException nsme) {
-//                    log.error(nsme);
-                }
-
-                if (!s.getComment().isEmpty()) {
-                    pw.print(SP_4 + JDO + SP);
-                    for (String comment : s.getComment()) {
-                        pw.print(comment);
+                    if (!s.getComment().isEmpty()) {
+                        pw.print(SP_4 + JDO + SP);
+                        for (String comment : s.getComment()) {
+                            pw.print(comment);
+                        }
+                        pw.println(SP + JDC);
                     }
-                    pw.println(SP + JDC);
-                }
 
-                if (cst != null) {
-                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
-                } else { // really not a bad case, most likely will be set by the reset()
-                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
+                    // NOTE: not the best way to do this, but functions for now
+                    try {
+                        cst = c.getConstructor(new Class<?>[]{});
+                    } catch (NoSuchMethodException nsme) {
+//                    log.error(nsme);
+
+                        // reset
+                        cst = null;
+                    }
+
+                    if (cst != null) {
+                        pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
+                    } else { // really not a bad case, most likely will be set by the reset()
+                        pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
+                    }
                 }
             }
 
-            // reset
-            c = null;
             buildStateVariableAccessor(s, accessorBlock);
             pw.println();
         }
