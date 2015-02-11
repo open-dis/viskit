@@ -273,9 +273,9 @@ public class SimkitXML2Java {
 
         pw.println(SP_4 + "/* Simulation State Variables */");
         pw.println();
-        for (StateVariable s : liStateV) {
 
-            Class<?> c = null;
+        Class<?> c = null;
+        for (StateVariable s : liStateV) {
 
             // Non array type generics
             if (isGeneric(s.getType())) {
