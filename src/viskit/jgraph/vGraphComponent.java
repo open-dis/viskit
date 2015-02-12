@@ -378,6 +378,14 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         epSt.append(idx++);
                         epSt.append(" ");
                         epSt.append(ep.getValue());
+
+                        // TODO: Will need a schema change for this to show correctly
+                        if (ep.getType() != null) {
+                            epSt.append(" ");
+                            epSt.append("(");
+                            epSt.append(ep.getType());
+                            epSt.append(")");
+                        }
                         epSt.append("<br>");
                     }
                     if (epSt.length() > 0) {

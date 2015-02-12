@@ -74,11 +74,11 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     /**
      * This is overridden because I've removed the plus minus buttons.  The
      * number of parameters must match the target.
-     * @param data
+     * @param data edge parameter data
      */
     @Override
     public void setData(List<? extends ViskitElement> data) {
-        ArrayList<ViskitElement> myList = new ArrayList<>(data);
+        List<ViskitElement> myList = new ArrayList<>(data);
         int diff = argList.size() - myList.size();
         if (diff == 0) {
             super.setData(data);
