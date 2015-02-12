@@ -330,8 +330,8 @@ public class EventInspectorDialog extends JDialog {
 
             // Bug 1373: This is how we will now sync up any SchedulingEdge
             // parameters with corresponding EventNode parameters
-            // TODO: Recheck bug and verify this isn't don't else where.  W/O
-            // the coninue statement, it nukes edge values that were already
+            // TODO: Recheck bug and verify this isn't don't elsewhere.  W/O
+            // the continue statement, it nukes edge values that were already
             // there if we modify a node
             for (ViskitElement ve : en.getConnections()) {
 
@@ -348,7 +348,7 @@ public class EventInspectorDialog extends JDialog {
                         LogUtils.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) ve).getModelKey());
 
                         // If this isn't the first time, then skip over this edge
-                        if (((SchedulingEdge) ve).parameters.isEmpty()) {continue;}
+                        if (!((SchedulingEdge) ve).parameters.isEmpty()) {continue;}
 
                         // We match EventArgument count to EdgeParameter count
                         // here.
