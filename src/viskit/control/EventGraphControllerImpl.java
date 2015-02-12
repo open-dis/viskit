@@ -629,9 +629,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     {
         selectionVector = v;
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(nodeSelected());
+        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected(v));
+        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(nodeOrEdgeSelected(v));
+        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(nodeOrEdgeSelected(v));
     }
     private Vector<Object> copyVector = new Vector<>();
 
@@ -661,6 +661,18 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private boolean nodeSelected() {
         return nodeInVector(selectionVector);
+    }
+
+    private boolean nodeOrEdgeSelected(Vector v) {
+        if (nodeInVector(v)) {
+            return true;
+        }
+        for (Object o : v) {
+            if (o instanceof Edge) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean nodeInVector(Vector v) {
