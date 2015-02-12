@@ -88,7 +88,12 @@ public class ClassPanel extends JPanel {
                         Boolean recurse = null;
                         if (fa1.isDirectory()) {
                             if (recurse == null) {
-                                int retrn = JOptionPane.showConfirmDialog(ClassPanel.this, "Recurse directories?", "Question", JOptionPane.YES_OPTION, JOptionPane.QUESTION_MESSAGE);
+                                int retrn =
+                                        JOptionPane.showConfirmDialog(ClassPanel.this,
+                                                "Recurse directories?", "Question",
+                                                JOptionPane.YES_OPTION,
+                                                JOptionPane.QUESTION_MESSAGE);
+
                                 recurse = retrn == JOptionPane.YES_OPTION;
                             }
                             tree.addContentRoot(fa1, recurse);
@@ -101,7 +106,10 @@ public class ClassPanel extends JPanel {
         });
     }
 
-    static class ClassTypeFilter extends FileFilter {
+    /** Facilitates a class finding utility when a user wishes to manually add a
+     * LEGO to the LEGO tree for Assembly construction
+     */
+    class ClassTypeFilter extends FileFilter {
 
         private Class<?> targetClass;     // looking for classes of this kind (or jars or directories)
 
