@@ -39,6 +39,9 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed bug to  prevent potential edge parameter values from being wiped out on
+  an node modification
+
   Preventing a case where we have simkit.jar in both the working classpath and
   in a project's /lib directory.  We don't need to expose multiple libs of the
   same name in the LEGOs tree because they happen to be in two different places
