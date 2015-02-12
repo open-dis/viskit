@@ -2,6 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import viskit.VGlobals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,11 +25,19 @@ public class EventStateTransition extends ViskitElement {
     private String indexingExpression = "";
     private String value;
     private String comment;
+    private String localVariableAssignment;
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(stateVarName);
-        if (stateVarType.indexOf('[') != -1) {
+        StringBuffer sb = new StringBuffer();
+        if (isOperation) {
+            sb.append(localVariableAssignment);
+            sb.append(" ");
+            sb.append("=");
+            sb.append(" ");
+        }
+        sb.append(stateVarName);
+        if (VGlobals.instance().isArray(stateVarType)) {
             handleArrayIndexing(sb);
         }
 
@@ -145,5 +154,16 @@ public class EventStateTransition extends ViskitElement {
     @Override
     public String getComment() {
         return comment;
+    }
+
+    public String getLocalVariableAssignment() {
+        return localVariableAssignment;
+    }
+
+    /**
+     * @param localVariableAssignment the localVariableAssignment to set
+     */
+    public void setLocalVariableAssignment(String localVariableAssignment) {
+        this.localVariableAssignment = localVariableAssignment;
     }
 }

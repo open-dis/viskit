@@ -111,23 +111,20 @@ placed on the Listener Event Graph Object (LEGO) tree by selecting the "+"
 button on the LEGO panel.  This will allow a user to drag those representative
 SimEntity icons onto the Assy pallete for Assy creation.
 
- * Of importance for the java source generation of an Event Graph is the
- * Parameter Map. The Parameter Map is an annotation construct generated and
- * placed in generated source code to depict all described parameters of an
- * event graph which will aid in correct state variable initialization from
- * either the constructor, or the reset event. The Parameter Map is also used to
- * generated correctly parameterized constructors during source code generation,
- * and to construct proper setters and getters for parameters.  A zero parameter
- * constructor is always generated in addition to any parameterized
- * constructors.
+ * Of importance for the java source generation of an Assembly is the
+ * ParameterMap.  The ParameterMap is an annotation construct placed in
+ * generated, or hand-crafted Event Graph source code to depict all described
+ * parameters of EG constructors which will aid in correct state variable
+ * initialization when constructing Assemblies.
  *
- * The Parameter Map is also parsed from source code at runtime to allow Viskit
+ * A zero parameter constructor is always generated in addition to any
+ * parameterized constructors.
+ *
+ * The ParameterMap is also parsed from source code at runtime to allow Viskit
  * to properly identify constructors of EGs classes on the classpath whether
  * they are from generated source, or contained in third party libraries.  The
- * importance of this feature is that when Assemblies are constructed from
- * iconized EGs, the Assembly can be constructed such that each EG parameter is
- * identified and properly initialized at runtime from generated Assembly source
- * code.
+ * importance of this feature is that iconized EGs will be displayed in the
+ * LEGOs tree panel for drag and drop Assembly construction.
 
 4) At this time, EG files can be manually opened and modified, or created new.
 Due to the unique nature of XML IDs, each method within the same EG file must

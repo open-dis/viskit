@@ -25,7 +25,6 @@ import viskit.model.ViskitElement;
  */
 public class TransitionsPanel extends JPanel {
 
-    private JTextArea jta;
     private JList<String> lis;
     private JButton minusButt, plusButt;
     private myListModel model;
@@ -53,7 +52,7 @@ public class TransitionsPanel extends JPanel {
         model.addElement("1");
         model.addElement("2");
         model.addElement("3");
-        lis = new JList<String>(model);
+        lis = new JList<>(model);
         lis.setVisibleRowCount(3);
 
         JScrollPane jsp = new JScrollPane(lis);
@@ -71,14 +70,12 @@ public class TransitionsPanel extends JPanel {
         plusButt.setBorder(null);
         plusButt.setText(null);
         Dimension d = plusButt.getPreferredSize();
-        //plusButt.setFont(plusButt.getFont().deriveFont(plusButt.getFont().getSize2D() + 5f));
         plusButt.setMinimumSize(d);
         plusButt.setMaximumSize(d);
         buttPan.add(plusButt);
         minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
         minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minusGrey.png")));
         d = plusButt.getPreferredSize();
-        //minusButt.setFont(plusButt.getFont()); //.deriveFont(plusButt.getFont().getSize2D()+5f));
         minusButt.setMinimumSize(d);
         minusButt.setMaximumSize(d);
         minusButt.setBorder(null);
@@ -120,7 +117,7 @@ public class TransitionsPanel extends JPanel {
     }
 
     // TODO: combine with list model.  List has no clone method implemented
-    ArrayList<ViskitElement> arLis = new ArrayList<ViskitElement>();
+    ArrayList<ViskitElement> arLis = new ArrayList<>();
 
     public void setTransitions(List<? extends ViskitElement> tLis) {
         clearTransitions();
@@ -142,12 +139,17 @@ public class TransitionsPanel extends JPanel {
 
     private String transitionString(ViskitElement est) {
         String tstring = est.getStateVarName();
-        if (est.getStateVarType().indexOf('[') != -1) {
+        if (VGlobals.instance().isArray(tstring)) {
             tstring += "[";
             tstring += est.getIndexingExpression();
             tstring += "]";
         }
         if (est.isOperation()) {
+            String l = ((EventStateTransition) est).getLocalVariableAssignment();
+            if (l != null && !l.isEmpty()) {
+                tstring = l + " = " + tstring;
+            }
+
             tstring += "." + est.getOperationOrAssignment() + "\n";
         } else {
             tstring += " = " + est.getOperationOrAssignment() + "\n";

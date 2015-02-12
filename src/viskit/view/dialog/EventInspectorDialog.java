@@ -233,7 +233,11 @@ public class EventInspectorDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 EventStateTransition est = (EventStateTransition) e.getSource();
-                boolean modified = EventTransitionDialog.showDialog(EventInspectorDialog.this, locationComponent, est, arguments);
+                boolean modified = EventTransitionDialog.showDialog(
+                        EventInspectorDialog.this,
+                        locationComponent,
+                        est,
+                        arguments);
                 if (modified) {
                     transitions.updateTransition(est);
                     setModified(true);
@@ -264,7 +268,9 @@ public class EventInspectorDialog extends JDialog {
 
     private void sizeAndPosition() {
         pack();     // do this prior to next
-        // little check to add some extra space to always include the node name in title bar w/out dotdotdots
+
+        // little check to add some extra space to always include the node name
+        // in title bar w/out dotdotdots
         if (getWidth() < 350) {
             setSize(350, getHeight());
         }
@@ -402,12 +408,12 @@ public class EventInspectorDialog extends JDialog {
                     parseThis.append(est.toString());
                     parseThis.append(";");
                     String idxv = est.getIndexingExpression();
-                    if (idxv != null && idxv.length() > 0) {
+                    if (idxv != null && !idxv.isEmpty()) {
                         addPotentialLocalIndexVariable(evn, est.getIndexingExpression());
                     }
                 }
                 String ps = parseThis.toString().trim();
-                if (ps.length() > 0 && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
+                if (!ps.isEmpty() && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
                     String parseResults = VGlobals.instance().parseCode(evn, ps);
                     if (parseResults != null) {
                         boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);

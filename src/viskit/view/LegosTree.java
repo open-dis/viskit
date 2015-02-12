@@ -26,6 +26,7 @@ import viskit.util.FindClassesForInterface;
 import viskit.ParameterMap;
 import viskit.VGlobals;
 import viskit.VStatics;
+import viskit.control.AssemblyControllerImpl;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -198,8 +199,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
     }
 
     // 4 May 06 JMB The filter down below checks for empty dirs.
-    /** If there is a directory with xml in it, it will show in the LEGO tree,
-     * but if its children have errors when marshaling they will not appear.
+    /** If there is a directory, or a jarfile with xml in it, it will show in
+     * the LEGO tree, but if its children have errors when marshaling they will
+     * not appear.
+     *
      * @param f the path to evaluate for SimEntities
      */
     public void addContentRoot(File f) {
@@ -366,12 +369,18 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         return parent;
     }
 
+    /** Adds SimEntity icons to the Assembly Editor drag and drop tree
+     *
+     * @param f the jar to evaluate for SimEntitiy based EGs
+     */
     private void addJarFile(String jarFilePath) {
         JarFile jf;
         try {
             jf = new JarFile(jarFilePath);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(LegosTree.this, "Error reading " + jarFilePath, "I/O Error", JOptionPane.ERROR_MESSAGE);
+            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).messageUser(
+                    JOptionPane.ERROR_MESSAGE,
+                    "I/O Error", "Error reading " + jarFilePath);
             return;
         }
         jarFileCommon(jf);

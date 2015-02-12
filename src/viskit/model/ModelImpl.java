@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import viskit.VGlobals;
 import viskit.control.EventGraphController;
 import viskit.mvc.mvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -359,28 +360,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     private void jaxbEvToNode(Event ev, EventNode node) {
         node.setName(ev.getName());
 
-        Coordinate coor = ev.getCoordinate();
-        if (coor != null) //todo lose this after all xmls updated
-        {
-            node.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
-                    Double.parseDouble(coor.getY())));
-        }
-
         node.getComments().clear();
         node.getComments().addAll(ev.getComment());
-        node.setCodeBLock(ev.getCode());
-        node.getLocalVariables().clear();
-
-        for (LocalVariable lv : ev.getLocalVariable()) {
-            if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
-                EventLocalVariable elv = new EventLocalVariable(
-                        lv.getName(), lv.getType(), lv.getValue());
-                elv.setComment(concatStrings(lv.getComment()));
-                elv.opaqueModelObject = lv;
-
-                node.getLocalVariables().add(elv);
-            }
-        }
 
         node.getArguments().clear();
         for (Argument arg : ev.getArgument()) {
@@ -395,6 +376,20 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             node.getArguments().add(ea);
         }
 
+        node.getLocalVariables().clear();
+        for (LocalVariable lv : ev.getLocalVariable()) {
+            if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
+                EventLocalVariable elv = new EventLocalVariable(
+                        lv.getName(), lv.getType(), lv.getValue());
+                elv.setComment(concatStrings(lv.getComment()));
+                elv.opaqueModelObject = lv;
+
+                node.getLocalVariables().add(elv);
+            }
+        }
+
+        node.setCodeBLock(ev.getCode());
+
         node.getTransitions().clear();
         for (StateTransition st : ev.getStateTransition()) {
             EventStateTransition est = new EventStateTransition();
@@ -403,7 +398,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             est.setStateVarType(sv.getType());
 
             // bug fix 1183
-            if (sv.getType().contains("[")) {
+            if (VGlobals.instance().isArray(sv.getType())) {
                 String idx = st.getIndex();
                 est.setIndexingExpression(idx);
             }
@@ -411,6 +406,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             est.setOperation(st.getOperation() != null);
             if (est.isOperation()) {
                 est.setOperationOrAssignment(st.getOperation().getMethod());
+
+                LocalVariableAssignment l = st.getLocalVariableAssignment();
+                if (l != null && l.getValue() != null && !l.getValue().isEmpty())
+                    est.setLocalVariableAssignment(st.getLocalVariableAssignment().getValue());
             } else {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
             }
@@ -422,6 +421,15 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             est.opaqueModelObject = st;
             node.getTransitions().add(est);
         }
+
+        Coordinate coor = ev.getCoordinate();
+        if (coor != null) //todo lose this after all xmls updated
+        {
+            node.setPosition(new Point2D.Double(
+                    Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
+        }
+
     }
 
     private void buildEdgesFromJaxb(EventNode src, List<Object> lis) {
@@ -885,7 +893,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             StateVariable sv = findStateVariable(transition.getStateVarName());
             st.setState(sv);
 
-            if (sv.getType() != null && sv.getType().contains("[")) {
+            if (sv.getType() != null && VGlobals.instance().isArray(sv.getType())) {
 
                 // Match the state transition's index to the given index
                 st.setIndex(transition.getIndexingExpression());
@@ -894,6 +902,13 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 Operation o = oFactory.createOperation();
                 o.setMethod(transition.getOperationOrAssignment());
                 st.setOperation(o);
+
+                String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
+                if (localV != null && !localV.isEmpty()) {
+                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
+                    l.setValue(((EventStateTransition)transition).getLocalVariableAssignment());
+                    st.setLocalVariableAssignment(l);
+                }
             } else {
                 Assignment a = oFactory.createAssignment();
                 a.setValue(transition.getOperationOrAssignment());

@@ -612,7 +612,10 @@ public class SimkitXML2Java {
 
         List<StateTransition> liStateT = run.getStateTransition();
 
-        if (!liStateT.isEmpty()) {pw.println();}
+        if (!liStateT.isEmpty()) {
+            pw.println();
+            pw.println(SP_8 + "/* local variable decarlations */");
+        }
 
         for (LocalVariable local : liLocalV) {
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
@@ -683,6 +686,9 @@ public class SimkitXML2Java {
 
         pw.println();
 
+        if (!liLocalV.isEmpty()) {
+            pw.println(SP_8 + "/* local variable decarlations */");
+        }
         for (LocalVariable local : liLocalV) {
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
         }
@@ -804,7 +810,9 @@ public class SimkitXML2Java {
 
         pw.println();
 
-        // local variable decls
+        if (!liLocalV.isEmpty()) {
+            pw.println(SP_8 + "/* local variable decarlations */");
+        }
         for (LocalVariable local : liLocalV) {
             String[] lines = {" "};
             String value = local.getValue();
@@ -839,6 +847,7 @@ public class SimkitXML2Java {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
+            LocalVariableAssignment l = st.getLocalVariableAssignment();
             String change = "";
             String olds = ""; // old decl line Bar oldFoo ...
             String oldName = sv.getName(); // oldFoo
@@ -861,7 +870,7 @@ public class SimkitXML2Java {
             }
 
             // by now, olds is "Bar" ( not Bar[] )
-            // or nothing if alreadyDecld
+            // or nothing if already Decld
             // now build up "Bar oldFoo = getFoo()"
             String getter = oldName + SP + EQ + SP + "get" + oldName.substring(5) + LP;
             if ("".equals(olds)) {
@@ -874,19 +883,33 @@ public class SimkitXML2Java {
                 olds += indexFrom(st);
             }
             olds += RP + SC;
+
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
             olds += sv.getName() + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "") + change;
             String[] lines = olds.split("\\;");
+
             // format it
             for (int i = 0; i < lines.length; i++) {
                 if (i == 0) {
                     pw.println(SP_8 + "/* StateTransition for " + sv.getName() + " */");
-                } else if (i == 2) {
-                    pw.println(SP_8 + "/* Code block for pre-transition */");
+                    pw.println(SP_8 + lines[i] + SC);
+                } else {
+
+                    // Account for local assignment to accomodate state transition
+                    if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
+                        pw.println(SP_8 + l.getValue() + SP + EQ + SP + sv.getName()
+                                + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "")
+                                + change);
+
+                        // reset
+                        l = null;
+                    } else {
+                        pw.println(SP_8 + lines[i] + SC);
+                    }
                 }
-                pw.println(SP_8 + lines[i] + SC);
             }
+
             if (isArray(sv.getType())) {
                 pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(st));
                 pw.print(CM + SP + QU + sv.getName() + QU + CM + SP);

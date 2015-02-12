@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.VGlobals;
+import viskit.control.EventGraphControllerImpl;
 
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
@@ -27,9 +28,7 @@ import viskit.view.ArgumentsPanel;
  */
 public class EventTransitionDialog extends JDialog {
 
-    private JTextField actionField;
-    private JTextField arrayIndexField;
-    private JTextField commentField;
+    private JTextField actionField, arrayIndexField, localAssignmentField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
     private JRadioButton assTo, opOn;
     private static EventTransitionDialog dialog;
@@ -39,12 +38,10 @@ public class EventTransitionDialog extends JDialog {
     private JButton okButt, canButt;
     private JButton newSVButt;
     private JLabel actionLab;
-    private JPanel indexPanel;
+    private JPanel indexPanel, localAssignmentPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
     private ArgumentsPanel argPanel;
-    public static String newStateVarName, newStateVarType, newIndexExpression, newAction, newComment;
-    public static boolean newIsOperation;
 
     public static boolean showDialog(JDialog f, Component comp, EventStateTransition est, ArgumentsPanel ap) {
         if (dialog == null) {
@@ -90,27 +87,33 @@ public class EventTransitionDialog extends JDialog {
         actionLab.setPreferredSize(dx);
         actionLab.setHorizontalAlignment(JLabel.TRAILING);
 
-        JLabel commLab = new JLabel("state var. comment");
-        int w = maxWidth(new JComponent[]{nameLab, assTo, opOn, actionLab, commLab});
+        JLabel localVarAssignLab = new JLabel("local variable assig.");
+        JLabel commLab = new JLabel("description");
+
+        int w = maxWidth(new JComponent[]{nameLab, assTo, opOn, actionLab, localVarAssignLab, commLab});
 
         stateVarsCB = new JComboBox<>(VGlobals.instance().getStateVarsCBModel());
         setMaxHeight(stateVarsCB);
         stateVarsCB.setBackground(Color.white);
         newSVButt = new JButton("new");
-        commentField = new JTextField(25);
-        setMaxHeight(commentField);
+        descriptionField = new JTextField(25);
+        setMaxHeight(descriptionField);
         actionField = new JTextField(25);
         setMaxHeight(actionField);
         arrayIndexField = new JTextField(25);
         setMaxHeight(arrayIndexField);
+        localAssignmentField = new JTextField(25);
+        localAssignmentField.setToolTipText("Use this field to assign the return type for an invoke on \".\"");
+        setMaxHeight(localAssignmentField);
 
+        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
+        fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
         fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
         fieldsPanel.add(new OneLinePanel(null, w, assTo));
         fieldsPanel.add(new OneLinePanel(null, w, opOn));
         fieldsPanel.add(new OneLinePanel(actionLab, w, actionField));
-        fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localVarAssignLab, w, localAssignmentField));
 
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
@@ -134,16 +137,17 @@ public class EventTransitionDialog extends JDialog {
         enableApplyButtonListener lis = new enableApplyButtonListener();
         arrayIndexField.addCaretListener(lis);
         actionField.addCaretListener(lis);
-        commentField.addCaretListener(lis);
+        descriptionField.addCaretListener(lis);
+        localAssignmentField.addCaretListener(lis);
         stateVarsCB.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox cb = (JComboBox) e.getSource();
                 vStateVariable sv = (vStateVariable) cb.getSelectedItem();
-                commentField.setText(sv.getComment());
+                descriptionField.setText(sv.getComment());
                 okButt.setEnabled(true);
-                indexPanel.setVisible(sv.getType().indexOf('[') != -1);
+                indexPanel.setVisible(VGlobals.instance().isArray(sv.getType()));
                 modified = true;
                 pack();
             }
@@ -168,9 +172,9 @@ public class EventTransitionDialog extends JDialog {
 
         // to start off:
         if (stateVarsCB.getItemCount() > 0) {
-            commentField.setText(((vStateVariable) stateVarsCB.getItemAt(0)).getComment());
+            descriptionField.setText(((vStateVariable) stateVarsCB.getItemAt(0)).getComment());
         } else {
-            commentField.setText("");
+            descriptionField.setText("");
         }
 
         RadButtListener rbl = new RadButtListener();
@@ -229,6 +233,11 @@ public class EventTransitionDialog extends JDialog {
             }
         }
         if (param != null) {
+            if (stateVarsCB.getItemCount() > 0) {
+                descriptionField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());
+            } else {
+                descriptionField.setText("");
+            }
             actionField.setText(param.getOperationOrAssignment());
             String ie = param.getIndexingExpression();
             if (ie == null || ie.equals("")) {
@@ -245,21 +254,20 @@ public class EventTransitionDialog extends JDialog {
                 actionLab.setText("=");
             }
             setVarNameComboBox(param);
-            if (stateVarsCB.getItemCount() > 0) {
-                commentField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());
-            } else {
-                commentField.setText("");
-            }
+            localAssignmentField.setText(param.getLocalVariableAssignment());
         } else {
+            descriptionField.setText("");
             actionField.setText("");
             arrayIndexField.setText(indexArg);
             stateVarsCB.setSelectedIndex(0);
-            commentField.setText("");
+            localAssignmentField.setText("");
             assTo.setSelected(true);
         }
 
         // We have an indexing argument already set
-        indexPanel.setVisible(((vStateVariable) stateVarsCB.getSelectedItem()).getType().indexOf('[') != -1);
+        String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
+        indexPanel.setVisible(VGlobals.instance().isArray(typ));
+        localAssignmentPanel.setVisible(opOn.isSelected());
         pack();
     }
 
@@ -276,30 +284,26 @@ public class EventTransitionDialog extends JDialog {
 
         if (!est.getStateVarName().equals("")) // for first time
         {
-            JOptionPane.showMessageDialog(this, "State variable " + est.getStateVarName() + "not found.",
-                    "alert", JOptionPane.ERROR_MESSAGE);
+            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                    JOptionPane.ERROR_MESSAGE,
+                    "Alert",
+                    "State variable " + est.getStateVarName() + "not found.");
         }
     }
 
     private void unloadWidgets() {
         if (param != null) {
+            param.getComments().clear();
+            String cs = descriptionField.getText().trim();
+            if (!cs.isEmpty()) {
+                param.getComments().add(0, cs);
+            }
             param.setStateVarName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
             param.setStateVarType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
             param.setIndexingExpression(arrayIndexField.getText().trim());
             param.setOperationOrAssignment(actionField.getText().trim());
             param.setOperation(opOn.isSelected());
-            param.getComments().clear();
-            String cs = commentField.getText().trim();
-            if (cs.length() > 0) {
-                param.getComments().add(0, cs);
-            }
-        } else {
-            newStateVarName = ((vStateVariable) stateVarsCB.getSelectedItem()).getName();
-            newStateVarType = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
-            newIndexExpression = arrayIndexField.getText().trim();
-            newAction = actionField.getText().trim();
-            newIsOperation = opOn.isSelected();
-            newComment = commentField.getText().trim();
+            param.setLocalVariableAssignment(localAssignmentField.getText().trim());
         }
     }
 
@@ -309,6 +313,7 @@ public class EventTransitionDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
+            localAssignmentField.setText("");
             actionField.setText("");
             VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
             dispose();
@@ -328,14 +333,18 @@ public class EventTransitionDialog extends JDialog {
             } else {
                 String ty = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
                 if (VGlobals.instance().isPrimitive(ty)) {
-                    JOptionPane.showMessageDialog(EventTransitionDialog.this, "A method may not be invoked on a primitive type.",
-                            "Java Language Error", JOptionPane.ERROR_MESSAGE);
+                    ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                            JOptionPane.ERROR_MESSAGE,
+                            "Java Language Error",
+                            "A method may not be invoked on a primitive type.");
                     assTo.setSelected(true);
                 } else {
                     actionLab.setText(".");
                 }
             }
+            localAssignmentPanel.setVisible(opOn.isSelected());
             actionLab.setPreferredSize(d);
+            pack();
         }
     }
 
@@ -345,8 +354,9 @@ public class EventTransitionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 // check for array index
-                if (((vStateVariable) stateVarsCB.getSelectedItem()).getType().indexOf('[') != -1) {
-                    if (arrayIndexField.getText().trim().length() <= 0) {
+                String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
+                if (VGlobals.instance().isArray(typ)) {
+                    if (arrayIndexField.getText().trim().isEmpty()) {
                         int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "Using a state variable which is an array" +
                                 "\nrequires an indexing expression.\nIgnore and continue?",
                                 "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -356,7 +366,7 @@ public class EventTransitionDialog extends JDialog {
                     }
                 }
                 // check for null action
-                if (actionField.getText().trim().length() <= 0) {
+                if (actionField.getText().trim().isEmpty()) {
                     int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "No transition (action) has been entered." +
                             "\nIgnore and continue?",
                             "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -388,19 +398,7 @@ public class EventTransitionDialog extends JDialog {
     class OneLinePanel extends JPanel {
 
         OneLinePanel(JLabel lab, int w, JComponent comp) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            if (lab == null) {
-                lab = new JLabel("");
-            }
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
+            this(lab,w,comp,null);
         }
 
         OneLinePanel(JLabel lab, int w, JComponent comp1, JComponent comp2) {
@@ -413,7 +411,9 @@ public class EventTransitionDialog extends JDialog {
             add(lab);
             add(Box.createHorizontalStrut(5));
             add(comp1);
-            add(comp2);
+
+            if (comp2 != null)
+                add(comp2);
 
             Dimension d = getPreferredSize();
             d.width = Integer.MAX_VALUE;

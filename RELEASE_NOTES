@@ -39,6 +39,11 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Added a feature to the state transition panel whereby we can now assign local
+  variables to return type invoke on "." methods, i.e. boolean b = queue.add(E);
+  Before, we could only accomplish this type call and fire the state transition
+  manually via code block entries.  This is a step in reducing code block usage.
+
   Fixed and issue where super type more than one level up were not being
   resolved in the EG to Java translator
 
