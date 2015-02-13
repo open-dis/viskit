@@ -39,8 +39,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
-  Fixed bug to  prevent potential edge parameter values from being wiped out on
-  a node modification
+  Fixed bug to prevent edge parameter values from being wiped out during a node
+  modification
 
   Preventing a case where we have simkit.jar in both the working classpath and
   in a project's /lib directory.  We don't need to expose multiple libs of the
