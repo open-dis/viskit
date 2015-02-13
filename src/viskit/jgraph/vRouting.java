@@ -56,12 +56,12 @@ import viskit.model.ViskitElement;
  * A replacement class to tweak the routing slightly so that the edges come into
  * the node from directions other than NSE and W if there are more than one edge
  * to/from a node.  This class will also provide a unique control point to give
- * a distinctive parabolic shape the edge when there are more than one edge to/
- * from a node.
+ * a distinctive parabolic shape to the edge when there are more than one edge
+ * to/from a node.
  *
  * @author Mike Bailey
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitRouting">Terry Norbraten, NPS MOVES</a>
- * @version $Id:$
+ * @version $Id$
  */
 public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
@@ -79,11 +79,11 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         if (edge.getSource() instanceof PortView) {
             from = ((PortView) edge.getSource()).getLocation();
             fromKey = getKey((PortView) edge.getSource());
-        } else if (edge.getSource() != null) {
+        }/* else if (edge.getSource() != null) {
             Rectangle2D b = edge.getSource().getBounds();
             from = edge.getAttributes().createPoint(b.getCenterX(),
                     b.getCenterY());
-        } else {
+        }*/ else {
             from = (Point2D) points.get(0);
         }
 
@@ -92,11 +92,11 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         if (edge.getTarget() instanceof PortView) {
             to = ((PortView) edge.getTarget()).getLocation();
             toKey = getKey((PortView) edge.getTarget());
-        } else if (edge.getTarget() != null) {
+        }/* else if (edge.getTarget() != null) {
             Rectangle2D b = edge.getTarget().getBounds();
             to = edge.getAttributes().createPoint(b.getCenterX(),
                     b.getCenterY());
-        } else {
+        }*/ else {
             to = (Point2D) points.get(points.size() - 1);
         }
 
@@ -115,8 +115,12 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
         double dx = Math.abs(from.getX() - to.getX());
         double dy = Math.abs(from.getY() - to.getY());
-        double x2 = from.getX() + ((to.getX() - from.getX()) / 2);
-        double y2 = from.getY() + ((to.getY() - from.getY()) / 2);
+
+        // Offset adjustments so that we and edge does not start from the center of a node
+        double x1 = from.getX() + ((to.getX() - from.getX()) / 2);
+        double y1 = from.getY() + ((to.getY() - from.getY()) / 2);
+        double x2 = to.getX() + ((from.getX() - to.getX()) / 2);
+        double y2 = to.getY() + ((from.getY() - to.getY()) / 2);
 
         // Handle beginning Edge point placement (not worried about AssemblyEdge)
         Object ed = edge.getSource();
@@ -135,15 +139,25 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             }
         }
 
-        int adjustment = 55 * adjustFactor;       // bias control for parabola
+        // bias control for parabola effect
+        int adjustment = 55 * adjustFactor;
 
         Point2D[] routed = new Point2D[2];
-        if (dx > dy) {
-            routed[0] = edge.getAllAttributes().createPoint(x2, from.getY() + adjustment);
-            routed[1] = edge.getAllAttributes().createPoint(x2, to.getY() + adjustment);
+
+        // determine orthoganality between nodes
+        boolean adjust = (dx == 0 || dy == 0);
+
+        if (adjust) {
+            if (dx > dy) {
+                routed[0] = edge.getAllAttributes().createPoint(x1, from.getY() + adjustment);
+                routed[1] = edge.getAllAttributes().createPoint(x1, to.getY() + adjustment);
+            } else {
+                routed[0] = edge.getAllAttributes().createPoint(from.getX() + adjustment, y1);
+                routed[1] = edge.getAllAttributes().createPoint(to.getX() + adjustment, y1);
+            }
         } else {
-            routed[0] = edge.getAllAttributes().createPoint(from.getX(), y2 + adjustment);
-            routed[1] = edge.getAllAttributes().createPoint(to.getX(), y2 + adjustment);
+            routed[0] = edge.getAllAttributes().createPoint(x1, y1);
+            routed[1] = edge.getAllAttributes().createPoint(x2, y2);
         }
 
         // Set/Add unique control points
