@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.VGlobals;
@@ -109,12 +108,14 @@ public class EventTransitionDialog extends JDialog {
                 + "declared local variable, or, declare a new one here");
         setMaxHeight(localAssignmentField);
 
+        JLabel equals = new JLabel("=");
+
         JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
         divider.setBackground(Color.blue.brighter());
 
         fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localVarAssignLab, w, localAssignmentField));
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localVarAssignLab, w, localAssignmentField, equals));
         fieldsPanel.add(divider);
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
