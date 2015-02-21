@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.VGlobals;
@@ -70,7 +71,7 @@ public class EventTransitionDialog extends JDialog {
 
         con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
-        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
+        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.PAGE_AXIS));
 
         JLabel nameLab = new JLabel("state variable");
         JLabel arrayIdxLab = new JLabel("index variable");
@@ -87,7 +88,7 @@ public class EventTransitionDialog extends JDialog {
         actionLab.setPreferredSize(dx);
         actionLab.setHorizontalAlignment(JLabel.TRAILING);
 
-        JLabel localVarAssignLab = new JLabel("local variable assig.");
+        JLabel localVarAssignLab = new JLabel("local assignment");
         JLabel commLab = new JLabel("description");
 
         int w = maxWidth(new JComponent[]{nameLab, assTo, opOn, actionLab, localVarAssignLab, commLab});
@@ -103,17 +104,24 @@ public class EventTransitionDialog extends JDialog {
         arrayIndexField = new JTextField(25);
         setMaxHeight(arrayIndexField);
         localAssignmentField = new JTextField(25);
-        localAssignmentField.setToolTipText("Use this field to assign the return type for an invoke on \".\"");
+        localAssignmentField.setToolTipText("Use this field to optionally "
+                + "assign a return type for an invoke on \".\" to an already "
+                + "declared local variable, or, declare a new one here");
         setMaxHeight(localAssignmentField);
 
+        JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
+        divider.setBackground(Color.blue.brighter());
+
         fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
+        fieldsPanel.add(Box.createVerticalStrut(10));
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localVarAssignLab, w, localAssignmentField));
+        fieldsPanel.add(divider);
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
         fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
         fieldsPanel.add(new OneLinePanel(null, w, assTo));
         fieldsPanel.add(new OneLinePanel(null, w, opOn));
         fieldsPanel.add(new OneLinePanel(actionLab, w, actionField));
-        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localVarAssignLab, w, localAssignmentField));
 
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));

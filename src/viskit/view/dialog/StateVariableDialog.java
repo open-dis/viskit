@@ -180,22 +180,23 @@ public class StateVariableDialog extends ViskitSmallDialog {
     }
 
     private void fillWidgets() {
+        boolean isArray;
+        String ty;
         if (stVar != null) {
             stateVarNameField.setText(stVar.getName());
-            String ty = stVar.getType();
+            ty = stVar.getType();
             stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
             arraySizeField.setText(getArraySize(ty));
             commentField.setText(stVar.getComment());
-            boolean isArray = VGlobals.instance().isArray(stVar.getType());
-            toggleArraySizeFields(isArray);
+            isArray = VGlobals.instance().isArray(stVar.getType());
         } else {
             stateVarNameField.setText(((Model) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
-            String ty = (String) stateVarTypeCombo.getSelectedItem();
-            boolean isArray = VGlobals.instance().isArray(ty);
+            ty = (String) stateVarTypeCombo.getSelectedItem();
+            isArray = VGlobals.instance().isArray(ty);
             commentField.setText("");
             arraySizeField.setText("");
-            toggleArraySizeFields(isArray);
         }
+        toggleArraySizeFields(isArray);
         stateVarNameField.requestFocus();
         stateVarNameField.selectAll();
     }
