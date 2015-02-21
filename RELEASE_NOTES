@@ -2,9 +2,10 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
-  At this time, the XML to Java translators cannot declare a super type generic
-  container and instantiate it as a dynamic type, i.e. List<String> list =
-  new ArrayList<>();
+  At this time, the XML to Java translators cannot handle a super type generic
+  container declaration in XML, then instantiate it as a dynamic type, i.e.
+  List<String> list = new ArrayList<>();  The static declaration will match the
+  dynamic type accordingly.
 
   We can create local arguments, but must be assign values.  We can create
   method parameters, schedule events and initiate state variable changes, but
