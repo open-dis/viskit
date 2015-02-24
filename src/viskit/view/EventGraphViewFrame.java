@@ -243,7 +243,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
         stateVariablesPanel.add(eventGraphParametersSubpanel);
 
-        VariablesPanel vp = new VariablesPanel(300, 5);
+        StateVariablesPanel vp = new StateVariablesPanel(300, 5);
         stateVariablesPanel.add(vp);
         stateVariablesPanel.add(Box.createVerticalStrut(5));
         stateVariablesPanel.setMinimumSize(new Dimension(20, 20));
@@ -500,14 +500,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         help.mainFrameLocated(this.getBounds());
     }
 
-    /**
-     * run the add parameter dialog
-     * @return the String representation of this parameter
-     */
     @Override
     public String addParameterDialog() {
 
-        if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
+        if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
@@ -519,7 +515,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, null)) {      // blocks here
+        if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
@@ -1201,29 +1197,29 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), node); // blocks
+        return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(SchedulingEdge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
     @Override
     public boolean doEditCancelEdge(CancelingEdge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
     @Override
     public boolean doEditParameter(vParameter param) {
-        return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), param);    // blocks
+        return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), param);    // blocks
     }
 
     @Override
     public boolean doEditStateVariable(vStateVariable var) {
-        return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), getCurrentVgcw(), var);
+        return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), var);
     }
 
     @Override
@@ -1251,26 +1247,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public void modelChanged(mvcModelEvent event) {
         VgraphComponentWrapper vgcw = getCurrentVgcw();
         ParametersPanel pp = vgcw.paramPan;
-        VariablesPanel vp = vgcw.varPan;
+        StateVariablesPanel vp = vgcw.varPan;
         switch (event.getID()) {
             // Changes the two side panels need to know about
             case ModelEvent.SIMPARAMETERADDED:
                 pp.addRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.SIMPARAMETERDELETED:
-                pp.removeRow(event.getSource());
+                pp.removeRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.SIMPARAMETERCHANGED:
-                pp.updateRow(event.getSource());
+                pp.updateRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.STATEVARIABLEADDED:
                 vp.addRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.STATEVARIABLEDELETED:
-                vp.removeRow(event.getSource());
+                vp.removeRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.STATEVARIABLECHANGED:
-                vp.updateRow(event.getSource());
+                vp.updateRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.CODEBLOCKCHANGED:
                 vgcw.codeBlockPan.setData((String) event.getSource());

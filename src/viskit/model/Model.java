@@ -54,8 +54,8 @@ public interface Model {
     Vector<ViskitElement> getAllNodes();
 
     /**
-     * Messaged by controller to inst all defined StateVariables.
-     * @return Vector of StateVariables.
+     * Messaged by controller to retrieve all defined StateVariables.
+     * @return Vector of StateVariables
      */
     Vector<ViskitElement> getStateVariables();
 

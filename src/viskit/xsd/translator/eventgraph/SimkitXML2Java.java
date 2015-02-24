@@ -848,7 +848,8 @@ public class SimkitXML2Java {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
-            LocalVariableAssignment l = st.getLocalVariableAssignment();
+            LocalVariableAssignment lva = st.getLocalVariableAssignment();
+            LocalVariableMethodCall lvmc = st.getLocalVariableMethodCall();
             String change = "";
             String olds = ""; // old decl line Bar oldFoo ...
             String oldName = sv.getName(); // oldFoo
@@ -898,13 +899,13 @@ public class SimkitXML2Java {
                 } else {
 
                     // Account for local assignment to accomodate state transition
-                    if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
-                        pw.println(SP_8 + l.getValue() + SP + EQ + SP + sv.getName()
+                    if (lva != null && lva.getValue() != null && !lva.getValue().isEmpty() && lvmc == null) {
+                        pw.println(SP_8 + lva.getValue() + SP + EQ + SP + sv.getName()
                                 + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "")
                                 + change);
 
                         // reset
-                        l = null;
+                        lva = null;
                     } else {
                         pw.println(SP_8 + lines[i] + SC);
                     }
@@ -919,6 +920,16 @@ public class SimkitXML2Java {
                 pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU + CM + SP);
                 pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + RP + RP + SC);
             }
+
+            // Now, print out any any void return type, zero parameter methods
+            // as part of this state transition
+            if (lvmc != null) {
+                String localMethodCall = st.getLocalVariableMethodCall().getValue();
+                if (localMethodCall != null && !localMethodCall.isEmpty()) {
+                    pw.println(SP_8 + st.getLocalVariableAssignment().getValue() + PD + localMethodCall + LP + RP + SC);
+                }
+            }
+
             pw.println();
         }
 

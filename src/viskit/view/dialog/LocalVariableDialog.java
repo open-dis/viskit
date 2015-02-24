@@ -38,15 +38,14 @@ public class LocalVariableDialog extends JDialog {
     private static LocalVariableDialog dialog;
     private static boolean modified = false;
     private EventLocalVariable locVar;
-    private Component locationComp;
     private JButton okButt,  canButt;
     public static String newName,  newType,  newValue,  newComment;
 
-    public static boolean showDialog(JFrame f, Component comp, EventLocalVariable parm) {
+    public static boolean showDialog(JFrame f, EventLocalVariable parm) {
         if (dialog == null) {
-            dialog = new LocalVariableDialog(f, comp, parm);
+            dialog = new LocalVariableDialog(f, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -54,10 +53,9 @@ public class LocalVariableDialog extends JDialog {
         return modified;
     }
 
-    private LocalVariableDialog(JFrame parent, Component comp, EventLocalVariable lv) {
+    private LocalVariableDialog(JFrame parent, EventLocalVariable lv) {
         super(parent, "Local Variable Inspector", true);
         this.locVar = lv;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -109,16 +107,6 @@ public class LocalVariableDialog extends JDialog {
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (lv == null);     // if it's a new locVar, they can always accept defaults with no typing
-        okButt.setEnabled(lv == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
@@ -128,6 +116,8 @@ public class LocalVariableDialog extends JDialog {
         this.commentField.addCaretListener(lis);
         this.valueField.addCaretListener(lis);
         this.typeCombo.addActionListener(lis);
+
+        setParams(parent, lv);
     }
 
     private int maxWidth(JComponent[] c) {
@@ -147,9 +137,8 @@ public class LocalVariableDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public void setParams(Component c, EventLocalVariable p) {
+    public final void setParams(Component c, EventLocalVariable p) {
         locVar = p;
-        locationComp = c;
 
         fillWidgets();
 
@@ -157,8 +146,8 @@ public class LocalVariableDialog extends JDialog {
         okButt.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {

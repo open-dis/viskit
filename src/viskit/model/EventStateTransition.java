@@ -26,6 +26,7 @@ public class EventStateTransition extends ViskitElement {
     private String value;
     private String comment;
     private String localVariableAssignment;
+    private String localVariableMethodCall;
 
     @Override
     public String toString() {
@@ -165,5 +166,19 @@ public class EventStateTransition extends ViskitElement {
      */
     public void setLocalVariableAssignment(String localVariableAssignment) {
         this.localVariableAssignment = localVariableAssignment;
+    }
+
+    /**
+     * @return the localVariableMethodCall
+     */
+    public String getLocalVariableMethodCall() {
+        return localVariableMethodCall;
+    }
+
+    /**
+     * @param localVariableMethodCall the localVariableMethodCall to set
+     */
+    public void setLocalVariableMethodCall(String localVariableMethodCall) {
+        this.localVariableMethodCall = localVariableMethodCall;
     }
 }

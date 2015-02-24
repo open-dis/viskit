@@ -35,23 +35,19 @@ public class StateVariableDialog extends ViskitSmallDialog {
     private JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
     private JLabel arrSizeLab;
     private vStateVariable stVar;
-    private Component locationComp;
     private JButton okButt,  canButt;
     public static String newName,  newType,  newComment;
     private myFocusListener focList;
     private Component myTyperComponent;       // i.e., the editor of the type JComboBox
 
-    public static boolean showDialog(JFrame f, Component comp, vStateVariable var) {
-        return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, comp, var);
+    public static boolean showDialog(JFrame f, vStateVariable var) {
+        return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var);
     }
 
-    protected StateVariableDialog(JFrame parent, Component comp, Object param) {
+    protected StateVariableDialog(JFrame parent, Object param) {
         super(parent, "State Variable Declaration Inspector", true);
 
         focList = new myFocusListener();
-
-        this.stVar = (vStateVariable) param;
-        this.locationComp = comp;
 
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
@@ -106,19 +102,6 @@ public class StateVariableDialog extends ViskitSmallDialog {
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (param == null);     // if it's a new stVar, they can always accept defaults with no typing
-        okButt.setEnabled(param == null);
-        if (okButt.isEnabled()) {
-            getRootPane().setDefaultButton(okButt);
-        } else {
-            getRootPane().setDefaultButton(canButt);
-        }
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
@@ -132,6 +115,8 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowClosingListener(this, okButt, canButt));
+
+        setParams(parent, param);
     }
 
     /** Toggle these fields appropriately
@@ -145,21 +130,21 @@ public class StateVariableDialog extends ViskitSmallDialog {
     }
 
     @Override
-    void setParams(Component c, Object p) {
+    final void setParams(Component c, Object p) {
         stVar = (vStateVariable) p;
-        locationComp = c;
 
         fillWidgets();
 
         modified = (p == null);
         okButt.setEnabled(p == null);
+
         if (p == null) {
             getRootPane().setDefaultButton(okButt);
         } else {
             getRootPane().setDefaultButton(canButt);
         }
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private String stripArraySize(String typ) {

@@ -30,15 +30,14 @@ public class EventArgumentDialog extends JDialog {
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
     private EventArgument myEA;
-    private Component locationComp;
     private JButton okButt,  canButt;
     public static String newName,  newType,  newDescription;
 
-    public static boolean showDialog(JFrame f, Component comp, EventArgument parm) {
+    public static boolean showDialog(JFrame f, EventArgument parm) {
         if (dialog == null) {
-            dialog = new EventArgumentDialog(f, comp, parm);
+            dialog = new EventArgumentDialog(f, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -46,10 +45,9 @@ public class EventArgumentDialog extends JDialog {
         return modified;
     }
 
-    private EventArgumentDialog(JFrame parent, Component comp, EventArgument param) {
+    private EventArgumentDialog(JFrame parent, EventArgument param) {
         super(parent, "Event Argument", true);
         this.myEA = param;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -94,16 +92,6 @@ public class EventArgumentDialog extends JDialog {
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(panel);
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (param == null);     // if it's a new myEA, they can always accept defaults with no typing
-        okButt.setEnabled(param == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
@@ -112,6 +100,8 @@ public class EventArgumentDialog extends JDialog {
         this.nameField.addCaretListener(listener);
         this.descriptionField.addCaretListener(listener);
         this.parameterTypeCombo.addActionListener(listener);
+
+        setParams(parent, param);
     }
 
     private int maxWidth(JComponent[] c) {
@@ -131,9 +121,8 @@ public class EventArgumentDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public void setParams(Component c, EventArgument p) {
+    public final void setParams(Component c, EventArgument p) {
         myEA = p;
-        locationComp = c;
 
         fillWidgets();
 
@@ -141,8 +130,8 @@ public class EventArgumentDialog extends JDialog {
         okButt.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {

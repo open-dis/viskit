@@ -34,13 +34,13 @@ public class ArgumentsPanel extends ViskitTablePanel {
     }
 
     @Override
-    public String[] getFields(Object o, int rowNum) {
+    public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = ((EventArgument) o).getName();
-        sa[1] = ((EventArgument) o).getType();
-        List<String> ar = ((EventArgument) o).getDescription();
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        List<String> ar = ((EventArgument) e).getDescription();
         if (ar.size() > 0) {
-            sa[2] = ((EventArgument) o).getDescription().get(0);
+            sa[2] = ((EventArgument) e).getDescription().get(0);
         } else {
             sa[2] = "";
         }

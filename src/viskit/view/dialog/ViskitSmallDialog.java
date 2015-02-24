@@ -16,36 +16,40 @@ import viskit.VStatics;
 /** This is a class to help in code reuse.  There are several small Dialogs
  * which are all used the same way.  This class puts the common code in a single
  * super class.
+ *
+ * NOTE: This is only working for one class due to the static modifier for the
+ * dialog
+ *
  * <p>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
+ *
  * @author Mike Bailey
  * @since May 3, 2004 : 2:39:34 PM
  * @version $Id$
  */
 public abstract class ViskitSmallDialog extends JDialog {
 
-    public static boolean modified = false;
+    protected static boolean modified = false;
     private static ViskitSmallDialog dialog;
 
-    protected static boolean showDialog(String className, JFrame f, Component comp, Object var) {
+    protected static boolean showDialog(String className, JFrame f, Object var) {
         if (dialog == null) {
             try {
                 Class[] args = new Class[] {
                     VStatics.classForName("javax.swing.JFrame"),
-                    VStatics.classForName("java.awt.Component"),
                     VStatics.classForName("java.lang.Object")
                 };
                 Class<?> c = VStatics.classForName(className);
                 Constructor constr = c.getDeclaredConstructor(args);
-                dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, comp, var});
+                dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
                 LogUtils.getLogger(ViskitSmallDialog.class).error(e);
             }
         } else {
-            dialog.setParams(comp, var);
+            dialog.setParams(f, var);
         }
 
         dialog.setVisible(true);

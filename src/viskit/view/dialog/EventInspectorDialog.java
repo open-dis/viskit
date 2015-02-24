@@ -14,7 +14,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import viskit.VGlobals;
-import viskit.ViskitConfig;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
 import viskit.view.CodeBlockPanel;
@@ -35,7 +34,6 @@ public class EventInspectorDialog extends JDialog {
 
     private static EventInspectorDialog dialog;
     private Component locationComponent;
-    private JFrame fr;
     private EventNode node;
     private static boolean modified = false;
     private JTextField name;
@@ -58,15 +56,14 @@ public class EventInspectorDialog extends JDialog {
      * dialog should appear.
      *
      * @param f parent frame
-     * @param comp location component
      * @param node EventNode to edit
      * @return whether data was modified, or not
      */
-    public static boolean showDialog(JFrame f, Component comp, EventNode node) {
+    public static boolean showDialog(JFrame f, EventNode node) {
         if (dialog == null) {
-            dialog = new EventInspectorDialog(f, comp, node);
+            dialog = new EventInspectorDialog(f, node);
         } else {
-            dialog.setParams(comp, node);
+            dialog.setParams(f, node);
         }
 
         dialog.setVisible(true);
@@ -74,11 +71,10 @@ public class EventInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventInspectorDialog(JFrame frame, Component locationComp, EventNode node) {
+    private EventInspectorDialog(JFrame frame, EventNode node) {
         super(frame, "Event Inspector: " + node.getName(), true);
-        this.fr = frame;
         this.node = node;
-        this.locationComponent = locationComp;
+        this.locationComponent = frame;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -206,8 +202,8 @@ public class EventInspectorDialog extends JDialog {
         KeyListener klis = new myKeyListener();
         name.addKeyListener(klis);
         description.addKeyListener(klis);
-        codeBlock.addUpdateListener(myChangeListener);
         editDescriptionButton.addActionListener(new commentListener());
+
         arguments.addPlusListener(myChangeListener);
         arguments.addMinusListener(myChangeListener);
         arguments.addDoubleClickedListener(new ActionListener() {
@@ -216,10 +212,31 @@ public class EventInspectorDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
-                boolean modified = EventArgumentDialog.showDialog(fr, locationComponent, ea);
+                boolean modified = EventArgumentDialog.showDialog(
+                        (JFrame) locationComponent,
+                        ea);
                 if (modified) {
                     arguments.updateRow(ea);
-                    setModified(true);
+                    setModified(modified);
+                }
+            }
+        });
+
+        codeBlock.addUpdateListener(myChangeListener);
+
+        localVariables.addPlusListener(myChangeListener);
+        localVariables.addMinusListener(myChangeListener);
+        localVariables.addDoubleClickedListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EventLocalVariable elv = (EventLocalVariable) e.getSource();
+                boolean modified = LocalVariableDialog.showDialog(
+                        (JFrame) locationComponent,
+                        elv);
+                if (modified) {
+                    localVariables.updateRow(elv);
+                    setModified(modified);
                 }
             }
         });
@@ -234,28 +251,13 @@ public class EventInspectorDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 EventStateTransition est = (EventStateTransition) e.getSource();
                 boolean modified = EventTransitionDialog.showDialog(
-                        EventInspectorDialog.this,
-                        locationComponent,
+                        (JFrame) locationComponent,
                         est,
-                        arguments);
+                        arguments,
+                        localVariables);
                 if (modified) {
                     transitions.updateTransition(est);
-                    setModified(true);
-                }
-            }
-        });
-
-        localVariables.addPlusListener(myChangeListener);
-        localVariables.addMinusListener(myChangeListener);
-        localVariables.addDoubleClickedListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                EventLocalVariable elv = (EventLocalVariable) e.getSource();
-                boolean modified = LocalVariableDialog.showDialog(fr, locationComponent, elv);
-                if (modified) {
-                    localVariables.updateRow(elv);
-                    setModified(true);
+                    setModified(modified);
                 }
             }
         });
@@ -399,35 +401,42 @@ public class EventInspectorDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             if (modified) {
 
-                // Our node object hasn't been updated yet (see unloadWidgets) and won't if
-                // we cancel out below.  But to do the beanshell parse test, a node needs to be supplied
-                // so the context can be set up properly.
-                // Build a temp one;
-                EventNode evn = node.shallowCopy();   // temp copy
-                unloadWidgets(evn);  // put our pending edits in place
+                  // NOTE: currently, BeanShell checking for more than a simple
+                  // primitive types is disabled.  The compiler will inform of
+                  // any potential errors, so, disable this unnecessary code for
+                  // now
 
-                // Parse the state transitions
-                StringBuilder parseThis = new StringBuilder();
-                for (ViskitElement transition : transitions.getTransitions()) {
-                    EventStateTransition est = (EventStateTransition) transition;
-                    parseThis.append(est.toString());
-                    parseThis.append(";");
-                    String idxv = est.getIndexingExpression();
-                    if (idxv != null && !idxv.isEmpty()) {
-                        addPotentialLocalIndexVariable(evn, est.getIndexingExpression());
-                    }
-                }
-                String ps = parseThis.toString().trim();
-                if (!ps.isEmpty() && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
-                    String parseResults = VGlobals.instance().parseCode(evn, ps);
-                    if (parseResults != null) {
-                        boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);
-                        if (!ret) // don't ignore
-                        {
-                            return;
-                        }
-                    }
-                }
+//                // Our node object hasn't been updated yet (see unloadWidgets) and won't if
+//                // we cancel out below.  But to do the beanshell parse test, a node needs to be supplied
+//                // so the context can be set up properly.
+//                // Build a temp one;
+//                EventNode evn = node.shallowCopy();   // temp copy
+//                unloadWidgets(evn);  // put our pending edits in place
+//
+//                // Parse the state transitions
+//                StringBuilder parseThis = new StringBuilder();
+//                for (ViskitElement transition : transitions.getTransitions()) {
+//                    EventStateTransition est = (EventStateTransition) transition;
+//                    parseThis.append(est.toString());
+//                    parseThis.append(";");
+//                    String idxv = est.getIndexingExpression();
+//                    if (idxv != null && !idxv.isEmpty()) {
+//                        addPotentialLocalIndexVariable(evn, est.getIndexingExpression());
+//                    }
+//                }
+//
+//                String ps = parseThis.toString().trim();
+//                if (!ps.isEmpty() && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
+//                    String parseResults = VGlobals.instance().parseCode(evn, ps);
+//                    if (parseResults != null) {
+//                        boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);
+//                        if (!ret) // don't ignore
+//                        {
+//                            return;
+//                        }
+//                    }
+//                }
+
                 unloadWidgets(node);
             }
             dispose();

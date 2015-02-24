@@ -33,16 +33,15 @@ public class ParameterDialog extends JDialog {
     private static ParameterDialog dialog;
     private static boolean modified = false;
     private vParameter param;
-    private Component locationComp;
-    private JButton okButt,  canButt;
+    private JButton okButt, canButt;
     public static String newName,  newType,  newComment;
     private static int count = 0;
 
-    public static boolean showDialog(JFrame f, Component comp, vParameter parm) {
+    public static boolean showDialog(JFrame f, vParameter parm) {
         if (dialog == null) {
-            dialog = new ParameterDialog(f, comp, parm);
+            dialog = new ParameterDialog(f, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -51,10 +50,8 @@ public class ParameterDialog extends JDialog {
         return modified;
     }
 
-    private ParameterDialog(JFrame parent, Component comp, vParameter param) {
+    private ParameterDialog(JFrame parent, vParameter param) {
         super(parent, "Parameter Inspector", true);
-        this.param = param;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -65,7 +62,6 @@ public class ParameterDialog extends JDialog {
         con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
         con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 new EmptyBorder(10, 10, 10, 10)));
-
 
         con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
@@ -104,16 +100,6 @@ public class ParameterDialog extends JDialog {
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (param == null);     // if it's a new param, they can always accept defaults with no typing
-        okButt.setEnabled(param == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
@@ -123,6 +109,8 @@ public class ParameterDialog extends JDialog {
         this.commentField.addCaretListener(lis);
         this.expressionField.addCaretListener(lis);
         this.parameterTypeCombo.addActionListener(lis);
+
+        setParams(parent, param);
     }
 
     private int maxWidth(JComponent[] c) {
@@ -142,9 +130,8 @@ public class ParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public void setParams(Component c, vParameter p) {
+    public final void setParams(Component c, vParameter p) {
         param = p;
-        locationComp = c;
 
         fillWidgets();
 
@@ -152,8 +139,8 @@ public class ParameterDialog extends JDialog {
         okButt.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {

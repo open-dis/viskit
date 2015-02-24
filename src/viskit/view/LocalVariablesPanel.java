@@ -17,7 +17,6 @@ import viskit.model.ViskitElement;
 public class LocalVariablesPanel extends ViskitTablePanel
 {
   private String[] mytitles = {"name","type","initial value","description"};
-  private static int count = 0;
 
   public LocalVariablesPanel(int wid)
   {
@@ -37,13 +36,13 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public String[] getFields(Object o, int rowNum)
+  public String[] getFields(ViskitElement e, int rowNum)
   {
     String[] sa = new String[4];
-    sa[0] = ((EventLocalVariable)o).getName();
-    sa[1] = ((EventLocalVariable)o).getType();
-    sa[2] = ((EventLocalVariable)o).getValue();
-    sa[3] = ((EventLocalVariable)o).getComment();
+    sa[0] = e.getName();
+    sa[1] = e.getType();
+    sa[2] = e.getValue();
+    sa[3] = e.getComment();
     return sa;
   }
 
@@ -51,8 +50,10 @@ public class LocalVariablesPanel extends ViskitTablePanel
   public ViskitElement newRowObject()
   {
     //return new EventLocalVariable("locvar_"+count++,"int","0");
-    return new EventLocalVariable(VGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
-                                    "int","0");
+    return new EventLocalVariable(
+            VGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
+            "int",
+            "0");
   }
 
   @Override

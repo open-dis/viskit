@@ -13,13 +13,13 @@ import viskit.model.vStateVariable;
  * @since 8:49:21 AM
  * @version $Id$
  */
-public class VariablesPanel extends ViskitTablePanel {
+public class StateVariablesPanel extends ViskitTablePanel {
 
     private String[] mytitles = {"name", "type", "description"};
     private String plusToolTip = "Add a state variable";
     private String minusToolTip = "Removed the selected state variable";
 
-    VariablesPanel(int wid, int height) {
+    StateVariablesPanel(int wid, int height) {
         super(wid, height);            // separate constructor from initialization
         init(true);
     }
@@ -30,11 +30,11 @@ public class VariablesPanel extends ViskitTablePanel {
     }
 
     @Override
-    public String[] getFields(Object o, int rowNum) {
+    public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = ((vStateVariable) o).getName();
-        sa[1] = ((vStateVariable) o).getType();
-        sa[2] = ((vStateVariable) o).getComment();
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        sa[2] = e.getComment();
         return sa;
     }
 

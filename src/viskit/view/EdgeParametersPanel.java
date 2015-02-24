@@ -48,11 +48,11 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     }
 
     @Override
-    public String[] getFields(Object o, int rowNum) {
+    public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[2];
         ViskitElement eventArgument = argList.get(rowNum);
         sa[0] = eventArgument.getName() + " (" + eventArgument.getType() + ")";
-        sa[1] = ((ViskitElement) o).getValue();
+        sa[1] = e.getValue();
         return sa;
     }
 

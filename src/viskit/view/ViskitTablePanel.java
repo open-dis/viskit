@@ -188,13 +188,13 @@ public abstract class ViskitTablePanel extends JPanel {
     /**
      * Add a row defined by the argument to the end of the table.  The table data
      * will be retrieved through the abstract method, getFields(o).
-     * @param o
+     * @param e
      */
-    public void addRow(ViskitElement o) {
-        shadow.add(o);
+    public void addRow(ViskitElement e) {
+        shadow.add(e);
 
         Vector<String> rowData = new Vector<>();
-        String[] fields = getFields(o, 0);
+        String[] fields = getFields(e, 0);
         rowData.addAll(Arrays.asList(fields));
         mod.addRow(rowData);
 
@@ -215,10 +215,10 @@ public abstract class ViskitTablePanel extends JPanel {
 
     /**
      * Remove the row representing the argument from the table.
-     * @param o
+     * @param e the element row to remove
      */
-    public void removeRow(Object o) {
-        removeRow(findObjectRow(o));
+    public void removeRow(ViskitElement e) {
+        removeRow(findObjectRow(e));
     }
 
     /**
@@ -263,9 +263,9 @@ public abstract class ViskitTablePanel extends JPanel {
 
     /**
      * Update the table row, typically after editing, representing the passed rowObject.
-     * @param rowObject the object to update a table row with
+     * @param rowObject the element to update a table row with
      */
-    public void updateRow(Object rowObject) {
+    public void updateRow(ViskitElement rowObject) {
         int row = findObjectRow(rowObject);
 
         String[] fields = getFields(rowObject, 0);
@@ -293,11 +293,11 @@ public abstract class ViskitTablePanel extends JPanel {
 
     /**
      * Return the fields to be displayed in the table.
-     * @param o row object
+     * @param e a row element
      * @param rowNum row number...not used unless EdgeParametersPanel //todo fix
      * @return  String array of fields
      */
-    abstract public String[] getFields(Object o, int rowNum);
+    abstract public String[] getFields(ViskitElement e, int rowNum);
 
     /**
      * Build a new row object
@@ -378,7 +378,7 @@ public abstract class ViskitTablePanel extends JPanel {
                 }
             }
             if (c != tab.getColumnCount() - 1) {    // leave the last one alone
-                // its important to set maxwidth before preferred with because the latter
+                // its important to set maxwidth before preferred width because the latter
                 // gets clamped by the former.
                 col.setMaxWidth(maxWidth + 5);       // why the fudge?
                 col.setPreferredWidth(maxWidth + 5); // why the fudge?
@@ -389,13 +389,13 @@ public abstract class ViskitTablePanel extends JPanel {
 
     /**
      * Build a table row based on the passed row object.
-     * @param o a ViskitElement to add to the table row
+     * @param e a ViskitElement to add to the table row
      */
-    private void putARow(ViskitElement o) {
-        shadow.add(o);
+    private void putARow(ViskitElement e) {
+        shadow.add(e);
 
         Vector<String> rowData = new Vector<>();
-        String[] fields = getFields(o, shadow.size() - 1);
+        String[] fields = getFields(e, shadow.size() - 1);
         rowData.addAll(Arrays.asList(fields));
         mod.addRow(rowData);
     }

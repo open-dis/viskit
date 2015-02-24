@@ -100,11 +100,24 @@ public interface EventGraphView {
      */
     void showAndSaveSource(String className, String s, String filename);
 
+    /**
+     * Shows the XML representation of this EG
+     * @param f the EG file to display
+     */
     void displayXML(File f);
 
     // The following 2 may be implemented by the view in some other way that an official GUI Dialog
-    String addParameterDialog();          // returns param name
 
-    String addStateVariableDialog();      // returns statevar name
+    /**
+     * run the add parameter dialog
+     * @return the String representation of this parameter
+     */
+    String addParameterDialog();
+
+    /**
+     * run the add state variable dialog
+     * @return the String representation of this state variable
+     */
+    String addStateVariableDialog();
 
 }

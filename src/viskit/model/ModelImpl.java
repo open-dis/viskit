@@ -406,12 +406,16 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             est.setOperation(st.getOperation() != null);
             if (est.isOperation()) {
                 est.setOperationOrAssignment(st.getOperation().getMethod());
-
-                LocalVariableAssignment l = st.getLocalVariableAssignment();
-                if (l != null && l.getValue() != null && !l.getValue().isEmpty())
-                    est.setLocalVariableAssignment(st.getLocalVariableAssignment().getValue());
             } else {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
+            }
+
+            LocalVariableAssignment l = st.getLocalVariableAssignment();
+            if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
+                est.setLocalVariableAssignment(l.getValue());
+
+                if (st.getLocalVariableMethodCall() != null)
+                    est.setLocalVariableMethodCall(st.getLocalVariableMethodCall().getValue());
             }
 
             List<String> cmt = new ArrayList<>();
@@ -882,9 +886,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     /**
-     * Here we convert indexing expressions into local variable references
-     * @param targ
-     * @param local
+     * Here we convert local state transition expressions into global references
+     *
+     * @param targ List of StateTransitions to populate
+     * @param local List of StateTransitions to transfer to the target
      */
     private void cloneTransitions(List<StateTransition> targ, List<ViskitElement> local) {
         targ.clear();
@@ -898,21 +903,37 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 // Match the state transition's index to the given index
                 st.setIndex(transition.getIndexingExpression());
             }
+
             if (transition.isOperation()) {
                 Operation o = oFactory.createOperation();
                 o.setMethod(transition.getOperationOrAssignment());
                 st.setOperation(o);
-
-                String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
-                if (localV != null && !localV.isEmpty()) {
-                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
-                    l.setValue(((EventStateTransition)transition).getLocalVariableAssignment());
-                    st.setLocalVariableAssignment(l);
-                }
             } else {
                 Assignment a = oFactory.createAssignment();
                 a.setValue(transition.getOperationOrAssignment());
                 st.setAssignment(a);
+            }
+
+            // Various locally declared variable ops
+            String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
+            if (localV != null && !localV.isEmpty()) {
+
+                String assign = ((EventStateTransition)transition).getLocalVariableAssignment();
+
+                if (assign != null && !assign.isEmpty()) {
+                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
+                    l.setValue(assign);
+                    st.setLocalVariableAssignment(l);
+                }
+
+                // If we have any void return type, zero parameter methods to
+                // call on local vars, do it now
+                String call = ((EventStateTransition) transition).getLocalVariableMethodCall();
+                if (call != null && !call.isEmpty()) {
+                    LocalVariableMethodCall lvmc = oFactory.createLocalVariableMethodCall();
+                    lvmc.setValue(call);
+                    st.setLocalVariableMethodCall(lvmc);
+                }
             }
 
             transition.opaqueModelObject = st; //replace

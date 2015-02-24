@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import viskit.VGlobals;
+import viskit.control.EventGraphControllerImpl;
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
 
@@ -138,14 +139,16 @@ public class TransitionsPanel extends JPanel {
     }
 
     private String transitionString(ViskitElement est) {
+
         String tstring = est.getStateVarName();
         if (VGlobals.instance().isArray(tstring)) {
             tstring += "[";
             tstring += est.getIndexingExpression();
             tstring += "]";
         }
+
+        String l = ((EventStateTransition) est).getLocalVariableAssignment();
         if (est.isOperation()) {
-            String l = ((EventStateTransition) est).getLocalVariableAssignment();
             if (l != null && !l.isEmpty()) {
                 tstring = l + " = " + tstring;
             }
@@ -153,6 +156,13 @@ public class TransitionsPanel extends JPanel {
             tstring += "." + est.getOperationOrAssignment() + "\n";
         } else {
             tstring += " = " + est.getOperationOrAssignment() + "\n";
+        }
+
+        // If we have any void return type, zero parameter methods to call on
+        // local vars, do it now
+        String localMethodCall = ((EventStateTransition) est).getLocalVariableMethodCall();
+        if (l != null && !l.isEmpty() && localMethodCall != null && !localMethodCall.isEmpty()) {
+            tstring += l + "." + localMethodCall + "()\n";
         }
 
         return tstring;
@@ -163,15 +173,21 @@ public class TransitionsPanel extends JPanel {
         arLis.clear();
     }
 
+    /** Used to determine whether to show or hide StateTransitions
+     *
+     * @return a state transitions string
+     */
     public String getString() {
         String s = "";
         for (Enumeration en = model.elements(); en.hasMoreElements();) {
             s += (String) en.nextElement();
             s += "\n";
         }
+
+        // lose last cr
         if (s.length() > 0) {
             return s.substring(0, s.length() - 1);
-        }     // lose last cr
+        }
         return s;
     }
     private ActionListener myPlusListener;
@@ -207,10 +223,11 @@ public class TransitionsPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (VGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
-                JOptionPane.showMessageDialog(TransitionsPanel.this,
-                        "No state variables have been defined," +
-                        "\ntherefore no state transitions are possible.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                    JOptionPane.ERROR_MESSAGE,
+                    "Alert",
+                    "No state variables have been defined," +
+                        "\ntherefore no state transitions are possible.");
                 return;
             }
             model.addElement("double click to edit");

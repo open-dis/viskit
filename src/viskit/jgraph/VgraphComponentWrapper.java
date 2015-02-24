@@ -38,7 +38,7 @@ import viskit.model.Model;
 import viskit.view.CodeBlockPanel;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.ParametersPanel;
-import viskit.view.VariablesPanel;
+import viskit.view.StateVariablesPanel;
 
 /**
  * A class to serve as the jgraph object, while carrying other objects needed
@@ -58,7 +58,7 @@ public class VgraphComponentWrapper extends vGraphComponent {
     public JSplitPane drawingSplitPane;
     public JSplitPane stateParamSplitPane;
     public ParametersPanel paramPan;
-    public VariablesPanel varPan;
+    public StateVariablesPanel varPan;
     public CodeBlockPanel codeBlockPan;
     public boolean isActive = true;
 

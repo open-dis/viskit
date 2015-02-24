@@ -28,15 +28,17 @@ public class ParametersPanel extends ViskitTablePanel {
         init(true);
     }
 
+    @Override
     public String[] getColumnTitles() {
         return mytitles;
     }
 
-    public String[] getFields(Object o, int rowNum) {
+    @Override
+    public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = ((vParameter) o).getName();
-        sa[1] = ((vParameter) o).getType();
-        sa[2] = ((vParameter) o).getComment();
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        sa[2] = e.getComment();
         return sa;
     }
 
@@ -46,6 +48,7 @@ public class ParametersPanel extends ViskitTablePanel {
         return ea;
     }
 
+    @Override
     public int getNumVisibleRows() {
         return 3;
     }

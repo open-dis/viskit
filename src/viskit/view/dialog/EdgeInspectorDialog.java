@@ -53,7 +53,7 @@ public class EdgeInspectorDialog extends JDialog {
     private Border delayPanBorder,  delayPanDisabledBorder;
     private JPanel priorityPanel;
     private JComboBox priorityCB;
-    private ArrayList<Priority> priorityList;  // matches combo box
+    private java.util.List<Priority> priorityList;  // matches combo box
     private Vector<String> priorityNames;
     private int priorityDefaultIndex = 3;      // set properly below
     private JPanel myParmPanel;
@@ -76,15 +76,14 @@ public class EdgeInspectorDialog extends JDialog {
      * otherwise, it should be the component on top of which the
      * dialog should appear.
      * @param f the frame to orient this dialog
-     * @param comp the frame to orient this dialog
      * @param edge the Edge node to edit
      * @return an indication of success
      */
-    public static boolean showDialog(JFrame f, Component comp, Edge edge) {
+    public static boolean showDialog(JFrame f, Edge edge) {
         if (dialog == null) {
-            dialog = new EdgeInspectorDialog(f, comp, edge);
+            dialog = new EdgeInspectorDialog(f, edge);
         } else {
-            dialog.setParams(comp, edge);
+            dialog.setParams(f, edge);
         }
 
         dialog.setVisible(true);
@@ -92,9 +91,8 @@ public class EdgeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EdgeInspectorDialog(JFrame frame, Component locationComp, Edge edge) {
-        super(frame, "Edge Inspector", true);
-        this.edge = edge;
+    private EdgeInspectorDialog(JFrame parent, Edge edge) {
+        super(parent, "Edge Inspector", true);
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -252,14 +250,6 @@ public class EdgeInspectorDialog extends JDialog {
         edgeInspectorPanel.add(twoRowButtonPanel);
         cont.add(edgeInspectorPanel);
 
-        fillWidgets();     // put the data into the widgets
-
-        okButt.setEnabled(false);
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
@@ -287,19 +277,21 @@ public class EdgeInspectorDialog extends JDialog {
                 }
             }
         });
+
+        setParams(parent, edge);
     }
 
-    public void setParams(Component c, Edge e) {
+    public final void setParams(Component c, Edge e) {
         edge = e;
 
         fillWidgets();
-        pack();
 
         modified = false;
         okButt.setEnabled(false);
-        getRootPane().setDefaultButton(canButt);
 
-        this.setLocationRelativeTo(c);
+        getRootPane().setDefaultButton(canButt);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void keepSameSize(JComponent a, JComponent b) {

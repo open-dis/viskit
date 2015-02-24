@@ -27,7 +27,6 @@ import viskit.model.ModelEvent;
 import viskit.control.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
-import viskit.xsd.bindings.eventgraph.LocalVariableAssignment;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -472,6 +471,15 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         sttrans.append(!est.isOperation() ? "=" : ".");
                         sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
                         sttrans.append("<br>");
+
+                        String lvmc = est.getLocalVariableMethodCall();
+                        if (l != null && !l.isEmpty() && lvmc != null && !lvmc.isEmpty()) {
+                            sttrans.append("&nbsp;");
+                            sttrans.append(l);
+                            sttrans.append(".");
+                            sttrans.append(est.getLocalVariableMethodCall());
+                            sttrans.append("<br>");
+                        }
                     }
 
                     if (sttrans.length() > 0) {
