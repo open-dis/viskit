@@ -7,11 +7,6 @@ Post release fixes / upgrades / issues:
   List<String> list = new ArrayList<>();  The static declaration will match the
   dynamic type accordingly.
 
-  We can create local arguments, but must be assign values.  We can create
-  method parameters, schedule events and initiate state variable changes, but
-  we have no way of calling void return type methods, therefore we must use the
-  code block to perform these types of method calls.
-
   Because of the unique nature of XML IDs, we are not able to have similar
   method names, i.e. Arrival, in the same EG file even with differing method
   signatures.  As such, subclassing is still possible, but the user will have
@@ -39,6 +34,15 @@ Post release fixes / upgrades / issues:
   the user can investigate and fix during EG or Assy authoring.
 
   ****** FIXES / UPGRADES:
+
+  Improvements to the state transitions panel in that we can now invoke void
+  return type, zero parameter method calls as part of a state transition.  This
+  is accomplished by declaring a local variable within an EventNode of which its
+  type will be used to parse which of these method types will be available for
+  use
+
+  Implemented capability to provide an unqualified Java class name and have the
+  fully qualified class found on the classpath.  Implemented in viskit.VStatics
 
   Fixed bug to prevent edge parameter values from being wiped out during a node
   modification
