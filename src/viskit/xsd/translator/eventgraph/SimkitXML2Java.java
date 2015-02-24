@@ -752,7 +752,8 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    /** these Events should now be any other than the Run event
+    /** These Events should now be any other than the Run, or Reset events
+     *
      * @param e the Event to process
      * @param eventBlock the StringWriter assigned to write the Event
      */
@@ -1083,8 +1084,8 @@ public class SimkitXML2Java {
     }
 
     // find the maximal set that the subclass parameters
-    // can cover of the superclass's available constructors
-    // note a subclass should have at least the superclass's
+    // can cover of the super class's available constructors
+    // note a subclass should have at least the super class's
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> localSuperParams = new ArrayList<>();
