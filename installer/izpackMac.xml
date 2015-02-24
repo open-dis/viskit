@@ -82,7 +82,7 @@
 
           <fileset dir="stage"               targetdir="$INSTALL_PATH">
               <include name="Schemas/**"/>
-              <exclude name="Schemas/*.patch"/>
+              <exclude name="Schemas/legacyDTDs/**"/>
               <include name="configuration/**"/>
               <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
               <include name="images/**"/>
