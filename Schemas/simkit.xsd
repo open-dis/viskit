@@ -123,6 +123,12 @@
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
+  <xs:element name="LocalVariableMethodCall">
+      <xs:complexType>
+      <xs:attribute name="value"/>
+      <xs:attribute name="description"/>
+    </xs:complexType>
+  </xs:element>
   <!-- bug fix 1183 -->
   <xs:element name="StateTransition">
     <xs:complexType>
@@ -133,6 +139,7 @@
         </xs:choice>
         <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableAssignment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableMethodCall"/>
       </xs:sequence>
       <xs:attribute name="state" use="required" type="xs:IDREF"/>
       <xs:attribute name="index"/>
