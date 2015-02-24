@@ -37,9 +37,10 @@ Post release fixes / upgrades / issues:
 
   Improvements to the state transitions panel in that we can now invoke void
   return type, zero parameter method calls as part of a state transition.  This
-  is accomplished by declaring a local variable within an EventNode of which its
-  type will be used to parse which of these method types will be available for
-  use
+  is accomplished by declaring a local variable within an EventNode, or by using
+  an event argument supplied by an Edge.  The type will be used to reflect on
+  which method types will be available for use on either the local variable, or
+  the argument
 
   Implemented capability to provide an unqualified Java class name and have the
   fully qualified class found on the classpath.  Implemented in viskit.VStatics

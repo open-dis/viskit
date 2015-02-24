@@ -1002,7 +1002,7 @@ public class SimkitXML2Java {
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
         for (EdgeParameter ep : liEdgeP) {
-            pw.print(CM + SP + "(Object)" + ep.getValue());
+            pw.print(CM + SP + "(Object) " + ep.getValue());
         }
 
         pw.println(RP + SC);
