@@ -82,10 +82,10 @@ import java.util.jar.JarEntry;
 public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
 
     /**
-     *  Provide delegation constructor
+     * Provide delegation constructor
      *
-     * @param parent
-     * @param dirsJarsOrZips
+     * @param parent the parent class loader
+     * @param dirsJarsOrZips a directory of .class, jar or zip files to search
      */
     public SimpleDirectoriesAndJarsClassLoader(ClassLoader parent, String[] dirsJarsOrZips) {
         super(parent);
@@ -93,14 +93,14 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     }
 
     /**
-     *  Same old ClassLoader constructor
+     * Same old ClassLoader constructor
      *
-     * @param dirsJarsOrZips
+     * @param dirsJarsOrZips a directory of .class, jar or zip files to search
      */
     public SimpleDirectoriesAndJarsClassLoader(String[] dirsJarsOrZips) {
-        super();
         init(dirsJarsOrZips);
     }
+
     Object[] roots;
     private Manifest manifest;
     // **************************************************************************
@@ -193,26 +193,17 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
                 }
                 byte[] classBytes = new byte[is.available()];
                 is.read(classBytes);
-                is.close();
                 definePackage(name);
                 return defineClass(name, classBytes, 0, classBytes.length);
             } catch (IOException e) {
                 System.err.println("exc: " + e.getMessage());
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {}
             }
         }
-        /*
-        finally
-        {
-        if ( null != fi )
-        {
-        try
-        {
-        fi.close();
-        }
-        catch (Exception e){}
-        }
-        }
-         */
+
         // We could not find the class, so indicate the problem with an exception
         throw new ClassNotFoundException(name);
 
@@ -278,7 +269,7 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
     }
 
     /**
-     *  Minimal package definition
+     * Minimal package definition
      *
      * @param className
      */

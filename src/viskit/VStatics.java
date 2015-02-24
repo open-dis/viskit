@@ -33,14 +33,17 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
+import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
-import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,6 +53,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
+import viskit.doe.LocalBootLoader;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -221,18 +225,25 @@ public class VStatics {
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c;
 
-        c = cForName(s, VGlobals.instance().getWorkClassLoader());
+        Class<?> c = cForName(s, VGlobals.instance().getWorkClassLoader());
+
         if (c == null) {
-            c = cForName(s, VStatics.class.getClassLoader());
+            c = tryUnqualifiedName(s);
         }
+
+//        if (c == null) {
+//            c = cForName(s, VStatics.class.getClassLoader());
+//        }
+
         if (c == null) {
             c = FileBasedClassManager.instance().getFileClass(s);
         }
-        if (c == null) {
-            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), getExtraClassPathArray()));
-        }
+
+//        if (c == null) {
+//            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), getExtraClassPathArray()));
+//        }
+
         return c;
     }
 
@@ -402,6 +413,62 @@ public class VStatics {
             }
             return null;
         }
+    }
+
+    /** Attempt to resolve an unqualified name to qualified
+     *
+     * @param name the unqualified class name to resolve
+     * @return a fully resolved class on the classpath
+     */
+    static Class<?> tryUnqualifiedName(String name) {
+
+        String userDir = System.getProperty("user.dir");
+        String userHome = System.getProperty("user.home");
+
+        FindFile finder;
+        Path startingDir;
+        String pattern = name + "\\.class";
+        Class<?> c = null;
+        LocalBootLoader loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader();
+        String[] classpaths = loader.getClassPath();
+
+        for (String cpath : classpaths) {
+
+            // We can deal with jars w/the SimpleDirectoriesAndJarsClassLoader
+            if (cpath.contains(".jar")) {continue;}
+
+            startingDir = Paths.get(cpath);
+            finder = new FindFile(pattern);
+
+            try {
+                Files.walkFileTree(startingDir, finder);
+            } catch (IOException e) {
+                LogUtils.getLogger(VStatics.class).error(e);
+            }
+
+            try {
+                if (finder.getPath() != null) {
+                    String clazz = finder.getPath().toString();
+
+                    // Strip out unwanted prepaths
+                    if (clazz.contains(userHome)) {
+                        clazz = clazz.substring(userHome.length() + 1, clazz.length());
+                    } else if (clazz.contains(userDir)) {
+                        clazz = clazz.substring(VGlobals.instance().getWorkDirectory().getPath().length() + 1, clazz.length());
+                    }
+
+                    // Strip off .class and replace File.separatorChar w/ a "."
+                    clazz = clazz.substring(0, clazz.lastIndexOf(".class"));
+                    clazz = clazz.replace(File.separatorChar, '.');
+
+                    c = Class.forName(clazz, false, loader);
+                    break;
+                }
+            } catch (ClassNotFoundException e) {}
+
+        }
+
+        return c;
     }
 
     static public String getPathSeparator() {
