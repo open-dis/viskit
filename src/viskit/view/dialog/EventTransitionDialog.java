@@ -6,14 +6,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.EventGraphControllerImpl;
-import viskit.model.EventLocalVariable;
 
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
@@ -101,6 +99,8 @@ public class EventTransitionDialog extends JDialog {
         JLabel equalsLab = new JLabel("=");
 
         assignMethod = new JRadioButton("assign method");
+        assignMethod.setToolTipText("first, assign a return type to an already "
+                + "declared local variable, or an argument");
 
         int w = maxWidth(new JComponent[]{commLab, localVarAssignLab, nameLab,
             arrayIdxLab, assTo, opOn, actionLab, assignMethod, localMethodLab});
@@ -117,8 +117,8 @@ public class EventTransitionDialog extends JDialog {
         setMaxHeight(arrayIndexField);
         localAssignmentField = new JTextField(25);
         localAssignmentField.setToolTipText("Use this field to optionally "
-                + "assign a return type for an invoke on \".\" to an already "
-                + "declared local variable, or, declare a new one here");
+                + "assign a return type to an already "
+                + "declared local variable, or an argument");
         setMaxHeight(localAssignmentField);
 
         fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
@@ -450,7 +450,12 @@ public class EventTransitionDialog extends JDialog {
                     actionLab.setText(".");
                 }
             }
-            localMethodCallPanel.setVisible(assignMethod.isSelected() && !localAssignmentField.getText().isEmpty());
+
+            // Don't allow selection in this case
+            if (localAssignmentField.getText().isEmpty())
+                assignMethod.setSelected(false);
+
+            localMethodCallPanel.setVisible(assignMethod.isSelected());
             actionLab.setPreferredSize(d);
             pack();
         }
