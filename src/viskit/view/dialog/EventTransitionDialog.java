@@ -6,12 +6,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.EventGraphControllerImpl;
+import viskit.model.EventLocalVariable;
 
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
@@ -251,11 +253,22 @@ public class EventTransitionDialog extends JDialog {
         ComboBoxModel<String> methodCB = new DefaultComboBoxModel<>();
         java.util.List<ViskitElement> types = localVariablesPanel.getData();
 
-        // Enable argument type methods to be invokes as well
+        // Enable argument type methods to be invoked as well
         if (types.isEmpty()) {
             types = argPanel.getData();
         }
-        
+
+        // Last chance to pull if from a quickly declare local variable
+        // NOTE: Not ready for this, but good intention here
+//        if (types.isEmpty()) {
+//            String[] typs = localAssignmentField.getText().split(" ");
+//            if (typs.length > 1) {
+//                types = new ArrayList<>();
+//                EventLocalVariable v = new EventLocalVariable(typs[1], typs[0], "");
+//                types.add(v);
+//            }
+//        }
+
         for (ViskitElement e : types) {
             type = VStatics.classForName(e.getType());
             methods = type.getMethods();
@@ -269,6 +282,7 @@ public class EventTransitionDialog extends JDialog {
                 ((DefaultComboBoxModel<String>)methodCB).addElement(method.getName());
             }
         }
+
         return methodCB;
     }
 
@@ -357,11 +371,7 @@ public class EventTransitionDialog extends JDialog {
 
     private void setLocalVariableComboBox(EventStateTransition est) {
         localVarsCB.setModel(resolveLocalMethodCalls());
-
-        String lvmc = param.getLocalVariableMethodCall();
-        if (lvmc != null) {
-            assignMethod.setSelected(!lvmc.isEmpty());
-        }
+        setAssignMethod();
         localMethodCallPanel.setVisible(assignMethod.isSelected() && !localAssignmentField.getText().isEmpty());
 
         // Check for any local variables first
@@ -374,6 +384,13 @@ public class EventTransitionDialog extends JDialog {
                 localVarsCB.setSelectedIndex(i);
                 break;
             }
+        }
+    }
+
+    private void setAssignMethod() {
+        String lvmc = param.getLocalVariableMethodCall();
+        if (lvmc != null) {
+            assignMethod.setSelected(!lvmc.isEmpty());
         }
     }
 
@@ -390,8 +407,10 @@ public class EventTransitionDialog extends JDialog {
             param.setIndexingExpression(arrayIndexField.getText().trim());
             param.setOperationOrAssignment(actionField.getText().trim());
             param.setOperation(opOn.isSelected());
-            param.setLocalVariableMethodCall((String) localVarsCB.getSelectedItem());
-            assignMethod.setSelected(param.getLocalVariableMethodCall() != null);
+
+            setAssignMethod();
+            if (assignMethod.isSelected())
+                param.setLocalVariableMethodCall((String) localVarsCB.getSelectedItem());
         }
     }
 

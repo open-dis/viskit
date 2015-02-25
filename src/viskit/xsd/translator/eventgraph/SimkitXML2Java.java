@@ -516,9 +516,9 @@ public class SimkitXML2Java {
         if (!liParams.isEmpty()) {
             for (StateVariable st : liStateV) {
 
-            // Supress warning call to unchecked cast since we return a clone
+                // Suppress warning call to unchecked cast since we return a clone
                 // of Objects vice the desired type
-                if (isGeneric(st.getType())) {
+                if (isGeneric(st.getType()) && isArray(st.getType())) {
                     pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
                     break;
                 }
@@ -893,22 +893,20 @@ public class SimkitXML2Java {
 
             // format it
             for (int i = 0; i < lines.length; i++) {
+
                 if (i == 0) {
                     pw.println(SP_8 + "/* StateTransition for " + sv.getName() + " */");
                     pw.println(SP_8 + lines[i] + SC);
                 } else {
 
                     // Account for local assignment to accomodate state transition
-                    if (lva != null && lva.getValue() != null && !lva.getValue().isEmpty() && lvmc == null) {
-                        pw.println(SP_8 + lva.getValue() + SP + EQ + SP + sv.getName()
-                                + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "")
-                                + change);
-
-                        // reset
-                        lva = null;
-                    } else {
+                    // NOTE: This cover a lot of cases, but may not be thorough
+                    // enough.  We'll have to monitor as new cases develop
+                    if (lva != null && !lva.getValue().isEmpty() && liArgs.isEmpty() && ops != null)
+                        pw.println(SP_8 + lva.getValue() + SP + EQ + SP + lines[i] + SC);
+                    else
                         pw.println(SP_8 + lines[i] + SC);
-                    }
+
                 }
             }
 
@@ -924,9 +922,9 @@ public class SimkitXML2Java {
             // Now, print out any any void return type, zero parameter methods
             // as part of this state transition
             if (lvmc != null) {
-                String localMethodCall = st.getLocalVariableMethodCall().getValue();
+                String localMethodCall = lvmc.getValue();
                 if (localMethodCall != null && !localMethodCall.isEmpty()) {
-                    pw.println(SP_8 + st.getLocalVariableAssignment().getValue() + PD + localMethodCall + LP + RP + SC);
+                    pw.println(SP_8 +  lva.getValue() + PD + localMethodCall + LP + RP + SC);
                 }
             }
 
