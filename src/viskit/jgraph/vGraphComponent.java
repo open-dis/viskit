@@ -369,28 +369,30 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                             sb.append(" )<br>");
                         }
                     }
-                    StringBuilder epSt = new StringBuilder();
-                    int idx = 1;
-                    for (Iterator itr = se.parameters.iterator(); itr.hasNext();) {
-                        vEdgeParameter ep = (vEdgeParameter) itr.next();
-                        epSt.append("&nbsp;");
-                        epSt.append(idx++);
-                        epSt.append(" ");
-                        epSt.append(ep.getValue());
 
-                        // TODO: Will need a schema change for this to show correctly
-                        if (ep.getType() != null) {
-                            epSt.append(" ");
-                            epSt.append("(");
-                            epSt.append(ep.getType());
-                            epSt.append(")");
-                        }
-                        epSt.append("<br>");
-                    }
-                    if (epSt.length() > 0) {
+                    int idx = 1;
+                    if (!se.parameters.isEmpty()) {
+
                         sb.append("<u>edge parameters</u><br>");
-                        sb.append(epSt.toString());
+                        for (Iterator itr = se.parameters.iterator(); itr.hasNext();) {
+                            vEdgeParameter ep = (vEdgeParameter) itr.next();
+                            sb.append("&nbsp;");
+                            sb.append(idx++);
+                            sb.append(" ");
+                            sb.append(ep.getValue());
+
+                            // TODO: Will need a schema change for this to show correctly
+                            if (ep.getType() != null) {
+                                sb.append(" ");
+                                sb.append("(");
+                                sb.append(ep.getType());
+                                sb.append(")");
+                            }
+                            sb.append("<br>");
+                        }
                     }
+
+                    // Strip out the last <br>
                     if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
                         sb.setLength(sb.length() - 4);
                     }
@@ -414,66 +416,66 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     }
 
                     List<ViskitElement> argLis = en.getArguments();
-                    StringBuffer args = new StringBuffer();
-                    int n = 0;
-                    for (ViskitElement ve : argLis) {
-                        EventArgument arg = (EventArgument) ve;
-                        String as = arg.getName() + " (" + arg.getType() + ")";
-                        args.append("&nbsp;");
-                        args.append(++n);
-                        args.append(" ");
-                        args.append(as);
-                        args.append("<br>");
-                    }
-                    if (args.length() > 0) {
+                    if (!argLis.isEmpty()) {
+
                         sb.append("<u>arguments</u><br>");
-                        sb.append(args);
+                        int n = 0;
+                        for (ViskitElement ve : argLis) {
+                            EventArgument arg = (EventArgument) ve;
+                            String as = arg.getName() + " (" + arg.getType() + ")";
+                            sb.append("&nbsp;");
+                            sb.append(++n);
+                            sb.append(" ");
+                            sb.append(as);
+                            sb.append("<br>");
+                        }
                     }
 
                     Vector<ViskitElement> locVarLis = en.getLocalVariables();
-                    StringBuffer lvs = new StringBuffer();
-                    for (ViskitElement ve : locVarLis) {
-                        EventLocalVariable lv = (EventLocalVariable) ve;
-                        lvs.append("&nbsp;");
-                        lvs.append(lv.getName());
-                        lvs.append(" (");
-                        lvs.append(lv.getType());
-                        lvs.append(") = ");
-                        String val = lv.getValue();
-                        lvs.append(val.isEmpty() ? "<i><default></i>" : val);
-                        lvs.append("<br>");
-                    }
-                    if (lvs.length() > 0) {
+                    if (!locVarLis.isEmpty()) {
+
                         sb.append("<u>local variables</u><br>");
-                        sb.append(lvs);
+                        for (ViskitElement ve : locVarLis) {
+                            EventLocalVariable lv = (EventLocalVariable) ve;
+                            sb.append("&nbsp;");
+                            sb.append(lv.getName());
+                            sb.append(" (");
+                            sb.append(lv.getType());
+                            sb.append(") = ");
+                            String val = lv.getValue();
+                            sb.append(val.isEmpty() ? "<i><default></i>" : val);
+                            sb.append("<br>");
+                        }
                     }
 
                     String codeBlock = en.getCodeBlock();
                     if (!codeBlock.isEmpty()) {
                         sb.append("<u>code block</u><br>");
-                        sb.append("&nbsp;");
-                        sb.append(" ");
-                        sb.append(codeBlock);
-                        sb.append("<br>");
-                    }
 
-                    List<ViskitElement> st = en.getTransitions();
-                    StringBuffer sttrans = new StringBuffer();
-                    for (ViskitElement ve : st) {
-                        EventStateTransition est = (EventStateTransition) ve;
-                        String[] sa = est.toString().split("\\n");
+                        String[] sa = codeBlock.split("\\n");
                         for (String s : sa) {
-                            sttrans.append("&nbsp;");
-                            sttrans.append(s);
-                            sttrans.append("<br>");
+                            sb.append("&nbsp;");
+                            sb.append(s);
+                            sb.append("<br>");
                         }
                     }
 
-                    if (sttrans.length() > 0) {
+                    List<ViskitElement> st = en.getTransitions();
+                    if (!st.isEmpty()) {
+
                         sb.append("<u>state transitions</u><br>");
-                        sb.append(sttrans);
+                        for (ViskitElement ve : st) {
+                            EventStateTransition est = (EventStateTransition) ve;
+                            String[] sa = est.toString().split("\\n");
+                            for (String s : sa) {
+                                sb.append("&nbsp;");
+                                sb.append(s);
+                                sb.append("<br>");
+                            }
+                        }
                     }
 
+                    // Strip out the last <br>
                     if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
                         sb.setLength(sb.length() - 4);
                     }
