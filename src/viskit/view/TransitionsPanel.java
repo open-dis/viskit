@@ -139,33 +139,7 @@ public class TransitionsPanel extends JPanel {
     }
 
     private String transitionString(ViskitElement est) {
-
-        String tstring = est.getStateVarName();
-        if (VGlobals.instance().isArray(tstring)) {
-            tstring += "[";
-            tstring += est.getIndexingExpression();
-            tstring += "]";
-        }
-
-        String l = ((EventStateTransition) est).getLocalVariableAssignment();
-        if (est.isOperation()) {
-            if (l != null && !l.isEmpty()) {
-                tstring = l + " = " + tstring;
-            }
-
-            tstring += "." + est.getOperationOrAssignment() + "\n";
-        } else {
-            tstring += " = " + est.getOperationOrAssignment() + "\n";
-        }
-
-        // If we have any void return type, zero parameter methods to call on
-        // local vars, do it now
-        String localMethodCall = ((EventStateTransition) est).getLocalVariableMethodCall();
-        if (l != null && !l.isEmpty() && localMethodCall != null && !localMethodCall.isEmpty()) {
-            tstring += l + "." + localMethodCall + "()\n";
-        }
-
-        return tstring;
+        return est.toString();
     }
 
     public void clearTransitions() {
@@ -186,7 +160,7 @@ public class TransitionsPanel extends JPanel {
 
         // lose last cr
         if (s.length() > 0) {
-            return s.substring(0, s.length() - 1);
+            s = s.substring(0, s.length() - 1);
         }
         return s;
     }

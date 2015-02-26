@@ -461,23 +461,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     StringBuffer sttrans = new StringBuffer();
                     for (ViskitElement ve : st) {
                         EventStateTransition est = (EventStateTransition) ve;
-                        sttrans.append("&nbsp;");
-                        String l = est.getLocalVariableAssignment();
-                        if (est.isOperation() && l != null && !l.isEmpty()) {
-                            sttrans.append(l);
-                            sttrans.append("=");
-                        }
-                        sttrans.append(est.getStateVarName());
-                        sttrans.append(!est.isOperation() ? "=" : ".");
-                        sttrans.append(escapeLTGT(est.getOperationOrAssignment()));
-                        sttrans.append("<br>");
-
-                        String lvmc = est.getLocalVariableMethodCall();
-                        if (l != null && !l.isEmpty() && lvmc != null && !lvmc.isEmpty()) {
+                        String[] sa = est.toString().split("\\n");
+                        for (String s : sa) {
                             sttrans.append("&nbsp;");
-                            sttrans.append(l);
-                            sttrans.append(".");
-                            sttrans.append(est.getLocalVariableMethodCall());
+                            sttrans.append(s);
                             sttrans.append("<br>");
                         }
                     }

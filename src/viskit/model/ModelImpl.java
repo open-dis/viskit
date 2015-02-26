@@ -392,7 +392,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         node.getTransitions().clear();
         for (StateTransition st : ev.getStateTransition()) {
+
             EventStateTransition est = new EventStateTransition();
+
+            LocalVariableAssignment l = st.getLocalVariableAssignment();
+            if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
+                est.setLocalVariableAssignment(l.getValue());
+            }
+
             StateVariable sv = (StateVariable) st.getState();
             est.setStateVarName(sv.getName());
             est.setStateVarType(sv.getType());
@@ -410,13 +417,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
             }
 
-            LocalVariableAssignment l = st.getLocalVariableAssignment();
-            if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
-                est.setLocalVariableAssignment(l.getValue());
-
-                if (st.getLocalVariableMethodCall() != null)
-                    est.setLocalVariableMethodCall(st.getLocalVariableMethodCall().getValue());
-            }
+            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
+            if (lvi != null && lvi.getMethod() != null && !lvi.getMethod().isEmpty())
+                est.setLocalVariableInvocation(st.getLocalVariableInvocation().getMethod());
 
             List<String> cmt = new ArrayList<>();
             cmt.addAll(sv.getComment());
@@ -886,7 +889,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     /**
-     * Here we convert local state transition expressions into global references
+     * Here we convert local state transition expressions into JAXB bindings
      *
      * @param targ List of StateTransitions to populate
      * @param local List of StateTransitions to transfer to the target
@@ -895,6 +898,19 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         targ.clear();
         for (ViskitElement transition : local) {
             StateTransition st = oFactory.createStateTransition();
+
+            // Various locally declared variable ops
+            String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
+            if (localV != null && !localV.isEmpty()) {
+
+                String assign = ((EventStateTransition)transition).getLocalVariableAssignment();
+                if (assign != null && !assign.isEmpty()) {
+                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
+                    l.setValue(assign);
+                    st.setLocalVariableAssignment(l);
+                }
+            }
+
             StateVariable sv = findStateVariable(transition.getStateVarName());
             st.setState(sv);
 
@@ -914,25 +930,16 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 st.setAssignment(a);
             }
 
-            // Various locally declared variable ops
-            String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
-            if (localV != null && !localV.isEmpty()) {
+            // If we have any void return type, zero parameter methods to
+            // call on local vars, or args, do it now
+            String localI = ((EventStateTransition)transition).getLocalVariableInvocation();
+            if (localI != null && !localI.isEmpty()) {
 
-                String assign = ((EventStateTransition)transition).getLocalVariableAssignment();
-
-                if (assign != null && !assign.isEmpty()) {
-                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
-                    l.setValue(assign);
-                    st.setLocalVariableAssignment(l);
-                }
-
-                // If we have any void return type, zero parameter methods to
-                // call on local vars, do it now
-                String call = ((EventStateTransition) transition).getLocalVariableMethodCall();
-                if (call != null && !call.isEmpty()) {
-                    LocalVariableMethodCall lvmc = oFactory.createLocalVariableMethodCall();
-                    lvmc.setValue(call);
-                    st.setLocalVariableMethodCall(lvmc);
+                String invoke = ((EventStateTransition) transition).getLocalVariableInvocation();
+                if (invoke != null && !invoke.isEmpty()) {
+                    LocalVariableInvocation lvi = oFactory.createLocalVariableInvocation();
+                    lvi.setMethod(invoke);
+                    st.setLocalVariableInvocation(lvi);
                 }
             }
 

@@ -123,9 +123,9 @@
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="LocalVariableMethodCall">
+  <xs:element name="LocalVariableInvocation">
       <xs:complexType>
-      <xs:attribute name="value"/>
+      <xs:attribute name="method"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -138,8 +138,8 @@
           <xs:element ref="Operation"/>
         </xs:choice>
         <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableAssignment"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableInvocation"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
-        <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableMethodCall"/>
       </xs:sequence>
       <xs:attribute name="state" use="required" type="xs:IDREF"/>
       <xs:attribute name="index"/>

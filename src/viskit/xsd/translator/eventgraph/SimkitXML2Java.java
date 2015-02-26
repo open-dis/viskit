@@ -849,7 +849,7 @@ public class SimkitXML2Java {
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
             LocalVariableAssignment lva = st.getLocalVariableAssignment();
-            LocalVariableMethodCall lvmc = st.getLocalVariableMethodCall();
+            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
             String change = "";
             String olds = ""; // old decl line Bar oldFoo ...
             String oldName = sv.getName(); // oldFoo
@@ -900,9 +900,7 @@ public class SimkitXML2Java {
                 } else {
 
                     // Account for local assignment to accomodate state transition
-                    // NOTE: This cover a lot of cases, but may not be thorough
-                    // enough.  We'll have to monitor as new cases develop
-                    if (lva != null && !lva.getValue().isEmpty() && liArgs.isEmpty() && ops != null)
+                    if (lva != null && !lva.getValue().isEmpty())
                         pw.println(SP_8 + lva.getValue() + SP + EQ + SP + lines[i] + SC);
                     else
                         pw.println(SP_8 + lines[i] + SC);
@@ -921,10 +919,10 @@ public class SimkitXML2Java {
 
             // Now, print out any any void return type, zero parameter methods
             // as part of this state transition
-            if (lvmc != null) {
-                String localMethodCall = lvmc.getValue();
-                if (localMethodCall != null && !localMethodCall.isEmpty()) {
-                    pw.println(SP_8 +  lva.getValue() + PD + localMethodCall + LP + RP + SC);
+            if (lvi != null) {
+                String invoke = lvi.getMethod();
+                if (invoke != null && !invoke.isEmpty()) {
+                    pw.println(SP_8 + invoke + SC);
                 }
             }
 

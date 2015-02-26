@@ -31,17 +31,17 @@ import viskit.view.LocalVariablesPanel;
  */
 public class EventTransitionDialog extends JDialog {
 
-    private JTextField actionField, arrayIndexField, localAssignmentField, descriptionField;
+    private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
     private JComboBox<String> localVarsCB;
-    private JRadioButton assTo, opOn, assignMethod;
+    private JRadioButton assTo, opOn;
     private static EventTransitionDialog dialog;
     private static boolean modified = false;
     private EventStateTransition param;
     private JButton okButt, canButt;
     private JButton newSVButt;
     private JLabel actionLab;
-    private JPanel indexPanel, localMethodCallPanel;
+    private JPanel indexPanel, localAssignmentPanel, localInvocationPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
     private ArgumentsPanel argPanel;
@@ -79,7 +79,7 @@ public class EventTransitionDialog extends JDialog {
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.PAGE_AXIS));
 
         JLabel commLab = new JLabel("description");
-        JLabel localVarAssignLab = new JLabel("local assignment");
+        JLabel localAssignLab = new JLabel("local assignment");
         JLabel nameLab = new JLabel("state variable");
         JLabel arrayIdxLab = new JLabel("index variable");
 
@@ -95,15 +95,8 @@ public class EventTransitionDialog extends JDialog {
         actionLab.setPreferredSize(dx);
         actionLab.setHorizontalAlignment(JLabel.TRAILING);
 
-        JLabel localMethodLab = new JLabel("invoke local var method");
-        JLabel equalsLab = new JLabel("=");
-
-        assignMethod = new JRadioButton("assign method");
-        assignMethod.setToolTipText("first, assign a return type to an already "
-                + "declared local variable, or an argument");
-
-        int w = maxWidth(new JComponent[]{commLab, localVarAssignLab, nameLab,
-            arrayIdxLab, assTo, opOn, actionLab, assignMethod, localMethodLab});
+        JLabel localInvokeLab = new JLabel("local invocation");
+        JLabel methodLab = new JLabel("invoke local var method");
 
         stateVarsCB = new JComboBox<>();
         setMaxHeight(stateVarsCB);
@@ -111,19 +104,28 @@ public class EventTransitionDialog extends JDialog {
         newSVButt = new JButton("new");
         descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
-        actionField = new JTextField(25);
+        actionField = new JTextField(15);
         setMaxHeight(actionField);
-        arrayIndexField = new JTextField(25);
+        arrayIndexField = new JTextField(5);
         setMaxHeight(arrayIndexField);
-        localAssignmentField = new JTextField(25);
+        localAssignmentField = new JTextField(15);
         localAssignmentField.setToolTipText("Use this field to optionally "
-                + "assign a return type to an already "
-                + "declared local variable, or an argument");
+                + "assign a return type from a state variable to an already "
+                + "declared local variable");
         setMaxHeight(localAssignmentField);
+        localInvocationField = new JTextField(15);
+        localInvocationField.setToolTipText("Use this field to optionally "
+                + "invoke a zero parameter void method call to an already "
+                + "declared local variable, or an argument");
+        setMaxHeight(localInvocationField);
+
+        int w = maxWidth(new JComponent[]{commLab, localAssignLab,
+            nameLab, arrayIdxLab, assTo, opOn, actionLab,
+            localInvokeLab, methodLab});
 
         fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(new OneLinePanel(localVarAssignLab, w, localAssignmentField, equalsLab));
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab, w, localAssignmentField, new JLabel("=")));
 
         JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
         divider.setBackground(Color.blue.brighter());
@@ -143,12 +145,13 @@ public class EventTransitionDialog extends JDialog {
         fieldsPanel.add(Box.createVerticalStrut(10));
 
         localVarsCB = new JComboBox<>();
-        localVarsCB.setToolTipText("Use this to call void return type methods on locally declared variables");
+        localVarsCB.setToolTipText("Use this to select void return type methods "
+                + "for locally declared variables, or arguments");
         setMaxHeight(localVarsCB);
         localVarsCB.setBackground(Color.white);
 
-        fieldsPanel.add(new OneLinePanel(null, w, assignMethod));
-        fieldsPanel.add(localMethodCallPanel = new OneLinePanel(localMethodLab, w, localVarsCB));
+        fieldsPanel.add(new OneLinePanel(localInvokeLab, w, localInvocationField, new JLabel(".")));
+        fieldsPanel.add(localInvocationPanel = new OneLinePanel(methodLab, w, localVarsCB));
 
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
@@ -169,10 +172,12 @@ public class EventTransitionDialog extends JDialog {
         okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
-        arrayIndexField.addCaretListener(lis);
-        actionField.addCaretListener(lis);
         descriptionField.addCaretListener(lis);
         localAssignmentField.addCaretListener(lis);
+        arrayIndexField.addCaretListener(lis);
+        actionField.addCaretListener(lis);
+        localInvocationField.addCaretListener(lis);
+
         stateVarsCB.addActionListener(new ActionListener() {
 
             @Override
@@ -225,7 +230,6 @@ public class EventTransitionDialog extends JDialog {
         RadButtListener rbl = new RadButtListener();
         assTo.addActionListener(rbl);
         opOn.addActionListener(rbl);
-        assignMethod.addActionListener(rbl);
 
         setParams(parent, param);
     }
@@ -279,7 +283,7 @@ public class EventTransitionDialog extends JDialog {
                 if (method.toString().contains("java.lang.Object")) {continue;}
                 if (!method.toString().contains("void")) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
-                ((DefaultComboBoxModel<String>)methodCB).addElement(method.getName());
+                ((DefaultComboBoxModel<String>)methodCB).addElement(method.getName() + "()");
             }
         }
 
@@ -316,7 +320,8 @@ public class EventTransitionDialog extends JDialog {
             } else {
                 descriptionField.setText("");
             }
-            actionField.setText(param.getOperationOrAssignment());
+            localAssignmentField.setText(param.getLocalVariableAssignment());
+            setStateVariableComboBox(param);
             String ie = param.getIndexingExpression();
             if (ie == null || ie.isEmpty()) {
                 arrayIndexField.setText(indexArg);
@@ -331,22 +336,28 @@ public class EventTransitionDialog extends JDialog {
                 assTo.setSelected(!isOp);
                 actionLab.setText("=");
             }
-            setStateVariableComboBox(param);
-            localAssignmentField.setText(param.getLocalVariableAssignment());
+            actionField.setText(param.getOperationOrAssignment());
+
+            // We only need the variable, not the method invocation
+            if (param.getLocalVariableInvocation() != null && !param.getLocalVariableInvocation().isEmpty())
+                localInvocationField.setText(param.getLocalVariableInvocation().split("\\.")[0]);
+
             setLocalVariableComboBox(param);
         } else {
             descriptionField.setText("");
-            actionField.setText("");
-            arrayIndexField.setText(indexArg);
-            stateVarsCB.setSelectedIndex(0);
             localAssignmentField.setText("");
+            stateVarsCB.setSelectedIndex(0);
+            arrayIndexField.setText(indexArg);
+            actionField.setText("");
             assTo.setSelected(true);
+            localInvocationField.setText("");
             localVarsCB.setSelectedIndex(0);
         }
 
         // We have an indexing argument already set
         String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
         indexPanel.setVisible(VGlobals.instance().isArray(typ));
+        localAssignmentPanel.setVisible(opOn.isSelected());
     }
 
     private void setStateVariableComboBox(EventStateTransition est) {
@@ -371,13 +382,12 @@ public class EventTransitionDialog extends JDialog {
 
     private void setLocalVariableComboBox(EventStateTransition est) {
         localVarsCB.setModel(resolveLocalMethodCalls());
-        setAssignMethod();
-        localMethodCallPanel.setVisible(assignMethod.isSelected() && !localAssignmentField.getText().isEmpty());
+        localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
 
         // Check for any local variables first
         if (localVarsCB.getItemCount() <= 0) {return;}
         localVarsCB.setSelectedIndex(0);
-        String lVMethodCall = est.getLocalVariableMethodCall();
+        String lVMethodCall = est.getLocalVariableInvocation();
         for (int i = 0; i < localVarsCB.getItemCount(); i++) {
             String call = localVarsCB.getItemAt(i);
             if (lVMethodCall != null && lVMethodCall.contains(call)) {
@@ -387,30 +397,27 @@ public class EventTransitionDialog extends JDialog {
         }
     }
 
-    private void setAssignMethod() {
-        String lvmc = param.getLocalVariableMethodCall();
-        if (lvmc != null) {
-            assignMethod.setSelected(!lvmc.isEmpty());
-        }
-    }
-
     private void unloadWidgets() {
         if (param != null) {
+
             param.getComments().clear();
+
             String cs = descriptionField.getText().trim();
             if (!cs.isEmpty()) {
                 param.getComments().add(0, cs);
             }
-            param.setLocalVariableAssignment(localAssignmentField.getText().trim());
+
+            if (!localAssignmentField.getText().isEmpty())
+                param.setLocalVariableAssignment(localAssignmentField.getText().trim());
+
             param.setStateVarName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
             param.setStateVarType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
             param.setIndexingExpression(arrayIndexField.getText().trim());
             param.setOperationOrAssignment(actionField.getText().trim());
             param.setOperation(opOn.isSelected());
 
-            setAssignMethod();
-            if (assignMethod.isSelected())
-                param.setLocalVariableMethodCall((String) localVarsCB.getSelectedItem());
+            if (!localInvocationField.getText().isEmpty())
+                param.setLocalVariableInvocation(localInvocationField.getText().trim() + "." + (String) localVarsCB.getSelectedItem());
         }
     }
 
@@ -423,7 +430,7 @@ public class EventTransitionDialog extends JDialog {
             localAssignmentField.setText("");
             actionField.setText("");
             VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
-            assignMethod.setSelected(false);
+            localInvocationField.setText("");
             dispose();
         }
     }
@@ -450,12 +457,7 @@ public class EventTransitionDialog extends JDialog {
                     actionLab.setText(".");
                 }
             }
-
-            // Don't allow selection in this case
-            if (localAssignmentField.getText().isEmpty())
-                assignMethod.setSelected(false);
-
-            localMethodCallPanel.setVisible(assignMethod.isSelected());
+            localAssignmentPanel.setVisible(opOn.isSelected());
             actionLab.setPreferredSize(d);
             pack();
         }
@@ -484,9 +486,13 @@ public class EventTransitionDialog extends JDialog {
                 }
                 // check for null action
                 if (actionField.getText().trim().isEmpty()) {
-                    int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "No transition (action) has been entered." +
+                    int ret = JOptionPane.showConfirmDialog(
+                            EventTransitionDialog.this,
+                            "No transition (action) has been entered." +
                             "\nIgnore and continue?",
-                            "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                            "Warning",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE);
                     if (ret != JOptionPane.YES_OPTION) {
                         return;
                     }
@@ -501,6 +507,7 @@ public class EventTransitionDialog extends JDialog {
 
         @Override
         public void caretUpdate(CaretEvent event) {
+            localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);

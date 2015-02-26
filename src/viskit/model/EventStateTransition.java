@@ -26,17 +26,19 @@ public class EventStateTransition extends ViskitElement {
     private String value;
     private String comment;
     private String localVariableAssignment;
-    private String localVariableMethodCall;
+    private String localVariableInvocation;
 
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        if (isOperation) {
+
+        if (localVariableAssignment != null && !localVariableAssignment.isEmpty()) {
             sb.append(localVariableAssignment);
-            sb.append(" ");
-            sb.append("=");
-            sb.append(" ");
+            sb.append(' ');
+            sb.append('=');
+            sb.append(' ');
         }
+
         sb.append(stateVarName);
         if (VGlobals.instance().isArray(stateVarType)) {
             handleArrayIndexing(sb);
@@ -48,11 +50,17 @@ public class EventStateTransition extends ViskitElement {
             sb.append('=');
         }
         sb.append(operationOrAssignment);
+
+        if (localVariableInvocation != null && !localVariableInvocation.isEmpty()) {
+            sb.append('\n');
+            sb.append(localVariableInvocation);
+        }
+
         return sb.toString();
     }
 
     private void handleArrayIndexing(StringBuffer sb) {
-        if (indexingExpression != null && indexingExpression.length() > 0) {
+        if (indexingExpression != null && !indexingExpression.isEmpty()) {
             sb.append('[');
             sb.append(indexingExpression);
             sb.append(']');
@@ -156,7 +164,9 @@ public class EventStateTransition extends ViskitElement {
     public String getComment() {
         return comment;
     }
-
+    /**
+     * @return the localVariableAssignment
+     */
     public String getLocalVariableAssignment() {
         return localVariableAssignment;
     }
@@ -169,16 +179,16 @@ public class EventStateTransition extends ViskitElement {
     }
 
     /**
-     * @return the localVariableMethodCall
+     * @return the localVariableInvocation
      */
-    public String getLocalVariableMethodCall() {
-        return localVariableMethodCall;
+    public String getLocalVariableInvocation() {
+        return localVariableInvocation;
     }
 
     /**
-     * @param localVariableMethodCall the localVariableMethodCall to set
+     * @param localVariableInvocation the localVariableInvocation to set
      */
-    public void setLocalVariableMethodCall(String localVariableMethodCall) {
-        this.localVariableMethodCall = localVariableMethodCall;
+    public void setLocalVariableInvocation(String localVariableInvocation) {
+        this.localVariableInvocation = localVariableInvocation;
     }
 }
