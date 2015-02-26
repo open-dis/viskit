@@ -229,6 +229,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
+
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
         stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel, BoxLayout.Y_AXIS));
@@ -237,8 +238,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         JPanel eventGraphParametersSubpanel = new JPanel();
         eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel, BoxLayout.X_AXIS));
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
+
         JLabel stateVariableLabel = new JLabel("State Variables");
         stateVariableLabel.setToolTipText("State variables can be modified during event processing");
+
         eventGraphParametersSubpanel.add(stateVariableLabel);
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
         stateVariablesPanel.add(eventGraphParametersSubpanel);
@@ -278,36 +281,37 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
 
-        JTextArea descriptionTextArea = new JTextArea();
-        descriptionTextArea.setEditable(false);
-        descriptionTextArea.setWrapStyleWord(true);
-        descriptionTextArea.setLineWrap(true);
-        descriptionTextArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
-        descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
 
+        JTextArea descriptionTA = new JTextArea();
+        descriptionTA.setEditable(false);
+        descriptionTA.setWrapStyleWord(true);
+        descriptionTA.setLineWrap(true);
+        descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+
+        JScrollPane descriptionSP = new JScrollPane(descriptionTA);
+        descriptionSP.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        descriptionSP.setMinimumSize(new Dimension(20, 20));
+
         // This works, you just have to have several lines of typed text to cause
         // the etched scrollbar to appear
-        parametersPanel.add(descriptionScrollPane);
+        parametersPanel.add(descriptionSP);
         parametersPanel.add(Box.createVerticalStrut(5));
-
         parametersPanel.setMinimumSize(new Dimension(20, 20));
 
         eventGraphParametersSubpanel = new JPanel();
         eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel, BoxLayout.X_AXIS));
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
+
         JLabel titleLabel = new JLabel("Event Graph Parameters");
         titleLabel.setToolTipText("Event graph parameters are initialized upon starting each simulation replication");
+
         eventGraphParametersSubpanel.add(titleLabel);
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
         parametersPanel.add(eventGraphParametersSubpanel);
 
         ParametersPanel pp = new ParametersPanel(300, 5);
-        parametersPanel.add(pp);
-        parametersPanel.add(Box.createVerticalStrut(5));
         pp.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
@@ -330,20 +334,22 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         });
 
-        CodeBlockPanel codeblockPan = buildCodeBlockPanel();
+        parametersPanel.add(pp);
+        parametersPanel.add(Box.createVerticalStrut(5));
 
+        CodeBlockPanel codeblockPan = buildCodeBlockPanel();
 
         JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(stateVariablesPanel),
                 new JScrollPane(buildCodeBlockComponent(codeblockPan)));
         stateCblockSplt.setResizeWeight(0.75);
+        stateCblockSplt.setMinimumSize(new Dimension(20, 20));
 
         // Split pane that has description, parameters, state variables and code block.
         JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 parametersPanel,
                 stateCblockSplt);
         spltPn.setResizeWeight(0.75);
-
         spltPn.setMinimumSize(new Dimension(20, 20));
 
         vgcw.stateParamSplitPane = spltPn;
@@ -424,8 +430,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the left component (JGraph side) most of the usable
-        // extra space in this SplitPlane -> 75%
-        graphPane.drawingSplitPane.setResizeWeight(0.75);
+        // extra space in this SplitPlane -> 65%
+        graphPane.drawingSplitPane.setResizeWeight(0.65);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         graphPane.addMouseListener(new vCursorHandler());
