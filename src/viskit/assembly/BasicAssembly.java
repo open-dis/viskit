@@ -569,8 +569,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             System.out.println("Already running.");
         }
-        createObjects();
-        performHookups();
+
+        // Incase the user input bad parameters
+        try {
+            createObjects();
+            performHookups();
+        } catch (Throwable t) {
+
+            // Because we don't have any live controllers to message the user
+            // in this thread context, brute force the message
+            JOptionPane.showMessageDialog(null,
+                    t.getMessage(),
+                    "Assembly Run Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
 
         printInfo();    // subclasses may display what they wish at the top of the run.
 
@@ -764,6 +776,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initReportFile();
 
+            // Because there is no instantiated report builder in this run
+            // thread context, we reflect one here
             ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.reports.AnalystReportBuilder");
