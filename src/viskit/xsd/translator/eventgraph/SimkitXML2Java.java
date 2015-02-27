@@ -744,7 +744,7 @@ public class SimkitXML2Java {
         }
 
         String x = run.getCode();
-        if (!x.isEmpty()) {
+        if (x != null && !x.isEmpty()) {
             pw.println(SP_8 + x);
         }
         pw.println(SP_4 + CB);
