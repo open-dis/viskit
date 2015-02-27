@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity author="ahbuss" extend="SimEntityBase" name="ServerGeneric" package="examples" version="$Id: ServerGeneric.xml 1590 2007-10-07 05:41:19Z tdnorbra $" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ServerGeneric" package="examples" version="$Id: ServerGeneric.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="totalNumberServers" type="int">
-        <Comment/>
+        <Comment></Comment>
     </Parameter>
     <Parameter name="serviceTimeGenerator" type="simkit.random.RandomVariate">
-        <Comment/>
+        <Comment></Comment>
     </Parameter>
     <StateVariable name="numberAvailableServers" type="int">
-        <Comment/>
+        <Comment></Comment>
     </StateVariable>
     <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;">
-        <Comment/>
+        <Comment></Comment>
     </StateVariable>
     <StateVariable name="delayInQueue" type="double">
-        <Comment/>
+        <Comment></Comment>
     </StateVariable>
     <StateVariable name="timeInSystem" type="double">
-        <Comment/>
+        <Comment></Comment>
     </StateVariable>
     <Event name="Run">
-        <Comment/>
+        <Comment></Comment>
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>
         <StateTransition state="queue">
             <Assignment value="new java.util.LinkedList&lt;simkit.Entity&gt;()"/>
         </StateTransition>
-        <Code/>
-        <Coordinate x="30" y="30"/>
+        <Code></Code>
+        <Coordinate x="30.0" y="30.0"/>
     </Event>
     <Event name="Arrival">
-        <Comment/>
+        <Comment></Comment>
         <Argument name="customer" type="simkit.Entity"/>
         <StateTransition state="queue">
             <Operation method="add(customer)"/>
         </StateTransition>
-        <Schedule condition="numberAvailableServers &gt; 0" delay="0.0" event="StartService" priority="HIGH">
-            <Comment/>
+        <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH">
+            <Comment></Comment>
         </Schedule>
         <Code>customer.stampTime();</Code>
-        <Coordinate x="30" y="170"/>
+        <Coordinate x="30.0" y="170.0"/>
     </Event>
     <Event name="StartService">
-        <Comment/>
+        <Comment></Comment>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
@@ -52,15 +52,15 @@
         <StateTransition state="delayInQueue">
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
-        <Schedule condition="true" delay="serviceTimeGenerator.generate()" event="EndService" priority="DEFAULT">
-            <Comment/>
+        <Schedule delay="serviceTimeGenerator.generate()" event="EndService" condition="true" priority="DEFAULT">
+            <Comment></Comment>
             <EdgeParameter value="customer"/>
         </Schedule>
         <Code>Entity customer = queue.getFirst();</Code>
-        <Coordinate x="170" y="160"/>
+        <Coordinate x="170.0" y="160.0"/>
     </Event>
     <Event name="EndService">
-        <Comment/>
+        <Comment></Comment>
         <Argument name="customer" type="simkit.Entity"/>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
@@ -68,10 +68,10 @@
         <StateTransition state="timeInSystem">
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
-        <Schedule condition="queue.size() &gt; 0" delay="0.0" event="StartService" priority="HIGH">
-            <Comment/>
+        <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH">
+            <Comment></Comment>
         </Schedule>
-        <Code/>
-        <Coordinate x="290" y="160"/>
+        <Code></Code>
+        <Coordinate x="290.0" y="160.0"/>
     </Event>
 </SimEntity>

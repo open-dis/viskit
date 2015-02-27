@@ -13,13 +13,13 @@
             <EdgeParameter value="new Integer(nextID)"/>
         </Schedule>
         <Code></Code>
-        <Coordinate x="25.0" y="115.0"/>
+        <Coordinate x="30.0" y="120.0"/>
     </Event>
     <Event name="CustomerArrival">
         <Comment></Comment>
         <Argument name="customer" type="Integer"/>
         <Code></Code>
-        <Coordinate x="185.0" y="115.0"/>
+        <Coordinate x="190.0" y="120.0"/>
     </Event>
     <Event name="Run">
         <Comment></Comment>
@@ -27,6 +27,6 @@
             <Assignment value="0"/>
         </StateTransition>
         <Code></Code>
-        <Coordinate x="25.0" y="5.0"/>
+        <Coordinate x="30.0" y="10.0"/>
     </Event>
 </SimEntity>

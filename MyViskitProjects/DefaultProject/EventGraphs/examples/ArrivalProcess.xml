@@ -7,13 +7,13 @@
             <Assignment value="0"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
-        <Coordinate x="45.0" y="65.0"/>
+        <Coordinate x="50.0" y="70.0"/>
     </Event>
     <Event name="Arrival">
         <StateTransition state="numberArrivals">
             <Assignment value="numberArrivals + 1"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
-        <Coordinate x="255.0" y="65.0"/>
+        <Coordinate x="260.0" y="70.0"/>
     </Event>
 </SimEntity>
