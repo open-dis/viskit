@@ -567,7 +567,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void run() {
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
-            System.out.println("Already running.");
+            System.err.println("Assemby already running.");
         }
 
         // Incase the user input bad parameters
@@ -587,7 +587,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         printInfo();    // subclasses may display what they wish at the top of the run.
 
         // reset the document with
-        // existing parameters
+        // existing parameters.
         // might have run before
         statsConfig.reset();
         statsConfig.setEntityIndex(entitiesWithStats);

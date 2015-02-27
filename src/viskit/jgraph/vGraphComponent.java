@@ -907,13 +907,17 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         }
     }
 
-    /** Create the cells attributes before rendering on the graph
+    final static double DEFAULT_CELL_SIZE = 54.0d;
+
+    /** Create the cell's final attributes before rendering on the graph.  The
+     * edge attributes are set in the vGraphModel
      *
-     * @param point the 2D point at which to render the cell
+     * @param node the named EventNode to create attributes for
      * @return the cells attributes before rendering on the graph
      */
-    public Map createCellAttributes(Point2D point) {
+    public Map createCellAttributes(EventNode node) {
         Map map = new Hashtable();
+        Point2D point = node.getPosition();
 
         // Snap the Point to the Grid
         if (this != null) {
@@ -922,9 +926,14 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             point = (Point2D) point.clone();
         }
 
-        // Add a Bounds Attribute to the Map
-        GraphConstants.setBounds(map, new Rectangle2D.Double(point.getX(),
-                point.getY(), 54, 54));
+        // Add a Bounds Attribute to the Map.  NOTE: using the length of the
+        // node name to help size the cell does not bode well with the
+        // customized edge router, so, leave it at DEFAULT_CELL_SIZE
+        GraphConstants.setBounds(map, new Rectangle2D.Double(
+                point.getX(),
+                point.getY(),
+                DEFAULT_CELL_SIZE,
+                DEFAULT_CELL_SIZE));
 
         GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
 
@@ -970,7 +979,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         DefaultGraphCell vertex = createDefaultGraphCell(node);
 
         // Create a Map that holds the attributes for the Vertex
-        vertex.getAttributes().applyMap(createCellAttributes(node.getPosition()));
+        vertex.getAttributes().applyMap(createCellAttributes(node));
 
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);

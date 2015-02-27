@@ -792,7 +792,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         jaxbEv.setName(nIe(nodeName));
 
         if ("Run".equals(nIe(nodeName))) {
-            jaxbEv.setDescription("This event is fired first to facilitate initialization of all simulation state variables");
+            jaxbEv.setDescription("This event is fired first to facilitate "
+                    + "initialization of all simulation state variables");
         }
         node.opaqueModelObject = jaxbEv;
         jaxbRoot.getEvent().add(jaxbEv);
