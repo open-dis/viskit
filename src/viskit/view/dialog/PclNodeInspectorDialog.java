@@ -36,7 +36,6 @@ public class PclNodeInspectorDialog extends JDialog {
     private static PclNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeListenerNode pclNode;
-    private Component locationComp;
     private JButton okButt, canButt;
     private enableApplyButtonListener lis;
     JPanel buttPan;
@@ -44,12 +43,12 @@ public class PclNodeInspectorDialog extends JDialog {
     private JTextField descTF;
     private JLabel descLab;
 
-    public static boolean showDialog(JFrame f, Component comp, PropChangeListenerNode parm) {
+    public static boolean showDialog(JFrame f, PropChangeListenerNode parm) {
         try {
             if (dialog == null) {
-                dialog = new PclNodeInspectorDialog(f, comp, parm);
+                dialog = new PclNodeInspectorDialog(f, parm);
             } else {
-                dialog.setParams(comp, parm);
+                dialog.setParams(f, parm);
             }
         } catch (ClassNotFoundException e) {
             String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
@@ -64,10 +63,9 @@ public class PclNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclNodeInspectorDialog(JFrame parent, Component comp, PropChangeListenerNode lv) throws ClassNotFoundException {
+    private PclNodeInspectorDialog(JFrame parent, PropChangeListenerNode lv) throws ClassNotFoundException {
         super(parent, "Property Change Listener (PCL) Inspector", true);
         this.pclNode = lv;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -119,24 +117,15 @@ public class PclNodeInspectorDialog extends JDialog {
         buttPan.add(canButt);
         buttPan.add(okButt);
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (lv == null);     // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled(lv == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
+
+        setParams(parent, lv);
     }
 
-    public void setParams(Component c, PropChangeListenerNode p) throws ClassNotFoundException {
+    public final void setParams(Component c, PropChangeListenerNode p) throws ClassNotFoundException {
         pclNode = p;
-        locationComp = c;
 
         fillWidgets();
 
@@ -145,7 +134,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
         getRootPane().setDefaultButton(canButt);
         pack();
-        this.setLocationRelativeTo(c);
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() throws ClassNotFoundException {

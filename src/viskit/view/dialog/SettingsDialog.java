@@ -71,7 +71,6 @@ public class SettingsDialog extends JDialog {
 
     private static SettingsDialog dialog;
     private static boolean modified = false;
-    private JFrame mother;
     private JButton canButt;
     private JButton okButt;
     private JTabbedPane tabbedPane;
@@ -102,7 +101,6 @@ public class SettingsDialog extends JDialog {
 
     private SettingsDialog(JFrame mother) {
         super(mother, "Viskit Application Settings", true);
-        this.mother = mother;
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -129,16 +127,6 @@ public class SettingsDialog extends JDialog {
         content.add(Box.createVerticalStrut(5));
         content.add(buttPan);
 
-        fillWidgets();     // put the data into the widgets
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        Dimension d = getSize();
-        d.width = Math.max(d.width, 500);
-        setSize(d);
-        this.setLocationRelativeTo(mother);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
@@ -150,18 +138,21 @@ public class SettingsDialog extends JDialog {
         clusterRunCB.addActionListener(vis);
         analRptCB.addActionListener(vis);
         debugMsgsCB.addActionListener(vis);
+
+        setParams();
     }
 
     private void setParams() {
         fillWidgets();
+        getRootPane().setDefaultButton(canButt);
 
         modified = false;
 
         pack();
         Dimension d = getSize();
-        d.width = Math.max(d.width, 600);
+        d.width = Math.max(d.width, 500);
         setSize(d);
-        this.setLocationRelativeTo(mother);
+        setLocationRelativeTo(getParent());
     }
 
     private void buildWidgets() {

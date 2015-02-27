@@ -50,7 +50,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Collection;
 
-/**
+/** NOTE: Not used
+ *
  * A dialog class that lets the user add a new parameter to the document.
  * After the user clicks "OK", "Cancel", or closes the dialog via the
  * close box, the caller retrieves the "buttonChosen" variable from
@@ -68,11 +69,11 @@ public class RecentFilesDialog extends JDialog {
     private Color defaultColor;
     private MouseListener myRollOverHandler = new mHandler();
 
-    public static String showDialog(JFrame f, Component comp, Collection<String> lis) {
+    public static String showDialog(JFrame f, Collection<String> lis) {
         if (dialog == null) {
-            dialog = new RecentFilesDialog(f, comp, lis);
+            dialog = new RecentFilesDialog(f, lis);
         } else {
-            dialog.setParams(comp, lis);
+            dialog.setParams(f, lis);
         }
 
         dialog.selection = null;
@@ -81,7 +82,7 @@ public class RecentFilesDialog extends JDialog {
     }
     String selection;
 
-    private RecentFilesDialog(JFrame parent, Component comp, Collection<String> lis) {
+    private RecentFilesDialog(JFrame parent, Collection<String> lis) {
         super(parent, "Recent files", true);
         this.lis = lis;
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -122,7 +123,8 @@ public class RecentFilesDialog extends JDialog {
         jlist.addMouseListener(new myMM());
         cont.add(jlist);
         cont.setBorder(new LineBorder(Color.black, 1));
-        setParams(comp, lis);
+
+        setParams(parent, lis);
     }
     clearAction myClearer;
 
@@ -146,8 +148,8 @@ public class RecentFilesDialog extends JDialog {
         myClearer.nlis = lis;
 
         fillWidgets();
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {

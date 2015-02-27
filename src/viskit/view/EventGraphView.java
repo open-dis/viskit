@@ -57,6 +57,10 @@ public interface EventGraphView {
 
     File[] openFilesAsk();
 
+    /** NOTE: Not used
+     * @param lis a list of recently open files
+     * @return a recently opened file
+     */
     File openRecentFilesAsk(Collection<String> lis);
 
     /** Saves the current Event Graph "as" desired by the user

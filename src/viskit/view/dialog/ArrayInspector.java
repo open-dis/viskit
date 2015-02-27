@@ -26,18 +26,14 @@ import viskit.view.ObjListPanel;
 public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
-    private JComponent locationComp;
     private JButton canButt,  okButt;
     private JPanel buttPan,  contentP;
     private JTextField typeTF,  sizeTF;
     private JPanel upPan;
     private enableApplyButtonListener listnr;
-    private JDialog parent;
 
-    public ArrayInspector(JDialog parent, JComponent comp) {
+    public ArrayInspector(JDialog parent) {
         super(parent, "Array Inspector", true);
-        locationComp = comp;
-        this.parent = parent;
         contentP = new JPanel();
         contentP.setLayout(new BoxLayout(contentP, BoxLayout.Y_AXIS));
         contentP.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -90,7 +86,7 @@ public class ArrayInspector extends JDialog {
     public void setData(List<Object> lis) // of instantiators
     {
         olp = new ObjListPanel(listnr);
-        olp.setDialogInfo(parent, parent);
+        olp.setDialogInfo((JDialog) getParent());
         olp.setData(lis, false); // don't show the type
 
         contentP.removeAll();
@@ -104,7 +100,7 @@ public class ArrayInspector extends JDialog {
 
         sizeTF.setText("" + lis.size());
         pack();
-        this.setLocationRelativeTo(locationComp);
+        setLocationRelativeTo(getParent());
 
         // Something going on....the array size textfield doesn't become active again until we do this...
         olp.requestFocus();
@@ -115,7 +111,7 @@ public class ArrayInspector extends JDialog {
 
     public void setType(String typ) {
         myArrTyp = typ;
-        Class c = VStatics.classForName(typ);
+        Class<?> c = VStatics.classForName(typ);
         myTyp = VStatics.convertClassName(c.getComponentType().getName());
         typeTF.setText(typ);
     }

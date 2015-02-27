@@ -65,38 +65,38 @@ public class TextAreaDialog extends JDialog
   public StringBuffer param;
   private static String title = "";
 
-  public static boolean showDialog(Window owner, Component comp, StringBuffer parm)
+  public static boolean showDialog(Window owner, StringBuffer parm)
   {
     if (owner instanceof JFrame)
-      dialog = new TextAreaDialog((JFrame) owner, comp, parm);
+      dialog = new TextAreaDialog((JFrame) owner, parm);
     else
-      dialog = new TextAreaDialog((JDialog) owner, comp, parm);
+      dialog = new TextAreaDialog((JDialog) owner, parm);
 
     dialog.setVisible(true);
     // above call blocks
     return modified;
   }
 
-  public static boolean showTitledDialog(String titl, Window owner, Component comp, StringBuffer parm)
+  public static boolean showTitledDialog(String titl, Window owner, StringBuffer parm)
   {
     if (dialog != null)
       dialog.setTitle(titl);
 
     title = titl;
-    return showDialog(owner, comp, parm);
+    return showDialog(owner, parm);
   }
 
-  private TextAreaDialog(JDialog owner, Component comp, StringBuffer param)
+  private TextAreaDialog(JDialog owner, StringBuffer param)
   {
     super(owner, title, true);
-    common(comp,param);
+    common(owner,param);
   }
-  private TextAreaDialog(JFrame owner, Component comp, StringBuffer param)
+  private TextAreaDialog(JFrame owner, StringBuffer param)
   {
     super(owner, title, true);
-    common(comp,param);
+    common(owner,param);
   }
-  private void common(Component comp,StringBuffer param)
+  private void common(Component comp, StringBuffer param)
   {
     this.param = param;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -124,22 +124,14 @@ public class TextAreaDialog extends JDialog
     buttPan.add(okButt);
     cont.add(buttPan);
 
-    fillWidgets();     // put the data into the widgets
-
-    modified = (param == null);     // if it's a new myEA, they can always accept defaults with no typing
-    okButt.setEnabled((param == null));
-
-    getRootPane().setDefaultButton(canButt);
-
-    pack();     // do this prior to next
-    this.setLocationRelativeTo(comp);
-
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener();
     this.commentArea.addCaretListener(lis);
+
+    setParams(comp, param);
   }
 
   public void setParams(Component c, StringBuffer p)
@@ -152,8 +144,8 @@ public class TextAreaDialog extends JDialog
     okButt.setEnabled((p.length() == 0));
 
     getRootPane().setDefaultButton(canButt);
-
-    this.setLocationRelativeTo(c);
+    pack();
+    setLocationRelativeTo(c);
   }
 
   private void fillWidgets()

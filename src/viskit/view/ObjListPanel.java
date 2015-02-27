@@ -2,7 +2,6 @@ package viskit.view;
 
 import edu.nps.util.SpringUtilities;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
@@ -53,7 +52,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         this.changeListener = changeListener;
     }
 
-    public void setDialogInfo(JDialog parent, Component locComp) {
+    public void setDialogInfo(JDialog parent) {
         this.parent = parent;
     }
 
@@ -186,7 +185,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         //vinst = new VInstantiator.Constr(params[0],vinst.getType()); // ???
         Class<?> c = VStatics.classForName(vinst.getType());
         if (c.isArray()) {
-            ArrayInspector ai = new ArrayInspector(parent, this);   // "this" could be locComp
+            ArrayInspector ai = new ArrayInspector(parent);   // "this" could be locComp
             ai.setType(vinst.getType());
             ai.setData(((VInstantiator.Array) vinst).getInstantiators());
 
@@ -199,7 +198,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 }
             }
         } else {
-            ObjectInspector oi = new ObjectInspector(parent, this);     // "this" could be locComp
+            ObjectInspector oi = new ObjectInspector(parent);     // "this" could be locComp
             oi.setType(vinst.getType());
             // use default constructor if exists
             Class<?> clazz = VStatics.classForName(vinst.getType());

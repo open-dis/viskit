@@ -36,7 +36,7 @@ public class XTree extends JTree {
     XMLOutputter xmlOut;
     Document doc = null;
 
-    public void setFile(File xmlF) throws Exception {
+    public final void setFile(File xmlF) throws Exception {
         SAXBuilder builder;
         Format form;
         try {
@@ -46,10 +46,8 @@ public class XTree extends JTree {
             form = Format.getPrettyFormat();
             xmlOut.setFormat(form);
         } catch (JDOMException | IOException e) {
-            builder = null;
             doc = null;
             xmlOut = null;
-            form = null;
 
             throw new Exception("Error parsing or finding file " + xmlF.getAbsolutePath());
         }
@@ -292,7 +290,6 @@ public class XTree extends JTree {
                 f.setLocation(300, 300);
                 f.setVisible(true);
 
-
             // xt.setFile(fil);
 
             }
@@ -365,7 +362,7 @@ class XTreePanel extends JPanel {
         });
     }
 
-    String getElementText(DefaultMutableTreeNode dmt) {
+    final String getElementText(DefaultMutableTreeNode dmt) {
         Object o = dmt.getUserObject();
         if (o instanceof XTree.nElement) {
             Element elm = ((XTree.nElement) o).elem;

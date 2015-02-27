@@ -45,7 +45,7 @@ public class ConstructorPanel extends JPanel {
         add(Box.createVerticalGlue());
 
         olp = new ObjListPanel(modLis); // may have to intercept
-        olp.setDialogInfo(parent, parent);
+        olp.setDialogInfo(parent);
         olp.setData(args, true);
         if (args.size() > 0) {
             add(olp);

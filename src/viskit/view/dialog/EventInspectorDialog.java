@@ -245,12 +245,12 @@ public class EventInspectorDialog extends JDialog {
         transitions.addMinusListener(myChangeListener);
         transitions.addDoubleClickedListener(new MouseAdapter() {
 
-            // EventTransitionDialog: State transition
+            // EventStateTransitionDialog: State transition
             // bug fix 1183
             @Override
             public void mouseClicked(MouseEvent e) {
                 EventStateTransition est = (EventStateTransition) e.getSource();
-                boolean modified = EventTransitionDialog.showDialog(
+                boolean modified = EventStateTransitionDialog.showDialog(
                         (JFrame) locationComponent,
                         est,
                         arguments,
@@ -276,7 +276,7 @@ public class EventInspectorDialog extends JDialog {
         if (getWidth() < 350) {
             setSize(350, getHeight());
         }
-        this.setLocationRelativeTo(locationComponent);
+        setLocationRelativeTo(locationComponent);
     }
 
     public void setParams(Component c, EventNode en) {
@@ -544,7 +544,7 @@ public class EventInspectorDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             StringBuffer sb = new StringBuffer(EventInspectorDialog.this.description.getText().trim());
-            boolean modded = TextAreaDialog.showTitledDialog("Event Description", EventInspectorDialog.this,
+            boolean modded = TextAreaDialog.showTitledDialog("Event Description",
                     EventInspectorDialog.this, sb);
             if (modded) {
                 EventInspectorDialog.this.description.setText(sb.toString().trim());

@@ -143,9 +143,9 @@ public class CodeBlockPanel extends JPanel {
             StringBuffer sb = new StringBuffer(jtc.getText().trim());
             boolean modded;
             if (owner instanceof JDialog) {
-                modded = TextAreaDialog.showTitledDialog(title, owner, owner, sb);
+                modded = TextAreaDialog.showTitledDialog(title, owner, sb);
             } else {
-                modded = TextAreaDialog.showTitledDialog(title, owner, owner, sb);
+                modded = TextAreaDialog.showTitledDialog(title, owner, sb);
             }
             if (modded) {
                 jtc.setText(sb.toString().trim());

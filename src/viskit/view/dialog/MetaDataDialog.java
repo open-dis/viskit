@@ -26,7 +26,6 @@ abstract public class MetaDataDialog extends JDialog {
     protected JComponent runtimePanel;
     private JButton canButt;
     private JButton okButt;
-    Component locationComp;
     GraphMetaData param;
     JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
@@ -40,7 +39,6 @@ abstract public class MetaDataDialog extends JDialog {
     public MetaDataDialog(JFrame f, GraphMetaData gmd, String title) {
         super(f, title, true);
         this.param = gmd;
-        this.locationComp = f;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -150,24 +148,22 @@ abstract public class MetaDataDialog extends JDialog {
         buttPan.add(canButt);
         buttPan.add(okButt);
         c.add(buttPan);
-        fillWidgets();
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(locationComp);
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
+
+        setParams(f, gmd);
     }
 
-    public void setParams(Component c, GraphMetaData gmd) {
+    public final void setParams(Component c, GraphMetaData gmd) {
         param = gmd;
-        locationComp = c;
 
         fillWidgets();
 
         modified = (gmd == null);
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {

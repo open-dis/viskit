@@ -33,7 +33,6 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private static SimEventListenerConnectionInspectorDialog dialog;
   private static boolean modified = false;
   private SimEvListenerEdge simEvEdge;
-  private Component locationComp;
   private JButton  okButt, canButt;
 
   private JPanel  buttPan;
@@ -41,23 +40,22 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   public static String xnewProperty;
   public static String newTarget,newTargetEvent,newSource,newSourceEvent;
 
-  public static boolean showDialog(JFrame f, Component comp, SimEvListenerEdge parm)
+  public static boolean showDialog(JFrame f, SimEvListenerEdge parm)
   {
     if (dialog == null)
-      dialog = new SimEventListenerConnectionInspectorDialog(f, comp, parm);
+      dialog = new SimEventListenerConnectionInspectorDialog(f, parm);
     else
-      dialog.setParams(comp, parm);
+      dialog.setParams(f, parm);
 
     dialog.setVisible(true);
     // above call blocks
     return modified;
   }
 
-  private SimEventListenerConnectionInspectorDialog(JFrame parent, Component comp, SimEvListenerEdge ed)
+  private SimEventListenerConnectionInspectorDialog(JFrame parent, SimEvListenerEdge ed)
   {
     super(parent, "SimEvent Listener Connection", true);
     simEvEdge = ed;
-    this.locationComp = comp;
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     this.addWindowListener(new myCloseListener());
 
@@ -84,26 +82,18 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     buttPan.add(okButt);
     buttPan.add(Box.createHorizontalStrut(5));
 
-    fillWidgets();     // put the data into the widgets
-
-    modified = (ed == null);     // if it's a new pclNode, they can always accept defaults with no typing
-    okButt.setEnabled((ed == null));
-
-    getRootPane().setDefaultButton(canButt);
-
-    pack();     // do this prior to next
-
     // Make the first display a minimum of 400 width
     Dimension d = getSize();
     d.width = Math.max(d.width,400);
     setSize(d);
 
-    this.setLocationRelativeTo(locationComp);
-
     // attach listeners
     canButt.addActionListener(new cancelButtonListener());
     okButt.addActionListener(new applyButtonListener());
+
+    setParams(parent, ed);
   }
+
   private void pairWidgets(JLabel lab, JComponent tf, boolean edit)
   {
     VStatics.clampHeight(tf);
@@ -114,10 +104,10 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
         ((JTextField)tf).addCaretListener(lis);
     }
   }
-  public void setParams(Component c, SimEvListenerEdge ae)
+
+  public final void setParams(Component c, SimEvListenerEdge ae)
   {
     simEvEdge = ae;
-    locationComp = c;
 
     fillWidgets();
 
@@ -125,9 +115,10 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     okButt.setEnabled((ae == null));
 
     getRootPane().setDefaultButton(canButt);
-
-    this.setLocationRelativeTo(c);
+    pack();
+    setLocationRelativeTo(c);
   }
+
   private void fillWidgets()
   {
     if(simEvEdge != null) {
@@ -222,5 +213,3 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     }
   }
 }
-
-

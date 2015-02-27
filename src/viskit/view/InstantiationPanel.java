@@ -545,7 +545,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 olp = new ObjListPanel(ip);
                 olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                         "Method arguments", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
-                olp.setDialogInfo(packMe, packMe);
+                olp.setDialogInfo(packMe);
                 olp.setData(vc, true);
                 add(olp);
 
@@ -596,7 +596,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             olp = new ObjListPanel(ip);
             olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Method arguments", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
-            olp.setDialogInfo(packMe, packMe);
+            olp.setDialogInfo(packMe);
 
             olp.setData(vi.getParams(), true);
             add(olp);

@@ -21,16 +21,14 @@ import viskit.view.InstantiationPanel;
 public class ObjectInspector extends JDialog implements ActionListener
 {
   public boolean modified = false;
-  private JComponent locationComp;
   private JButton canButt,okButt;
   private JPanel buttPan,contentP;
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 
-  public ObjectInspector(JDialog parent, JComponent comp)
+  public ObjectInspector(JDialog parent)
   {
     super(parent,"Object Inspector",true);
-    locationComp = comp;
     contentP = new JPanel();
     contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
     contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
@@ -64,7 +62,7 @@ public class ObjectInspector extends JDialog implements ActionListener
     contentP.add(buttPan);
 
     pack();     // do this prior to next
-    this.setLocationRelativeTo(locationComp);
+    setLocationRelativeTo(getParent());
   }
 
   @Override

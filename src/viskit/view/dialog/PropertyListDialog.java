@@ -33,17 +33,16 @@ public class PropertyListDialog extends JDialog {
     private static PropertyListDialog dialog;
     private static int selection = -1;
     private String[][] pnamesTypes;
-    private Component locationComp;
     private JButton okButt,  canButt;
     private JTable table;
     private JPanel buttPan;
     public static String newProperty;
 
-    public static int showDialog(Dialog f, Component comp, String title, String[][] namesTypes) {
+    public static int showDialog(Dialog f, String title, String[][] namesTypes) {
         if (dialog == null) {
-            dialog = new PropertyListDialog(f, comp, title, namesTypes);
+            dialog = new PropertyListDialog(f, title, namesTypes);
         } else {
-            dialog.setParams(comp, namesTypes);
+            dialog.setParams(f, namesTypes);
         }
 
         dialog.setVisible(true);
@@ -51,10 +50,9 @@ public class PropertyListDialog extends JDialog {
         return selection;
     }
 
-    private PropertyListDialog(Dialog parent, Component comp, String title, String[][] namesTypes) {
+    private PropertyListDialog(Dialog parent, String title, String[][] namesTypes) {
         super(parent, title, true);
         this.pnamesTypes = namesTypes;
-        this.locationComp = comp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -71,27 +69,15 @@ public class PropertyListDialog extends JDialog {
         buttPan.add(okButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
-        fillWidgets();     // put the data into the widgets
-
-        if (pnamesTypes != null) {
-            selection = 0;
-        }    // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled(pnamesTypes == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
+
+        setParams(parent, namesTypes);
     }
 
-    public void setParams(Component c, String[][] namesTypes) {
+    public final void setParams(Component c, String[][] namesTypes) {
         pnamesTypes = namesTypes;
-        locationComp = c;
 
         fillWidgets();
 
@@ -101,8 +87,8 @@ public class PropertyListDialog extends JDialog {
         okButt.setEnabled(pnamesTypes == null);
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     String[] colNames = {"property name", "property type"};

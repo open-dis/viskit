@@ -859,12 +859,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     @Override
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
         JFrame frame = VGlobals.instance().getMainAppWindow();
-        return EventGraphNodeInspectorDialog.showDialog(frame, frame, evNode);
+        return EventGraphNodeInspectorDialog.showDialog(frame, evNode);
     }
 
     @Override
     public boolean doEditPclNode(PropChangeListenerNode pclNode) {
-        return PclNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), pclNode); // blocks
+        return PclNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), pclNode); // blocks
     }
 
     @Override
@@ -879,7 +879,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
-        return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), seEdge);
+        return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), seEdge);
     }
 
     private Object getLeafUO(JTree tree) {
@@ -975,7 +975,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), VGlobals.instance().getMainAppWindow(), lis);
+        String fn = RecentFilesDialog.showDialog(this, lis);
         if (fn != null) {
             File f = new File(fn);
             if (f.exists()) {
@@ -1077,7 +1077,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
      *
      * @param file to candidate EG file
      */
-    private void deleteCanceledSave(File file) {
+    public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
                 if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {

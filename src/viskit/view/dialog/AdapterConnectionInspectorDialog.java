@@ -162,25 +162,16 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         buttPan.add(okButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
-        fillWidgets();     // put the data into the widgets
-
-        modified = (ed == null);     // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled((ed == null));
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-
         // Make the first display a minimum of 400 width
         Dimension d = getSize();
         d.width = Math.max(d.width, 400);
         setSize(d);
 
-        this.setLocationRelativeTo(parent);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
+
+        setParams(parent, ed);
     }
 
     private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
@@ -194,7 +185,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         }
     }
 
-    public void setParams(Component c, AdapterEdge ae) {
+    public final void setParams(Component c, AdapterEdge ae) {
         adapterEdge = ae;
 
         fillWidgets();
@@ -203,8 +194,8 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         okButt.setEnabled((ae == null));
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {
@@ -354,8 +345,9 @@ public class AdapterConnectionInspectorDialog extends JDialog {
                 return;
             }
             String[] sa = new String[evsv.size()];
-            int which = EventListDialog.showDialog(AdapterConnectionInspectorDialog.this, AdapterConnectionInspectorDialog.this,
-                    classname + " Events", toArray(evsv, sa));
+            int which = EventListDialog.showDialog(AdapterConnectionInspectorDialog.this,
+                    classname + " Events",
+                    toArray(evsv, sa));
             if (which != -1) {
                 modified = true;
                 selection.setText(evsv.get(which));

@@ -29,13 +29,13 @@ import viskit.view.LocalVariablesPanel;
  * @author DMcG, Mike Bailey
  * @version $Id$
  */
-public class EventTransitionDialog extends JDialog {
+public class EventStateTransitionDialog extends JDialog {
 
     private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
     private JComboBox<String> localVarsCB;
     private JRadioButton assTo, opOn;
-    private static EventTransitionDialog dialog;
+    private static EventStateTransitionDialog dialog;
     private static boolean modified = false;
     private EventStateTransition param;
     private JButton okButt, canButt;
@@ -51,7 +51,7 @@ public class EventTransitionDialog extends JDialog {
 
     public static boolean showDialog(JFrame f, EventStateTransition est, ArgumentsPanel ap, LocalVariablesPanel lvp) {
         if (dialog == null) {
-            dialog = new EventTransitionDialog(f, est, ap, lvp);
+            dialog = new EventStateTransitionDialog(f, est, ap, lvp);
         } else {
             dialog.setParams(f, est);
         }
@@ -61,7 +61,7 @@ public class EventTransitionDialog extends JDialog {
         return modified;
     }
 
-    private EventTransitionDialog(JFrame parent, EventStateTransition param, ArgumentsPanel ap, LocalVariablesPanel lvp) {
+    private EventStateTransitionDialog(JFrame parent, EventStateTransition param, ArgumentsPanel ap, LocalVariablesPanel lvp) {
 
         super(parent, "State Transition", true);
         argPanel = ap;
@@ -472,8 +472,7 @@ public class EventTransitionDialog extends JDialog {
                 String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
                 if (VGlobals.instance().isArray(typ)) {
                     if (arrayIndexField.getText().trim().isEmpty()) {
-                        int ret = JOptionPane.showConfirmDialog(
-                                EventTransitionDialog.this,
+                        int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
                                 "Using a state variable which is an array" +
                                 "\nrequires an indexing expression.\nIgnore and continue?",
                                 "Warning",
@@ -486,8 +485,7 @@ public class EventTransitionDialog extends JDialog {
                 }
                 // check for null action
                 if (actionField.getText().trim().isEmpty()) {
-                    int ret = JOptionPane.showConfirmDialog(
-                            EventTransitionDialog.this,
+                    int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
                             "No transition (action) has been entered." +
                             "\nIgnore and continue?",
                             "Warning",
@@ -550,7 +548,7 @@ public class EventTransitionDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(EventTransitionDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButt.doClick();

@@ -33,17 +33,16 @@ public class EventListDialog extends JDialog {
     private static EventListDialog dialog;
     private static int selection = -1;
     private String[] names;
-    private Component locationComp;
     private JButton okButt,  canButt;
     private JList<String> list;
     private JPanel buttPan;
     public static String newName;
 
-    public static int showDialog(Dialog f, Component comp, String title, String[] names) {
+    public static int showDialog(Dialog f, String title, String[] names) {
         if (dialog == null) {
-            dialog = new EventListDialog(f, comp, title, names);
+            dialog = new EventListDialog(f, title, names);
         } else {
-            dialog.setParams(comp, names);
+            dialog.setParams(f, names);
         }
 
         dialog.setVisible(true);
@@ -51,10 +50,9 @@ public class EventListDialog extends JDialog {
         return selection;
     }
 
-    private EventListDialog(Dialog parent, Component comp, String title, String[] namesTypes) {
+    private EventListDialog(Dialog parent, String title, String[] names) {
         super(parent, title, true);
-        this.names = namesTypes;
-        this.locationComp = comp;
+        this.names = names;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -71,27 +69,15 @@ public class EventListDialog extends JDialog {
         buttPan.add(okButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
-        fillWidgets();     // put the data into the widgets
-
-        if (names != null) {
-            selection = 0;
-        }    // if it's a new pclNode, they can always accept defaults with no typing
-        okButt.setEnabled(names == null);
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-
-        this.setLocationRelativeTo(locationComp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
+
+        setParams(parent, names);
     }
 
-    public void setParams(Component c, String[] names) {
+    public final void setParams(Component c, String[] names) {
         this.names = names;
-        locationComp = c;
 
         fillWidgets();
 
@@ -101,8 +87,8 @@ public class EventListDialog extends JDialog {
         okButt.setEnabled(names == null);
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     String[] colNames = {"property name", "property type"};

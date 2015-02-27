@@ -37,7 +37,6 @@ import viskit.mvc.mvcRecentFileListener;
 import viskit.util.EventGraphFileFilter;
 import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
-import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
 
@@ -1177,27 +1176,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * @param file to candidate EG file
      */
     private void deleteCanceledSave(File file) {
-        if (file.exists()) {
-            if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
-                    deleteCanceledSave(file.getParentFile());
-                }
-            }
-        }
+        VGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        String fn = RecentFilesDialog.showDialog(VGlobals.instance().getMainAppWindow(), this, lis);
-        if (fn != null) {
-            File f = new File(fn);
-            if (f.exists()) {
-                return f;
-            } else {
-                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
-            }
-        }
-        return null;
+        return VGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
     }
 
     @Override

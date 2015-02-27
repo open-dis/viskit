@@ -32,18 +32,18 @@ public class EdgeParameterDialog extends JDialog {
     private JButton okButt,  canButt;
     public static String newValue;
 
-    public static boolean showDialog(JDialog d, Component comp, vEdgeParameter parm) {
+    public static boolean showDialog(JDialog d, vEdgeParameter parm) {
         if (dialog == null) {
-            dialog = new EdgeParameterDialog(d, comp, parm);
+            dialog = new EdgeParameterDialog(d, parm);
         } else {
-            dialog.setParams(comp, parm);
+            dialog.setParams(d, parm);
         }
         dialog.setVisible(true);
         // above call blocks
         return modified;
     }
 
-    private EdgeParameterDialog(JDialog parent, Component comp, vEdgeParameter param) {
+    private EdgeParameterDialog(JDialog parent, vEdgeParameter param) {
         super(parent, "Edge Parameter", true);
         this.param = param;
         this.type = param.bogus != null ? param.bogus : "";
@@ -86,22 +86,14 @@ public class EdgeParameterDialog extends JDialog {
         con.add(Box.createVerticalGlue());           // takes up space when dialog is expanded vertically
         cont.add(con);
 
-        fillWidgets();                               // put the data into the widgets
-
-        modified = (param == null);                  // if it's a new param, they can always accept defaults with no typing
-        okButt.setEnabled((param == null));
-
-        getRootPane().setDefaultButton(canButt);
-
-        pack();     // do this prior to next
-        this.setLocationRelativeTo(comp);
-
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         this.valueField.addCaretListener(lis);
+
+        setParams(parent, param);
     }
 
     private int maxWidth(JComponent[] c) {
@@ -121,7 +113,7 @@ public class EdgeParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public void setParams(Component c, vEdgeParameter p) {
+    public final void setParams(Component c, vEdgeParameter p) {
         param = p;
         type = p.bogus != null ? p.bogus : "";
 
@@ -131,8 +123,8 @@ public class EdgeParameterDialog extends JDialog {
         okButt.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
-
-        this.setLocationRelativeTo(c);
+        pack();
+        setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {
