@@ -605,14 +605,13 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(runBlock);
         List<LocalVariable> liLocalV = run.getLocalVariable();
+        List<StateTransition> liStateT = run.getStateTransition();
 
         pw.println(SP_4 + "@Override");
         pw.println(SP_4 + "public void reset() " + OB);
         pw.println(SP_8 + "super.reset()" + SC);
 
-        List<StateTransition> liStateT = run.getStateTransition();
-
-        if (!liStateT.isEmpty()) {
+        if (!liLocalV.isEmpty()) {
             pw.println();
             pw.println(SP_8 + "/* local variable decarlations */");
         }
