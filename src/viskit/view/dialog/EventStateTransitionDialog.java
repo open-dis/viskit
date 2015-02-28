@@ -125,12 +125,12 @@ public class EventStateTransitionDialog extends JDialog {
 
         fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab, w, localAssignmentField, new JLabel("=")));
 
         JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
         divider.setBackground(Color.blue.brighter());
 
         fieldsPanel.add(divider);
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab, w, localAssignmentField, new JLabel("=")));
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
         fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
@@ -216,7 +216,6 @@ public class EventStateTransitionDialog extends JDialog {
 //                String lv = (String) cb.getSelectedItem();
                 okButt.setEnabled(true);
                 modified = true;
-                pack();
             }
         });
 
@@ -262,7 +261,7 @@ public class EventStateTransitionDialog extends JDialog {
             types = argPanel.getData();
         }
 
-        // Last chance to pull if from a quickly declare local variable
+        // Last chance to pull if from a quickly declared local variable
         // NOTE: Not ready for this, but good intention here
 //        if (types.isEmpty()) {
 //            String[] typs = localAssignmentField.getText().split(" ");
@@ -383,6 +382,7 @@ public class EventStateTransitionDialog extends JDialog {
     private void setLocalVariableComboBox(EventStateTransition est) {
         localVarsCB.setModel(resolveLocalMethodCalls());
         localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
+        pack();
 
         // Check for any local variables first
         if (localVarsCB.getItemCount() <= 0) {return;}
@@ -428,9 +428,10 @@ public class EventStateTransitionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             localAssignmentField.setText("");
+            arrayIndexField.setText("");
             actionField.setText("");
-            VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
             localInvocationField.setText("");
+            VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
             dispose();
         }
     }
@@ -509,6 +510,7 @@ public class EventStateTransitionDialog extends JDialog {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
+            pack();
         }
 
         @Override

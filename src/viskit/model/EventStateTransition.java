@@ -44,12 +44,15 @@ public class EventStateTransition extends ViskitElement {
             handleArrayIndexing(sb);
         }
 
-        if (isOperation) {
-            sb.append('.');
-        } else {
-            sb.append('=');
+        // Prevent a "=" from being appended if empty
+        if (operationOrAssignment != null && !operationOrAssignment.isEmpty()) {
+            if (isOperation) {
+                sb.append('.');
+            } else {
+                sb.append('=');
+            }
+            sb.append(operationOrAssignment);
         }
-        sb.append(operationOrAssignment);
 
         if (localVariableInvocation != null && !localVariableInvocation.isEmpty()) {
             sb.append('\n');

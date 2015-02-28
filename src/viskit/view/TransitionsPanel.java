@@ -223,7 +223,8 @@ public class TransitionsPanel extends JPanel {
                 myMouseLis.mouseClicked(me);
 
                 // If they cancelled, kill it
-                if ("double click to edit".equals(model.get(model.getSize() - 1))) {  // remove it
+                String result = model.get(model.getSize() - 1);
+                if ("double click to edit".equals(result) || result.isEmpty()) {  // remove it
                     ActionEvent ae = new ActionEvent(minusButt, 0, "delete");  // dummy
                     minusButt.getActionListeners()[0].actionPerformed(ae);
                 }

@@ -33,7 +33,6 @@ import viskit.view.TransitionsPanel;
 public class EventInspectorDialog extends JDialog {
 
     private static EventInspectorDialog dialog;
-    private Component locationComponent;
     private EventNode node;
     private static boolean modified = false;
     private JTextField name;
@@ -71,10 +70,9 @@ public class EventInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventInspectorDialog(JFrame frame, EventNode node) {
+    private EventInspectorDialog(final JFrame frame, EventNode node) {
         super(frame, "Event Inspector: " + node.getName(), true);
         this.node = node;
-        this.locationComponent = frame;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -183,9 +181,6 @@ public class EventInspectorDialog extends JDialog {
 
         panel.add(twoRowButtonPanel);
 
-        fillWidgets();     // put the data into the widgets
-        sizeAndPosition();
-
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
@@ -212,9 +207,7 @@ public class EventInspectorDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 EventArgument ea = (EventArgument) e.getSource();
-                boolean modified = EventArgumentDialog.showDialog(
-                        (JFrame) locationComponent,
-                        ea);
+                boolean modified = EventArgumentDialog.showDialog(frame, ea);
                 if (modified) {
                     arguments.updateRow(ea);
                     setModified(modified);
@@ -231,9 +224,7 @@ public class EventInspectorDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 EventLocalVariable elv = (EventLocalVariable) e.getSource();
-                boolean modified = LocalVariableDialog.showDialog(
-                        (JFrame) locationComponent,
-                        elv);
+                boolean modified = LocalVariableDialog.showDialog(frame, elv);
                 if (modified) {
                     localVariables.updateRow(elv);
                     setModified(modified);
@@ -250,8 +241,11 @@ public class EventInspectorDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 EventStateTransition est = (EventStateTransition) e.getSource();
+
+                // modified comes back true even if a caret was placed in a
+                // text box
                 boolean modified = EventStateTransitionDialog.showDialog(
-                        (JFrame) locationComponent,
+                        frame,
                         est,
                         arguments,
                         localVariables);
@@ -261,6 +255,8 @@ public class EventInspectorDialog extends JDialog {
                 }
             }
         });
+
+        setParams(frame, node);
     }
 
     private void setModified(boolean f) {
@@ -268,7 +264,7 @@ public class EventInspectorDialog extends JDialog {
         modified = f;
     }
 
-    private void sizeAndPosition() {
+    private void sizeAndPosition(Component c) {
         pack();     // do this prior to next
 
         // little check to add some extra space to always include the node name
@@ -276,15 +272,14 @@ public class EventInspectorDialog extends JDialog {
         if (getWidth() < 350) {
             setSize(350, getHeight());
         }
-        setLocationRelativeTo(locationComponent);
+        setLocationRelativeTo(c);
     }
 
-    public void setParams(Component c, EventNode en) {
+    public final void setParams(Component c, EventNode en) {
         node = en;
-        locationComponent = c;
 
         fillWidgets();
-        sizeAndPosition();
+        sizeAndPosition(c);
     }
 
     private void fillWidgets() {
