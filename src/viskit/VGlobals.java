@@ -43,7 +43,7 @@ import viskit.view.EventGraphViewFrame;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
-import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SysExitHandler;
 import java.awt.Component;
@@ -438,7 +438,7 @@ public class VGlobals {
                 type = eventLocalVariable.getType();
                 name = eventLocalVariable.getName();
                 if (isArray(type)) {
-                    result = handleNameType(name, eventLocalVariable.getArrayType());
+                    result = handleNameType(name, stripArraySize(type));
                 } else {
                     result = handleNameType(name, type);
                 }
@@ -468,7 +468,7 @@ public class VGlobals {
             type = stateVariable.getType();
             name = stateVariable.getName();
             if (isArray(type)) {
-                result = handleNameType(name, stateVariable.getArrayType());
+                result = handleNameType(name, stripArraySize(type));
             } else {
                 result = handleNameType(name, type);
             }
@@ -487,7 +487,7 @@ public class VGlobals {
             type = par.getType();
             name = par.getName();
             if (isArray(type)) {
-                result = handleNameType(name, par.getArrayType());
+                result = handleNameType(name, stripArraySize(type));
             } else {
                 result = handleNameType(name, type);
             }
@@ -775,10 +775,10 @@ public class VGlobals {
             String g = m.group();
             v.add(g.substring(1, g.length() - 1).trim());
         }
-        if (v.size() <= 0) {
+        if (v.isEmpty()) {
             return null;
         }
-        return toArray(v, new String[0]);
+        return GenericConversion.toArray(v, new String[0]);
     }
 
     /**

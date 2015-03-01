@@ -58,8 +58,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        vEdgeParameter ea = new vEdgeParameter("value");
-        return ea;
+        return new vEdgeParameter("value");
     }
 
     @Override

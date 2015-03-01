@@ -418,22 +418,28 @@ public abstract class ViskitTablePanel extends JPanel {
                 case "p":
                     if (myPlusLis != null) {
                         myPlusLis.actionPerformed(event);
-                    }   if (shouldDoAddsAndDeletes) {
+                    }
+                    if (shouldDoAddsAndDeletes) {
                         addRow();
-                    }   break;
+                    }
+                    break;
                 case "m":
                     int reti = JOptionPane.showConfirmDialog(ViskitTablePanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
                     if (reti != JOptionPane.YES_OPTION) {
                         return;
-                    }   if (myMinusLis != null) {
+                    }
+                    if (myMinusLis != null) {
                         event.setSource(shadow.get(tab.getSelectedRow()));
                         myMinusLis.actionPerformed(event);
-                    }   // Begin T/S for Bug 1373.  This process should remove edge
+                    }
+
+                    // Begin T/S for Bug 1373.  This process should remove edge
                     // parameters not only from the preceding EdgeInspectorDialog,
                     // but also from the EG XML representation
                     if (shouldDoAddsAndDeletes) {
                         removeRow(tab.getSelectedRow());
-                    }   break;
+                    }
+                    break;
                 default:
                     doEdit();
                     break;

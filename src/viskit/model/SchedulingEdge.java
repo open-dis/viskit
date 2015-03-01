@@ -53,7 +53,6 @@ public class SchedulingEdge extends Edge {
     private String name;
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String value;
@@ -107,11 +106,6 @@ public class SchedulingEdge extends Edge {
     @Override
     public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override

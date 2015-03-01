@@ -35,6 +35,13 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Further improvements to the state transitions panel in that when we wish to
+  invoke methods on state variables, a combo box of choices is presented.  If a
+  method requires a parameter, the parameter is typed into the action field
+
+  Fixed issue where canceling a local variable method call in the state
+  transition dialog did not initiate an auto row delete
+
   Improvements to the state transitions panel in that we can now invoke void
   return type, zero parameter method calls as part of a state transition.  This
   is accomplished by declaring a local variable within an EventNode, or by using

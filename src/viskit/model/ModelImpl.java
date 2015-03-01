@@ -1043,7 +1043,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         if (args.size() > 0) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new vEdgeParameter(""));
+                edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
             se.parameters = edgeParameters;
         }
@@ -1077,7 +1077,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         if (args.size() > 0) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new vEdgeParameter(""));
+                edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
             ce.parameters = edgeParameters;
         }

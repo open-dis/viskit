@@ -16,7 +16,6 @@ public class EventStateTransition extends ViskitElement {
     private List<String> descriptionArray = new ArrayList<>();
     private String type;
     private String name;
-    private String arrayType;
     private String stateVarName = "";
     private String stateVarType = "";
     private String operationOrAssignment = "";
@@ -151,11 +150,6 @@ public class EventStateTransition extends ViskitElement {
     @Override
     public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override

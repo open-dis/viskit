@@ -327,6 +327,7 @@ public class EventInspectorDialog extends JDialog {
 
             // Bug 1373: This is how we will now sync up any SchedulingEdge
             // parameters with corresponding EventNode parameters
+            
             // TODO: Recheck bug and verify this isn't don't elsewhere.  W/O
             // the continue statement, it nukes edge values that were already
             // there if we modify a node
@@ -354,7 +355,7 @@ public class EventInspectorDialog extends JDialog {
                             // The user will be able to change any values from
                             // the EdgeInspectorDialog.  Right now, values are
                             // defaulted to zeros.
-                            ((SchedulingEdge) ve).parameters.add(new vEdgeParameter("0"));
+                            ((SchedulingEdge) ve).parameters.add(new vEdgeParameter(v.getValue()));
                         }
                     }
                 }

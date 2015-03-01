@@ -19,9 +19,6 @@ public class vStateVariable extends ViskitElement {
     /** The variable type. This can be a primitive or a class name. */
     private String variableType;
 
-    /** The above field holds the size within the brackets **/
-    private String arrayVariableType;
-
     /** array size, for (multi-dim) array */
     private String[] arraySize;
 
@@ -75,13 +72,7 @@ public class vStateVariable extends ViskitElement {
     @Override
     public final void setType(String pVariableType) {
         variableType = pVariableType;
-        arrayVariableType = VGlobals.instance().stripArraySize(pVariableType);
         arraySize = VGlobals.instance().getArraySize(pVariableType);
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayVariableType;
     }
 
     public String[] getArraySize() {

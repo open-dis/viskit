@@ -198,8 +198,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 }
             }
         } else {
-            ObjectInspector oi = new ObjectInspector(parent);     // "this" could be locComp
+            ObjectInspector oi = new ObjectInspector(parent);
             oi.setType(vinst.getType());
+
             // use default constructor if exists
             Class<?> clazz = VStatics.classForName(vinst.getType());
             if (clazz != null) {

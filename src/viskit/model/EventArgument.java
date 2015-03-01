@@ -20,7 +20,6 @@ public class EventArgument extends ViskitElement {
     private String value;
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String comment;
@@ -62,12 +61,7 @@ public class EventArgument extends ViskitElement {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
-    }
-
+    
     @Override
     public String getIndexingExpression() {
         return indexingExpression;

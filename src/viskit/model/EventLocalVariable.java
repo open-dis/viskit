@@ -17,7 +17,6 @@ public class EventLocalVariable extends ViskitElement {
     private String name;
     private String value;
     private String comment = "";
-    private String arrayType;
     private String[] arraySize;
     private List<String> descriptionArray = new ArrayList<>();
     private String indexingExpression;
@@ -68,13 +67,7 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public final void setType(String pType) {
         type = pType;
-        arrayType = VGlobals.instance().stripArraySize(pType);
         arraySize = VGlobals.instance().getArraySize(pType);
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     public String[] getArraySize() {

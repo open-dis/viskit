@@ -18,7 +18,6 @@ public class ConstructorArgument extends ViskitElement {
     private String name;
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String type;
@@ -71,11 +70,6 @@ public class ConstructorArgument extends ViskitElement {
     @Override
     public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override

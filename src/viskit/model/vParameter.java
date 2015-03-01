@@ -18,7 +18,6 @@ public class vParameter extends ViskitElement {
     private String type;
     private String value = "";
     private String comment = "";
-    private String arrayType;
     private String[] arraySize;
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
@@ -75,13 +74,7 @@ public class vParameter extends ViskitElement {
     @Override
     public final void setType(String pType) {
         type = pType;
-        arrayType = VGlobals.instance().stripArraySize(pType);
         arraySize = VGlobals.instance().getArraySize(pType);
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     public String[] getArraySize() {

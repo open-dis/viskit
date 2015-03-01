@@ -20,7 +20,6 @@ public class vEdgeParameter extends ViskitElement {
     private String value;
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String comment;
@@ -66,11 +65,6 @@ public class vEdgeParameter extends ViskitElement {
     @Override
     public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override

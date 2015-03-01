@@ -22,7 +22,6 @@ public class AdapterEdge extends AssemblyEdge {
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String value;
@@ -77,11 +76,6 @@ public class AdapterEdge extends AssemblyEdge {
     @Override
     public void setDescriptionArray(List<String> descriptionArray) {
         this.descriptionArray = descriptionArray;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override

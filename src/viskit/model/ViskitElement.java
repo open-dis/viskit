@@ -14,7 +14,7 @@ import java.util.List;
  *
  * Base class for the objects that get passed around between M, V and C.
  */
-abstract public class ViskitElement {
+abstract public class ViskitElement implements Comparable<ViskitElement> {
 
     public Object opaqueViewObject;       // for private use of V
     public Object opaqueModelObject;      // for private use of M
@@ -34,6 +34,11 @@ abstract public class ViskitElement {
 
     public Object getModelKey() {
         return modelKey;
+    }
+
+    @Override
+    public int compareTo(ViskitElement e) {
+        return getType().compareTo(e.getType());
     }
 
     /**
@@ -67,8 +72,6 @@ abstract public class ViskitElement {
      * @param type representation of the type of the state variable
      */
     public abstract void setType(String type);
-
-    public abstract String getArrayType();
 
     public abstract String getIndexingExpression();
 

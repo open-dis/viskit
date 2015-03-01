@@ -19,7 +19,6 @@ public class CancelingEdge extends Edge {
     private String name;
     private boolean operation;
     private String operationOrAssignment;
-    private String arrayType;
     private String indexingExpression;
     private String stateVarName;
     private String value;
@@ -71,11 +70,6 @@ public class CancelingEdge extends Edge {
     @Override
     public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String getArrayType() {
-        return arrayType;
     }
 
     @Override
