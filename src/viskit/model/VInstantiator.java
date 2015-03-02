@@ -330,7 +330,7 @@ public abstract class VInstantiator {
                         tmp = VStatics.resolveParameters(p.getType())[0];
                     }
                 }
-                Iterator li = tmp.iterator();
+                Iterator<Object> li = tmp.iterator();
                 if (VStatics.debug) {
                     while (li.hasNext()) {
                         log.info(li.next());
@@ -529,9 +529,9 @@ public abstract class VInstantiator {
             }
         }
 
-        private boolean unambiguousMatch(Class[] args, List<PropertyDescriptor> propDesc) {
+        private boolean unambiguousMatch(Class<?>[] args, List<PropertyDescriptor> propDesc) {
             // if can find unambiguous match by type, put propDesc into proper order
-            if (args.length <= 0 || propDesc.size() <= 0) {
+            if (args.length <= 0 || propDesc.isEmpty()) {
                 return false;
             }
             Vector<Integer> holder = new Vector<>();
@@ -597,7 +597,7 @@ public abstract class VInstantiator {
         @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<>();
-            for (Object o : getArgs()) {
+            for (Object o : args) {
                 VInstantiator vi = (VInstantiator) o;
                 lis.add(vi.vcopy());
             }
@@ -612,7 +612,7 @@ public abstract class VInstantiator {
             if (getType() == null || getType().isEmpty()) {
                 return false;
             }
-            for (Object o : getArgs()) {
+            for (Object o : args) {
                 VInstantiator v = (VInstantiator) o;
                 if (!v.isValid()) {
                     return false;
@@ -643,7 +643,7 @@ public abstract class VInstantiator {
         @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<>();
-            for (Object vi : getInstantiators()) {
+            for (Object vi : instantiators) {
                 lis.add(((VInstantiator) vi).vcopy());
             }
             VInstantiator rv = new VInstantiator.Array(getType(), lis);
@@ -675,7 +675,7 @@ public abstract class VInstantiator {
             if (getType() == null || getType().isEmpty()) {
                 return false;
             }
-            for (Object vi : getInstantiators()) {
+            for (Object vi : instantiators) {
                 if (!((VInstantiator) vi).isValid()) {
                     return false;
                 }
@@ -733,7 +733,7 @@ public abstract class VInstantiator {
         @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<>();
-            for (Object o : getParams()) {
+            for (Object o : params) {
                 VInstantiator vi = (VInstantiator) o;
                 lis.add(vi.vcopy());
             }
@@ -747,11 +747,11 @@ public abstract class VInstantiator {
         public boolean isValid() {
             String t = getType(), fc = getFactoryClass(), m = getMethod();
             if (t == null || fc == null || m == null ||
-                    t.length() <= 0 || fc.length() <= 0 || m.length() <= 0) {
+                    t.isEmpty() || fc.isEmpty() || m.isEmpty()) {
                 return false;
             }
 
-            for (Object o : getParams()) {
+            for (Object o : params) {
                 VInstantiator v = (VInstantiator) o;
                 if (!v.isValid()) {
                     return false;
