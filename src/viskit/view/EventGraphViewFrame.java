@@ -429,8 +429,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the left component (JGraph side) most of the usable
-        // extra space in this SplitPlane -> 65%
-        graphPane.drawingSplitPane.setResizeWeight(0.65);
+        // extra space in this SplitPlane -> 75%
+        graphPane.drawingSplitPane.setResizeWeight(0.75);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         graphPane.addMouseListener(new vCursorHandler());
