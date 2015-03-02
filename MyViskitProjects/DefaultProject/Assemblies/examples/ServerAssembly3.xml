@@ -9,31 +9,31 @@
     <TerminalParameter name="serviceTime_2_2_1" link="serviceTime_2_2_1" value="2.3" type="double">
         <DoubleRange lowValue="3.0" highValue="4.0"/>
     </TerminalParameter>
-    <SimEntity name="arrival" type="examples.ArrivalProcess">
-        <FactoryParameter name="interarrivalTime" factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter value="Exponential" type="java.lang.String"/>
+    <SimEntity name="arrival" type="examples.ArrivalProcess" description="">
+        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter name="interarrivalTime_2_1_1" linkRef="interarrivalTime_2_1_1" value="1.7" type="double"/>
+                    <TerminalParameter name="p[0] : " value="1.7" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="90" y="90"/>
+        <Coordinate x="90.0" y="90.0"/>
     </SimEntity>
-    <SimEntity name="server" type="examples.SimpleServer">
-        <FactoryParameter name="serviceTime" factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter value="Gamma" type="java.lang.String"/>
+    <SimEntity name="server" type="examples.SimpleServer" description="">
+        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter name="" value="Gamma" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter name="serviceTime_2_1_1" linkRef="serviceTime_2_1_1" value="2.1" type="double"/>
+                    <TerminalParameter name="p[0] : " value="2.1" type="double"/>
                 </MultiParameter>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter name="serviceTime_2_2_1" linkRef="serviceTime_2_2_1" value="2.3" type="double"/>
+                    <TerminalParameter name="p[0] : " value="1.6" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
         <TerminalParameter name="totalNumberServers" value="2" type="int"/>
-        <Coordinate x="280" y="90"/>
+        <Coordinate x="280.0" y="90.0"/>
     </SimEntity>
     <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
         <TerminalParameter value="numberInQueue" type="java.lang.String"/>
