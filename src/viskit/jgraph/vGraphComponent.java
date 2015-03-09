@@ -1,8 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -16,10 +14,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.undo.UndoManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
-import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.view.EventGraphViewFrame;
@@ -41,7 +39,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
     vGraphModel vGModel;
     EventGraphViewFrame parent;
-    protected Action removeAction;
+    private UndoManager undoManager;
 
     /** Sets up JGraph to render nodes and edges for DES
      *
@@ -63,6 +61,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setGridSize(10);
         this.setMarqueeHandler(new MyMarqueeHandler());
         this.setAntiAliased(true);
+        this.setLockedHandleColor(Color.red);
+        this.setHighlightColor(Color.red);
 
         // Set the Tolerance to 2 Pixel
         setTolerance(2);
@@ -70,15 +70,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // Jump to default port on connect
         setJumpToDefaultPort(true);
 
-        this.addGraphSelectionListener(new myGraphSelectionListener());
+        // Set up the cut/remove/paste/copy/undo/redo actions
+        undoManager = new vGraphUndoManager(parent.getController());
+        addGraphSelectionListener((GraphSelectionListener) undoManager);
+        model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
-
-        setupCutCopyPaste();
-
-        //this.setMarqueeColor(Color.red);
-        this.setLockedHandleColor(Color.red);
-        this.setHighlightColor(Color.red);
-        //this.setHandleColor(Color.orange);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
@@ -124,83 +120,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         });
     }
 
-    private void setupCutCopyPaste() {
-
-        // Handle keystrokes
-        Action cutAction = new myCutKeyHandler();
-        Action copyAction = new myCopyKeyHandler();
-        Action pasteAction = new myPasteKeyHandler();
-
-        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod),
-                cutAction.getValue(Action.NAME));
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod),
-                copyAction.getValue(Action.NAME));
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod),
-                pasteAction.getValue(Action.NAME));
-        this.getActionMap().put(cutAction.getValue(Action.NAME), cutAction);
-        this.getActionMap().put(copyAction.getValue(Action.NAME), copyAction);
-        this.getActionMap().put(pasteAction.getValue(Action.NAME), pasteAction);
-
-        removeAction = new myRemoveKeyHandler();
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod),
-                removeAction.getValue(Action.NAME));
-        this.getActionMap().put(removeAction.getValue(Action.NAME), removeAction);
-    }
-
-    class myCopyKeyHandler extends AbstractAction {
-
-        myCopyKeyHandler() {
-            super("copy");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((EventGraphController) parent.getController()).copy();
-        }
-    }
-
-    class myCutKeyHandler extends AbstractAction {
-
-        myCutKeyHandler() {
-            super("cut");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((EventGraphController) parent.getController()).cut();
-        }
-    }
-
-    class myPasteKeyHandler extends AbstractAction {
-
-        myPasteKeyHandler() {
-            super("paste");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((EventGraphController) parent.getController()).paste();
-        }
-    }
-
-    class myRemoveKeyHandler extends AbstractAction {
-
-        myRemoveKeyHandler() {
-            super("remove");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!vGraphComponent.this.isSelectionEmpty()) {
-                Object[] cells = vGraphComponent.this.getSelectionCells();
-                cells = vGraphComponent.this.getDescendants(cells);
-                vGraphComponent.this.getModel().remove(cells);
-            }
-        }
-    }
-
     @Override
     public void updateUI() {
         // Install a new UI
@@ -223,6 +142,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         switch (ev.getID()) {
             case ModelEvent.NEWMODEL:
+
+                // Ensure we start fresh
                 vGModel.deleteAll();
                 break;
             case ModelEvent.EVENTADDED:
@@ -254,6 +175,17 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.CANCELINGEDGEDELETED:
                 vGModel.deleteCancelingEdge((Edge) ev.getSource());
                 break;
+
+            // Deliberate fall-through for these b/c the JGraph internal model
+            // keeps track
+            case ModelEvent.REDO_CANCELING_EDGE:
+            case ModelEvent.REDO_SCHEDULING_EDGE:
+            case ModelEvent.REDO_EVENT_NODE:
+            case ModelEvent.UNDO_CANCELING_EDGE:
+            case ModelEvent.UNDO_SCHEDULING_EDGE:
+            case ModelEvent.UNDO_EVENT_NODE:
+                vGModel.reDrawNodes();
+                break;
             default:
                 //System.out.println("duh");
         }
@@ -266,8 +198,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     public void graphChanged(GraphModelEvent e) {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {
             return;
-        }  // this came in from outside, we don't have to inform anybody..prevent reentry
-        //todo confirm any other events that should cause us to bail here
+        } // this came in from outside, we don't have to inform anybody..prevent reentry
+
+        // TODO: confirm any other events that should cause us to bail here
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
         if (ch != null) {
@@ -541,33 +474,108 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     }
 
     /**
-     * This class informs the controller that the selected set has changed.  Since we're only using this
-     * to (dis)able the cut and copy menu items, it could be argued that this functionality should be internal
-     * to the View, and the controller needn't be involved.  Nevertheless, the round trip through the controller
-     * remains in place.
+     * @return the undoManager
      */
-    class myGraphSelectionListener implements GraphSelectionListener {
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
 
-        Vector<Object> selected = new Vector<>();
+    /** Inserts a new Edge between source and target nodes
+     *
+     * @param source the source node to connect
+     * @param target the target node to connect
+     */
+    public void connect(Port source, Port target) {
 
-        @Override
-        public void valueChanged(GraphSelectionEvent e) {
-            boolean enabled = !vGraphComponent.this.isSelectionEmpty();
-	    removeAction.setEnabled(enabled);
-
-            Object[] oa = e.getCells();
-            if (oa == null || oa.length <= 0) {
-                return;
-            }
-            for (Object o : oa) {
-                if (e.isAddedCell(o)) {
-                    selected.add(((DefaultGraphCell) o).getUserObject());
-                } else {
-                    selected.remove(((DefaultGraphCell) o).getUserObject());
-                }
-            }
-            ((EventGraphController) parent.getController()).selectNodeOrEdge(selected);
+        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
+        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
+        Object[] oa = new Object[]{src, tar};
+        EventGraphController controller = (EventGraphController) parent.getController();
+        if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
+            controller.buildNewCancelingArc(oa);
+        } else {
+            controller.buildNewSchedulingArc(oa);
         }
+    }
+
+    final static double DEFAULT_CELL_SIZE = 54.0d;
+
+    /** Create the cell's final attributes before rendering on the graph.  The
+     * edge attributes are set in the vGraphModel
+     *
+     * @param node the named EventNode to create attributes for
+     * @return the cells attributes before rendering on the graph
+     */
+    public Map createCellAttributes(EventNode node) {
+        Map map = new Hashtable();
+        Point2D point = node.getPosition();
+
+        // Snap the Point to the Grid
+        if (this != null) {
+            point = snap((Point2D) point.clone());
+        } else {
+            point = (Point2D) point.clone();
+        }
+
+        // Add a Bounds Attribute to the Map.  NOTE: using the length of the
+        // node name to help size the cell does not bode well with the
+        // customized edge router, so, leave it at DEFAULT_CELL_SIZE
+        GraphConstants.setBounds(map, new Rectangle2D.Double(
+                point.getX(),
+                point.getY(),
+                DEFAULT_CELL_SIZE,
+                DEFAULT_CELL_SIZE));
+
+        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
+
+        // Make sure the cell is resized on insert (doen't work)
+//        GraphConstants.setResize(map, true);
+
+        GraphConstants.setBackground(map, Color.black.darker());
+        GraphConstants.setForeground(map, Color.white);
+        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
+
+        // Add a nice looking gradient background
+//        GraphConstants.setGradientColor(map, Color.blue);
+        // Add a Border Color Attribute to the Map
+//        GraphConstants.setBorderColor(map, Color.black);
+        // Add a White Background
+//        GraphConstants.setBackground(map, Color.white);
+
+        // Make Vertex Opaque
+        GraphConstants.setOpaque(map, true);
+        return map;
+    }
+
+    /**
+     * Creates a DefaultGraphCell with a given name
+     * @param node the named EventNode
+     * @return a DefaultGraphCell with a given name
+     */
+    protected DefaultGraphCell createDefaultGraphCell(EventNode node) {
+
+        DefaultGraphCell cell = new CircleCell(node.getName());
+        node.opaqueViewObject = cell;
+        cell.setUserObject(node);
+
+        // Add one Floating Port
+        cell.add(new vPortCell(node.getName() + "/Center"));
+        return cell;
+    }
+
+    /** Insert a new Vertex at point
+     * @param node the EventNode to insert
+     */
+    public void insert(EventNode node) {
+        DefaultGraphCell vertex = createDefaultGraphCell(node);
+
+        // Create a Map that holds the attributes for the Vertex
+        vertex.getAttributes().applyMap(createCellAttributes(node));
+
+        // Insert the Vertex (including child port and attributes)
+        getGraphLayoutCache().insert(vertex);
+
+        vGModel.reDrawNodes();
     }
 
     /** MarqueeHandler that Connects Vertices and Displays PopupMenus */
@@ -629,16 +637,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // Display PopupMenu or Remember Start Location and First Port
         @Override
         public void mousePressed(final MouseEvent e) {
-            // If Right Mouse Button
-            if (SwingUtilities.isRightMouseButton(e)) {
-                // Find Cell in Model Coordinates
-//                Object cell = vGraphComponent.this.getFirstCellForLocation(e.getX(), e.getY());
-                // Create PopupMenu for the Cell
-//                JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
-                // Display PopupMenu
-//                menu.show(vGraphComponent.this, e.getX(), e.getY());
-                // Else if in ConnectMode and Remembered Port is Valid
-            } else if (port != null && vGraphComponent.this.isPortsVisible()) {
+            if (port != null && vGraphComponent.this.isPortsVisible()) {
                 // Remember Start Location
                 start = vGraphComponent.this.toScreen(port.getLocation());
                 // Remember First Port
@@ -849,146 +848,13 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     (int) (r.getWidth() + 2 * s), (int) (r.getHeight() + 2 * s));
         }
 
-    } // End of Editor.MyMarqueeHandler
-
-    // NOTE: Not used
-    // PopupMenu
-    //
-    public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
-        JPopupMenu menu = new JPopupMenu();
-        if (cell != null) {
-            // Edit
-            menu.add(new AbstractAction("Edit") {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    vGraphComponent.this.startEditingAtCell(cell);
-                }
-            });
-        }
-        // Remove
-        if (!vGraphComponent.this.isSelectionEmpty()) {
-            menu.addSeparator();
-            menu.add(new AbstractAction("Remove") {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    removeAction.actionPerformed(e);
-                }
-            });
-        }
-        menu.addSeparator();
-        // Insert
-        menu.add(new AbstractAction("Insert") {
-
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-//                insert(pt);
-            }
-        });
-        return menu;
-    }
-
-    /** Inserts a new Edge between source and target nodes
-     *
-     * @param source the source node
-     * @param target the target node
-     */
-    public void connect(Port source, Port target) {
-
-        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
-        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
-        Object[] oa = new Object[]{src, tar};
-        EventGraphController controller = (EventGraphController) parent.getController();
-        if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
-            controller.buildNewCancelingArc(oa);
-        } else {
-            controller.buildNewSchedulingArc(oa);
-        }
-    }
-
-    final static double DEFAULT_CELL_SIZE = 54.0d;
-
-    /** Create the cell's final attributes before rendering on the graph.  The
-     * edge attributes are set in the vGraphModel
-     *
-     * @param node the named EventNode to create attributes for
-     * @return the cells attributes before rendering on the graph
-     */
-    public Map createCellAttributes(EventNode node) {
-        Map map = new Hashtable();
-        Point2D point = node.getPosition();
-
-        // Snap the Point to the Grid
-        if (this != null) {
-            point = snap((Point2D) point.clone());
-        } else {
-            point = (Point2D) point.clone();
-        }
-
-        // Add a Bounds Attribute to the Map.  NOTE: using the length of the
-        // node name to help size the cell does not bode well with the
-        // customized edge router, so, leave it at DEFAULT_CELL_SIZE
-        GraphConstants.setBounds(map, new Rectangle2D.Double(
-                point.getX(),
-                point.getY(),
-                DEFAULT_CELL_SIZE,
-                DEFAULT_CELL_SIZE));
-
-        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
-
-        // Make sure the cell is resized on insert (doen't work)
-//        GraphConstants.setResize(map, true);
-
-        GraphConstants.setBackground(map, Color.black.darker());
-        GraphConstants.setForeground(map, Color.white);
-        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
-
-        // Add a nice looking gradient background
-//        GraphConstants.setGradientColor(map, Color.blue);
-        // Add a Border Color Attribute to the Map
-//        GraphConstants.setBorderColor(map, Color.black);
-        // Add a White Background
-//        GraphConstants.setBackground(map, Color.white);
-
-        // Make Vertex Opaque
-        GraphConstants.setOpaque(map, true);
-        return map;
-    }
-
-    /**
-     * Creates a DefaultGraphCell with a given name
-     * @param node the named EventNode
-     * @return a DefaultGraphCell with a given name
-     */
-    protected DefaultGraphCell createDefaultGraphCell(EventNode node) {
-
-        DefaultGraphCell cell = new CircleCell(node.getName());
-        node.opaqueViewObject = cell;
-        cell.setUserObject(node);
-
-        // Add one Floating Port
-        cell.add(new vPortCell(node.getName() + "/Center"));
-        return cell;
-    }
-
-    /** Insert a new Vertex at point
-     * @param node the EventNode to insert
-     */
-    public void insert(EventNode node) {
-        DefaultGraphCell vertex = createDefaultGraphCell(node);
-
-        // Create a Map that holds the attributes for the Vertex
-        vertex.getAttributes().applyMap(createCellAttributes(node));
-
-        // Insert the Vertex (including child port and attributes)
-        getGraphLayoutCache().insert(vertex);
-    }
+    } // End of vGraphComponent.MyMarqueeHandler
 }
 
-/**
+/**         Extended JGraph Classes
  * ********************************************
  */
+
 /**
  * To mark our edges.
  */
@@ -1073,7 +939,6 @@ class vSelfEdgeView extends vEdgeView {
     }
 }
 
-/***********************************************/
 /**
  * To mark our nodes.
  */

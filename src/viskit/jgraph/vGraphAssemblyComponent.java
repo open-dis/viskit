@@ -1,21 +1,18 @@
 package viskit.jgraph;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.undo.UndoManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
-import org.jgraph.event.GraphSelectionEvent;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.view.AssemblyViewFrame;
@@ -30,14 +27,13 @@ import viskit.model.*;
  * @author Mike Bailey
  * @since Feb 19, 2004
  * @since 2:54:31 PM
- * @version $Id: vGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra
- * $
+ * @version $Id: vGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra$
  */
 public class vGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
     vGraphAssemblyModel vGAModel;
     AssemblyViewFrame parent;
-    protected Action removeAction;
+    private UndoManager undoManager;
 
     public vGraphAssemblyComponent(vGraphAssemblyModel model, AssemblyViewFrame frame) {
         super(model);
@@ -54,6 +50,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setGridSize(10);
         this.setMarqueeHandler(new MyMarqueeHandler());
         this.setAntiAliased(true);
+        this.setLockedHandleColor(Color.red);
+        this.setHighlightColor(Color.red);
 
         // Set the Tolerance to 2 Pixel
         setTolerance(2);
@@ -61,15 +59,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         // Jump to default port on connect
         setJumpToDefaultPort(true);
 
-        this.addGraphSelectionListener(new myGraphSelectionListener());
+         // Set up the cut/remove/paste/copy/undo/redo actions
+        undoManager = new vGraphUndoManager(parent.getController());
+        addGraphSelectionListener((GraphSelectionListener) undoManager);
+        model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
-
-        setupCutCopyPaste();
-
-        //this.setMarqueeColor(Color.red);
-        this.setLockedHandleColor(Color.red);
-        this.setHighlightColor(Color.red);
-        //this.setHandleColor(Color.orange);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
@@ -123,83 +117,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         });
     }
 
-    private void setupCutCopyPaste() {
-
-        // Handle keystrokes
-        Action cutAction = new myCutKeyHandler();
-        Action copyAction = new myCopyKeyHandler();
-        Action pasteAction = new myPasteKeyHandler();
-
-        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod),
-                cutAction.getValue(Action.NAME));
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod),
-                copyAction.getValue(Action.NAME));
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod),
-                pasteAction.getValue(Action.NAME));
-        this.getActionMap().put(cutAction.getValue(Action.NAME), cutAction);
-        this.getActionMap().put(copyAction.getValue(Action.NAME), copyAction);
-        this.getActionMap().put(pasteAction.getValue(Action.NAME), pasteAction);
-
-        removeAction = new myRemoveKeyHandler();
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod),
-                removeAction.getValue(Action.NAME));
-        this.getActionMap().put(removeAction.getValue(Action.NAME), removeAction);
-    }
-
-    class myCopyKeyHandler extends AbstractAction {
-
-        myCopyKeyHandler() {
-            super("copy");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((AssemblyController) parent.getController()).copy();
-        }
-    }
-
-    class myCutKeyHandler extends AbstractAction {
-
-        myCutKeyHandler() {
-            super("cut");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((AssemblyController) parent.getController()).cut();
-        }
-    }
-
-    class myPasteKeyHandler extends AbstractAction {
-
-        myPasteKeyHandler() {
-            super("paste");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ((AssemblyController) parent.getController()).paste();
-        }
-    }
-
-    class myRemoveKeyHandler extends AbstractAction {
-
-        myRemoveKeyHandler() {
-            super("remove");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!vGraphAssemblyComponent.this.isSelectionEmpty()) {
-                Object[] cells = vGraphAssemblyComponent.this.getSelectionCells();
-                cells = vGraphAssemblyComponent.this.getDescendants(cells);
-                vGraphAssemblyComponent.this.getModel().remove(cells);
-            }
-        }
-    }
-
     @Override
     public void updateUI() {
         // Install a new UI
@@ -215,6 +132,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         switch (ev.getID()) {
             case ModelEvent.NEWASSEMBLYMODEL:
+
+                // Ensure we start fresh
                 vGAModel.deleteAll();
                 break;
             case ModelEvent.EVENTGRAPHADDED:
@@ -271,22 +190,36 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 vGAModel.changePclEdge((AssemblyEdge) ev.getSource());
                 break;
 
+            // Deliberate fall-through for these b/c the JGraph internal model
+            // keeps track
+            case ModelEvent.UNDO_EVENT_GRAPH:
+            case ModelEvent.REDO_EVENT_GRAPH:
+            case ModelEvent.UNDO_PCL:
+            case ModelEvent.REDO_PCL:;
+            case ModelEvent.UNDO_ADAPTER_EDGE:
+            case ModelEvent.REDO_ADAPTER_EDGE:
+            case ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE:
+            case ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE:
+            case ModelEvent.UNDO_PCL_EDGE:
+            case ModelEvent.REDO_PCL_EDGE:
+                vGAModel.reDrawNodes();
+                break;
             default:
             //System.out.println("duh");
         }
         currentModelEvent = null;
     }
 
-
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
-        if (currentModelEvent != null && currentModelEvent.getSource() != this.vGAModel) // bail if this came from outside
+        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWASSEMBLYMODEL) // bail if this came from outside
         {
             return;
-        }  // this came in from outside, we don't have to inform anybody..prevent reentry
-        //todo confirm any other events that should cause us to bail here
+        } // this came in from outside, we don't have to inform anybody..prevent reentry
+
+        // TODO: confirm any other events that should cause us to bail here
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
         if (ch != null) {
@@ -455,34 +388,114 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     }
 
     /**
-     * This class informs the controller that the selected set has changed.
-     * Since we're only using this to (dis)able the cut and copy menu items, it
-     * could be argued that this functionality should be internal to the View,
-     * and the controller needn't be involved. Nevertheless, the round trip
-     * through the controller remains in place.
+     * @return the undoManager
      */
-    class myGraphSelectionListener implements GraphSelectionListener {
+    public UndoManager getUndoManager() {
+        return undoManager;
+    }
 
-        Vector<Object> selected = new Vector<>();
+    /** Insert a new Edge between source and target
+     * @param source the "from" of the connection
+     * @param target the "to" of the connection
+     */
+    public void connect(Port source, Port target) {
+        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
+        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
+        Object[] oa = new Object[]{src, tar};
+        AssemblyController controller = (AssemblyController) parent.getController();
 
-        @Override
-        public void valueChanged(GraphSelectionEvent e) {
-            boolean enabled = !vGraphAssemblyComponent.this.isSelectionEmpty();
-            removeAction.setEnabled(enabled);
-
-            Object[] oa = e.getCells();
-            if (oa == null || oa.length <= 0) {
-                return;
-            }
-            for (Object o : oa) {
-                if (e.isAddedCell(o)) {
-                    selected.add(((DefaultGraphCell) o).getUserObject());
-                } else {
-                    selected.remove(((DefaultGraphCell) o).getUserObject());
-                }
-            }
-            ((AssemblyController) parent.getController()).selectNodeOrEdge(selected);
+        if (parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE) {
+            controller.newAdapterArc(oa);
+        } else if (parent.getCurrentMode() == AssemblyViewFrame.SIMEVLIS_MODE) {
+            controller.newSimEvListArc(oa);
+        } else if (parent.getCurrentMode() == AssemblyViewFrame.PCL_MODE) {
+            controller.newPropChangeListArc(oa);
         }
+    }
+
+    final static double DEFAULT_CELL_SIZE = 54.0d;
+
+    /** Create the cells attributes before rendering on the graph.  The
+     * edge attributes are set in the vGraphAssemblyModel
+     *
+     * @param node the named AssemblyNode to create attributes for
+     * @return the cells attributes before rendering on the graph
+     */
+    public Map createCellAttributes(AssemblyNode node) {
+        Map map = new Hashtable();
+        Point2D point = node.getPosition();
+
+        // Snap the Point to the Grid
+        if (this != null) {
+            point = snap((Point2D) point.clone());
+        } else {
+            point = (Point2D) point.clone();
+        }
+
+        // Add a Bounds Attribute to the Map
+        GraphConstants.setBounds(map, new Rectangle2D.Double(
+                point.getX(),
+                point.getY(),
+                DEFAULT_CELL_SIZE,
+                DEFAULT_CELL_SIZE));
+
+        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
+
+        // Make sure the cell is resized on insert (doen't work)
+//        GraphConstants.setResize(map, true);
+
+        GraphConstants.setBackground(map, Color.black.darker());
+        GraphConstants.setForeground(map, Color.white);
+        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
+
+        // Add a nice looking gradient background
+//        GraphConstants.setGradientColor(map, Color.blue);
+        // Add a Border Color Attribute to the Map
+//        GraphConstants.setBorderColor(map, Color.black);
+        // Add a White Background
+//        GraphConstants.setBackground(map, Color.white);
+
+        // Make Vertex Opaque
+        GraphConstants.setOpaque(map, true);
+        return map;
+    }
+
+    /**
+     * Creates a DefaultGraphCell with a given name
+     * @param node the named AssemblyNode
+     * @return a DefaultGraphCell with a given name
+     */
+    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
+
+        DefaultGraphCell cell;
+        if (node instanceof EvGraphNode) {
+            cell = new AssemblyCircleCell(node.getName());
+        } else {
+            cell = new AssemblyPropListCell(node.getName());
+        }
+
+        node.opaqueViewObject = cell;
+        cell.setUserObject(node);
+
+        // Add one Floating Port
+        cell.add(new vAssemblyPortCell(node.getName() + "/Center"));
+        return cell;
+    }
+
+    /** Insert a new Vertex at point
+     *
+     * @param node the AssemblyNode to insert
+     */
+    public void insert(AssemblyNode node) {
+        DefaultGraphCell vertex = createDefaultGraphCell(node);
+
+        // Create a Map that holds the attributes for the Vertex
+        vertex.getAttributes().applyMap(createCellAttributes(node));
+
+        // Insert the Vertex (including child port and attributes)
+        getGraphLayoutCache().insert(vertex);
+
+        vGAModel.reDrawNodes();
     }
 
     /** MarqueeHandler that Connects Vertices and Displays PopupMenus */
@@ -544,16 +557,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         // Display PopupMenu or Remember Start Location and First Port
         @Override
         public void mousePressed(final MouseEvent e) {
-            // If Right Mouse Button
-            if (SwingUtilities.isRightMouseButton(e)) {
-            // Find Cell in Model Coordinates
-//                Object cell = vGraphAssemblyComponent.this.getFirstCellForLocation(e.getX(), e.getY());
-                // Create PopupMenu for the Cell
-//                JPopupMenu menu = createPopupMenu(e.getPoint(), cell);
-                // Display PopupMenu
-//                menu.show(vGraphAssemblyComponent.this, e.getX(), e.getY());
-                // Else if in ConnectMode and Remembered Port is Valid
-            } else if (port != null && vGraphAssemblyComponent.this.isPortsVisible()) {
+            if (port != null && vGraphAssemblyComponent.this.isPortsVisible()) {
                 // Remember Start Location
                 start = vGraphAssemblyComponent.this.toScreen(port.getLocation());
                 // Remember First Port
@@ -764,144 +768,13 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     (int) (r.getWidth() + 2 * s), (int) (r.getHeight() + 2 * s));
         }
 
-    } // End of Editor.MyMarqueeHandler
-
-    // TODO: Not currently used
-    public JPopupMenu createPopupMenu(final Point pt, final Object cell) {
-        JPopupMenu menu = new JPopupMenu();
-        if (cell != null) {
-            // Edit
-            menu.add(new AbstractAction("Edit") {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    vGraphAssemblyComponent.this.startEditingAtCell(cell);
-                }
-            });
-        }
-        // Remove
-        if (!vGraphAssemblyComponent.this.isSelectionEmpty()) {
-            menu.addSeparator();
-            menu.add(new AbstractAction("Remove") {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    removeAction.actionPerformed(e);
-                }
-            });
-        }
-        menu.addSeparator();
-        // Insert
-        menu.add(new AbstractAction("Insert") {
-
-            @Override
-            public void actionPerformed(ActionEvent ev) {
-//                insert(pt);
-            }
-        });
-        return menu;
-    }
-
-    /** Insert a new Edge between source and target
-     * @param source the "from" of the connection
-     * @param target the "to" of the connection
-     */
-    public void connect(Port source, Port target) {
-        DefaultGraphCell src = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(source);
-        DefaultGraphCell tar = (DefaultGraphCell) vGraphAssemblyComponent.this.getModel().getParent(target);
-        Object[] oa = new Object[]{src, tar};
-        AssemblyController controller = (AssemblyController) parent.getController();
-
-        if (parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE) {
-            controller.newAdapterArc(oa);
-        } else if (parent.getCurrentMode() == AssemblyViewFrame.SIMEVLIS_MODE) {
-            controller.newSimEvListArc(oa);
-        } else if (parent.getCurrentMode() == AssemblyViewFrame.PCL_MODE) {
-            controller.newPropChangeListArc(oa);
-        }
-    }
-
-    /** Create the cells attributes before rendering on the graph
-     *
-     * @param point the 2D point at which to render the cell
-     * @return the cells attributes before rendering on the graph
-     */
-    public Map createCellAttributes(Point2D point) {
-        Map map = new Hashtable();
-
-        // Snap the Point to the Grid
-        if (this != null) {
-            point = snap((Point2D) point.clone());
-        } else {
-            point = (Point2D) point.clone();
-        }
-
-        // Add a Bounds Attribute to the Map
-        GraphConstants.setBounds(map, new Rectangle2D.Double(point.getX(),
-                point.getY(), 54, 54));
-
-        GraphConstants.setBorder(map, BorderFactory.createRaisedBevelBorder());
-
-        // Make sure the cell is resized on insert (doen't work)
-//        GraphConstants.setResize(map, true);
-
-        GraphConstants.setBackground(map, Color.black.darker());
-        GraphConstants.setForeground(map, Color.white);
-        GraphConstants.setFont(map, GraphConstants.DEFAULTFONT.deriveFont(Font.BOLD, 12));
-
-        // Add a nice looking gradient background
-//        GraphConstants.setGradientColor(map, Color.blue);
-        // Add a Border Color Attribute to the Map
-//        GraphConstants.setBorderColor(map, Color.black);
-        // Add a White Background
-//        GraphConstants.setBackground(map, Color.white);
-
-        // Make Vertex Opaque
-        GraphConstants.setOpaque(map, true);
-        return map;
-    }
-
-    /**
-     * Creates a DefaultGraphCell with a given name
-     * @param node the named AssemblyNode
-     * @return a DefaultGraphCell with a given name
-     */
-    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
-
-        DefaultGraphCell cell;
-        if (node instanceof EvGraphNode) {
-            cell = new AssemblyCircleCell(node.getName());
-        } else {
-            cell = new AssemblyPropListCell(node.getName());
-        }
-
-        node.opaqueViewObject = cell;
-        cell.setUserObject(node);
-
-        // Add one Floating Port
-        cell.add(new vAssemblyPortCell(node.getName() + "/Center"));
-        return cell;
-    }
-
-    /** Insert a new Vertex at point
-     *
-     * @param node the AssemblyNode to insert
-     */
-    public void insert(AssemblyNode node) {
-        DefaultGraphCell vertex = createDefaultGraphCell(node);
-
-        // Create a Map that holds the attributes for the Vertex
-        vertex.getAttributes().applyMap(createCellAttributes(node.getPosition()));
-
-        // Insert the Vertex (including child port and attributes)
-        getGraphLayoutCache().insert(vertex);
-        getGraphLayoutCache().toFront(new Object[]{vertex});
-    }
+    } // End of vGraphAssemblyComponent.MyMarqueeHandler
 }
 
-/**
+/**        Extended JGraph Classes
  * ********************************************
  */
+
 /**
  * To mark our edges.
  */
@@ -942,6 +815,7 @@ class vAssemblyPortView extends PortView {
 }
 
 /***********************************************/
+
 /**
  * To mark our nodes.
  */

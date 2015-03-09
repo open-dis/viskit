@@ -132,15 +132,27 @@ public interface AssemblyController {
      */
     void simEvListenerEdgeEdit(SimEvListenerEdge seEdge);
 
+    /** CMD-Z or CNTL-Z */
+    void undo();
+
+    /** CMD-Y or CNTL-Y */
+    void redo();
+
+    /** Perform a full delete */
+    void remove();
+    
     /**
-     * menu selections
+     * Not supported in Viskit
+     */
+    void cut();
+
+    /**
+     * CMD-C or CNTL-C
      */
     void copy();
 
-    /**
-     * Ultimately performs a delete function for selected edges and nodes
-     */
-    void cut();        // to remove nodes and edges
+    /** Performs the paste operation CNTL-V or CMD-V */
+    void paste();
 
     /**
      * Opens a Viskit Project Assembly File
@@ -160,9 +172,6 @@ public interface AssemblyController {
     void openProject(File file);
 
     void openRecent(String fullPath);
-
-    /** Performs the paste operation CNTL-V or CMD-V */
-    void paste();
 
     /**
      * Perform shutdown operations

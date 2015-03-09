@@ -143,7 +143,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private RecentAssyFileListener myAssyFileListener;
     private RecentProjFileSetListener myProjFileListener;
 
-    private VgraphAssemblyComponentWrapper getCurrentVgacw() {
+    public VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
@@ -155,6 +155,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     public Component getCurrentJgraphComponent() {
         VgraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
 
@@ -353,16 +354,29 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
-        // the next three are disabled until something is selected
-        editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_T,
+        editMenu.add(buildMenuItem(controller, "undo", "Undo", KeyEvent.VK_Z,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
+        editMenu.add(buildMenuItem(controller, "redo", "Redo", KeyEvent.VK_Y,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
+
+        ActionIntrospector.getAction(controller, "undo").setEnabled(false);
+        ActionIntrospector.getAction(controller, "redo").setEnabled(false);
+        editMenu.addSeparator();
+
+        // the next four are disabled until something is selected
+        editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+        editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(controller, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(controller, "paste", "Paste Nodes", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(controller, "paste", "Paste Events", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+        editMenu.add(buildMenuItem(controller, "remove", "Delete", KeyEvent.VK_DELETE,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
 
-        // These 4 start off being disabled, until something is selected
+        // These start off being disabled, until something is selected
         ActionIntrospector.getAction(controller, "cut").setEnabled(false);
+        ActionIntrospector.getAction(controller, "remove").setEnabled(false);
         ActionIntrospector.getAction(controller, "copy").setEnabled(false);
         ActionIntrospector.getAction(controller, "paste").setEnabled(false);
         editMenu.addSeparator();
@@ -386,8 +400,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
         helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
         helpMenu.addSeparator();
+
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
         helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
+
         myMenuBar.add(helpMenu);
     }
 
@@ -592,7 +608,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void addTab(AssemblyModel mod) {
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
-        vGAmod.graph = graphPane;                               // todo fix this
+        vGAmod.setjGraph(graphPane);                               // todo fix this
 
         graphPane.assyModel = mod;
         graphPane.trees = treePanels;
@@ -765,6 +781,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         dragged = trans;
     }
 
+    /** Class to facilitate dragging new nodes onto the pallete */
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
@@ -821,12 +838,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private FileBasedAssyNode isFileBasedAssyNode(String s) {
         try {
             return FileBasedAssyNode.fromString(s);
-        } catch (FileBasedAssyNode.exception exception) {
+        } catch (FileBasedAssyNode.exception e) {
             return null;
         }
     }
 
-    // Some private classes to implement dnd and dynamic cursor update
+    /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
     class vCursorHandler extends MouseAdapter {
 
         Cursor select;
@@ -836,7 +853,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         vCursorHandler() {
             super();
             select = Cursor.getDefaultCursor();
-            //select    = new Cursor(Cursor.MOVE_CURSOR);
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
 
             Image img = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
@@ -853,6 +869,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         switch (event.getID()) {
             default:
                 getCurrentVgacw().viskitModelChanged((ModelEvent) event);
+                break;
         }
     }
 
@@ -889,7 +906,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             return dmtn.getUserObject();
         }
         return null;
-
     }
 
     @Override
@@ -1183,6 +1199,5 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 }
 
 interface DragStartListener {
-
     void startingDrag(Transferable trans);
 }

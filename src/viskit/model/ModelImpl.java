@@ -9,20 +9,25 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import viskit.VGlobals;
-import viskit.control.EventGraphController;
+import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.mvcAbstractModel;
+import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 
 /**
- * This is the "master" model of an event graph.  It should hold the node, edge and assembly
- * information.  What hasn't been done is to put in accessor methods for the view to
- * read pieces that it needs, say after it receives a "new model" event.
+ * <p>
+ * This is the "master" model of an event graph.  It should control the node and
+ * edge XML (JAXB) information.  What hasn't been done is to put in accessor
+ * methods for the view to read pieces that it needs, say after it receives a
+ * "new model" event.
+ * </p>
  *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -48,12 +53,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     private String privateLocVarPrefix = "locvar_";
     private String stateVarPrefix = "state_";
     private GraphMetaData metaData;
-    private EventGraphController controller;
+    private EventGraphControllerImpl controller;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public ModelImpl(EventGraphController controller) {
-        this.controller = controller;
+    public ModelImpl(mvcController controller) {
+        this.controller = (EventGraphControllerImpl) controller;
         metaData = new GraphMetaData(this);
     }
 
@@ -773,6 +778,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     // Event (node) mods
     // -----------------
+
     @Override
     public void newEvent(String nodeName, Point2D p) {
         EventNode node = new EventNode(nodeName);
@@ -803,13 +809,29 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
+    public void redoEvent(EventNode node) {
+        Event jaxbEv = oFactory.createEvent();
+        evNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
+        jaxbEv.setName(node.getName());
+        node.opaqueModelObject = jaxbEv;
+        jaxbRoot.getEvent().add(jaxbEv);
+
+        setDirty(true);
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone"));
+    }
+
+    @Override
     public void deleteEvent(EventNode node) {
         Event jaxbEv = (Event) node.opaqueModelObject;
         evNodeCache.remove(jaxbEv);
         jaxbRoot.getEvent().remove(jaxbEv);
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
+        else
+            notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone"));
     }
 
     private StateVariable findStateVariable(String nm) {
@@ -830,7 +852,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             nm = privateLocVarPrefix + locVarNameSequence++;
         } while (!isUniqueLVorIdxVname(nm));
         return nm;
-
     }
 
     @Override
@@ -1040,7 +1061,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
-        if (args.size() > 0) {
+        if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
@@ -1050,10 +1071,25 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         se.priority = "DEFAULT";  // set default
 
-        this.edgeCache.put(sch, se);
+        edgeCache.put(sch, se);
         setDirty(true);
+        notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Scheduling Edge added"));
+    }
 
-        this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
+    @Override
+    public void redoSchedulingEdge(Edge ed) {
+        EventNode src, target;
+        src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
+        target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
+        Schedule sched = oFactory.createSchedule();
+        ed.opaqueModelObject = sched;
+        Event targEv = (Event) target.opaqueModelObject;
+        sched.setEvent(targEv);
+        Event srcEv = (Event) src.opaqueModelObject;
+        srcEv.getScheduleOrCancel().add(sched);
+        edgeCache.put(sched, ed);
+        setDirty(true);
+        notifyChanged(new ModelEvent(ed, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
     }
 
     @Override
@@ -1074,7 +1110,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
-        if (args.size() > 0) {
+        if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
@@ -1082,18 +1118,45 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             ce.parameters = edgeParameters;
         }
 
-        this.edgeCache.put(can, ce);
+        edgeCache.put(can, ce);
         setDirty(true);
+        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling Edge added"));
+    }
 
-        this.notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Edge added"));
+    @Override
+    public void redoCancelingEdge(Edge ed) {
+        EventNode src, target;
+        src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
+        target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
+        Cancel can = oFactory.createCancel();
+        ed.opaqueModelObject = can;
+        Event targEv = (Event) target.opaqueModelObject;
+        can.setEvent(targEv);
+        Event srcEv = (Event) src.opaqueModelObject;
+        srcEv.getScheduleOrCancel().add(can);
+        edgeCache.put(can, ed);
+        setDirty(true);
+        notifyChanged(new ModelEvent(ed, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
     }
 
     @Override
     public void deleteSchedulingEdge(Edge edge) {
         _commonEdgeDelete(edge);
 
-        setDirty(true);
-        this.notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
+        else
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Edge undone"));
+    }
+
+    @Override
+    public void deleteCancelingEdge(Edge edge) {
+        _commonEdgeDelete(edge);
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
+        else
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELING_EDGE, "Canceling edge undone"));
     }
 
     private void _commonEdgeDelete(Edge edg) {
@@ -1106,14 +1169,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         edgeCache.remove(edg);
-    }
-
-    @Override
-    public void deleteCancelingEdge(Edge edge) {
-        _commonEdgeDelete(edge);
-
         setDirty(true);
-        this.notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
     }
 
     @Override
@@ -1136,7 +1192,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
+        notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
     }
 
     @Override
@@ -1155,7 +1211,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(e, ModelEvent.CANCELINGEDGECHANGED, "Canceling edge changed"));
+        notifyChanged(new ModelEvent(e, ModelEvent.CANCELINGEDGECHANGED, "Canceling edge changed"));
     }
 
     /**

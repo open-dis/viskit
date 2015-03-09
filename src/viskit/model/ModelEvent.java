@@ -41,6 +41,14 @@ public class ModelEvent extends mvcModelEvent
 
   public static final int CODEBLOCKCHANGED = 16;
 
+  public static final int REDO_CANCELING_EDGE = 34;
+  public static final int REDO_SCHEDULING_EDGE = 35;
+  public static final int REDO_EVENT_NODE = 36;
+
+  public static final int UNDO_CANCELING_EDGE = 37;
+  public static final int UNDO_SCHEDULING_EDGE = 38;
+  public static final int UNDO_EVENT_NODE = 39;
+
   // assembly editor:
   public static final int NEWASSEMBLYMODEL = 17;
 
@@ -65,6 +73,17 @@ public class ModelEvent extends mvcModelEvent
   public static final int PCLEDGECHANGED = 32;
 
   public static final int METADATA_CHANGED = 33;
+
+  public static final int UNDO_EVENT_GRAPH = 40;
+  public static final int REDO_EVENT_GRAPH = 41;
+  public static final int UNDO_PCL = 42;
+  public static final int REDO_PCL = 43;
+  public static final int UNDO_ADAPTER_EDGE = 44;
+  public static final int REDO_ADAPTER_EDGE = 45;
+  public static final int UNDO_SIM_EVENT_LISTENER_EDGE = 46;
+  public static final int REDO_SIM_EVENT_LISTENER_EDGE = 47;
+  public static final int UNDO_PCL_EDGE = 48;
+  public static final int REDO_PCL_EDGE = 49;
 
   public ModelEvent(Object obj, int id, String message)
   {

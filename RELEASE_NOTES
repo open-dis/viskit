@@ -35,6 +35,12 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Major refactor of the MVC components to implement undo / redo on both the EG
+  and Assy editors
+
+  Fixed potential NPE when attempting to capture a frame image with no file
+  loaded in either the EG or Assy. editors
+
   Further improvements to the state transitions panel in that when we wish to
   invoke methods on state variables, a combo box of choices is presented.  If a
   method requires a parameter, the parameter is typed into the action field

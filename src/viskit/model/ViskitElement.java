@@ -18,6 +18,8 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
 
     public Object opaqueViewObject;       // for private use of V
     public Object opaqueModelObject;      // for private use of M
+
+    /** NOT USED */
     public Object opaqueControllerObject; // for private use of C
 
     /** every node or edge has a unique key */

@@ -168,7 +168,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    private VgraphComponentWrapper getCurrentVgcw() {
+    public VgraphComponentWrapper getCurrentVgcw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
@@ -180,6 +180,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     public Component getCurrentJgraphComponent() {
         VgraphComponentWrapper vcw = getCurrentVgcw();
+        if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getLeftComponent();
     }
 
@@ -271,7 +272,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         });
 
-        // Event graph parameters area
+        // Event jGraph parameters area
         JPanel parametersPanel = new JPanel();
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
@@ -417,7 +418,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public void addTab(Model mod) {
         vGraphModel vmod = new vGraphModel();
         VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
-        vmod.graph = graphPane;                               // todo fix this
+        vmod.setjGraph(graphPane);
         graphPane.model = mod;
 
         buildStateParamSplit(graphPane);
@@ -637,28 +638,43 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
-        // the next three are disabled until something is selected
-        editMenu.add(buildMenuItem(vcontroller, "cut", "Cut", KeyEvent.VK_T,
+        editMenu.add(buildMenuItem(vcontroller, "undo", "Undo", KeyEvent.VK_Z,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
+        editMenu.add(buildMenuItem(vcontroller, "redo", "Redo", KeyEvent.VK_Y,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
+
+        ActionIntrospector.getAction(vcontroller, "undo").setEnabled(false);
+        ActionIntrospector.getAction(vcontroller, "redo").setEnabled(false);
+        editMenu.addSeparator();
+
+        // the next four are disabled until something is selected
+        editMenu.add(buildMenuItem(vcontroller, "cut", "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+        editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(vcontroller, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(vcontroller, "paste", "Paste Events", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(vcontroller, "paste", "Paste Events", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+        editMenu.add(buildMenuItem(vcontroller, "remove", "Delete", KeyEvent.VK_DELETE,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
 
-        // These 3 start off being disabled, until something is selected
+        // These start off being disabled, until something is selected
         ActionIntrospector.getAction(vcontroller, "cut").setEnabled(false);
+        ActionIntrospector.getAction(vcontroller, "remove").setEnabled(false);
         ActionIntrospector.getAction(vcontroller, "copy").setEnabled(false);
         ActionIntrospector.getAction(vcontroller, "paste").setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(vcontroller, "newNode", "Add Event Node", KeyEvent.VK_N, null));
-        editMenu.add(buildMenuItem(vcontroller, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S, null));
-        editMenu.add(buildMenuItem(vcontroller, "newStateVariable", "Add State Variable...", KeyEvent.VK_V, null));
-        editMenu.add(buildMenuItem(vcontroller, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_R, null));
-        editMenu.add(buildMenuItem(vcontroller, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
+        editMenu.add(buildMenuItem(vcontroller, "newNode", "Add Event Node", KeyEvent.VK_N,
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK)));
+        editMenu.add(buildMenuItem(vcontroller, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S,
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK)));
+        editMenu.add(buildMenuItem(vcontroller, "newStateVariable", "Add State Variable...", KeyEvent.VK_V,
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
+        editMenu.add(buildMenuItem(vcontroller, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null));
+        editMenu.add(buildMenuItem(vcontroller, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", null, null));
 
-        // This starts off being disabled, until something is selectedTab
+        // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(vcontroller, "newSelfRefSchedulingEdge").setEnabled(false);
         ActionIntrospector.getAction(vcontroller, "newSelfRefCancelingEdge").setEnabled(false);
         editMenu.addSeparator();
@@ -914,7 +930,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         vCursorHandler() {
             super();
             select = Cursor.getDefaultCursor();
-            //select    = new Cursor(Cursor.MOVE_CURSOR);
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
             Image img = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
 
@@ -1016,7 +1031,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     final static int SELF_REF_CANCEL_DRAG = 2;
     private int dragger;
 
-    // Two classes to support dragging and dropping on the graph
+    // Two classes to support dragging and dropping on the jGraph
     class DragMouseAdapter extends MouseAdapter {
 
         @Override
@@ -1035,6 +1050,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
+    /** Class to facilitate dragging new nodes, or self-referential edges onto nodes  onto the pallette */
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
@@ -1049,7 +1065,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         public void drop(DropTargetDropEvent e) {
             Point p = e.getLocation();  // subtract the size of the label
 
-            // get the node in question from the graph
+            // get the node in question from the jGraph
             Object o = getCurrentVgcw().getViskitElementAt(p);
 
             if (dragger == NODE_DRAG) {
@@ -1265,7 +1281,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 vp.setData(null);
                 pp.setData(null);
 
-            // Changes the graph needs to know about
+                // Deliberate fallthrough here
+
+            // Changes the jGraph needs to know about
             default:
                 vgcw.viskitModelChanged((ModelEvent) event);
                 break;

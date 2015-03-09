@@ -47,8 +47,11 @@ public interface Model {
     boolean isDirty();
 
     /**
-     * This is messaged by the controller, typically after a newModel(f) message.  It is used to inst a vector of all the
-     * nodes in the graph.  Since the EventNode object has src and target members, it also serves to inst all the edges.
+     * This is messaged by the controller, typically after a newModel(f) message.
+     * It is used to inst a vector of all the nodes in the graph.  Since the
+     * EventNode object has src and target members, it also serves to inst all
+     * the edges.
+     * 
      * @return Vector of EventNodes.
      */
     Vector<ViskitElement> getAllNodes();
@@ -79,24 +82,30 @@ public interface Model {
      */
     void newSchedulingEdge(EventNode src, EventNode target);
 
+    /** Models a canceling edge between two nodes
+     *
+     * @param src the source node
+     * @param target the target node
+     */
     void newCancelingEdge(EventNode src, EventNode target);
 
     /**
-     * Delete the referenced event, also deleting attached edges.
+     * Delete the referenced event, also deleting attached edges.  Also handles
+     * an undo
      *
-     * @param node the node to delete
+     * @param node the node to delete or undo
      */
     void deleteEvent(EventNode node);
 
-    /** Deletes the given edge from the canvas
+    /** Deletes the given edge from the canvas.  Also handles an undo
      *
-     * @param edge the edge to delete
+     * @param edge the edge to delete or undo
      */
     void deleteSchedulingEdge(Edge edge);
 
-    /** Deletes the given edge from the canvas
+    /** Deletes the given edge from the canvas.  Also handles and undo
      *
-     * @param edge the edge to delete
+     * @param edge the edge to delete or undo
      */
     void deleteCancelingEdge(Edge edge);
 
@@ -156,4 +165,21 @@ public interface Model {
     void resetIdxNameGenerator();
 
     String generateStateVariableName();
+
+    /** Supports redo of a canceling edge
+     * @param ed the CancelingEdge to reinsert into the model
+     */
+    void redoCancelingEdge(Edge ed);
+
+    /**
+     * Supports redo of a scheduling edge
+     * @param ed the SchedulingEdge to reinsert into the model
+     */
+    void redoSchedulingEdge(Edge ed);
+
+    /**
+     * Supports redo of an event node
+     * @param node the event to reinsert into the model
+     */
+    void redoEvent(EventNode node);
 }

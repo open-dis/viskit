@@ -14,8 +14,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import viskit.util.FileBasedAssyNode;
-import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
+import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 
@@ -42,11 +43,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private Map<String, AssemblyNode> nodeCache;
     private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
-    private AssemblyController controller;
+    private AssemblyControllerImpl controller;
 
-    public AssemblyModelImpl(AssemblyController cont) {
+    public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
-        controller = cont;
+        controller = (AssemblyControllerImpl) cont;
         metaData = new GraphMetaData(this);
         setNodeCache(new LinkedHashMap<String, AssemblyNode>());
     }
@@ -330,6 +331,41 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
+    public void redoEventGraph(EvGraphNode node) {
+        SimEntity jaxbEG = oFactory.createSimEntity();
+
+        jaxbEG.setName(node.getName());
+        node.opaqueModelObject = jaxbEG;
+        jaxbEG.setType(node.getType());
+
+        getNodeCache().put(node.getName(), node);   // key = ev
+
+        jaxbRoot.getSimEntity().add(jaxbEG);
+
+        modelDirty = true;
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
+    }
+
+    @Override
+    public void deleteEvGraphNode(EvGraphNode evNode) {
+        SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
+        getNodeCache().remove(jaxbEv.getName());
+        jaxbRoot.getSimEntity().remove(jaxbEv);
+
+        modelDirty = true;
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event Graph deleted"));
+        else
+            notifyChanged(new ModelEvent(evNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
+    }
+
+    @Override
+    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+        newPropChangeListener(widgetName, node.loadedClass, p);
+    }
+
+    @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
         PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
         if (p == null) {
@@ -358,10 +394,33 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
-        // This is not needed
-        //todo yank out all the FileBasedAssyNode stuff
-        newPropChangeListener(widgetName, node.loadedClass, p);
+    public void redoPropChangeListener(PropChangeListenerNode node) {
+
+        PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
+
+        jaxbPCL.setName(node.getName());
+        jaxbPCL.setType(node.getType());
+
+        node.opaqueModelObject = jaxbPCL;
+
+        jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
+
+        modelDirty = true;
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_PCL, "Property Change Node redone"));
+    }
+
+    @Override
+    public void deletePropChangeListener(PropChangeListenerNode pclNode) {
+        PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
+        getNodeCache().remove(pclNode.getName());
+        jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
+
+        modelDirty = true;
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
+        else
+            notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL, "Property Change Listener undone"));
     }
 
     @Override
@@ -391,7 +450,27 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target) {
+    public void redoAdapterEdge(AdapterEdge ae) {
+        AssemblyNode src, target;
+
+        src = (AssemblyNode) ae.getFrom();
+        target = (AssemblyNode) ae.getTo();
+
+        Adapter jaxbAdapter = oFactory.createAdapter();
+        ae.opaqueModelObject = jaxbAdapter;
+        jaxbAdapter.setTo(target.getName());
+        jaxbAdapter.setFrom(src.getName());
+        jaxbAdapter.setName(ae.getName());
+
+        jaxbRoot.getAdapter().add(jaxbAdapter);
+
+        modelDirty = true;
+
+        this.notifyChanged(new ModelEvent(ae, ModelEvent.REDO_ADAPTER_EDGE, "Adapter edge added"));
+    }
+
+    @Override
+    public PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
         PropChangeEdge pce = new PropChangeEdge();
         pce.setFrom(src);
         pce.setTo(target);
@@ -411,6 +490,24 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
         return pce;
+    }
+
+    @Override
+    public void redoPropChangeEdge(PropChangeEdge pce) {
+        AssemblyNode src, target;
+
+        src = (AssemblyNode) pce.getFrom();
+        target = (AssemblyNode) pce.getTo();
+
+        PropertyChangeListenerConnection pclc = oFactory.createPropertyChangeListenerConnection();
+        pce.opaqueModelObject = pclc;
+        pclc.setListener(target.getName());
+        pclc.setSource(src.getName());
+
+        jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
+        modelDirty = true;
+
+        this.notifyChanged(new ModelEvent(pce, ModelEvent.REDO_PCL_EDGE, "PCL edge added"));
     }
 
     @Override
@@ -436,23 +533,21 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteEvGraphNode(EvGraphNode evNode) {
-        SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
-        getNodeCache().remove(jaxbEv.getName());
-        jaxbRoot.getSimEntity().remove(jaxbEv);
+    public void redoSimEvLisEdge(SimEvListenerEdge sele) {
+        AssemblyNode src, target;
+
+        src = (AssemblyNode) sele.getFrom();
+        target = (AssemblyNode) sele.getTo();
+
+        SimEventListenerConnection selc = oFactory.createSimEventListenerConnection();
+        sele.opaqueModelObject = selc;
+        selc.setListener(target.getName());
+        selc.setSource(src.getName());
+
+        jaxbRoot.getSimEventListenerConnection().add(selc);
 
         modelDirty = true;
-        this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event graph deleted"));
-    }
-
-    @Override
-    public void deletePCLNode(PropChangeListenerNode pclNode) {
-        PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
-        getNodeCache().remove(pclNode.getName());
-        jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
-
-        modelDirty = true;
-        this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
+        notifyChanged(new ModelEvent(sele, ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE, "SimEvList Edge redone"));
     }
 
     @Override
@@ -462,7 +557,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
 
         modelDirty = true;
-        this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
+        else
+            notifyChanged(new ModelEvent(pce, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
     }
 
     @Override
@@ -472,7 +571,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbRoot.getSimEventListenerConnection().remove(sel_c);
 
         modelDirty = true;
-        this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
+        else
+            notifyChanged(new ModelEvent(sele, ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE, "SimEvList edge undone"));
     }
 
     @Override
@@ -481,7 +584,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbRoot.getAdapter().remove(j_adp);
 
         modelDirty = true;
-        notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
+        else
+            notifyChanged(new ModelEvent(ae, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
     }
 
     @Override

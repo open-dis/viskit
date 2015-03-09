@@ -20,13 +20,13 @@ import viskit.model.SchedulingEdge;
  */
 public class vGraphModel extends DefaultGraphModel {
 
-    public JGraph graph; // fix this
+    Map viskitEdgeStyle, viskitCancelEdgeStyle;
+    Map viskitSelfRefEdge, viskitSelfRefCancel;
+    private JGraph jGraph;
 
     public vGraphModel() {
         initViskitStyle();
     }
-    Map viskitEdgeStyle, viskitCancelEdgeStyle;
-    Map viskitSelfRefEdge, viskitSelfRefCancel;
 
     @SuppressWarnings("unchecked") // JGraph not genericized
     private void initViskitStyle() {
@@ -76,6 +76,12 @@ public class vGraphModel extends DefaultGraphModel {
         reDrawNodes(); // jmb try...yes, I thought the stopEditing would do the same thing
     }
 
+    /** Critical in toggling the status of a model, whether it can compile, or not */
+    public void reDrawNodes() {
+        jGraph.getUI().stopEditing(jGraph);
+        jGraph.refresh();
+    }
+
     public void changeEdge(Edge ed) {
         changeEitherEdge(ed);
     }
@@ -100,38 +106,40 @@ public class vGraphModel extends DefaultGraphModel {
         reDrawNodes(); // this does it, but label is screwed
     }
 
-    private void reDrawNodes() {
-        graph.getUI().stopEditing(graph);
-        graph.refresh();
-    }
-
+    /** Ensures a clean JGraph tab for a new model */
     public void deleteAll() {
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
             if (localRoot instanceof CircleCell) {
                 Object[] child = new Object[1];
                 child[0] = ((CircleCell) localRoot).getFirstChild();
-                remove(child);
+                jGraph.getGraphLayoutCache().remove(child);
             }
         }
-        remove(localRoots);
+        jGraph.getGraphLayoutCache().remove(localRoots);
+
+        reDrawNodes();
+    }
+
+    public void deleteEventNode(EventNode en) {
+
+        DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
+        c.removeAllChildren();
+        jGraph.getGraphLayoutCache().remove(new Object[]{c});
+
+        reDrawNodes();
     }
 
     public void deleteEdge(Edge edge) {
+
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
-        remove(new Object[]{e});
+        jGraph.getGraphLayoutCache().remove(new Object[]{e});
 
         reDrawNodes();
     }
 
     public void deleteCancelingEdge(Edge edge) {
         deleteEdge(edge);
-    }
-
-    public void deleteEventNode(EventNode en) {
-        DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
-        c.removeAllChildren();
-        remove(new Object[]{c});
     }
 
     public void addEdge(Edge e) {
@@ -145,6 +153,7 @@ public class vGraphModel extends DefaultGraphModel {
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     private void _addEdgeCommon(Edge ed, Map edgeStyle) {
+
         EventNode enfrom = ed.from;
         EventNode ento = ed.to;
         DefaultGraphCell source = (DefaultGraphCell) enfrom.opaqueViewObject;
@@ -175,8 +184,15 @@ public class vGraphModel extends DefaultGraphModel {
             atts.put(edge, edgeStyle);
         }
 
-        insert(new Object[]{edge}, atts, cs, null, null);
+        jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
 
         reDrawNodes();
+    }
+
+    /**
+     * @param jGraph the jGraph to set
+     */
+    public void setjGraph(JGraph jGraph) {
+        this.jGraph = jGraph;
     }
 }

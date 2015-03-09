@@ -108,14 +108,6 @@ public interface EventGraphController {
 
     void codeBlockEdit(String s);
 
-    /* menu selections */
-    void copy();
-
-    /**
-     * Ultimately performs a delete function for selected edges and nodes
-     */
-    void cut();        // to remove nodes and edges
-
     /**
      * Opens selected files from a FileChooser
      */
@@ -129,6 +121,25 @@ public interface EventGraphController {
      * Closes all open EGs open from a project
      */
     void closeAll();
+
+    /** CMD-Z or CNTL-Z */
+    void undo();
+
+    /** CMD-Y or CNTL-Y */
+    void redo();
+
+    /** Perform a full delete */
+    void remove();
+
+    /**
+     * Not supported in Viskit
+     */
+    void cut();
+
+    /**
+     * CMD-C or CNTL-C
+     */
+    void copy();
 
     /** Performs the paste operation CNTL-V or CMD-V */
     void paste();

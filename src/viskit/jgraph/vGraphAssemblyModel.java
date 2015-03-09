@@ -23,14 +23,14 @@ import viskit.model.*;
  */
 public class vGraphAssemblyModel extends DefaultGraphModel {
 
-    public JGraph graph; // fix this
+    Map viskitAssyAdapterEdgeStyle;
+    Map viskitAssyPclEdgeStyle;
+    Map viskitAssySimEvLisEdgeStyle;
+    private JGraph jGraph;
 
     public vGraphAssemblyModel() {
         initViskitStyle();
     }
-    Map viskitAssyAdapterEdgeStyle;
-    Map viskitAssyPclEdgeStyle;
-    Map viskitAssySimEvLisEdgeStyle;
 
     @SuppressWarnings("unchecked") // JGraph not genericized
     private void initViskitStyle() {
@@ -71,47 +71,54 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle, Color.black);
     }
 
-    private void reDrawNodes() {
-        graph.getUI().stopEditing(graph);
-        graph.refresh();
-    }
-
     public void changeEvent(AssemblyNode en) {
         DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
         c.setUserObject(en);
+
         reDrawNodes();
     }
 
+    public void reDrawNodes() {
+        jGraph.getUI().stopEditing(jGraph);
+        jGraph.refresh();
+    }
+
+    public void changeEGNode(AssemblyNode egn) {
+        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
+        c.setUserObject(egn);
+
+        reDrawNodes();
+    }
+
+    public void changePCLNode(AssemblyNode pcln) {
+        changeEGNode(pcln);
+    }
+
+    /** Ensures a clean JGraph tab for a new model */
     public void deleteAll() {
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
             if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropListCell) {
                 Object[] child = new Object[1];
                 child[0] = ((DefaultGraphCell) localRoot).getFirstChild();
-                remove(child);
+                jGraph.getGraphLayoutCache().remove(child);
             }
         }
-        remove(localRoots);
+        jGraph.getGraphLayoutCache().remove(localRoots);
+
+        reDrawNodes();
     }
 
     public void deleteEGNode(AssemblyNode egn) {
         DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
         c.removeAllChildren();
-        this.remove(new Object[]{c});
-    }
+        jGraph.getGraphLayoutCache().remove(new Object[]{c});
 
-    public void changeEGNode(AssemblyNode egn) {
-        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
-        c.setUserObject(egn);
         reDrawNodes();
     }
 
     public void deletePCLNode(AssemblyNode pcln) {
         deleteEGNode(pcln);
-    }
-
-    public void changePCLNode(AssemblyNode pcln) {
-        changeEGNode(pcln);
     }
 
     // TODO: This version JGraph does not support generics
@@ -133,8 +140,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         Map atts = new Hashtable();
         atts.put(edge, this.viskitAssyAdapterEdgeStyle);
 
-        insert(new Object[]{edge}, atts, cs, null, null);
-        toBack(new Object[]{edge});
+        jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
+
+        reDrawNodes();
     }
 
     public void changeAdapterEdge(AssemblyEdge ae) {
@@ -143,8 +151,8 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
 
     public void deleteAdapterEdge(AssemblyEdge ae) {
         DefaultEdge c = (DefaultEdge) ae.opaqueViewObject;
-        this.remove(new Object[]{c});
-        
+        jGraph.getGraphLayoutCache().remove(new Object[]{c});
+
         reDrawNodes();
     }
 
@@ -182,8 +190,9 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         Map atts = new Hashtable();
         atts.put(edge, this.viskitAssySimEvLisEdgeStyle);
 
-        insert(new Object[]{edge}, atts, cs, null, null);
-        toBack(new Object[]{edge});
+        jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
+
+        reDrawNodes();
     }
 
     public void deletePclEdge(AssemblyEdge pce) {
@@ -212,9 +221,15 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         Map atts = new Hashtable();
         atts.put(edge, this.viskitAssyPclEdgeStyle);
 
-        insert(new Object[] {edge}, atts, cs, null, null);
-        toBack(new Object[] {edge});
+        jGraph.getGraphLayoutCache().insert(new Object[] {edge}, atts, cs, null, null);
 
         reDrawNodes();
+    }
+
+    /**
+     * @param jGraph the jGraph to set
+     */
+    public void setjGraph(JGraph jGraph) {
+        this.jGraph = jGraph;
     }
 }

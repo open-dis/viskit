@@ -26,6 +26,12 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
      void newEventGraph(String widgetName, String className, Point2D p);
 
+     /**
+      * Support redo for the event graph node
+      * @param node the node to redo
+      */
+     void redoEventGraph(EvGraphNode node);
+
     /** Places an event graph node on the assembly pallete when the user drags
      * an icon from the LEGO tree
      *
@@ -36,6 +42,12 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
     void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
     void newPropChangeListener(String widgetName, String className, Point2D p);
+
+    /**
+     * Supports redo of a PropChangeListenerNode
+     * @param node the node to redo
+     */
+    void redoPropChangeListener(PropChangeListenerNode node);
 
     void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
@@ -82,7 +94,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-    PropChangeEdge newPclEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
+    PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
 
     void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
@@ -98,9 +110,15 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     void deleteEvGraphNode(EvGraphNode evNode);
 
-    void deletePCLNode(PropChangeListenerNode pclNode);
+    void deletePropChangeListener(PropChangeListenerNode pclNode);
 
     void deleteAdapterEdge(AdapterEdge ae);
+
+    /**
+     * Support redo of an AdapterEdge
+     * @param ae the edge to redo
+     */
+    void redoAdapterEdge(AdapterEdge ae);
 
     /**
      * Assembly nodes don't hold onto edges.
@@ -108,7 +126,19 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     void deletePropChangeEdge(PropChangeEdge pce);
 
+    /**
+     * Supports redo of a PropChangeEdge
+     * @param pce the edge to redo
+     */
+    void redoPropChangeEdge(PropChangeEdge pce);
+
     void deleteSimEvLisEdge(SimEvListenerEdge sele);
+
+    /**
+     * Supports redo of a SimEvLisEdge
+     * @param sele the edge to redo
+     */
+    void redoSimEvLisEdge(SimEvListenerEdge sele);
 
     /** Retrieve a list of detailed output entity names
      *

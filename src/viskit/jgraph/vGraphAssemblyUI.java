@@ -8,6 +8,10 @@ import viskit.control.AssemblyController;
 import viskit.model.*;
 
 /**
+ * BasicGraphUI must be overridden to allow in node and edge editing.
+ * This code is a copy of the appropriate parts of EditorGraph.java, which is
+ * part of JGraph examples.
+ *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -16,10 +20,6 @@ import viskit.model.*;
  * @since Mar 8, 2004
  * @since 3:17:59 PM
  * @version $Id$
- *
- * BasicGraphUI must be overridden to allow in node and edge editing.
- * This code is a copy of the appropriate parts of EditorGraph.java, which is
- * part of JGraph examples.
  */
 public class vGraphAssemblyUI extends BasicGraphUI {
 

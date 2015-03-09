@@ -20,11 +20,15 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import org.jgraph.graph.DefaultGraphCell;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
+import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -53,7 +57,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class EventGraphControllerImpl extends mvcAbstractController implements EventGraphController {
 
-    static final Logger LOGGER = LogUtils.getLogger(EventGraphControllerImpl.class);
+    static final Logger LOG = LogUtils.getLogger(EventGraphControllerImpl.class);
 
     public EventGraphControllerImpl() {
         initConfig();
@@ -125,7 +129,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         boolean modified =
-                EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
+                EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {
 
             // update title bar
@@ -270,7 +274,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             dirWatch.setLoopSleepTime(1_000); // 1 sec
             dirWatch.startWatcher();
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOG.error(e);
         }
     }
 
@@ -290,11 +294,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private void fileWatchOpen(File f) {
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
-        LOGGER.debug("f is: " + f + " and ofile is: " + ofile);
+        LOG.debug("f is: " + f + " and ofile is: " + ofile);
         try {
             FileIO.copyFile(f, ofile, true);
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOG.error(e);
 //            e.printStackTrace();
         }
     }
@@ -622,37 +626,22 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     {
         ((viskit.model.Model) getModel()).newStateVariable(name, type, initVal, comment);
     }
+
     private Vector<Object> selectionVector = new Vector<>();
+    private Vector<Object> copyVector = new Vector<>();
 
     @Override
     public void selectNodeOrEdge(Vector<Object> v) //------------------------------------
     {
         selectionVector = v;
+        boolean selected = nodeOrEdgeSelected(v);
+
+        // Cut not supported
+        ActionIntrospector.getAction(this, "cut").setEnabled(false);
+        ActionIntrospector.getAction(this, "remove").setEnabled(selected);
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected(v));
-        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(nodeOrEdgeSelected(v));
-        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(nodeOrEdgeSelected(v));
-    }
-    private Vector<Object> copyVector = new Vector<>();
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void copy() //----------------
-    {
-        if (!nodeSelected()) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
-                    "Unsupported Action",
-                    "Edges cannot be copied.");
-            return;
-        }
-        copyVector = (Vector<Object>) selectionVector.clone();
-
-        // Paste only works for node, check to enable/disable paste menu item
-        handlePasteMenuItem();
-    }
-
-    private void handlePasteMenuItem() {
-        ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
+        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(selected);
+        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(selected);
     }
 
     private boolean nodeCopied() {
@@ -684,28 +673,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return false;
     }
 
-    @Override
-    public void paste() //-----------------
-    {
-        if (copyVector.isEmpty()) {
-            return;
-        }
-        int x = 100, y = 100;
-        int n = 0;
-        // We only paste un-attached nodes (at first)
-        for (Object o : copyVector) {
-            if (o instanceof Edge) {
-                continue;
-            }
-            String nm = ((ViskitElement) o).getName();
-            ((viskit.model.Model) getModel()).newEvent(nm + "-copy", new Point(x + (20 * n), y + (20 * n)));
-            n++;
-        }
-    }
+    private boolean doRemove = false;
 
     @Override
-    public void cut() //---------------
-    {
+    public void remove() {
         if (!selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
@@ -720,44 +691,186 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
             if (msg.length() > 3) {
                 msg = msg.substring(3);
-            }  // remove leading stuff
+            } // remove leading stuff
 
-            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected but attached edges are permanently deleted.)" : "");
-            if (((EventGraphView) getView()).genericAskYN("Cut element(s)?", "Confirm cut " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
+            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
+            doRemove = ((EventGraphView) getView()).genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            if (doRemove) {
                 // do edges first?
                 delete();
             }
-            handlePasteMenuItem();
         }
     }
 
-    /** Permanently delete selected nodes and attached edges from the cache */
+    @Override
+    public void cut() //---------------
+    {
+        // Not supported
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void copy() //----------------
+    {
+        if (!nodeSelected()) {
+            messageUser(JOptionPane.WARNING_MESSAGE,
+                    "Unsupported Action",
+                    "Edges cannot be copied.");
+            return;
+        }
+        copyVector = (Vector<Object>) selectionVector.clone();
+
+        // Paste only works for a node, check to enable/disable paste menu item
+        handlePasteMenuItem();
+    }
+
+    private void handlePasteMenuItem() {
+        ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
+    }
+
+    static int bias = 0;
+
+    @Override
+    public void paste() //-----------------
+    {
+        if (copyVector.isEmpty()) {
+            return;
+        }
+        int x = 100, y = 100;
+        int offset = 20;
+        // We only paste un-attached nodes (at first)
+        for (Object o : copyVector) {
+            if (o instanceof Edge) {
+                continue;
+            }
+            String nm = ((ViskitElement) o).getName();
+            buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
+            bias++;
+        }
+    }
+
+    /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
     private void delete() {
-        copyVector = (Vector<Object>) selectionVector.clone();
-        for (Object elem : copyVector) {
+
+        // Prevent concurrent modification
+        Vector<Object> v = (Vector<Object>) selectionVector.clone();
+        for (Object elem : v) {
             if (elem instanceof Edge) {
-                killEdge((Edge) elem);
+                removeEdge((Edge) elem);
             } else if (elem instanceof EventNode) {
                 EventNode en = (EventNode) elem;
                 for (ViskitElement ed : en.getConnections()) {
-                    killEdge((Edge) ed);
+                    removeEdge((Edge) ed);
                 }
                 ((Model) getModel()).deleteEvent(en);
             }
         }
 
         // Clear the cache after a delete to prevent unnecessary buildup
-        selectionVector.clear();
-        copyVector.clear();
+        if (!selectionVector.isEmpty())
+            selectionVector.clear();
     }
 
-    private void killEdge(Edge e) {
+    /** Removes the JAXB (XML) binding from the model for this edge
+     *
+     * @param e the edge to remove
+     */
+    private void removeEdge(Edge e) {
         if (e instanceof SchedulingEdge) {
             ((Model) getModel()).deleteSchedulingEdge(e);
         } else {
             ((Model) getModel()).deleteCancelingEdge(e);
         }
+    }
+
+    /** Assume the last selected element is our candidate for a redo */
+    private DefaultGraphCell redoGraphCell;
+
+    /** Inform the model that this in an undo, not full delete */
+    private boolean isUndo = false;
+
+    /**
+     * Informs the model that this is an undo, not a full delete
+     * @return true if an undo, not a full delete
+     */
+    public boolean isUndo() {
+        return isUndo;
+    }
+
+    /**
+     * Removes the last selected node or edge from the JGraph model
+     */
+    @Override
+    public void undo() {
+
+        isUndo = true;
+
+        EventGraphViewFrame view = (EventGraphViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+
+        Object[] roots = view.getCurrentVgcw().getRoots();
+        redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
+        selectionVector.add(redoGraphCell.getUserObject());
+
+        remove();
+
+        if (!doRemove) {return;}
+
+        try {
+
+            // This will clear the selectionVector via callbacks
+            undoMgr.undo(view.getCurrentVgcw().getGraphLayoutCache());
+        } catch (CannotUndoException ex) {
+            LOG.error("Unable to undo: " + ex);
+        } finally {
+            updateUndoRedoStatus();
+        }
+    }
+
+    /**
+     * Replaces the last selected node or edge from the JGraph model
+     */
+    @Override
+    public void redo() {
+
+        // Recreate the JAXB (XML) bindings since the paste function only does
+        // nodes and not edges
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
+
+            // Handles both arcs and self-referential arcs
+            if (redoGraphCell.getUserObject() instanceof SchedulingEdge) {
+                SchedulingEdge ed = (SchedulingEdge) redoGraphCell.getUserObject();
+                ((Model) getModel()).redoSchedulingEdge(ed);
+            } else {
+                CancelingEdge ed = (CancelingEdge) redoGraphCell.getUserObject();
+                ((Model) getModel()).redoCancelingEdge(ed);
+            }
+        } else {
+            EventNode node = (EventNode) redoGraphCell.getUserObject();
+            ((Model) getModel()).redoEvent(node);
+        }
+
+        EventGraphViewFrame view = (EventGraphViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        try {
+            undoMgr.redo(view.getCurrentVgcw().getGraphLayoutCache());
+        } catch (CannotRedoException ex) {
+            LOG.error("Unable to redo: " + ex);
+        } finally {
+            updateUndoRedoStatus();
+        }
+    }
+
+    /** Toggles the undo/redo Edit menu items on/off */
+    public void updateUndoRedoStatus() {
+        EventGraphViewFrame view = (EventGraphViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgcw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgcw().getGraphLayoutCache()));
+
+        isUndo = false;
     }
 
     @Override
@@ -796,11 +909,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             x2j = new SimkitXML2Java(localLastFile);
             x2j.unmarshal();
         } catch (FileNotFoundException fnfe) {
-            LOGGER.error(fnfe);
+            LOG.error(fnfe);
         }
 
         String source = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
-        LOGGER.debug(source);
+        LOG.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +
                     mod.getMetaData().name;
@@ -873,7 +986,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Handles the menu selection for a new self-referential scheduling edge */
     public void newSelfRefSchedulingEdge() //--------------------------
     {
-        if (selectionVector != null && selectionVector.size() > 0) {
+        if (selectionVector != null) {
             for (Object o : selectionVector) {
                 if (o instanceof EventNode) {
                     ((Model) getModel()).newSchedulingEdge((EventNode) o, (EventNode) o);
@@ -884,7 +997,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     /** Handles the menu selection for a new self-referential canceling edge */
     public void newSelfRefCancelingEdge() {  //--------------------------
-        if (selectionVector != null && selectionVector.size() > 0) {
+        if (selectionVector != null) {
             for (Object o : selectionVector) {
                 if (o instanceof EventNode) {
                     ((Model) getModel()).newCancelingEdge((EventNode) o, (EventNode) o);
@@ -899,7 +1012,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (mod == null) {return;}
         GraphMetaData gmd = mod.getMetaData();
         boolean modified =
-                EventGraphMetaDataDialog.showDialog(VGlobals.instance().getEventGraphEditor(), gmd);
+                EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {
             ((Model) getModel()).changeMetaData(gmd);
 
@@ -951,6 +1064,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Get only the jgraph part
         Component component = egvf.getCurrentJgraphComponent();
+        if (component == null) {return;}
         File localLastFile = ((Model) getModel()).getLastFile();
         if (localLastFile != null) {
             fileName = localLastFile.getName();
@@ -992,13 +1106,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) {
             _doOpen(eventGraph);
-            LOGGER.debug("eventGraph: " + eventGraph);
+            LOG.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
             if (itr.hasNext()) {
                 eventGraphImage = itr.next();
                 eventGraphImageFile = new File(eventGraphImage);
-                LOGGER.debug("eventGraphImage is: " + eventGraphImage);
+                LOG.debug("eventGraphImage is: " + eventGraphImage);
                 tcb = new TimerCallback(eventGraphImageFile, false, egvf.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
@@ -1032,7 +1146,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
-                LOGGER.debug("CurrentJgraphComponent is a JScrollPane: " + component);
+                LOG.debug("CurrentJgraphComponent is a JScrollPane: " + component);
             }
             Rectangle reg = component.getBounds();
             BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
@@ -1042,7 +1156,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             try {
                 ImageIO.write(image, "png", fil);
             } catch (IOException e) {
-                LOGGER.error(e);
+                LOG.error(e);
             }
 
             // display a scaled version
@@ -1073,8 +1187,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            LOGGER.error("Error loading history file: " + e.getMessage());
-            LOGGER.warn("Recent file saving disabled");
+            LOG.error("Error loading history file: " + e.getMessage());
+            LOG.warn("Recent file saving disabled");
             historyConfig = null;
         }
     }

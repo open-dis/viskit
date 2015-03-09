@@ -25,8 +25,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import org.jgraph.graph.DefaultGraphCell;
 import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
@@ -35,7 +38,9 @@ import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
+import static viskit.control.EventGraphControllerImpl.LOG;
 import viskit.doe.LocalBootLoader;
+import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -46,6 +51,7 @@ import viskit.view.dialog.AssemblyMetaDataDialog;
 import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
+import viskit.view.EventGraphViewFrame;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -637,6 +643,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
+    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
+    {   AssemblyView view = (AssemblyView) getView();
+        if (view != null)
+            ((AssemblyView) getView()).genericReport(typ, title, msg);
+        else {
+            JOptionPane.showMessageDialog(null, msg, title, typ);
+        }
+    }
+
+    @Override
     public void quit() {
         if (preQuit()) {
             postQuit();
@@ -875,7 +891,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        pcListenerEdgeEdit(((AssemblyModel) getModel()).newPclEdge(oArr[0], oArr[1]));
+        pcListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
     AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
@@ -998,29 +1014,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private Vector<Object> selectionVector = new Vector<>();
+    private Vector<Object> copyVector = new Vector<>();
 
     @Override
     public void selectNodeOrEdge(Vector<Object> v) {
         selectionVector = v;
-        ActionIntrospector.getAction(this, "copy").setEnabled(nodeOrEdgeSelected());
-        ActionIntrospector.getAction(this, "cut").setEnabled(nodeOrEdgeSelected());
-    }
-    private Vector<Object> copyVector = new Vector<>();
+        boolean selected = nodeOrEdgeSelected();
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void copy() {
-        if (selectionVector.isEmpty()) {
-            return;
-        }
-        copyVector = (Vector<Object>) selectionVector.clone();
-
-        // Paste only works for node, check to enable/disable paste menu item
-        handlePasteMenuItem();
-    }
-
-    private void handlePasteMenuItem() {
-        ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
+        // Cut not supported
+        ActionIntrospector.getAction(this, "cut").setEnabled(false);
+        ActionIntrospector.getAction(this, "remove").setEnabled(selected);
+        ActionIntrospector.getAction(this, "copy").setEnabled(selected);
     }
 
     private boolean nodeCopied() {
@@ -1044,35 +1048,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return false;
     }
 
-    @Override
-    public void paste() //-----------------
-    {
-        if (copyVector.isEmpty()) {
-            return;
-        }
-        int x = 100,
-            y = 100;
-        int n = 0;
-        for (Object o : copyVector) {
-            if (o instanceof AssemblyEdge) {
-                continue;
-            }
-            if (o instanceof EvGraphNode) {
-                String nm = ((ViskitElement) o).getName();
-                String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount++, typ, new Point(x + (20 * n), y + (20 * n)));
-            } else if (o instanceof PropChangeListenerNode) {
-                String nm = ((ViskitElement) o).getName();
-                String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount++, typ, new Point(x + (20 * n), y + (20 * n)));
-            }
-            n++;
-        }
-    }
+    private boolean doRemove = false;
 
     @Override
-    public void cut() {
-        if (selectionVector != null && !selectionVector.isEmpty()) {
+    public void remove() {
+        if (!selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
             int nodeCount = 0;  // different msg for edge delete
@@ -1084,43 +1064,92 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 s = s.replace('\n', ' ');
                 msg += ", \n" + s;
             }
-            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be deleted.)" : "";
-            if (((AssemblyView) getView()).genericAsk("Cut element(s)?", "Confirm cut" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION) {
+            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
+            doRemove = ((AssemblyView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            if (doRemove) {
                 // do edges first?
                 delete();
             }
-            handlePasteMenuItem();
         }
     }
 
-    /** Permanently delete selected nodes and attached edges from the cache */
+    @Override
+    public void cut() //---------------
+    {
+        // Not supported
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void copy() {
+        if (selectionVector.isEmpty()) {
+            return;
+        }
+        copyVector = (Vector<Object>) selectionVector.clone();
+
+        // Paste only works for node, check to enable/disable paste menu item
+        handlePasteMenuItem();
+    }
+
+    private void handlePasteMenuItem() {
+        ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
+    }
+
+    static int bias = 0;
+
+    @Override
+    public void paste() //-----------------
+    {
+        if (copyVector.isEmpty()) {
+            return;
+        }
+        int x = 100, y = 100;
+        int offset = 20;
+        for (Object o : copyVector) {
+            if (o instanceof AssemblyEdge) {
+                continue;
+            }
+            if (o instanceof EvGraphNode) {
+                String nm = ((ViskitElement) o).getName();
+                String typ = ((ViskitElement) o).getType();
+                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount++, typ, new Point(x + (offset * bias), y + (offset * bias)));
+            } else if (o instanceof PropChangeListenerNode) {
+                String nm = ((ViskitElement) o).getName();
+                String typ = ((ViskitElement) o).getType();
+                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount++, typ, new Point(x + (offset * bias), y + (offset * bias)));
+            }
+            bias++;
+        }
+    }
+
+    /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
     private void delete() {
-        copyVector = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
-        for (Object elem : copyVector) {
+        Vector<Object> v = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
+        for (Object elem : v) {
             if (elem instanceof AssemblyEdge) {
-                killEdge((AssemblyEdge) elem);
+                removeEdge((AssemblyEdge) elem);
             } else if (elem instanceof EvGraphNode) {
                 EvGraphNode en = (EvGraphNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
-                    killEdge(ed);
+                    removeEdge(ed);
                 }
                 ((AssemblyModel) getModel()).deleteEvGraphNode(en);
             } else if (elem instanceof PropChangeListenerNode) {
                 PropChangeListenerNode en = (PropChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
-                    killEdge(ed);
+                    removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePCLNode(en);
+                ((AssemblyModel) getModel()).deletePropChangeListener(en);
             }
         }
 
         // Clear the cache after a delete to prevent unnecessary buildup
-        selectionVector.clear();
-        copyVector.clear();
+        if (!selectionVector.isEmpty())
+            selectionVector.clear();
     }
 
-    private void killEdge(AssemblyEdge e) {
+    private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
         } else if (e instanceof PropChangeEdge) {
@@ -1130,18 +1159,107 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    /** Assume the last selected element is our candidate for a redo */
+    private DefaultGraphCell redoGraphCell;
+
+    /** Inform the model that this in an undo, not full delete */
+    private boolean isUndo = false;
+
+    /**
+     * Informs the model that this is an undo, not a full delete
+     * @return true if an undo, not a full delete
+     */
+    public boolean isUndo() {
+        return isUndo;
+    }
+
+    /**
+     * Removes the last selected node or edge from the JGraph model
+     */
     @Override
-    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
-    {   AssemblyView view = (AssemblyView) getView();
-        if (view != null)
-            ((AssemblyView) getView()).genericReport(typ, title, msg);
-        else {
-            JOptionPane.showMessageDialog(null, msg, title, typ);
+    public void undo() {
+
+        isUndo = true;
+
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+
+        Object[] roots = view.getCurrentVgacw().getRoots();
+        redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
+        selectionVector.add(redoGraphCell.getUserObject());
+
+        remove();
+
+        if (!doRemove) {return;}
+
+        try {
+
+            // This will clear the selectionVector via callbacks
+            undoMgr.undo(view.getCurrentVgacw().getGraphLayoutCache());
+        } catch (CannotUndoException ex) {
+            LOG.error("Unable to undo: " + ex);
+        } finally {
+            updateUndoRedoStatus();
         }
+    }
+
+    /**
+     * Replaces the last selected node or edge from the JGraph model
+     */
+    @Override
+    public void redo() {
+
+        // Recreate the JAXB (XML) bindings since the paste function only does
+        // nodes and not edges
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
+
+            // Handles both arcs and self-referential arcs
+            if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
+                AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoAdapterEdge(ed);
+            } else if (redoGraphCell.getUserObject() instanceof PropChangeEdge) {
+                PropChangeEdge ed = (PropChangeEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
+            } else {
+                SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
+            }
+        } else {
+
+            if (redoGraphCell.getUserObject() instanceof PropChangeListenerNode) {
+                PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropChangeListener(node);
+            } else {
+                EvGraphNode node = (EvGraphNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoEventGraph(node);
+            }
+        }
+
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        try {
+            undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
+        } catch (CannotRedoException ex) {
+            LOG.error("Unable to redo: " + ex);
+        } finally {
+            updateUndoRedoStatus();
+        }
+    }
+
+    /** Toggles the undo/redo Edit menu items on/off */
+    public void updateUndoRedoStatus() {
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
+
+        isUndo = false;
     }
 
     /********************************/
     /* from menu:*/
+
     @Override
     public void showXML() {
         AssemblyModel vmod = (AssemblyModel) getModel();
@@ -1642,6 +1760,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // Get only the jgraph part
             Component component = avf.getCurrentJgraphComponent();
+            if (component == null) {return;}
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
             }
