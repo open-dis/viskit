@@ -245,6 +245,20 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         } else {
             viskitView.delTab(mod);   // Not a good open, tell view
         }
+
+        resetRedoUndoStatus();
+    }
+
+    /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
+    private void resetRedoUndoStatus() {
+
+        EventGraphViewFrame view = (EventGraphViewFrame) getView();
+
+        if (view.getCurrentVgcw() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+            undoMgr.discardAllEdits();
+            updateUndoRedoStatus();
+        }
     }
 
     /** Mark every EG file opened as "open" in the app config file */
@@ -728,7 +742,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
     }
 
-    static int bias = 0;
+    private int bias = 0;
 
     @Override
     public void paste() //-----------------

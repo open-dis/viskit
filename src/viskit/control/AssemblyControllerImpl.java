@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,7 +52,6 @@ import viskit.view.dialog.AssemblyMetaDataDialog;
 import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
-import viskit.view.EventGraphViewFrame;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -127,7 +127,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
 
-        _setProjFileSet();
+        recordProjFile();
     }
 
     @Override
@@ -145,7 +145,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public final java.util.List<String> getOpenAssyFileList(boolean refresh) {
         if (refresh || openAssemblies == null) {
-            _setAssyFileSet();
+            recordAssyFiles();
         }
         return openAssemblies;
     }
@@ -264,6 +264,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } else {
             vaw.delTab(mod);
+        }
+
+        resetRedoUndoStatus();
+    }
+
+    /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
+    private void resetRedoUndoStatus() {
+
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+
+        if (view.getCurrentVgacw() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+            undoMgr.discardAllEdits();
+            updateUndoRedoStatus();
         }
     }
 
@@ -1030,7 +1044,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private boolean nodeCopied() {
         return nodeOrEdgeInVector(copyVector);
     }
-    int copyCount = 0;
 
     private boolean nodeOrEdgeSelected() {
         return nodeOrEdgeInVector(selectionVector);
@@ -1083,11 +1096,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     public void copy() {
         if (selectionVector.isEmpty()) {
+            messageUser(JOptionPane.WARNING_MESSAGE,
+                    "Unsupported Action",
+                    "Edges cannot be copied.");
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
 
-        // Paste only works for node, check to enable/disable paste menu item
+        // Paste only works for a node, check to enable/disable paste menu item
         handlePasteMenuItem();
     }
 
@@ -1095,7 +1111,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ActionIntrospector.getAction(this, "paste").setEnabled(nodeCopied());
     }
 
-    static int bias = 0;
+    /** Also acts as a bias for point offset */
+    private int copyCount = 0;
 
     @Override
     public void paste() //-----------------
@@ -1109,16 +1126,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof AssemblyEdge) {
                 continue;
             }
+
+            Point2D p = new Point(x + (offset * copyCount), y + (offset * copyCount));
             if (o instanceof EvGraphNode) {
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount++, typ, new Point(x + (offset * bias), y + (offset * bias)));
+                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
             } else if (o instanceof PropChangeListenerNode) {
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount++, typ, new Point(x + (offset * bias), y + (offset * bias)));
+                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
             }
-            bias++;
+            copyCount++;
         }
     }
 
@@ -1876,7 +1895,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private java.util.List<String> openAssemblies;
-    private void _setAssyFileSet() {
+    private void recordAssyFiles() {
         openAssemblies = new ArrayList<>(4);
         if (historyConfig == null) {return;}
         String[] valueAr = historyConfig.getStringArray(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
@@ -1896,7 +1915,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    private void _setProjFileSet() {
+    private void recordProjFile() {
         if (historyConfig == null) {
             return;
         }
@@ -1949,7 +1968,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private Set<String> getRecentAssyFileSet(boolean refresh) {
         if (refresh || recentAssyFileSet == null) {
-            _setAssyFileSet();
+            recordAssyFiles();
         }
         return recentAssyFileSet;
     }
@@ -1968,7 +1987,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private Set<String> getRecentProjFileSet(boolean refresh) {
         if (refresh || recentProjFileSet == null) {
-            _setProjFileSet();
+            recordProjFile();
         }
         return recentProjFileSet;
     }
