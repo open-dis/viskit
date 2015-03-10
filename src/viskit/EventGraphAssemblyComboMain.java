@@ -211,7 +211,7 @@ public class EventGraphAssemblyComboMain {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } else if (s.equalsIgnoreCase("platform")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } else if (!s.isEmpty()) {
+            } else {
                 UIManager.setLookAndFeel(s);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
