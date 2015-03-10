@@ -1,0 +1,16 @@
+$Id:$
+
+This note details what files are to be modified when bumping up the release
+version #:
+
+1) build.properties
+    product.version.major=1
+    product.version.minor=0
+    product.version.level=0
+
+2) src/viskit/version.txt
+    version # only.  SVN will take care of the rest
+
+3) installer/Unix_shortcutSpec.xml
+   installer/launch4jConfix.xml
+   installer/shortcutSpec.xml
