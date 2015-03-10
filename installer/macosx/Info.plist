@@ -17,7 +17,7 @@
         <key>CFBundleVersion</key>
         <string>2.1</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright © 1995-2014. All rights reserved.</string>
+	<string>Copyright © 1995-2015. All rights reserved.</string>
         <key>CFBundleShortVersionString</key>
         <string>Developed at the Naval Postgraduate School, Monterey, CA</string>
         <key>CFBundleIdentifier</key>
@@ -35,7 +35,7 @@
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 1995-2014. All rights reserved.</string>
+	<string>Copyright © 1995-2015. All rights reserved.</string>
         <key>CFBundleIconFile</key>
         <string>ViskitLogo.icns</string>
         <key>Java</key>
