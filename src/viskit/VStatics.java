@@ -415,7 +415,9 @@ public class VStatics {
         }
     }
 
-    /** Attempt to resolve an unqualified name to qualified
+    /** Attempt to resolve an unqualified to a qualified class name.  This only
+     * works for classes that are on the classpath that are not contained in a
+     * jar file
      *
      * @param name the unqualified class name to resolve
      * @return a fully resolved class on the classpath
