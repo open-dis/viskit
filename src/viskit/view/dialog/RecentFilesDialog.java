@@ -177,22 +177,6 @@ public class RecentFilesDialog extends JDialog {
         }
     }
 
-    class OneLinePanel extends JPanel {
-
-        OneLinePanel(JLabel lab, int w, JComponent comp) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
-        }
-    }
-
     class mHandler extends MouseAdapter {
 
         @Override

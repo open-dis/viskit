@@ -94,13 +94,24 @@ public interface EventGraphController {
     void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
     /** Requests to the controller to perform editing operations on existing entities
+     *
      * @param node the node to edit
      */
     void nodeEdit(EventNode node);
 
-    void schedulingArcEdit(SchedulingEdge ed);
+    /**
+     * Edit a scheduling edge
+     * 
+     * @param ed the edge to edit
+     */
+    void schedulingArcEdit(Edge ed);
 
-    void cancellingArcEdit(CancelingEdge ed);
+    /**
+     * Edit a canceling edge
+     *
+     * @param ed the edge to edit
+     */
+    void cancellingArcEdit(Edge ed);
 
     void simParameterEdit(vParameter param);
 

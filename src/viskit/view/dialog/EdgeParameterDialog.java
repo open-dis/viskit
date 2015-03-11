@@ -64,7 +64,7 @@ public class EdgeParameterDialog extends JDialog {
 
         JLabel valueLab = new JLabel("value");
         JLabel typeLab = new JLabel("type");
-        int w = maxWidth(new JComponent[]{valueLab, typeLab});
+        int w = OneLinePanel.maxWidth(new JComponent[]{valueLab, typeLab});
 
         valueField = new JTextField(25);
         setMaxHeight(valueField);
@@ -94,17 +94,6 @@ public class EdgeParameterDialog extends JDialog {
         this.valueField.addCaretListener(lis);
 
         setParams(parent, param);
-    }
-
-    private int maxWidth(JComponent[] c) {
-        int tmpw, maxw = 0;
-        for (JComponent c1 : c) {
-            tmpw = c1.getPreferredSize().width;
-            if (tmpw > maxw) {
-                maxw = tmpw;
-            }
-        }
-        return maxw;
     }
 
     private void setMaxHeight(JComponent c) {
@@ -175,22 +164,6 @@ public class EdgeParameterDialog extends JDialog {
         }
     }
 
-    class OneLinePanel extends JPanel {
-
-        OneLinePanel(JLabel lab, int w, JComponent comp) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
-        }
-    }
-
     class myCloseListener extends WindowAdapter {
 
         @Override
@@ -209,5 +182,3 @@ public class EdgeParameterDialog extends JDialog {
         }
     }
 }
-
-

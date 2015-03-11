@@ -67,7 +67,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         JLabel commLab = new JLabel("description");
         arrSizeLab = new JLabel("array size");
 
-        int w = maxWidth(new JComponent[] {nameLab, initLab, typeLab, commLab});
+        int w = OneLinePanel.maxWidth(new JComponent[] {nameLab, initLab, typeLab, commLab});
 
         stateVarNameField = new JTextField(15);
         stateVarNameField.addFocusListener(focList);

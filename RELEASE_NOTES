@@ -35,6 +35,13 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Major refactor to implement a combo box selection for scheduling edge time
+  delays.  Can now select parameters, local or argument vars and invoke methods,
+  or simply type in a delay value
+
+  Fixed a potential NPE issue in the File Based Assembly Node (FBAN) when
+  parsing node files that are of *.class origin only and not XML
+
 Release: 1.0.0(March 10, 2015)
 -------------------------
 Major changes since 0.7.0:

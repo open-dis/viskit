@@ -31,7 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
  */
-
 package viskit.jgraph;
 
 import java.util.Vector;
@@ -55,7 +54,7 @@ import viskit.mvc.mvcController;
  * @author
  * <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vUndoableEditListener">Terry
  * Norbraten, NPS MOVES</a>
- * @version $Id:$
+ * @version $Id$
  */
 public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 

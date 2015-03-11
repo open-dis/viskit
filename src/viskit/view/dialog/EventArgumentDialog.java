@@ -66,7 +66,7 @@ public class EventArgumentDialog extends JDialog {
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
         JLabel descriptionLabel = new JLabel("description");
-        int w = maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
@@ -102,17 +102,6 @@ public class EventArgumentDialog extends JDialog {
         this.parameterTypeCombo.addActionListener(listener);
 
         setParams(parent, param);
-    }
-
-    private int maxWidth(JComponent[] c) {
-        int tmpw, maxw = 0;
-        for (JComponent jc : c) {
-            tmpw = jc.getPreferredSize().width;
-            if (tmpw > maxw) {
-                maxw = tmpw;
-            }
-        }
-        return maxw;
     }
 
     private void setMaxHeight(JComponent c) {
@@ -202,22 +191,6 @@ public class EventArgumentDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
-        }
-    }
-
-    class OneLinePanel extends JPanel {
-
-        OneLinePanel(JLabel lab, int w, JComponent comp) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
         }
     }
 

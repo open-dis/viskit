@@ -71,17 +71,6 @@ public abstract class ViskitSmallDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    protected int maxWidth(JComponent[] c) {
-        int tmpw, maxw = 0;
-        for (JComponent c1 : c) {
-            tmpw = c1.getPreferredSize().width;
-            if (tmpw > maxw) {
-                maxw = tmpw;
-            }
-        }
-        return maxw;
-    }
-
     class cancelButtonListener implements ActionListener {
 
         @Override
@@ -135,22 +124,6 @@ public abstract class ViskitSmallDialog extends JDialog {
             modified = true;
             applyButt.setEnabled(true);
             getRootPane().setDefaultButton(applyButt);       // in JDialog
-        }
-    }
-
-    class OneLinePanel extends JPanel {
-
-        OneLinePanel(JLabel lab, int w, JComponent comp) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
         }
     }
 

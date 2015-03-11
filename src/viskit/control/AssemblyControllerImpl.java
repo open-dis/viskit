@@ -250,7 +250,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (mod.newModel(file) && !isOpenAlready) {
 
             vaw.setSelectedAssemblyName(mod.getMetaData().name);
-            // TODO: Implement an Assembly descrition block set here
+            // TODO: Implement an Assembly description block set here
 
             adjustRecentAssySet(file);
             markAssyFilesOpened();

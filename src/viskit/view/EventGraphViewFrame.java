@@ -1207,15 +1207,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public boolean doEditEdge(SchedulingEdge edge) {
+    public boolean doEditEdge(Edge edge) {
         selectMode.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
     @Override
-    public boolean doEditCancelEdge(CancelingEdge edge) {
-        selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
+    public boolean doEditCancelEdge(Edge edge) {
+        return doEditEdge(edge); // blocks
     }
 
     @Override

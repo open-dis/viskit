@@ -23,10 +23,10 @@ import viskit.ViskitProject;
 public class ClassPanel extends JPanel {
 
     JButton plus, minus;
-    LegosTree tree;
+    LegoTree tree;
     JFileChooser jfc;
 
-    public ClassPanel(LegosTree ltree, String title, String plusTT, String minusTT) {
+    public ClassPanel(LegoTree ltree, String title, String plusTT, String minusTT) {
         this.tree = ltree;
         jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 

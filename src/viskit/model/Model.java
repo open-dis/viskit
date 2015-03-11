@@ -51,19 +51,21 @@ public interface Model {
      * It is used to inst a vector of all the nodes in the graph.  Since the
      * EventNode object has src and target members, it also serves to inst all
      * the edges.
-     * 
+     *
      * @return Vector of EventNodes.
      */
     Vector<ViskitElement> getAllNodes();
 
     /**
-     * Messaged by controller to retrieve all defined StateVariables.
+     * Messaged by controller to retrieve all defined StateVariables
+     * 
      * @return Vector of StateVariables
      */
     Vector<ViskitElement> getStateVariables();
 
     /**
-     * Messaged by controller to inst all defined simulation parameters.  Order (may be) important (?), ergo ArrayList container.
+     * Messaged by controller to inst all defined simulation parameters
+     *
      * @return Vector of vParameter objects.
      */
     Vector<ViskitElement> getSimParameters();

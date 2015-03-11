@@ -47,10 +47,9 @@ public class vGraphUI extends BasicGraphUI {
 
     /** Our own implemented dialog editor scheme
      *
-     * @param c the cell to edit
+     * @param cell the cell to edit
      */
-    private void createEditDialog(Object c) {
-        final Object cell = c;
+    private void createEditDialog(final Object cell) {
 
         SwingUtilities.invokeLater(new Runnable() {
 

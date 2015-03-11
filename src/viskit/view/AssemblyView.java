@@ -43,22 +43,22 @@ public interface AssemblyView {
      * @param b flag to indicate recursion checking of the given path if a known
      * directory
      */
-    void addToEventGraphPallette(File f, boolean b);
+    void addEventGraphToLEGOTree(File f, boolean b);
 
-    void removeFromEventGraphPallette(File f);
+    void removeEventGraphFromLEGOTree(File f);
 
     /**
      * Add a path to PropertyChangeListeners in the LEGO tree
      * @param f the path to evaluate for PropertyChangeListeners
      * @param b flag to indicate recursion checking of the given path
      */
-    void addToPropChangePallette(File f, boolean b);
+    void addPropChangeToLEGOTree(File f, boolean b);
 
     /** Not currently used
      *
      * @param f the PCL to remove from the node tree
      */
-    void removeFromPropChangePallette(File f);
+    void removePropChangeFromLEGOTree(File f);
 
     int genericAsk(String title, String prompt);      // returns JOptionPane constants
 

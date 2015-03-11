@@ -24,6 +24,11 @@ public class EventArgument extends ViskitElement {
     private String stateVarName;
     private String comment;
 
+    @Override
+    public String toString() {
+        return "(" + type + ") " + name;
+    }
+
     public List<String> getDescription() {
         return comments;
     }
@@ -61,7 +66,7 @@ public class EventArgument extends ViskitElement {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     @Override
     public String getIndexingExpression() {
         return indexingExpression;

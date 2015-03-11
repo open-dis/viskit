@@ -30,24 +30,30 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
-/**<p>
+/** Class to support creating a Listener Event Graph Object (LEGO) tree on the
+ * Assy Editor.  Used for dragging and dropping EG and PCL nodes to the pallete
+ * for creating Assy files.
+ *
+ * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
- * www.nps.edu</p>
+ * www.nps.edu
+ * </pre>
+ *
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:44:31 AM
  * @version $Id$
  */
-public class LegosTree extends JTree implements DragGestureListener, DragSourceListener {
+public class LegoTree extends JTree implements DragGestureListener, DragSourceListener {
 
-    static Logger log = LogUtils.getLogger(LegosTree.class);
+    static Logger log = LogUtils.getLogger(LegoTree.class);
 
-    private DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("root");
+    private DefaultMutableTreeNode rootNode;
     private Class<?> targetClass;
     private String targetClassName;
-    private Color background = new Color(0xFB, 0xFB, 0xE5);
+    private Color background;
     private ImageIcon myLeafIcon;
     private Icon standardNonLeafIcon;
     private Image myLeafIconImage;
@@ -67,7 +73,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
      * @param dslis a DragStartListener
      * @param tooltip description for this LEGO tree
      */
-    LegosTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
+    LegoTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
         this(className, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
@@ -78,8 +84,10 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
      * @param dslis a DragStartListener
      * @param tooltip description for this LEGO tree
      */
-    LegosTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip) {
+    LegoTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip) {
         super();
+        rootNode = new DefaultMutableTreeNode("root");
+        background = new Color(0xFB, 0xFB, 0xE5);
         setModel(mod = new DefaultTreeModel(rootNode));
         directoryRoots = new HashMap<>();
 
@@ -107,7 +115,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         rendr.setLeafIcon(myLeafIcon);
         DragSource dragSource = DragSource.getDefaultDragSource();
 
-        LegosTree instance = this;
+        LegoTree instance = this;
 
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
@@ -162,14 +170,15 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
     }
 
+    /** Used to help prevent duplicate EG or PCL nodes from appearing in the LEGO
+     * tree on the Assy Editor in addition to simply supporting the user by
+     * removing a node
+     *
+     * @param f the file to remove from the LEGO tree
+     */
     public void removeContentRoot(File f) {
-        //System.out.println("LegosTree.removeContentRoot: "+f.getAbsolutePath());
-        if (_removeNode(rootNode, f) != null) {
-            // Do nothing?
-        } // System.out.println("...success");
-        else {
-             // Do nothing?
-        }
+        //System.out.println("LegoTree.removeContentRoot: "+f.getAbsolutePath());
+        _removeNode(rootNode, f);
     }
 
     private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
@@ -183,12 +192,14 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     _removeNode(n, f);
                 } else {
                     FileBasedAssyNode fban = (FileBasedAssyNode) uo;
+
                     try {
-                        if (fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
+                        if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
                             mod.removeNodeFromParent(n);
                             FileBasedClassManager.instance().unloadFile(fban);
                             return n;
                         }
+                        // TODO: What about *.class based nodes?
                     } catch (IOException e) {
                         log.error(e);
                     }
@@ -328,11 +339,11 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
                     VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
                 }
 
-            } catch (Throwable throwable) {
+            } catch (Throwable t) {
 
                 // Uncomment to reveal common reason for Exceptions
-                throwable.printStackTrace();
-                log.error(throwable);
+                t.printStackTrace();
+                log.error(t);
                 if (recurseNogoList != null) {
                     recurseNogoList.add(f.getName());
                 }
@@ -555,7 +566,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Object uo = ((DefaultMutableTreeNode) value).getUserObject();
-            setLeafIcon(LegosTree.this.myLeafIcon); // default
+            setLeafIcon(LegoTree.this.myLeafIcon); // default
 
             if (uo instanceof Class<?>) {
                 Class<?> c = (Class<?>) uo;
@@ -581,7 +592,7 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
             } else {
                 if (leaf) // don't show a leaf icon for a directory in the filesys which doesn't happen to have contents
                 {
-                    setLeafIcon(LegosTree.this.standardNonLeafIcon);
+                    setLeafIcon(LegoTree.this.standardNonLeafIcon);
                 }
                 setToolTipText(uo.toString());
                 value = value.toString();
@@ -710,4 +721,4 @@ public class LegosTree extends JTree implements DragGestureListener, DragSourceL
         }
     }
 
-} // end class file LegosTree.java
+} // end class file LegoTree.java

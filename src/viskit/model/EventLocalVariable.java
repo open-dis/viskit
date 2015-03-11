@@ -13,10 +13,11 @@ import viskit.VGlobals;
  */
 public class EventLocalVariable extends ViskitElement {
 
+    private static final String EMPTY = "";
     private String type;
     private String name;
     private String value;
-    private String comment = "";
+    private String comment = EMPTY;
     private String[] arraySize;
     private List<String> descriptionArray = new ArrayList<>();
     private String indexingExpression;
@@ -29,6 +30,11 @@ public class EventLocalVariable extends ViskitElement {
         this.name = name;
         setType(type);
         this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return (type.isEmpty() && name.isEmpty()) ? EMPTY : "(" + type + ") " + name;
     }
 
     @Override

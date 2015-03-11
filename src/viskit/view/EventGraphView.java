@@ -18,15 +18,27 @@ import java.util.Collection;
 public interface EventGraphView {
 
     /**
-     * Permit user to edit existing entities *
+     * Permits user to edit existing edges
      *
      * @param edge the canceling edge to edit
      * @return successful or not
      */
-    boolean doEditCancelEdge(CancelingEdge edge);
+    boolean doEditCancelEdge(Edge edge);
 
-    boolean doEditEdge(SchedulingEdge edge);
+    /**
+     * Permits user to edit existing edges
+     *
+     * @param edge the scheduling edge to edit
+     * @return successful or not
+     */
+    boolean doEditEdge(Edge edge);
 
+    /**
+     * Permits user to edit existing event nodes
+     *
+     * @param node the event node to edit
+     * @return successful or not
+     */
     boolean doEditNode(EventNode node);
 
     boolean doEditParameter(vParameter param);

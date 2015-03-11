@@ -132,7 +132,8 @@ public class EventGraphCache {
     }
 
     /**
-     * Creates the entity table for this analyst xml object
+     * Creates the entity table for an analyst report xml object.  Also aids in
+     * opening EG files that are SimEntity node of an Assy file
      *
      * @param assemblyFile the assembly file loaded into the Assembly Runner
      */
@@ -142,13 +143,13 @@ public class EventGraphCache {
         setEntityTable(new Element("EntityTable"));
 
         // Clear the cache if currently full
-        if (getEventGraphNamesList().size() > 0) {
+        if (!getEventGraphNamesList().isEmpty()) {
             getEventGraphNamesList().clear();
         }
-        if (getEventGraphFilesList().size() > 0) {
+        if (!getEventGraphFilesList().isEmpty()) {
             getEventGraphFilesList().clear();
         }
-        if (getEventGraphImagePathsList().size() > 0) {
+        if (!getEventGraphImagePathsList().isEmpty()) {
             getEventGraphImagePathsList().clear();
         }
         setAssemblyDocument(loadXML(assemblyFile));
@@ -156,19 +157,12 @@ public class EventGraphCache {
         Element localRootElement = getAssemblyDocument().getRootElement();
         List<Element> simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
 
-        // Conduct a test for a diskit package which is native java
-        String isDiskitFile = "diskit";
         for (Element temp : simEntityList) {
-            String javaTest = temp.getAttributeValue("type").substring(0, isDiskitFile.length());
-
-            // If it's not a java file process it
-            if (!javaTest.equals(isDiskitFile)) {
-                Element tableEntry = new Element("SimEntity");
-                tableEntry.setAttribute("name", temp.getAttributeValue("name"));
-                tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
-                saveEventGraphReferences(temp.getAttributeValue("type"));
-                getEntityTable().addContent(tableEntry);
-            }
+            Element tableEntry = new Element("SimEntity");
+            tableEntry.setAttribute("name", temp.getAttributeValue("name"));
+            tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
+            saveEventGraphReferences(temp.getAttributeValue("type"));
+            getEntityTable().addContent(tableEntry);
         }
 
         setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());

@@ -321,12 +321,16 @@ public class VGlobals {
         return getActiveEventGraphModel().getStateVariables();
     }
 
-    private Vector<? extends ViskitElement> getSimParmsList() {
+    public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
+        return new DefaultComboBoxModel<>(getStateVarsList());
+    }
+
+    private Vector<ViskitElement> getSimParamsList() {
         return getActiveEventGraphModel().getSimParameters();
     }
 
-    public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
-        return new DefaultComboBoxModel<>(getStateVarsList());
+    public ComboBoxModel<ViskitElement> getSimParamsCBModel() {
+        return new DefaultComboBoxModel<>(getSimParamsList());
     }
 
     /* AnalystReport model / view / controller */
@@ -482,7 +486,7 @@ public class VGlobals {
         }
 
         // Sim parameters
-        for (ViskitElement par : getSimParmsList()) {
+        for (ViskitElement par : getSimParamsList()) {
             String result;
             type = par.getType();
             name = par.getName();
@@ -785,7 +789,7 @@ public class VGlobals {
      * This is messaged by dialogs and others when a user has selected a type
      * for a new variable.  We look around to see if we've already got it
      * covered.  If not, we add it to the end of the list.
-     * 
+     *
      * @param ty the type to evaluate
      * @return the String representation of this type if found
      */

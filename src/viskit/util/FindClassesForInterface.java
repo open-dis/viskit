@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/**
+/** A custom class finder to support finding EGs and PCLs in *.class form vice
+ * XML.  Used to populate the LEGOs tree on the Assy Editor.
+ *
  * @version $Id$
  * @author  ahbuss
  */
@@ -95,21 +97,20 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                LogUtils.getLogger(FindClassesForInterface.class).info("Attempting to find " + name);
+                LogUtils.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
 
-                Class<?> clz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
+                clazz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
+                found.put(name, clazz);
 
-                found.put(name, clz);
-                LogUtils.getLogger(FindClassesForInterface.class).info("Found Class: " + clz.getName() + "\n");
-                return clz;
+                LogUtils.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
             } catch (Exception e) {
                 LogUtils.getLogger(FindClassesForInterface.class).error(e);
-                return null;
             } finally {
                 try {
                     classFile.close();
                 } catch (IOException ioe) {}
             }
+            return clazz;
         }
     }
 
@@ -213,11 +214,11 @@ public class FindClassesForInterface {
             }
         }
         System.out.println("SimEntities:");
-        for (int i = 0; i < simEntities.size(); ++i) {
+        for (int i = 0; i < simEntities.size(); i++) {
             System.out.println(simEntities.get(i));
         }
         System.out.println("PropertyChangeListeners:");
-        for (int i = 0; i < propertyChangeListeners.size(); ++i) {
+        for (int i = 0; i < propertyChangeListeners.size(); i++) {
             System.out.println(propertyChangeListeners.get(i));
         }
 

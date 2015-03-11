@@ -16,12 +16,13 @@ import java.util.ArrayList;
 
 import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.LogUtils;
+import java.lang.reflect.Method;
+import java.util.Collections;
 import simkit.Priority;
 import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.model.EventNode;
 import viskit.model.Edge;
-import viskit.model.ModelImpl;
+import viskit.model.EventLocalVariable;
 import viskit.model.SchedulingEdge;
 import viskit.model.ViskitElement;
 import viskit.model.vEdgeParameter;
@@ -41,31 +42,25 @@ import viskit.view.EdgeParametersPanel;
 public class EdgeInspectorDialog extends JDialog {
 
     private static EdgeInspectorDialog dialog;
-    private Edge edge;
     private static boolean modified = false;
+    private Edge edge;
     private boolean schedulingType = true; // true = scheduling, false = cancelling
-    private JButton canButt,  okButt;
-    private JLabel srcEvent,  targEvent;
-    private JTextField delay;
+    private JButton canButt, okButt;
+    private JLabel srcEvent, targEvent;
     private EdgeParametersPanel parameters;
     private ConditionalExpressionPanel conditionalExpressionPanel;
-    private JPanel timeDelayPanel;
-    private Border delayPanBorder,  delayPanDisabledBorder;
-    private JPanel priorityPanel;
-    private JComboBox priorityCB;
+    private JPanel timeDelayPanel, priorityPanel, myParmPanel;
+    private Border delayPanBorder, delayPanDisabledBorder;
+    private JComboBox<String> priorityCB, timeDelayMethodsCB;
+    private JComboBox<ViskitElement> timeDelayVarsCB;
     private java.util.List<Priority> priorityList;  // matches combo box
     private Vector<String> priorityNames;
     private int priorityDefaultIndex = 3;      // set properly below
-    private JPanel myParmPanel;
-    private JLabel schedulingLabel;
-    private JLabel cancellingLabel;
-    private JButton addConditionalButton;
-    private JButton addDescriptionButton;
+    private JLabel schedulingLabel, cancellingLabel;
+    private JButton addConditionalButton, addDescriptionButton;
     private JTextArea descriptionJta;
     private JScrollPane descriptionJsp;
-
-    Vector<ViskitElement> nodeList;
-    ModelImpl mod; //todo fix
+    private JLabel dotLabel;
 
     /**
      * Set up and show the dialog.  The first Component argument
@@ -80,11 +75,7 @@ public class EdgeInspectorDialog extends JDialog {
      * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Edge edge) {
-        if (dialog == null) {
-            dialog = new EdgeInspectorDialog(f, edge);
-        } else {
-            dialog.setParams(f, edge);
-        }
+        dialog = new EdgeInspectorDialog(f, edge);
 
         dialog.setVisible(true);
         // above call blocks
@@ -93,11 +84,10 @@ public class EdgeInspectorDialog extends JDialog {
 
     private EdgeInspectorDialog(JFrame parent, Edge edge) {
         super(parent, "Edge Inspector", true);
+        this.edge = edge;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
-
-        mod = (ModelImpl) (VGlobals.instance().getEventGraphEditor().getModel());
 
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
@@ -106,6 +96,7 @@ public class EdgeInspectorDialog extends JDialog {
         edgeInspectorPanel.setLayout(new BoxLayout(edgeInspectorPanel, BoxLayout.Y_AXIS));
         edgeInspectorPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
+
         // edge type
         JPanel typePanel = new JPanel();
         typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.X_AXIS));
@@ -114,9 +105,9 @@ public class EdgeInspectorDialog extends JDialog {
         BoxLayoutUtils.clampWidth(typeLabel);
         typePanel.add(typeLabel);
         typePanel.add(Box.createHorizontalStrut(15));
-        schedulingLabel = new JLabel("<html><b>Scheduling");
+        schedulingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Scheduling" + OneLinePanel.CLOSE_LABEL_BOLD);
         BoxLayoutUtils.clampWidth(schedulingLabel);
-        cancellingLabel = new JLabel("<html><b>Canceling");
+        cancellingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Canceling" + OneLinePanel.CLOSE_LABEL_BOLD);
         BoxLayoutUtils.clampWidth(cancellingLabel);
         typePanel.add(schedulingLabel);
         typePanel.add(cancellingLabel);
@@ -153,13 +144,15 @@ public class EdgeInspectorDialog extends JDialog {
         sourceTargetPanel.add(sourceTargetValuesPanel);
         sourceTargetPanel.add(Box.createHorizontalGlue());
         BoxLayoutUtils.clampHeight(sourceTargetPanel);
-        edgeInspectorPanel.add(sourceTargetPanel);
 
+        edgeInspectorPanel.add(sourceTargetPanel);
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
         descriptionJta = new JTextArea(2, 25);
         descriptionJsp = new JScrollPane(descriptionJta);
-        descriptionJsp.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Description")));
+        descriptionJsp.setBorder(new CompoundBorder(
+                new EmptyBorder(0, 0, 5, 0),
+                BorderFactory.createTitledBorder("Description")));
         edgeInspectorPanel.add(descriptionJsp);
 
         Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
@@ -175,38 +168,49 @@ public class EdgeInspectorDialog extends JDialog {
             }
         });
 
-        myChangeListener chlis = new myChangeListener();
-        descriptionJta.addKeyListener(chlis);
-
         conditionalExpressionPanel = new ConditionalExpressionPanel(edge, schedulingType);
         edgeInspectorPanel.add(conditionalExpressionPanel);
 
         priorityPanel = new JPanel();
         priorityPanel.setLayout(new BoxLayout(priorityPanel, BoxLayout.X_AXIS));
-        priorityPanel.setOpaque(false);
-        priorityPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Priority")));
+        priorityPanel.setBorder(new CompoundBorder(
+                new EmptyBorder(0, 0, 5, 0),
+                BorderFactory.createTitledBorder("Priority")));
         priorityCB = buildPriorityComboBox();
-        priorityPanel.add(Box.createHorizontalStrut(50)); //102));     // set packed width clamp here
+        priorityPanel.add(Box.createHorizontalStrut(50));
         priorityPanel.add(priorityCB);
-        priorityPanel.add(Box.createHorizontalStrut(50)); //102));
+        priorityPanel.add(Box.createHorizontalStrut(50));
         edgeInspectorPanel.add(priorityPanel);
         BoxLayoutUtils.clampHeight(priorityPanel);
 
         timeDelayPanel = new JPanel();
-        timeDelayPanel.setLayout(new BoxLayout(timeDelayPanel, BoxLayout.X_AXIS));
-        timeDelayPanel.setOpaque(false);
+        timeDelayPanel.add(Box.createHorizontalStrut(25));
+        timeDelayVarsCB = buildTimeDelayVarsComboBox();
+        timeDelayVarsCB.setToolTipText("Select a simulation parameter, event "
+                + "node argument or local variable for method invocation");
+        timeDelayPanel.add(new OneLinePanel(
+                null,
+                0,
+                timeDelayVarsCB,
+                dotLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD)));
         timeDelayPanel.setBorder(BorderFactory.createTitledBorder("Time Delay"));
-        delay = new JTextField();
-        delay.setOpaque(true);
-        delay.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        Dimension d = delay.getPreferredSize();      // only expand in horiz direction
-        d.width = Integer.MAX_VALUE;
-        delay.setMaximumSize(d);
-        timeDelayPanel.add(delay);
         delayPanBorder = timeDelayPanel.getBorder();
-        delayPanDisabledBorder = BorderFactory.createTitledBorder(new LineBorder(Color.gray), "Time Delay",
-                TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION,
-                null, Color.gray);
+        delayPanDisabledBorder = BorderFactory.createTitledBorder(
+                new LineBorder(Color.gray),
+                "Time Delay",
+                TitledBorder.DEFAULT_JUSTIFICATION,
+                TitledBorder.DEFAULT_POSITION,
+                null,
+                Color.gray);
+        timeDelayMethodsCB = buildTimeDelayMethodsCB();
+        timeDelayMethodsCB.setToolTipText("Select an invocable method, or type "
+                + "in floating point delay value");
+        timeDelayPanel.add(new OneLinePanel(null, 0, timeDelayMethodsCB));
+        timeDelayPanel.add(Box.createHorizontalStrut(25));
+
+        // NOTE: Apply and Cancel buttons are squished if we don't do this
+        BoxLayoutUtils.clampHeight(timeDelayPanel);
+
         edgeInspectorPanel.add(timeDelayPanel);
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
@@ -216,7 +220,6 @@ public class EdgeInspectorDialog extends JDialog {
         parameters = new EdgeParametersPanel(300);
         JScrollPane paramSp = new JScrollPane(parameters);
         paramSp.setBorder(null);
-        paramSp.setOpaque(false);
 
         myParmPanel.add(paramSp);
 
@@ -254,10 +257,14 @@ public class EdgeInspectorDialog extends JDialog {
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
+        myChangeListener chlis = new myChangeListener();
+        descriptionJta.addKeyListener(chlis);
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
-        delay.addCaretListener(chlis);
+        timeDelayVarsCB.addActionListener(chlis);
         priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
+        timeDelayVarsCB.getEditor().getEditorComponent().addKeyListener(chlis);
+        timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(chlis);
 
         addHideButtonListener hideList = new addHideButtonListener();
         addConditionalButton.addActionListener(hideList);
@@ -278,10 +285,20 @@ public class EdgeInspectorDialog extends JDialog {
             }
         });
 
+        timeDelayVarsCB.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                okButt.setEnabled(true);
+                modified = true;
+            }
+        });
+
         setParams(parent, edge);
     }
 
     public final void setParams(Component c, Edge e) {
+
         edge = e;
 
         fillWidgets();
@@ -302,8 +319,9 @@ public class EdgeInspectorDialog extends JDialog {
         b.setMinimumSize(d);
     }
 
-    private JComboBox buildPriorityComboBox() {
+    private JComboBox<String> buildPriorityComboBox() {
         priorityNames = new Vector<>(10);
+        JComboBox<String> jcb = new JComboBox<>(priorityNames);
         priorityList = new ArrayList<>(10);
         try {
             Class<?> c = VStatics.classForName("simkit.Priority");
@@ -317,13 +335,85 @@ public class EdgeInspectorDialog extends JDialog {
                     } // save the default one
                 }
             }
-            JComboBox<String> jcb = new JComboBox<>(priorityNames);
-            jcb.setEditable(true); // this allows anything to be intered
-            return jcb;
+            jcb.setEditable(true); // this allows anything to be entered
         } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
         }
-        return new JComboBox<>(new String[] {"simkit package not in class path"});
+        return jcb;
+    }
+
+    /** Populates the time delay combo box with parameters, local vars and event
+     * node arguments from the node that is the source of the current edge
+     *
+     * @return a time delay combo box populated with parameters, local vars
+     * and event node arguments
+     */
+    private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
+        JComboBox<ViskitElement> cb = new JComboBox<>();
+
+        ComboBoxModel<ViskitElement> m = VGlobals.instance().getSimParamsCBModel();
+
+        // First item should be empty
+        ((DefaultComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
+        cb.setModel(m);
+
+        java.util.List<ViskitElement> vars = edge.from.getLocalVariables();
+        for (ViskitElement e : vars) {
+            ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
+        }
+
+        vars = edge.from.getArguments();
+        for (ViskitElement e : vars) {
+            ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
+        }
+        return cb;
+    }
+
+    private JComboBox<String> buildTimeDelayMethodsCB() {
+        Class<?> type;
+        Method[] methods;
+        String typ;
+        java.util.List<ViskitElement> types = edge.from.getLocalVariables();
+        Vector<String> methodNames = new Vector<>();
+
+        // Enable argument type methods to be invoked as well
+        types.addAll(edge.from.getArguments());
+
+        String className;
+        for (ViskitElement e : types) {
+            typ = e.getType();
+
+            if (VGlobals.instance().isGeneric(typ)) {
+                typ = typ.substring(0, typ.indexOf("<"));
+            }
+            if (VGlobals.instance().isArray(typ)) {
+                typ = typ.substring(0, typ.indexOf("["));
+            }
+            type = VStatics.classForName(typ);
+            methods = type.getMethods();
+
+            // Filter out methods of Object and any
+            // methods requiring parameters
+            for (Method method : methods) {
+                className = method.getDeclaringClass().getName();
+                if (className.contains("java.lang.Object")) {continue;}
+                if (method.getParameterCount() > 0) {continue;}
+
+                if (!methodNames.contains(method.getName() + "()"))
+                    methodNames.add(method.getName() + "()");
+            }
+        }
+        Collections.sort(methodNames);
+        ComboBoxModel<String> m = new DefaultComboBoxModel<>(methodNames);
+        JComboBox<String> cb = new JComboBox<>();
+
+        // Allow user to edit the selection
+        cb.setEditable(true);
+
+        // First item should be empty
+        ((DefaultComboBoxModel<String>)m).insertElementAt("", 0);
+        cb.setModel(m);
+        return cb;
     }
 
     private void setPriorityCBValue(String pr) {
@@ -357,31 +447,62 @@ public class EdgeInspectorDialog extends JDialog {
         }
     }
 
+    private void setTimeDelayVarsCBValue(String value) {
+
+        if (timeDelayMethodsCB.getItemCount() <= 0) {return;}
+
+        // Default value
+        timeDelayVarsCB.setSelectedIndex(0);
+
+        for (int i = 0; i < timeDelayVarsCB.getItemCount(); i++) {
+            ViskitElement e = timeDelayVarsCB.getItemAt(i);
+            if (e.getName().contains(value)) {
+                timeDelayVarsCB.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void setTimeDelayMethodsCBValue(String value) {
+
+        if (timeDelayMethodsCB.getItemCount() <= 0) {return;}
+
+        // Default
+        timeDelayMethodsCB.setSelectedItem(value);
+
+        // Set the ComboBox width to accomodate the string length
+        timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
+
+        for (int i = 0; i < timeDelayMethodsCB.getItemCount(); i++) {
+            String s = timeDelayMethodsCB.getItemAt(i);
+            if (value.equals(s)) {
+                timeDelayMethodsCB.setSelectedIndex(i);
+
+                // Set the ComboBox width to accomodate the string length
+                timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
+                return;
+            }
+        }
+    }
+
     private void fillWidgets() {
-        nodeList = mod.getAllNodes();            // todo fix
-       //Collections.sort(nodeList);             // todo get working
 
         srcEvent.setText(edge.from.getName());
         targEvent.setText(edge.to.getName());
-        myParmPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0),
+        myParmPanel.setBorder(new CompoundBorder(
+                new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
-                    myParmPanel.setVisible(false);
-                } else {
-                    parameters.setArgumentList(edge.to.getArguments());
-                    parameters.setData(edge.parameters);
-                    myParmPanel.setVisible(true);
-                }
-            }
-        };
-        SwingUtilities.invokeLater(r);
+        if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
+            myParmPanel.setVisible(false);
+        } else {
+            parameters.setArgumentList(edge.to.getArguments());
+            parameters.setData(edge.parameters);
+            myParmPanel.setVisible(true);
+        }
 
         if (edge instanceof SchedulingEdge) {
+
             if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
                 conditionalExpressionPanel.setText("");
                 hideShowConditionals(false);
@@ -389,6 +510,7 @@ public class EdgeInspectorDialog extends JDialog {
                 conditionalExpressionPanel.setText(edge.conditional);
                 hideShowConditionals(true);
             }
+
             setDescription(edge.conditionalDescription);
 
             if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
@@ -397,17 +519,36 @@ public class EdgeInspectorDialog extends JDialog {
                 hideShowDescription(true);
             }
 
-            if (edge.delay == null || edge.delay.trim().isEmpty()) {
-                delay.setText("0.0");
-            } else {
-                delay.setText("" + edge.delay);
+            setTimeDelayVarsCBValue("");
+            timeDelayVarsCB.setEnabled(false);
+            setTimeDelayMethodsCBValue("0.0");
+            timeDelayMethodsCB.setEnabled(true);
+            dotLabel.setEnabled(false);
+
+            if (edge.delay != null && !edge.delay.trim().isEmpty()) {
+
+                String[] s = edge.delay.split("\\.");
+                if (s.length == 1) {
+                    setTimeDelayMethodsCBValue(s[0]);
+                } else if (s.length == 2) {
+
+                    if (!Character.isDigit(s[0].charAt(0))) {
+                        setTimeDelayVarsCBValue(s[0]);
+                        timeDelayVarsCB.setEnabled(true);
+                        setTimeDelayMethodsCBValue(s[1]);
+                        dotLabel.setEnabled(true);
+                    } else {
+                        setTimeDelayMethodsCBValue(edge.delay);
+                    }
+                }
             }
-            delay.setEnabled(true);
+
             timeDelayPanel.setBorder(delayPanBorder);
 
             setPriorityCBValue(((SchedulingEdge) edge).priority);
 
         } else {
+
             if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
                 conditionalExpressionPanel.setText("");
             } else {
@@ -416,8 +557,8 @@ public class EdgeInspectorDialog extends JDialog {
 
             setDescription(edge.conditionalDescription);
 
-            delay.setText("n/a");
-            delay.setEnabled(false);
+            timeDelayMethodsCB.setEnabled(false);
+            timeDelayVarsCB.setEnabled(false);
             timeDelayPanel.setBorder(delayPanDisabledBorder);
         }
 
@@ -460,8 +601,14 @@ public class EdgeInspectorDialog extends JDialog {
 
             ((SchedulingEdge) edge).priority = s;
         }
-        String delaySt = delay.getText();
-        edge.delay = (delaySt == null || delaySt.trim().isEmpty()) ? "0.0" : delay.getText();
+
+        String delaySt = (String) timeDelayVarsCB.getSelectedItem();
+        if (delaySt == null || delaySt.trim().isEmpty())
+            delaySt = (String) timeDelayMethodsCB.getSelectedItem();
+        else
+            delaySt += ("." + (String) timeDelayMethodsCB.getSelectedItem());
+
+        edge.delay = delaySt;
 
         String condSt = conditionalExpressionPanel.getText();
         edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText();
@@ -478,7 +625,7 @@ public class EdgeInspectorDialog extends JDialog {
 
             // Bug 1373: This is how applying changes to a scheduling edge
             // causes the correct EG XML representation when removing event
-            // parameters from a proceding node.  This loop adds vEdgeParameters
+            // parameters from a proceeding node.  This loop adds vEdgeParameters
             for (ViskitElement o : parameters.getData()) {
                 edge.parameters.add(o);
             }
@@ -490,37 +637,23 @@ public class EdgeInspectorDialog extends JDialog {
     private void hideShowConditionals(boolean show) {
         conditionalExpressionPanel.showConditions(show);
         addConditionalButton.setVisible(!show);
-        pack();
     }
 
     private void hideShowDescription(boolean show) {
         showDescription(show);
         addDescriptionButton.setVisible(!show);
-        pack();
     }
 
     class addHideButtonListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(final ActionEvent e) {
             if (e.getSource().equals(addConditionalButton)) {
                 hideShowConditionals(true);
             } else if (e.getSource().equals(addDescriptionButton)) {
                 hideShowDescription(true);
             }
-        }
-    }
-
-    class reverseButtonListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent event) {
-            EventNode en = edge.from;
-            edge.from = edge.to;
-            edge.to = en;
-            modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            pack();
         }
     }
 
@@ -577,7 +710,7 @@ public class EdgeInspectorDialog extends JDialog {
         cancellingLabel.setVisible(!wh);
     }
 
-    public void showDescription(boolean wh) {
+    private void showDescription(boolean wh) {
         descriptionJsp.setVisible(wh);
     }
 
@@ -613,5 +746,4 @@ public class EdgeInspectorDialog extends JDialog {
             }
         }
     }
-
 }

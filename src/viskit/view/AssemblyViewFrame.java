@@ -77,7 +77,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JToolBar toolBar;
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
-    private LegosTree lTree,  pclTree;
+    private LegoTree lTree,  pclTree;
     private JPanel assemblyEditorContent;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -702,10 +702,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private JSplitPane buildTreePanels() {
 
-        lTree = new LegosTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
+        lTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        pclTree = new LegosTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
+        pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
@@ -724,7 +724,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
                     // Recurse a directory and locate appropriate SimEntity class files
                     } else {
-                        addToEventGraphPallette(file, true);
+                        addEventGraphToLEGOTree(file, true);
                     }
                 }
             }
@@ -737,7 +737,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addToEventGraphPallette(vkp.getEventGraphsDir(), true);
+        addEventGraphToLEGOTree(vkp.getEventGraphsDir(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
@@ -919,24 +919,24 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void addToEventGraphPallette(File f, boolean b) {
+    public void addEventGraphToLEGOTree(File f, boolean b) {
         if (f.exists()) {
             lTree.addContentRoot(f, b);
         }
     }
 
     @Override
-    public void addToPropChangePallette(File f, boolean b) {
+    public void addPropChangeToLEGOTree(File f, boolean b) {
         pclTree.addContentRoot(f, b);
     }
 
     @Override
-    public void removeFromEventGraphPallette(File f) {
+    public void removeEventGraphFromLEGOTree(File f) {
         lTree.removeContentRoot(f);
     }
 
     @Override
-    public void removeFromPropChangePallette(File f) {
+    public void removePropChangeFromLEGOTree(File f) {
         pclTree.removeContentRoot(f);
     }
 

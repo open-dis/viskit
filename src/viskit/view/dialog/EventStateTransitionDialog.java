@@ -44,7 +44,7 @@ public class EventStateTransitionDialog extends JDialog {
     private EventStateTransition param;
     private JButton okButt, canButt;
     private JButton newSVButt;
-    private JLabel actionLab1, actionLab2;
+    private JLabel actionLab1, actionLab2, localInvokeDot;
     private JPanel localAssignmentPanel, indexPanel, stateTransInvokePanel, localInvocationPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
@@ -106,7 +106,7 @@ public class EventStateTransitionDialog extends JDialog {
 
         JLabel localInvokeLab = new JLabel("local invocation");
         JLabel methodLab = new JLabel("invoke local var method");
-        JLabel stateTranInvokeLab = new JLabel("invoke state var method .");
+        JLabel stateTranInvokeLab = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD);
 
         stateVarsCB = new JComboBox<>();
         setMaxHeight(stateVarsCB);
@@ -129,7 +129,7 @@ public class EventStateTransitionDialog extends JDialog {
                 + "declared local variable, or an argument");
         setMaxHeight(localInvocationField);
 
-        int w = maxWidth(new JComponent[]{commLab, localAssignLab,
+        int w = OneLinePanel.maxWidth(new JComponent[]{commLab, localAssignLab,
             nameLab, arrayIdxLab, assTo, opOn, stateTranInvokeLab,
             localInvokeLab, methodLab});
 
@@ -140,16 +140,19 @@ public class EventStateTransitionDialog extends JDialog {
         divider.setBackground(Color.blue.brighter());
 
         fieldsPanel.add(divider);
-        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab, w, localAssignmentField, new JLabel("=")));
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab,
+                w,
+                localAssignmentField,
+                new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "=" + OneLinePanel.CLOSE_LABEL_BOLD)));
         fieldsPanel.add(Box.createVerticalStrut(10));
         fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
         fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
-        fieldsPanel.add(new OneLinePanel(null, w, assTo));
-        fieldsPanel.add(new OneLinePanel(null, w, opOn));
+        fieldsPanel.add(new OneLinePanel(new JLabel(""), w, assTo));
+        fieldsPanel.add(new OneLinePanel(new JLabel(""), w, opOn));
 
         stateTranMethodsCB = new JComboBox<>();
         stateTranMethodsCB.setToolTipText("Use this to select methods to invoke"
-                + "on state variables");
+                + " on state variables");
         setMaxHeight(stateTranMethodsCB);
         stateTranMethodsCB.setBackground(Color.white);
 
@@ -168,7 +171,11 @@ public class EventStateTransitionDialog extends JDialog {
         setMaxHeight(localVarMethodsCB);
         localVarMethodsCB.setBackground(Color.white);
 
-        fieldsPanel.add(new OneLinePanel(localInvokeLab, w, localInvocationField, new JLabel(".")));
+        fieldsPanel.add(new OneLinePanel(
+                localInvokeLab,
+                w,
+                localInvocationField,
+                localInvokeDot = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD)));
         fieldsPanel.add(localInvocationPanel = new OneLinePanel(methodLab, w, localVarMethodsCB));
 
         con.add(fieldsPanel);
@@ -230,8 +237,6 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-//                JComboBox cb = (JComboBox) e.getSource();
-//                String lv = (String) cb.getSelectedItem();
                 okButt.setEnabled(true);
                 modified = true;
             }
@@ -240,8 +245,6 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-//                JComboBox cb = (JComboBox) e.getSource();
-//                String lv = (String) cb.getSelectedItem();
                 okButt.setEnabled(true);
                 modified = true;
             }
@@ -259,17 +262,6 @@ public class EventStateTransitionDialog extends JDialog {
         opOn.addActionListener(rbl);
 
         setParams(parent, param);
-    }
-
-    private int maxWidth(JComponent[] c) {
-        int tmpw, maxw = 0;
-        for (JComponent jc : c) {
-            tmpw = jc.getPreferredSize().width;
-            if (tmpw > maxw) {
-                maxw = tmpw;
-            }
-        }
-        return maxw;
     }
 
     private void setMaxHeight(JComponent c) {
@@ -344,9 +336,7 @@ public class EventStateTransitionDialog extends JDialog {
         Vector<String> methodNames = new Vector<>();
 
         // Enable argument type methods to be invoked as well
-        if (types.isEmpty()) {
-            types = argPanel.getData();
-        }
+        types.addAll(argPanel.getData());
 
         // Last chance to pull if from a quickly declared local variable
         // NOTE: Not ready for this, but good intention here
@@ -419,7 +409,7 @@ public class EventStateTransitionDialog extends JDialog {
                 descriptionField.setText("");
             }
             localAssignmentField.setText(param.getLocalVariableAssignment());
-            setStateVariableComboBox(param);
+            setStateVariableCBValue(param);
             String ie = param.getIndexingExpression();
             if (ie == null || ie.isEmpty()) {
                 arrayIndexField.setText(indexArg);
@@ -445,14 +435,14 @@ public class EventStateTransitionDialog extends JDialog {
                 actionLab2.setText("");
                 actionField.setText(param.getOperationOrAssignment());
             }
-            setStateTranMethodsComboBox(param);
+            setStateTranMethodsCBValue(param);
 
             // We only need the variable, not the method invocation
             String localInvoke = param.getLocalVariableInvocation();
             if (localInvoke != null && !localInvoke.isEmpty())
                 localInvocationField.setText(localInvoke.split("\\.")[0]);
 
-            setLocalVariableComboBox(param);
+            setLocalVariableCBValue(param);
         } else {
             descriptionField.setText("");
             localAssignmentField.setText("");
@@ -471,7 +461,7 @@ public class EventStateTransitionDialog extends JDialog {
         localAssignmentPanel.setVisible(opOn.isSelected());
     }
 
-    private void setStateVariableComboBox(EventStateTransition est) {
+    private void setStateVariableCBValue(EventStateTransition est) {
         stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
         stateVarsCB.setSelectedIndex(0);
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
@@ -482,7 +472,7 @@ public class EventStateTransitionDialog extends JDialog {
             }
         }
 
-        if (!est.getStateVarName().equals("")) // for first time
+        if (est.getStateVarName().isEmpty()) // for first time
         {
             ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
@@ -491,7 +481,7 @@ public class EventStateTransitionDialog extends JDialog {
         }
     }
 
-    private void setStateTranMethodsComboBox(EventStateTransition est) {
+    private void setStateTranMethodsCBValue(EventStateTransition est) {
         stateTranMethodsCB.setModel(resolveStateTranMethodCalls());
         stateTransInvokePanel.setVisible(opOn.isSelected());
         pack();
@@ -518,7 +508,7 @@ public class EventStateTransitionDialog extends JDialog {
         }
     }
 
-    private void setLocalVariableComboBox(EventStateTransition est) {
+    private void setLocalVariableCBValue(EventStateTransition est) {
         localVarMethodsCB.setModel(resolveLocalMethodCalls());
         localInvocationPanel.setVisible(opOn.isSelected());
         pack();
@@ -668,6 +658,7 @@ public class EventStateTransitionDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
+            localInvokeDot.setEnabled(!localInvocationField.getText().isEmpty());
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
@@ -677,32 +668,6 @@ public class EventStateTransitionDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
-        }
-    }
-
-    class OneLinePanel extends JPanel {
-
-        OneLinePanel(JLabel lab, int w, JComponent comp) {
-            this(lab,w,comp,null);
-        }
-
-        OneLinePanel(JLabel lab, int w, JComponent comp1, JComponent comp2) {
-            setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-            if (lab == null) {
-                lab = new JLabel("");
-            }
-            add(Box.createHorizontalStrut(5));
-            add(Box.createHorizontalStrut(w - lab.getPreferredSize().width));
-            add(lab);
-            add(Box.createHorizontalStrut(5));
-            add(comp1);
-
-            if (comp2 != null)
-                add(comp2);
-
-            Dimension d = getPreferredSize();
-            d.width = Integer.MAX_VALUE;
-            setMaximumSize(d);
         }
     }
 

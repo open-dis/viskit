@@ -2,11 +2,16 @@ package viskit.util;
 
 import java.io.File;
 
-/**<p>
+/** Utility class to help identify whether an EG or PCL is from XML or *.class
+ * form.  Used to help populate the LEGO tree on the Assy Editor.
+ *
+ * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
- * www.nps.edu</p>
+ * www.nps.edu
+ * </pre>
+ *
  * @author Mike Bailey
  * @since Jul 21, 2004
  * @since 3:26:42 PM
@@ -52,11 +57,9 @@ public class FileBasedAssyNode {
             } else if (sa.length == 4) {
                 return new FileBasedAssyNode(new File(sa[0]), sa[1], new File(sa[2]), sa[3]);
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
         throw new FileBasedAssyNode.exception();
     }
 
-    public static class exception extends Exception {
-    }
+    public static class exception extends Exception {}
 }

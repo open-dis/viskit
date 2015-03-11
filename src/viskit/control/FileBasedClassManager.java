@@ -1,6 +1,6 @@
 package viskit.control;
 
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
+import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +27,15 @@ import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
-/**
+/** A custom class manager to support finding EGs and PCLs in *.class form vice
+ * XML.  Used to populate the LEGOs tree on the Assy Editor.
+ *
+ * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
+ * </pre>
  * @author Mike Bailey
  * @since Jul 23, 2004
  * @since 12:53:36 PM
@@ -178,7 +182,7 @@ public class FileBasedClassManager implements Runnable {
                 new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
                 new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
-            List<Object>[] pa = newListObjectTypeArray(List.class, 1);
+            List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
             VStatics.putParameterList(fclass.getName(), pa);
 
@@ -464,7 +468,7 @@ public class FileBasedClassManager implements Runnable {
         ObjectFactory of = new ObjectFactory();
         Constructor<?>[] constr = c.getConstructors();
         Annotation[] paramAnnots;
-        List<Object>[] l = newListObjectTypeArray(ArrayList.class, constr.length);
+        List<Object>[] l = GenericConversion.newListObjectTypeArray(ArrayList.class, constr.length);
         for (int j = 0; j < constr.length; j++) {
             Class<?>[] clz = constr[j].getParameterTypes();
             paramAnnots = constr[j].getDeclaredAnnotations();
@@ -487,7 +491,7 @@ public class FileBasedClassManager implements Runnable {
                 if (paramAnnots.length > 1) {
                     throw new RuntimeException("Only one Annotation per constructor");
                 }
-                l = newListObjectTypeArray(ArrayList.class, 1);
+                l = GenericConversion.newListObjectTypeArray(ArrayList.class, 1);
                 ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
 
                 if (param != null) {

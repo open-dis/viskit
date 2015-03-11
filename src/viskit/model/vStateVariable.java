@@ -14,10 +14,10 @@ import viskit.VGlobals;
 public class vStateVariable extends ViskitElement {
 
     /** Name of the state variable */
-    private String variableName;
+    private String name;
 
     /** The variable type. This can be a primitive or a class name. */
-    private String variableType;
+    private String type;
 
     /** array size, for (multi-dim) array */
     private String[] arraySize;
@@ -33,18 +33,13 @@ public class vStateVariable extends ViskitElement {
     private String value;
     private String stateVarType;
 
-    @Override
-    public String toString() {
-        return "(" + variableType + ") " + variableName;
-    }
-
     /**
      * Constructor
      * @param pVariableName
      * @param pVariableType
      */
     vStateVariable(String pVariableName, String pVariableType) {
-        variableName = pVariableName;
+        name = pVariableName;
         setType(pVariableType);
         currentValue = null;
     }
@@ -55,23 +50,28 @@ public class vStateVariable extends ViskitElement {
     }
 
     @Override
+    public String toString() {
+        return "(" + type + ") " + name;
+    }
+
+    @Override
     public String getName() {
-        return variableName;
+        return name;
     }
 
     @Override
     public void setName(String pVariableName) {
-        variableName = pVariableName;
+        name = pVariableName;
     }
 
     @Override
     public String getType() {
-        return variableType;
+        return type;
     }
 
     @Override
     public final void setType(String pVariableType) {
-        variableType = pVariableType;
+        type = pVariableType;
         arraySize = VGlobals.instance().getArraySize(pVariableType);
     }
 

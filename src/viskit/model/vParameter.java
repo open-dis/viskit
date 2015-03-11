@@ -39,6 +39,11 @@ public class vParameter extends ViskitElement {
     }
 
     @Override
+    public String toString() {
+        return "(" + type + ") " + name;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

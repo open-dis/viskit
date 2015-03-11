@@ -322,7 +322,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         File ofile = new File(watchDir, nm);
         ofile.delete();
         AssemblyView view = (AssemblyView) VGlobals.instance().getAssemblyController().getView();
-        view.removeFromEventGraphPallette(f);
+        view.removeEventGraphFromLEGOTree(f);
     }
 
     @Override
@@ -588,7 +588,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated.  model.isDirty will be set from
             // this call.
-            VGlobals.instance().getAssemblyEditor().addToEventGraphPallette(f, false);
+            VGlobals.instance().getAssemblyEditor().addEventGraphToLEGOTree(f, false);
         }
 
         // Don't watch a an XML file whose source couldn't be compiled correctly
@@ -1037,7 +1037,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void nodeEdit(viskit.model.EventNode node) // shouldn't be required
+    public void nodeEdit(EventNode node) // shouldn't be required
     //----------------------------------
     {
         boolean done;
@@ -1052,7 +1052,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void schedulingArcEdit(viskit.model.SchedulingEdge ed) {
+    public void schedulingArcEdit(Edge ed) {
         boolean modified = ((EventGraphView) getView()).doEditEdge(ed);
         if (modified) {
             ((viskit.model.Model) getModel()).changeSchedulingEdge(ed);
@@ -1060,7 +1060,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void cancellingArcEdit(viskit.model.CancelingEdge ed) {
+    public void cancellingArcEdit(Edge ed) {
         boolean modified = ((EventGraphView) getView()).doEditCancelEdge(ed);
         if (modified) {
             ((viskit.model.Model) getModel()).changeCancelingEdge(ed);

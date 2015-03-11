@@ -26,7 +26,7 @@ public class ConditionalExpressionPanel extends JPanel {
 
     JTextArea conditionalTA;
     Edge edge;
-    private JPanel conditionalPanel,  ifTextPan;
+    private JPanel conditionalPanel, ifTextPan;
 
     public ConditionalExpressionPanel(Edge edge, boolean schedulingType) {
         this.edge = edge;
@@ -35,7 +35,9 @@ public class ConditionalExpressionPanel extends JPanel {
 
         conditionalPanel = new JPanel();
         conditionalPanel.setLayout(new BoxLayout(conditionalPanel, BoxLayout.Y_AXIS));
-        conditionalPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Conditional Expression")));
+        conditionalPanel.setBorder(new CompoundBorder(
+                new EmptyBorder(0, 0, 5, 0),
+                BorderFactory.createTitledBorder("Conditional Expression")));
 
         ifTextPan = new JPanel();
         ifTextPan.setLayout(new BoxLayout(ifTextPan, BoxLayout.X_AXIS));
@@ -61,15 +63,7 @@ public class ConditionalExpressionPanel extends JPanel {
         thenTextPan.setLayout(new BoxLayout(thenTextPan, BoxLayout.X_AXIS));
         thenTextPan.add(Box.createHorizontalStrut(10));
         JLabel rightParen;
-        
-// TODO:  detect cancelling edge...
-//      if (edge instanceof SchedulingEdge)
-//           rightParen = new JLabel(") then schedule target event");
-//      else if (edge instanceof CancelingEdge) 
-//           rightParen = new JLabel(") then cancel target event");
-//      else
-//          rightParen = new JLabel(") then schedule/cancel target event");
-        
+
         if (schedulingType) {
             rightParen = new JLabel(") then schedule target event");
         } else {
@@ -86,6 +80,7 @@ public class ConditionalExpressionPanel extends JPanel {
 
         conditionalTA.addCaretListener(new CaretListener() {
 
+            @Override
             public void caretUpdate(CaretEvent e) {
                 if (changeListener != null) {
                     changeListener.stateChanged(new ChangeEvent(conditionalTA));
