@@ -1,4 +1,4 @@
-$Id:$
+$Id$
 
 This note details what files are to be modified when bumping up the release
 version #:
@@ -14,3 +14,5 @@ version #:
 3) installer/Unix_shortcutSpec.xml
    installer/launch4jConfix.xml
    installer/shortcutSpec.xml
+   installer/macosx/Info.plist
+        CFBundleVersion
