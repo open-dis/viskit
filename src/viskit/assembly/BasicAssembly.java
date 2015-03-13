@@ -758,7 +758,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             if (scenarioManager != null) {
                 try {
                     Method doStop = scenarioManager.getClass().getMethod("doStopSimulation");
-                    doStop.invoke(scenarioManager, getNumberReplications());
+                    doStop.invoke(scenarioManager, (Object[]) null);
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
 //                    ex.printStackTrace();
                     LOG.error(ex);
