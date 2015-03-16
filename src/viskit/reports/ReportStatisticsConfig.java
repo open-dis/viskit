@@ -15,6 +15,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -24,7 +25,7 @@ import simkit.stat.SampleStatistics;
 import viskit.VGlobals;
 import viskit.ViskitProject;
 
-/** 
+/**
  * This class serves as the intermediate step between viskit.xsd.BasicAssembly and
  * the AnalystReport.  As of (July 2006) Viskit does not have the ability
  * to export statistical reports indexed by SimEntity.  This is a requirement for
@@ -34,7 +35,7 @@ import viskit.ViskitProject;
  * (replicationStatistics). After construction this object is passed to the BasicAssembly.java
  * object. The BasicAssembly strips the keyValues from the passed object and provides those
  * values to this class.  Using an underscore '_' as a deliberate separator this class extracts
- * the name of each SimEntity for each PropChangeListener.  These names are used to index output 
+ * the name of each SimEntity for each PropChangeListener.  These names are used to index output
  * from the simulation.
  *
  * TODO: Remove the naming convention requirement and index the statistics object in either the
@@ -78,9 +79,9 @@ public class ReportStatisticsConfig {
      * Assembly name
      */
     private String assemblyName;
-    
+
     /** Creates a new instance of ReportStatisticsConfig
-     * @param assemblyName 
+     * @param assemblyName
      */
     public ReportStatisticsConfig(String assemblyName) {
         this.assemblyName = assemblyName;
@@ -97,12 +98,12 @@ public class ReportStatisticsConfig {
     /**
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
-     * @param keyValues 
+     * @param keyValues
      */
-    public void setEntityIndex(LinkedList<String> keyValues) {
+    public void setEntityIndex(List<String> keyValues) {
         entityIndex = new String[keyValues.size()];
         propertyIndex = new String[keyValues.size()];
-      
+
         if (keyValues.size() > 0) {
             System.out.println("Replication Statistic(s) created");
             System.out.println("--------------------------------");
@@ -127,7 +128,7 @@ public class ReportStatisticsConfig {
     }
 
     /**
-     * Performs simple string parsing to find the underscore separating the 
+     * Performs simple string parsing to find the underscore separating the
      * EntityName and the Property Name
      *
      * @param str the string entry for the name of a property change listener
@@ -149,7 +150,7 @@ public class ReportStatisticsConfig {
      * Creates a replication record for each SampleStatistics object after each
      * run.
      * @param repNumber
-     * @param repStats 
+     * @param repStats
      */
     public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
         LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
@@ -229,7 +230,7 @@ public class ReportStatisticsConfig {
             XMLOutputter outputter = new XMLOutputter();
             Format fmt = Format.getPrettyFormat();
             outputter.setFormat(fmt);
-            
+
             // Create a unique file name for each DTG/Location Pair
             ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
             File anStatDir = vkp.getAnalystReportStatisticsDir();

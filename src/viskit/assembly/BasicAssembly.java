@@ -97,7 +97,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private ReportStatisticsConfig statsConfig;
     private int designPointID;
     private DecimalFormat form;
-    private LinkedList<String> entitiesWithStats;
+    private List<String> entitiesWithStats;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
 
