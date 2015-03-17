@@ -582,6 +582,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     t.getMessage(),
                     "Assembly Run Error",
                     JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         printInfo();    // subclasses may display what they wish at the top of the run.
