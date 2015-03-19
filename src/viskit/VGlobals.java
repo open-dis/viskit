@@ -529,8 +529,13 @@ public class VGlobals {
         return null;    // null means good parse!
     }
 
-    public boolean isArray(String ty) {
-        return ty.contains("[") && ty.contains("]");
+    /** Checks for an array type
+     *
+     * @param type the type to check
+     * @return true if an array type
+     */
+    public boolean isArray(String type) {
+        return type.endsWith("]");
     }
 
     // TODO: Fix the logic here, it doesn't seem to get used correctly
@@ -580,8 +585,13 @@ public class VGlobals {
         return returnString;
     }
 
+    /** Checks for a generic type
+     *
+     * @param type the type to check
+     * @return true if a generic type
+     */
     public boolean isGeneric(String type) {
-        return type.contains("<") && type.contains(">");
+        return type.endsWith(">");
     }
 
     /** The entry point for Viskit startup.  This method will either identify a
