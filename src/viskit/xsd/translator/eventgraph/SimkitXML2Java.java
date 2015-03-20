@@ -731,6 +731,16 @@ public class SimkitXML2Java {
         }
 
         if (!liLocalV.isEmpty()) {pw.println();}
+        
+        if (run.getCode() != null && !run.getCode().isEmpty()) {
+            pw.println(SP_8 + "/* Code insertion for Event " + run.getName() + " */");
+            String[] lines = run.getCode().split("\\n");
+            for (String line : lines) {
+                pw.println(SP_8 + line);
+            }
+            pw.println(SP_8 + "/* End Code insertion */");
+            pw.println();
+        }
 
         List<StateTransition> liStateT = run.getStateTransition();
 
@@ -781,10 +791,6 @@ public class SimkitXML2Java {
             }
         }
 
-        String x = run.getCode();
-        if (x != null && !x.isEmpty()) {
-            pw.println(SP_8 + x);
-        }
         pw.println(SP_4 + CB);
         pw.println();
     }
