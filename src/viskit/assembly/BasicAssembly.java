@@ -576,10 +576,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             performHookups();
         } catch (Throwable t) {
 
+            String message;
+            if (t.getMessage() == null)
+                message = "A null pointer expection has occurred.  Assembly run"
+                        + " is terminated";
+            else
+                message = t.getMessage() + "Assembly run is terminated";
+
             // Because we don't have any live controllers to message the user
             // in this thread context, brute force the message
             JOptionPane.showMessageDialog(null,
-                    t.getMessage(),
+                    message,
                     "Assembly Run Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
