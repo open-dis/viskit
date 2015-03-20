@@ -223,6 +223,7 @@ public class SimkitXML2Java {
     }
 
     void buildParameters(StringWriter vars, StringWriter accessorBlock) {
+
         PrintWriter pw = new PrintWriter(vars);
 
         liParams = this.root.getParameter();
@@ -265,9 +266,6 @@ public class SimkitXML2Java {
     void buildStateVariables(StringWriter vars, StringWriter accessorBlock) {
 
         PrintWriter pw = new PrintWriter(vars);
-
-        liParams = this.root.getParameter();
-        superParams = resolveSuperParams(liParams);
 
         liStateV = this.root.getStateVariable();
 
@@ -361,6 +359,21 @@ public class SimkitXML2Java {
     }
 
     void buildParameterModifierAndAccessor(Parameter p, StringWriter sw) {
+
+        // Don't dup any super setters
+        if (!extendz.contains(SIM_ENTITY_BASE)) {
+
+            Class<?> sup = resolveExtensionClass();
+            Method[] methods = sup.getMethods();
+            for (int l = superParams.size(); l < liParams.size(); l++) {
+
+                for (Method m : methods) {
+                    if (("set" + capitalize(p.getName())).equals(m.getName())) {
+                        return;
+                    }
+                }
+            }
+        }
 
         PrintWriter pw = new PrintWriter(sw);
 
@@ -541,7 +554,13 @@ public class SimkitXML2Java {
 
             pw.println(RP + SP + OB);
 
+            Method[] methods = null;
+
+            // check for any super params for this constructor
             if (!extendz.contains(SIM_ENTITY_BASE)) {
+
+                Class<?> sup = resolveExtensionClass();
+                methods = sup.getMethods();
 
                 pw.print(SP_8 + "super" + LP);
                 for (Parameter pt : superParams) {
@@ -553,10 +572,29 @@ public class SimkitXML2Java {
                 pw.println(RP + SC);
             }
 
-            // skip over any sets that would get done in the superclass
+            String superParam = null;
+
+            // skip over any sets that would get done in the superclass, or
+            // call super.set*()
             for (int l = superParams.size(); l < liParams.size(); l++) {
+
                 Parameter pt = liParams.get(l);
-                pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
+                if (methods != null) {
+                    for (Method m : methods) {
+                        if (("set" + capitalize(pt.getName())).equals(m.getName())) {
+                            superParam = m.getName();
+                            break;
+                        }
+                    }
+                }
+
+                if (superParam != null && !superParam.isEmpty())
+                    pw.println(SP_8 + "super.set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
+                else
+                    pw.println(SP_8 + "set" + capitalize(pt.getName()) + LP + shortinate(pt.getName()) + RP + SC);
+
+                // reset
+                superParam = null;
             }
 
             for (StateVariable st : liStateV) {
