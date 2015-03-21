@@ -576,17 +576,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             performHookups();
         } catch (Throwable t) {
 
-            String message;
-            if (t.getMessage() == null)
-                message = "A null pointer expection has occurred.  Assembly run"
-                        + " is terminated";
-            else
-                message = t.getMessage() + "Assembly run is terminated";
-
             // Because we don't have any live controllers to message the user
             // in this thread context, brute force the message
             JOptionPane.showMessageDialog(null,
-                    message,
+                    t,
                     "Assembly Run Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
@@ -694,7 +687,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
-                    JOptionPane.showMessageDialog(null, cme.getMessage(), "Simulation Start Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            cme,
+                            "Assembly Run Error",
+                            JOptionPane.ERROR_MESSAGE);
                     int newEventListId = Schedule.addNewEventList();
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
                     for (SimEntity entity : simEntity) {
