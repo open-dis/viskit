@@ -694,15 +694,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
-                    JOptionPane.showMessageDialog(null, "Viskit has detected " +
-                            "a possible error condition in the simulation " +
-                            "entities. \nIt is possible that one of the " +
-                            "entities is instancing a SimEntity type unsafely." +
-                            " \nPlease check that any internally created " +
-                            "entities are handled appropriately. \nYou'll " +
-                            "probably have to restart Viskit, however, Viskit " +
-                            "will now try to swap in\n a new EventList for " +
-                            "debugging purposes only.");
+                    JOptionPane.showMessageDialog(null, cme.getMessage(), "Simulation Start Error", JOptionPane.ERROR);
                     int newEventListId = Schedule.addNewEventList();
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
                     for (SimEntity entity : simEntity) {
