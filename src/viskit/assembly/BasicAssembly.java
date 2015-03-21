@@ -579,7 +579,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Because we don't have any live controllers to message the user
             // in this thread context, brute force the message
             JOptionPane.showMessageDialog(null,
-                    t,
+                    t + "\nSimulation will terminate",
                     "Assembly Run Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
@@ -688,7 +688,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
                     JOptionPane.showMessageDialog(null,
-                            cme,
+                            cme + "\nSimulation will terminate",
                             "Assembly Run Error",
                             JOptionPane.ERROR_MESSAGE);
                     int newEventListId = Schedule.addNewEventList();
