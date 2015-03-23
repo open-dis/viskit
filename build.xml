@@ -782,6 +782,7 @@ their descpritions.
 
     <!--  === TARGET: clean === -->
     <target name="clean"
+            depends="nuke.dot.viskit"
             description="Deletes build directory, xsd bindings, dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
