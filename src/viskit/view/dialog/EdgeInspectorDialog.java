@@ -602,7 +602,7 @@ public class EdgeInspectorDialog extends JDialog {
             ((SchedulingEdge) edge).priority = s;
         }
 
-        String delaySt = (String) timeDelayVarsCB.getSelectedItem();
+        String delaySt = ((ViskitElement) timeDelayVarsCB.getSelectedItem()).getValue();
         if (delaySt == null || delaySt.trim().isEmpty())
             delaySt = (String) timeDelayMethodsCB.getSelectedItem();
         else
