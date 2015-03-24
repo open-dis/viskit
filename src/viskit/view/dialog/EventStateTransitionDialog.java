@@ -472,13 +472,14 @@ public class EventStateTransitionDialog extends JDialog {
             }
         }
 
-        if (est.getStateVarName().isEmpty()) // for first time
-        {
-            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
-                    JOptionPane.ERROR_MESSAGE,
-                    "Alert",
-                    "State variable " + est.getStateVarName() + "not found.");
-        }
+        // TODO: determine if this is necessary
+//        if (est.getStateVarName().isEmpty()) // for first time
+//        {
+//            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+//                    JOptionPane.ERROR_MESSAGE,
+//                    "Alert",
+//                    "State variable " + est.getStateVarName() + "not found.");
+//        }
     }
 
     private void setStateTranMethodsCBValue(EventStateTransition est) {
