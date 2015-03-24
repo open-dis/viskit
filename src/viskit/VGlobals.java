@@ -591,7 +591,7 @@ public class VGlobals {
      * @return true if a generic type
      */
     public boolean isGeneric(String type) {
-        return type.endsWith(">");
+        return type.contains(">");
     }
 
     /** The entry point for Viskit startup.  This method will either identify a
