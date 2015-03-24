@@ -16,16 +16,12 @@ import java.util.List;
 public class PropChangeEdge extends AssemblyEdge {
 
     protected String property;
-    private String name;
-    private String type;
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
     private String value;
     private String comment;
-    private String stateVarType;
 
     PropChangeEdge() // package-limited
     {
@@ -37,26 +33,6 @@ public class PropChangeEdge extends AssemblyEdge {
 
     public void setProperty(String p) {
         property = p;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
     }
 
     @Override
@@ -72,11 +48,6 @@ public class PropChangeEdge extends AssemblyEdge {
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
-    }
-
-    @Override
-    public String getStateVarName() {
-        return stateVarName;
     }
 
     @Override
@@ -97,10 +68,5 @@ public class PropChangeEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

@@ -13,18 +13,13 @@ import viskit.VGlobals;
  */
 public class EventLocalVariable extends ViskitElement {
 
-    private static final String EMPTY = "";
-    private String type;
-    private String name;
     private String value;
     private String comment = EMPTY;
     private String[] arraySize;
     private List<String> descriptionArray = new ArrayList<>();
     private String indexingExpression;
-    private String stateVarName;
     private boolean operation;
     private String operationOrAssignment;
-    private String stateVarType;
 
     public EventLocalVariable(String name, String type, String value) {
         this.name = name;
@@ -47,21 +42,6 @@ public class EventLocalVariable extends ViskitElement {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
@@ -72,7 +52,7 @@ public class EventLocalVariable extends ViskitElement {
 
     @Override
     public final void setType(String pType) {
-        type = pType;
+        super.setType(pType);
         arraySize = VGlobals.instance().getArraySize(pType);
     }
 
@@ -96,11 +76,6 @@ public class EventLocalVariable extends ViskitElement {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -108,10 +83,5 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

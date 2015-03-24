@@ -22,9 +22,13 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
     /** NOT USED */
     public Object opaqueControllerObject; // for private use of C
 
+    protected static final String EMPTY = "";
+    protected String type = EMPTY;
+    protected String name = EMPTY;
+
     /** every node or edge has a unique key */
     private static int seqID = 0;
-    private Object modelKey = "" + (seqID++);
+    private Object modelKey = EMPTY + (seqID++);
 
     protected ViskitElement shallowCopy(ViskitElement newVe) {
         newVe.opaqueControllerObject = this.opaqueControllerObject;
@@ -48,14 +52,18 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
      *
      * @return name of node variable
      */
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
 
     /**
      * Sets the node variable name.
      *
      * @param name what the node variable name will become
      */
-    public abstract void setName(String name);
+    public void setName(String name){
+        this.name = name;
+    }
 
     /**
      * Returns a string representation of the type of the variable. This may
@@ -64,7 +72,9 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
      *
      * @return string representation of the type of the variable
      */
-    public abstract String getType();
+    public String getType() {
+        return type;
+    }
 
     /**
      * Sets the type of the node variable. There is no checking that the
@@ -73,23 +83,11 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
      *
      * @param type representation of the type of the state variable
      */
-    public abstract void setType(String type);
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public abstract String getIndexingExpression();
-
-    /**
-     * Returns the name of the state variable.
-     *
-     * @return name of state variable
-     */
-    public abstract String getStateVarName();
-
-    /**
-     * Returns the type of the state variable.
-     *
-     * @return type of state variable
-     */
-    public abstract String getStateVarType();
 
     public abstract String getValue();
 

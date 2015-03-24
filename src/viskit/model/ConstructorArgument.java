@@ -13,14 +13,11 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ConstructorArgument extends ViskitElement {
-    private String stateVarType;
+
     private List<String> descriptionArray = new ArrayList<>();
-    private String name;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
-    private String type;
     private String value;
     private List<String> comments = new ArrayList<>();
     private String comment;
@@ -38,28 +35,8 @@ public class ConstructorArgument extends ViskitElement {
         return value;
     }
 
-    public void setValue(String name) {
-        this.value = name;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
@@ -78,11 +55,6 @@ public class ConstructorArgument extends ViskitElement {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    @Override
     public String getComment() {
         return comment;
     }
@@ -95,10 +67,5 @@ public class ConstructorArgument extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

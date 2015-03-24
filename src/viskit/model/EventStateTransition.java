@@ -14,14 +14,10 @@ import viskit.VGlobals;
 public class EventStateTransition extends ViskitElement {
 
     private List<String> descriptionArray = new ArrayList<>();
-    private String type;
-    private String name;
-    private String stateVarName = "";
-    private String stateVarType = "";
-    private String operationOrAssignment = "";
+    private String operationOrAssignment = EMPTY;
     private boolean isOperation = false;
     private List<String> comments = new ArrayList<>();
-    private String indexingExpression = "";
+    private String indexingExpression = EMPTY;
     private String value;
     private String comment;
     private String localVariableAssignment;
@@ -38,8 +34,8 @@ public class EventStateTransition extends ViskitElement {
             sb.append(' ');
         }
 
-        sb.append(stateVarName);
-        if (VGlobals.instance().isArray(stateVarType)) {
+        sb.append(name);
+        if (VGlobals.instance().isArray(type)) {
             handleArrayIndexing(sb);
         }
 
@@ -96,50 +92,12 @@ public class EventStateTransition extends ViskitElement {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    public void setStateVarName(String stateVarName) {
-        this.stateVarName = stateVarName;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
-    }
-
-    public void setStateVarType(String stateVarType) {
-        this.stateVarType = stateVarType;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
 
     public void setIndexingExpression(String idxExpr) {
         this.indexingExpression = idxExpr;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
     }
 
     @Override

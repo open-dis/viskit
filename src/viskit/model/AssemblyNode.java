@@ -17,39 +17,17 @@ import java.util.Vector;
  */
 public abstract class AssemblyNode extends ViskitElement {
 
-    private String name;
-    private String type;
     private Vector<AssemblyEdge> connections = new Vector<>();
     private List<String> comments = new ArrayList<>();
     private Point2D position = new Point2D.Double(0d, 0d);
     private VInstantiator instantiator;
-    private String descriptionString = "";  // instance information
+    private String descriptionString = EMPTY;  // instance information
 
     AssemblyNode(String name, String type) // package access on constructor
     {
         this.name = name;
         this.type = type;
-        instantiator = new VInstantiator.FreeF(type, "");
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String s) {
-        this.name = s;
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String typ) {
-        this.type = typ;
+        instantiator = new VInstantiator.FreeF(type, EMPTY);
     }
 
     public List<String> getComments() {

@@ -20,7 +20,6 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class EventNode extends ViskitElement {
 
-    private String name;
     private Vector<ViskitElement> connections = new Vector<>();
     private Vector<ViskitElement> localVariables = new Vector<>();
     private List<String> comments = new ArrayList<>();
@@ -28,15 +27,12 @@ public class EventNode extends ViskitElement {
     private List<ViskitElement> arguments = new ArrayList<>();
     private List<String> descriptionArray = new ArrayList<>();
     private Point2D position = new Point2D.Double(0.d, 0.d);
-    private String codeblock = "";
-    private String type;
+    private String codeblock = EMPTY;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
     private String value;
     private String comment;
-    private String stateVarType;
 
     EventNode(String name) // package access on constructor
     {
@@ -57,11 +53,6 @@ public class EventNode extends ViskitElement {
         en.arguments = arguments;
         en.codeblock = codeblock;
         return en;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -129,16 +120,6 @@ public class EventNode extends ViskitElement {
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
     public List<String> getDescriptionArray() {
         return descriptionArray;
     }
@@ -151,11 +132,6 @@ public class EventNode extends ViskitElement {
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
-    }
-
-    @Override
-    public String getStateVarName() {
-        return stateVarName;
     }
 
     @Override
@@ -176,10 +152,5 @@ public class EventNode extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

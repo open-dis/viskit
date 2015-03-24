@@ -14,16 +14,13 @@ import java.util.List;
  * @version $Id$
  */
 public class CancelingEdge extends Edge {
-    private String type;
+
     private List<String> descriptionArray = new ArrayList<>();
-    private String name;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
     private String value;
     private String comment;
-    private String stateVarType;
 
     CancelingEdge() //package-limited
     {
@@ -43,16 +40,6 @@ public class CancelingEdge extends Edge {
     }
 
     @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
     public List<String> getDescriptionArray() {
         return descriptionArray;
     }
@@ -63,23 +50,8 @@ public class CancelingEdge extends Edge {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
-    }
-
-    @Override
-    public String getStateVarName() {
-        return stateVarName;
     }
 
     @Override
@@ -100,10 +72,5 @@ public class CancelingEdge extends Edge {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

@@ -406,8 +406,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
 
             StateVariable sv = (StateVariable) st.getState();
-            est.setStateVarName(sv.getName());
-            est.setStateVarType(sv.getType());
+            est.setName(sv.getName());
+            est.setType(sv.getType());
 
             // bug fix 1183
             if (VGlobals.instance().isArray(sv.getType())) {
@@ -933,7 +933,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 }
             }
 
-            StateVariable sv = findStateVariable(transition.getStateVarName());
+            StateVariable sv = findStateVariable(transition.getName());
             st.setState(sv);
 
             if (sv.getType() != null && VGlobals.instance().isArray(sv.getType())) {

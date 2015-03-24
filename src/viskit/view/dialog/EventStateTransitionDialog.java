@@ -115,6 +115,8 @@ public class EventStateTransitionDialog extends JDialog {
         descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
         actionField = new JTextField(15);
+        actionField.setToolTipText("Use this field to provide a method "
+                + "argument, or a value to assign");
         setMaxHeight(actionField);
         arrayIndexField = new JTextField(5);
         setMaxHeight(arrayIndexField);
@@ -466,7 +468,7 @@ public class EventStateTransitionDialog extends JDialog {
         stateVarsCB.setSelectedIndex(0);
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
             vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
-            if (est.getStateVarName().equalsIgnoreCase(sv.getName())) {
+            if (est.getName().equalsIgnoreCase(sv.getName())) {
                 stateVarsCB.setSelectedIndex(i);
                 return;
             }
@@ -542,8 +544,8 @@ public class EventStateTransitionDialog extends JDialog {
             if (!localAssignmentField.getText().isEmpty())
                 param.setLocalVariableAssignment(localAssignmentField.getText().trim());
 
-            param.setStateVarName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
-            param.setStateVarType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
+            param.setName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
+            param.setType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
             param.setIndexingExpression(arrayIndexField.getText().trim());
 
             String arg = actionField.getText().trim();

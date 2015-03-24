@@ -13,25 +13,17 @@ import viskit.VGlobals;
  */
 public class vStateVariable extends ViskitElement {
 
-    /** Name of the state variable */
-    private String name;
-
-    /** The variable type. This can be a primitive or a class name. */
-    private String type;
-
     /** array size, for (multi-dim) array */
     private String[] arraySize;
 
     /** Object that represents its current value */
     private Object currentValue;
-    private String comment = "";
+    private String comment = EMPTY;
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
     private String value;
-    private String stateVarType;
 
     /**
      * Constructor
@@ -52,21 +44,6 @@ public class vStateVariable extends ViskitElement {
     @Override
     public String toString() {
         return "(" + type + ") " + name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String pVariableName) {
-        name = pVariableName;
-    }
-
-    @Override
-    public String getType() {
-        return type;
     }
 
     @Override
@@ -120,11 +97,6 @@ public class vStateVariable extends ViskitElement {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
@@ -137,10 +109,5 @@ public class vStateVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

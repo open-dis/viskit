@@ -22,10 +22,8 @@ public class PropChangeListenerNode extends AssemblyNode {
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
     private String value;
     private String comment;
-    private String stateVarType;
     private boolean getMean = false;
     private boolean getCount = false;
 
@@ -101,11 +99,6 @@ public class PropChangeListenerNode extends AssemblyNode {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
@@ -123,10 +116,5 @@ public class PropChangeListenerNode extends AssemblyNode {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }

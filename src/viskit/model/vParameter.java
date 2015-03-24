@@ -14,17 +14,13 @@ import viskit.VGlobals;
  */
 public class vParameter extends ViskitElement {
 
-    private String name;
-    private String type;
-    private String value = "";
-    private String comment = "";
+    private String value = EMPTY;
+    private String comment = EMPTY;
     private String[] arraySize;
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
-    private String stateVarName;
-    private String stateVarType;
 
     vParameter(String pName, String pType) //package-accessible
     {
@@ -41,21 +37,6 @@ public class vParameter extends ViskitElement {
     @Override
     public String toString() {
         return "(" + type + ") " + name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String pName) {
-        name = pName;
-    }
-
-    @Override
-    public String getType() {
-        return type;
     }
 
     @Override
@@ -78,7 +59,7 @@ public class vParameter extends ViskitElement {
 
     @Override
     public final void setType(String pType) {
-        type = pType;
+        this.type = pType;
         arraySize = VGlobals.instance().getArraySize(pType);
     }
 
@@ -102,11 +83,6 @@ public class vParameter extends ViskitElement {
     }
 
     @Override
-    public String getStateVarName() {
-        return stateVarName;
-    }
-
-    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -114,10 +90,5 @@ public class vParameter extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getStateVarType() {
-        return stateVarType;
     }
 }
