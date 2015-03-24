@@ -21,7 +21,7 @@ import viskit.xsd.bindings.eventgraph.Event;
 public class EventNode extends ViskitElement {
 
     private Vector<ViskitElement> connections = new Vector<>();
-    private Vector<ViskitElement> localVariables = new Vector<>();
+    private List<ViskitElement> localVariables = new ArrayList<>();
     private List<String> comments = new ArrayList<>();
     private List<ViskitElement> transitions = new ArrayList<>();
     private List<ViskitElement> arguments = new ArrayList<>();
@@ -95,11 +95,11 @@ public class EventNode extends ViskitElement {
         this.connections = connections;
     }
 
-    public Vector<ViskitElement> getLocalVariables() {
+    public List<ViskitElement> getLocalVariables() {
         return localVariables;
     }
 
-    public void setLocalVariables(Vector<ViskitElement> localVariables) {
+    public void setLocalVariables(List<ViskitElement> localVariables) {
         this.localVariables = localVariables;
     }
 

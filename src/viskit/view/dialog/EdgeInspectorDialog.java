@@ -357,15 +357,12 @@ public class EdgeInspectorDialog extends JDialog {
         ((DefaultComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
         cb.setModel(m);
 
-        java.util.List<ViskitElement> vars = edge.from.getLocalVariables();
+        java.util.List<ViskitElement> vars = new ArrayList<>(edge.from.getLocalVariables());
+        vars.addAll(edge.from.getArguments());
         for (ViskitElement e : vars) {
             ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
         }
 
-        vars = edge.from.getArguments();
-        for (ViskitElement e : vars) {
-            ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
-        }
         return cb;
     }
 
@@ -373,8 +370,8 @@ public class EdgeInspectorDialog extends JDialog {
         Class<?> type;
         Method[] methods;
         String typ;
-        java.util.List<ViskitElement> types = edge.from.getLocalVariables();
         Vector<String> methodNames = new Vector<>();
+        java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
 
         // Enable argument type methods to be invoked as well
         types.addAll(edge.from.getArguments());

@@ -4,8 +4,8 @@ import edu.nps.util.LogUtils;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -327,7 +327,7 @@ public class EventInspectorDialog extends JDialog {
 
             // Bug 1373: This is how we will now sync up any SchedulingEdge
             // parameters with corresponding EventNode parameters
-            
+
             // TODO: Recheck bug and verify this isn't don't elsewhere.  W/O
             // the continue statement, it nukes edge values that were already
             // there if we modify a node
@@ -360,7 +360,7 @@ public class EventInspectorDialog extends JDialog {
                     }
                 }
             }
-            en.setLocalVariables(new Vector<>(localVariables.getData()));
+            en.setLocalVariables(localVariables.getData());
             en.getComments().clear();
             en.getComments().add(description.getText().trim());
             en.setCodeBLock(codeBlock.getData());
@@ -439,7 +439,7 @@ public class EventInspectorDialog extends JDialog {
         }
 
         private void addPotentialLocalIndexVariable(EventNode n, String lvName) {
-            Vector<ViskitElement> locVars = n.getLocalVariables();
+            List<ViskitElement> locVars = new ArrayList<>(n.getLocalVariables());
             locVars.add(new EventLocalVariable(lvName, "int", "0"));
         }
     }

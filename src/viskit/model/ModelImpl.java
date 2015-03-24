@@ -988,7 +988,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
     }
 
-    private void cloneLocalVariables(List<LocalVariable> targ, Vector<ViskitElement> local) {
+    private void cloneLocalVariables(List<LocalVariable> targ, List<ViskitElement> local) {
         targ.clear();
         for (ViskitElement eventLocalVariables : local) {
             LocalVariable lvar = oFactory.createLocalVariable();

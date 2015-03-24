@@ -514,8 +514,15 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         protected JComponent highlight;
 
         public MyMarqueeHandler() {
+            
             // Configures the panel for highlighting ports
-            highlight = createHighlight();
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    highlight = createHighlight();
+                }
+            };
+            SwingUtilities.invokeLater(r);
         }
 
         /**

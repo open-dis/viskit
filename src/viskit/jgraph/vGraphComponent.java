@@ -307,15 +307,14 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (!se.parameters.isEmpty()) {
 
                         sb.append("<u>edge parameters</u><br>");
-                        for (Iterator itr = se.parameters.iterator(); itr.hasNext();) {
-                            vEdgeParameter ep = (vEdgeParameter) itr.next();
+                        for (ViskitElement e : se.parameters) {
+                            vEdgeParameter ep = (vEdgeParameter) e;
                             sb.append("&nbsp;");
                             sb.append(idx++);
                             sb.append(" ");
                             sb.append(ep.getValue());
 
-                            // TODO: Will need a schema change for this to show correctly
-                            if (ep.getType() != null) {
+                            if (ep.getType() != null && !ep.getType().isEmpty()) {
                                 sb.append(" ");
                                 sb.append("(");
                                 sb.append(ep.getType());
@@ -364,7 +363,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    Vector<ViskitElement> locVarLis = en.getLocalVariables();
+                    List<ViskitElement> locVarLis = en.getLocalVariables();
                     if (!locVarLis.isEmpty()) {
 
                         sb.append("<u>local variables</u><br>");
@@ -594,8 +593,15 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         protected JComponent highlight;
 
         public MyMarqueeHandler() {
+
             // Configures the panel for highlighting ports
-            highlight = createHighlight();
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    highlight = createHighlight();
+                }
+            };
+            SwingUtilities.invokeLater(r);
         }
 
         /**
@@ -626,7 +632,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             // Find and Remember Port
             port = getSourcePortAt(e.getPoint());
             // If Port Found and in ConnectMode (=Ports Visible)
-            if (port != null && vGraphComponent.this.isPortsVisible() && e.getClickCount() != 2) //jmb  added to edit when in edge mode
+            if (port != null && vGraphComponent.this.isPortsVisible() /*&& e.getClickCount() != 2*/) //jmb  added to edit when in edge mode
             {
                 return true;
             }
@@ -726,7 +732,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     && vGraphComponent.this.isPortsVisible()) {
                 // Set Cusor on Graph (Automatically Reset)
                 vGraphComponent.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				// Consume Event
+		// Consume Event
                 // Note: This is to signal the BasicGraphUI's
                 // MouseHandle to stop further event processing.
                 e.consume();

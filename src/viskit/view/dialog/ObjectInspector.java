@@ -18,7 +18,7 @@ import viskit.view.InstantiationPanel;
  * Date: Jun 16, 2004
  * Time: 3:27:42 PM
  */
-public class ObjectInspector extends JDialog implements ActionListener
+public class ObjectInspector extends JDialog
 {
   public boolean modified = false;
   private JButton canButt,okButt;
@@ -63,11 +63,6 @@ public class ObjectInspector extends JDialog implements ActionListener
 
     pack();     // do this prior to next
     setLocationRelativeTo(getParent());
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e)
-  {
   }
 
   public void setData(VInstantiator vi) throws ClassNotFoundException

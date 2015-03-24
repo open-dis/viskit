@@ -35,12 +35,13 @@ import viskit.view.LocalVariablesPanel;
  */
 public class EventStateTransitionDialog extends JDialog {
 
+    private static EventStateTransitionDialog dialog;
+    private static boolean modified = false;
+
     private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
     private JComboBox<String> stateTranMethodsCB, localVarMethodsCB;
     private JRadioButton assTo, opOn;
-    private static EventStateTransitionDialog dialog;
-    private static boolean modified = false;
     private EventStateTransition param;
     private JButton okButt, canButt;
     private JButton newSVButt;
@@ -334,8 +335,8 @@ public class EventStateTransitionDialog extends JDialog {
         Class<?> type;
         Method[] methods;
         String typ;
-        java.util.List<ViskitElement> types = localVariablesPanel.getData();
         Vector<String> methodNames = new Vector<>();
+        java.util.List<ViskitElement> types = new ArrayList<>(localVariablesPanel.getData());
 
         // Enable argument type methods to be invoked as well
         types.addAll(argPanel.getData());

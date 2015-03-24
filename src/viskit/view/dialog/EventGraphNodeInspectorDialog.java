@@ -27,20 +27,21 @@ import viskit.view.InstantiationPanel;
  */
 public class EventGraphNodeInspectorDialog extends JDialog {
 
+    public static String newName;
+    public static VInstantiator newInstantiator;
+    private static EventGraphNodeInspectorDialog dialog;
+    private static boolean modified = false;
+
     private JLabel handleLab; //,outputLab;
     private JTextField handleField;
 
     // verboseCheck not used, does nothing for Viskit
     private JCheckBox outputCheck /*, verboseCheck*/;
     private InstantiationPanel ip;
-    private static EventGraphNodeInspectorDialog dialog;
-    private static boolean modified = false;
     private EvGraphNode egNode;
     private JButton okButt, canButt;
     private enableApplyButtonListener lis;
     private JPanel buttPan;
-    public static String newName;
-    public static VInstantiator newInstantiator;
     private JTextField descField;
     private JLabel descLab;
 

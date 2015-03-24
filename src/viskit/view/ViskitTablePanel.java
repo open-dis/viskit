@@ -188,7 +188,7 @@ public abstract class ViskitTablePanel extends JPanel {
     /**
      * Add a row defined by the argument to the end of the table.  The table data
      * will be retrieved through the abstract method, getFields(o).
-     * @param e
+     * @param e the argument for this row
      */
     public void addRow(ViskitElement e) {
         shadow.add(e);
