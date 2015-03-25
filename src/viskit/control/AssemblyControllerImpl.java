@@ -1205,7 +1205,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         Object[] roots = view.getCurrentVgacw().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
-        selectionVector.add(redoGraphCell.getUserObject());
+
+        // Prevent dups
+        if (!selectionVector.contains(redoGraphCell.getUserObject()))
+            selectionVector.add(redoGraphCell.getUserObject());
 
         remove();
 

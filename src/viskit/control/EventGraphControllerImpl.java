@@ -825,7 +825,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         Object[] roots = view.getCurrentVgcw().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
-        selectionVector.add(redoGraphCell.getUserObject());
+
+        // Prevent dups
+        if (!selectionVector.contains(redoGraphCell.getUserObject()))
+            selectionVector.add(redoGraphCell.getUserObject());
 
         remove();
 

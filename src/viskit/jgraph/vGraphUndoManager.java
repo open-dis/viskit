@@ -87,7 +87,10 @@ public class vGraphUndoManager extends GraphUndoManager implements GraphSelectio
         }
         for (Object o : oa) {
             if (e.isAddedCell(o)) {
-                selected.add(((DefaultGraphCell) o).getUserObject());
+
+                // Prevent dups
+                if (!selected.contains(((DefaultGraphCell) o).getUserObject()))
+                    selected.add(((DefaultGraphCell) o).getUserObject());
             } else {
                 selected.remove(((DefaultGraphCell) o).getUserObject());
             }
