@@ -54,6 +54,7 @@ import javax.swing.JOptionPane;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
+import viskit.model.VInstantiator;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -86,9 +87,11 @@ public class VStatics {
     }
 
     /**
-     * Convert a class name to human readable form.  (See Class.getName());
+     * Convert a class name array type to human readable form.
+     * (See Class.getName());
+     *
      * @param s from Class.getName()
-     * @return readable version
+     * @return readable version of array type
      */
     public static String convertClassName(String s) {
         if (s.charAt(0) != '[') {
@@ -494,6 +497,21 @@ public class VStatics {
         }
         parameterMap.remove(type);
         parameterMap.put(type, p);
+    }
+
+    /** Checks for and return a varargs type as an array, or the orig. type
+     *
+     * @param type the Class type to check
+     * @return return a varargs type as an array, or the orig. type
+     */
+    static public Class<?> getClassForInstantiatorType(String type) {
+        Class<?> c;
+        if (type.contains("Object...")) {
+            c = classForName("java.lang.Object[]");
+        } else {
+            c = classForName(type);
+        }
+        return c;
     }
 
     /**

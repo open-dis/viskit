@@ -69,7 +69,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
-        for (Iterator itr = lis.iterator(); itr.hasNext(); i++) {
+        for (Iterator<Object> itr = lis.iterator(); itr.hasNext(); i++) {
             VInstantiator inst = (VInstantiator) itr.next();
             shadow[i] = inst;
             typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
@@ -94,9 +94,12 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             entryTF[i].setText(inst.toString());
             entryTF[i].addCaretListener(this);
 
-            Class<?> c = VStatics.classForName(inst.getType());
+            // Special case for Object... (varargs)
+            Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
+
             if (c == null) {
-                System.err.println("what to do here... " + inst.getType());
+                System.err.println("what to do here for " + inst.getType());
+                return;
             }
 
             if (c != null) {
@@ -160,7 +163,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
     }
 
-    /* returns a list of instantiators */
+    /** @return a list of instantiators */
     public List<Object> getData() {
         Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLab.length; i++) {
@@ -176,12 +179,18 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     public void actionPerformed(ActionEvent e) {
         int idx = Integer.parseInt(e.getActionCommand());
 
-        VInstantiator vinst = shadow[idx];
-        Class<?> c = VStatics.classForName(vinst.getType());
+        VInstantiator inst = shadow[idx];
+
+        // Special case for Object... (varargs)
+        Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
+        if (c == null) {
+            System.err.println("what to do here for " + inst.getType());
+            return;
+        }
         if (c.isArray()) {
             ArrayInspector ai = new ArrayInspector(parent);   // "this" could be locComp
-            ai.setType(vinst.getType());
-            ai.setData(((VInstantiator.Array) vinst).getInstantiators());
+            ai.setType(inst.getType());
+            ai.setData(((VInstantiator.Array) inst).getInstantiators());
 
             ai.setVisible(true); // blocks
             if (ai.modified) {
@@ -193,7 +202,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
         } else {
             ObjectInspector oi = new ObjectInspector(parent);
-            oi.setType(vinst.getType());
+            oi.setType(inst.getType());
 
             // use default constructor if exists
             if (c != null) {
@@ -206,9 +215,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
 
             try {
-                oi.setData(vinst);
+                oi.setData(inst);
             } catch (ClassNotFoundException e1) {
-                String msg = "An object type specified in this element (probably " + vinst.getType() + ") was not found.\n" +
+                String msg = "An object type specified in this element (probably " + inst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
                 ((AssemblyController)VGlobals.instance().getAssemblyEditor().getController()).messageUser(
                         JOptionPane.ERROR_MESSAGE,

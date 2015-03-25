@@ -34,10 +34,9 @@ import viskit.model.VInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
+ * Naval Postgraduate School, Monterey, CA www.nps.edu
+ *
  * @author Mike Bailey
  * @since Jun 8, 2004
  * @since 8:31:41 AM
@@ -45,17 +44,28 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
 
-    private JLabel typeLab,  methodLab;
+    private JLabel typeLab, methodLab;
+
     private JTextField typeTF;
+
     private JComboBox<String> methodCB;
-    private static final int FF = 0,  CONSTR = 1,  FACT = 2,  ARR = 10;
+
+    private static final int FF = 0, CONSTR = 1, FACT = 2, ARR = 10;
+
     private JPanel instPane;
+
     private CardLayout instPaneLayMgr;
+
     private FFPanel ffPan;
+
     private ConstrPanel conPan;
+
     private FactoryPanel factPan;
+
     private ActionListener modifiedListener;
+
     private JDialog packMe;
+
     boolean constructorOnly = false;
 
     public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener) {
@@ -183,6 +193,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 return null;
         }
     }
+
     VInstantiator myVi;
 
     public void setData(VInstantiator vi) throws ClassNotFoundException {
@@ -222,10 +233,13 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         actionPerformed(null);
     }
 
-    /***********************************************************************/
+    /**
+     * ********************************************************************
+     */
     class FFPanel extends JPanel implements CaretListener {
 
         private JTextField value;
+
         private InstantiationPanel ip;
 
         public FFPanel(InstantiationPanel ip) {
@@ -248,6 +262,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
             value.setText(viff.getValue());
         }
+
         String typ;
 
         public void setType(String typ) throws ClassNotFoundException {
@@ -270,14 +285,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
     }
 
-    /***********************************************************************/
+    /**
+     * ********************************************************************
+     */
     class ConstrPanel extends JPanel implements ActionListener, CaretListener {
 
         private JTabbedPane tp;
+
         //private Constructor[] construct;
         private ConstructorPanel[] constructorPanels;
+
         private String noParamString = "(no parameters)";
+
         private ImageIcon checkMark;
+
         private InstantiationPanel ip;
 
         public ConstrPanel(InstantiationPanel ip) {
@@ -286,6 +307,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             tp = new JTabbedPane();
             checkMark = new ImageIcon(ClassLoader.getSystemResource("viskit/images/checkMark.png"));
         }
+
         String typ;
 
         public void setType(String clName) throws ClassNotFoundException {
@@ -332,19 +354,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             // tell mommy...put up here to emphasize that it is the chief reason for having this listener
             ip.actionPerformed(e);
 
-          // But we can do this: leave off the red border if only one to choose from
-            if(tp.getTabCount() > 1)
-              for (int i = 0; i < tp.getTabCount(); i++) {
-                if (i == idx) {
-                    tp.setIconAt(i, checkMark);
-                    constructorPanels[i].setBorder(BorderFactory.createLineBorder(Color.red));
-                    constructorPanels[i].setSelected(true);
-                } else {
-                    tp.setIconAt(i, null);
-                    constructorPanels[i].setBorder(null);
-                    constructorPanels[i].setSelected(false);
+            // But we can do this: leave off the red border if only one to choose from
+            if (tp.getTabCount() > 1) {
+                for (int i = 0; i < tp.getTabCount(); i++) {
+                    if (i == idx) {
+                        tp.setIconAt(i, checkMark);
+                        constructorPanels[i].setBorder(BorderFactory.createLineBorder(Color.red));
+                        constructorPanels[i].setSelected(true);
+                    } else {
+                        tp.setIconAt(i, null);
+                        constructorPanels[i].setBorder(null);
+                        constructorPanels[i].setSelected(false);
+                    }
                 }
-              }
+            }
         }
 
         public void setData(VInstantiator.Constr vi) {
@@ -359,12 +382,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (viskit.VStatics.debug) {
                 System.out.println("found a matching constructor at " + indx);
             }
-            if(indx != -1) {
+            if (indx != -1) {
                 constructorPanels[indx].setData(vi.getArgs());
                 tp.setSelectedIndex(indx);
             }
             actionPerformed(null);
-       }
+        }
 
         public VInstantiator getData() {
             ConstructorPanel cp = (ConstructorPanel) tp.getSelectedComponent();
@@ -372,16 +395,22 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
     }
 
-    /***********************************************************************/
+    /**
+     * ********************************************************************
+     */
     class FactoryPanel extends JPanel {
 
         private InstantiationPanel ip;
+
         private JLabel factClassLab;
 //        private JLabel factMethodLab;
+
         private JComboBox<Object> factClassCB;
 //        private JTextField factMethodTF;
 //        private JButton factMethodButt;
+
         private JPanel topP;
+
         private ObjListPanel olp;
 
         public FactoryPanel(InstantiationPanel ip) {
@@ -450,6 +479,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
             }
         }
+
         boolean noClassAction = false;
 
         class MyClassListener implements ActionListener {
@@ -490,10 +520,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             int strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
                             ts = ts.substring(strt + 1, ts.length());
 
+                            // Strip out java.lang
+                            if (ts.contains("java.lang.")) {
+                                ts = ts.replace("java.lang.", "");
+                            }
+
+                            // Show varargs symbol vice []
+                            if (ts.contains("[]")) {
+                                ts = ts.replaceAll("\\[\\]", "...");
+                            }
+
                             // We only want to promote the RVF.getInstance(String, Object...) static method
-                            if (method.getParameterCount() == 2 && ts.contains("String") && ts.contains("Object")) {
+                            if (method.getParameterCount() == 2 && ts.contains("String") && ts.contains("Object...")) {
                                 hm.put(ts, method);
-                                vn.add(0, ts);
+                                vn.add(ts);
                             }
                         }
                     }
@@ -505,25 +545,39 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
                 String[] ms = new String[0];
                 ms = vn.toArray(ms);
-                Object ret = JOptionPane.showInputDialog(packMe, "Choose method", "Factory methods", JOptionPane.PLAIN_MESSAGE, null,
-                        ms, ms[0]);
+                Object ret = JOptionPane.showInputDialog(packMe,
+                        "Choose method",
+                        "Factory methods",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        ms,
+                        ms[0]);
                 if (ret == null) {
                     factClassCB.requestFocus();
                     return;
                 }
 
-                Method m = hm.get((String)ret);
+                Method m = hm.get((String) ret);
 //                factMethodTF.setText(m.getName());
 //                factMethodTF.setEnabled(true);
 //                factMethodLab.setEnabled(true);
 //                factMethodButt.setEnabled(true);
                 Class<?>[] pc = m.getParameterTypes();
                 Vector<Object> vc = new Vector<>();
-                for (Class cl : pc) {
+                String args;
+                for (Class<?> cl : pc) {
+                    
+                    args = VStatics.convertClassName(cl.getName());
+
+                    // Show varargs symbol vice []
+                    if (args.contains("[]")) {
+                        args = args.replaceAll("\\[\\]", "...");
+                    }
+
                     if (cl.isArray()) {
-                        vc.add(new VInstantiator.Array(VStatics.convertClassName(cl.getName()), new ArrayList<>()));
+                        vc.add(new VInstantiator.Array(args, new ArrayList<>()));
                     } else {
-                        vc.add(new VInstantiator.FreeF(VStatics.convertClassName(cl.getName()), ""));
+                        vc.add(new VInstantiator.FreeF(args, ""));
                     }
                 }
 
@@ -544,7 +598,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
             }
         }
+
         String typ;
+
         Class<?> myObjClass;
 
         public void setType(String clName) throws ClassNotFoundException {

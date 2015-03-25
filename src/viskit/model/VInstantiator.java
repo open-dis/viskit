@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
@@ -113,7 +114,7 @@ public abstract class VInstantiator {
         public boolean isValid() {
             String t = getType();
             String v = getValue();
-            return t != null & v != null & t.length() > 0 && v.length() > 0;
+            return t != null & v != null & !t.isEmpty() & !v.isEmpty();
         }
     }
 
@@ -274,10 +275,7 @@ public abstract class VInstantiator {
                         MultiParameter mp = of.createMultiParameter();
                         mp.setType(type);
                         mp.setName(name);
-                        // if  mp is [] then done
-                        if (!type.endsWith("]")) {
-                        // fill with empty parameters?
-                        }
+
                         instr.add(buildMultiParameter(mp));
 
                     } else { // no constructors, should be a FactoryParameter or array of them
@@ -302,18 +300,18 @@ public abstract class VInstantiator {
         }
 
         VInstantiator.FreeF buildTerminalParameter(TerminalParameter p) {
-            VInstantiator.FreeF vf = new VInstantiator.FreeF(p.getType(), p.getValue());
-            return vf;
+            return new VInstantiator.FreeF(p.getType(), p.getValue());
         }
 
         VInstantiator.Array buildMultiParameter(MultiParameter p, boolean dummy) {
-            VInstantiator.Array va = new VInstantiator.Array(p.getType(), buildInstantiators(p.getParameters()));
-            return va;
+            return new VInstantiator.Array(p.getType(), buildInstantiators(p.getParameters()));
         }
 
         VInstantiator buildMultiParameter(MultiParameter p) {
             VInstantiator vAorC;
-            if (p.getType().endsWith("]")) {
+
+            // Check for special case of varargs
+            if (VGlobals.instance().isArray(p.getType()) || p.getType().contains("...")) {
                 vAorC = buildMultiParameter(p, true);
             } else {
                 if (VStatics.debug) {
@@ -663,8 +661,12 @@ public abstract class VInstantiator {
         @Override
         public String toString() {
             if (instantiators != null) {
-                String t = getType().substring(0, getType().indexOf('['));
-                return "new " + t + "[" + instantiators.size() + "]";
+                if (getType().contains("Object...")) {
+                    return getType();
+                } else {
+                    String t = getType().substring(0, getType().indexOf('['));
+                    return "new " + t + "[" + instantiators.size() + "]";
+                }
             } else {
                 return "";
             }
@@ -735,13 +737,35 @@ public abstract class VInstantiator {
             if (params.isEmpty()) {
                 return "";
             }
+
             StringBuilder b = new StringBuilder();
+            b.append(factoryClass);
+            b.append(".");
+            b.append(method);
+            b.append("(");
+            String args;
             for (Object o : params) {
-                b.append(((VInstantiator)o).type);
+
+                args = ((VInstantiator)o).type;
+
+                // Strip out java.lang
+                if (args.contains("java.lang.")) {
+                    args = args.replace("java.lang.", "");
+                }
+
+                // Show varargs symbol vice []
+                if (VGlobals.instance().isArray(args)) {
+                    args = args.replaceAll("\\[\\]", "...");
+                    b.append(args);
+                } else {
+                    b.append(args);
+                }
                 b.append(", ");
             }
             b = b.delete(b.lastIndexOf(", "), b.length());
-            return factoryClass + "." + method + "(" + b.toString() + ")";
+            b.append(")");
+
+            return b.toString();
         }
 
         @Override

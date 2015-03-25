@@ -111,7 +111,7 @@ public class ArrayInspector extends JDialog {
 
     public void setType(String typ) {
         myArrTyp = typ;
-        Class<?> c = VStatics.classForName(typ);
+        Class<?> c = VStatics.getClassForInstantiatorType(typ);
         myTyp = VStatics.convertClassName(c.getComponentType().getName());
         typeTF.setText(typ);
     }
@@ -151,8 +151,6 @@ public class ArrayInspector extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            //if(checkBlankFields())
-            //  return;
             modified = false;    // for the caller
             dispose();
         }
@@ -172,7 +170,6 @@ public class ArrayInspector extends JDialog {
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
-        //getRootPane().setDefaultButton(okButt);
         }
 
         @Override
