@@ -169,7 +169,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             outputCheck.setSelected(egNode.isOutputMarked());
             descField.setText(egNode.getDescriptionString());
             ip.setData(egNode.getInstantiator());
-          } else {
+        } else {
             handleField.setText("egNode name");
             outputCheck.setSelected(false);
             descField.setText("");

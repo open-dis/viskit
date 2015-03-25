@@ -67,8 +67,6 @@ public class ObjectInspector extends JDialog
 
   public void setData(VInstantiator vi) throws ClassNotFoundException
   {
-//    myVcon = vi.vcopy();
-//    ip.setData(myVcon);
     ip.setData(vi);
     pack();
   }

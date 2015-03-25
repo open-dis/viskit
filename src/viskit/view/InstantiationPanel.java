@@ -17,7 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+//import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -142,8 +142,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         return;
                     }
                     ffPan.setData(new VInstantiator.FreeF(newType, ""));
-                    //conPan.setData(new VInstantiator.Constr(newType,new Vector()));
-                    //conPan.setType(newType);
                     factPan.setData(new VInstantiator.Factory(newType, "", "", new Vector<>()));
                 }
                 int idx = methodCB.getSelectedIndex();
@@ -164,7 +162,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     case FACT:
                         instPaneLayMgr.show(instPane, "factPan");
                         factPan.factClassCB.requestFocus();
-                        //factPan.factClassCB.selectAll();
                         break;
                     default:
                         System.err.println("bad data Instantiation panel");
@@ -189,7 +186,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     VInstantiator myVi;
 
     public void setData(VInstantiator vi) throws ClassNotFoundException {
-        //myVi = vi;
         myVi = vi.vcopy();
         String typ = myVi.getType();
         typeTF.setText(typ);
@@ -209,7 +205,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             ffPan.setData((VInstantiator.FreeF) myVi);
             methodCB.setSelectedIndex(FF);
         } else {
-            //assert false: "Internal error InstantianPanel.setData()"
             System.err.println("Internal error InstantiationPanel.setData()");
         }
 
@@ -290,8 +285,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             this.ip = ip;
             tp = new JTabbedPane();
             checkMark = new ImageIcon(ClassLoader.getSystemResource("viskit/images/checkMark.png"));
-
-        //setup(className);         don't init in constructor
         }
         String typ;
 
@@ -335,11 +328,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         @Override
         public void actionPerformed(ActionEvent e) {
             int idx = tp.getSelectedIndex();
-//            if (construct == null || construct.length <= 0) // some classes have no constructors
-//            {
-//                return;
-//            }
-// Don't know what the above was about; the field was never being initted
 
             // tell mommy...put up here to emphasize that it is the chief reason for having this listener
             ip.actionPerformed(e);
@@ -388,10 +376,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     class FactoryPanel extends JPanel {
 
         private InstantiationPanel ip;
-        private JLabel factClassLab,  factMethodLab;
+        private JLabel factClassLab;
+//        private JLabel factMethodLab;
         private JComboBox<Object> factClassCB;
-        private JTextField factMethodTF;
-        private JButton factMethodButt;
+//        private JTextField factMethodTF;
+//        private JButton factMethodButt;
         private JPanel topP;
         private ObjListPanel olp;
 
@@ -402,43 +391,44 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
             factClassCB = new JComboBox<>(new Object[]{"simkit.random.RandomVariateFactory"});
-            // this is wierd, I want it's height to be the one for a non-editable CB
-            //  factClassCB.setEditable(false);
-            factClassCB.setEditable(true);
+//            factClassCB.setEditable(true);
             VStatics.clampHeight(factClassCB);
             factClassLab.setLabelFor(factClassCB);
 
             JLabel dummy = new JLabel("");
-            JLabel classHelp = new JLabel("(Press return after entering class name)");
+            JLabel classHelp = new JLabel("(Press return after selecting "
+                    + "factory class to start a new RandomVariate)", JLabel.LEADING);
             classHelp.setFont(factClassCB.getFont());
             dummy.setLabelFor(classHelp);
 
-            factMethodLab = new JLabel("Class method", JLabel.TRAILING);
-            factMethodTF = new JTextField();
-            VStatics.clampHeight(factMethodTF);
-            factMethodLab.setLabelFor(factMethodTF);
-            JPanel tinyP = new JPanel();
-            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
-            tinyP.add(factMethodTF);
-            factMethodButt = new JButton("...");
-            factMethodButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-            VStatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
-            tinyP.add(factMethodButt);
+//            factMethodLab = new JLabel("Class method", JLabel.TRAILING);
+//            factMethodTF = new JTextField();
+//            VStatics.clampHeight(factMethodTF);
+//            factMethodLab.setLabelFor(factMethodTF);
+//            JPanel tinyP = new JPanel();
+//            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
+//            tinyP.add(factMethodTF);
+//            factMethodButt = new JButton("...");
+//            factMethodButt.setBorder(
+//                    BorderFactory.createCompoundBorder(
+//                            BorderFactory.createEtchedBorder(),
+//                            BorderFactory.createEmptyBorder(0, 3, 0, 3)));
+//            VStatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
+//            tinyP.add(factMethodButt);
             topP.add(factClassLab);
             topP.add(factClassCB);
             topP.add(dummy);
             topP.add(classHelp);
-            topP.add(factMethodLab);
-            topP.add(tinyP);
-            SpringUtilities.makeCompactGrid(topP, 3, 2, 5, 5, 5, 5);
+//            topP.add(factMethodLab);
+//            topP.add(tinyP);
+            SpringUtilities.makeCompactGrid(topP, 2, 2, 5, 5, 5, 5);
 
             add(topP);
 
             factClassCB.addActionListener(new MyClassListener());
-            MyCaretListener myCarListener = new MyCaretListener();
-            //factClassCB.addCaretListener(myCarListener);
-            factMethodButt.addActionListener(new MyChangedListener());
-            factMethodTF.addCaretListener(myCarListener);
+//            MyCaretListener myCarListener = new MyCaretListener();
+//            factMethodButt.addActionListener(new MyChangedListener());
+//            factMethodTF.addCaretListener(myCarListener);
         }
 
         class MyChangedListener implements ActionListener {
@@ -470,7 +460,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     return;
                 }
                 Class<?> c;
-                //String cName = factClassCB.getText().trim();
                 String cName = factClassCB.getSelectedItem().toString();
                 try {
                     c = VStatics.classForName(cName);
@@ -478,9 +467,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         throw new ClassNotFoundException();
                     }
                 } catch (ClassNotFoundException e1) {
-                    JOptionPane.showMessageDialog(ip, cName + " class not found");
+                    JOptionPane.showMessageDialog(ip, cName + " not found on the classpath");
                     factClassCB.requestFocus();
-                    //factClassCB.selectAll();
                     return;
                 }
 
@@ -488,7 +476,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 if (statMeths == null || statMeths.length <= 0) {
                     JOptionPane.showMessageDialog(ip, cName + " contains no methods");
                     factClassCB.requestFocus();
-                    //factClassCB.selectAll();
                     return;
                 }
                 Vector<String> vn = new Vector<>();
@@ -503,10 +490,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             int strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
                             ts = ts.substring(strt + 1, ts.length());
 
-                            // We only want to promote the RandomVariate parameter of getInstance() only
-                            if (ts.contains("RandomVariate")) {
+                            // We only want to promote the RVF.getInstance(String, Object...) static method
+                            if (method.getParameterCount() == 2 && ts.contains("String") && ts.contains("Object")) {
                                 hm.put(ts, method);
-                                vn.add(ts);
+                                vn.add(0, ts);
                             }
                         }
                     }
@@ -514,7 +501,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 if (vn.isEmpty()) {
                     JOptionPane.showMessageDialog(ip, "<html><center>" + cName + " contains no static methods<br>returning " + typ + ".");
                     factClassCB.requestFocus();
-                    //factClassCB.selectAll();
                     return;
                 }
                 String[] ms = new String[0];
@@ -523,15 +509,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         ms, ms[0]);
                 if (ret == null) {
                     factClassCB.requestFocus();
-                    //factClassCB.selectAll();
                     return;
                 }
 
                 Method m = hm.get((String)ret);
-                factMethodTF.setText(m.getName());
-                factMethodTF.setEnabled(true);
-                factMethodLab.setEnabled(true);
-                factMethodButt.setEnabled(true);
+//                factMethodTF.setText(m.getName());
+//                factMethodTF.setEnabled(true);
+//                factMethodLab.setEnabled(true);
+//                factMethodButt.setEnabled(true);
                 Class<?>[] pc = m.getParameterTypes();
                 Vector<Object> vc = new Vector<>();
                 for (Class cl : pc) {
@@ -543,16 +528,17 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
 
                 olp = new ObjListPanel(ip);
-                olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                        "Method arguments", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+                olp.setBorder(BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(Color.black),
+                        "Method arguments",
+                        TitledBorder.CENTER,
+                        TitledBorder.DEFAULT_POSITION));
                 olp.setDialogInfo(packMe);
                 olp.setData(vc, true);
                 add(olp);
 
                 add(Box.createVerticalGlue());
 
-                // if(packMe != null)  // gets done in modified handler
-                //   packMe.pack();
                 if (ip.modifiedListener != null) {
                     ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Factory method chosen"));
                 }
@@ -567,9 +553,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (myObjClass == null) {
                 throw new ClassNotFoundException(typ);
             }
-            factMethodLab.setEnabled(false);
-            factMethodTF.setEnabled(false);
-            factMethodButt.setEnabled(false);
+//            factMethodLab.setEnabled(false);
+//            factMethodTF.setEnabled(false);
+//            factMethodButt.setEnabled(false);
         }
 
         public void setData(VInstantiator.Factory vi) {
@@ -578,26 +564,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
 
             removeAll();
-            //factClassCB.setText(vi.getFactoryClass());
             noClassAction = true;
             factClassCB.setSelectedItem(vi.getFactoryClass());              // this runs action event
             noClassAction = false;
-            factMethodTF.setText(vi.getMethod());
+//            factMethodTF.setText(vi.getMethod());
             add(topP);
 
-            /*
-            if(vi.getParams().size() <= 0) {
-            JLabel tempLab = new JLabel("no arguments to chosen factory method",JLabel.CENTER);
-            add(tempLab);
-            add(Box.createVerticalGlue());
-            return;
-            }
-             */
             olp = new ObjListPanel(ip);
-            olp.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    "Method arguments", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+            olp.setBorder(BorderFactory.createTitledBorder(
+                    BorderFactory.createLineBorder(Color.black),
+                    "Method arguments",
+                    TitledBorder.CENTER,
+                    TitledBorder.DEFAULT_POSITION));
             olp.setDialogInfo(packMe);
-
             olp.setData(vi.getParams(), true);
             add(olp);
 
@@ -606,10 +585,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
 
         public VInstantiator getData() {
-            //String fc = factClassCB.getText();
             String fc = (String) factClassCB.getSelectedItem();
             fc = (fc == null) ? "" : fc.trim();
-            String m = factMethodTF.getText();
+//            String m = factMethodTF.getText();
+
+            // Force the the getInstance method only
+            String m = "getInstance";
             m = (m == null) ? "" : m.trim();
             List<Object> lis;
             lis = (olp != null) ? olp.getData() : new Vector<>();

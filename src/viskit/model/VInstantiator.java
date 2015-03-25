@@ -691,6 +691,14 @@ public abstract class VInstantiator {
         private String method;
         private List<Object> params;
 
+        /** A factory for the VInstantiator which carries information on what
+         * type of variable we need to provide for a SimEntity constructor.
+         *
+         * @param type Object type required by a SimEntity constructor
+         * @param factoryClass the class that will return this type
+         * @param method the method of the factoryClass that will return our desired type
+         * @param params the parameters required to return the desired type
+         */
         public Factory(String type, String factoryClass, String method, List<Object> params) {
             super(type);
             setFactoryClass(factoryClass);
@@ -724,10 +732,16 @@ public abstract class VInstantiator {
 
         @Override
         public String toString() {
-            if (params.size() <= 0) {
+            if (params.isEmpty()) {
                 return "";
             }
-            return factoryClass + "." + method + "(" + ((VInstantiator) params.get(0)).getType() + ",...)";
+            StringBuilder b = new StringBuilder();
+            for (Object o : params) {
+                b.append(((VInstantiator)o).type);
+                b.append(", ");
+            }
+            b = b.delete(b.lastIndexOf(", "), b.length());
+            return factoryClass + "." + method + "(" + b.toString() + ")";
         }
 
         @Override

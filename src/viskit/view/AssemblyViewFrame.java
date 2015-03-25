@@ -875,13 +875,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public boolean doEditEvGraphNode(EvGraphNode evNode) {
-        JFrame frame = VGlobals.instance().getMainAppWindow();
-        return EventGraphNodeInspectorDialog.showDialog(frame, evNode);
+        return EventGraphNodeInspectorDialog.showDialog(this, evNode);
     }
 
     @Override
     public boolean doEditPclNode(PropChangeListenerNode pclNode) {
-        return PclNodeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), pclNode); // blocks
+        return PclNodeInspectorDialog.showDialog(this, pclNode); // blocks
     }
 
     @Override
@@ -896,7 +895,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
-        return SimEventListenerConnectionInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), seEdge);
+        return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
     }
 
     private Object getLeafUO(JTree tree) {
