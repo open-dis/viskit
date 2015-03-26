@@ -552,9 +552,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
      */
     protected DefaultGraphCell createDefaultGraphCell(EventNode node) {
 
-        DefaultGraphCell cell = new CircleCell(node.getName());
+        DefaultGraphCell cell = new CircleCell(node);
         node.opaqueViewObject = cell;
-        cell.setUserObject(node);
 
         // Add one Floating Port
         cell.add(new vPortCell(node.getName() + "/Center"));

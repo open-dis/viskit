@@ -1,7 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.event.MouseEvent;
-import javax.swing.SwingUtilities;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.VGlobals;
 import viskit.control.EventGraphController;
@@ -49,27 +48,20 @@ public class vGraphUI extends BasicGraphUI {
      *
      * @param cell the cell to edit
      */
-    private void createEditDialog(final Object cell) {
+    private void createEditDialog(Object cell) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-
-                EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();     // todo fix this
-                if (cell instanceof vEdgeCell) {
-                    Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
-                    if (e instanceof SchedulingEdge) {
-                        cntl.schedulingArcEdit((SchedulingEdge) e);
-                    } else //if(e instanceof CancelingEdge)
-                    {
-                        cntl.cancellingArcEdit((CancelingEdge) e);
-                    }
-                } else if (cell instanceof CircleCell) {
-                    EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
-                    cntl.nodeEdit(en);
-                }
+        EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();
+        if (cell instanceof vEdgeCell) {
+            Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
+            if (e instanceof SchedulingEdge) {
+                cntl.schedulingArcEdit((SchedulingEdge) e);
+            } else
+            {
+                cntl.cancellingArcEdit((CancelingEdge) e);
             }
-        });
+        } else if (cell instanceof CircleCell) {
+            EventNode en = (EventNode) ((CircleCell) cell).getUserObject();
+            cntl.nodeEdit(en);
+        }
     }
 }

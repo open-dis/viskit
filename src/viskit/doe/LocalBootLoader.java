@@ -16,6 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
+import viskit.VStatics;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
  * class loading that can be used in "Local Grid" mode.
@@ -295,9 +296,9 @@ public class LocalBootLoader extends URLClassLoader {
         while (loop) {
             try {
                 if (reloadSimkit) {
-                    stage1.loadClass("simkit.random.RandomVariate");
+                    stage1.loadClass(VStatics.RANDOM_VARIATE);
                 } else {
-                    stage1.loadClass("viskit.doe.LocalBootLoader");
+                    stage1.loadClass(VStatics.LOCAL_BOOT_LOADER);
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();

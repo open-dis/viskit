@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -321,18 +320,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface, "));
             } else {
                 constructorPanels = new ConstructorPanel[parameters.length];
+                VInstantiator.Constr constr;
                 for (int i = 0; i < parameters.length; ++i) {
 
-                    VInstantiator.Constr constr = new VInstantiator.Constr(parameters[i], clName);
+                    constr = new VInstantiator.Constr(parameters[i], clName);
                     String sign = noParamString;
                     for (int j = 0; j < constr.getArgs().size(); j++) {
                         sign += ((Parameter) (parameters[i].get(j))).getType() + ", ";
-                        ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter) (parameters[i].get(j))).getName());
+
+                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter) (parameters[i].get(j))).getName()))
+                            ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter) (parameters[i].get(j))).getName());
                     }
-                    sign = sign.substring(0, sign.length() - 3);
+                    sign = sign.substring(0, sign.length() - 2);
 
                     constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMe);
-                    // todo test carefully, following may not be required and might be causing double instantiations:
                     constructorPanels[i].setData(constr.getArgs());
 
                     tp.addTab("Constructor " + i, null, constructorPanels[i], sign);
@@ -419,7 +420,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
-            factClassCB = new JComboBox<>(new Object[]{"simkit.random.RandomVariateFactory"});
+            factClassCB = new JComboBox<>(new Object[]{VStatics.RANDOM_VARIATE_FACTORY});
 //            factClassCB.setEditable(true);
             VStatics.clampHeight(factClassCB);
             factClassLab.setLabelFor(factClassCB);
@@ -562,24 +563,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 //                factMethodTF.setEnabled(true);
 //                factMethodLab.setEnabled(true);
 //                factMethodButt.setEnabled(true);
-                Class<?>[] pc = m.getParameterTypes();
-                Vector<Object> vc = new Vector<>();
-                String args;
-                for (Class<?> cl : pc) {
-                    
-                    args = VStatics.convertClassName(cl.getName());
-
-                    // Show varargs symbol vice []
-                    if (args.contains("[]")) {
-                        args = args.replaceAll("\\[\\]", "...");
-                    }
-
-                    if (cl.isArray()) {
-                        vc.add(new VInstantiator.Array(args, new ArrayList<>()));
-                    } else {
-                        vc.add(new VInstantiator.FreeF(args, ""));
-                    }
-                }
+                Vector<Object> vc = VInstantiator.buildDummyInstantiators(m);
 
                 olp = new ObjListPanel(ip);
                 olp.setBorder(BorderFactory.createTitledBorder(
@@ -633,7 +617,22 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     TitledBorder.CENTER,
                     TitledBorder.DEFAULT_POSITION));
             olp.setDialogInfo(packMe);
-            olp.setData(vi.getParams(), true);
+
+            boolean foundString = false;
+            for (Object o : vi.getParams()) {
+                if (o instanceof String) {
+                    foundString = true;
+                    break;
+                }
+            }
+
+            if (foundString) {
+                Vector<Object> v = new Vector<>();
+                v.add(vi);
+                olp.setData(v, foundString);
+            } else {
+                olp.setData(vi.getParams(), true);
+            }
             add(olp);
 
             add(Box.createVerticalGlue());

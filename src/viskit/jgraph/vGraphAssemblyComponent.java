@@ -8,7 +8,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.undo.UndoManager;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
@@ -469,13 +468,12 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         DefaultGraphCell cell;
         if (node instanceof EvGraphNode) {
-            cell = new AssemblyCircleCell(node.getName());
+            cell = new AssemblyCircleCell(node);
         } else {
-            cell = new AssemblyPropListCell(node.getName());
+            cell = new AssemblyPropListCell(node);
         }
 
         node.opaqueViewObject = cell;
-        cell.setUserObject(node);
 
         // Add one Floating Port
         cell.add(new vAssemblyPortCell(node.getName() + "/Center"));

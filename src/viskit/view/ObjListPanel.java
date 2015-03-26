@@ -4,6 +4,7 @@ import edu.nps.util.SpringUtilities;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -88,8 +89,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
 
             entryTF[i] = new JTextField(8);
-            entryTF[i].setToolTipText("Manually enter method arguments after "
-                    + "selecting the Instantiating Wizard button");
+            entryTF[i].setToolTipText("Manually enter/override method "
+                    + "arguments here");
             VStatics.clampHeight(entryTF[i]);
             entryTF[i].setText(inst.toString());
             entryTF[i].addCaretListener(this);
@@ -163,7 +164,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
     }
 
-    /** @return a list of instantiators */
+    /** @return a list of free form instantiators */
     public List<Object> getData() {
         Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLab.length; i++) {
@@ -181,7 +182,6 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
         VInstantiator inst = shadow[idx];
 
-        // Special case for Object... (varargs)
         Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
         if (c == null) {
             System.err.println("what to do here for " + inst.getType());
@@ -190,7 +190,15 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         if (c.isArray()) {
             ArrayInspector ai = new ArrayInspector(parent);   // "this" could be locComp
             ai.setType(inst.getType());
-            ai.setData(((VInstantiator.Array) inst).getInstantiators());
+
+            // Special case for Object... (varargs)
+            if (inst instanceof VInstantiator.FreeF) {
+                List<Object> l = new ArrayList<>();
+                l.add((VInstantiator.FreeF) inst);
+                ai.setData(l);
+            } else {
+                ai.setData(((VInstantiator.Array) inst).getInstantiators());
+            }
 
             ai.setVisible(true); // blocks
             if (ai.modified) {
@@ -203,16 +211,6 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         } else {
             ObjectInspector oi = new ObjectInspector(parent);
             oi.setType(inst.getType());
-
-            // use default constructor if exists
-            if (c != null) {
-                java.lang.reflect.Constructor[] construct = c.getConstructors();
-                if (construct != null && construct.length > 0) {
-                //args = VInstantiator.buildDummyInstantiators(construct[0]);
-                //if ( vinst instanceof VInstantiator.Constr) ((VInstantiator.Constr)vinst).setArgs(args);
-
-                }
-            }
 
             try {
                 oi.setData(inst);

@@ -867,8 +867,8 @@ public class VGlobals {
     }
 
     /**
-     * @return a working directory which is typically an open project's build/
-     * classes directory
+     * @return a project's working directory which is typically the
+     * build/classes directory
      */
     public File getWorkDirectory() {
         return workDirectory;

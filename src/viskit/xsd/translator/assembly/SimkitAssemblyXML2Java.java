@@ -252,7 +252,7 @@ public class SimkitAssemblyXML2Java {
 //        printImports(pw);
 //        pw.println();
 
-        if (extendz.equals("java.lang.Object")) {
+        if (extendz.equals(VStatics.JAVA_LANG_OBJECT)) {
             extendz = "";
         } else {
             extendz = "extends" + sp + extendz + sp;
@@ -548,7 +548,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     boolean isString(String type) {
-        return type.equals("String") | type.equals("java.lang.String");
+        return type.contains("String");
     }
 
     boolean isArray(String type) {

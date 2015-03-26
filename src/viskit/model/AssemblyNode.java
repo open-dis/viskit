@@ -27,7 +27,6 @@ public abstract class AssemblyNode extends ViskitElement {
     {
         this.name = name;
         this.type = type;
-        instantiator = new VInstantiator.FreeF(type, EMPTY);
     }
 
     public List<String> getComments() {

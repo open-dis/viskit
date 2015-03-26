@@ -260,11 +260,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // Resetting the seed
-            Class<?> RVFactClass = lastLoaderWithReset.loadClass("simkit.random.RandomVariateFactory");
+            Class<?> RVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
             Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
             Object rn = getDefaultRandomNumber.invoke(null);
 
-            Class<?> RNClass = lastLoaderWithReset.loadClass("simkit.random.RandomNumber");
+            Class<?> RNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER);
             Method setSeed = RNClass.getMethod("setSeed", long.class);
             setSeed.invoke(rn, seed);
 

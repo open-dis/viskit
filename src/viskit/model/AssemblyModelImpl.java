@@ -312,9 +312,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         node.opaqueModelObject = jaxbEG;
         jaxbEG.setType(className);
 
-        VInstantiator.Constr vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
-
-        // TODO: Don't allow placement of a bad SimEntity on the Assembly palette
+        VInstantiator vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
 
         node.setInstantiator(vc);
 
@@ -379,7 +377,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbPCL.setName(nIe(widgetName));
         jaxbPCL.setType(className);
 
-        VInstantiator.Constr vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<>());
+        VInstantiator vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<>());
         pcNode.setInstantiator(vc);
 
         pcNode.opaqueModelObject = jaxbPCL;
@@ -830,26 +828,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
    private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
-
-        List<Object> vi = new ArrayList<>();
-
         for (Object o : lis) {
-            vi.add(buildInstantiatorFromJaxbParameter(o));
+            lis.add(buildInstantiatorFromJaxbParameter(o));
         }
-        return vi;
-    }
-
-    private List<String> getNamesFromParmList(List<Object> lis) {
-        List<String> v = new ArrayList<>();
-        for (Object o : lis) {
-            if (o instanceof TerminalParameter) {
-                String n = ((TerminalParameter) o).getName();
-                v.add(n);
-            } else {
-                v.add("");
-            }
-        }
-        return v;
+        return lis;
     }
 
     private VInstantiator buildInstantiatorFromJaxbParameter(Object o) {
@@ -1058,7 +1040,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     Double.parseDouble(coor.getY())));
         }
         List<Object> lis = pcl.getParameters();
-        VInstantiator.Constr vc = new VInstantiator.Constr(pcl.getType(),
+        VInstantiator vc = new VInstantiator.Constr(pcl.getType(),
                 getInstantiatorListFromJaxbParmList(lis));
         pNode.setInstantiator(vc);
 
@@ -1097,7 +1079,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         en.setOutputMarked(isOutputNode);
         en.setVerboseMarked(isVerboseNode);
         List<Object> lis = se.getParameters();
-        VInstantiator.Constr vc = new VInstantiator.Constr(lis, se.getType());
+        VInstantiator vc = new VInstantiator.Constr(lis, se.getType());
         en.setInstantiator(vc);
 
         en.opaqueModelObject = se;

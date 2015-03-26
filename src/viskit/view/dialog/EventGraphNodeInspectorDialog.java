@@ -71,9 +71,9 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventGraphNodeInspectorDialog(JFrame parent, EvGraphNode lv) throws ClassNotFoundException {
+    private EventGraphNodeInspectorDialog(JFrame parent, EvGraphNode node) throws ClassNotFoundException {
         super(parent, "Event Graph Inspector", true);
-        this.egNode = lv;
+        this.egNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -117,7 +117,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         descField.addCaretListener(lis);
         outputCheck.addActionListener(lis);
 
-        setParams(parent, lv);
+        setParams(parent, node);
     }
 
     public final void setParams(Component c, EvGraphNode p) throws ClassNotFoundException {

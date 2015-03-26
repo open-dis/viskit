@@ -54,7 +54,6 @@ import javax.swing.JOptionPane;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
-import viskit.model.VInstantiator;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -73,6 +72,14 @@ import viskit.xsd.bindings.eventgraph.Parameter;
 public class VStatics {
 
     public static boolean debug = false;
+
+    /* Commonly used class names */
+    public static final String RANDOM_NUMBER = "simkit.random.RandomNumber";
+    public static final String RANDOM_VARIATE = "simkit.random.RandomVariate";
+    public static final String RANDOM_VARIATE_FACTORY = RANDOM_VARIATE + "Factory";
+    public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
+    public static final String JAVA_LANG_STRING = "java.lang.String";
+    public static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
     /** Utility method to initialize and configure Viskit for a specific project
      * space
@@ -310,11 +317,11 @@ public class VStatics {
         switch (s) {
 
             case "String":
-                retVal = "java.lang.String";
+                retVal = JAVA_LANG_STRING;
                 break;
 
             case "Object":
-                retVal = "java.lang.Object";
+                retVal = JAVA_LANG_OBJECT;
                 break;
 
             case "Queue":
@@ -322,11 +329,11 @@ public class VStatics {
                 break;
 
             case "RandomNumber":
-                retVal = "simkit.random.RandomNumber";
+                retVal = RANDOM_NUMBER;
                 break;
 
             case "RandomVariate":
-                retVal = "simkit.random.RandomVariate";
+                retVal = RANDOM_VARIATE;
                 break;
 
             default:
@@ -515,7 +522,7 @@ public class VStatics {
     }
 
     /**
-     * For the given class type EG, return its specific ParameterMap
+     * For the given class type EG, return its specific ParameterMap contents
      * @param type the EG class name
      * @return a List of parameter map object arrays
      */

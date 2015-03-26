@@ -40,7 +40,7 @@ public abstract class ViskitSmallDialog extends JDialog {
             try {
                 Class[] args = new Class[] {
                     VStatics.classForName("javax.swing.JFrame"),
-                    VStatics.classForName("java.lang.Object")
+                    VStatics.classForName(VStatics.JAVA_LANG_OBJECT)
                 };
                 Class<?> c = VStatics.classForName(className);
                 Constructor constr = c.getDeclaredConstructor(args);

@@ -393,7 +393,7 @@ public class EdgeInspectorDialog extends JDialog {
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains("java.lang.Object")) {continue;}
+                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 
                 if (!methodNames.contains(method.getName() + "()"))
