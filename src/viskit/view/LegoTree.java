@@ -64,6 +64,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     String userDir = System.getProperty("user.dir");
     String userHome = System.getProperty("user.home");
+    String projectPath;
     String name;
 
     /** Constructor for Listener Event Graph Object Tree
@@ -119,6 +120,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
+
+        projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
     }
 
     // beginning of hack to hide the tree rootNode
@@ -281,11 +284,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                     } else {
 
                         // Shorten long path names
-                        // TODO: use VConfig to get the project path
                         if (f.getPath().contains(userDir)) {
                             name = f.getPath().substring(userDir.length() + 1, f.getPath().length());
                         } else if (f.getPath().contains(userHome)) {
                             name = f.getPath().substring(userHome.length() + 1, f.getPath().length());
+                        } else if (f.getPath().contains(projectPath)) {
+                            name = f.getPath().substring(projectPath.length()+1, f.getPath().length());
                         } else {
                             name = f.getPath();
                         }
@@ -526,11 +530,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
 
         // Shorten long path names
-        // TODO: use VConfig to get the project path
         if (jarFile.getName().contains(userDir)) {
             name = jarFile.getName().substring(userDir.length()+1, jarFile.getName().length());
         } else if (jarFile.getName().contains(userHome)) {
             name = jarFile.getName().substring(userHome.length()+1, jarFile.getName().length());
+        } else if (jarFile.getName().contains(projectPath)) {
+            name = jarFile.getName().substring(projectPath.length()+1, jarFile.getName().length());
         } else {
             name = jarFile.getName();
         }
