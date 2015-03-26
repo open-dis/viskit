@@ -828,10 +828,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
    private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
+
+       // To prevent java.util.ConcurrentModificationException
+       List<Object> vi = new ArrayList<>();
         for (Object o : lis) {
-            lis.add(buildInstantiatorFromJaxbParameter(o));
+            vi.add(buildInstantiatorFromJaxbParameter(o));
         }
-        return lis;
+        return vi;
     }
 
     private VInstantiator buildInstantiatorFromJaxbParameter(Object o) {
