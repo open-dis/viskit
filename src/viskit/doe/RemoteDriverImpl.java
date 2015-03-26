@@ -24,10 +24,16 @@ import viskit.gridlet.SessionManager;
  */
 public class RemoteDriverImpl implements DoeDriver {
     XmlRpcClientLite rpc;
-    Vector<Object> args = new Vector<Object>();
+    Vector<Object> args = new Vector<>();
     String usid = SessionManager.LOGIN_ERROR;
-    
-    /** Creates a new instance of RemoteDriverImpl */
+
+    /** Creates a new instance of RemoteDriverImpl
+     * @param host
+     * @param port
+     * @param user
+     * @param password
+     * @throws viskit.doe.DoeException
+     */
     public RemoteDriverImpl(String host, int port, String user, String password) throws DoeException {
         try {
             rpc = new XmlRpcClientLite(host,port);
@@ -37,9 +43,9 @@ public class RemoteDriverImpl implements DoeDriver {
             LogUtils.getLogger(RemoteDriverImpl.class).error(e);
         }
         if (rpc == null) throw new DoeException("Can't connect to Gridkit service at "+host+":"+port);
-       
+
         login(user,password);
-        
+
     }
 
     @Override
@@ -50,14 +56,14 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (Throwable e) {
         }
     }
-    
+
     // used to quickly convert args to an args Vector for rpc via varargs
     private Vector<Object> makeArgs(Object... arg) {
         args.clear();
         args.addAll(Arrays.asList(arg));
         return args;
     }
-    
+
     @Override
     public void run() throws DoeException {
         boolean ret = false;
@@ -87,7 +93,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public void changePassword(String username, String newPassword) throws DoeException {
         boolean ret = false;
-        
+
         try {
             ret = (Boolean) rpc.execute("gridkit.changePassword", makeArgs(usid,username,newPassword));
         } catch (XmlRpcException xre) {
@@ -101,7 +107,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public final void login(String username, String password) throws DoeException {
         this.usid = SessionManager.LOGIN_ERROR;
-        
+
         try {
             usid = (String) rpc.execute("gridkit.login", makeArgs(username,password) );
         } catch (XmlRpcException xre) {
@@ -115,7 +121,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public void logout() throws DoeException {
         boolean ret = false;
-        
+
         try {
             ret = (Boolean) rpc.execute("gridkit.logout", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -124,13 +130,13 @@ public class RemoteDriverImpl implements DoeDriver {
             throw new DoeException("logout failed: "+ioe.getMessage());
         }
         if (!ret) throw new DoeException("logout failed: not logged in?");
-        
+
     }
-    
+
     @Override
     public void clear() throws DoeException {
         boolean ret = false;
-        
+
         try {
             ret = (Boolean) rpc.execute("gridkit.clear", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -139,13 +145,13 @@ public class RemoteDriverImpl implements DoeDriver {
             throw new DoeException("clear failed: "+ioe.getMessage());
         }
         if (!ret) throw new DoeException("clear failed: not logged in, set up, or running?");
-        
+
     }
 
     @Override
     public int flushQueue() throws DoeException {
         int ret = -1;
-        
+
         try {
             ret = (Integer) rpc.execute("gridkit.flushQueue", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -160,7 +166,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public int getDesignPointCount() throws DoeException {
         int ret = -1;
-        
+
         try {
             ret = (Integer) rpc.execute("gridkit.getDesignPointCount", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -175,7 +181,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public synchronized Map getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
         Map ret = new Hashtable();
-        
+
         try {
             ret = (Hashtable) rpc.execute("gridkit.getDesignPointStats", makeArgs(usid,sampleIndex,designPtIndex) );
         } catch (XmlRpcException xre) {
@@ -191,7 +197,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public int getRemainingTasks() throws DoeException {
         int ret = -1;
-       
+
         try {
             ret = (Integer) rpc.execute("gridkit.getRemainingTasks", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -206,7 +212,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public synchronized Map getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
          Map ret = new Hashtable();
-        
+
         try {
             ret = (Hashtable) rpc.execute("gridkit.getReplicationStats", makeArgs(usid,sampleIndex,designPtIndex,replicationIndex) );
         } catch (XmlRpcException xre) {
@@ -221,7 +227,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public synchronized String getResult(int sample, int designPt) throws DoeException {
         String ret = "";
-        
+
         try {
             ret = (String) rpc.execute("gridkit.getResult", makeArgs(usid,sample,designPt) );
         } catch (XmlRpcException xre) {
@@ -238,7 +244,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public synchronized String getResultByTaskID(int taskID) throws DoeException {
         String ret = "";
-        
+
         try {
             ret = (String) rpc.execute("gridkit.getResultByTaskID", makeArgs(usid,taskID) );
         } catch (XmlRpcException xre) {
@@ -254,13 +260,11 @@ public class RemoteDriverImpl implements DoeDriver {
     @SuppressWarnings("unchecked")
     @Override
     public synchronized List<Object> getTaskQueue() throws DoeException {
-        Vector<Object> rpcret = new Vector<Object>();
-        List<Object> ret = new ArrayList<Object>();
+        Vector<Object> rpcret = new Vector<>();
+        List<Object> ret = new ArrayList<>();
         try {
             rpcret = (Vector<Object>) rpc.execute("gridkit.getTaskQueue", makeArgs(usid) );
-        } catch (XmlRpcException xre) {
-            throw new DoeException("getTaskQueue failed: "+xre.getMessage());
-        } catch (IOException ioe) {
+        } catch (XmlRpcException | IOException ioe) {
             throw new DoeException("getTaskQueue failed: "+ioe.getMessage());
         }
         if (rpcret.isEmpty()) throw new DoeException("getTaskQueue failed: not logged in, set up or running? (this method blocks until data available)");
@@ -271,7 +275,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public String qstat() throws DoeException {
         String ret = "";
-        
+
         try {
             ret = (String) rpc.execute("gridkit.qstat", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -286,7 +290,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public String qstatXML() throws DoeException {
         String ret = "";
-        
+
         try {
             ret = (String) rpc.execute("gridkit.qstatXML", makeArgs(usid) );
         } catch (XmlRpcException xre) {
@@ -301,7 +305,7 @@ public class RemoteDriverImpl implements DoeDriver {
     @Override
     public void removeIndexedTask(int sampleIndex, int designPtIndex) throws DoeException {
         int ret = -1;
-        
+
         try {
             ret = (Integer) rpc.execute("gridkit.removeIndexedTask", makeArgs(usid,sampleIndex,designPtIndex) );
         } catch (XmlRpcException xre) {
@@ -309,16 +313,16 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (IOException ioe) {
             throw new DoeException("removeIndexedTask failed: "+ioe.getMessage());
         }
-        
+
         if (ret<0) throw new DoeException("removeIndexedTask failed: not logged in, set up or running?");
-       
-    
+
+
     }
 
     @Override
     public void removeTask(int jobID, int taskID) throws DoeException {
         int ret = -1;
-        
+
         try {
             ret = (Integer) rpc.execute("gridkit.removeTask", makeArgs(usid,jobID,taskID) );
         } catch (XmlRpcException xre) {
@@ -326,16 +330,16 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (IOException ioe) {
             throw new DoeException("removeTask failed: "+ioe.getMessage());
         }
-        
+
         if (ret<0) throw new DoeException("removeTask failed: not logged in, set up or running?");
-        
-    
+
+
     }
 
     @Override
     public void setAssembly(String assemblyXML) throws DoeException {
         boolean ret = false;
-        
+
         try {
             ret = (Boolean) rpc.execute("gridkit.setAssembly", makeArgs(usid,assemblyXML) );
         } catch (XmlRpcException xre) {
@@ -343,15 +347,15 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (IOException ioe) {
             throw new DoeException("setAssembly failed: "+ioe.getMessage());
         }
-        
+
         if (!ret) throw new DoeException("setAssembly failed: not logged in?");
-    
+
     }
 
     @Override
     public void addEventGraph(String eventGraphXML) throws DoeException {
         boolean ret = false;
-        
+
         try {
             ret = (Boolean) rpc.execute("gridkit.addEventGraph", makeArgs(usid,eventGraphXML) );
         } catch (XmlRpcException xre) {
@@ -359,9 +363,9 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (IOException ioe) {
             throw new DoeException("addEventGraph failed: "+ioe.getMessage());
         }
-        
+
         if (!ret) throw new DoeException("addEventGraph failed: not logged in?");
-        
+
     }
 
     @Override
@@ -379,7 +383,7 @@ public class RemoteDriverImpl implements DoeDriver {
         int fileSize = (int) jarFile.length();
         int chunks = ( fileSize / buf.length ) + ( (fileSize % buf.length) > 0 ? 0 : -1 );
         int bufRead = 0;
-        
+
         while (chunks > -1 && bufRead > -1) { // both should > -1 together
             try {
                 bufRead = is.read(buf);
@@ -390,9 +394,9 @@ public class RemoteDriverImpl implements DoeDriver {
                 throw new DoeException("addJar failed: "+ioe.getMessage());
             }
         }
-        
+
         if (!ret) throw new DoeException("addJar failed: not logged in?");
     }
 
-    
+
 }

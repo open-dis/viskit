@@ -71,9 +71,7 @@ public abstract class VInstantiator {
             args = VStatics.convertClassName(c.getName());
 
             // Show varargs symbol vice []
-            if (args.contains("[]")) {
-                args = args.replaceAll("\\[\\]", "...");
-            }
+            args = VStatics.stripOutJavaDotLang(args);
 
             if (c.isArray()) {
                 v.add(new VInstantiator.Array(args, new ArrayList<>()));
@@ -688,13 +686,11 @@ public abstract class VInstantiator {
                 }
 
                 // Strip out java.lang
-                if (args.contains("java.lang.")) {
-                    args = args.replace("java.lang.", "");
-                }
+                args = VStatics.stripOutJavaDotLang(args);
 
                 // Show varargs symbol vice []
                 if (VGlobals.instance().isArray(args)) {
-                    args = args.replaceAll("\\[\\]", "...");
+                    args = VStatics.makeVarArgs(args);
                     b.append(args);
                 } else {
                     b.append(args);

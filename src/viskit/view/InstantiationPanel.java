@@ -522,14 +522,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             ts = ts.substring(strt + 1, ts.length());
 
                             // Strip out java.lang
-                            if (ts.contains("java.lang.")) {
-                                ts = ts.replace("java.lang.", "");
-                            }
+                            ts = VStatics.stripOutJavaDotLang(ts);
 
                             // Show varargs symbol vice []
-                            if (ts.contains("[]")) {
-                                ts = ts.replaceAll("\\[\\]", "...");
-                            }
+                            ts = VStatics.makeVarArgs(ts);
 
                             // We only want to promote the RVF.getInstance(String, Object...) static method
                             if (method.getParameterCount() == 2 && ts.contains("String") && ts.contains("Object...")) {

@@ -673,12 +673,45 @@ public class VStatics {
         return resolved;
     }
 
+    /**
+     * Strips out the qualified header, java.lang
+     * @param s the string to strip
+     * @return a stripped string
+     */
+    public static String stripOutJavaDotLang(String s) {
+        if (s.contains("java.lang.")) {
+            s = s.replace("java.lang.", "");
+        }
+        return s;
+    }
+
+    /**
+     * Strips out the array brackets and replaces with ...
+     * @param s the string to make varargs
+     * @return a varargs type
+     */
+    public static String makeVarArgs(String s) {
+
+        // Show varargs symbol vice []
+        if (s.contains("[]")) {
+            s = s.replaceAll("\\[\\]", "...");
+        }
+        return s;
+    }
+
     /** Checks if primitive type in Viskit format, i.e. not Clazz format
      * @param type the type to evaluate and determine if a primitive
-     * @return an indication of success
+     * @return true if the given string represents a primitive type
      */
     public static boolean isPrimitive(String type) {
-        return type.equals("byte") | type.equals("boolean") | type.equals("char") | type.equals("double") | type.equals("float") | type.equals("int") | type.equals("short") | type.equals("long");
+        return type.equals("byte") |
+                type.equals("boolean") |
+                type.equals("char") |
+                type.equals("double") |
+                type.equals("float") |
+                type.equals("int") |
+                type.equals("short") |
+                type.equals("long");
     }
 
     /**

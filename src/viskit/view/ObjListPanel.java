@@ -95,7 +95,6 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             entryTF[i].setText(inst.toString());
             entryTF[i].addCaretListener(this);
 
-            // Special case for Object... (varargs)
             Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
 
             if (c == null) {
