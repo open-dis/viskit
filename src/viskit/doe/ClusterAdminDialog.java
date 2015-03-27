@@ -52,7 +52,9 @@ import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Vector;
+import org.apache.xmlrpc.XmlRpcException;
 
 public class ClusterAdminDialog extends JDialog implements ActionListener
 {
@@ -211,6 +213,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   {
     SwingUtilities.invokeLater(new Runnable()
     {
+      @Override
       public void run()
       {
         showResultsOrStatus(s,isError);
@@ -236,6 +239,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   {
     SwingUtilities.invokeLater(new Runnable()
     {
+      @Override
       public void run()
       {
         enableActions(wh);
@@ -255,6 +259,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   {
     SwingUtilities.invokeLater(new Runnable()
     {
+      @Override
       public void run()
       {
         enableButtonActions(wh);
@@ -267,6 +272,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     delUserButt.setEnabled(wh);
     chgPwButt.setEnabled(wh);
   }
+  @Override
   public void actionPerformed(ActionEvent e)
   {
     switch (e.getActionCommand().charAt(0)) {
@@ -295,6 +301,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   {
     SwingUtilities.invokeLater(new Runnable()
     {
+      @Override
       public void run()
       {
         enableButt(butt,wh);
@@ -304,12 +311,12 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   private void close()
   {
     if(xmlrpc != null && adminUsrID != null) {
-      Vector<String> args = new Vector<String>();
+      Vector<String> args = new Vector<>();
       args.add(adminUsrID);
       try {
         xmlrpc.execute("gridkit.logout",args);
       }
-      catch (Exception e) {
+      catch (XmlRpcException | IOException e) {
         System.err.println("Error logging out from cluster.");
       }
     }
@@ -335,12 +342,13 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
 
     runInThread(new Runnable()
     {
+      @Override
       public void run()
       {
         Exception ex = null;
         try {
           xmlrpc = new XmlRpcClientLite(clusterName,port);
-          Vector<String> args = new Vector<String>();
+          Vector<String> args = new Vector<>();
           args.add(adminuname);
           args.add(pw);
           String usrID = (String)xmlrpc.execute("gridkit.login",args);
@@ -351,7 +359,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
             return;   // good return
           }
         }
-        catch (Exception e) {
+        catch (XmlRpcException | IOException e) {
           ex = e;
         }
         //error;
@@ -375,17 +383,18 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     enableButtonActions(false);
     runInThread(new Runnable()
     {
+      @Override
       public void run()
       {
         Exception ex = null;
         breakClause:
         {
           try {
-            Vector<String> args = new Vector<String>();
+            Vector<String> args = new Vector<>();
             args.add(adminUsrID);
             args.add(uname);
             Boolean ret = (Boolean) xmlrpc.execute("gridkit.addUser", args);
-            if (!ret.booleanValue())   // i.e., ret != true
+            if (!ret)   // i.e., ret != true
               break breakClause;
 
             // We now have a user with a pw = uname; set the password to that specified
@@ -394,13 +403,13 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
             args.add(uname);
             args.add(pw);
             ret = (Boolean) xmlrpc.execute("gridkit.changePassword", args);
-            if (ret.booleanValue()) {   // i.e., ret == true
+            if (ret) {   // i.e., ret == true
               showResultsOrStatus_SWTHR("User " + uname + " added.",false);
               enableButtonActions_SWTHR(true);
               return;   // good return
             }
           }
-          catch (Exception e) {
+          catch (XmlRpcException | IOException e) {
             ex = e;
           }
         } // breakClause
@@ -427,23 +436,24 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
 
     runInThread(new Runnable()
     {
+      @Override
       public void run()
       {
         Exception ex = null;
         breakClause:
         {
           try {
-            Vector<String> args = new Vector<String>();
+            Vector<String> args = new Vector<>();
             args.add(adminUsrID);
             args.add(uname);
             Boolean ret = (Boolean) xmlrpc.execute("gridkit.deleteUser", args);
-            if (ret.booleanValue()) {   // i.e., ret == true
+            if (ret) {   // i.e., ret == true
               showResultsOrStatus_SWTHR("User " + uname + " deleted.",false);
               enableButtonActions_SWTHR(true);
               return;   // good return
             }
           }
-          catch (Exception e) {
+          catch (XmlRpcException | IOException e) {
             ex = e;
           }
         } // breakClause
@@ -471,6 +481,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
 
     runInThread(new Runnable()
     {
+      @Override
       public void run()
       {
         _chgPassword(uname,pw);
@@ -482,18 +493,18 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   {
     Exception ex = null;
     try {
-      Vector<Object> args = new Vector<Object>();
+      Vector<Object> args = new Vector<>();
       args.add(adminUsrID);
       args.add(uname);
       args.add(pw);
       Boolean ret = (Boolean) xmlrpc.execute("gridkit.changePassword", args);
-      if (ret.booleanValue()) {   // i.e., ret == true
+      if (ret) {   // i.e., ret == true
         showResultsOrStatus_SWTHR("User " + uname + " password changed.",false);
         enableButtonActions_SWTHR(true);
         return;   // good return
       }
     }
-    catch (Exception e) {
+    catch (XmlRpcException | IOException e) {
       ex = e;
     }
 

@@ -50,6 +50,7 @@ import org.jfree.chart.labels.CategoryItemLabelGenerator;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.renderer.category.IntervalBarRenderer;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.util.SortOrder;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 import org.jfree.data.category.DefaultIntervalCategoryDataset;
@@ -60,14 +61,14 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * Horozontal each DesignPoint Statistic as a vertical bar, as these come in
  * the maxObjs and minObs scales are adjusted dynamically.
  * Each vertical bar shows standard deviation.
- * To consider, maybe clicking on a bar brings up replication stats for 
- * that design point with horizontal line across the mean. 
+ * To consider, maybe clicking on a bar brings up replication stats for
+ * that design point with horizontal line across the mean.
  * @author Patrick Sullivan
  * @version $Id$
  * @since April 20, 2006, 11:19 AM
  */
 public class StatsGraph extends JPanel {
-        
+
     String[] properties;
     int designPoints;
     int samples;
@@ -76,20 +77,20 @@ public class StatsGraph extends JPanel {
     Hashtable<String, ChartPanel> chartPanels;
     JTabbedPane tabbedPane;
     ChartPanel chartPanel;
-    
+
     public StatsGraph() {
         tabbedPane = new JTabbedPane();
-        meanAndStandardDeviations = new Hashtable<String, DefaultStatisticalCategoryDataset>();
-        minMaxs = new Hashtable<String, DefaultIntervalCategoryDataset>();
-        chartPanels = new Hashtable<String, ChartPanel>();
-        
+        meanAndStandardDeviations = new Hashtable<>();
+        minMaxs = new Hashtable<>();
+        chartPanels = new Hashtable<>();
+
         add(tabbedPane);
         setVisible(true);
         reset();
     }
-    
+
     /**
-     * 
+     *
      * @param properties
      * @param designPoints
      * @param samples
@@ -103,18 +104,18 @@ public class StatsGraph extends JPanel {
                 System.out.println("StatsGraph: createDataSets for " + prop);
             }
             createDataSets(prop);
-            tabbedPane.add(prop, chartPanels.get(prop));  
+            tabbedPane.add(prop, chartPanels.get(prop));
         }
     }
-    
-    public void reset() {
+
+    public final void reset() {
         setProperties(new String[] {"Viskit DOE Results"}, 0, 0);
     }
 
     /** add SampleStatistic to datasets at designPoint d and sample s
      * @param sample
      * @param d
-     * @param s 
+     * @param s
      */
     public void addSampleStatistic(viskit.xsd.bindings.assembly.SampleStatistics sample, int d, int s) {
         String name = sample.getName();
@@ -128,30 +129,30 @@ public class StatsGraph extends JPanel {
         minMax.setEndValue(d, "Sample " + s, Double.valueOf(sample.getMaxObs()));
         chartPanels.get(name).repaint();
     }
-    
+
     public void createDataSets(String name) {
-        
+
         meanAndStandardDeviations.put(name, createStatisticalDataset());
         minMaxs.put(name, createMinMaxDataset());
-        
-        JFreeChart chart = new JFreeChart("Statistics for " + name, 
+
+        JFreeChart chart = new JFreeChart("Statistics for " + name,
                 new Font("Helvetica", Font.BOLD, 14),
                 new CategoryPlot(),
                 false);
-       
+
         chartPanel = new ChartPanel(chart);
         chartPanels.put(name, chartPanel);
         chartPanel.setDomainZoomable(true);
-        chartPanel.setRangeZoomable(true);   
-   
-        NumberAxis numAx = new NumberAxis("Value of " + name); 
+        chartPanel.setRangeZoomable(true);
+
+        NumberAxis numAx = new NumberAxis("Value of " + name);
         CategoryItemLabelGenerator generator = new StandardCategoryItemLabelGenerator();
         CategoryItemRenderer renderer;
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
-        
+
         plot.setDomainAxis(new CategoryAxis("Latin Hypersquare Samples of Parameters from Design of Experiment Panel"));
         renderer = new StatisticalBarRenderer();
-        ((StatisticalBarRenderer) renderer).setItemMargin(.27d);
+        ((BarRenderer) renderer).setItemMargin(.27d);
         renderer.setBaseItemLabelsVisible(true);
         renderer.setBaseItemLabelGenerator(generator);
         numAx = new NumberAxis("Value of "+name);
@@ -163,18 +164,18 @@ public class StatsGraph extends JPanel {
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setRangeGridlinesVisible(true);
         plot.setDomainGridlinesVisible(true);
-        
-        // now minmax        
+
+        // now minmax
         renderer = new IntervalBarRenderer();
-        ((IntervalBarRenderer) renderer).setDrawBarOutline(true);
-        ((IntervalBarRenderer) renderer).setMaximumBarWidth(1.0d);
+        ((BarRenderer) renderer).setDrawBarOutline(true);
+        ((BarRenderer) renderer).setMaximumBarWidth(1.0d);
         renderer.setBaseShape(new java.awt.geom.RoundRectangle2D.Double());
         plot.setDataset(1, minMaxs.get(name));
         plot.setRenderer(1, renderer);
         //plot.setRowRenderingOrder(SortOrder.ASCENDING);
         plot.setRowRenderingOrder(SortOrder.DESCENDING);
     }
-    
+
     /**
      * Creates a sample dataset.
      *
@@ -183,7 +184,7 @@ public class StatsGraph extends JPanel {
     private DefaultStatisticalCategoryDataset createStatisticalDataset() {
 
         DefaultStatisticalCategoryDataset result = new DefaultStatisticalCategoryDataset();
-        
+
         for (int dp = 0; dp < designPoints; dp++) {
             for (int s = 0; s < samples; s++) {
                 result.add(0.0, 0.0, "Design Point " + dp, "Sample " + s);
@@ -194,7 +195,7 @@ public class StatsGraph extends JPanel {
     }
 
     private DefaultIntervalCategoryDataset createMinMaxDataset() {
-        
+
         String[] seriesKeys = new String[designPoints];
         String[] categoryKeys = new String[samples];
         Double[][] starts = new Double[designPoints][];
@@ -204,12 +205,12 @@ public class StatsGraph extends JPanel {
             starts[dp] = new Double[samples];
             ends[dp] = new Double[samples];
             for (int s = 0; s < samples; s++) {
-                starts[dp][s] = new Double(0.0d);
-                ends[dp][s] = new Double(0.001d);
+                starts[dp][s] = 0.0d;
+                ends[dp][s] = 0.001d;
                 categoryKeys[s] = "Sample " + s; // could de-loop
             }
         }
         DefaultIntervalCategoryDataset result = new DefaultIntervalCategoryDataset(seriesKeys, categoryKeys, starts, ends);
         return result;
-    }    
+    }
 }

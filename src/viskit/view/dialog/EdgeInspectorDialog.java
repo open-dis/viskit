@@ -631,9 +631,16 @@ public class EdgeInspectorDialog extends JDialog {
         }
     }
 
-    private void hideShowConditionals(boolean show) {
-        conditionalExpressionPanel.showConditions(show);
-        addConditionalButton.setVisible(!show);
+    private void hideShowConditionals(final boolean show) {
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                conditionalExpressionPanel.showConditions(show);
+                addConditionalButton.setVisible(!show);
+            }
+        };
+        SwingUtilities.invokeLater(r);
     }
 
     private void hideShowDescription(boolean show) {

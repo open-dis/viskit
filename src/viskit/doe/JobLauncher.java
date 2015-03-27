@@ -705,7 +705,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
         clusterStatusFrame.setBounds(frR);
 
-        clusterStatusFrame.setVisible(true);
+        Runnable rn = new Runnable() {
+            @Override
+            public void run() {
+                clusterStatusFrame.setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(rn);
 
         stopStatusThread(); // if running
         statusThread = new Thread(new statusUpdater());
@@ -783,11 +789,18 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         if (args.length != 1) {
             System.out.println("Give .xml file as argument");
         } else {
-            new JobLauncher(false, args[0], args[0], null);
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    new JobLauncher(false, args[0], args[0], null);
+                }
+            };
+            SwingUtilities.invokeLater(r);
         }
     }
 

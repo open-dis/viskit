@@ -79,9 +79,6 @@ public interface EventGraphController {
      */
     void newProject();
 
-    /** NOT USED */
-    void runAssemblyEditor();
-
     /** Show the XML form of an event graph */
     void showXML();
 
@@ -101,7 +98,7 @@ public interface EventGraphController {
 
     /**
      * Edit a scheduling edge
-     * 
+     *
      * @param ed the edge to edit
      */
     void schedulingArcEdit(Edge ed);

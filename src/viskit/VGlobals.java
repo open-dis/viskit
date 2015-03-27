@@ -181,25 +181,6 @@ public class VGlobals {
         return acont;
     }
 
-    public void runAssemblyView() {
-        if (avf == null) {
-            buildAssemblyViewFrame();
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                avf.setVisible(true);
-                avf.toFront();
-
-                if (!assyFirstRun) {
-                    assyFirstRun = true;
-                    ((AssemblyController)acont).newAssembly();
-                }
-            }
-        });
-    }
     ActionListener defaultAssyQuitHandler = new ActionListener() {
 
         @Override
@@ -300,15 +281,6 @@ public class VGlobals {
 
     public void setEventGraphQuitHandler(ActionListener lis) {
         eventGraphQuitHandler = lis;
-    }
-
-    public void runEventGraphView() {
-        if (egvf == null) {
-            buildEventGraphViewFrame();
-        }
-
-        egvf.setVisible(true);
-        egvf.toFront();
     }
 
     public void installEventGraphView() {

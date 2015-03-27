@@ -118,7 +118,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JTextField tmo;
     private JTextField unameTF;
     private JCheckBox doAnalystReports;
-    private JCheckBox doGraphOutput;
     private JCheckBox doLocalRun;
     private GraphUpdater graphUpdater;
     private QstatConsole qstatConsole;
@@ -302,7 +301,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JLabel analystReportLab = new JLabel("Analyst report each run");
         doAnalystReports = new JCheckBox((String) null, false);
-        doGraphOutput = new JCheckBox((String) null, false);
 
         numDPsTF.setEditable(false);
 
@@ -1143,7 +1141,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
         clusterStatusFrame.setBounds(frR);
 
-        clusterStatusFrame.setVisible(true);
+        Runnable rn = new Runnable() {
+            @Override
+            public void run() {
+                clusterStatusFrame.setVisible(true);
+            }
+        };
+        SwingUtilities.invokeLater(rn);
 
     // uncomment the following if you want continuous updates
     /*

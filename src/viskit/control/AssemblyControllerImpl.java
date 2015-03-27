@@ -130,14 +130,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         recordProjFile();
     }
 
-    @Override
-    public void runEventGraphEditor() {
-        if (VGlobals.instance().getEventGraphEditor() == null) {
-            VGlobals.instance().buildEventGraphViewFrame();
-        }
-        VGlobals.instance().runEventGraphView();
-    }
-
     /** Information required by the EventGraphControllerImpl to see if an Assembly
      * file is already open.  Also checked internally by this class.
      * @param refresh flag to refresh the list from viskitConfig.xml

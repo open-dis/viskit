@@ -77,8 +77,6 @@ public interface AssemblyController {
      */
     int getRunTabbledPanelIdx();
 
-    void runEventGraphEditor();
-
     void showXML();
 
     /** A component, e.g., vAMod, wants to say something.
@@ -140,7 +138,7 @@ public interface AssemblyController {
 
     /** Perform a full delete */
     void remove();
-    
+
     /**
      * Not supported in Viskit
      */
