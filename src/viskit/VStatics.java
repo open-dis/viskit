@@ -436,6 +436,7 @@ public class VStatics {
 
         String userDir = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
+        String workDir = VGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
         Path startingDir;
@@ -466,7 +467,9 @@ public class VStatics {
                     if (clazz.contains(userHome)) {
                         clazz = clazz.substring(userHome.length() + 1, clazz.length());
                     } else if (clazz.contains(userDir)) {
-                        clazz = clazz.substring(VGlobals.instance().getWorkDirectory().getPath().length() + 1, clazz.length());
+                        clazz = clazz.substring(userDir.length() + 1, clazz.length());
+                    } else if (clazz.contains(workDir)) {
+                        clazz = clazz.substring(workDir.length() + 1, clazz.length());
                     }
 
                     // Strip off .class and replace File.separatorChar w/ a "."
