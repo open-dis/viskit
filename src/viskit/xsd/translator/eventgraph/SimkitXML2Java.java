@@ -331,7 +331,8 @@ public class SimkitXML2Java {
                     } else { // really not a bad case, most likely will be set by the reset()
                         pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
                     }
-                }
+                } else
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
             }
 
             buildStateVariableAccessor(s, accessorBlock);
@@ -731,7 +732,7 @@ public class SimkitXML2Java {
         }
 
         if (!liLocalV.isEmpty()) {pw.println();}
-        
+
         if (run.getCode() != null && !run.getCode().isEmpty()) {
             pw.println(SP_8 + "/* Code insertion for Event " + run.getName() + " */");
             String[] lines = run.getCode().split("\\n");
