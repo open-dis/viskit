@@ -1136,7 +1136,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    private File getUniqueName(String suggName) {
+    /**
+     * Ensures a unique file name by appending a count integer to the filename
+     * until the system can detect that it is indeed unique
+     *
+     * @param suggName the base file name to start with
+     * @param parent the parent directory of the suggested file to be named
+     * @return a unique filename based on the suggName with an integer appended
+     * to ensure uniqueness
+     */
+    public File getUniqueName(String suggName, File parent) {
         String appnd = "";
         String suffix = "";
 
@@ -1148,7 +1157,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         int count = -1;
         File fil = null;
         do {
-            fil = new File(suggName + appnd + suffix);
+            fil = new File(parent, suggName + appnd + suffix);
             appnd = "" + ++count;
         } while (fil.exists());
 
@@ -1167,7 +1176,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             fil.getParentFile().mkdirs();
         }
         if (showUniqueName) {
-            fil = getUniqueName(suggName);
+            fil = getUniqueName(suggName, fil.getParentFile());
         }
 
         jfc.setSelectedFile(fil);

@@ -73,7 +73,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static String lineSep = System.getProperty("line.separator");
     static Logger log = LogUtils.getLogger(InternalAssemblyRunner.class);
-    String targetClassName;
+
+    /** The name of the assy to run */
+    String assemblyClassName;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;
     JMenuBar myMenuBar;
@@ -88,8 +90,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private String analystReportTempFile = null;
     FileOutputStream fos;
     FileInputStream fis;
-    Class<?> targetClass;
-    Object assemblyObj, targetObject;
+
+    /** The assembly to be run from java source */
+    Class<?> assemblyClass;
+
+    /** Instance of the assembly to run from java source */
+    Object assemblyInstance;
     private static int mutex = 0;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
@@ -160,8 +166,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            log.info("VM argument is: " + s);
 //        }
 
-        targetClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
-        doTitle(targetClassName);
+        assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
+        doTitle(assemblyClassName);
 
         runPanel.vcrSimTime.setText("0.0");
 
@@ -170,7 +176,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
-            fillRepWidgetsFromBasicAssemblyObject(defaultVerbose, defaultStopTime);
+            fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
             ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
@@ -183,40 +189,40 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(InternalAssemblyRunner.REWIND);
     }
 
-    private void fillRepWidgetsFromBasicAssemblyObject(boolean verbose, double stopTime) throws Throwable {
+    private void fillRepWidgetsFromPreRunAssy(boolean verbose, double stopTime) throws Throwable {
 
-        /* in order to resolve the target assy as a BasicAssembly, it must be
-         * resolved using the the same ClassLoader as the one used to compile
+        assemblyClass = VStatics.classForName(assemblyClassName);
+        if (assemblyClass == null) {
+            throw new ClassNotFoundException();
+        }
+        assemblyInstance = assemblyClass.newInstance();
+
+        /* in order to resolve the assy as a BasicAssembly, it must be
+         * loaded using the the same ClassLoader as the one used to compile
          * it.  Used in the verboseListener within the working Viskit
          * ClassLoader
          */
-        targetClass = VStatics.classForName(targetClassName);
-        if (targetClass == null) {
-            throw new ClassNotFoundException();
-        }
-        targetObject = targetClass.newInstance();
+        assembly = (BasicAssembly) assemblyInstance;
 
-        assembly = (BasicAssembly) targetObject;
+        Method getNumberReplications = assemblyClass.getMethod("getNumberReplications");
+        Method isSaveReplicationData = assemblyClass.getMethod("isSaveReplicationData");
+        Method isPrintReplicationReports = assemblyClass.getMethod("isPrintReplicationReports");
+        Method isPrintSummaryReport = assemblyClass.getMethod("isPrintSummaryReport");
+        Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
+        Method isVerbose = assemblyClass.getMethod("isVerbose");
+        Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
+        Method getStopTime = assemblyClass.getMethod("getStopTime");
 
-        Method getNumberReplications = targetClass.getMethod("getNumberReplications");
-        Method isSaveReplicationData = targetClass.getMethod("isSaveReplicationData");
-        Method isPrintReplicationReports = targetClass.getMethod("isPrintReplicationReports");
-        Method isPrintSummaryReport = targetClass.getMethod("isPrintSummaryReport");
-        Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
-        Method isVerbose = targetClass.getMethod("isVerbose");
-        Method setStopTime = targetClass.getMethod("setStopTime", double.class);
-        Method getStopTime = targetClass.getMethod("getStopTime");
+        runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
+        runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
+        runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
+        runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
 
-        runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(targetObject));
-        runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(targetObject));
-        runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(targetObject));
-        runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(targetObject));
-
-        // Set the run panel according to what's XML values
-        setVerbose.invoke(targetObject, verbose);
-        runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(targetObject));
-        setStopTime.invoke(targetObject, stopTime);
-        runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(targetObject));
+        // Set the run panel according to what the assy XML value is
+        setVerbose.invoke(assemblyInstance, verbose);
+        runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
+        setStopTime.invoke(assemblyInstance, stopTime);
+        runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(assemblyInstance));
     }
 
     File tmpFile;
@@ -244,20 +250,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            }
 //            log.info("\n");
 
-            targetClass = lastLoaderWithReset.loadClass(targetClass.getName());
-            assemblyObj = targetClass.newInstance();
+            // Now we are in the pure classloader realm where each assy run can
+            // be independent of any other
+            assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
+            assemblyInstance = assemblyClass.newInstance();
 
-            Method setOutputStream = targetClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplications = targetClass.getMethod("setNumberReplications", int.class);
-            Method setSaveReplicationData = targetClass.getMethod("setSaveReplicationData", boolean.class);
-            Method setPrintReplicationReports = targetClass.getMethod("setPrintReplicationReports", boolean.class);
-            Method setPrintSummaryReport = targetClass.getMethod("setPrintSummaryReport", boolean.class);
-            Method setEnableAnalystReports = targetClass.getMethod("setEnableAnalystReports", boolean.class);
-            Method setVerbose = targetClass.getMethod("setVerbose", boolean.class);
-            Method setStopTime = targetClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplication = targetClass.getMethod("setVerboseReplication", int.class);
-            Method setPclNodeCache = targetClass.getMethod("setPclNodeCache", Map.class);
-            Method addPropertyChangeListener = targetClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setOutputStream = assemblyClass.getMethod("setOutputStream", OutputStream.class);
+            Method setNumberReplications = assemblyClass.getMethod("setNumberReplications", int.class);
+            Method setSaveReplicationData = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
+            Method setPrintReplicationReports = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
+            Method setPrintSummaryReport = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
+            Method setEnableAnalystReports = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
+            Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
+            Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
+            Method setVerboseReplication = assemblyClass.getMethod("setVerboseReplication", int.class);
+            Method setPclNodeCache = assemblyClass.getMethod("setPclNodeCache", Map.class);
+            Method addPropertyChangeListener = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // Resetting the seed
             Class<?> RVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
@@ -270,24 +278,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA,16*1024);
 
-            setOutputStream.invoke(assemblyObj, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyObj, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
-            setSaveReplicationData.invoke(assemblyObj, runPanel.saveRepDataCB.isSelected());
-            setPrintReplicationReports.invoke(assemblyObj, runPanel.printRepReportsCB.isSelected());
-            setPrintSummaryReport.invoke(assemblyObj, runPanel.printSummReportsCB.isSelected());
+            setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
+            setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
+            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
+            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
+            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
-            setEnableAnalystReports.invoke(assemblyObj, runPanel.analystReportCB.isSelected());
+            setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
             // Allow panel values to override XML set values
-            setStopTime.invoke(assemblyObj, getStopTime());
-            setVerbose.invoke(assemblyObj, getVerbose());
+            setStopTime.invoke(assemblyInstance, getStopTime());
+            setVerbose.invoke(assemblyInstance, getVerbose());
 
-            setVerboseReplication.invoke(assemblyObj, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyObj, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
-            addPropertyChangeListener.invoke(assemblyObj, this);
-            assemblyRunnable = (Runnable) assemblyObj;
+            setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
+            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            addPropertyChangeListener.invoke(assemblyInstance, this);
+            assemblyRunnable = (Runnable) assemblyInstance;
 
             // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
@@ -324,8 +332,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             // Grab the temp analyst report and signal the AnalystReportFrame
             try {
-                Method getAnalystReport = targetClass.getMethod("getAnalystReport");
-                analystReportTempFile = (String) getAnalystReport.invoke(assemblyObj);
+                Method getAnalystReport = assemblyClass.getMethod("getAnalystReport");
+                analystReportTempFile = (String) getAnalystReport.invoke(assemblyInstance);
             } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                 log.fatal(ex);
             }
@@ -389,12 +397,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e) {
             try {
 
-                if (assemblyObj != null) {
+                if (assemblyInstance != null) {
 
                     Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
-                    Method setStopRun = targetClass.getMethod("setStopRun", boolean.class);
-                    setStopRun.invoke(assemblyObj, true);
+                    Method setStopRun = assemblyClass.getMethod("setStopRun", boolean.class);
+                    setStopRun.invoke(assemblyInstance, true);
                     textAreaOutputStream.kill();
                     mutex--;
                 }
@@ -446,7 +454,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
             }
-            File fil = getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
+            File fil = VGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
             int retv = saveChooser.showSaveDialog(null);
@@ -472,25 +480,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
         }
     }
-    // dup of EventGraphViewFrame
-    private File getUniqueName(String suggName, File parent) {
-        String appnd = "";
-        String suffix = "";
 
-        int lastDot = suggName.lastIndexOf('.');
-        if (lastDot != -1) {
-            suffix = suggName.substring(lastDot);
-            suggName = suggName.substring(0, lastDot);
-        }
-        int count = -1;
-        File fil = null;
-        do {
-            fil = new File(parent, suggName + appnd + suffix);
-            appnd = "" + ++count;
-        } while (fil.exists());
-
-        return fil;
-    }
     String returnedSimTime;
 
     private void signalReportReady() {
