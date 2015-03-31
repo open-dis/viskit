@@ -538,13 +538,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     boolean isPrimitive(String type) {
-        return type.equals("boolean") |
-               type.equals("char") |
-               type.equals("double") |
-               type.equals("float") |
-               type.equals("int") |
-               type.equals("long") |
-               type.equals("short");
+        return VGlobals.instance().isPrimitive(type);
     }
 
     boolean isString(String type) {
@@ -552,7 +546,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     boolean isArray(String type) {
-        return type.endsWith("]");
+        return VGlobals.instance().isArray(type);
     }
 
     void doMultiParameter(MultiParameter p, String indent, PrintWriter pw) {
