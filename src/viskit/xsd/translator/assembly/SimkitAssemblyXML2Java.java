@@ -399,7 +399,7 @@ public class SimkitAssemblyXML2Java {
             if (!pl.isEmpty()) {
                 pw.println();
                 for (Object o : pl) {
-                    doParameter(pl, o, sp16, pw);
+                    doParameter(pl, o, sp12, pw);
                 }
                 pw.println(sp12 + rp);
             } else {
@@ -482,7 +482,7 @@ public class SimkitAssemblyXML2Java {
         List<Object> facts = fact.getParameters();
         pw.println(indent + sp4 + castIfSimEntity(fact.getType()) + factory + pd + method + lp);
         for (Object o : facts) {
-            doParameter(facts, o, indent + sp8, pw);
+            doParameter(facts, o, indent + sp4, pw);
         }
         pw.print(indent + sp4 + rp);
     }
@@ -499,7 +499,7 @@ public class SimkitAssemblyXML2Java {
         } else if ( isString(type) ) {
             pw.print(indent + sp4 + qu + value + qu);
         } else { // some Expression
-            pw.print(indent + castIfSimEntity(type) + value);
+            pw.print(indent + sp4 + castIfSimEntity(type) + value);
         }
     }
 
@@ -515,15 +515,15 @@ public class SimkitAssemblyXML2Java {
         }
     }
 
-    boolean isPrimitive(String type) {
+    public boolean isPrimitive(String type) {
         return VGlobals.instance().isPrimitive(type);
     }
 
-    boolean isString(String type) {
+    public boolean isString(String type) {
         return type.contains("String");
     }
 
-    boolean isArray(String type) {
+    public boolean isArray(String type) {
         return VGlobals.instance().isArray(type);
     }
 
@@ -769,7 +769,6 @@ public class SimkitAssemblyXML2Java {
 
         pw.println(sp8 + nw + sp + "Thread" + lp + nAsm + rp + pd + "start" + lp + rp + sc);
 
-        pw.println();
         pw.println(sp4 + cb);
         pw.println(cb);
     }
