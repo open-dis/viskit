@@ -47,7 +47,7 @@ public class SimkitAssemblyXML2Java {
     final private String qu  = SimkitXML2Java.QU;
     final private String nw = "new";
 
-    SimkitAssembly root;
+    private SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
     JAXBContext jaxbCtx;
@@ -71,11 +71,11 @@ public class SimkitAssemblyXML2Java {
      * Creates a new instance of SimkitAssemblyXML2Java
      * when used from another class.  Instance this
      * with a String for the name of the xmlFile.
-     * @param xmlFile the name of the Assembly XML file
+     * @param xmlFile the name and path of an Assembly XML file
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
-        this(VStatics.classForName(SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(VStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
     }
 
@@ -163,29 +163,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     public String marshalFragmentToString(Object jaxb) {
-        Marshaller m;
-        String s;
-        if ( jaxb == null ) {
-            return "<Empty/>";
-        }
-        if (jaxb instanceof Results) {
-            s = "<Result/>";
-        } else {
-            s = "<Errors/>";
-        }
-        try {
-            m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            m.marshal(jaxb,pw);
-            s = sw.toString();
-        } catch (JAXBException e) {
-            log.error(e);
-//            e.printStackTrace();
-        }
-        return s;
+        return marshalToString(jaxb);
     }
 
     public void marshal(File f) {
@@ -848,7 +826,7 @@ public class SimkitAssemblyXML2Java {
             //FIXME Remove port stuff
             switch (a) {
                 case "-p":
-                case "--port":
+                case "-port":
                     // Dummy forward looking next()
                     lit.next();
                     if (lit.hasNext()) {
@@ -859,7 +837,7 @@ public class SimkitAssemblyXML2Java {
                     }
                     break;
                 case "-f":
-                case "--file":
+                case "-file":
                     // Dummy forward looking next()
                     lit.next();
                     if (lit.hasNext()) {
@@ -875,52 +853,35 @@ public class SimkitAssemblyXML2Java {
         log.info("Assembly file is: " + fileName);
         log.info("Generating Java Source...");
 
-        if (port == 0) {
-            if (fileName == null) {
-                usage();
-            } else {
-                try {
-                    sax2j = new SimkitAssemblyXML2Java(fileName); // regular style
-                } catch (FileNotFoundException ex) {
-                    log.error(ex);
-                }
-                if (sax2j != null) {
-                    sax2j.unmarshal();
-                }
-            }
+        if (fileName == null) {
+            usage();
         } else {
-            if (fileName == null) {
-                sax2j = new SimkitAssemblyXML2Java();
-            } else {
-                InputStream is = null;
-                try {
-                    is = new FileInputStream(fileName);
-                } catch (FileNotFoundException fnfe) {
-                    log.error(fnfe);
-                }
-                sax2j = new SimkitAssemblyXML2Java(is);
+
+            try {
+                sax2j = new SimkitAssemblyXML2Java(new File(fileName));
+            } catch (FileNotFoundException ex) {
+                log.error(ex);
             }
-        }
 
-        if (sax2j != null) {
-            File baseName = new File(sax2j.baseNameOf(fileName));
-            sax2j.setFileBaseName(baseName.getName());
-            sax2j.unmarshal();
-            String dotJava = sax2j.translate();
-            log.info("Done.");
+            if (sax2j != null) {
 
-            // also write out the .java to a file and compile it
-            // to a .class
-            log.info("Generating Java Bytecode...");
-            if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
+                sax2j.unmarshal();
+                String dotJava = sax2j.translate();
                 log.info("Done.");
+
+                // also write out the .java to a file and compile it
+                // to a .class
+                log.info("Generating Java Bytecode...");
+                if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
+                    log.info("Done.");
+                }
             }
         }
     }
 
     static void usage() {
         System.err.println("Check args, you need at least a port or a file in grid mode");
-        System.err.println("usage: Assembly [-p port | --port port | -f file | --file file]");
+        System.err.println("usage: Assembly [-p port | -port port | -f file | -file file]");
         System.exit(1);
     }
 }
