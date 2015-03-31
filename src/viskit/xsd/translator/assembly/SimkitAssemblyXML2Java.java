@@ -189,7 +189,7 @@ public class SimkitAssemblyXML2Java {
         }
     }
 
-    public SimkitAssembly getRoot() {
+    public SimkitAssembly getAssemblyRoot() {
         return root;
     }
 
@@ -396,7 +396,7 @@ public class SimkitAssemblyXML2Java {
             pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
             pw.print(sp12 + nw + sp + se.getType() + lp);
 
-            if (pl.size() > 0) {
+            if (!pl.isEmpty()) {
                 pw.println();
                 for (Object o : pl) {
                     doParameter(pl, o, sp16, pw);
@@ -716,7 +716,7 @@ public class SimkitAssemblyXML2Java {
         PrintWriter pw = new PrintWriter(out);
 
         // override the printInfo method to dump detailed output from the nodes which are marked, if any
-        List<Output> outputs = getRoot().getOutput();
+        List<Output> outputs = getAssemblyRoot().getOutput();
         if(!outputs.isEmpty()) {
             pw.println(sp4 + "@Override");
             pw.println(sp4 + "public void printInfo() {");
@@ -731,8 +731,8 @@ public class SimkitAssemblyXML2Java {
     }
 
     private void dumpEntities(List<Output> lis, PrintWriter pw) {
-        List<SimEntity> simEntities = getRoot().getSimEntity();
-        List<PropertyChangeListener> pcls = getRoot().getPropertyChangeListener();
+        List<SimEntity> simEntities = getAssemblyRoot().getSimEntity();
+        List<PropertyChangeListener> pcls = getAssemblyRoot().getPropertyChangeListener();
         for (Output output : lis) {
             Object elem = output.getEntity();
             String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
@@ -810,20 +810,21 @@ public class SimkitAssemblyXML2Java {
 
     /**
      * @param arg the command line arguments
-     * arg[0] - -f | --file | -p | --port
+     * arg[0] - -f | -file | -p | -port
      * arg[1] - filename | port
-     * arg[2] - -p | --port | -f | --file
+     * arg[2] - -p | -port | -f | -file
      * arg[3] - port | filename
      */
     public static void main(String[] arg) {
+
         int port = -1;
         String fileName = null;
         SimkitAssemblyXML2Java sax2j = null;
         List<String> args = java.util.Arrays.asList(arg);
-        ListIterator<String> lit = args.listIterator();
+        Iterator<String> lit = args.listIterator();
 
         for (String a : args) {
-            //FIXME Remove port stuff
+
             switch (a) {
                 case "-p":
                 case "-port":
