@@ -160,7 +160,6 @@ their descpritions.
         </java>
     </target>
 
-    <!-- some platform-unique initialization (,initializeWindows,initializeUnix,initializeMac) -->
     <target name="platformInitialize" depends="platformType"/>
     <target name="platformType">
         <condition property="isWindows" >
