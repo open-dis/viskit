@@ -388,9 +388,10 @@ public class SimkitAssemblyXML2Java {
 
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "protected void createSimEntities" + lp + rp + sp + ob);
+        List<Object> pl;
 
         for (SimEntity se : this.root.getSimEntity()) {
-            List<Object> pl = se.getParameters();
+            pl = se.getParameters();
 
             pw.println();
             pw.println(sp8 + "addSimEntity" + lp + sp + qu + se.getName() + qu + cm);
@@ -490,9 +491,11 @@ public class SimkitAssemblyXML2Java {
     void doTerminalParameter(TerminalParameter term, String indent, PrintWriter pw) {
 
         String type = term.getType();
-        String value = term.getValue();
+        String value;
         if ( term.getLinkRef() != null ) {
-            value=((TerminalParameter) (term.getLinkRef())).getValue();
+            value = ((TerminalParameter) (term.getLinkRef())).getValue();
+        } else {
+            value = term.getValue();
         }
         if ( isPrimitive(type) ) {
             pw.print(indent + sp4 + value);
@@ -720,7 +723,7 @@ public class SimkitAssemblyXML2Java {
         if(!outputs.isEmpty()) {
             pw.println(sp4 + "@Override");
             pw.println(sp4 + "public void printInfo() {");
-            pw.println(sp4 + "System.out.println" + lp + rp + sc);
+            pw.println(sp8 + "System.out.println" + lp + rp + sc);
             pw.println(sp8 + "System.out.println" + lp + qu + "Entity Details" + qu + rp + sc);
             pw.println(sp8 + "System.out.println" + lp + qu + "--------------" + qu + rp + sc);
             dumpEntities(outputs, pw);
