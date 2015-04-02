@@ -59,7 +59,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     private Image myLeafIconImage;
     private DefaultTreeModel mod;
     private DragStartListener lis;
-    private Vector<String> recurseNogoList;
     private String genericTableToolTip = "Drag onto canvas";
 
     String userDir = System.getProperty("user.dir");
@@ -202,7 +201,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                             FileBasedClassManager.instance().unloadFile(fban);
                             return n;
                         }
-                        // TODO: What about *.class based nodes?
                     } catch (IOException e) {
                         log.error(e);
                     }
@@ -213,42 +211,27 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     // 4 May 06 JMB The filter down below checks for empty dirs.
-    /** If there is a directory, or a jarfile with xml in it, it will show in
+    /** Adds SimEntity icons to the Assembly Editor drag and drop tree.
+     * If there is a directory, or a jarfile with xml in it, it will show in
      * the LEGO tree, but if its children have errors when marshaling they will
      * not appear.
-     *
-     * @param f the path to evaluate for SimEntities
-     */
-    public void addContentRoot(File f) {
-        if (!f.getName().contains("svn")) {
-            if (f.getName().toLowerCase().endsWith(".jar")) {
-                addJarFile(f.getPath());
-            } else if (!f.getName().endsWith(".java")) {
-                addContentRoot(f, false);
-            }
-        }
-    }
-
-    /** Adds SimEntity icons to the Assembly Editor drag and drop tree
      *
      * @param f the directory to recurse to find SimEntitiy based EGs
      * @param recurse if true, recurse the directory
      */
     public void addContentRoot(File f, boolean recurse) {
-        Vector<DefaultMutableTreeNode> v = new Vector<>();
+        if (!f.getName().contains("svn")) {
 
-        if (recurse) {
-            recurseNogoList = new Vector<>();
-        } else {
-            recurseNogoList = null;
-        }
-        if (!f.getName().endsWith(".java")) {
-            addContentRoot(f, recurse, v);
+            if (f.getName().toLowerCase().endsWith(".jar"))
+                addJarFile(f.getPath());
+
+            else if (!f.getName().endsWith(".java"))
+                _addContentRoot(f, recurse);
         }
     }
 
-    // The two above are the public ones.
-    private void addContentRoot(File f, boolean recurse, Vector<DefaultMutableTreeNode> rootVector) {
+    // Does the real work
+    private void _addContentRoot(File f, boolean recurse) {
         DefaultMutableTreeNode myNode;
 
         // Prevent duplicates of the EG icons
@@ -258,14 +241,13 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             if (!recurse) {
                 myNode = new DefaultMutableTreeNode(f.getPath());
                 rootNode.add(myNode);
-                rootVector.add(myNode); // for later pruning
                 directoryRoots.put(f.getPath(), myNode);
                 int idx = rootNode.getIndex(myNode);
                 mod.nodesWereInserted(rootNode, new int[] {idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa) {
-                    addContentRoot(file, recurse, rootVector);
+                    _addContentRoot(file, file.isDirectory());
                 }
             } else { // recurse = true
                 // Am I here?  If so, grab my treenode
@@ -296,7 +278,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
                         myNode = new DefaultMutableTreeNode(name);
                         rootNode.add(myNode);
-                        rootVector.add(myNode); // for later pruning
                         directoryRoots.put(f.getPath(), myNode);
                         int idx = rootNode.getIndex(myNode);
                         mod.nodesWereInserted(rootNode, new int[] {idx});
@@ -304,7 +285,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
                 for (File file : fa) {
-                    addContentRoot(file, recurse, rootVector);
+                    _addContentRoot(file, file.isDirectory());
                 }
             }   // recurse = true
         } // is directory
@@ -348,9 +329,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // Uncomment to reveal common reason for Exceptions
                 t.printStackTrace();
                 log.error(t);
-                if (recurseNogoList != null) {
-                    recurseNogoList.add(f.getName());
-                }
             }
         } // directory
     }

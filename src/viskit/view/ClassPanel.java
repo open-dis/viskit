@@ -85,21 +85,7 @@ public class ClassPanel extends JPanel {
                 if (retv == JFileChooser.APPROVE_OPTION) {
                     File[] fa = jfc.getSelectedFiles();
                     for (File fa1 : fa) {
-                        Boolean recurse = null;
-                        if (fa1.isDirectory()) {
-                            if (recurse == null) {
-                                int retrn =
-                                        JOptionPane.showConfirmDialog(ClassPanel.this,
-                                                "Recurse directories?", "Question",
-                                                JOptionPane.YES_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE);
-
-                                recurse = retrn == JOptionPane.YES_OPTION;
-                            }
-                            tree.addContentRoot(fa1, recurse);
-                        } else {
-                            tree.addContentRoot(fa1);
-                        }
+                        tree.addContentRoot(fa1, fa1.isDirectory());
                     }
                 }
             }

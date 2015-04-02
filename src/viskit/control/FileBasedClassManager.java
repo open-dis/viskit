@@ -11,7 +11,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -26,6 +25,7 @@ import viskit.VStatics;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 import viskit.xsd.bindings.eventgraph.SimEntity;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /** A custom class manager to support finding EGs and PCLs in *.class form vice
  * XML.  Used to populate the LEGOs tree on the Assy Editor.
@@ -41,7 +41,7 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  * @since 12:53:36 PM
  * @version $Id$
  */
-public class FileBasedClassManager implements Runnable {
+public class FileBasedClassManager {
 
     static Logger log = LogUtils.getLogger(FileBasedClassManager.class);
 
@@ -105,7 +105,7 @@ public class FileBasedClassManager implements Runnable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+            jaxbCtx = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             um = jaxbCtx.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?
@@ -114,7 +114,7 @@ public class FileBasedClassManager implements Runnable {
                 // Make sure it's not a Cached Miss
                 if (!isCacheMiss(f)) {
 
-                    // This will compile first time found EGs via an external JVM compile run
+                    // This will compile first time found EGs
                     paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
@@ -151,8 +151,11 @@ public class FileBasedClassManager implements Runnable {
                 // extra classpath
                 List<Object>[] pMap = listOfParamNames(fclass);
                 if (pMap != null && pMap.length > 0)
-                    VStatics.putParameterList(fclass.getName(), listOfParamNames(fclass));
+                    VStatics.putParameterList(fclass.getName(), pMap);
             }
+
+        // TODO: Check if this is really necessary and should be dealt with
+        // upstream
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
             throw new Exception("Unsupported file type.");
         }
@@ -468,7 +471,7 @@ public class FileBasedClassManager implements Runnable {
         ObjectFactory of = new ObjectFactory();
         Constructor<?>[] constr = c.getConstructors();
         Annotation[] paramAnnots;
-        List<Object>[] l = GenericConversion.newListObjectTypeArray(ArrayList.class, constr.length);
+        List<Object>[] l = GenericConversion.newListObjectTypeArray(List.class, constr.length);
         for (int j = 0; j < constr.length; j++) {
             Class<?>[] clz = constr[j].getParameterTypes();
             paramAnnots = constr[j].getDeclaredAnnotations();
@@ -491,7 +494,6 @@ public class FileBasedClassManager implements Runnable {
                 if (paramAnnots.length > 1) {
                     throw new RuntimeException("Only one Annotation per constructor");
                 }
-                l = GenericConversion.newListObjectTypeArray(ArrayList.class, 1);
                 ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
 
                 if (param != null) {
@@ -514,46 +516,4 @@ public class FileBasedClassManager implements Runnable {
         return l;
     }
 
-    public Collection<FileBasedAssyNode> getFileLoadedClasses() {
-        return fileMap.values();
-    }
-
-    public File getFile(String className) {
-        return fileMap.get(className).xmlSource;
-    }
-
-    /* TODO: This must have been an attempt to track changes in loaded EGs
-     * before an Assembly run is initiated in order to get the EG recompiled and
-     * placed on the runtime claspath.  Not currently invoked.
-     */
-    @Override
-    public void run() {
-        final Vector<String> v = new Vector<>();
-
-        while (true) { // forever
-            v.clear();
-            Collection<FileBasedAssyNode> c = getFileLoadedClasses();
-            for (FileBasedAssyNode localFban : c) {
-                File f = localFban.isXML ? localFban.xmlSource : localFban.classFile;
-                if (f.lastModified() != localFban.lastModified) {
-                    v.add(localFban.loadedClass);
-                    localFban.lastModified = f.lastModified();
-                }
-
-                if (v.size() > 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            VGlobals.instance().getActiveAssemblyModel().externalClassesChanged(v);
-                        }
-                    });
-                }
-            }
-            // Goal: sleep for the max estimated between when a user edits and saves an
-            // event graph, and when he switches back and tries to run his assembly
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {}
-        }
-    }
 }

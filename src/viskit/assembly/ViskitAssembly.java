@@ -1,6 +1,6 @@
 package viskit.assembly;
 
-import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.GenericConversion;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -60,14 +60,14 @@ public class ViskitAssembly extends BasicAssembly {
     protected void createSimEntities() {
         if (entities != null) {
             if (entities.values() != null) {
-                simEntity = toArray(entities.values(), new SimEntity[0]);
+                simEntity = GenericConversion.toArray(entities.values(), new SimEntity[0]);
             }
         }
     }
 
     @Override
     protected void createReplicationStats() {
-        replicationStats = toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
+        replicationStats = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener sampleStats : replicationStats) {
             LOG.debug(((Named) sampleStats).getName() + " replicationStat created");
         }
@@ -87,7 +87,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void createPropertyChangeListeners() {
-        propertyChangeListener = toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
+        propertyChangeListener = GenericConversion.toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener pcl : propertyChangeListener) {
             LOG.debug(pcl + " propertyChangeListener created");
         }
@@ -95,7 +95,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     public void hookupSimEventListeners() {
-        String[] listeners = toArray(simEventListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(simEventListenerConnections.keySet(), new String[0]);
         if(debug) {
             LOG.info("hookupSimEventListeners called " + listeners.length);
         }
@@ -112,10 +112,9 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
 
-
     @Override
     public void hookupReplicationListeners() {
-        String[] listeners = toArray(replicationStatsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(replicationStatsListenerConnections.keySet(), new String[0]);
         for (String listener : listeners) {
             List<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
             if (repStatsConnects != null) {
@@ -131,7 +130,7 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();
-        String[] listeners = toArray(designPointStatsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(designPointStatsListenerConnections.keySet(), new String[0]);
         // if not the default case, need to really do this with
         // a Class to create instances selected by each ReplicationStats listener.
         if (listeners.length > 0) {
@@ -150,7 +149,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void hookupPropertyChangeListeners() {
-        String[] listeners = toArray(propertyChangeListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(propertyChangeListenerConnections.keySet(), new String[0]);
         for (String listener : listeners) {
             List<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
             if (propertyConnects != null) {
@@ -188,7 +187,7 @@ public class ViskitAssembly extends BasicAssembly {
         if (debug) {
             LOG.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
         }
-        
+
         if (pc.property.isEmpty()) {
             pc.property = getReplicationStatsByName(listener).getName().trim();
             if (debug) {

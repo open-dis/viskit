@@ -49,6 +49,7 @@ import org.apache.log4j.Logger;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFile;
 import viskit.xsd.bindings.assembly.User;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
  * @version $Id$
@@ -68,9 +69,9 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
     /** Creates a new instance of SessionManager */
     public SessionManager() { // public?
-        sessions = new Hashtable<String, String>();
+        sessions = new Hashtable<>();
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error(e);
         }
@@ -196,9 +197,9 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                 // TODO: upgrade to generic JWSDP
                 List<User> users = passwd.getUser();
                 if (pwd.exists()) {
-                    FileInputStream is = new FileInputStream(pwd);
-                    passwd = (PasswordFile) u.unmarshal(is);
-                    is.close();
+                    try (FileInputStream is = new FileInputStream(pwd)) {
+                        passwd = (PasswordFile) u.unmarshal(is);
+                    }
 
                     // TODO: upgrade to generic JWSDP
                     users = passwd.getUser();
@@ -234,11 +235,10 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     users.add(user);
 
                     // write out to XML user database
-                    FileOutputStream fos = new FileOutputStream(pwd);
-
-                    jaxbCtx.createMarshaller().marshal(passwd,fos);
-                    fos.flush();
-                    fos.close();
+                    try (FileOutputStream fos = new FileOutputStream(pwd)) {
+                        jaxbCtx.createMarshaller().marshal(passwd,fos);
+                        fos.flush();
+                    }
                     LOG.info("New user created for "+newUser);
                     return Boolean.TRUE;
                 } else {
@@ -283,9 +283,10 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
         if ( getUser(usid).equals(username) || isAdmin(usid) ) {
             try {
                 Unmarshaller u = jaxbCtx.createUnmarshaller();
-                FileInputStream is = new FileInputStream(pwd);
-                PasswordFile passwd = (PasswordFile) u.unmarshal(is);
-                is.close();
+                PasswordFile passwd;
+                try (FileInputStream is = new FileInputStream(pwd)) {
+                    passwd = (PasswordFile) u.unmarshal(is);
+                }
                 List<User> users = passwd.getUser();
                 Iterator<User> it = users.iterator();
                 while (it.hasNext()) {
@@ -307,35 +308,11 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                         user.setPassword( new String(new org.apache.commons.codec.binary.Base64().encode(enc)) );
                     }
                 }
-                FileOutputStream fos = new FileOutputStream(pwd);
-                jaxbCtx.createMarshaller().marshal(passwd,fos);
-                fos.flush();
-                fos.close();
-            } catch (JAXBException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (IOException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (NoSuchAlgorithmException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (InvalidKeySpecException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (NoSuchPaddingException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (InvalidKeyException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (InvalidAlgorithmParameterException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (IllegalBlockSizeException e) {
-                LOG.error(e);
-                return Boolean.FALSE;
-            } catch (BadPaddingException e) {
+                try (FileOutputStream fos = new FileOutputStream(pwd)) {
+                    jaxbCtx.createMarshaller().marshal(passwd,fos);
+                    fos.flush();
+                }
+            } catch (JAXBException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
                 LOG.error(e);
                 return Boolean.FALSE;
             }
@@ -362,21 +339,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             byte[] enc = encipher.doFinal(utf8);
             // Encode bytes to base64 to get a String
             return new String(new org.apache.commons.codec.binary.Base64().encode(enc));
-        } catch (NoSuchAlgorithmException e) {
-            return "BAD-COOKIE";
-        } catch (InvalidKeySpecException e) {
-            return "BAD-COOKIE";
-        } catch (NoSuchPaddingException e) {
-            return "BAD-COOKIE";
-        } catch (InvalidKeyException e) {
-            return "BAD-COOKIE";
-        } catch (InvalidAlgorithmParameterException e) {
-            return "BAD-COOKIE";
-        } catch (UnsupportedEncodingException e) {
-            return "BAD-COOKIE";
-        } catch (IllegalBlockSizeException e) {
-            return "BAD-COOKIE";
-        } catch (BadPaddingException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException e) {
             return "BAD-COOKIE";
         }
     }

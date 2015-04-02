@@ -26,6 +26,7 @@ import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcHandler;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
  *
@@ -59,7 +60,7 @@ public class AssemblyHandler implements XmlRpcHandler {
         this.sessionManager = sessionManager;
         gridRuns = new Hashtable<>();
         try {
-            jaxbCtx = newInstance("viskit.xsd.bindings.assembly");
+            jaxbCtx = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error("Classpath error loading jaxb bindings?", e);
         }

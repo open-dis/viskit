@@ -144,7 +144,7 @@ public class BshGridlet extends Thread {
 
         SimkitAssembly root;
         sax2j.unmarshal();
-        root = sax2j.getRoot();
+        root = sax2j.getAssemblyRoot();
 
         Experiment exp = root.getExperiment();
         int replicationsPerDesignPoint = parseInt(exp.getReplicationsPerDesignPoint());

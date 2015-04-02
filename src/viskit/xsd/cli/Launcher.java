@@ -15,6 +15,8 @@ import java.util.jar.JarOutputStream;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
 import viskit.VStatics;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 public class Launcher extends Thread implements Runnable {
 
@@ -200,7 +202,7 @@ public class Launcher extends Thread implements Runnable {
         // create a jaxb context to obtain the name field from the assembly
         Class<?> jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
         Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-        Object jco = m.invoke(null, new Object[]{"viskit.xsd.bindings.assembly", cloader});
+        Object jco = m.invoke(null, new Object[]{SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS, cloader});
         m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
         Object umo = m.invoke(jco, new Object[]{});
 
@@ -239,7 +241,7 @@ public class Launcher extends Thread implements Runnable {
             ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
             Class<?> jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
             Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-            Object jco = m.invoke(null, new Object[]{"viskit.xsd.bindings.eventgraph", cloader});
+            Object jco = m.invoke(null, new Object[]{SimkitXML2Java.EVENT_GRAPH_BINDINGS, cloader});
             m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
             Object umo = m.invoke(jco, new Object[]{});
 
@@ -247,7 +249,7 @@ public class Launcher extends Thread implements Runnable {
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
             Object eventgraph = m.invoke(umo, new Object[]{bais});
 
-            jclz = cloader.loadClass("viskit.xsd.bindings.eventgraph.SimEntity");
+            jclz = cloader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
             String eventGraphName = (String) m.invoke(eventgraph, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});

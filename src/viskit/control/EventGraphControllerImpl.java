@@ -588,7 +588,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated.  model.isDirty will be set from
             // this call.
-            VGlobals.instance().getAssemblyEditor().addEventGraphToLEGOTree(f, false);
+            VGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
         }
 
         // Don't watch a an XML file whose source couldn't be compiled correctly

@@ -19,6 +19,7 @@ import viskit.mvc.mvcAbstractModel;
 import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -54,7 +55,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     public void init() {
         try {
-            jc = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            jc = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } catch (JAXBException e) {

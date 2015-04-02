@@ -20,6 +20,8 @@ import viskit.mvc.mvcAbstractModel;
 import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**
  * <p>
@@ -65,7 +67,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public void init() {
         try {
-            jc = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+            jc = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } catch (JAXBException e) {
@@ -137,7 +139,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             } catch (JAXBException ee) {
                 // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
                 try {
-                    JAXBContext assyCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+                    JAXBContext assyCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
                     Unmarshaller um = assyCtx.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.

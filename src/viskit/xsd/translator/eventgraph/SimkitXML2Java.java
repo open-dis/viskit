@@ -48,6 +48,7 @@ public class SimkitXML2Java {
     public final static String PROTECTED = "protected";
     public final static String PRIVATE = "private";
     public final static String SIM_ENTITY_BASE = "SimEntityBase";
+    public final static String EVENT_GRAPH_BINDINGS = "viskit.xsd.bindings.eventgraph";
 
     private SimEntity root;
     InputStream fileInputStream;
@@ -68,7 +69,7 @@ public class SimkitXML2Java {
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
+            jaxbCtx = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
             log.error(ex);
             error(ex.getMessage());
@@ -92,7 +93,8 @@ public class SimkitXML2Java {
      * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
-        this(VStatics.classForName(SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(VStatics.classForName(
+                SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
         setEventGraphFile(new File(xmlFile));
     }

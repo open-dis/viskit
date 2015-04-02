@@ -27,6 +27,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class SimkitAssemblyXML2Java {
 
+    public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean debug = false;
     static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
 
@@ -55,7 +56,7 @@ public class SimkitAssemblyXML2Java {
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
         try {
-            this.jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+            this.jaxbCtx = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
             log.error(ex);
             error(ex.getMessage());

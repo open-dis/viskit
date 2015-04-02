@@ -130,7 +130,7 @@ public class TestGridkitServerAssembly3 extends Thread {
                             .openStream())
                     );
             sax2j.unmarshal();
-            SimkitAssembly root = sax2j.getRoot();
+            SimkitAssembly root = sax2j.getAssemblyRoot();
 
             // need to set unique names for TerminalParameters
             // will pick out the double from Exponential

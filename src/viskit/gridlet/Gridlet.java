@@ -238,7 +238,7 @@ public class Gridlet extends Thread {
 
         SimkitAssembly root;
         sax2j.unmarshal();
-        root = sax2j.getRoot();
+        root = sax2j.getAssemblyRoot();
 
         Experiment exp = root.getExperiment();
         int replicationsPerDesignPoint = Integer.parseInt(exp.getReplicationsPerDesignPoint());
@@ -406,7 +406,7 @@ public class Gridlet extends Thread {
                 //((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
             }
 
-            Class<?> asmz = cloader.loadClass(sax2j.getRoot().getPackage()+"."+sax2j.getRoot().getName());
+            Class<?> asmz = cloader.loadClass(sax2j.getAssemblyRoot().getPackage()+"."+sax2j.getAssemblyRoot().getName());
             Constructor<?> asmc = asmz.getConstructors()[0];
             ViskitAssembly sim = (ViskitAssembly) (asmc.newInstance(new Object[] {} ));
             sim.setEnableAnalystReports(false); // not needed in cluster mode, and threadly

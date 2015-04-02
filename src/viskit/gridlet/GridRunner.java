@@ -173,7 +173,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
-            JAXBContext jaxbCtx = newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader() );
+            JAXBContext jaxbCtx = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
@@ -290,7 +290,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         try {
 
-            JAXBContext jc = newInstance( "viskit.xsd.bindings.assembly" , root.getClass().getClassLoader());
+            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             Unmarshaller u = jc.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
             int sample = parseInt(r.getSample());
@@ -470,7 +470,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
             this.numberOfStats = numberOfStats; // this really only needs to be set the first time
-            JAXBContext jc = newInstance("viskit.xsd.bindings.assembly", root.getClass().getClassLoader());
+            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
@@ -496,7 +496,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
         try {
-            JAXBContext jc = newInstance( "viskit.xsd.bindings.assembly", this.getClass().getClassLoader()  );
+            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);

@@ -43,7 +43,7 @@ public interface AssemblyView {
      * @param b flag to indicate recursion checking of the given path if a known
      * directory
      */
-    void addEventGraphToLEGOTree(File f, boolean b);
+    void addEventGraphsToLegoTree(File f, boolean b);
 
     void removeEventGraphFromLEGOTree(File f);
 
@@ -52,7 +52,7 @@ public interface AssemblyView {
      * @param f the path to evaluate for PropertyChangeListeners
      * @param b flag to indicate recursion checking of the given path
      */
-    void addPropChangeToLEGOTree(File f, boolean b);
+    void addPCLsToLegoTree(File f, boolean b);
 
     /** Not currently used
      *

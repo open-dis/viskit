@@ -52,6 +52,7 @@ import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.SimEntity;
 import viskit.xsd.bindings.assembly.TerminalParameter;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
  * Naval Postgraduate School, Monterey, CA
@@ -123,7 +124,7 @@ public class FileHandler {
     }
 
     public static void marshallJaxb(File of) throws Exception {
-        JAXBContext jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly");
+        JAXBContext jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         FileOutputStream fos = new FileOutputStream(of);
         Marshaller m = jaxbCtx.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

@@ -66,6 +66,7 @@ import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.Schedule;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
+import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
  * MOVES Institute
@@ -135,7 +136,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame) {
         try {
-            jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.assembly", this.getClass().getClassLoader());
+            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             unmarshaller = jaxbCtx.createUnmarshaller();
         } catch (JAXBException je) {
             LogUtils.getLogger(JobLauncherTab2.class).error(je);

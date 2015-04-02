@@ -715,17 +715,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             for (String path : extraCP) { // tbd same for pcls
                 file = new File(path);
                 if (file.exists()) {
-                    if ((path.endsWith(".jar"))) {
-                        lTree.addContentRoot(file);
-
-                    // ${file} may be an empty directory
-                    } else if (file.isDirectory() && file.listFiles().length == 0) {
-
-
-                    // Recurse a directory and locate appropriate SimEntity class files
-                    } else {
-                        addEventGraphToLEGOTree(file, true);
-                    }
+                     addEventGraphsToLegoTree(file, file.isDirectory());
                 }
             }
         }
@@ -737,15 +727,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphToLEGOTree(vkp.getEventGraphsDir(), true);
+        addEventGraphsToLegoTree(vkp.getEventGraphsDir(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
-                lTree.addContentRoot(new File(path));
-                pclTree.addContentRoot(new File(path));
+                addEventGraphsToLegoTree(new File(path), false);
+                addPCLsToLegoTree(new File(path), false);
             }
         }
 
@@ -918,14 +908,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void addEventGraphToLEGOTree(File f, boolean b) {
+    public void addEventGraphsToLegoTree(File f, boolean b) {
         if (f.exists()) {
             lTree.addContentRoot(f, b);
         }
     }
 
     @Override
-    public void addPropChangeToLEGOTree(File f, boolean b) {
+    public void addPCLsToLegoTree(File f, boolean b) {
         pclTree.addContentRoot(f, b);
     }
 
@@ -934,6 +924,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         lTree.removeContentRoot(f);
     }
 
+    // Not used
     @Override
     public void removePropChangeFromLEGOTree(File f) {
         pclTree.removeContentRoot(f);

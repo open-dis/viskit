@@ -886,10 +886,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     /** Changes the background color of EG tabs depending on model.isDirty()
-     * status to give the user an indication of a good/bad save & compile
-     * operation.  Of note is that the default L&F on must be selected for
+     * status to give the user an indication of a good/bad save &amp; compile
+     * operation.  Of note is that the default L&amp;F on must be selected for
      * Windoze machines, else no color will be visible.  On Macs, the platform
-     * L&F works best.
+     * L&amp;F works best.
      */
     public void toggleEgStatusIndicators() {
 
