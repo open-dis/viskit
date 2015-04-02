@@ -64,7 +64,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.control.AnalystReportController;
-import viskit.control.AssemblyController;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
