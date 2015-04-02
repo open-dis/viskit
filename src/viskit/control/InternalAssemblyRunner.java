@@ -403,13 +403,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
                     Method setStopRun = assemblyClass.getMethod("setStopRun", boolean.class);
                     setStopRun.invoke(assemblyInstance, true);
-                    textAreaOutputStream.kill();
+
+                    if (textAreaOutputStream != null)
+                        textAreaOutputStream.kill();
+
                     mutex--;
                 }
 
                 Schedule.coldReset();
 
-                if (!Thread.currentThread().getContextClassLoader().equals(lastLoaderNoReset))
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                if (loader != null && !loader.equals(lastLoaderNoReset))
                     Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
