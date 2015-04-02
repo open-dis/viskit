@@ -380,7 +380,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     }
 
                     String codeBlock = en.getCodeBlock();
-                    if (!codeBlock.isEmpty()) {
+                    if (codeBlock != null && !codeBlock.isEmpty()) {
                         sb.append("<u>code block</u><br>");
 
                         String[] sa = codeBlock.split("\\n");
