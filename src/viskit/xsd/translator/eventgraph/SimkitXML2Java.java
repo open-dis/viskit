@@ -368,12 +368,10 @@ public class SimkitXML2Java {
 
             Class<?> sup = resolveExtensionClass();
             Method[] methods = sup.getMethods();
-            for (int l = superParams.size(); l < liParams.size(); l++) {
 
-                for (Method m : methods) {
-                    if (("set" + capitalize(p.getName())).equals(m.getName())) {
-                        return;
-                    }
+            for (Method m : methods) {
+                if (("set" + capitalize(p.getName())).equals(m.getName())) {
+                    return;
                 }
             }
         }
@@ -1194,6 +1192,7 @@ public class SimkitXML2Java {
      * @return indication of a match
      */
     private boolean unqualifiedMatch(String fromXml, String fromClazz) {
+        fromClazz = VStatics.convertClassName(fromClazz);
         if (fromXml.equals(fromClazz)) {
             return true;
         }
@@ -1217,10 +1216,6 @@ public class SimkitXML2Java {
 
     private String baseOf(String s) {
         return s.substring(0, s.indexOf(LB));
-    }
-
-    private String indexIn(String s) {
-        return s.substring(s.indexOf(LB) + 1, s.indexOf(RB) - 1);
     }
 
     private String baseNameOf(String s) {

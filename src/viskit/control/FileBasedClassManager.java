@@ -5,8 +5,6 @@ import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,11 +16,9 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.FindClassesForInterface;
-import viskit.ParameterMap;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
-import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -149,7 +145,7 @@ public class FileBasedClassManager {
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = listOfParamNames(fclass);
+                List<Parameter>[] pMap = VStatics.resolveParameters(fclass);
                 if (pMap != null && pMap.length > 0)
                     VStatics.putParameterList(fclass.getName(), pMap);
             }
@@ -185,7 +181,7 @@ public class FileBasedClassManager {
                 new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
                 new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
-            List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
+            List<Parameter>[] pa = GenericConversion.newListParameterTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
             VStatics.putParameterList(fclass.getName(), pa);
 
@@ -465,55 +461,6 @@ public class FileBasedClassManager {
         }
         // if egFile not in cacheXML, it can't be stale
         return false;
-    }
-
-    private List<Object>[] listOfParamNames(Class<?> c) {
-        ObjectFactory of = new ObjectFactory();
-        Constructor<?>[] constr = c.getConstructors();
-        Annotation[] paramAnnots;
-        List<Object>[] l = GenericConversion.newListObjectTypeArray(List.class, constr.length);
-        for (int j = 0; j < constr.length; j++) {
-            Class<?>[] clz = constr[j].getParameterTypes();
-            paramAnnots = constr[j].getDeclaredAnnotations();
-            if (paramAnnots == null) {
-                l[j] = new ArrayList<>();
-                for (Class<?> clz1 : clz) {
-                    String zName = clz1.getName();
-                    if (zName.indexOf(".class") > 0) {
-                        zName = zName.split("\\.")[0];
-                    }
-                    Parameter p = of.createParameter();
-                    p.setName(" ");
-                    if (viskit.VStatics.debug) {
-                        log.debug("setting type " + zName);
-                    }
-                    p.setType(zName);
-                    l[j].add(p);
-                }
-            } else {
-                if (paramAnnots.length > 1) {
-                    throw new RuntimeException("Only one Annotation per constructor");
-                }
-                ParameterMap param = constr[j].getAnnotation(viskit.ParameterMap.class);
-
-                if (param != null) {
-                    String[] names = param.names();
-                    String[] types = param.types();
-                    if (names.length != types.length) {
-                        throw new RuntimeException("ParameterMap names and types length mismatch");
-                    }
-                    for (int i = 0; i < names.length; i++) {
-                        Parameter p = of.createParameter();
-                        p.setName(names[i]);
-                        p.setType(types[i]);
-                        l[0] = new ArrayList<>();
-                        l[0].add(p);
-                    }
-                }
-                // If param was null, then treat as jar file in the extra classpath
-            }
-        }
-        return l;
     }
 
 }

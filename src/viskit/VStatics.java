@@ -39,6 +39,7 @@ import edu.nps.util.LogUtils;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
@@ -80,6 +82,8 @@ public class VStatics {
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
     public static final String JAVA_LANG_STRING = "java.lang.String";
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
+
+    static final Logger LOG = LogUtils.getLogger(VStatics.class);
 
     /** Utility method to initialize and configure Viskit for a specific project
      * space
@@ -456,7 +460,7 @@ public class VStatics {
             try {
                 Files.walkFileTree(startingDir, finder);
             } catch (IOException e) {
-                LogUtils.getLogger(VStatics.class).error(e);
+                LOG.error(e);
             }
 
             try {
@@ -494,14 +498,14 @@ public class VStatics {
         return System.getProperty("file.separator");
     }
 
-    static Map<String, List<Object>[]> parameterMap = new HashMap<>();
+    static Map<String, List<Parameter>[]> parameterMap = new HashMap<>();
 
     /**
      * For the given class type EG, record its specific ParameterMap
      * @param type the EG class name
      * @param p a List of parameter map object arrays
      */
-    static public void putParameterList(String type, List<Object>[] p) {
+    static public void putParameterList(String type, List<Parameter>[] p) {
         if (debug) {
             System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
         }
@@ -509,7 +513,7 @@ public class VStatics {
         parameterMap.put(type, p);
     }
 
-    /** Checks for and return a varargs type as an array, or the orig. type
+    /** Checks for and return a varargs type as an array, or the orig type
      *
      * @param type the Class type to check
      * @return return a varargs type as an array, or the orig. type
@@ -525,152 +529,133 @@ public class VStatics {
     }
 
     /**
-     * For the given class type EG, return its specific ParameterMap contents
-     * @param type the EG class name
+     * For the given EG class type, return its specific ParameterMap contents
+     * 
+     * @param type the EG class type to resolve
      * @return a List of parameter map object arrays
      */
-    static public List<Object>[] resolveParameters(String type) {
-        List<Object>[] resolved = parameterMap.get(type);
+    static public List<Parameter>[] resolveParameters(Class<?> type) {
+        List<Parameter>[] resolved = parameterMap.get(type.getName());
         if (debug) {
             if (resolved != null) {
                 System.out.println("parameters already resolved");
             }
         }
-        if (resolved == null) { // taken from LegosTree addJarCommon(), tbd refactor it
-            Class<?> c = classForName(type);
-            if (c == null) {
-                LogUtils.getLogger(VStatics.class).warn("Class file for: " + type + " was not found on the classpath");
-                return null;
-            }
-            if (debug) {
-                System.out.println("adding " + c.getName());
-            }
+        if (resolved == null) {
+
+            Constructor<?>[] constr = type.getConstructors();
+            Annotation[] paramAnnots;
+            List<Parameter>[] plist = GenericConversion.newListParameterTypeArray(List.class, constr.length);
             ObjectFactory of = new ObjectFactory();
-            Constructor[] constr = c.getConstructors();
-            List<Object>[] plist = GenericConversion.newListObjectTypeArray(ArrayList.class, constr.length);
-
-            // at this point, there should be loaded classes
-            // from LegosTree, however, addJarFileCommon is only
-            // looking for SimEntity types (TBD could refactor this better
-            // as this code block is directly from LegosTree.addJarFileCommon())
             Field f = null;
+
             try {
-                f = c.getField("parameterMap");
+                f = type.getField("parameterMap");
             } catch (SecurityException ex) {
-                LogUtils.getLogger(VStatics.class).error(ex);
+                LOG.error(ex);
+//                ex.printStackTrace();
             } catch (NoSuchFieldException ex) {}
-            if (f != null) { // these would be base classes not arrays
-                if (debug) {
-                    System.out.println(f + " is a parameterMap");
+
+            if (viskit.VStatics.debug) {
+                System.out.println("adding " + type.getName());
+                System.out.println("\t # constructors: " + constr.length);
+            }
+
+            for (int i = 0; i < constr.length; i++) {
+                Class<?>[] ptypes = constr[i].getParameterTypes();
+                paramAnnots = constr[i].getDeclaredAnnotations();
+                plist[i] = new ArrayList<>();
+                if (viskit.VStatics.debug) {
+                    System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                 }
-                try {
-                    // parameters are in the following order
-                    // {
-                    //  { "type0","name0","type1","name1",... }
-                    //  { "type0","name0", ... }
-                    //  ...
-                    // }
-                    String[][] paramMap = (String[][]) f.get(new String[0][0]);
-                    int numConstrs = paramMap.length;
 
-                    for (int n = 0; n < numConstrs; n++) {
-                        String[] params = paramMap[n];
-                        if (params != null) {
-                            plist[n] = new ArrayList<>();
-                            for (int k = 0; k < params.length; k += 2) {
-                                try {
-                                    Parameter p = of.createParameter();
-                                    String ptype = params[k];
-                                    String pname = params[k + 1];
+                // possible that a class inherited a parameterMap, check if annotated first
+                if (paramAnnots != null) {
+                    if (paramAnnots.length > 1) {
+                        throw new RuntimeException("Only one Annotation per constructor");
+                    }
 
-                                    p.setName(pname);
-                                    p.setType(ptype);
-                                    plist[n].add(p);
-                                    if (debug) {
-                                        System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                    ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
+                    if (param != null) {
+                        String[] names = param.names();
+                        String[] types = param.types();
+                        if (names.length != types.length) {
+                            throw new RuntimeException("ParameterMap names and types length mismatch");
+                        }
+                        for (int k = 0; k < names.length; k++) {
+                            Parameter pt = of.createParameter();
+                            pt.setName(names[k]);
+                            pt.setType(types[k]);
+
+                            plist[i].add(pt);
+                        }
+                    }
+
+                } else if (f != null) {
+                    if (viskit.VStatics.debug) {
+                        System.out.println(f + " is a parameterMap");
+                    }
+                    try {
+                        // parameters are in the following order
+                        // {
+                        //  { "type0","name0","type1","name1",... }
+                        //  { "type0","name0", ... }
+                        //  ...
+                        // }
+                        String[][] pMap = (String[][]) (f.get(new String[0][0]));
+                        int numConstrs = pMap.length;
+
+                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
+                            String[] params = pMap[n];
+                            if (params != null) {
+                                plist[n] = new ArrayList<>();
+                                for (int k = 0; k < params.length; k += 2) {
+                                    try {
+                                        Parameter p = of.createParameter();
+                                        String ptype = params[k];
+                                        String pname = params[k + 1];
+
+                                        p.setName(pname);
+                                        p.setType(ptype);
+
+                                        plist[n].add(p);
+                                        if (viskit.VStatics.debug) {
+                                            System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                                        }
+                                    } catch (Exception ex) {
+                                        LOG.error(ex);
+//                                        ex.printStackTrace();
                                     }
-                                } catch (Exception e) {
-                                    LogUtils.getLogger(VStatics.class).error(e);
                                 }
                             }
                         }
+                        break; // fix this up, should index along with i not n
+                    } catch (IllegalArgumentException | IllegalAccessException ex) {
+                        LOG.error(ex);
+//                        ex.printStackTrace();
                     }
-                } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    LogUtils.getLogger(VStatics.class).error(ex);
-                }
-            } else {
-                if (debug) {
-                    System.out.println("\t # constructors: " + constr.length);
-                }
-                for (int i = 0; i < constr.length; i++) {
-                    Class<?>[] ptypes = constr[i].getParameterTypes();
-                    plist[i] = new ArrayList<>();
-                    if (debug) {
-                        System.out.println("\t # params " + ptypes.length + " in constructor " + i);
-                    }
-                    for (int k = 0; k < ptypes.length; k++) {
+                } else { // unknonws
+                    for (Class<?> ptype : ptypes) {
                         try {
                             Parameter p = of.createParameter();
-                            String ptname = ptypes[k].getName();
+                            String ptname = VStatics.convertClassName(ptype.getName());
                             if (ptname.indexOf(".class") > 0) { //??
                                 ptname = ptname.split("\\.")[0];
                             }
-                            // could be from class loader, which would
-                            // prepend [L, etc. to an array, fix it up here
-                            if (ptname.startsWith("[")) {
-                                if (debug) {
-                                    System.out.println("[] an array " + ptname);
-                                }
-                                // java has it if array of some type then [Lclassname, long
-                                // pointer? so for all cases of prims [x except [L
-                                // then just convert to full name, otherwise if begins with [L
-                                // check if length of string is > 2, then it is [classname
-                                // also, note name is followed by ;
-                                if (ptname.length() == 2) { // must be a prim type
-                                    switch (ptname) {
-                                        case "[B":
-                                            ptname = "byte[]";
-                                            break;
-                                        case "[C":
-                                            ptname = "char[]";
-                                            break;
-                                        case "[D":
-                                            ptname = "double[]";
-                                            break;
-                                        case "[F":
-                                            ptname = "float[]";
-                                            break;
-                                        case "[I":
-                                            ptname = "int[]";
-                                            break;
-                                        case "[J":
-                                            ptname = "long[]";
-                                            break;
-                                        case "[S":
-                                            ptname = "short[]";
-                                            break;
-                                        case "[Z":
-                                            ptname = "boolean[]";
-                                            break;
-                                    }
-                                } else {
-                                    ptname = convertClassName(ptname);
-                                }
-                            }
-
-                            p.setName("p[" + k + "] : ");
+                            p.setName(" ");
                             p.setType(ptname);
                             plist[i].add(p);
-                            if (debug) {
+                            if (viskit.VStatics.debug) {
                                 System.out.println("\t " + p.getName() + p.getType());
                             }
-                        } catch (Exception e) {
-                            LogUtils.getLogger(VStatics.class).error(e);
+                        } catch (Exception ex) {
+                            LOG.error(ex);
+//                            ex.printStackTrace();
                         }
                     }
                 }
             }
-            putParameterList(type, plist);
+            putParameterList(type.getName(), plist);
             resolved = plist;
         }
         return resolved;

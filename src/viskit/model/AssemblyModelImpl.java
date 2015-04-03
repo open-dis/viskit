@@ -19,6 +19,7 @@ import viskit.mvc.mvcAbstractModel;
 import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
+import viskit.xsd.bindings.eventgraph.Parameter;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
 /**
@@ -1082,7 +1083,14 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         en.setDescriptionString(se.getDescription());
         en.setOutputMarked(isOutputNode);
         en.setVerboseMarked(isVerboseNode);
-        List<Object> lis = se.getParameters();
+
+        List<Parameter> lis = new ArrayList<>();
+        for (Object o : se.getParameters()) {
+            if (o instanceof Parameter) {
+                lis.add((Parameter) o);
+            }
+        }
+        
         VInstantiator vc = new VInstantiator.Constr(lis, se.getType());
         en.setInstantiator(vc);
 

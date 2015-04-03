@@ -1,6 +1,5 @@
 package viskit.view;
 
-import static edu.nps.util.GenericConversion.newListObjectTypeArray;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -9,8 +8,6 @@ import java.awt.dnd.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
 import java.util.jar.JarFile;
@@ -23,12 +20,9 @@ import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
-import viskit.ParameterMap;
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.AssemblyControllerImpl;
-import viskit.xsd.bindings.eventgraph.ObjectFactory;
-import viskit.xsd.bindings.eventgraph.Parameter;
 
 /** Class to support creating a Listener Event Graph Object (LEGO) tree on the
  * Assy Editor.  Used for dragging and dropping EG and PCL nodes to the pallete
@@ -327,7 +321,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             } catch (Throwable t) {
 
                 // Uncomment to reveal common reason for Exceptions
-                t.printStackTrace();
+//                t.printStackTrace();
                 log.error(t);
             }
         } // directory
@@ -398,113 +392,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, targetClass);
         for (Class<?> c : list) {
-            Constructor<?>[] constr = c.getConstructors();
-            List<Object>[] plist = newListObjectTypeArray(ArrayList.class, constr.length);
-            ObjectFactory of = new ObjectFactory();
-            Field f = null;
-            try {
-                f = c.getField("parameterMap");
-            } catch (SecurityException ex) {
-                log.error(ex);
-//                ex.printStackTrace();
-            } catch (NoSuchFieldException ex) {}
-
-            if (viskit.VStatics.debug) {
-                System.out.println("adding " + c.getName());
-            }
-            if (viskit.VStatics.debug) {
-                System.out.println("\t # constructors: " + constr.length);
-            }
-
-            for (int i = 0; i < constr.length; i++) {
-                Class<?>[] ptypes = constr[i].getParameterTypes();
-                plist[i] = new ArrayList<>();
-                if (viskit.VStatics.debug) {
-                    System.out.println("\t # params " + ptypes.length + " in constructor " + i);
-                }
-
-                ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
-                // possible that a class inherited a parameterMap, check if annotated first
-                if (param != null) {
-                    String[] names = param.names();
-                    String[] types = param.types();
-                    if (names.length != types.length) {
-                        throw new RuntimeException("ParameterMap names and types length mismatch");
-                    }
-                    for (int k = 0; k < names.length; k++) {
-                        Parameter pt = of.createParameter();
-                        pt.setName(names[k]);
-                        pt.setType(types[k]);
-
-                        plist[i].add(pt);
-                    }
-
-                } else if (f != null) {
-                    if (viskit.VStatics.debug) {
-                        System.out.println(f + " is a parameterMap");
-                    }
-                    try {
-                        // parameters are in the following order
-                        // {
-                        //  { "type0","name0","type1","name1",... }
-                        //  { "type0","name0", ... }
-                        //  ...
-                        // }
-                        String[][] parameterMap = (String[][]) (f.get(new String[0][0]));
-                        int numConstrs = parameterMap.length;
-
-                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
-                            String[] params = parameterMap[n];
-                            if (params != null) {
-                                plist[n] = new ArrayList<>();
-                                for (int k = 0; k < params.length; k += 2) {
-                                    try {
-                                        Parameter p = of.createParameter();
-                                        String ptype = params[k];
-                                        String pname = params[k + 1];
-
-                                        p.setName(pname);
-                                        p.setType(ptype);
-
-                                        plist[n].add(p);
-                                        if (viskit.VStatics.debug) {
-                                            System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
-                                        }
-                                    } catch (Exception ex) {
-                                        log.error(ex);
-//                                        ex.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                        break; // fix this up, should index along with i not n
-                    } catch (IllegalArgumentException | IllegalAccessException ex) {
-                        log.error(ex);
-//                        ex.printStackTrace();
-                    }
-                } else {// unknonws
-                    for (int k = 0; k < ptypes.length; k++) {
-                        try {
-                            Parameter p = of.createParameter();
-                            String ptname = VStatics.convertClassName(ptypes[k].getName());
-                            if (ptname.indexOf(".class") > 0) { //??
-                                ptname = ptname.split("\\.")[0];
-                            }
-                            p.setName("p[" + k + "] : ");
-                            p.setType(ptname);
-
-                            plist[i].add(p);
-                            if (viskit.VStatics.debug) {
-                                System.out.println("\t " + p.getName() + p.getType());
-                            }
-                        } catch (Exception ex) {
-                            log.error(ex);
-//                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-            VStatics.putParameterList(c.getName(), plist);
+            VStatics.resolveParameters(c);
         }
 
         // Shorten long path names

@@ -61,6 +61,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
  * Converter for a Collection of Type to an Array of Type using reification
@@ -79,7 +80,7 @@ import java.util.List;
  *     Comments: 1) Created method to take a Collection of Type and fill a
  *                  Collection Array of Type
  *   </b></pre>
- * 
+ *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class GenericConversion {
@@ -124,6 +125,28 @@ public class GenericConversion {
         @SuppressWarnings("unchecked")
         // known unchecked cast
         List<Object>[] lis = (List<Object>[]) Array.newInstance(type, length);
+        for (int ix = 0; ix < lis.length; ix++) {
+            lis[ix] = new ArrayList<>();
+        }
+        return lis;
+    }
+
+    /** Method to return a generic List&lt;Parameter&gt; array initialized based
+     * on runtime type information.  Will warn of an unchecked cast which, in
+     * this case, is permissible
+     * @param <T> the type to cast this array
+     * @param type a Class&lt;? extends T&gt; type
+     * @param length the desired length of the type array
+     * @throws IllegalArgumentException if a primitive class type is given
+     * @return a initialized List&lt;Object&gt;[] of length length
+     */
+    public static <T> List<Parameter>[] newListParameterTypeArray(Class<? extends T> type, int length) {
+        if (type.isPrimitive()) {
+            throw new IllegalArgumentException("Argument cannot be primitive: " + type);
+        }
+        @SuppressWarnings("unchecked")
+        // known unchecked cast
+        List<Parameter>[] lis = (List<Parameter>[]) Array.newInstance(type, length);
         for (int ix = 0; ix < lis.length; ix++) {
             lis[ix] = new ArrayList<>();
         }
