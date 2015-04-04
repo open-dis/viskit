@@ -131,26 +131,4 @@ public class GenericConversion {
         return lis;
     }
 
-    /** Method to return a generic List&lt;Parameter&gt; array initialized based
-     * on runtime type information.  Will warn of an unchecked cast which, in
-     * this case, is permissible
-     * @param <T> the type to cast this array
-     * @param type a Class&lt;? extends T&gt; type
-     * @param length the desired length of the type array
-     * @throws IllegalArgumentException if a primitive class type is given
-     * @return a initialized List&lt;Object&gt;[] of length length
-     */
-    public static <T> List<Parameter>[] newListParameterTypeArray(Class<? extends T> type, int length) {
-        if (type.isPrimitive()) {
-            throw new IllegalArgumentException("Argument cannot be primitive: " + type);
-        }
-        @SuppressWarnings("unchecked")
-        // known unchecked cast
-        List<Parameter>[] lis = (List<Parameter>[]) Array.newInstance(type, length);
-        for (int ix = 0; ix < lis.length; ix++) {
-            lis[ix] = new ArrayList<>();
-        }
-        return lis;
-    }
-
 } // end class file GenericConversion.java

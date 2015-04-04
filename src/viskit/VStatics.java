@@ -498,14 +498,14 @@ public class VStatics {
         return System.getProperty("file.separator");
     }
 
-    static Map<String, List<Parameter>[]> parameterMap = new HashMap<>();
+    static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
     /**
      * For the given class type EG, record its specific ParameterMap
      * @param type the EG class name
      * @param p a List of parameter map object arrays
      */
-    static public void putParameterList(String type, List<Parameter>[] p) {
+    static public void putParameterList(String type, List<Object>[] p) {
         if (debug) {
             System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
         }
@@ -530,12 +530,12 @@ public class VStatics {
 
     /**
      * For the given EG class type, return its specific ParameterMap contents
-     * 
+     *
      * @param type the EG class type to resolve
      * @return a List of parameter map object arrays
      */
-    static public List<Parameter>[] resolveParameters(Class<?> type) {
-        List<Parameter>[] resolved = parameterMap.get(type.getName());
+    static public List<Object>[] resolveParameters(Class<?> type) {
+        List<Object>[] resolved = parameterMap.get(type.getName());
         if (debug) {
             if (resolved != null) {
                 System.out.println("parameters already resolved");
@@ -545,7 +545,7 @@ public class VStatics {
 
             Constructor<?>[] constr = type.getConstructors();
             Annotation[] paramAnnots;
-            List<Parameter>[] plist = GenericConversion.newListParameterTypeArray(List.class, constr.length);
+            List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
             ObjectFactory of = new ObjectFactory();
             Field f = null;
 
@@ -570,7 +570,7 @@ public class VStatics {
                 }
 
                 // possible that a class inherited a parameterMap, check if annotated first
-                if (paramAnnots != null) {
+                if (paramAnnots != null && paramAnnots.length > 0) {
                     if (paramAnnots.length > 1) {
                         throw new RuntimeException("Only one Annotation per constructor");
                     }
@@ -629,7 +629,7 @@ public class VStatics {
                                 }
                             }
                         }
-                        break; // fix this up, should index along with i not n
+//                        break; // fix this up, should index along with i not n
                     } catch (IllegalArgumentException | IllegalAccessException ex) {
                         LOG.error(ex);
 //                        ex.printStackTrace();

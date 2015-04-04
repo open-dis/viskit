@@ -19,7 +19,6 @@ import viskit.util.FindClassesForInterface;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
-import viskit.xsd.bindings.eventgraph.Parameter;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
@@ -145,7 +144,7 @@ public class FileBasedClassManager {
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Parameter>[] pMap = VStatics.resolveParameters(fclass);
+                List<Object>[] pMap = VStatics.resolveParameters(fclass);
                 if (pMap != null && pMap.length > 0)
                     VStatics.putParameterList(fclass.getName(), pMap);
             }
@@ -181,7 +180,7 @@ public class FileBasedClassManager {
                 new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
                 new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
-            List<Parameter>[] pa = GenericConversion.newListParameterTypeArray(List.class, 1);
+            List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
             VStatics.putParameterList(fclass.getName(), pa);
 

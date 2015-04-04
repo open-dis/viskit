@@ -311,7 +311,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String clName) throws ClassNotFoundException {
             LogUtils.getLogger(InstantiationPanel.class).debug("Constructor for class " + clName);
-            List<Parameter>[] parameters = VStatics.resolveParameters(VStatics.classForName(clName));
+            List<Object>[] parameters = VStatics.resolveParameters(VStatics.classForName(clName));
             typ = clName;
             removeAll();
             tp.removeAll();
@@ -326,10 +326,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     constr = new VInstantiator.Constr(parameters[i], clName);
                     String sign = noParamString;
                     for (int j = 0; j < constr.getArgs().size(); j++) {
-                        sign += parameters[i].get(j).getType() + ", ";
+                        sign += ((Parameter)parameters[i].get(j)).getType() + ", ";
 
-                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(parameters[i].get(j).getName()))
-                            ((VInstantiator) (constr.getArgs().get(j))).setName(parameters[i].get(j).getName());
+                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
+                            ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
                     }
                     sign = sign.substring(0, sign.length() - 2);
 

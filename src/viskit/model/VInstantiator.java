@@ -140,7 +140,7 @@ public abstract class VInstantiator {
          * @param params a list of Assembly parameters
          * @param type a parameter type
          */
-        public Constr(List<Parameter> params, String type) {
+        public Constr(List<Object> params, String type) {
             super(type);
 
             if (viskit.VStatics.debug) {
@@ -180,7 +180,7 @@ public abstract class VInstantiator {
             // gets lists of EventGraph parameters for type if top-level
             // or null if type is a basic class i.e., java.lang.Double
             // todo use same block as LegosTree to resolve any type
-            List<Parameter>[] eparams = VStatics.resolveParameters(VStatics.classForName(type));
+            List<Object>[] eparams = VStatics.resolveParameters(VStatics.classForName(type));
             int indx = 0;
 
             args = buildInstantiators(params);
@@ -217,10 +217,10 @@ public abstract class VInstantiator {
                     if (args != null) {
                         for (int j = 0; j < eparams[indx].size(); j++) {
                             if (viskit.VStatics.debug) {
-                                LOG.info("setting name " + eparams[indx].get(j).getName());
+                                LOG.info("setting name " + ((Parameter)eparams[indx].get(j)).getName());
                             }
-                            ((VInstantiator) args.get(j)).setName(eparams[indx].get(j).getName());
-                            ((VInstantiator) args.get(j)).setDescription(listToString(eparams[indx].get(j).getComment()));
+                            ((VInstantiator) args.get(j)).setName(((Parameter)eparams[indx].get(j)).getName());
+                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eparams[indx].get(j)).getComment()));
                         }
                     }
                 }
@@ -252,7 +252,7 @@ public abstract class VInstantiator {
          * @param assemblyParameters used to build the instantiators
          * @return a List of VInstantiators given a List of Assembly Parameters
          */
-        final List<Object> buildInstantiators(List<Parameter> assemblyParameters) {
+        final List<Object> buildInstantiators(List<Object> assemblyParameters) {
 
             List<Object> instr = new ArrayList<>();
             for (Object o : assemblyParameters) {
@@ -315,12 +315,7 @@ public abstract class VInstantiator {
         }
 
         VInstantiator.Array buildMultiParameter(MultiParameter p, boolean dummy) {
-            List<Parameter> lis = new ArrayList<>();
-            for (Object o : p.getParameters()) {
-                if (o instanceof Parameter) {
-                    lis.add((Parameter) o);
-                }
-            }
+            List<Object> lis = p.getParameters();
             return new VInstantiator.Array(p.getType(), buildInstantiators(lis));
         }
 
@@ -335,12 +330,7 @@ public abstract class VInstantiator {
                     LOG.info("Trying to buildMultiParamter " + p.getType());
                 }
 
-                List<Parameter> tmp = new ArrayList<>();
-                for (Object o : p.getParameters()) {
-                    if (o instanceof Parameter) {
-                        tmp.add((Parameter) o);
-                    }
-                }
+                List<Object> tmp = p.getParameters();
 
                 if (tmp.isEmpty()) {
 
@@ -351,7 +341,7 @@ public abstract class VInstantiator {
                         tmp = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
                     }
                 }
-                Iterator<Parameter> li = tmp.iterator();
+                Iterator<Object> li = tmp.iterator();
                 if (VStatics.debug) {
                     while (li.hasNext()) {
                         LOG.info(li.next());
@@ -364,18 +354,13 @@ public abstract class VInstantiator {
         }
 
         VInstantiator.Factory buildFactoryParameter(FactoryParameter p) {
-            List<Parameter> lis = new ArrayList<>();
-            for (Object o : p.getParameters()) {
-                if (o instanceof Parameter) {
-                    lis.add((Parameter) o);
-                }
-            }
+            List<Object> lis = p.getParameters();
             return new VInstantiator.Factory(
                     p.getType(), p.getFactory(), p.getMethod(),
                     buildInstantiators(lis));
         }
 
-        final boolean paramsMatch(List<Parameter> aparams, List<Parameter> eparams) {
+        final boolean paramsMatch(List<Object> aparams, List<Object> eparams) {
             if (aparams.size() != eparams.size()) {
                 if (viskit.VStatics.debug) {
                     LOG.info("No match.");
@@ -385,7 +370,7 @@ public abstract class VInstantiator {
 
             for (int i = 0; i < aparams.size(); i++) {
                 Object o = aparams.get(i);
-                String eType = eparams.get(i).getType();
+                String eType = ((Parameter)eparams.get(i)).getType();
                 String aType;
                 if (o instanceof TerminalParameter) { // check if caller is sending assembly param types
                     aType = ((TerminalParameter) o).getType();
@@ -447,7 +432,7 @@ public abstract class VInstantiator {
          * @return the index into the found matching constructor
          */
         public int indexOfArgNames(String type, List<Object> args) {
-            List<Parameter>[] parameters = VStatics.resolveParameters(VStatics.classForName(type));
+            List<Object>[] parameters = VStatics.resolveParameters(VStatics.classForName(type));
             int indx = -1;
 
             if (parameters == null) {
@@ -459,7 +444,7 @@ public abstract class VInstantiator {
                 LOG.info("args length " + args.size());
                 LOG.info("resolveParameters " + type + " list length is " + parameters.length);
             }
-            for (List<Parameter> parameter : parameters) {
+            for (List<Object> parameter : parameters) {
                 if (viskit.VStatics.debug) {
                     LOG.info("parameterLi.size() " + parameter.size());
                 }
@@ -470,11 +455,11 @@ public abstract class VInstantiator {
                         if (viskit.VStatics.debug) {
                             LOG.info("touching " +
                                     VStatics.convertClassName(
-                                            parameter.get(j).getType())
+                                            ((Parameter)parameter.get(j)).getType())
                                     + " "
                                     + ((VInstantiator) args.get(j)).getType());
                         }
-                        String pType = VStatics.convertClassName(parameter.get(j).getType());
+                        String pType = VStatics.convertClassName(((Parameter)parameter.get(j)).getType());
                         String vType = ((VInstantiator) args.get(j)).getType();
 
                         // check if vType was assignable from pType.
@@ -502,10 +487,10 @@ public abstract class VInstantiator {
                             match &= (pClazz.isAssignableFrom(vClazz) | interfz);
 
                             // set the names, the final iteration of while cleans up
-                            if (!((VInstantiator) (args.get(j))).getName().equals(parameter.get(j).getName()))
-                                ((VInstantiator) (args.get(j))).setName(parameter.get(j).getName());
+                            if (!((VInstantiator) (args.get(j))).getName().equals(((Parameter)parameter.get(j)).getName()))
+                                ((VInstantiator) (args.get(j))).setName(((Parameter)parameter.get(j)).getName());
                             if (viskit.VStatics.debug) {
-                                LOG.info(" to " + parameter.get(j).getName());
+                                LOG.info(" to " + ((Parameter)parameter.get(j)).getName());
                             }
                         }
                     }
