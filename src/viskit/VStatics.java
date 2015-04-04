@@ -644,7 +644,7 @@ public class VStatics {
                                 ptType = ptType.split("\\.")[0];
                             }
 
-                            // Not sure what use a name like this is
+                            // Not sure what use a name like this is for PCLs
                             p.setName("p[" + k++ + "] : ");
                             p.setType(ptType);
                             plist[i].add(p);
