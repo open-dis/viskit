@@ -635,15 +635,18 @@ public class VStatics {
 //                        ex.printStackTrace();
                     }
                 } else { // unknonws
+                    int k = 0;
                     for (Class<?> ptype : ptypes) {
                         try {
                             Parameter p = of.createParameter();
-                            String ptname = VStatics.convertClassName(ptype.getName());
-                            if (ptname.indexOf(".class") > 0) { //??
-                                ptname = ptname.split("\\.")[0];
+                            String ptType = VStatics.convertClassName(ptype.getName());
+                            if (ptType.indexOf(".class") > 0) { //??
+                                ptType = ptType.split("\\.")[0];
                             }
-                            p.setName(" ");
-                            p.setType(ptname);
+
+                            // Not sure what use a name like this is
+                            p.setName("p[" + k++ + "] : ");
+                            p.setType(ptType);
                             plist[i].add(p);
                             if (viskit.VStatics.debug) {
                                 System.out.println("\t " + p.getName() + p.getType());
