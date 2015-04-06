@@ -764,7 +764,7 @@ public class SimkitAssemblyXML2Java {
 
         // The main method doesn't need to dump the outputs, since they are done at object init time now
         pw.println(sp4 + "public static void main(String[] args) {");
-        pw.print(sp8 + this.root.getName() + sp + nameAsm() + sp);
+        pw.print(sp8 + this.root.getName() + sp + nAsm + sp);
         pw.println(eq + sp + nw + sp + this.root.getName() + lp + rp + sc);
 
         pw.println(sp8 + nw + sp + "Thread" + lp + nAsm + rp + pd + "start" + lp + rp + sc);
