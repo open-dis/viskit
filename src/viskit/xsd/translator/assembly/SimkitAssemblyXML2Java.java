@@ -417,7 +417,7 @@ public class SimkitAssemblyXML2Java {
 
         for (SimEventListenerConnection sect : this.root.getSimEventListenerConnection()) {
             pw.print(sp8 + "addSimEventListenerConnection" + lp + qu + sect.getListener() + qu);
-            pw.println(cm + qu + sect.getSource() + qu + rp + sc);
+            pw.println(cm + sp + qu + sect.getSource() + qu + rp + sc);
         }
 
         if ( this.root.getAdapter().size() > 0 ) {
@@ -425,7 +425,7 @@ public class SimkitAssemblyXML2Java {
         }
 
         for (Adapter a : this.root.getAdapter()) {
-            pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm );
+            pw.print(sp8 + "addAdapter" + lp + qu + a.getName() + qu + cm);
             pw.print(sp + qu + a.getEventHeard() + qu + cm );
             pw.print(sp + qu + a.getEventSent() + qu + cm );
             pw.print(sp + qu + a.getFrom() + qu + cm );
@@ -576,14 +576,10 @@ public class SimkitAssemblyXML2Java {
             if (null != pclMode ) // For backwards compatibility
             switch (pclMode) {
                 case "replicationStat":
-                    replicationStats.put(pcl.getName(), pcl);
-                    break;
                 case "replicationStats":
                     replicationStats.put(pcl.getName(), pcl);
                     break;
                 case "designPointStat":
-                    designPointStats.put(pcl.getName(), pcl);
-                    break;
                 case "designPointStats":
                     designPointStats.put(pcl.getName(), pcl);
                     break;
@@ -614,7 +610,7 @@ public class SimkitAssemblyXML2Java {
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
-                    doParameter(pl, o, sp16, pw);
+                    doParameter(pl, o, sp12, pw);
                 }
                 pw.println(sp12 + rp);
             } else {
@@ -625,7 +621,7 @@ public class SimkitAssemblyXML2Java {
 
         for (String propChangeListener : propertyChangeListenerConnections.keySet()) {
             for (PropertyChangeListenerConnection pclc : propertyChangeListenerConnections.get(propChangeListener)) {
-                pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propChangeListener + qu + cm + qu + pclc.getProperty() + qu + cm);
+                pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
                 pw.println(qu + pclc.getSource() + qu + rp + sc);
                 pw.println();
             }
@@ -647,7 +643,7 @@ public class SimkitAssemblyXML2Java {
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
-                    doParameter(pl, o, sp16, pw);
+                    doParameter(pl, o, sp12, pw);
                 }
                 pw.println(sp12 + rp);
             } else {
@@ -660,7 +656,7 @@ public class SimkitAssemblyXML2Java {
                     propertyChangeListenerConnections.get(propChangeListener);
             if (myConnections != null) {
                 for (PropertyChangeListenerConnection pclc : myConnections) {
-                    pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + propChangeListener + qu + cm + qu + pclc.getProperty() + qu + cm);
+                    pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + propChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
                     pw.println(qu + pclc.getSource() + qu + rp + sc);
                     pw.println();
                 }
@@ -684,7 +680,7 @@ public class SimkitAssemblyXML2Java {
             if (pl.size() > 0) {
                 pw.println();
                 for (Object o : pl) {
-                    doParameter(pl, o, sp16, pw);
+                    doParameter(pl, o, sp12, pw);
                 }
                 pw.println(sp12 + rp);
             } else {
