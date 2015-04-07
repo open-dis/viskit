@@ -22,10 +22,7 @@
             <classpath>
                 <path refid="runtime.classpath"/>
             </classpath>
-            <!-- Uncomment for translating and compiling EGs -->
-            <arg value="${viskit.eg}"/>
-            <!-- Uncomment for translating and compiling Assemblies -->
-            <!--arg line="-f ${viskit.assy}"/-->
+            <arg line="${translation.args}"/>
         </java>
     </target>
 
@@ -42,10 +39,7 @@
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <!-- Uncomment for translating and compiling EGs -->
-            <arg value="${viskit.eg}"/>
-            <!-- Uncomment for translating and compiling Assemblies -->
-            <!--arg line="-f ${viskit.assy}"/-->
+            <arg line="${translation.args}"/>
         </java>
     </target>
 
