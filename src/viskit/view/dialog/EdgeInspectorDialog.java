@@ -359,6 +359,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         java.util.List<ViskitElement> vars = new ArrayList<>(edge.from.getLocalVariables());
         vars.addAll(edge.from.getArguments());
+
         for (ViskitElement e : vars) {
             ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
         }
@@ -371,10 +372,10 @@ public class EdgeInspectorDialog extends JDialog {
         Method[] methods;
         String typ;
         Vector<String> methodNames = new Vector<>();
-        java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
 
-        // Enable argument type methods to be invoked as well
+        java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
         types.addAll(edge.from.getArguments());
+        types.addAll(VGlobals.instance().getSimParametersList());
 
         String className;
         for (ViskitElement e : types) {
@@ -400,6 +401,7 @@ public class EdgeInspectorDialog extends JDialog {
                     methodNames.add(method.getName() + "()");
             }
         }
+        
         Collections.sort(methodNames);
         ComboBoxModel<String> m = new DefaultComboBoxModel<>(methodNames);
         JComboBox<String> cb = new JComboBox<>();
@@ -446,9 +448,9 @@ public class EdgeInspectorDialog extends JDialog {
 
     private void setTimeDelayVarsCBValue(String value) {
 
-        if (timeDelayMethodsCB.getItemCount() <= 0) {return;}
+        if (timeDelayVarsCB.getItemCount() <= 0) {return;}
 
-        // Default value
+        // Default
         timeDelayVarsCB.setSelectedIndex(0);
 
         for (int i = 0; i < timeDelayVarsCB.getItemCount(); i++) {
@@ -516,13 +518,12 @@ public class EdgeInspectorDialog extends JDialog {
                 hideShowDescription(true);
             }
 
-            setTimeDelayVarsCBValue("");
-            timeDelayVarsCB.setEnabled(false);
-            setTimeDelayMethodsCBValue("0.0");
+            boolean enable = timeDelayVarsCB.getItemCount() > 0;
+            timeDelayVarsCB.setEnabled(enable);
+            dotLabel.setEnabled(enable);
             timeDelayMethodsCB.setEnabled(true);
-            dotLabel.setEnabled(false);
 
-            if (edge.delay != null && !edge.delay.trim().isEmpty()) {
+            if (!enable && edge.delay != null && !edge.delay.trim().isEmpty()) {
 
                 String[] s = edge.delay.split("\\.");
                 if (s.length == 1) {

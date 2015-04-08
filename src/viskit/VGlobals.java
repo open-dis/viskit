@@ -288,20 +288,20 @@ public class VGlobals {
         }
     }
 
-    private Vector<ViskitElement> getStateVarsList() {
+    public Vector<ViskitElement> getStateVariablesList() {
         return getActiveEventGraphModel().getStateVariables();
     }
 
     public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
-        return new DefaultComboBoxModel<>(getStateVarsList());
+        return new DefaultComboBoxModel<>(getStateVariablesList());
     }
 
-    private Vector<ViskitElement> getSimParamsList() {
+    public Vector<ViskitElement> getSimParametersList() {
         return getActiveEventGraphModel().getSimParameters();
     }
 
     public ComboBoxModel<ViskitElement> getSimParamsCBModel() {
-        return new DefaultComboBoxModel<>(getSimParamsList());
+        return new DefaultComboBoxModel<>(getSimParametersList());
     }
 
     /* AnalystReport model / view / controller */
@@ -438,7 +438,7 @@ public class VGlobals {
         }
 
         // state variables
-        for (ViskitElement stateVariable : getStateVarsList()) {
+        for (ViskitElement stateVariable : getStateVariablesList()) {
             String result;
             type = stateVariable.getType();
             name = stateVariable.getName();
@@ -457,7 +457,7 @@ public class VGlobals {
         }
 
         // Sim parameters
-        for (ViskitElement par : getSimParamsList()) {
+        for (ViskitElement par : getSimParametersList()) {
             String result;
             type = par.getType();
             name = par.getName();

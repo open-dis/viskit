@@ -100,4 +100,5 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
     public abstract String getOperationOrAssignment();
 
     public abstract boolean isOperation();
-}
+
+} // end class file ViskitElement.java

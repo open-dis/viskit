@@ -613,7 +613,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                         "\nUnique name substituted.");
                 mangleParamName(vp);
             }
-            notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "New sim parameter"));
+            notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
         }
     }
 
@@ -664,7 +664,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         jaxbRoot.getParameter().add(p);
 
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "new sim parameter"));
     }
 
     @Override

@@ -4,7 +4,7 @@ import edu.nps.util.LogUtils;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -438,10 +438,10 @@ public class EventInspectorDialog extends JDialog {
             dispose();
         }
 
-        private void addPotentialLocalIndexVariable(EventNode n, String lvName) {
-            List<ViskitElement> locVars = new ArrayList<>(n.getLocalVariables());
-            locVars.add(new EventLocalVariable(lvName, "int", "0"));
-        }
+//        private void addPotentialLocalIndexVariable(EventNode n, String lvName) {
+//            List<ViskitElement> locVars = new ArrayList<>(n.getLocalVariables());
+//            locVars.add(new EventLocalVariable(lvName, "int", "0"));
+//        }
     }
 
     // begin show/hide support for unused fields

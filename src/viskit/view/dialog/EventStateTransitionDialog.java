@@ -277,8 +277,8 @@ public class EventStateTransitionDialog extends JDialog {
         Class<?> type;
         String typ;
         java.util.List<Method> methods;
-        java.util.List<ViskitElement> types = new ArrayList<>();
         Vector<String> methodNames = new Vector<>();
+        java.util.List<ViskitElement> types = new ArrayList<>();
 
         // Prevent duplicate types
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
