@@ -137,7 +137,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         myQuitAction = new ExitAction("Exit");
 
         // Tabbed event graph editor
-        egFrame = (EventGraphViewFrame) VGlobals.instance().initEventGraphViewFrame();
+        egFrame = (EventGraphViewFrame) VGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(egFrame.getContent());
             int idx = tabbedPane.indexOfComponent(egFrame.getContent());
@@ -156,7 +156,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
 
         // Assembly editor
-        assyFrame = (AssemblyViewFrame) VGlobals.instance().initAssemblyViewFrame();
+        assyFrame = (AssemblyViewFrame) VGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(assyFrame.getContent());
             int idx = tabbedPane.indexOfComponent(assyFrame.getContent());

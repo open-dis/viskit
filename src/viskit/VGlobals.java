@@ -136,34 +136,15 @@ public class VGlobals {
         return (AssemblyViewFrame) avf;
     }
 
-    /** Used only if a call to {@link #getAssemblyEditor()} ever returns null
-     *
-     * @return the component AssemblyViewFrame
-     */
-    public mvcAbstractJFrameView buildAssemblyViewFrame() {
-        mvcController cont = new AssemblyControllerImpl();
-        return buildAssemblyViewFrame(cont);
-    }
-
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
      * @return the component AssemblyViewFrame
      */
-    public mvcAbstractJFrameView initAssemblyViewFrame() {
-        AssemblyControllerImpl cont = new AssemblyControllerImpl();
-        return initAssemblyViewFrame(cont);
-    }
-
-    private mvcAbstractJFrameView buildAssemblyViewFrame(mvcController cont) {
-        initAssemblyViewFrame(cont);
-        ((AssemblyControllerImpl)cont).begin();
-        return avf;
-    }
-
-    private mvcAbstractJFrameView initAssemblyViewFrame(mvcController cont) {
-        acont = cont;
-        avf = new AssemblyViewFrame(cont);
+    public mvcAbstractJFrameView buildAssemblyViewFrame() {
+        acont = new AssemblyControllerImpl();
+        avf = new AssemblyViewFrame(acont);
         acont.setView(avf);
+        ((AssemblyControllerImpl)acont).begin();
         return avf;
     }
 
@@ -219,16 +200,6 @@ public class VGlobals {
         return (EventGraphViewFrame) egvf;
     }
 
-    public mvcAbstractJFrameView buildEventGraphViewFrame() {
-        return buildEventGraphViewFrame(new EventGraphControllerImpl());
-    }
-
-    public mvcAbstractJFrameView buildEventGraphViewFrame(mvcController cont) {
-        initEventGraphViewFrame(cont);
-        ((EventGraphControllerImpl)cont).begin();
-        return egvf;
-    }
-
     /** This method starts the chain of various Viskit startup steps.  By
      * calling for a new EventGraphControllerImpl(), in its constructor is a call
      * to initConfig() which is the first time that the viskitConfig.xml is
@@ -239,14 +210,11 @@ public class VGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public mvcAbstractJFrameView initEventGraphViewFrame() {
-        return initEventGraphViewFrame(new EventGraphControllerImpl());
-    }
-
-    public mvcAbstractJFrameView initEventGraphViewFrame(mvcController cont) {
-        egvf = new EventGraphViewFrame(cont);
-        cont.setView(egvf);
-        eContl = cont;
+    public mvcAbstractJFrameView buildEventGraphViewFrame() {
+        eContl = new EventGraphControllerImpl();
+        egvf = new EventGraphViewFrame(eContl);
+        eContl.setView(egvf);
+        ((EventGraphControllerImpl)eContl).begin();
         return egvf;
     }
 
@@ -282,12 +250,6 @@ public class VGlobals {
         eventGraphQuitHandler = lis;
     }
 
-    public void installEventGraphView() {
-        if (egvf == null) {
-            buildEventGraphViewFrame();
-        }
-    }
-
     public Vector<ViskitElement> getStateVariablesList() {
         return getActiveEventGraphModel().getStateVariables();
     }
@@ -318,33 +280,14 @@ public class VGlobals {
         return (AnalystReportFrame) aRf;
     }
 
-    /** Used only if a call to {@link #getAnalystReportEditor()} ever returns null
-     *
-     * @return the component AnalystReportFrame
-     */
-    public mvcAbstractJFrameView buildAnalystReportFrame() {
-        mvcController cont = new AnalystReportController();
-        return buildAnalystReportFrame(cont);
-    }
-
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
      * @return the component AnalystReportFrame
      */
-    public mvcAbstractJFrameView initAnalystReportFrame() {
-        mvcController cont = new AnalystReportController();
-        return initAnalystReportFrame(cont);
-    }
-
-    private mvcAbstractJFrameView buildAnalystReportFrame(mvcController cont) {
-        initAnalystReportFrame(cont);
-        return aRf;
-    }
-
-    private mvcAbstractJFrameView initAnalystReportFrame(mvcController cont) {
-        aRcont = cont;
-        aRf = new AnalystReportFrame(cont);
-        cont.setView(aRf);
+    public mvcAbstractJFrameView buildAnalystReportFrame() {
+        aRcont = new AnalystReportController();
+        aRf = new AnalystReportFrame(aRcont);
+        aRcont.setView(aRf);
         return aRf;
     }
 
@@ -357,9 +300,9 @@ public class VGlobals {
         return aRcont;
     }
 
-    /******/
-    /* Beanshell code */
-    /******/
+    /******
+     * Beanshell code
+     ******/
     private void initBeanShell() {
 
         if (interpreter == null) {

@@ -53,7 +53,7 @@ import viskit.view.AnalystReportFrame;
  * performed here vice the view.
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.AnalystReportController">Terry Norbraten, NPS MOVES</a>
- * @version $Id:$
+ * @version $Id$
  */
 public class AnalystReportController extends mvcAbstractController {
 
@@ -65,9 +65,7 @@ public class AnalystReportController extends mvcAbstractController {
     private AnalystReportBuilder arb;
 
     /** Creates a new instance of AnalystReportController */
-    public AnalystReportController() {
-
-    }
+    public AnalystReportController() {}
 
     /** Called from the InternalAssemblyRunner when the temp Analyst report is
      * filled out and ready to copy
