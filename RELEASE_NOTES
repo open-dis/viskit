@@ -35,6 +35,10 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed issue when a user used the Assy editor's recent project's list to
+  select a recent project and the selected project's title wasn't correctly
+  displayed.
+
   Added support for Object... (varargs) for the
   RandomVariateFactor.getInstance(String, Object...) static Simkit method.  We
   can now write out java.lang.Object... to XML, parse it and apply it correctly
