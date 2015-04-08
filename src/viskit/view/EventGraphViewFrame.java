@@ -546,8 +546,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void listChanged() {
             EventGraphController vcontroller = (EventGraphController) getController();
-            Set<String> lis = vcontroller.getRecentFileSet();
-            openRecentMenu.removeAll();
+            Set<String> lis = vcontroller.getRecentEGFileSet();
+            openRecentEGMenu.removeAll();
             for (String fullPath : lis) {
                 File f = new File(fullPath);
                 if (!f.exists()) {
@@ -558,15 +558,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
-                openRecentMenu.add(mi);
+                openRecentEGMenu.add(mi);
             }
             if (lis.size() > 0) {
-                openRecentMenu.add(new JSeparator());
+                openRecentEGMenu.add(new JSeparator());
                 Action act = new ParameterizedAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                openRecentMenu.add(mi);
+                openRecentEGMenu.add(mi);
             }
         }
     }
@@ -582,13 +582,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             EventGraphController vcontroller = (EventGraphController) getController();
             String fullPath = (String) getValue(FULLPATH);
             if (fullPath.equals(CLEARPATHFLAG)) {
-                vcontroller.clearRecentFileSet();
+                vcontroller.clearRecentEGFileSet();
             } else {
                 vcontroller.openRecentEventGraph(fullPath);
             }
         }
     }
-    private JMenu openRecentMenu;
+    private JMenu openRecentEGMenu;
     private RecentEgFileListener myEgFileListener;
 
     private void buildMenus() {
@@ -611,7 +611,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         fileMenu.add(buildMenuItem(vcontroller, "open", "Open", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentMenu = buildMenu("Open Recent Event Graph"));
+        fileMenu.add(openRecentEGMenu = buildMenu("Open Recent Event Graph"));
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(buildMenuItem(vcontroller, "close", "Close", null,
@@ -1118,11 +1118,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
     }
 
-    /** Open an already existing Viskit Project */
+    /** Open an already existing Viskit Project.  Called via reflection from
+     * the Actions library.
+     */
     public void openProject() {
         ((AssemblyViewFrame) VGlobals.instance().getAssemblyController().getView()).openProject();
-
-        showProjectName();
     }
 
     @Override

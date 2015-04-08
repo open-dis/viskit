@@ -35,7 +35,7 @@ public class LocalDriverImpl implements DoeRunDriver {
         initGridRunner(loader);
     }
 
-    void initGridRunner(LocalBootLoader loader) {
+    final void initGridRunner(LocalBootLoader loader) {
         loader = loader.init();
         Thread.currentThread().setContextClassLoader(loader);
         try {

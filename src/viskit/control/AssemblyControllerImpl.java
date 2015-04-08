@@ -594,13 +594,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
         clearRecentAssyFileList();
-        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentFileSet();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
         VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override
     public void openProject(File file) {
-        VStatics.initProjectDirectories(file);
+        VStatics.setViskitProjectFile(file);
         VGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list

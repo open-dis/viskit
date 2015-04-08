@@ -29,6 +29,7 @@ import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.doe.LocalBootLoader;
@@ -78,7 +79,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
     private LegoTree lTree,  pclTree;
-    private JPanel assemblyEditorContent;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
 
@@ -140,8 +140,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private String FULLPATH = "FULLPATH";
     private String CLEARPATHFLAG = "<<clearPath>>";
     JMenu openRecentAssyMenu, openRecentProjMenu;
-    private RecentAssyFileListener myAssyFileListener;
-    private RecentProjFileSetListener myProjFileListener;
 
     public VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -248,7 +246,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 mi.setToolTipText(fullPath);
                 openRecentProjMenu.add(mi);
             }
-            if (lis.size() > 0) {
+            if (!lis.isEmpty()) {
                 openRecentProjMenu.add(new JSeparator());
                 Action act = new ParameterizedProjAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
@@ -292,6 +290,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             } else {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(new File(fullPath));
+
+                showProjectName();
             }
         }
     }
@@ -299,11 +299,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
 
-        myAssyFileListener = new RecentAssyFileListener();
-        controller.addRecentAssyFileSetListener(myAssyFileListener);
-
-        myProjFileListener = new RecentProjFileSetListener();
-        controller.addRecentProjFileSetListener(myProjFileListener);
+        controller.addRecentAssyFileSetListener(new RecentAssyFileListener());
+        controller.addRecentProjFileSetListener(new RecentProjFileSetListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -1026,6 +1023,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         if (this.titlList != null) {
             titlList.setTitle(ttl, titlKey);
         }
+
+        VGlobals.instance().getEventGraphEditor().showProjectName();
     }
 
     private File getUniqueName(String suggName) {

@@ -346,7 +346,7 @@ public class SettingsDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphController();
-            ctrlr.clearRecentFileSet();
+            ctrlr.clearRecentEGFileSet();
         }
     }
 

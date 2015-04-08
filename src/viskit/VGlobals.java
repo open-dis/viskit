@@ -144,7 +144,6 @@ public class VGlobals {
         acont = new AssemblyControllerImpl();
         avf = new AssemblyViewFrame(acont);
         acont.setView(avf);
-        ((AssemblyControllerImpl)acont).begin();
         return avf;
     }
 
@@ -214,7 +213,6 @@ public class VGlobals {
         eContl = new EventGraphControllerImpl();
         egvf = new EventGraphViewFrame(eContl);
         eContl.setView(egvf);
-        ((EventGraphControllerImpl)eContl).begin();
         return egvf;
     }
 

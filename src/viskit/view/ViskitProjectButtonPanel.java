@@ -169,7 +169,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     defaultButtActionPerformed(null);
 
     if (file != null)
-        VStatics.initProjectDirectories(file);
+        VStatics.setViskitProjectFile(file);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
@@ -200,7 +200,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
-    VStatics.initProjectDirectories(projF);
+    VStatics.setViskitProjectFile(projF);
 
     // The work directory will have already been created by default as VGlobals.init
     // was already called which creates the directory ${user.home}/.viskit

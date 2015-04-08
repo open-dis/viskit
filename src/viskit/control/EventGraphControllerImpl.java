@@ -237,7 +237,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
-            adjustRecentSet(file);
+            adjustRecentEGFileSet(file);
             markEgFilesAsOpened();
 
             // Check for good compilation
@@ -357,19 +357,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private static final int RECENTLISTSIZE = 15;
-    private Set<String> recentFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
+    private Set<String> recentEGFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an event graph file to add to the list
      */
-    private void adjustRecentSet(File file) {
+    private void adjustRecentEGFileSet(File file) {
         String s = file.getAbsolutePath().replaceAll("\\\\", "/");
-        recentFileSet.remove(s);
-        recentFileSet.add(s);      // to the top
+        recentEGFileSet.remove(s);
+        recentEGFileSet.add(s);      // to the top
 
-        saveHistoryXML(recentFileSet);
+        saveHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
 
@@ -380,7 +380,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         String[] valueAr = historyConfig.getStringArray(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
-            if (recentFileSet.add(s)) {
+            if (recentEGFileSet.add(s)) {
                 String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
@@ -406,22 +406,22 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void clearRecentFileSet() {
-        recentFileSet.clear();
-        saveHistoryXML(recentFileSet);
+    public void clearRecentEGFileSet() {
+        recentEGFileSet.clear();
+        saveHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
 
     @Override
-    public Set<String> getRecentFileSet() {
-        return getRecentFileSet(false);
+    public Set<String> getRecentEGFileSet() {
+        return getRecentEGFileSet(false);
     }
 
-    private Set<String> getRecentFileSet(boolean refresh) {
-        if (refresh || recentFileSet == null) {
+    private Set<String> getRecentEGFileSet(boolean refresh) {
+        if (refresh || recentEGFileSet == null) {
             _setFileSet();
         }
-        return recentFileSet;
+        return recentEGFileSet;
     }
 
     private List<String> getOpenFileSet(boolean refresh) {
@@ -514,7 +514,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (f == null) {return;}
 
         int idx = 0;
-        for (String key : recentFileSet) {
+        for (String key : recentEGFileSet) {
             if (key.contains(f.getName())) {
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
@@ -526,7 +526,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     // time a file is opened
     private void markConfigOpen(String path) {
         int idx = 0;
-        for (String key : recentFileSet) {
+        for (String key : recentEGFileSet) {
             if (key.contains(path)) {
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
@@ -570,7 +570,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             mod.changeMetaData(gmd); // might have renamed
 
             handleCompileAndSave(mod, saveFile);
-            adjustRecentSet(saveFile);
+            adjustRecentEGFileSet(saveFile);
             markEgFilesAsOpened();
         }
     }

@@ -203,8 +203,8 @@ public interface EventGraphController {
 
     void removeRecentEgFileListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentFileSet();
+    Set<String> getRecentEGFileSet();
 
     /** Clears the recent EG file list thus far generated */
-    void clearRecentFileSet();
+    void clearRecentEGFileSet();
 }

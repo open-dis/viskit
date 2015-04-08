@@ -85,16 +85,23 @@ public class VStatics {
 
     static final Logger LOG = LogUtils.getLogger(VStatics.class);
 
-    /** Utility method to initialize and configure Viskit for a specific project
-     * space
+    /** Utility method to configure a Viskit project
      *
      * @param projFile the base directory of a Viskit project
      */
-    public static void initProjectDirectories(File projFile) {
-        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+    public static void setViskitProjectFile(File projFile) {
+
+        String path  = projFile.getParent().replaceAll("\\\\", "/");
+        if (!ViskitProject.MY_VISKIT_PROJECTS_DIR.equals(path)) {
+            ViskitProject.MY_VISKIT_PROJECTS_DIR = path;
+            ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, path);
+        }
+
+        String name = projFile.getName();
+        if (!ViskitProject.DEFAULT_PROJECT_NAME.equals(name)) {
+            ViskitProject.DEFAULT_PROJECT_NAME = name;
+            ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, name);
+        }
     }
 
     /**
