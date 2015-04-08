@@ -401,7 +401,7 @@ public class EdgeInspectorDialog extends JDialog {
                     methodNames.add(method.getName() + "()");
             }
         }
-        
+
         Collections.sort(methodNames);
         ComboBoxModel<String> m = new DefaultComboBoxModel<>(methodNames);
         JComboBox<String> cb = new JComboBox<>();
@@ -523,7 +523,7 @@ public class EdgeInspectorDialog extends JDialog {
             dotLabel.setEnabled(enable);
             timeDelayMethodsCB.setEnabled(true);
 
-            if (!enable && edge.delay != null && !edge.delay.trim().isEmpty()) {
+            if (edge.delay != null && !edge.delay.trim().isEmpty()) {
 
                 String[] s = edge.delay.split("\\.");
                 if (s.length == 1) {
@@ -600,7 +600,7 @@ public class EdgeInspectorDialog extends JDialog {
             ((SchedulingEdge) edge).priority = s;
         }
 
-        String delaySt = ((ViskitElement) timeDelayVarsCB.getSelectedItem()).getValue();
+        String delaySt = ((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName();
         if (delaySt == null || delaySt.trim().isEmpty())
             delaySt = (String) timeDelayMethodsCB.getSelectedItem();
         else
