@@ -585,8 +585,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             return;
         }
 
-        printInfo();    // subclasses may display what they wish at the top of the run.
-
         // reset the document with
         // existing parameters.
         // might have run before
@@ -678,12 +676,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
-                Long seed = simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed();
-                firePropertyChange("seed", seed);
+                long seed = simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
-                System.out.println("Starting Replication #" + (replication + 1) + " with random seed: " + seed);
+                System.out.println("Starting Replication #" + (replication + 1) + " with RNG seed state of: " + seed);
                 try {
                     Schedule.reset();
                 } catch (java.util.ConcurrentModificationException cme) {
@@ -816,13 +813,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
-    }
-
-    /**
-     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
-     * createObject() at run time.
-     */
-    public void printInfo() {
     }
 
 } // end class file BasicAssembly.java

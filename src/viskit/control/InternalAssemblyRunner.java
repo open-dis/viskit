@@ -99,7 +99,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private static int mutex = 0;
     private ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
-    long seed;
+
+    /** Captures the original RNG seed state */
+    long[] seeds;
     private boolean inRegressionMode;
     private stopListener assemblyRunStopListener;
 
@@ -126,7 +128,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
         runPanel.vcrStep.setEnabled(false);
-        seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
+        seeds = RandomVariateFactory.getDefaultRandomNumber().getSeeds();
         twiddleButtons(OFF);
 
         // Viskit's current working ClassLoader
@@ -227,7 +229,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     File tmpFile;
     RandomAccessFile rTmpFile;
-    boolean resetSeeds = false;
     JTextAreaOutputStream textAreaOutputStream;
 
     protected void initRun() {
@@ -267,16 +268,28 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             Method setPclNodeCache = assemblyClass.getMethod("setPclNodeCache", Map.class);
             Method addPropertyChangeListener = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
-            // Resetting the seed
-            Class<?> RVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
-            Method getDefaultRandomNumber = RVFactClass.getMethod("getDefaultRandomNumber");
-            Object rn = getDefaultRandomNumber.invoke(null);
+            // As of discussion held 10 APR 2015, resetting the RNG seed state
+            // is not necessary for basic Viskit operation.  Pseudo random
+            // independence is guarrenteed from the default RNG (normally the
+            // MersenneTwister)
 
-            Class<?> RNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER);
-            Method setSeed = RNClass.getMethod("setSeed", long.class);
-            setSeed.invoke(rn, seed);
+            // *** Resetting the RNG seed state ***
+            if (runPanel.resetSeedCB.isSelected()) {
 
-            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA,16*1024);
+                Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
+                Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
+                Object rn = getDefaultRandomNumber.invoke(null);
+
+                Class<?> rNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER);
+                Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
+                setSeeds.invoke(rn, seeds);
+
+                // TODO: We can also call RNG.resetSeed() which recreates the
+                // seed state (array) from the original seed
+            }
+            // *** End RNG seed state reset ***
+
+            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
