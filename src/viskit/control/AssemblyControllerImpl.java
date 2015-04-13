@@ -1062,7 +1062,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String msg = "";
             int nodeCount = 0;  // different msg for edge delete
             for (Object o : selectionVector) {
-                if (o instanceof EvGraphNode || o instanceof PropChangeListenerNode) {
+                if (o instanceof AssemblyNode) {
                     nodeCount++;
                 }
                 String s = o.toString();
