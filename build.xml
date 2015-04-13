@@ -17,10 +17,6 @@
     <!-- in this build.xml file, so, be careful.                                            -->
     <property file="build.properties"/>
 
-    <!-- magic properties, do not change or delete -->
-
-    <property name="build.compiler" value="modern"/>
-
     <!-- ID properties (this file) -->
     <property name="SVNId" value="$Id$"/>
 
@@ -267,19 +263,9 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit,javahelp">
-        <javac destdir="${dir.build.classes}"
-               source="${javac.source}"
-               target="${javac.target}"
-               debug="true"
-               fork="true"
-               includeantruntime="false">
+    <target name="compile" depends="bindings.simkit,javahelp,compile.not.mac,compile.mac">
 
-            <compilerarg line="${javac.compile.args}"/>
-            <classpath refid="compile.classpath"/>
-            <src path="${dir.src}"/>
-        </javac>
-
+        <!-- Common compile tasks -->
         <copy todir="${dir.build.classes}">
             <fileset dir="${dir.src}">
                 <include name="viskit/version.txt"/>
@@ -293,8 +279,36 @@ their descpritions.
             </fileset>
         </copy>
 
-        <!-- For some reason, viskit.doe.package-info.java makes its own directory in classes -->
+        <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>
+    </target>
+
+    <target name="compile.not.mac" unless="isMac">
+        <javac destdir="${dir.build.classes}"
+               source="${javac.source}"
+               target="${javac.target}"
+               debug="true"
+               fork="true"
+               includeantruntime="false">
+
+            <compilerarg line="${javac.compile.args.not.mac}"/>
+            <classpath refid="compile.classpath"/>
+            <src path="${dir.src}"/>
+        </javac>
+    </target>
+
+    <target name="compile.mac" if="isMac">
+        <javac destdir="${dir.build.classes}"
+               source="${javac.source}"
+               target="${javac.target}"
+               debug="true"
+               fork="true"
+               includeantruntime="false">
+
+            <compilerarg line="${javac.compile.args.mac}"/>
+            <classpath refid="compile.classpath"/>
+            <src path="${dir.src}"/>
+        </javac>
     </target>
 
     <target name="javahelp"
@@ -623,20 +637,10 @@ their descpritions.
 
     <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
     <target name="quick.run"
-            depends="init,quick.run.win,quick.run.mac,quick.run.linux"
+            depends="init,quick.run.not.mac,quick.run.mac"
             description="Run Viskit, don't check dependencies, don't rebuild"/>
 
-    <target name="quick.run.win" if="isWindows">
-        <java classname="viskit.Splash2"
-              classpathref="runtime.classpath"
-              fork="true">
-
-            <jvmarg line="${common.run.args}"/>
-            <arg value="${main.class}"/>
-        </java>
-    </target>
-
-    <target name="quick.run.linux" if="isUnixNotMac">
+    <target name="quick.run.not.mac" unless="isMac">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
