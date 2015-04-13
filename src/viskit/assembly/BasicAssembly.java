@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.assembly;
 
 import viskit.reports.ReportStatisticsConfig;
-import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.beans.PropertyChangeListener;
@@ -404,7 +404,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         List<SavedStats> reps = replicationData.get(id);
         if (reps != null) {
-            stats = toArray(reps, new SavedStats[0]);
+            stats = GenericConversion.toArray(reps, new SavedStats[0]);
         }
         return stats;
     }
