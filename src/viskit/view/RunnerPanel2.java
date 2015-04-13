@@ -138,7 +138,7 @@ public class RunnerPanel2 extends JPanel {
     private JPanel makeVCRPanel(boolean skipCloseButt) {
         JPanel flowPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrSimTimeLab = new JLabel("Sim start time:");
+        JLabel vcrSimTimeLab = new JLabel("Sim start time: ");
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
@@ -152,7 +152,7 @@ public class RunnerPanel2 extends JPanel {
         labTF.add(Box.createHorizontalStrut(10));
         flowPan.add(labTF);
 
-        JLabel vcrStopTimeLabel = new JLabel("Sim stop time:");
+        JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
         VStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
@@ -176,7 +176,7 @@ public class RunnerPanel2 extends JPanel {
                 }
             });
         VStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
-        JLabel numRepsLab = new JLabel("# replications:");
+        JLabel numRepsLab = new JLabel("# replications: ");
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(numRepsLab);
@@ -190,7 +190,7 @@ public class RunnerPanel2 extends JPanel {
 
         verboseRepNumberTF = new JTextField(7);
         VStatics.clampSize(verboseRepNumberTF);
-        verboseRepNumberTF.setToolTipText("Select a single replication number (0..N) to be verbose");
+        verboseRepNumberTF.setToolTipText("Input a single replication number (1...n) to be verbose");
         flowPan.add(verboseRepNumberTF);
 
         closeButt = new JButton("Close");
