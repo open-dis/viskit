@@ -188,19 +188,14 @@ their descpritions.
     <target name="init"
             depends="platformInitialize,check.JAVA_HOME,check.ANT_HOME"
             description="Preparatory actions required for all targets">
+
         <tstamp/>
+
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
         <echo message="Buildfile version ${SVNId}"/>
         <echo message="Base directory: ${basedir}"/>
-        <echo message="Source directory: ${dir.src}"/>
-        <echo message="Build directory: ${dir.build}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
-    </target>
 
-    <!--  === TARGET: build.init === -->
-    <target  name="build.init"
-             depends="init"
-             description="Preparatory actions for compilation and documentation targets">
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
         <mkdir dir="${dir.build.classes}"/>
@@ -213,7 +208,7 @@ their descpritions.
 
     <!-- @deprecated - Now a legacy target as we are no longer building schema from DTD -->
     <target name="build.schema"
-            depends="build.init"
+            depends="init"
             description="Create xsd Schemas from dtd @deprecated">
         <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
         <trang failonerror="true" input="${assembly.dtd}" output="${assembly.xsd}" schemaIn="dtd" schemaOut="xsd"/>
@@ -227,7 +222,7 @@ their descpritions.
     </target>
 
     <target name="bindings.simkit"
-            depends="build.init"
+            depends="init"
             description="Create bindings to Simkit XML Schemas" >
 
         <xjc extension="true"
@@ -263,7 +258,19 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit,javahelp,compile.not.mac,compile.mac">
+    <target name="compile" depends="bindings.simkit,javahelp">
+
+        <javac destdir="${dir.build.classes}"
+               source="${javac.source}"
+               target="${javac.target}"
+               debug="true"
+               fork="true"
+               includeantruntime="false">
+
+            <compilerarg line="${javac.compile.args}"/>
+            <classpath refid="compile.classpath"/>
+            <src path="${dir.src}"/>
+        </javac>
 
         <!-- Common compile tasks -->
         <copy todir="${dir.build.classes}">
@@ -281,34 +288,6 @@ their descpritions.
 
         <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>
-    </target>
-
-    <target name="compile.not.mac" unless="isMac">
-        <javac destdir="${dir.build.classes}"
-               source="${javac.source}"
-               target="${javac.target}"
-               debug="true"
-               fork="true"
-               includeantruntime="false">
-
-            <compilerarg line="${javac.compile.args.not.mac}"/>
-            <classpath refid="compile.classpath"/>
-            <src path="${dir.src}"/>
-        </javac>
-    </target>
-
-    <target name="compile.mac" if="isMac">
-        <javac destdir="${dir.build.classes}"
-               source="${javac.source}"
-               target="${javac.target}"
-               debug="true"
-               fork="true"
-               includeantruntime="false">
-
-            <compilerarg line="${javac.compile.args.mac}"/>
-            <classpath refid="compile.classpath"/>
-            <src path="${dir.src}"/>
-        </javac>
     </target>
 
     <target name="javahelp"
@@ -493,17 +472,17 @@ their descpritions.
             depends="fresh.diskit"
             description="compile application specific modules, like diskit"/>
 
-    <target name="build.viskit.with.extensions"
+    <target name="build.with.extensions"
             depends="jar,runtime.extensions"
             description="Build viskit and any extension jars"/>
 
-    <target name="build.viskit.no.extensions"
+    <target name="build.no.extensions"
             depends="jar"
             description="Build viskit jar only, no DES extensions"/>
 
     <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
     <target name="doc"
-            depends="build.init,compile"
+            depends="init,compile"
             description="Create the javadoc for Viskit.">
 
         <delete dir="${dir.api.doc}"/>
@@ -570,7 +549,7 @@ their descpritions.
         </copy>
     </target>
 
-    <target name="build.gridkit" depends="build.viskit.with.extensions">
+    <target name="build.gridkit" depends="build.with.extensions">
         <delete dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/lib"/>
 
@@ -627,7 +606,7 @@ their descpritions.
 
     <!-- TARGET: Run w/Viskit custom splash -->
     <target name="build.run.with.extensions"
-            depends="build.viskit.with.extensions,quick.run"
+            depends="build.with.extensions,quick.run"
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
     </target>
     <target name="build.run.no.extensions"
@@ -714,7 +693,7 @@ their descpritions.
         </java>
     </target>
 
-    <target name="compile.test" depends="build.init"
+    <target name="compile.test" depends="init"
             description="Build the JUnit test harness">
 
         <javac destdir="${dir.build.test.classes}"
@@ -798,37 +777,37 @@ their descpritions.
     <!-- These targets are useful for viewing in the console various
          ${user.home}/.viskit properties/config files -->
 
-    <target name="show.debug.log" depends="build.init">
+    <target name="show.debug.log" depends="init">
         <concat>
             <fileset dir="${user.home}/.viskit" includes="debug.log"/>
         </concat>
     </target>
 
-    <target name="show.app.xml" depends="build.init">
+    <target name="show.app.xml" depends="init">
         <concat>
             <fileset dir="${user.home}/.viskit" includes="c_app.xml"/>
         </concat>
     </target>
 
-    <target name="show.gui.xml" depends="build.init">
+    <target name="show.gui.xml" depends="init">
         <concat>
             <fileset dir="${user.home}/.viskit" includes="c_gui.xml"/>
         </concat>
     </target>
 
-    <target name="show.passwd.xml" depends="build.init">
+    <target name="show.passwd.xml" depends="init">
         <concat>
             <fileset dir="${user.home}/.viskit" includes="passwd.xml"/>
         </concat>
     </target>
 
-    <target name="show.validation.errors" depends="build.init">
+    <target name="show.validation.errors" depends="init">
         <concat>
             <fileset dir="${user.home}/.viskit" includes="validationErrors.log"/>
         </concat>
     </target>
 
-    <target name="show.config.xml" depends="build.init">
+    <target name="show.config.xml" depends="init">
         <concat>
             <fileset dir="${env.HOME}/.viskit" includes="vconfig.xml"/>
         </concat>
