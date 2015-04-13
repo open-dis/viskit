@@ -35,6 +35,11 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed an issue where the default Random Number Generator's seed reset call was
+  performed incorrectly and was unnecessary.  The default RNG is the Mersenne
+  Twister who's seed state is generated at instantiation time in Simkit with a
+  default seed.
+
   Fixed issue when a user used the Assy editor's recent project's list to
   select a recent project and the selected project's title wasn't correctly
   displayed.
