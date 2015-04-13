@@ -1043,7 +1043,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private boolean nodeOrEdgeInVector(Vector v) {
         for (Object o : v) {
-            if (o instanceof EvGraphNode) {
+            if (o instanceof AssemblyNode) {
                 return true;
             }
             if (o instanceof AssemblyEdge) {
