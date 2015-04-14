@@ -50,7 +50,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         pointLess = new Point2D.Double(30, 60);
         controller = (AssemblyControllerImpl) cont;
         metaData = new GraphMetaData(this);
-        setNodeCache(new LinkedHashMap<String, AssemblyNode>());
+        nodeCache = new LinkedHashMap<>();
     }
 
     public void init() {
@@ -376,12 +376,14 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
         jaxbPCL.setName(nIe(widgetName));
+        pcNode.opaqueModelObject = jaxbPCL;
         jaxbPCL.setType(className);
 
         VInstantiator vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<>());
         pcNode.setInstantiator(vc);
 
-        pcNode.opaqueModelObject = jaxbPCL;
+        getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
+
         if (!nameCheck()) {
             manglePCLName(pcNode);
         }
@@ -1121,7 +1123,4 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return nodeCache;
     }
 
-    public final void setNodeCache(Map<String, AssemblyNode> nodeCache) {
-        this.nodeCache = nodeCache;
-    }
 }
