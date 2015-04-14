@@ -101,13 +101,15 @@ public class PclNodeInspectorDialog extends JDialog {
         clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
         clearStatsCB.addActionListener(lis);
 
+        ActionListener listnr = new StatsCBListener();
+
         getMeanStatsCB = new JCheckBox("Obtain mean statistics only");
         getMeanStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getMeanStatsCB.addActionListener(new getMeanStatsCBListener());
+        getMeanStatsCB.addActionListener(listnr);
 
         getCountStatsCB = new JCheckBox("Obtain raw count statistics only");
         getCountStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatsCB.addActionListener(new getCountStatsCBListener());
+        getCountStatsCB.addActionListener(listnr);
 
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -182,13 +184,16 @@ public class PclNodeInspectorDialog extends JDialog {
                 content.add(Box.createVerticalStrut(3));
             }
 
-            getMeanStatsCB.setSelected(pclNode.isGetMean());
-            content.add(getMeanStatsCB);
-            content.add(Box.createVerticalStrut(3));
+            // No need to display mean and count CBs for a SPD PCL
+            if (!pclNode.getType().contains("SimplePropertyDumper")) {
+                getMeanStatsCB.setSelected(pclNode.isGetMean());
+                content.add(getMeanStatsCB);
+                content.add(Box.createVerticalStrut(3));
 
-            getCountStatsCB.setSelected(pclNode.isGetCount());
-            content.add(getCountStatsCB);
-            content.add(Box.createVerticalStrut(3));
+                getCountStatsCB.setSelected(pclNode.isGetCount());
+                content.add(getCountStatsCB);
+                content.add(Box.createVerticalStrut(3));
+            }
 
             content.add(ip);
             content.add(Box.createVerticalStrut(5));
@@ -196,7 +201,6 @@ public class PclNodeInspectorDialog extends JDialog {
             setContentPane(content);
         } else {
             nameField.setText("pclNode name");
-        //commentField.setText("comments here");
         }
     }
 
@@ -224,31 +228,20 @@ public class PclNodeInspectorDialog extends JDialog {
         ip.setData(pclNode.getInstantiator());
     }
 
-    class getMeanStatsCBListener implements CaretListener, ActionListener {
+    class StatsCBListener implements CaretListener, ActionListener {
+
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
+
         @Override
         public void actionPerformed(ActionEvent ae) {
             boolean isSelected = getMeanStatsCB.isSelected();
             getCountStatsCB.setSelected(!isSelected);
-            caretUpdate(null);
-        }
-    }
-
-    class getCountStatsCBListener implements CaretListener, ActionListener {
-        @Override
-        public void caretUpdate(CaretEvent event) {
-            modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
-        }
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            boolean isSelected = getCountStatsCB.isSelected();
+            isSelected = getCountStatsCB.isSelected();
             getMeanStatsCB.setSelected(!isSelected);
             caretUpdate(null);
         }
