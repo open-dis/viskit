@@ -218,32 +218,47 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
          */
         if (getReplicationStats().length == 0) {return;}
         designPointStats = new SampleStatistics[getReplicationStats().length];
-        String typeStat;
+        String typeStat, nodeType;
         int ix = 0;
         boolean isCount;
-        for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+        for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
+
             LOG.debug("entry is: " + entry);
             Object obj;
+
             if (entry.toString().contains("PropChangeListenerNode")) {
 
                 // Since the pclNodeCache was created under a previous ClassLoader
                 // we must use reflection to invoke the methods on the AssemblyNodes
                 // that it contains, otherwise we will throw ClassCastExceptions
                 try {
-                    obj = getPclNodeCache().get(entry.getKey());
-                    String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
+                    obj = pclNodeCache.get(entry.getKey());
+                    LOG.debug("AssemblyNode key: " + obj);
+                    nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                     // This is not a designPoint, so skip
                     if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
                         LOG.debug("SimplePropertyDumper encountered");
                         continue;
                     }
+
                     isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                     LOG.debug("isGetCount: " + isCount);
+
                     typeStat = isCount ? ".count" : ".mean";
-                    LOG.debug("AssemblyNode key: " + entry.getKey());
                     LOG.debug("typeStat is: " + typeStat);
-                    designPointStats[ix] = new SimpleStatsTally(((SampleStatistics) getReplicationStats()[ix]).getName() + typeStat);
+
+                    SampleStatistics stat = (SampleStatistics) getReplicationStats()[ix];
+                    if (stat.getName().equals("%unnamed%"))
+                        stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
+
+                    if (getReplicationStats()[ix] instanceof SimpleStatsTally) {
+                        stat.setName(stat.getName() + typeStat);
+                        designPointStats[ix] = stat;
+                    }
+                    else
+                        designPointStats[ix] = new SimpleStatsTally(stat.getName() + typeStat);
+
                     LOG.debug(designPointStats[ix]);
                     ix++;
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -397,7 +412,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /** @param id the ID of this replication statistic
-     * @return an array of SampleStatistic for this Assembly
+     * @return an array of SampleStatistics for this Assembly
      */
     public SampleStatistics[] getReplicationStats(int id) {
         SampleStatistics[] stats = null;
@@ -428,10 +443,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             }
         }
         return id;
-    }
-
-    public Map<Integer, List<SavedStats>> getReplicationData() {
-        return new LinkedHashMap<>(replicationData);
     }
 
     private void saveState(int lastRepNum) {
@@ -582,8 +593,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     t + "\nSimulation will terminate",
                     "Assembly Run Error",
                     JOptionPane.ERROR_MESSAGE);
+
+            // Comment in to see what the matter is
+//            t.printStackTrace();
             return;
         }
+        
+        printInfo();    // subclasses may display what they wish at the top of the run.
 
         // reset the document with
         // existing parameters.
@@ -710,7 +726,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
                     // # of PropertyChangeListenerNodes is == to replicationStats.length
-                    for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+                    for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
                         Object obj;
                         if (entry.toString().contains("PropChangeListenerNode")) {
 
@@ -718,7 +734,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                             // we must use reflection to invoke the methods on the AssemblyNodes
                             // that it contains, otherwise we will throw ClassCastExceptions
                             try {
-                                obj = getPclNodeCache().get(entry.getKey());
+                                obj = pclNodeCache.get(entry.getKey());
                                 String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                                 // This is not a designPoint, so skip
@@ -775,7 +791,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.reports.AnalystReportBuilder");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
-                Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), getPclNodeCache());
+                Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), pclNodeCache);
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFile.invoke(arbObject, analystReportFile);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
@@ -807,12 +823,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return verboseReplicationNumber;
     }
 
-    public Map<String, AssemblyNode> getPclNodeCache() {
-        return pclNodeCache;
-    }
-
     public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;
     }
+
+    /**
+     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
+     * createObject() at run time.
+     */
+    public void printInfo() {}
 
 } // end class file BasicAssembly.java

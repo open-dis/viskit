@@ -221,6 +221,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         // TODO: confirm any other events that should cause us to bail here
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
+
+        // bounds (position) might have changed:
         if (ch != null) {
             for (Object cell : ch) {
                 if (cell instanceof AssemblyCircleCell) {
@@ -231,8 +233,6 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         EvGraphNode en = (EvGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
-
-                        // might have changed:
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 } else if (cell instanceof AssemblyPropListCell) {
@@ -243,9 +243,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (r != null) {
                         PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent.getModel()).changePclNode(pcln);
-
-                        // might have changed:
+                        ((AssemblyModel) parent. getModel()).changePclNode(pcln);
                         m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
                     }
                 }

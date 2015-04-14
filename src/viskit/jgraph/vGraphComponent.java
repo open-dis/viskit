@@ -202,6 +202,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // TODO: confirm any other events that should cause us to bail here
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
+
+        // bounds (position) might have changed:
         if (ch != null) {
             for (Object cell : ch) {
                 if (cell instanceof CircleCell) {
@@ -212,9 +214,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((Model) parent.getModel()).changeEvent(en);
-
-                        // might have changed:
+                         ((Model) parent.getModel()).changeEvent(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 }

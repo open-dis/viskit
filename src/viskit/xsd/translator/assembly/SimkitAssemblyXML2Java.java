@@ -573,20 +573,20 @@ public class SimkitAssemblyXML2Java {
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
             String pclMode = pcl.getMode();
 
-            if (null != pclMode ) // For backwards compatibility
-            switch (pclMode) {
-                case "replicationStat":
-                case "replicationStats":
-                    replicationStats.put(pcl.getName(), pcl);
-                    break;
-                case "designPointStat":
-                case "designPointStats":
-                    designPointStats.put(pcl.getName(), pcl);
-                    break;
-                default:
-                    propertyChangeListeners.put(pcl.getName(), pcl);
-                    break;
-            }
+            if (null != pclMode) // For backwards compatibility
+                switch (pclMode) {
+                    case "replicationStat":
+                    case "replicationStats":
+                        replicationStats.put(pcl.getName(), pcl);
+                        break;
+                    case "designPointStat":
+                    case "designPointStats":
+                        designPointStats.put(pcl.getName(), pcl);
+                        break;
+                    default:
+                        propertyChangeListeners.put(pcl.getName(), pcl);
+                        break;
+                }
         }
 
         for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
@@ -640,7 +640,7 @@ public class SimkitAssemblyXML2Java {
             pw.println(sp8 + "addReplicationStats" + lp + qu + propChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
-            if (pl.size() > 0) {
+            if (!pl.isEmpty()) {
                 pw.println();
                 for (Object o : pl) {
                     doParameter(pl, o, sp12, pw);

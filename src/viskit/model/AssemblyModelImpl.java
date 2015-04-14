@@ -310,18 +310,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         SimEntity jaxbEG = oFactory.createSimEntity();
 
         jaxbEG.setName(nIe(widgetName));
-        node.opaqueModelObject = jaxbEG;
         jaxbEG.setType(className);
+        node.opaqueModelObject = jaxbEG;
 
         VInstantiator vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
-
         node.setInstantiator(vc);
-
-        getNodeCache().put(node.getName(), node);   // key = ev
 
         if (!nameCheck()) {
             mangleEGName(node);
         }
+
+        getNodeCache().put(node.getName(), node);   // key = ev
 
         jaxbRoot.getSimEntity().add(jaxbEG);
 
@@ -373,22 +372,24 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             pcNode.setPosition(p);
         }
 
-        PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
+        PropertyChangeListener pcl = oFactory.createPropertyChangeListener();
 
-        jaxbPCL.setName(nIe(widgetName));
-        pcNode.opaqueModelObject = jaxbPCL;
-        jaxbPCL.setType(className);
+        pcl.setName(nIe(widgetName));
+        pcl.setType(className);
+        pcNode.opaqueModelObject = pcl;
 
-        VInstantiator vc = new VInstantiator.Constr(jaxbPCL.getType(), new Vector<>());
+        List<Object> lis = pcl.getParameters();
+
+        VInstantiator vc = new VInstantiator.Constr(pcl.getType(), lis);
         pcNode.setInstantiator(vc);
-
-        getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
 
         if (!nameCheck()) {
             manglePCLName(pcNode);
         }
 
-        jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
+        getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
+
+        jaxbRoot.getPropertyChangeListener().add(pcl);
 
         modelDirty = true;
         notifyChanged(new ModelEvent(pcNode, ModelEvent.PCLADDED, "Property Change Node added to assembly"));
@@ -1045,6 +1046,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             pNode.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
                     Double.parseDouble(coor.getY())));
         }
+
         List<Object> lis = pcl.getParameters();
         VInstantiator vc = new VInstantiator.Constr(pcl.getType(),
                 getInstantiatorListFromJaxbParmList(lis));
