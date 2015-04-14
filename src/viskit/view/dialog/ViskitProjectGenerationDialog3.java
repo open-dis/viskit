@@ -16,7 +16,7 @@ import viskit.ViskitProject;
 /** Dialog to assist in generating a new viskit project directory space
  *
  * @author  mike
- * @version $Id:$
+ * @version $Id$
  */
 public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
 
@@ -157,8 +157,10 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 5);
         add(jLabel3, gridBagConstraints);
 
-        pathTF.setColumns(30);
         pathTF.setEditable(false);
+        pathTF.setBackground(new java.awt.Color(204, 204, 204));
+        pathTF.setColumns(30);
+        pathTF.setToolTipText("The path is a combination of the location and name");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;

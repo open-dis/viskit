@@ -85,8 +85,12 @@
     </Component>
     <Component class="javax.swing.JTextField" name="pathTF">
       <Properties>
-        <Property name="columns" type="int" value="30"/>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="cc" green="cc" red="cc" type="rgb"/>
+        </Property>
+        <Property name="columns" type="int" value="30"/>
+        <Property name="toolTipText" type="java.lang.String" value="The path is a combination of the location and name"/>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
