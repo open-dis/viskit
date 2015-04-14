@@ -54,6 +54,7 @@ import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.model.AssemblyNode;
 
 /**
@@ -237,7 +238,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                     // This is not a designPoint, so skip
-                    if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
+                    if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
                         LOG.debug("SimplePropertyDumper encountered");
                         continue;
                     }
@@ -598,7 +599,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //            t.printStackTrace();
             return;
         }
-        
+
         printInfo();    // subclasses may display what they wish at the top of the run.
 
         // reset the document with
@@ -738,7 +739,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                                 // This is not a designPoint, so skip
-                                if (nodeType.equals("simkit.util.SimplePropertyDumper")) {
+                                if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
                                     LOG.debug("SimplePropertyDumper encountered");
                                     continue;
                                 }

@@ -78,6 +78,7 @@ public class VStatics {
     /* Commonly used class names */
     public static final String RANDOM_NUMBER = "simkit.random.RandomNumber";
     public static final String RANDOM_VARIATE = "simkit.random.RandomVariate";
+    public static final String SIMPLE_PROPERTY_DUMPER = "simkit.util.SimplePropertyDumper";
     public static final String RANDOM_VARIATE_FACTORY = RANDOM_VARIATE + "Factory";
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
     public static final String JAVA_LANG_STRING = "java.lang.String";
