@@ -67,7 +67,7 @@ import viskit.view.dialog.SettingsDialog;
  * @since 3:25:11 PM
  * @version $Id$
  */
-public class EventGraphAssemblyComboMainFrame extends JFrame {
+public class MainFrame extends JFrame {
 
     private JTabbedPane tabbedPane;
     private JTabbedPane runTabbedPane;
@@ -91,7 +91,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
 
-    public EventGraphAssemblyComboMainFrame(String initialFile) {
+    public MainFrame(String initialFile) {
         super("Viskit");
 
         this.initialFile = initialFile;
@@ -199,7 +199,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             tabbedPane.add(reportPanel.getContentPane());
             int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
-            tabbedPane.setToolTipTextAt(idx, "Support analyst assessment and produce report");
+            tabbedPane.setToolTipTextAt(idx, "Support analyst assessment and report generation");
             menuBar = ((AnalystReportFrame)reportPanel).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
@@ -350,7 +350,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
             if (dirtyMod != null && dirtyMod.isDirty()) {
 
-                // This will fire another call stateChanged()
+                // This will fire another call to stateChanged()
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
                 return;
             }
@@ -427,7 +427,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SettingsDialog.showDialog(EventGraphAssemblyComboMainFrame.this);
+            SettingsDialog.showDialog(MainFrame.this);
         }
     };
 
@@ -541,8 +541,8 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
         }
     };
 
-    /** Runs the Assy with a fresh class loader free of artifacts for a
-     * completely independent run
+    /** Prepares the Assy with a fresh class loader free of static artifacts for
+     * a completely independent run
      */
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
 
@@ -574,7 +574,7 @@ public class EventGraphAssemblyComboMainFrame extends JFrame {
             }
 
             if (tabIdx == key) {
-                EventGraphAssemblyComboMainFrame.this.setTitle(title);
+                MainFrame.this.setTitle(title);
             }
         }
     }

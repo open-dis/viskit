@@ -102,7 +102,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     /** Captures the original RNG seed state */
     long[] seeds;
-    private boolean inRegressionMode;
     private stopListener assemblyRunStopListener;
 
     /**
@@ -110,7 +109,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      * @param aRPanelVisible if true, the analyst report panel will be visible
      */
     public InternalAssemblyRunner(boolean aRPanelVisible) {
-        inRegressionMode = false;
 
         saver = new saveListener();
 
@@ -133,19 +131,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         // Viskit's current working ClassLoader
         lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
-    }
-
-    /**
-     * Are we running in regression mode.
-     *
-     * @param regress Should we run in regression mode
-     */
-    public void setRegressionMode(boolean regress) {
-        inRegressionMode = regress;
-
-        if (inRegressionMode) {
-            runPanel.analystReportCB.setSelected(true);
-        }
     }
 
     public JComponent getRunnerPanel() {return runPanel;}
@@ -268,9 +253,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             Method setPclNodeCache = assemblyClass.getMethod("setPclNodeCache", Map.class);
             Method addPropertyChangeListener = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
-            // As of discussion held 10 APR 2015, resetting the RNG seed state
+            // As of discussion held 09 APR 2015, resetting the RNG seed state
             // is not necessary for basic Viskit operation.  Pseudo random
-            // independence is guarrenteed from the default RNG (normally the
+            // independence is guaranteed from the default RNG (normally the
             // MersenneTwister)
 
             // *** Resetting the RNG seed state ***

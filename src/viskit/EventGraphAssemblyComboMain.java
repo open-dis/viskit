@@ -49,7 +49,7 @@ import java.net.URL;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import viskit.view.EventGraphAssemblyComboMainFrame;
+import viskit.view.MainFrame;
 
 /**
  * <p>MOVES Institute
@@ -192,7 +192,7 @@ public class EventGraphAssemblyComboMain {
         ToolTipManager ttm = ToolTipManager.sharedInstance();
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
-        JFrame mainFrame = new EventGraphAssemblyComboMainFrame(initialFile);
+        JFrame mainFrame = new MainFrame(initialFile);
         VGlobals.instance().setMainAppWindow(mainFrame);
 
         if (onMac) {
@@ -228,7 +228,7 @@ public class EventGraphAssemblyComboMain {
                 public Object invoke(Object proxy, Method method, Object[] args) {
                     switch (method.getName()) {
                         case "handleQuit":
-                            ((EventGraphAssemblyComboMainFrame)VGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
+                            ((MainFrame)VGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
                             break;
                         case "handleAbout":
                             try {
