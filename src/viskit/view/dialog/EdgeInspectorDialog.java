@@ -257,11 +257,12 @@ public class EdgeInspectorDialog extends JDialog {
         canButt.addActionListener(new cancelButtonListener());
         okButt.addActionListener(new applyButtonListener());
 
-        myChangeListener chlis = new myChangeListener();
+        final myChangeListener chlis = new myChangeListener();
         descriptionJta.addKeyListener(chlis);
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
         timeDelayVarsCB.addActionListener(chlis);
+        timeDelayMethodsCB.addActionListener(chlis);
         priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
         timeDelayVarsCB.getEditor().getEditorComponent().addKeyListener(chlis);
         timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(chlis);
@@ -279,18 +280,8 @@ public class EdgeInspectorDialog extends JDialog {
                 boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this, ep);
                 if (wasModified) {
                     parameters.updateRow(ep);
-                    okButt.setEnabled(true);
-                    modified = true;
+                    chlis.actionPerformed(event);
                 }
-            }
-        });
-
-        timeDelayVarsCB.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okButt.setEnabled(true);
-                modified = true;
             }
         });
 
@@ -518,9 +509,13 @@ public class EdgeInspectorDialog extends JDialog {
                 hideShowDescription(true);
             }
 
-            boolean enable = timeDelayVarsCB.getItemCount() > 0;
-            timeDelayVarsCB.setEnabled(enable);
-            dotLabel.setEnabled(enable);
+            // Prepare default selections
+            timeDelayVarsCB.setEnabled(timeDelayVarsCB.getItemCount() > 0);
+            setTimeDelayVarsCBValue("");
+            setTimeDelayMethodsCBValue("");
+
+            // We always want this enabled to be able to enter manual delay
+            // values
             timeDelayMethodsCB.setEnabled(true);
 
             if (edge.delay != null && !edge.delay.trim().isEmpty()) {
@@ -529,12 +524,9 @@ public class EdgeInspectorDialog extends JDialog {
                 if (s.length == 1) {
                     setTimeDelayMethodsCBValue(s[0]);
                 } else if (s.length == 2) {
-
                     if (!Character.isDigit(s[0].charAt(0))) {
                         setTimeDelayVarsCBValue(s[0]);
-                        timeDelayVarsCB.setEnabled(true);
                         setTimeDelayMethodsCBValue(s[1]);
-                        dotLabel.setEnabled(true);
                     } else {
                         setTimeDelayMethodsCBValue(edge.delay);
                     }
@@ -555,8 +547,9 @@ public class EdgeInspectorDialog extends JDialog {
 
             setDescription(edge.conditionalDescription);
 
-            timeDelayMethodsCB.setEnabled(false);
             timeDelayVarsCB.setEnabled(false);
+            dotLabel.setVisible(false);
+            timeDelayMethodsCB.setEnabled(false);
             timeDelayPanel.setBorder(delayPanDisabledBorder);
         }
 
@@ -689,6 +682,10 @@ public class EdgeInspectorDialog extends JDialog {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
+            dotLabel.setVisible(!((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName().isEmpty());
+
+            // Set the ComboBox width to accomodate the string length
+            timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
         }
 
         @Override
