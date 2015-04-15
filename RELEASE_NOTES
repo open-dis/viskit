@@ -35,6 +35,9 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Added a header to the output replication report to better understand the order
+  of stats data presented.
+
   Fixed issue where designPointStats names were not being correctly set during
   Assy. runtime causing NPE and incorrect stat output due to name mismatches.
 
