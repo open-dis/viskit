@@ -789,7 +789,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-
                     FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
                     if (xn != null) {
                         switch (sa[0]) {

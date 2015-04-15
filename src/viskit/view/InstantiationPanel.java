@@ -147,7 +147,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         conPan.setType(newType);
                         factPan.setType(newType);
                     } catch (ClassNotFoundException e1) {
-                        JOptionPane.showMessageDialog(InstantiationPanel.this, "Unknown type");
+                        JOptionPane.showMessageDialog(InstantiationPanel.this, "Unknown type: " + e1 );
                         return;
                     }
                     ffPan.setData(new VInstantiator.FreeF(newType, ""));
@@ -416,6 +416,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private ObjListPanel olp;
 
+        // TODO: Sometimes, there is a weird artifact that appears that looks
+        //       like [...], like a button with elipses.  It happens on this
+        //       panel, but is proving difficult to track down.  (TDN 15 APR 15)
         public FactoryPanel(InstantiationPanel ip) {
             this.ip = ip;
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -603,7 +606,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             removeAll();
             noClassAction = true;
-            factClassCB.setSelectedItem(vi.getFactoryClass());              // this runs action event
+            factClassCB.setSelectedItem(vi.getFactoryClass()); // this fires action event
             noClassAction = false;
 //            factMethodTF.setText(vi.getMethod());
             add(topP);
@@ -644,9 +647,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             // Force the the getInstance method only
             String m = "getInstance";
-            m = (m == null) ? "" : m.trim();
-            List<Object> lis;
-            lis = (olp != null) ? olp.getData() : new Vector<>();
+//            m = (m == null) ? "" : m.trim();
+            List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
             return new VInstantiator.Factory(typ, fc, m, lis);
         }
     }

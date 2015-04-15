@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import viskit.VGlobals;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
@@ -680,10 +681,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         VInstantiator inst = pclNode.getInstantiator();
 
+        // this will be a list of one...a MultiParameter....get its list, but
+        // throw away the object itself.  This is because the
+        // PropertyChangeListener object serves as "its own" MultiParameter.
         List<Object> jlistt = getJaxbParamList(inst);
 
-        // this will be a list of one...a MultiParameter....get its list, but throw away the
-        // object itself.  This is because the PropertyChangeListener object serves as "its own" MultiParameter,
         if (jlistt.size() != 1) {
             throw new RuntimeException("Design error in AssemblyModel");
         }
@@ -728,10 +730,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         VInstantiator inst = evNode.getInstantiator();
 
+        // this will be a list of one...a MultiParameter....get its list, but
+        // throw away the object itself.  This is because the SimEntity object
+        // serves as "its own" MultiParameter.
         List<Object> jlistt = getJaxbParamList(inst);
 
-        // this will be a list of one...a MultiParameter....get its list, but throw away the
-        // object itself.  This is because the SimEntity object serves as "its own" MultiParameter,
         if (jlistt.size() != 1) {
             throw new RuntimeException("Design error in AssemblyModel");
         }
@@ -852,6 +855,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
+    private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
+        return new VInstantiator.FreeF(tp.getType(), tp.getValue());
+    }
+
     private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
         return new VInstantiator.Array(o.getType(), getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
@@ -863,10 +870,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
         return new VInstantiator.Factory(o.getType(), o.getFactory(),
                 "getInstance", getInstantiatorListFromJaxbParmList(o.getParameters()));
-    }
-
-    private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
-        return new VInstantiator.FreeF(tp.getType(), tp.getValue());
     }
 
     // We know we will get a List<Object> one way or the other
@@ -884,23 +887,28 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private Object buildParam(Object vi) {
         if (vi instanceof VInstantiator.FreeF) {
-            return buildParmFromFreeF((VInstantiator.FreeF) vi);
+            return buildParamFromFreeF((VInstantiator.FreeF) vi);
         } //TerminalParm
         if (vi instanceof VInstantiator.Constr) {
-            return buildParmFromConstr((VInstantiator.Constr) vi);
+            return buildParamFromConstr((VInstantiator.Constr) vi);
         } // List of Parms
         if (vi instanceof VInstantiator.Factory) {
-            return buildParmFromFactory((VInstantiator.Factory) vi);
+            return buildParamFromFactory((VInstantiator.Factory) vi);
         } // FactoryParam
         if (vi instanceof VInstantiator.Array) {
-            return buildParmFromArray((VInstantiator.Array) vi);
+            VInstantiator.Array via = (VInstantiator.Array) vi;
+
+            if (VGlobals.instance().isArray(via.getType()))
+                return buildParamFromArray(via);
+            else if (via.getType().contains("..."))
+                return buildParamFromVarargs(via);
         } // MultiParam
 
         //assert false : AssemblyModelImpl.buildJaxbParameter() received null;
         return null;
     }
 
-    private TerminalParameter buildParmFromFreeF(VInstantiator.FreeF viff) {
+    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeF viff) {
         TerminalParameter tp = oFactory.createTerminalParameter();
 
         tp.setType(viff.getType());
@@ -909,7 +917,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return tp;
     }
 
-    private MultiParameter buildParmFromConstr(VInstantiator.Constr vicon) {
+    private MultiParameter buildParamFromConstr(VInstantiator.Constr vicon) {
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
@@ -919,11 +927,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return mp;
     }
 
-    private FactoryParameter buildParmFromFactory(VInstantiator.Factory vifact) {
+    private FactoryParameter buildParamFromFactory(VInstantiator.Factory vifact) {
         FactoryParameter fp = oFactory.createFactoryParameter();
 
         fp.setType(vifact.getType());
-        fp.setFactory(vifact.getFactoryClass()); //todo when method supported +"."+vifact.getMethod()+"()");
+        fp.setFactory(vifact.getFactoryClass());
 
         for (Object vi : vifact.getParams()) {
             fp.getParameters().add(buildParam(vi));
@@ -931,7 +939,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return fp;
     }
 
-    private MultiParameter buildParmFromArray(VInstantiator.Array viarr) {
+    private MultiParameter buildParamFromArray(VInstantiator.Array viarr) {
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(viarr.getType());
@@ -939,6 +947,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             mp.getParameters().add(buildParam(vi));
         }
         return mp;
+    }
+
+    private TerminalParameter buildParamFromVarargs(VInstantiator.Array viarr) {
+        return buildParamFromFreeF((VInstantiator.FreeF) viarr.getInstantiators().get(0));
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {

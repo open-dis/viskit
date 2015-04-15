@@ -106,13 +106,17 @@ public class ArrayInspector extends JDialog {
         olp.requestFocus();
         sizeTF.requestFocus();
     }
-    String myArrTyp;
     String myTyp;
 
     public void setType(String typ) {
-        myArrTyp = typ;
         Class<?> c = VStatics.getClassForInstantiatorType(typ);
-        myTyp = VStatics.convertClassName(c.getComponentType().getName());
+
+        // Convert [] to varargs (...)
+        if (c.isArray())
+            myTyp = typ;
+        else
+            myTyp = VStatics.convertClassName(c.getComponentType().getName());
+
         typeTF.setText(typ);
     }
 
@@ -170,6 +174,7 @@ public class ArrayInspector extends JDialog {
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override

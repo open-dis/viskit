@@ -70,6 +70,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
+        String jTFText;
         for (Iterator<Object> itr = lis.iterator(); itr.hasNext(); i++) {
             VInstantiator inst = (VInstantiator) itr.next();
             shadow[i] = inst;
@@ -92,7 +93,19 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             entryTF[i].setToolTipText("Manually enter/override method "
                     + "arguments here");
             VStatics.clampHeight(entryTF[i]);
-            entryTF[i].setText(inst.toString());
+
+            // A little more Object... (vararg) support
+            if (inst instanceof VInstantiator.Array) {
+                VInstantiator.Array via = (VInstantiator.Array) inst;
+                if (!via.getInstantiators().isEmpty() && via.getInstantiators().get(0) instanceof VInstantiator.FreeF) {
+                    VInstantiator.FreeF vif = (VInstantiator.FreeF) via.getInstantiators().get(0);
+                    jTFText = vif.getValue();
+                } else
+                    jTFText = inst.toString();
+            } else
+                jTFText = inst.toString();
+
+            entryTF[i].setText(jTFText);
             entryTF[i].addCaretListener(this);
 
             Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
@@ -163,15 +176,24 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
     }
 
-    /** @return a list of free form instantiators */
+    /** The base of embedded parameters to finalize EG constructor instantiation.
+     * Provides support for Object... (varargs)
+     *
+     * @return a list of free form instantiators
+     */
     public List<Object> getData() {
         Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLab.length; i++) {
             if (shadow[i] instanceof VInstantiator.FreeF) {
                 ((VInstantiator.FreeF) shadow[i]).setValue(entryTF[i].getText().trim());
+            } else if (shadow[i] instanceof VInstantiator.Array) {
+                VInstantiator.Array via = (VInstantiator.Array) shadow[i];
+                List<Object> inst = via.getInstantiators();
+                inst.add(new VInstantiator.FreeF(via.getType(), entryTF[i].getText().trim()));
             }
             v.add(shadow[i]);
         }
+        setData(v, true);
         return v;
     }
 
@@ -218,15 +240,18 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                         "Add the XML or class file defining the element to the proper list at left.";
                 ((AssemblyController)VGlobals.instance().getAssemblyEditor().getController()).messageUser(
                         JOptionPane.ERROR_MESSAGE,
-                        "Class Definition Not Found",
+                        e1.getMessage(),
                         msg);
                 return;
             }
             oi.setVisible(true); // blocks
             if (oi.modified) {
-                if (oi.getData() == null) {return;}
-                shadow[idx] = oi.getData();
-                entryTF[idx].setText(oi.getData().toString());
+
+                VInstantiator vi = oi.getData();
+                if (vi == null) {return;}
+
+                shadow[idx] = vi;
+                entryTF[idx].setText(vi.toString());
                 if (changeListener != null) {
                     changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
                 }

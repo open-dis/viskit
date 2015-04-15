@@ -714,7 +714,7 @@ public class VStatics {
         if (debug) {
             System.out.print("number of constructors for " + type + ":");
         }
-        if (type.endsWith("]")) {
+        if (VGlobals.instance().isArray(type)) {
             if (debug) {
                 System.out.print("1");
             }

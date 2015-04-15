@@ -70,13 +70,17 @@ public abstract class VInstantiator {
         for (Class<?> c : cs) {
             args = VStatics.convertClassName(c.getName());
 
-            // Show varargs symbol vice []
+            // Strip out java.lang
             args = VStatics.stripOutJavaDotLang(args);
+
+            // Show varargs symbol vice []
+            args = VStatics.makeVarArgs(args);
 
             if (c.isArray()) {
                 v.add(new VInstantiator.Array(args, new ArrayList<>()));
 
-            // Special case, make a factory instantiator
+            // Special case, make a factory instantiator, but causes recursive
+            // Object Inspector panels to occur
             } /*else if (args.equals(VStatics.RANDOM_VARIATE)) {
 
                 List<Object> params = new ArrayList<>();
@@ -290,7 +294,7 @@ public abstract class VInstantiator {
 
                     } else { // no constructors, should be a FactoryParameter or array of them
 
-                        if (type.endsWith("]")) {
+                        if (VGlobals.instance().isArray(type)) {
                             MultiParameter mp = of.createMultiParameter();
                             mp.setType(type);
                             mp.setName(name);
