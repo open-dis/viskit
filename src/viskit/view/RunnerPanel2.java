@@ -200,6 +200,7 @@ public class RunnerPanel2 extends JPanel {
         }
 
         saveRepDataCB = new JCheckBox("Save replication data");
+        saveRepDataCB.setToolTipText("If using only a SimplePropertyDumper, no need to check this");
         flowPan.add(saveRepDataCB);
         printRepReportsCB = new JCheckBox("Print replication reports");
         flowPan.add(printRepReportsCB);

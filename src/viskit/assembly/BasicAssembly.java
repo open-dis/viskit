@@ -486,41 +486,64 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * For each inner stats, print to console name, count, min, max, mean,
      * standard deviation and variance.  This can be done generically.
      *
-     * @param rep The replication number for this report
-     * @return a replication report section of the analyst report
+     * @param rep The replication number (one off) for this report
+     * @return a replication report section for the analyst report
      */
     protected String getReplicationReport(int rep) {
 
         PropertyChangeListener[] clonedReplicationStats = getReplicationStats();
+        int i = 0;
 
         // Outputs raw replication statistics to XML report
         if (isSaveReplicationData()) {
             statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
         }
 
-        StringBuilder buf = new StringBuilder("Output Report for Replication #");
+        // Report header
+        StringBuilder buf = new StringBuilder("\nOutput Report for Replication #");
         buf.append(rep + 1);
+        buf.append(System.getProperty("line.separator"));
+        buf.append("name");
+        buf.append('\t');
+        buf.append('\t');
+        buf.append("count");
+        buf.append('\t');
+        buf.append("min");
+        buf.append('\t');
+        buf.append("max");
+        buf.append('\t');
+        buf.append("mean");
+        buf.append('\t');
+        buf.append("std dev");
+        buf.append('\t');
+        buf.append("var");
 
-        for (int i = 0; i < clonedReplicationStats.length; i++) {
+        SampleStatistics stat;
+
+        // Report data
+        for (PropertyChangeListener pcl : clonedReplicationStats) {
+            stat = (SampleStatistics) pcl;
             buf.append(System.getProperty("line.separator"));
-            buf.append(((SampleStatistics) clonedReplicationStats[i]).getName());
-            if (!(((SampleStatistics) clonedReplicationStats[i]).getName().length() > 20)) {
+            buf.append(stat.getName());
+            if (!(stat.getName().length() > 20)) {
                 buf.append('\t');
             }
             buf.append('\t');
-            buf.append(((SampleStatistics) clonedReplicationStats[i]).getCount());
+            buf.append(stat.getCount());
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMinObs()));
+            buf.append(form.format(stat.getMinObs()));
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMaxObs()));
+            buf.append(form.format(stat.getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getMean()));
+            buf.append(form.format(stat.getMean()));
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getStandardDeviation()));
+            buf.append(form.format(stat.getStandardDeviation()));
             buf.append('\t');
-            buf.append(form.format(((SampleStatistics) clonedReplicationStats[i]).getVariance()));
-            ((SampleStatistics) replicationStats[i]).reset();
+            buf.append(form.format(stat.getVariance()));
+
+            ((SampleStatistics) replicationStats[i++]).reset();
         }
+        buf.append(System.getProperty("line.separator"));
         return buf.toString();
     }
 
@@ -539,10 +562,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         StringBuilder buf = new StringBuilder("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());
+        buf.append(System.getProperty("line.separator"));
+
         for (SampleStatistics designPointStat : getDesignPointStats()) {
             buf.append(System.getProperty("line.separator"));
             buf.append(designPointStat);
         }
+        buf.append(System.getProperty("line.separator"));
         return buf.toString();
     }
 
