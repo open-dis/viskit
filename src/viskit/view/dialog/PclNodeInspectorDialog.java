@@ -101,15 +101,13 @@ public class PclNodeInspectorDialog extends JDialog {
         clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
         clearStatsCB.addActionListener(lis);
 
-        ActionListener listnr = new StatsCBListener();
-
         getMeanStatsCB = new JCheckBox("Obtain mean statistics only");
         getMeanStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getMeanStatsCB.addActionListener(listnr);
+        getMeanStatsCB.addActionListener(new getMeanStatsCBListener());
 
         getCountStatsCB = new JCheckBox("Obtain raw count statistics only");
         getCountStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatsCB.addActionListener(listnr);
+        getCountStatsCB.addActionListener(new getCountStatsCBListener());
 
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -228,20 +226,31 @@ public class PclNodeInspectorDialog extends JDialog {
         ip.setData(pclNode.getInstantiator());
     }
 
-    class StatsCBListener implements CaretListener, ActionListener {
-
+    class getMeanStatsCBListener implements CaretListener, ActionListener {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
             okButt.setEnabled(true);
             getRootPane().setDefaultButton(okButt);
         }
-
         @Override
         public void actionPerformed(ActionEvent ae) {
             boolean isSelected = getMeanStatsCB.isSelected();
             getCountStatsCB.setSelected(!isSelected);
-            isSelected = getCountStatsCB.isSelected();
+            caretUpdate(null);
+        }
+    }
+
+    class getCountStatsCBListener implements CaretListener, ActionListener {
+        @Override
+        public void caretUpdate(CaretEvent event) {
+            modified = true;
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
+        }
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            boolean isSelected = getCountStatsCB.isSelected();
             getMeanStatsCB.setSelected(!isSelected);
             caretUpdate(null);
         }
