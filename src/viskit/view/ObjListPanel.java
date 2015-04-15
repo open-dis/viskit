@@ -224,6 +224,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
             oi.setVisible(true); // blocks
             if (oi.modified) {
+                if (oi.getData() == null) {return;}
                 shadow[idx] = oi.getData();
                 entryTF[idx].setText(oi.getData().toString());
                 if (changeListener != null) {

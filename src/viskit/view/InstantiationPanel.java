@@ -291,7 +291,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private JTabbedPane tp;
 
-        //private Constructor[] construct;
         private ConstructorPanel[] constructorPanels;
 
         private String noParamString = "(no parameters)";
@@ -392,7 +391,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public VInstantiator getData() {
             ConstructorPanel cp = (ConstructorPanel) tp.getSelectedComponent();
-            return new VInstantiator.Constr(typ, cp.getData());
+            if (cp == null)
+                return null;
+            else
+                return new VInstantiator.Constr(typ, cp.getData());
         }
     }
 
