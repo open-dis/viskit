@@ -643,11 +643,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         public VInstantiator getData() {
             String fc = (String) factClassCB.getSelectedItem();
             fc = (fc == null) ? "" : fc.trim();
-//            String m = factMethodTF.getText();
-
-            // Force the the getInstance method only
-            String m = "getInstance";
-//            m = (m == null) ? "" : m.trim();
+            String m = VStatics.RANDOM_VARIATE_FACTORY_METHOD;
             List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
             return new VInstantiator.Factory(typ, fc, m, lis);
         }

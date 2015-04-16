@@ -94,16 +94,22 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     + "arguments here");
             VStatics.clampHeight(entryTF[i]);
 
+            jTFText = inst.toString();
+            
             // A little more Object... (vararg) support
             if (inst instanceof VInstantiator.Array) {
                 VInstantiator.Array via = (VInstantiator.Array) inst;
                 if (!via.getInstantiators().isEmpty() && via.getInstantiators().get(0) instanceof VInstantiator.FreeF) {
                     VInstantiator.FreeF vif = (VInstantiator.FreeF) via.getInstantiators().get(0);
                     jTFText = vif.getValue();
-                } else
-                    jTFText = inst.toString();
-            } else
-                jTFText = inst.toString();
+                }
+            } else if (inst instanceof VInstantiator.Factory) {
+                VInstantiator.Factory vif = (VInstantiator.Factory) inst;
+                if (!vif.getParams().isEmpty() && vif.getParams().get(0) instanceof VInstantiator.FreeF) {
+                    VInstantiator.FreeF viff = (VInstantiator.FreeF) vif.getParams().get(0);
+                    jTFText = viff.getValue();
+                }
+            }
 
             entryTF[i].setText(jTFText);
             entryTF[i].addCaretListener(this);
@@ -190,6 +196,10 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 VInstantiator.Array via = (VInstantiator.Array) shadow[i];
                 List<Object> inst = via.getInstantiators();
                 inst.add(new VInstantiator.FreeF(via.getType(), entryTF[i].getText().trim()));
+            } else if (shadow[i] instanceof VInstantiator.Factory) {
+                VInstantiator.Factory vif = (VInstantiator.Factory) shadow[i];
+                List<Object> params = vif.getParams();
+                params.add(new VInstantiator.FreeF(vif.getType(), entryTF[i].getText().trim()));
             }
             v.add(shadow[i]);
         }

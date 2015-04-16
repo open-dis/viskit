@@ -76,21 +76,10 @@ public abstract class VInstantiator {
             // Show varargs symbol vice []
             args = VStatics.makeVarArgs(args);
 
-            if (c.isArray()) {
+            if (c.isArray())
                 v.add(new VInstantiator.Array(args, new ArrayList<>()));
-
-            // Special case, make a factory instantiator, but causes recursive
-            // Object Inspector panels to occur
-            } /*else if (args.equals(VStatics.RANDOM_VARIATE)) {
-
-                List<Object> params = new ArrayList<>();
-                params.add("java.lang.String");
-                params.add("java.lang.Object...");
-                VInstantiator fac = new VInstantiator.Factory(args, VStatics.RANDOM_VARIATE_FACTORY, "getInstance", params);
-                v.add(fac);
-            } */else {
+            else
                 v.add(new VInstantiator.FreeF(args, ""));
-            }
         }
         return v;
     }
@@ -302,9 +291,9 @@ public abstract class VInstantiator {
                         } else {
                             FactoryParameter fp = of.createFactoryParameter();
                             fp.setName(name);
-                            fp.setFactory(type); // this gets handled later
-                            fp.setType(type); // this should be the type returned by method
-                            fp.setMethod("fill in method for factory");
+                            fp.setFactory(VStatics.RANDOM_VARIATE_FACTORY);
+                            fp.setType(type); // this is the type returned by method
+                            fp.setMethod(VStatics.RANDOM_VARIATE_FACTORY_METHOD);
 
                             instr.add(buildFactoryParameter(fp));
                         }
@@ -519,6 +508,9 @@ public abstract class VInstantiator {
             if (clazz != null) {
                 Constructor[] construct = clazz.getConstructors();
                 if (construct != null && construct.length > 0) {
+
+                    // TODO: May need to revisit why we are just concerned with
+                    // the default zero param constructor
                     return VInstantiator.buildDummyInstantiators(construct[0]);
                 }
             }

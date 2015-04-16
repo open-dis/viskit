@@ -14,6 +14,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
@@ -860,16 +861,20 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
-        return new VInstantiator.Array(o.getType(), getInstantiatorListFromJaxbParmList(o.getParameters()));
+        return new VInstantiator.Array(o.getType(),
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
     private VInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
-        return new VInstantiator.Constr(o.getType(), getInstantiatorListFromJaxbParmList(o.getParameters()));
+        return new VInstantiator.Constr(o.getType(),
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
     private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
-        return new VInstantiator.Factory(o.getType(), o.getFactory(),
-                "getInstance", getInstantiatorListFromJaxbParmList(o.getParameters()));
+        return new VInstantiator.Factory(o.getType(),
+                o.getFactory(),
+                VStatics.RANDOM_VARIATE_FACTORY_METHOD,
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
     // We know we will get a List<Object> one way or the other
