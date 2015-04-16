@@ -2,6 +2,16 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  Due to the way the SimkitXML2Java generates EG extensions of super
+  SimEntities, a default constructor will not be generated is subclasses
+  accordingly.  When it is time to parameterize EG constructors at Assy creation
+  time, an EG with a default (no arg) will conveniently establish a Random
+  Variate Factory instance automatically within the Event Node Inspector.  A
+  subclass of a SimEntity will not automatically establish a RVF instance,
+  therefore one must select the instantiation wizard, select "factory", accept
+  the change and then a RVF instance will be established and ready to accept
+  direct (String, Object...) inputs.
+
   At this time, the XML to Java translators cannot handle a super type generic
   container declaration in XML, then instantiate it as a dynamic type, i.e.
   List<String> list = new ArrayList<>();  The static declaration will match the
