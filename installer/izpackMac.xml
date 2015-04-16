@@ -26,6 +26,7 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
+        <!-- Minimum JDK version required -->
         <javaversion>1.7</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>

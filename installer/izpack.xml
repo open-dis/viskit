@@ -30,11 +30,12 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
+        <!-- Minimum JDK version required -->
         <javaversion>1.7</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
-        <!-- Hopefully helps with Win Vista/7 installs -->
-        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
+        <!-- Hopefully helps with Win Vista/7/8 installs -->
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7|izpack.windowsinstall.8"/>
     </info>
 
     <guiprefs height="600" width="800" resizable="yes">
@@ -95,7 +96,7 @@
                 <include name="viskit/**"/>
                 <include name="viskit-exe.jar"/>
             </fileset>
-            <fileset dir="stage"               targetdir="$USER_HOME">
+            <fileset dir="stage" targetdir="$USER_HOME">
               <os family="windows"/>
               <os family="unix"/>
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
@@ -119,6 +120,7 @@
             </executable>
         </pack>
     </packs>
+
     <native type="izpack" name="ShellLink.dll">
         <os family="windows"/>
     </native>
@@ -126,11 +128,10 @@
         <os family="windows"/>
     </native>
 
-    <!-- Don't forget the 64 bit Windows OS -->
+    <!-- Don't forget 64 bit Windows O/Ss -->
     <native type="izpack" name="ShellLink_x64.dll">
         <os family="windows"/>
     </native>
-
     <native type="3rdparty" name="COIOSHelper_x64.dll" stage="both">
         <os family="windows"/>
     </native>
