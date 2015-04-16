@@ -95,12 +95,12 @@
                 <include name="license/**" />
                 <include name="viskit/**"/>
                 <include name="viskit-exe.jar"/>
+                <include name="RELEASE_NOTES*"/>
             </fileset>
             <fileset dir="stage" targetdir="$USER_HOME">
               <os family="windows"/>
               <os family="unix"/>
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
-              <exclude name="MyViskitProjects/DefaultProject/Assemblies/examples/TLCAssembly.xml"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
             </fileset>
             <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">

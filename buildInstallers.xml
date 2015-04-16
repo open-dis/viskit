@@ -133,6 +133,11 @@
         <copy todir="${installer}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
+        <copy todir="${installer}/stage">
+            <fileset dir="${basedir}">
+                <include name="RELEASE_NOTES*"/>
+            </fileset>
+        </copy>
         <mkdir dir="${installer}/build" />
     </target>
 
