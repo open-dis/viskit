@@ -1,4 +1,4 @@
-This file will explain the inner workings of Viskit.
+This file will attempt to explain the inner workings of Viskit.
 
 To build Viskit, from the command line, type "ant compile."  This process will
 first generate XML binding source files from various Schema files located in the
@@ -167,9 +167,9 @@ listed in the File -> Recents menu selections for each editor.
 (blue) and PCL (pink) nodes can be dragged across from the LEGOs tree panel, or
 menu items can be invoked to do the same.  EG nodes are parameterized via dialog
 wizards.  RandomVariates are instantiated via the RV Factory static getInstance
-method utilizing the RV parameter.  Adapters, SimEventListeners and PCSs are
-the last to be selected, connected and initialized before an Assy run is
-initiated.
+method utilizing (String, Object...) parameters.  Adapters, SimEventListeners
+and Property Change Listeners (PCLs) are the last to be selected, connected and
+initialized before an Assy run is initiated.
 
 9) When it is time to run an Assy file, the Initialize assembly runner button is
 selected from the Assy Editor which fires off a few events:

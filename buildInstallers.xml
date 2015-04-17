@@ -138,6 +138,11 @@
                 <include name="RELEASE_NOTES*"/>
             </fileset>
         </copy>
+        <copy todir="${installer}/stage">
+            <fileset dir="${basedir}/doc">
+                <include name="ViskitOperation.txt"/>
+            </fileset>
+        </copy>
         <mkdir dir="${installer}/build" />
     </target>
 

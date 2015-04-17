@@ -91,6 +91,7 @@
               <include name="license/**"/>
               <include name="viskit/**"/>
               <include name="RELEASE_NOTES*"/>
+              <include name="ViskitOperation.txt"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$USER_HOME">

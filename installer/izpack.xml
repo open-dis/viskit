@@ -96,6 +96,7 @@
                 <include name="viskit/**"/>
                 <include name="viskit-exe.jar"/>
                 <include name="RELEASE_NOTES*"/>
+                <include name="ViskitOperation.txt"/>
             </fileset>
             <fileset dir="stage" targetdir="$USER_HOME">
               <os family="windows"/>
