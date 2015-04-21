@@ -45,6 +45,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Implemented an Open Recent Projects menu item for the EventGraphViewFrame
+
   Added a header to the output replication report to better understand the order
   of stats data presented.
 
