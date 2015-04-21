@@ -45,7 +45,7 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
-  Fix several menu activated NPEs when no EG or Assy files are loaded
+  Fixed several menu activated NPEs when no EG or Assy files are loaded
 
   Implemented an Open Recent Projects menu item for the EventGraphViewFrame
 
