@@ -905,7 +905,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private boolean checkSave() {
-        if (((Model) getModel()).isDirty() || ((Model) getModel()).getLastFile() == null) {
+        Model mod = (Model) getModel();
+        if (mod == null) {return false;}
+        if (mod.isDirty() || mod.getLastFile() == null) {
             String msg = "The model will be saved.\nContinue?";
             String title = "Confirm";
             int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
@@ -920,6 +922,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void generateJavaSource() {
         Model mod = (Model) getModel();
+        if (mod == null) {return;}
         File localLastFile = mod.getLastFile();
         if (!checkSave() || localLastFile == null) {
             return;

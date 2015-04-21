@@ -301,6 +301,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
+        ActionIntrospector.getAction(controller, "export2grid").setEnabled(false);
         fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));

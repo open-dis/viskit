@@ -71,6 +71,8 @@ public class EventGraphAssemblyComboMain {
 
         // Launch all GUI stuff on, or within the EDT
         try {
+//              throw new InvocationTargetException(new Throwable("mail this error"));
+
             if (!EventQueue.isDispatchThread()) {
                 SwingUtilities.invokeAndWait(new Runnable() {
 
@@ -118,8 +120,9 @@ public class EventGraphAssemblyComboMain {
             style.append("font-size:").append(font.getSize()).append("pt;");
 
             URL url = null;
+            String attach = System.getProperty("user.home") + "/.viskit/debug.log";
             try {
-                url = new URL("mailto:viskit@www.movesinstitute.org?subject=Viskit%20startup%20error");
+                url = new URL("mailto:viskit@www.movesinstitute.org?subject=Viskit%20startup%20error&body=see%20attachment&attachment=" + attach);
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }
@@ -170,6 +173,7 @@ public class EventGraphAssemblyComboMain {
             }
             if (dotViskit.delete())
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
+
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }

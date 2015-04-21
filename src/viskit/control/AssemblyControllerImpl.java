@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -39,7 +40,6 @@ import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import static viskit.control.EventGraphControllerImpl.LOG;
 import viskit.doe.LocalBootLoader;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
@@ -68,7 +68,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
 
-    static final Logger LOGGER = LogUtils.getLogger(AssemblyControllerImpl.class);
+    static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
@@ -99,7 +99,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param assyPath an assembly file to compile
      */
     public void compileAssembly(String assyPath) {
-        LOGGER.debug("Compiling assembly: " + assyPath);
+        LOG.debug("Compiling assembly: " + assyPath);
         File f = new File(assyPath);
         initialFile = assyPath;
         _doOpen(f);
@@ -112,11 +112,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // The initialFile is set if we have stated a file "arg" upon startup
         // from the command line
         if (initialFile != null) {
-            LOGGER.debug("Loading initial file: " + initialFile);
+            LOG.debug("Loading initial file: " + initialFile);
             compileAssembly(initialFile);
         } else {
             List<File> lis = getOpenAssyFileList(false);
-            LOGGER.debug("Inside begin() and lis.size() is: " + lis.size());
+            LOG.debug("Inside begin() and lis.size() is: " + lis.size());
 
             for (File f : lis) {
                 _doOpen(f);
@@ -360,7 +360,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     break;
 
                 default:
-                    LOGGER.warn("Program error AssemblyController.assyChanged");
+                    LOG.warn("Program error AssemblyController.assyChanged");
             }
         }
 
@@ -543,7 +543,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             } while (model.nameExists(retn));   // don't force the vAMod to mangle the name
             intField.setInt(this, count);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
-            LOGGER.error(ex);
+            LOG.error(ex);
         }
         return retn;
     }
@@ -1328,7 +1328,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } else {
-            LOGGER.info(f + " is valid XML\n");
+            LOG.info(f + " is valid XML\n");
         }
 
         SimkitAssemblyXML2Java x2j = null;
@@ -1336,7 +1336,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
         } catch (FileNotFoundException e) {
-            LOGGER.error(e);
+            LOG.error(e);
         }
         return x2j.translate();
     }
@@ -1362,13 +1362,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } else {
-            LOGGER.info(x2j.getEventGraphFile() + " is valid XML\n");
+            LOG.info(x2j.getEventGraphFile() + " is valid XML\n");
         }
 
         try {
             eventGraphSource = x2j.translate();
         } catch (Exception e) {
-            LOGGER.error("Error building Java from " + x2j.getFileBaseName() +
+            LOG.error("Error building Java from " + x2j.getFileBaseName() +
                     ": " + e.getMessage() + ", erroneous event-graph xml found");
         }
         return eventGraphSource;
@@ -1436,25 +1436,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             File classesDir = viskitProj.getClassesDir();
 
-            LOGGER.info("Test compiling " + javaFile.getCanonicalPath());
+            LOG.info("Test compiling " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
             if (compileSuccess) {
 
-                LOGGER.info(diagnostic + "\n");
+                LOG.info(diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
             } else {
 
-                LOGGER.error(diagnostic + "\n");
+                LOG.error(diagnostic + "\n");
                 if (!baosOut.toString().isEmpty()) {
-                    LOGGER.error(baosOut.toString() + "\n");
+                    LOG.error(baosOut.toString() + "\n");
                 }
             }
 
         } catch (IOException ioe) {
-            LOGGER.error(ioe);
+            LOG.error(ioe);
         } finally {
             try {
                 if (fw != null)
@@ -1479,7 +1479,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph) {
-                LOGGER.debug("Is an Assembly: " + !isEventGraph);
+                LOG.debug("Is an Assembly: " + !isEventGraph);
                 return null;
             }
 
@@ -1489,7 +1489,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (src == null) {
                 String msg = xmlFile + " did not compile.\n" +
                         "Please check that you have provided the correct parameters for any super classes";
-                LOGGER.error(xmlFile + " " + msg);
+                LOG.error(xmlFile + " " + msg);
                 messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
             }
@@ -1514,7 +1514,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 paf = compileJavaClassAndSetPackage(src);
             }
         } catch (FileNotFoundException e) {
-            LOGGER.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
+            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
         return paf;
@@ -1601,7 +1601,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
             }
         };
-        SwingUtilities.invokeLater(r);
+        if (SwingUtilities.isEventDispatchThread())
+            SwingUtilities.invokeLater(r);
+        else {
+            try {
+                SwingUtilities.invokeAndWait(r);
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOG.error(e);
+            }
+        }
 
         SwingWorker worker = new SwingWorker<Void, Void>() {
 
@@ -1631,6 +1639,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
+
+                    // reset
+                    execStrings = null;
                 }
 
                 return null;
@@ -1644,7 +1655,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     get();
 
                 } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error(e);
+                    LOG.error(e);
                 } finally {
                     ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
                     mutex--;
@@ -1780,7 +1791,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             try {
                 ImageIO.write(image, "png", fil);
             } catch (IOException e) {
-                LOGGER.error(e);
+                LOG.error(e);
             }
 
             // display a scaled version
@@ -1813,7 +1824,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             try {
                 Runtime.getRuntime().exec(execStrings);
             } catch (IOException e) {
-                LOGGER.error(e);
+                LOG.error(e);
             }
         }
     };
@@ -1841,7 +1852,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
             }
         } catch (Exception ex) {
-            LOGGER.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
+            LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
@@ -1902,7 +1913,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (historyConfig == null) {initConfig();}
         openAssemblies = new ArrayList<>(4);
         List<String> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
-        LOGGER.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
+        LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
         int idx = 0;
         for (String s : valueAr) {
             if (recentAssyFileSet.add(new File(s))) {
@@ -1922,7 +1933,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void recordProjFiles() {
         if (historyConfig == null) {initConfig();}
         List<String> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
-        LOGGER.debug("recordProjFile valueAr size is: " + valueAr.size());
+        LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
         for (String value : valueAr) {
             adjustRecentProjSet(new File(value));
         }
@@ -1997,8 +2008,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            LOGGER.error("Error loading history file: " + e.getMessage());
-            LOGGER.warn("Recent file saving disabled");
+            LOG.error("Error loading history file: " + e.getMessage());
+            LOG.warn("Recent file saving disabled");
             historyConfig = null;
         }
     }
