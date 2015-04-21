@@ -27,11 +27,10 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
 import viskit.Help;
 import viskit.model.ModelEvent;
-import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.ViskitConfig;
 import viskit.ViskitProject;
+import viskit.control.RecentProjFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangListenerImageIcon;
@@ -69,7 +68,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public static final int ADAPTER_MODE = 1;
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
+
+    // The view needs access to this
+    public JButton runButt;
+
+    JMenu openRecentAssyMenu, openRecentProjMenu;
+
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
+
+    private String FULLPATH = VStatics.FULL_PATH;
+    private String CLEARPATHFLAG = VStatics.CLEAR_PATH_FLAG;
     private Color background = new Color(0xFB, 0xFB, 0xE5);
     private String filename;
 
@@ -82,8 +90,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
 
-    // The view needs access to this
-    public JButton runButt;
     private int untitledCount = 0;
 
     public AssemblyViewFrame(mvcController controller) {
@@ -137,9 +143,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         getContent().add(tabbedPane, BorderLayout.CENTER);
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
-    private String FULLPATH = "FULLPATH";
-    private String CLEARPATHFLAG = "<<clearPath>>";
-    JMenu openRecentAssyMenu, openRecentProjMenu;
 
     public VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -202,18 +205,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
-            Set<String> lis = acontroller.getRecentAssyFileSet();
+            Set<File> lis = acontroller.getRecentAssyFileSet();
             openRecentAssyMenu.removeAll();
-            for (String fullPath : lis) {
-                File f = new File(fullPath);
-                if (!f.exists()) {
+            for (File fullPath : lis) {
+                if (!fullPath.exists()) {
                     continue;
                 }
-                String nameOnly = f.getName();
+                String nameOnly = fullPath.getName();
                 Action act = new ParameterizedAssyAction(nameOnly);
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath);
+                mi.setToolTipText(fullPath.getPath());
                 openRecentAssyMenu.add(mi);
             }
             if (lis.size() > 0) {
@@ -227,36 +229,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    class RecentProjFileSetListener implements mvcRecentFileListener {
-
-        @Override
-        public void listChanged() {
-            AssemblyController acontroller = (AssemblyController) getController();
-            Set<String> lis = acontroller.getRecentProjFileSet();
-            openRecentProjMenu.removeAll();
-            for (String fullPath : lis) {
-                File f = new File(fullPath);
-                if (!f.exists()) {
-                    continue;
-                }
-                String nameOnly = f.getName();
-                Action act = new ParameterizedProjAction(nameOnly);
-                act.putValue(FULLPATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath);
-                openRecentProjMenu.add(mi);
-            }
-            if (!lis.isEmpty()) {
-                openRecentProjMenu.add(new JSeparator());
-                Action act = new ParameterizedProjAction("clear");
-                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText("Clear this list");
-                openRecentProjMenu.add(mi);
-            }
-        }
-    }
-
     class ParameterizedAssyAction extends javax.swing.AbstractAction {
 
         ParameterizedAssyAction(String s) {
@@ -266,32 +238,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         @Override
         public void actionPerformed(ActionEvent ev) {
             AssemblyController acontroller = (AssemblyController) getController();
-            String fullPath = (String) getValue(FULLPATH);
-            if (fullPath.equals(CLEARPATHFLAG)) {
+
+            File fullPath;
+            Object obj = getValue(VStatics.FULL_PATH);
+            if (obj instanceof String)
+                fullPath = new File((String) obj);
+            else
+                fullPath = (File) obj;
+
+            if (fullPath.getPath().equals(CLEARPATHFLAG)) {
                 acontroller.clearRecentAssyFileList();
             } else {
-                acontroller.openRecent(fullPath);
-            }
-        }
-    }
-
-    class ParameterizedProjAction extends javax.swing.AbstractAction {
-
-        ParameterizedProjAction(String s) {
-            super(s);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) getController();
-            String fullPath = (String) getValue(FULLPATH);
-            if (fullPath.equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentProjFileSet();
-            } else {
-                acontroller.doProjectCleanup();
-                acontroller.openProject(new File(fullPath));
-
-                showProjectName();
+                acontroller.openRecentAssembly(fullPath);
             }
         }
     }
@@ -300,7 +258,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         AssemblyController controller = (AssemblyController) getController();
 
         controller.addRecentAssyFileSetListener(new RecentAssyFileListener());
-        controller.addRecentProjFileSetListener(new RecentProjFileSetListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -321,6 +278,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
+        RecentProjFileSetListener listener = new RecentProjFileSetListener();
+        listener.setMenuItem(openRecentProjMenu);
+        controller.addRecentProjFileSetListener(listener);
+
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
@@ -338,7 +299,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
-        // TODO: Unknown what this exactly does
+        // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
         fileMenu.addSeparator();
 
@@ -1015,14 +976,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void showProjectName() {
-
-        // Set project title in Frame title bar
-        String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
-        setTitle(ttl);
-        if (this.titlList != null) {
-            titlList.setTitle(ttl, titlKey);
-        }
-
+        super.showProjectName();
         VGlobals.instance().getEventGraphEditor().showProjectName();
     }
 
@@ -1175,15 +1129,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         comp.setMaximumSize(d);
         comp.setMinimumSize(d);
     }
-    private TitleListener titlList;
-    private int titlKey;
 
-    public void setTitleListener(TitleListener lis, int key) {
-        titlList = lis;
-        titlKey = key;
-
-        showProjectName();
-    }
 }
 
 interface DragStartListener {

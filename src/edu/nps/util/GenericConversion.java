@@ -61,7 +61,6 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
  * Converter for a Collection of Type to an Array of Type using reification

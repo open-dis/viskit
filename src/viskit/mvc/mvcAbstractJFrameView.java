@@ -1,6 +1,8 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
+import viskit.ViskitConfig;
+import viskit.util.TitleListener;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -17,6 +19,8 @@ import javax.swing.JFrame;
  */
 public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener {
 
+    protected TitleListener titlList;
+    protected int titlKey;
     private mvcModel model;
     private mvcController controller;
 
@@ -26,6 +30,30 @@ public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, m
 
     public void registerWithModel() {
         ((mvcAbstractModel) model).addModelListener(this);
+    }
+
+    /** Sets the frame title listener and key for this frame
+     *
+     * @param lis the title listener to set
+     * @param key the key for this frame's title
+     */
+    public void setTitleListener(TitleListener lis, int key) {
+        titlList = lis;
+        titlKey = key;
+
+        showProjectName();
+    }
+
+    /**
+     * Shows the project name in the frame title bar
+     */
+    public void showProjectName() {
+
+        String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
+        setTitle(ttl);
+        if (this.titlList != null) {
+            titlList.setTitle(ttl, titlKey);
+        }
     }
 
     @Override
@@ -51,4 +79,5 @@ public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, m
 
     @Override
     public abstract void modelChanged(mvcModelEvent event);
+
 }

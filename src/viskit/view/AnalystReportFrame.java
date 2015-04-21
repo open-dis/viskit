@@ -61,7 +61,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.apache.log4j.Logger;
 import viskit.util.OpenAssembly;
-import viskit.util.TitleListener;
 import viskit.control.AnalystReportController;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
@@ -925,25 +924,6 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             if (resp == JFileChooser.APPROVE_OPTION) {
                 tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
             }
-        }
-    }
-    private TitleListener titlList;
-    private int titlkey;
-
-    public void setTitleListener(TitleListener lis, int key) {
-        titlList = lis;
-        titlkey = key;
-        doTitle(null);
-    }
-    private String currentTitle = FRAME_DEFAULT_TITLE;
-
-    public void doTitle(String nm) {
-        if (nm != null && nm.length() > 0) {
-            currentTitle = FRAME_DEFAULT_TITLE + ": " + nm;
-        }
-
-        if (titlList != null) {
-            titlList.setTitle(currentTitle, titlkey);
         }
     }
 }

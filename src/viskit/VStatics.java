@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
@@ -85,17 +86,35 @@ public class VStatics {
     public static final String JAVA_LANG_STRING = "java.lang.String";
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
+    public static final String FULL_PATH = "FULLPATH";
+    public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
+
     static final Logger LOG = LogUtils.getLogger(VStatics.class);
 
     /** Utility method to configure a Viskit project
      *
      * @param projFile the base directory of a Viskit project
      */
+    @SuppressWarnings("unchecked")
     public static void setViskitProjectFile(File projFile) {
         ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+
+        XMLConfiguration historyConfig = ViskitConfig.instance().getViskitAppConfig();
+        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        boolean match = false;
+        for (String s : valueAr) {
+            if (s.equals(projFile.getPath())) {
+                match = true;
+                break;
+            }
+        }
+        if (!match) {
+            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
+            historyConfig.getDocument().normalize();
+        }
     }
 
     /**

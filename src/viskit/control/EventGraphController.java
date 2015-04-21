@@ -121,7 +121,7 @@ public interface EventGraphController {
      */
     void open();
 
-    void openRecentEventGraph(String path);
+    void openRecentEventGraph(File path);
 
     void close();
 
@@ -195,15 +195,15 @@ public interface EventGraphController {
      */
     void captureWindow();
 
-    void addOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis);
+    void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void removeOpenEventGraphListener(DirectoryWatch.DirectoryChangeListener lis);
+    void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
     void addRecentEgFileListener(mvcRecentFileListener lis);
 
     void removeRecentEgFileListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentEGFileSet();
+    Set<File> getRecentEGFileSet();
 
     /** Clears the recent EG file list thus far generated */
     void clearRecentEGFileSet();

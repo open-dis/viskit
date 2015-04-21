@@ -169,7 +169,7 @@ public interface AssemblyController {
      */
     void openProject(File file);
 
-    void openRecent(String fullPath);
+    void openRecentAssembly(File fullPath);
 
     /**
      * Perform shutdown operations
@@ -254,7 +254,7 @@ public interface AssemblyController {
 
     void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentAssyFileSet();
+    Set<File> getRecentAssyFileSet();
 
     void clearRecentAssyFileList();
 
@@ -262,7 +262,7 @@ public interface AssemblyController {
 
     void removeRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentProjFileSet();
+    Set<File> getRecentProjFileSet();
 
     void clearRecentProjFileSet();
 }

@@ -84,11 +84,6 @@ public interface EventGraphView {
     File saveFileAsk(String suggName, boolean showUniqueName);
 
     /**
-     * Show the project name in the main frame title bar
-     */
-    void showProjectName();
-
-    /**
      * Update the name of the EventGraph in the component title bar
      *
      * @param name the name of the EventGraph

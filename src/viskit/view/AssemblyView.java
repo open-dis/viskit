@@ -38,7 +38,7 @@ public interface AssemblyView {
     /**
      * Add a path to SimEntities in the LEGO tree.  This call will check
      * compilation of EGs
-     * 
+     *
      * @param f the path to evaluate for SimEntites
      * @param b flag to indicate recursion checking of the given path if a known
      * directory
@@ -97,9 +97,6 @@ public interface AssemblyView {
 
     /** Open an already existing Viskit Project */
     void openProject();
-
-    /** Show the project name in the main frame title bar */
-    void showProjectName();
 
     /** Update the name of the Assembly in the component title bar
      * @param s the name of the Assembly

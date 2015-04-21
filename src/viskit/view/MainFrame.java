@@ -50,6 +50,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
 import viskit.control.InternalAssemblyRunner;
+import viskit.control.RecentProjFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
@@ -177,6 +178,12 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
         }
 
+        // Now set the recent open project's file listener here
+        RecentProjFileSetListener listener = new RecentProjFileSetListener();
+        listener.setMenuItem(egFrame.getOpenRecentProjMenu());
+        final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
+        assyCntlr.addRecentProjFileSetListener(listener);
+
         // Assembly Run
         runTabbedPane = new JTabbedPane();
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
@@ -269,7 +276,6 @@ public class MainFrame extends JFrame {
         /* End DIFF between OA3302 branch and trunk */
 
         // Now setup the assembly file change listener(s)
-        final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
         assyCntlr.setAssemblyRunPane(tabbedPane, tabbedPaneIdx);
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
 
@@ -285,11 +291,11 @@ public class MainFrame extends JFrame {
 
         // Now setup the open-event graph listener(s)
         final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
-        egCntlr.addOpenEventGraphListener(assyCntlr.getOpenEventGraphListener());
+        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
 
         /* DIFF between OA3302 branch and trunk */
         if (isDOEVisible)
-            egCntlr.addOpenEventGraphListener(doeFrame.getController().getOpenEventGraphListener());
+            egCntlr.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
 
         // let the event graph controller establish the Viskit classpath and open

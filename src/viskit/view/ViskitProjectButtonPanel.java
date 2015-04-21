@@ -44,11 +44,12 @@ import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
 /**
- * Edit this GUI with Netbeans Matisse
+ * Utility to help guide the user on Viskit start up options, or when a new
+ * project need to be created during runtime
  *
  * @author Mike Bailey
  * @since Aug 2008
- * @version $Id: $
+ * @version $Id$
  */
 public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 
@@ -142,14 +143,15 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     static boolean firstTime = true;
+
     /** I'm not happy about one minor aspect and that is if the user selects
      * this option, then cancels, Viskit will automatically create and open a
      * ${user.home}/MyViskitProjects/DefaultProject space
      *
-     * @param evt the open and existing project event button pushed
+     * @param evt the open an existing project event action
      */
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
-    File file = null;
+    File file;
     if (!firstTime) {
         mvcController vac = VGlobals.instance().getAssemblyController();
         if (vac != null) {
@@ -158,18 +160,20 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
             if (vaw != null) {
                 vaw.openProject();
-                return;
             }
         }
     } else {
         file = ViskitProject.openProjectDir(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        VStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
+
+        // NOTE: We have no way of setting the first opened project here as the
+        // controller hasn't been created yet to store that info when Viskit
+        // first starts up
     }
 
     defaultButtActionPerformed(null);
 
-    if (file != null)
-        VStatics.setViskitProjectFile(file);
 }//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
@@ -182,7 +186,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     File projF;
 
     // What we wish to do here is force the user to create a new project space
-    // before letting them move on, or, open and exiskiting project, or the only
+    // before letting them move on, or, open and existing project, or the only
     // other option is to exit
     do {
         ViskitProjectGenerationDialog3.showDialog();
@@ -198,9 +202,14 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
     } while (true);
 
+    VStatics.setViskitProjectFile(projF);
+
+    // NOTE: We have no way of setting the first opened project here as the
+    // controller hasn't been created yet to store that info when Viskit first
+    // starts up
+
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
-    VStatics.setViskitProjectFile(projF);
 
     // The work directory will have already been created by default as VGlobals.init
     // was already called which creates the directory ${user.home}/.viskit

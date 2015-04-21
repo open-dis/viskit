@@ -97,7 +97,7 @@ public class AnalystReportController extends mvcAbstractController {
             frame = (AnalystReportFrame) getView();
         }
 
-        frame.doTitle(targetFile.getName());
+        frame.showProjectName();
         buildArb(targetFile);
     }
 

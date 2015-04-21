@@ -147,7 +147,7 @@ public class DirectoryWatch {
      * @param lis
      * @return true if was not already registered
      */
-    public boolean addListener(DirectoryChangeListener lis) {
+    public final boolean addListener(DirectoryChangeListener lis) {
         return listeners.add(lis);
     }
 
@@ -197,8 +197,8 @@ public class DirectoryWatch {
                 try {
                     Thread.sleep(sleepTimeMs);
                 } catch (InterruptedException e) {
-                    System.out.println("DirWatcher killed");
-                    return;
+                    System.err.println("DirWatcher killed");
+                    break;
                 }
             }
         }
@@ -234,7 +234,7 @@ public class DirectoryWatch {
         void foundFile(File f);
     }
 
-    static public interface DirectoryChangeListener {
+    public interface DirectoryChangeListener {
 
         int FILE_ADDED = 0;
         int FILE_REMOVED = 1;

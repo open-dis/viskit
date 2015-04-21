@@ -171,9 +171,6 @@ public class VGlobals {
                     if (avf != null) {
                         avf.setVisible(false);
                     }
-                    if (egvf != null && egvf.isVisible()) {
-                        // do nothing at the moment
-                    }
                 }
             });
         }
