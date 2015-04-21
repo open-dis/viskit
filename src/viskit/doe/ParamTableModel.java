@@ -121,6 +121,8 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             System.err.println("Terminal param w/out name ref!");
         }
 
+        if (termHashMap.get(nm) == null) {return;}
+        
         int row = termHashMap.get(nm);
 
         String val = tp.getValue();
