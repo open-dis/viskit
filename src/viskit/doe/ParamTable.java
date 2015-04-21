@@ -69,7 +69,7 @@ public class ParamTable extends JTable {
     }
 
     /**
-     * 
+     *
      * @param simEntities
      * @param designParams
      */
@@ -81,7 +81,7 @@ public class ParamTable extends JTable {
     private int[] colWidths = {175, 160, 125, 75, 90, 90};
 
     private void setColumnWidths() {
-        TableColumn column = null;
+        TableColumn column;
         for (int i = 0; i < ParamTableModel.NUM_COLS; i++) {
             column = getColumnModel().getColumn(i);
             column.setPreferredWidth(colWidths[i]);
@@ -100,8 +100,9 @@ public class ParamTable extends JTable {
             setBorder(new EmptyBorder(0, 3, 0, 0));       // keeps left from being cutoff
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Integer rowKey = new Integer(row);
+            Integer rowKey = row;
             if (ptm.noEditRows.contains(rowKey) || column == ParamTableModel.TYPE_COL) {
                 setBackground(noedit);
             } else if (ptm.multiRows.contains(rowKey)) {
@@ -149,7 +150,7 @@ public class ParamTable extends JTable {
          * @param col
          */
         private void handleFactorSwitchable(int row, int col) {
-            boolean factor = ((Boolean) getValueAt(row, ParamTableModel.FACTOR_COL)).booleanValue();
+            boolean factor = ((Boolean) getValueAt(row, ParamTableModel.FACTOR_COL));
             if (factor) {
                 switch (col) {
                     case ParamTableModel.VALUE_COL:
@@ -187,6 +188,7 @@ public class ParamTable extends JTable {
             // This so we can change background of cells depending on the state of the checkboxes.
             addItemListener(new ItemListener() {
 
+                @Override
                 public void itemStateChanged(ItemEvent e) {
                     ListSelectionModel lsm = ParamTable.this.getSelectionModel();
                     if (!lsm.isSelectionEmpty()) {
@@ -197,8 +199,9 @@ public class ParamTable extends JTable {
             });
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Integer rowKey = new Integer(row);
+            Integer rowKey = row;
             setEnabled(true);
             if (ptm.noEditRows.contains(rowKey) || column == ParamTableModel.TYPE_COL) {
                 setBackground(noedit);
@@ -214,7 +217,7 @@ public class ParamTable extends JTable {
                 setBackground(defaultC);
             }
 
-            setSelected((value != null && ((Boolean) value).booleanValue()));
+            setSelected((value != null && ((Boolean) value)));
             setToolTipText("Whether this variable is used as an indepedent variable in the experiment.");
 
             return this;
