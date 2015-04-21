@@ -128,7 +128,8 @@ public class EventGraphAssemblyComboMain {
             String msg = "Viskit has experienced a startup glitch.  <br/>Please "
                     + "navigate to " + System.getProperty("user.home") + "/.viskit/debug.log and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">viskit@www.movesinstitute.org</a></b>";
+                    + "<b><a href=\"" + url.toString() + "\">viskit@www.movesinstitute.org</a></b>"
+                    + "<br/>Click the link to open up a client email form";
 
             // html content
             JEditorPane ep = new JEditorPane("text/html",
