@@ -35,16 +35,16 @@
         <TerminalParameter name="totalNumberServers" value="2" type="int"/>
         <Coordinate x="280.0" y="90.0"/>
     </SimEntity>
-    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
-        <TerminalParameter value="numberInQueue" type="java.lang.String"/>
-        <Coordinate x="210" y="230"/>
+    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberInQueue" type="java.lang.String"/>
+        <Coordinate x="210.0" y="230.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
-        <TerminalParameter value="numberAvailableServers" type="java.lang.String"/>
-        <Coordinate x="350" y="230"/>
+    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
+        <Coordinate x="350.0" y="230.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="simplePropertyDumper" type="simkit.util.SimplePropertyDumper">
-        <Coordinate x="280" y="290"/>
+    <PropertyChangeListener name="simplePropertyDumper" type="simkit.util.SimplePropertyDumper" meanStatistics="false" countStatistics="true">
+        <Coordinate x="280.0" y="290.0"/>
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="numInQueueStat" source="server"/>
     <PropertyChangeListenerConnection listener="numAvailServersStat" source="server"/>
