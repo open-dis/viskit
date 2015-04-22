@@ -19,6 +19,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -1620,10 +1622,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 initAssemblyRun();
 
                 if (execStrings == null) {
-                    messageUser(JOptionPane.WARNING_MESSAGE,
-                            "Assembly Source Generation Error",
-                            "Compile not attempted, check ${user.home}/.viskit/debug.log for details"
-                    );
+
+                    if (VGlobals.instance().getActiveAssemblyModel() == null) {
+                        messageUser(JOptionPane.WARNING_MESSAGE,
+                            "Assembly File Not Opened",
+                            "Please open an Assembly file");
+                    } else {
+
+                        URL url = null;
+                        try {
+                            url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
+                                    + "?subject=Assembly%20Source%20Generation%20Error&body=log%20output:");
+                        } catch (MalformedURLException ex) {
+                            LOG.error(ex);
+                        }
+
+                        String msg = "Assembly compile not attempted.  <br/>Please "
+                                + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
+                                + "email the log to "
+                                + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                                + "<br/><br/>Click the link to open up a client email form, then copy and paste the log's contents";
+
+                        LogUtils.showHyperlinkedDialog((Component) getView(), "Assembly Source Generation Error", url, msg);
+                    }
                 } else {
 
                     // Ensure a cleared Assembly Run panel upon every Assembly compile

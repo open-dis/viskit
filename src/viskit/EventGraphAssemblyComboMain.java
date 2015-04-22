@@ -34,21 +34,15 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtils;
-import java.awt.Desktop;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.Image;
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import viskit.view.MainFrame;
 
 /**
@@ -71,6 +65,7 @@ public class EventGraphAssemblyComboMain {
 
         // Launch all GUI stuff on, or within the EDT
         try {
+//            throw new InvocationTargetException(new Throwable("mail this error"));
 
             if (!EventQueue.isDispatchThread()) {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -107,54 +102,21 @@ public class EventGraphAssemblyComboMain {
                 e.printStackTrace();
             }
 
-            // \/ Bugfix 1377 \/
-
-            // for copying style
-            JLabel label = new JLabel();
-            Font font = label.getFont();
-
-            // create some css from the label's font
-            StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
-            style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
-            style.append("font-size:").append(font.getSize()).append("pt;");
-
             URL url = null;
             try {
-                url = new URL("mailto:viskit@www.movesinstitute.org?subject=Viskit%20startup%20error&body=see%20attachment");
+                url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST +
+                        "?subject=Viskit%20startup%20error&body=log%20output:");
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }
 
             String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                    + "navigate to " + System.getProperty("user.home") + "/.viskit/debug.log and "
+                    + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">viskit@www.movesinstitute.org</a></b>"
-                    + "<br/>Click the link to open up a client email form";
+                    + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<br/><br/>Click the link to open up a client email form, then copy and paste the log's contents";
 
-            // html content
-            JEditorPane ep = new JEditorPane("text/html",
-                    "<html><body style=\"" + style + "\">"
-                    + msg + "</body></html>");
-
-            final URL localUrl = url;
-
-            // handle link events to bring up mail client
-            ep.addHyperlinkListener(new HyperlinkListener() {
-                @Override
-                public void hyperlinkUpdate(HyperlinkEvent e) {
-                    try {
-                        if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                            Desktop.getDesktop().mail(localUrl.toURI());
-                        }
-                    } catch (IOException | URISyntaxException ex) {
-                        LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
-                    }
-                }
-            });
-            ep.setEditable(false);
-            ep.setBackground(label.getBackground());
-
-            JOptionPane.showMessageDialog(null, ep, e.toString(), JOptionPane.ERROR_MESSAGE);
+            LogUtils.showHyperlinkedDialog(null, e.toString(), url, msg);
         }
     }
 

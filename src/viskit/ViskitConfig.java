@@ -30,6 +30,7 @@ public class ViskitConfig {
     public static final File V_CONFIG_FILE = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
     public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
+    public static final File V_DEBUG_LOG = new File(VISKIT_CONFIG_DIR, "debug.log");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";

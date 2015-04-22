@@ -85,6 +85,7 @@ public class VStatics {
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
     public static final String JAVA_LANG_STRING = "java.lang.String";
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
+    public static final String VISKIT_MAILING_LIST = "viskit@www.movesinstitute.org";
 
     public static final String FULL_PATH = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
