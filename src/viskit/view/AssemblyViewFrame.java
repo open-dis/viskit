@@ -267,6 +267,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
+        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();

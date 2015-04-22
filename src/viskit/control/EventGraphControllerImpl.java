@@ -90,10 +90,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // placeholder for multi-tabbed combo app.
     }
 
-    /** Creates a new Viskit Project */
     @Override
     public void newProject() {
         ((AssemblyController)VGlobals.instance().getAssemblyController()).newProject();
+    }
+
+    @Override
+    public void zipAndMailProject() {
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).zipAndMailProject();
     }
 
     @Override

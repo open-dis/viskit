@@ -22,6 +22,7 @@
             <ClusterRun visible="false"/>
             <AnalystReport visible="false"/>
         </tabs>
+        <debug>false</debug>
     </app>
     <history>
         <ProjectEditor>

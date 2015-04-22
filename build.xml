@@ -768,6 +768,11 @@ their descpritions.
             <include name="*.jar"/>
         </delete>
         <delete file="viskit-exe.jar"/>
+
+        <!-- This one is scary -->
+        <delete dir=".">
+            <include name="*.zip"/>
+        </delete>
     </target>
 
     <target name="nuke.dot.viskit" description="Abolish an out of synch confituration and metadata directory">

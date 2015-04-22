@@ -45,6 +45,12 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Added support for the user to zip up a current Viskit project and emailing it
+  along with the debug.log to the viskit mailing list
+
+  Fixed and exception issue when verbose debug was selected from the Settings
+  dialog
+
   Fixed several menu activated NPEs when no EG or Assy files are loaded
 
   Implemented an Open Recent Projects menu item for the EventGraphViewFrame

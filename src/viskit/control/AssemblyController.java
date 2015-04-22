@@ -59,6 +59,11 @@ public interface AssemblyController {
      */
     void newProject();
 
+    /** Creates a zip of the current project directory and initiates an email
+     * client form to open for mailing to the viskit mailing list
+     */
+    void zipAndMailProject();
+
     /**
      * Sets the Assembly Run panel
      * @param runPane the parent of the Assembly Run panel

@@ -48,30 +48,33 @@ import java.io.*;
  */
 public class FileIO {
 
-    public static void copyFile(File infile, PrintWriter pw, boolean close) throws IOException {
-        BufferedReader is = new BufferedReader(new FileReader(infile));
-        copyFile(is, pw, close);
-    }
-
     /**
-     * Copy a source file to a destination
+     * Copy a source file to a destination file
+     *
      * @param infile the source file
      * @param outfile the destination file
      * @param close the FileWriter after the copy operation
-     * @throws java.io.IOException if something goes wrong during the copy
+     * @throws java.io.IOException if something goes wrong during the copy op
      */
     public static void copyFile(File infile, File outfile, boolean close) throws IOException {
-        copyFile(infile, new PrintWriter(new BufferedWriter(new FileWriter(outfile))), close);
+        copyFile(new BufferedReader(new FileReader(infile)), new PrintWriter(new BufferedWriter(new FileWriter(outfile))), close);
     }
 
-    public static void copyFile(Reader is, Writer os, boolean close) throws IOException {
-        int b; // byte read from file
-        while ((b = is.read()) != -1) {
-            os.write(b);
-        }
-        is.close();
-        if (close) {
-            os.close();
+    private static void copyFile(Reader is, Writer os, boolean close) throws IOException {
+        try {
+            synchronized (is) {
+                synchronized (os) {
+                    String msg;
+                    while ((msg = ((BufferedReader)is).readLine()) != null) {
+                        os.write(msg+"\n");
+                    }
+                }
+            }
+        } finally {
+            is.close();
+            if (close) {
+                os.close();
+            }
         }
     }
 }

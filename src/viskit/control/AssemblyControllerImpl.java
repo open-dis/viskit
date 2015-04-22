@@ -2,10 +2,13 @@ package viskit.control;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
+import edu.nps.util.ZipUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -562,6 +565,69 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
+    }
+
+    @Override
+    public void zipAndMailProject() {
+
+        SwingWorker worker = new SwingWorker<Void, Void>() {
+
+            File projDir;
+            File projZip;
+
+            @Override
+            public Void doInBackground() {
+
+                projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projZip = new File(System.getProperty("user.dir"), projDir.getName() + ".zip");
+
+                try {
+
+                    // First, copy the debug.log to the project dir
+                    FileIO.copyFile(ViskitConfig.V_DEBUG_LOG, new File(projDir, "debug.log"), true);
+                    ZipUtils.zipFolder(projDir, projZip);
+                } catch (IOException e) {
+                    LOG.error(e);
+                }
+
+                return null;
+            }
+
+            @Override
+            public void done() {
+                try {
+
+                    // Wait for the zip process to finish
+                    get();
+
+                    URL url = null;
+                    try {
+                        url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
+                                + "?subject=Viskit%20Project%20Submission%20Name=" + projDir.getName() + "&body=see%20attachment");
+                    } catch (MalformedURLException e) {
+                        LOG.error(e);
+                    }
+
+                    String msg = "Please "
+                            + "navigate to " + projZip.getParent() + " and "
+                            + "email the " + projZip.getName() + " zip file to "
+                            + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                            + "<br/><br/>Click the link to open up a client email form, then attach the zip file";
+
+                    try {
+                        Desktop.getDesktop().open(projZip.getParentFile());
+                    } catch (IOException e) {
+                        LOG.error(e);
+                    }
+
+                    LogUtils.showHyperlinkedDialog((Component) getView(), "Viskit Project Name=" + projDir.getName(), url, msg);
+
+                } catch (InterruptedException | ExecutionException e) {
+                    LOG.error(e);
+                }
+            }
+        };
+        worker.execute();
     }
 
     /** Common method between the AssyView and this AssyController
