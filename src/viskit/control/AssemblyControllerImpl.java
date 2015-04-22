@@ -988,7 +988,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 done = ((AssemblyModel) getModel()).changeEvGraphNode(evNode);
             }
         } while (!done);
-
     }
 
     @Override
