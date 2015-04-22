@@ -10,7 +10,7 @@
 
     <!-- ID properties (this file) -->
     <property name="SVNId" value="$Id$"/>
-    <property name="installer" value="${basedir}/installer"/>
+    <property name="installers.dir" value="${basedir}/installer"/>
     <property name="launch4j" value="${user.home}/launch4j"/>
 
     <!-- get all izpack related packages -->
@@ -83,7 +83,7 @@
             depends="no.extensions,getLaunch4j,clean.installers"
             description="Build the installers with no runtime extensions">
 
-        <copy todir="${installer}/stage/">
+        <copy todir="${installers.dir}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
                 <include name="intro_no_diskit.html"/>
             </fileset>
@@ -98,10 +98,10 @@
             depends="with.extensions,getLaunch4j,clean.installers"
             description="Builds the installers with runtime extension libraries included">
 
-        <copy todir="${installer}/stage/lib/ext">
+        <copy todir="${installers.dir}/stage/lib/ext">
             <fileset refid="runtime.lib.ext"/>
         </copy>
-        <copy todir="${installer}/stage/">
+        <copy todir="${installers.dir}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/VisPages">
                 <include name="intro.html"/>
             </fileset>
@@ -112,38 +112,38 @@
     </target>
 
     <target name="installers.common">
-        <copy todir="${installer}/stage/Schemas">
+        <copy todir="${installers.dir}/stage/Schemas">
             <fileset dir="${basedir}/Schemas"/>
         </copy>
-        <copy todir="${installer}/stage/configuration">
+        <copy todir="${installers.dir}/stage/configuration">
             <fileset dir="${configuration.dir}"/>
         </copy>
-        <copy todir="${installer}/stage/MyViskitProjects/DefaultProject">
+        <copy todir="${installers.dir}/stage/MyViskitProjects/DefaultProject">
             <fileset dir="${examples.lib}"/>
         </copy>
-        <copy todir="${installer}/stage/images">
-            <fileset dir="${installer}/images"/>
+        <copy todir="${installers.dir}/stage/images">
+            <fileset dir="${installers.dir}/images"/>
         </copy>
-        <copy todir="${installer}/stage/lib" >
+        <copy todir="${installers.dir}/stage/lib" >
             <fileset refid="runtime.lib"/>
         </copy>
-        <copy todir="${installer}/stage/license">
+        <copy todir="${installers.dir}/stage/license">
             <fileset dir="${basedir}/license"/>
         </copy>
-        <copy todir="${installer}/stage/viskit/javahelp">
+        <copy todir="${installers.dir}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
-        <copy todir="${installer}/stage">
+        <copy todir="${installers.dir}/stage">
             <fileset dir="${basedir}">
                 <include name="RELEASE_NOTES*"/>
             </fileset>
         </copy>
-        <copy todir="${installer}/stage">
+        <copy todir="${installers.dir}/stage">
             <fileset dir="${basedir}/doc">
                 <include name="ViskitOperation.txt"/>
             </fileset>
         </copy>
-        <mkdir dir="${installer}/build" />
+        <mkdir dir="${installers.dir}/build" />
     </target>
 
     <target name="make.win.unix.installer">
@@ -153,9 +153,9 @@
                  classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
 
         <!-- Associate the viskit-exe.jar with a native win executable -->
-        <launch4j configFile="${installer}/launch4jConfig.xml"/>
+        <launch4j configFile="${installers.dir}/launch4jConfig.xml"/>
 
-        <copy todir="${installer}/stage">
+        <copy todir="${installers.dir}/stage">
             <fileset refid="runtime.viskit.exe"/>
         </copy>
         <delete>
@@ -166,17 +166,17 @@
 
         <!-- create an executable out of the jar file that installs Viskit and related files, assumes java exists,
             however once Viskit.exe actually runs it should check and download latest JDK -->
-        <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstallWin.jar"
+        <izpack input="${installers.dir}/izpack.xml"
+                output="${installers.dir}/build/ViskitInstallWin.jar"
                 installerType="standard"
-                basedir="${installer}"
+                basedir="${installers.dir}"
                 inheritAll="true"
                 compression="deflate"
                 compressionlevel="9"/>
-        <izpack input="${installer}/izpack.xml"
-                output="${installer}/build/ViskitInstallUnix.jar"
+        <izpack input="${installers.dir}/izpack.xml"
+                output="${installers.dir}/build/ViskitInstallUnix.jar"
                 installerType="standard"
-                basedir="${installer}"
+                basedir="${installers.dir}"
                 inheritAll="true"
                 compression="deflate"
                 compressionlevel="9"/>
@@ -185,21 +185,21 @@
         <launch4j>
             <config chdir="."
                     dontwrapjar="false"
-                    jar="${installer}/build/ViskitInstallWin.jar"
-                    outfile="${installer}/build/ViskitInstallWin.exe"
+                    jar="${installers.dir}/build/ViskitInstallWin.jar"
+                    outfile="${installers.dir}/build/ViskitInstallWin.exe"
                     headertype="gui"
-                    icon="${installer}/images/ViskitIcon.ico">
+                    icon="${installers.dir}/images/ViskitIcon.ico">
                 <jre minVersion="1.7.0"/>
             </config>
         </launch4j>
     </target>
 
     <target name="make.mac.installer">
-        <copy file="${dist.jar}" todir="${installer}/stage/lib"/>
-        <izpack input="${installer}/izpackMac.xml"
-                output="${installer}/build/ViskitInstallMac.jar"
+        <copy file="${dist.jar}" todir="${installers.dir}/stage/lib"/>
+        <izpack input="${installers.dir}/izpackMac.xml"
+                output="${installers.dir}/build/ViskitInstallMac.jar"
                 installerType="standard"
-                basedir="${installer}"
+                basedir="${installers.dir}"
                 inheritAll="true"
                 compression="deflate"
                 compressionlevel="9"/>
@@ -207,8 +207,8 @@
     </target>
 
     <target name="clean.installers">
-        <delete dir="${installer}/build"/>
-        <delete dir="${installer}/stage"/>
+        <delete dir="${installers.dir}/build"/>
+        <delete dir="${installers.dir}/stage"/>
     </target>
 
     <target name="clean.installer.materials"
