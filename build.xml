@@ -771,7 +771,7 @@ their descpritions.
     </target>
 
     <target name="nuke.dot.viskit" description="Abolish an out of synch confituration and metadata directory">
-        <delete includeemptydirs="yes" dir="${user.home}/.viskit"/>
+        <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
@@ -779,37 +779,37 @@ their descpritions.
 
     <target name="show.debug.log" depends="init">
         <concat>
-            <fileset dir="${user.home}/.viskit" includes="debug.log"/>
+            <fileset dir="${dot.viskit.dir}" includes="debug.log"/>
         </concat>
     </target>
 
     <target name="show.app.xml" depends="init">
         <concat>
-            <fileset dir="${user.home}/.viskit" includes="c_app.xml"/>
+            <fileset dir="${dot.viskit.dir}" includes="c_app.xml"/>
         </concat>
     </target>
 
     <target name="show.gui.xml" depends="init">
         <concat>
-            <fileset dir="${user.home}/.viskit" includes="c_gui.xml"/>
+            <fileset dir="${dot.viskit.dir}" includes="c_gui.xml"/>
         </concat>
     </target>
 
     <target name="show.passwd.xml" depends="init">
         <concat>
-            <fileset dir="${user.home}/.viskit" includes="passwd.xml"/>
+            <fileset dir="${dot.viskit.dir}" includes="passwd.xml"/>
         </concat>
     </target>
 
     <target name="show.validation.errors" depends="init">
         <concat>
-            <fileset dir="${user.home}/.viskit" includes="validationErrors.log"/>
+            <fileset dir="${dot.viskit.dir}" includes="validationErrors.log"/>
         </concat>
     </target>
 
     <target name="show.config.xml" depends="init">
         <concat>
-            <fileset dir="${env.HOME}/.viskit" includes="vconfig.xml"/>
+            <fileset dir="${dot.viskit.dir}" includes="vconfig.xml"/>
         </concat>
     </target>
 
