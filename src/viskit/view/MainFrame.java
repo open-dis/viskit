@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
+import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -520,7 +521,7 @@ public class MainFrame extends JFrame {
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.VStatics.debug) {
-                    System.out.println("in actionPerformed of exit");
+                    LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user

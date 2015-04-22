@@ -39,6 +39,7 @@ import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
+import viskit.view.dialog.SettingsDialog;
 
 /**
  * Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -80,7 +81,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public Help help;
 
     private static final String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
-    private static final String LOOK_AND_FEEL = ViskitConfig.instance().getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
+    private static final String LOOK_AND_FEEL = SettingsDialog.getLookAndFeel();;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar
@@ -595,7 +596,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 fullPath = new File((String) obj);
             else
                 fullPath = (File) obj;
-            
+
             if (fullPath.getPath().equals(CLEARPATHFLAG)) {
                 vcontroller.clearRecentEGFileSet();
             } else {

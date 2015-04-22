@@ -44,6 +44,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.*;
 import viskit.view.MainFrame;
+import viskit.view.dialog.SettingsDialog;
 
 /**
  * <p>MOVES Institute
@@ -169,8 +170,7 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void setLandFandFonts() {
-        ViskitConfig cfg = ViskitConfig.instance();
-        String s = cfg.getVal(ViskitConfig.LOOK_AND_FEEL_KEY);
+        String s = SettingsDialog.getLookAndFeel();
         try {
             if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

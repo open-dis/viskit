@@ -277,29 +277,25 @@ public class SettingsDialog extends JDialog {
         otherTF.addActionListener(lis);
      }
 
-    class lafListener implements ActionListener
-    {
-      @Override
-      public void actionPerformed(ActionEvent e)
-      {
-        if(e.getSource() == otherTF) {
-          guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+    class lafListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == otherTF) {
+                guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+            } else {
+                if (defaultLafRB.isSelected()) {
+                    guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_DEFAULT);
+                    otherTF.setEnabled(false);
+                } else if (platformLafRB.isSelected()) {
+                    guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_PLATFORM);
+                    otherTF.setEnabled(false);
+                } else if (otherLafRB.isSelected()) {
+                    guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+                    otherTF.setEnabled(true);
+                }
+            }
         }
-        else {
-         if(defaultLafRB.isSelected()) {
-           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_DEFAULT);
-           otherTF.setEnabled(false);
-         }
-         else if(platformLafRB.isSelected()) {
-           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, ViskitConfig.LAF_PLATFORM);
-           otherTF.setEnabled(false);
-        }
-         else if(otherLafRB.isSelected()) {
-           guiConfig.setProperty(ViskitConfig.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
-           otherTF.setEnabled(true);
-         }
-        }
-      }
     }
     private static XMLConfiguration appConfig;
     private static XMLConfiguration projectConfig;
@@ -688,7 +684,7 @@ public class SettingsDialog extends JDialog {
      * @return if verbose debug message are to be printed
      */
     public static boolean isVerboseDebug() {
-        return Boolean.valueOf(ViskitConfig.instance().getVal(ViskitConfig.DEBUG_MSGS_KEY));
+        return getVisibilitySense(ViskitConfig.DEBUG_MSGS_KEY);
     }
 
     /**
