@@ -167,14 +167,14 @@
         <!-- create an executable out of the jar file that installs Viskit and related files, assumes java exists,
             however once Viskit.exe actually runs it should check and download latest JDK -->
         <izpack input="${installers.dir}/izpack.xml"
-                output="${installers.dir}/build/ViskitInstallWin.jar"
+                output="${installers.dir}/build/${win.installer.jar}"
                 installerType="standard"
                 basedir="${installers.dir}"
                 inheritAll="true"
                 compression="deflate"
                 compressionlevel="9"/>
         <izpack input="${installers.dir}/izpack.xml"
-                output="${installers.dir}/build/ViskitInstallUnix.jar"
+                output="${installers.dir}/build/${linux.installer.jar}"
                 installerType="standard"
                 basedir="${installers.dir}"
                 inheritAll="true"
@@ -185,8 +185,8 @@
         <launch4j>
             <config chdir="."
                     dontwrapjar="false"
-                    jar="${installers.dir}/build/ViskitInstallWin.jar"
-                    outfile="${installers.dir}/build/ViskitInstallWin.exe"
+                    jar="${installers.dir}/build/${win.installer.jar}"
+                    outfile="${installers.dir}/build/${win.installer.exe}"
                     headertype="gui"
                     icon="${installers.dir}/images/ViskitIcon.ico">
                 <jre minVersion="1.7.0"/>
@@ -197,7 +197,7 @@
     <target name="make.mac.installer">
         <copy file="${dist.jar}" todir="${installers.dir}/stage/lib"/>
         <izpack input="${installers.dir}/izpackMac.xml"
-                output="${installers.dir}/build/ViskitInstallMac.jar"
+                output="${installers.dir}/build/${mac.installer.jar}"
                 installerType="standard"
                 basedir="${installers.dir}"
                 inheritAll="true"
