@@ -36,6 +36,7 @@ package viskit;
 import edu.nps.util.LogUtils;
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -125,12 +126,12 @@ public class EventGraphAssemblyComboMain {
      * .viskit config directory in the user's profile space
      */
     public static void nukeDotViskit() {
-        java.io.File dotViskit = new java.io.File(System.getProperty("user.home") + "/.viskit");
+        File dotViskit = ViskitConfig.V_DEBUG_LOG;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
-            java.io.File[] files = dotViskit.listFiles();
-            for (java.io.File file : files) {
+            File[] files = dotViskit.listFiles();
+            for (File file : files) {
                 file.delete();
             }
             if (dotViskit.delete())
