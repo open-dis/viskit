@@ -45,8 +45,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
-  Added support for the user to zip up a current Viskit project and emailing it
-  along with the debug.log to the viskit mailing list
+  Added support for the user to zip a current Viskit project, to include the
+  current debug.log and email it to the viskit mailing list
 
   Fixed and exception issue when verbose debug was selected from the Settings
   dialog

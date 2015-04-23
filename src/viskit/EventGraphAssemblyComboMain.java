@@ -115,7 +115,7 @@ public class EventGraphAssemblyComboMain {
                     + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                    + "<br/><br/>Click the link to open up a client email form, then copy and paste the log's contents";
+                    + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
             LogUtils.showHyperlinkedDialog(null, e.toString(), url, msg);
         }

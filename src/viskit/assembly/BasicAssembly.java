@@ -42,6 +42,8 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import javax.swing.JOptionPane;
@@ -55,6 +57,7 @@ import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 import viskit.VGlobals;
 import viskit.VStatics;
+import viskit.ViskitConfig;
 import viskit.model.AssemblyNode;
 
 /**
@@ -175,7 +178,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Received the replicationStatistics LinkedHashMap from ViskitAssembly. This
+     * Receives the replicationStatistics LinkedHashMap from ViskitAssembly. This
      * method extracts the key values and passes them to ReportStatisticsConfig. The
      * key set is in the order of the replication statistics object in this class.
      * The goal of this and related methods is to aid ReportStatisticsConfig in
@@ -188,7 +191,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * <p/>
      * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
-     * @param repStatistics
+     * @param repStatistics a map containing collected stats on a SimEntity's state variables
      */
     protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> repStatistics) {
         Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
@@ -614,12 +617,23 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             performHookups();
         } catch (Throwable t) {
 
-            // Because we don't have any live controllers to message the user
-            // in this thread context, brute force the message
-            JOptionPane.showMessageDialog(null,
-                    t + "\nSimulation will terminate",
-                    "Assembly Run Error",
-                    JOptionPane.ERROR_MESSAGE);
+            LOG.error(t);
+
+            URL url = null;
+            try {
+                url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
+                        + "?subject=Assembly%20Run%20Error&body=log%20output:");
+            } catch (MalformedURLException ex) {
+                LOG.error(ex);
+            }
+
+            String msg = "Assembly run aborted.  <br/>Please "
+                    + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
+                    + "email the log to "
+                    + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
+
+            LogUtils.showHyperlinkedDialog(null, t.toString(), url, msg);
 
             // Comment in to see what the matter is
 //            t.printStackTrace();

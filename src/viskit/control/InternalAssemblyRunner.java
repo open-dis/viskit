@@ -259,6 +259,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // MersenneTwister)
 
             // *** Resetting the RNG seed state ***
+            // NOTE: This is currently disabled as the resetSeedCB is not
+            // enabled nor visible
             if (runPanel.resetSeedCB.isSelected()) {
 
                 Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);

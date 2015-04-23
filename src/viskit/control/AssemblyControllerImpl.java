@@ -613,7 +613,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             + "navigate to " + projZip.getParent() + " and "
                             + "email the " + projZip.getName() + " zip file to "
                             + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                            + "<br/><br/>Click the link to open up a client email form, then attach the zip file";
+                            + "<br/><br/>Click the link to open up an email form, then attach the zip file";
 
                     try {
                         Desktop.getDesktop().open(projZip.getParentFile());
@@ -1703,13 +1703,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             LOG.error(ex);
                         }
 
-                        String msg = "Assembly compile not attempted.  <br/>Please "
+                        String msg = "Assembly source generation/compilation failure.  <br/>Please "
                                 + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
                                 + "email the log to "
                                 + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                                + "<br/><br/>Click the link to open up a client email form, then copy and paste the log's contents";
+                                + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-                        LogUtils.showHyperlinkedDialog((Component) getView(), "Assembly Source Generation Error", url, msg);
+                        LogUtils.showHyperlinkedDialog((Component) getView(), "Assembly Error", url, msg);
                     }
                 } else {
 

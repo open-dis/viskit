@@ -164,15 +164,9 @@ public class VGlobals {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (avf != null) {
-                        avf.setVisible(false);
-                    }
-                }
-            });
+            if (avf != null) {
+                avf.setVisible(false);
+            }
         }
     };
     ActionListener assyQuitHandler = defaultAssyQuitHandler;
@@ -227,9 +221,6 @@ public class VGlobals {
         public void actionPerformed(ActionEvent e) {
             if (egvf != null) {
                 egvf.setVisible(false);
-            }
-            if (avf != null && avf.isVisible()) {
-                // do nothing at the moment
             }
         }
     };

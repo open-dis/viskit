@@ -212,9 +212,11 @@ public class RunnerPanel2 extends JPanel {
         analystReportCB.setEnabled(aRPanelVisible);
         flowPan.add(analystReportCB);
 
+        // Initially, unselected
         resetSeedCB = new JCheckBox("Reset seed state each rerun");
 
         // TODO: Expose at a later time when we have usefullness for this
+        resetSeedCB.setEnabled(false);
 //        flowPan.add(resetSeedCB);
         /* End DIFF between OA3302 branch and trunk */
 
