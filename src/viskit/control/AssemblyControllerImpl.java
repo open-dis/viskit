@@ -603,7 +603,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     URL url = null;
                     try {
                         url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
-                                + "?subject=Viskit%20Project%20Submission%20Name=" + projDir.getName() + "&body=see%20attachment");
+                                + "?subject=Viskit%20Project%20Submission%20Name="
+                                + projDir.getName() + "&body=see%20attachment");
                     } catch (MalformedURLException e) {
                         LOG.error(e);
                     }

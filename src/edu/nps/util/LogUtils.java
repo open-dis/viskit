@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
@@ -123,7 +122,7 @@ public class LogUtils {
      * @param url a URL used to populate an email form
      * @param msg the message to inform the user with and for emailing
      */
-    public static void showHyperlinkedDialog(Component parent, String cause, URL url, String msg) {
+    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg) {
 
         // Bugfix 1377
 
@@ -141,24 +140,14 @@ public class LogUtils {
                 "<html><body style=\"" + style + "\">"
                 + msg + "</body></html>");
 
-        final URL localUrl = url;
-
-        try {
-            url = new URL("file:///" + ViskitConfig.V_DEBUG_LOG.getPath());
-        } catch (MalformedURLException ex) {
-            LOG.error(ex);
-        }
-
-        final URL localUrl2 = url;
-
         // handle link events to bring up mail client and debug.log
         ep.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 try {
                     if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                        Desktop.getDesktop().mail(localUrl.toURI());
-                        Desktop.getDesktop().browse(localUrl2.toURI());
+                        Desktop.getDesktop().mail(url.toURI());
+                        Desktop.getDesktop().browse(ViskitConfig.V_DEBUG_LOG.toURI());
                     }
                 } catch (IOException | URISyntaxException ex) {
                     LOG.error(ex);
