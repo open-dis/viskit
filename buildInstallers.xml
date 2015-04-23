@@ -91,6 +91,8 @@
         <ant target="installers.common"/>
         <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
+
+        <echo message="IzPack installer builds complete"/>
     </target>
 
     <!-- adapted from izpack wiki for building IzPack with native Launch4j'er on Win32 -->
@@ -109,6 +111,8 @@
         <ant target="installers.common"/>
         <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
+
+        <echo message="IzPack installer builds complete"/>
     </target>
 
     <target name="installers.common">
@@ -192,6 +196,8 @@
                 <jre minVersion="1.7.0"/>
             </config>
         </launch4j>
+
+        <chmod file="${installers.dir}/build/${win.installer.exe}" perm="ugo+rx"/>
     </target>
 
     <target name="make.mac.installer">
@@ -203,7 +209,8 @@
                 inheritAll="true"
                 compression="deflate"
                 compressionlevel="9"/>
-        <echo message="IzPack installer builds complete"/>
+
+        <chmod file="${installers.dir}/build/${mac.installer.jar}" perm="ugo+rx"/>
     </target>
 
     <target name="clean.installers">

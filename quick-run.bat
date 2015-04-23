@@ -1,2 +1,2 @@
-@REM Launches Viskit with, or without module dependencies, i.e. Diskit
+@REM Launches Viskit without building.  Assumes already built
 ant quick.run

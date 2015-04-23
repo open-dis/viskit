@@ -597,7 +597,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             public void done() {
                 try {
 
-                    // Wait for the zip process to finish
+                    // Waits for the zip process to finish
                     get();
 
                     URL url = null;
@@ -620,7 +620,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         LOG.error(e);
                     }
 
-                    LogUtils.showHyperlinkedDialog((Component) getView(), "Viskit Project Name=" + projDir.getName(), url, msg);
+                    LogUtils.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg);
 
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
