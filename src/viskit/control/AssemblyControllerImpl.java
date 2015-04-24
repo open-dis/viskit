@@ -1733,7 +1733,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 } finally {
                     ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
                     mutex--;
