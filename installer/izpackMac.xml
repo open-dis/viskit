@@ -46,6 +46,7 @@
         <langpack iso3="spa"/>
         <langpack iso3="jpn"/>
         <langpack iso3="ita"/>
+        <langpack iso3="chn"/>
     </locale>
 
     <resources>

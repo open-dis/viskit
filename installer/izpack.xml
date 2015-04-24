@@ -34,14 +34,22 @@
         <javaversion>1.7</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
-        <!-- Hopefully helps with Win Vista/7/8 installs -->
-        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7|izpack.windowsinstall.8"/>
+        <!-- Hopefully helps with Win Vista/7 installs -->
+        <!-- No setting available for Win8 in izPack v4.3.5 -->
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
     </info>
 
     <guiprefs height="600" width="800" resizable="yes">
         <laf name="liquid">
-            <os family="unix,windows"/>
+            <os family="windows"/>
         </laf>
+        <laf name="metouia">
+            <os family="unix" />
+        </laf>
+        <!--laf name="looks">
+            <os family="windows" />
+            <param name="variant" value="extwin" />
+        </laf-->
     </guiprefs>
 
     <locale>
@@ -52,6 +60,7 @@
         <langpack iso3="spa"/>
         <langpack iso3="jpn"/>
         <langpack iso3="ita"/>
+        <langpack iso3="chn"/>
     </locale>
 
     <resources>
@@ -73,7 +82,10 @@
         <panel classname="SimpleFinishPanel"/>
     </panels>
     <listeners>
-        <listener installer="SummaryLoggerInstallerListener"/>
+        <listener installer="SummaryLoggerInstallerListener">
+            <os family="windows"/>
+            <os family="unix"/>
+        </listener>
     </listeners>
     <packs>
         <pack name="Core" required="yes">
