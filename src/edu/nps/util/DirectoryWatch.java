@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -44,7 +44,6 @@ package edu.nps.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class DirectoryWatch {
     private static int sequenceNum = 0;
     private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
     private long sleepTimeMs = DEFAULTSLEEPTIMEMS;
-    private Map<String, Long> lastFiles;
+    private Map<File, Long> lastFiles;
     private Thread thread;
     private File root;
 
@@ -101,7 +100,7 @@ public class DirectoryWatch {
         if (!root.exists()) {
             throw new FileNotFoundException("File or directory passed to DirectoryWatch constructor does not exist");
         }
-        lastFiles = new HashMap<>(50);
+        lastFiles = new HashMap<>();
 
         fileAdder fa = new fileAdder();
         if (recurse) {
@@ -115,11 +114,7 @@ public class DirectoryWatch {
 
         @Override
         public void foundFile(File f) {
-            try {
-                lastFiles.put(f.getCanonicalPath(), f.lastModified());
-            } catch (IOException e) {
-                System.err.println("error in getCanonicalPath() of " + f.toString());
-            }
+            lastFiles.put(f, f.lastModified());
         }
     }
 
@@ -167,7 +162,7 @@ public class DirectoryWatch {
 
     class Runner implements Runnable, RecurseListener {
 
-        Map<String, Long> workingHM = new HashMap<>(50);
+        Map<File, Long> workingHM = new HashMap<>(50);
 
         @Override
         public void run() {
@@ -181,10 +176,10 @@ public class DirectoryWatch {
                 recurseTree(root, this);    // this removes from lastFiles
 
                 // Now see if any were removed...they will be the ones left
-                for (String cPath : lastFiles.keySet()) {
-                    fireAction(new File(cPath), DirectoryChangeListener.FILE_REMOVED);
+                for (File cPath : lastFiles.keySet()) {
+                    fireAction(cPath, DirectoryChangeListener.FILE_REMOVED);
                 }
-                Map<String, Long> temp = lastFiles;
+                Map<File, Long> temp = lastFiles;
                 lastFiles = workingHM;
                 workingHM = temp; // gets zeroed above
                 for (File f : changed) {
@@ -207,26 +202,20 @@ public class DirectoryWatch {
 
         @Override
         public void foundFile(File f) {
-            String canonP;
-            try {
-                canonP = f.getCanonicalPath();
-            } catch (IOException e) {
-                System.out.println("error in getCanonicalPath() of " + f.toString());
-                return;
-            }
+
             long moddate = f.lastModified();
 
-            Long lastdate = lastFiles.get(canonP);
+            Long lastdate = lastFiles.get(f);
 
             if (lastdate == null) {
-                added.add(f);//fireAction(f,DirectoryChangeListener.FILE_ADDED);
+                added.add(f);
             } else {
-                lastFiles.remove(canonP);
+                lastFiles.remove(f);
                 if (lastdate != moddate) {
-                    changed.add(f); //fireAction(f,DirectoryChangeListener.FILE_CHANGED);
+                    changed.add(f);
                 }
             }
-            workingHM.put(canonP, moddate);
+            workingHM.put(f, moddate);
         }
     }
 
