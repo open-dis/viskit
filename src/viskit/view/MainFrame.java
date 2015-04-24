@@ -86,9 +86,9 @@ public class MainFrame extends JFrame {
     private int TAB0_EGEDITOR_IDX = 0;
     private int TAB0_ASSYEDITOR_IDX = 1;
     private int TAB0_ASSYRUN_SUBTABS_IDX = 2;
-    private int TAB0_ANAL_REPORT_IDX = 3;
+    private int TAB0_ANALYST_REPORT_IDX = 3;
     private int[] tabIndices = {TAB0_EGEDITOR_IDX, TAB0_ASSYEDITOR_IDX,
-            TAB0_ASSYRUN_SUBTABS_IDX, TAB0_ANAL_REPORT_IDX};
+            TAB0_ASSYRUN_SUBTABS_IDX, TAB0_ANALYST_REPORT_IDX};
     private final int TAB1_LOCALRUN_IDX = 0;
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
@@ -217,9 +217,9 @@ public class MainFrame extends JFrame {
             }
             ((AnalystReportFrame)reportPanel).setTitleListener(myTitleListener, idx);
             jamQuitHandler(null, myQuitAction, menuBar);
-            tabIndices[TAB0_ANAL_REPORT_IDX] = idx;
+            tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
         } else {
-            tabIndices[TAB0_ANAL_REPORT_IDX] = -1;
+            tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
 
         // Assembly runner
@@ -375,12 +375,8 @@ public class MainFrame extends JFrame {
 
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            AssemblyController assyCont = (AssemblyController) assyFrame.getController();
-            if (assyCont.getRunTabbedPane().isEnabledAt(assyCont.getRunTabbledPanelIdx())) {
-                assyCont.getRunTabbedPane().setEnabledAt(assyCont.getRunTabbledPanelIdx(), false);
-
-                // Resets the Viskit ClassLoader
-                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
+            if (tabbedPane.isEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX])) {
+                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], false);
             }
         }
     }

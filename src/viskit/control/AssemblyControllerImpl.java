@@ -78,7 +78,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
     private JTabbedPane runTabbedPane;
-    private int runTabbedPaneIdx;
+    private int runTabbedPaneIdx;/** The handler to run an assembly */
+    private AssemblyRunnerPlug runner;
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
@@ -146,13 +147,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void setAssemblyRunPane(JComponent runTabbedPane, int idx) {
         this.runTabbedPane = (JTabbedPane) runTabbedPane;
-        this.runTabbedPaneIdx = idx;
-        this.getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, false);
-    }
-
-    @Override
-    public JTabbedPane getRunTabbedPane() {
-        return runTabbedPane;
+        runTabbedPaneIdx = idx;
     }
 
     @Override
@@ -252,9 +247,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             initOpenAssyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
 
-            if (getRunTabbedPane().isEnabledAt(this.runTabbedPaneIdx)) {
-                getRunTabbedPane().setEnabledAt(this.runTabbedPaneIdx, false);
-            }
         } else {
             vaw.delTab(mod);
         }
@@ -349,7 +341,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     // NOTE: This doesn't work quite right.  If no Assy is open,
                     // then any non-associated EGs that were also open will
                     // annoyingly close from the closeAll call above.  We are
-                    // using an open EG cache system that relies on parsling an
+                    // using an open EG cache system that relies on parsing an
                     // Assy file to find its associated EGs to open
                     if (!isCloseAll()) {
 
@@ -361,7 +353,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         }
                     }
 
-                    getRunTabbedPane().setEnabledAt(runTabbedPaneIdx, false);
                     break;
 
                 default:
@@ -1719,13 +1710,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
                             + "----------------------" + rp2.lineEnd);
 
-                    getRunTabbedPane().setEnabledAt(AssemblyControllerImpl.this.runTabbedPaneIdx, true);
-
                     // Ensure changes to the Assembly Properties dialog get saved
                     save();
 
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
+                    runTabbedPane.setEnabledAt(runTabbedPaneIdx, true);
 
                     // reset
                     execStrings = null;
@@ -1743,6 +1733,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
+                    e.printStackTrace();
                 } finally {
                     ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
                     mutex--;
@@ -1902,19 +1893,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
     }
-
-    /** The default version of this.  Run assembly in external VM. */
-    AssemblyRunnerPlug runner = new AssemblyRunnerPlug() {
-
-        @Override
-        public void exec(String[] execStrings) {
-            try {
-                Runtime.getRuntime().exec(execStrings);
-            } catch (IOException e) {
-                LOG.error(e);
-            }
-        }
-    };
 
     /** Override the default AssemblyRunnerPlug
      *

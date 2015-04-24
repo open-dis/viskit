@@ -65,17 +65,11 @@ public interface AssemblyController {
     void zipAndMailProject();
 
     /**
-     * Sets the Assembly Run panel
+     * Sets the Assembly Run tabbed panel
      * @param runPane the parent of the Assembly Run panel
-     * @param idx the index to retrieve the Run Pane
+     * @param idx the index to retrieve the Assembly Run panel
      */
     void setAssemblyRunPane(JComponent runPane, int idx);
-
-    /** Retrieves the parent of the Assembly Run Panel
-     *
-     * @return the parent of the Assembly Run Panel
-     */
-    JTabbedPane getRunTabbedPane();
 
     /** Retrieves the index of the Assembly Run Panel within the RunTabbedPane
      * @return the index of the Assembly Run Panel within the RunTabbedPane
