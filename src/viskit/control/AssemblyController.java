@@ -71,11 +71,6 @@ public interface AssemblyController {
      */
     void setAssemblyRunPane(JComponent runPane, int idx);
 
-    /** Retrieves the index of the Assembly Run Panel within the RunTabbedPane
-     * @return the index of the Assembly Run Panel within the RunTabbedPane
-     */
-    int getRunTabbledPanelIdx();
-
     void showXML();
 
     /** A component, e.g., vAMod, wants to say something.

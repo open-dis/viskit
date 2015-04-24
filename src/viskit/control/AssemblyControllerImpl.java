@@ -78,7 +78,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
     private JTabbedPane runTabbedPane;
-    private int runTabbedPaneIdx;/** The handler to run an assembly */
+    private int runTabbedPaneIdx;
+
+    /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
 
     /** Creates a new instance of AssemblyController */
@@ -148,11 +150,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void setAssemblyRunPane(JComponent runTabbedPane, int idx) {
         this.runTabbedPane = (JTabbedPane) runTabbedPane;
         runTabbedPaneIdx = idx;
-    }
-
-    @Override
-    public int getRunTabbledPanelIdx() {
-        return runTabbedPaneIdx;
+        this.runTabbedPane.setEnabledAt(runTabbedPaneIdx, false);
     }
 
     private boolean checkSaveIfDirty() {
