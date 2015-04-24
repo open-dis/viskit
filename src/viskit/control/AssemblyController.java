@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
@@ -222,6 +221,7 @@ public interface AssemblyController {
 
     OpenAssembly.AssyChangeListener getAssemblyChangeListener();
 
+    /** @return a DirectoryChangeListener */
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
 
     /**

@@ -35,6 +35,8 @@ package viskit.control;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -54,35 +56,50 @@ import viskit.view.AssemblyViewFrame;
  */
 public class RecentProjFileSetListener implements mvcRecentFileListener {
 
-    private JMenu openRecentProjMenu;
+    private List<JMenu> openRecentProjMenus;
 
-    public void setMenuItem(JMenu menuItem) {
-        openRecentProjMenu = menuItem;
+    public RecentProjFileSetListener() {
+        openRecentProjMenus = new ArrayList<>();
+    }
+
+    public void addMenuItem(JMenu menuItem) {
+        openRecentProjMenus.add(menuItem);
     }
 
     @Override
     public void listChanged() {
         AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
         Set<File> lis = acontroller.getRecentProjFileSet();
-        openRecentProjMenu.removeAll();
+
+        for (JMenu m : openRecentProjMenus) {
+            m.removeAll();
+        }
+
         for (File fullPath : lis) {
+
             if (!fullPath.exists()) {
                 continue;
             }
-            String nameOnly = fullPath.getName();
-            Action act = new ParameterizedProjAction(nameOnly);
-            act.putValue(VStatics.FULL_PATH, fullPath);
-            JMenuItem mi = new JMenuItem(act);
-            mi.setToolTipText(fullPath.getPath());
-            openRecentProjMenu.add(mi);
+
+            for (JMenu m : openRecentProjMenus) {
+                String nameOnly = fullPath.getName();
+                Action act = new ParameterizedProjAction(nameOnly);
+                act.putValue(VStatics.FULL_PATH, fullPath);
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText(fullPath.getPath());
+                m.add(mi);
+            }
         }
         if (!lis.isEmpty()) {
-            openRecentProjMenu.add(new JSeparator());
-            Action act = new ParameterizedProjAction("clear");
-            act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
-            JMenuItem mi = new JMenuItem(act);
-            mi.setToolTipText("Clear this list");
-            openRecentProjMenu.add(mi);
+
+            for (JMenu m : openRecentProjMenus) {
+                m.add(new JSeparator());
+                Action act = new ParameterizedProjAction("clear");
+                act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
+                JMenuItem mi = new JMenuItem(act);
+                mi.setToolTipText("Clear this list");
+                m.add(mi);
+            }
         }
     }
 

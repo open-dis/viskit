@@ -39,13 +39,15 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
 import viskit.VGlobals;
 import viskit.mvc.mvcAbstractController;
-import viskit.reports.AnalystReportBuilder;
+import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
 import viskit.view.AnalystReportFrame;
 
@@ -62,7 +64,7 @@ public class AnalystReportController extends mvcAbstractController {
     private AnalystReportFrame frame;
     private File reportFile;
     private File currentAssyFile;
-    private AnalystReportBuilder arb;
+    private AnalystReportModel arb;
 
     /** Creates a new instance of AnalystReportController */
     public AnalystReportController() {}
@@ -99,6 +101,19 @@ public class AnalystReportController extends mvcAbstractController {
 
         frame.showProjectName();
         buildArb(targetFile);
+    }
+
+    JTabbedPane mainTabbedPane;
+    int mainTabbedPaneIdx;
+
+    /**
+     * Sets the Analyst report panel
+     * @param tabbedPane our Analyst report panel parent
+     * @param idx the index to retrieve the Analyst report panel
+     */
+    public void setMainTabbedPane(JComponent tabbedPane, int idx) {
+        this.mainTabbedPane = (JTabbedPane) tabbedPane;
+        mainTabbedPaneIdx = idx;
     }
 
     public void openAnalystReport() {
@@ -219,7 +234,7 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     private void openAnalystReport(File selectedFile) {
-        AnalystReportBuilder arbLocal = new AnalystReportBuilder(selectedFile);
+        AnalystReportModel arbLocal = new AnalystReportModel(selectedFile);
         setContent(arbLocal);
         reportFile = selectedFile;
         frame.setReportDirty(false);
@@ -227,9 +242,9 @@ public class AnalystReportController extends mvcAbstractController {
 
     private void buildArb(File targetFile) {
         LOG.debug("TargetFile is: " + targetFile);
-        AnalystReportBuilder arbLocal;
+        AnalystReportModel arbLocal;
         try {
-            arbLocal = new AnalystReportBuilder(frame, targetFile, currentAssyFile);
+            arbLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
         } catch (Exception e) {
             LOG.error("Error parsing analyst report: " + e.getMessage());
 //            e.printStackTrace();
@@ -240,7 +255,7 @@ public class AnalystReportController extends mvcAbstractController {
         frame.setReportDirty(false);
     }
 
-    private void setContent(AnalystReportBuilder arb) {
+    private void setContent(AnalystReportModel arb) {
         if (arb != null && frame.isReportDirty()) {
             int resp = JOptionPane.showConfirmDialog(frame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +

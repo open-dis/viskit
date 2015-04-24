@@ -56,6 +56,7 @@ import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
+import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 
 /** Controller for the Assembly Run panel
@@ -496,6 +497,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         AnalystReportController cont = (AnalystReportController) VGlobals.instance().getAnalystReportController();
         if (cont != null) {
             cont.setReportXML(analystReportTempFile);
+
+            // Switch over to the analyst report tab if we have a report ready
+            // for editing
+            AnalystReportModel mod = (AnalystReportModel) cont.getModel();
+            if (mod != null && mod.isReportReady()) {
+                cont.mainTabbedPane.setSelectedIndex(cont.mainTabbedPaneIdx);
+                mod.setReportReady(false);
+            }
         } else {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +

@@ -47,6 +47,7 @@ import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.assembly.AssemblyRunnerPlug;
+import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
@@ -55,6 +56,7 @@ import viskit.control.RecentProjFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
+import viskit.model.AnalystReportModel;
 import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
@@ -134,7 +136,6 @@ public class MainFrame extends JFrame {
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
-        ChangeListener tabChangeListener = new myTabChangeListener();
 
         myQuitAction = new ExitAction("Exit");
 
@@ -179,26 +180,36 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
         }
 
-        // Now set the recent open project's file listener here
-        RecentProjFileSetListener listener = new RecentProjFileSetListener();
-        listener.setMenuItem(egFrame.getOpenRecentProjMenu());
+        final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
         final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
-        assyCntlr.addRecentProjFileSetListener(listener);
+
+        // Now set the recent open project's file listener for the egFrame now
+        // that we have an assyFrame reference
+        RecentProjFileSetListener listener = assyFrame.getRecentProjFileSetListener();
+        listener.addMenuItem(egFrame.getOpenRecentProjMenu());
+
+        // Now setup the assembly and event graph file change listener(s)
+        assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
+        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
 
         // Assembly Run
         runTabbedPane = new JTabbedPane();
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
         runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
         runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
-        int tabbedPaneIdx = -1;
+
+        // Always selected as visible
         if (SettingsDialog.isAssemblyRunVisible()) {
             tabbedPane.add(runTabbedPanePanel);
-            tabbedPaneIdx = tabbedPane.indexOfComponent(runTabbedPanePanel);
-            tabbedPane.setTitleAt(tabbedPaneIdx, "Assembly Run");
-            tabbedPane.setToolTipTextAt(tabbedPaneIdx, "Run simulation defined by assembly");
+            int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
+            tabbedPane.setTitleAt(idx, "Assembly Run");
+            tabbedPane.setToolTipTextAt(idx, "Run simulation defined by assembly");
             menus.add(null); // placeholder
+            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
+            assyCntlr.setAssemblyRunPane(tabbedPane, idx);
+        } else {
+            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = -1;
         }
-        tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = tabbedPaneIdx;
 
         // Analyst report
         boolean aRPanelVisible = SettingsDialog.isAnalystReportVisible();
@@ -218,6 +229,9 @@ public class MainFrame extends JFrame {
             ((AnalystReportFrame)reportPanel).setTitleListener(myTitleListener, idx);
             jamQuitHandler(null, myQuitAction, menuBar);
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
+            AnalystReportController cntlr = (AnalystReportController) reportPanel.getController();
+            cntlr.setMainTabbedPane(tabbedPane, idx);
+            assyCntlr.addAssemblyFileListener((AnalystReportFrame) reportPanel);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
@@ -257,6 +271,8 @@ public class MainFrame extends JFrame {
             doCommonHelp(menuBar);
             doeFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
             jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
+            assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
+            egCntlr.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
         }
 
         // Grid run panel
@@ -272,31 +288,8 @@ public class MainFrame extends JFrame {
             menus.add(menuBar);
             doCommonHelp(menuBar);
             runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
+            assyCntlr.addAssemblyFileListener(runGridComponent);
         }
-
-        /* End DIFF between OA3302 branch and trunk */
-
-        // Now setup the assembly file change listener(s)
-        assyCntlr.setAssemblyRunPane(tabbedPane, tabbedPaneIdx);
-        assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-
-        /* DIFF between OA3302 branch and trunk */
-        if (isDOEVisible)
-            assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
-        /* End DIFF between OA3302 branch and trunk */
-
-        assyCntlr.addAssemblyFileListener(runGridComponent);
-        if (aRPanelVisible) {
-            assyCntlr.addAssemblyFileListener((AnalystReportFrame) reportPanel);
-        }
-
-        // Now setup the open-event graph listener(s)
-        final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
-        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
-
-        /* DIFF between OA3302 branch and trunk */
-        if (isDOEVisible)
-            egCntlr.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
         /* End DIFF between OA3302 branch and trunk */
 
         // let the event graph controller establish the Viskit classpath and open
@@ -318,6 +311,7 @@ public class MainFrame extends JFrame {
         // Swing:
         getContentPane().add(tabbedPane);
 
+        ChangeListener tabChangeListener = new myTabChangeListener();
         tabbedPane.addChangeListener(tabChangeListener);
         runTabbedPane.addChangeListener(tabChangeListener);
     }
@@ -337,6 +331,7 @@ public class MainFrame extends JFrame {
         timer.schedule(delayedThreadStartTask, ms);
     }
 
+    /** Utility class to handle tab selections on the main frame */
     class myTabChangeListener implements ChangeListener {
 
         @Override

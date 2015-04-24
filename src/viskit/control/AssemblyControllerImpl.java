@@ -427,11 +427,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         @Override
         public void fileChanged(File file, int action, DirectoryWatch source) {
-            // Do nothing?
+            // Do nothing.  The DirectoryWatch still tracks temp EGs, but we
+            // don't need anything special from this method, yet....
         }
     };
 
-    /** @return a DirectoryChangeListener */
     @Override
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
         return egListener;

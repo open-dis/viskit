@@ -826,11 +826,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initReportFile();
 
-            // Because there is no instantiated report builder in this run
-            // thread context, we reflect one here
+            // Because there is no instantiated report builder in the current
+            // thread context, we reflect here
             ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
             try {
-                Class<?> clazz = localLoader.loadClass("viskit.reports.AnalystReportBuilder");
+                Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 Object arbObject = arbConstructor.newInstance(statsConfig.getReport(), pclNodeCache);
                 Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);

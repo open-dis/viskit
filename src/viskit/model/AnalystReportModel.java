@@ -31,7 +31,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-package viskit.reports;
+package viskit.model;
 
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
@@ -53,7 +53,9 @@ import viskit.util.EventGraphCache;
 import viskit.VGlobals;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
-import viskit.model.AssemblyNode;
+import viskit.mvc.mvcAbstractModel;
+import viskit.reports.HistogramChart;
+import viskit.reports.LinearRegressionChart;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -64,9 +66,9 @@ import viskit.model.AssemblyNode;
  * @since July 18, 2006, 7:04 PM
  * @version $Id$
  */
-public final class AnalystReportBuilder {
+public final class AnalystReportModel extends mvcAbstractModel {
 
-    static Logger log = LogUtils.getLogger(AnalystReportBuilder.class);
+    static Logger log = LogUtils.getLogger(AnalystReportModel.class);
 
     private boolean debug = false;
 
@@ -93,8 +95,7 @@ public final class AnalystReportBuilder {
     private Element statisticalResults;
     private Element concRec;
 
-    /** Reference to the Analyst Report JPanel for JProgressBar */
-    private JFrame aRPanel;
+    private JProgressBar jpb;
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -105,7 +106,7 @@ public final class AnalystReportBuilder {
      *        used by this Analyst Report
      * @param map the set of PCLs that have specific properties set for type statistic desired
      */
-    public AnalystReportBuilder(String statisticsReportPath, Map<String, AssemblyNode> map) {
+    public AnalystReportModel(String statisticsReportPath, Map<String, AssemblyNode> map) {
 
         try {
             Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
@@ -128,9 +129,14 @@ public final class AnalystReportBuilder {
      * @param assyFile the current assembly file to process a report from
      * @throws java.lang.Exception
      */
-    public AnalystReportBuilder(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
+    public AnalystReportModel(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
         this(xmlFile);
-        this.aRPanel = aRPanel;
+
+        // TODO: This doesn't seem to be doing anything correctly
+        jpb = new JProgressBar();
+        aRPanel.add(jpb);
+        aRPanel.validate();
+
         log.debug("Successful parseXML");
         if (assyFile != null) {
             setAssemblyFile(assyFile);
@@ -144,7 +150,7 @@ public final class AnalystReportBuilder {
      * annotations, or as required from the analyst/user.
      * @param fullReport an existing fully annotated report to reopen
      */
-    public AnalystReportBuilder(File fullReport) {
+    public AnalystReportModel(File fullReport) {
         try {
             parseXML(fullReport);
         } catch (Exception ex) {
@@ -957,15 +963,21 @@ public final class AnalystReportBuilder {
         createBehaviorDescriptions();
     }
 
+    private boolean reportReady = false;
+
+    public boolean isReportReady() {
+        return reportReady;
+    }
+
+    public void setReportReady(boolean b) {
+        reportReady = b;
+    }
+
     /** Post Analyst Report processing steps to take */
-    public void postProcessing() {
-        JProgressBar jpb = new JProgressBar();
+    private void postProcessing() {
         jpb.setIndeterminate(true);
         jpb.setString("Analyst Report now generating...");
         jpb.setStringPainted(true);
-
-        aRPanel.add(jpb);
-        aRPanel.validate();
 
         log.debug("JProgressBar set");
 
@@ -980,6 +992,7 @@ public final class AnalystReportBuilder {
         jpb.setStringPainted(false);
 
         announceReportReadyToView();
+        reportReady = true;
     }
 
     /** Utility method used here to invoke the capability to capture all Event
@@ -1008,8 +1021,12 @@ public final class AnalystReportBuilder {
     }
 
     private void announceReportReadyToView() {
+
+        // NOTE: This method may be called with the classloader set during Assy
+        // Run initialization, so, we can't center this dialog via reference to
+        // the main app frame.
         JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
-                "Analyst Report is loaded and ready for display.</p></body></html>",
+                "Analyst Report is loaded and is now ready for further editing.</p></body></html>",
                 "Analyst Report Ready", JOptionPane.INFORMATION_MESSAGE);
         // TODO consider inserting loaded filename into message above as a user confirmation
     }
@@ -1156,4 +1173,4 @@ public final class AnalystReportBuilder {
         this.pclNodeCache = pclNodeCache;
     }
 
-} // end class file AnalystReportBuilder.java
+} // end class file AnalystReportModel.java

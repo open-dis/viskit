@@ -22,7 +22,6 @@ import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
@@ -633,8 +632,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
-        // The recently opened project file listener will be set in the
-        // MainFrame after the AssemblyView is instantiated
+        // The recently opened project file listener will be set with the
+        // openRecentProjMenu in the MainFrame after the AssemblyView is
+        // instantiated
 
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));

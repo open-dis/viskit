@@ -65,6 +65,7 @@ import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.control.AnalystReportController;
 import viskit.doe.LocalBootLoader;
+import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
@@ -277,11 +278,12 @@ public class VGlobals {
         return aRf;
     }
 
-    // The model is the builder, but not very functional as a model
-//    public mvcModel getAnalystReoprtModel() {
-//        return aRcont.getModel();
-//    }
+    /** @return the analyst report builder (model) */
+    public AnalystReportModel getAnalystReoprtModel() {
+        return (AnalystReportModel) aRcont.getModel();
+    }
 
+    /** @return the analyst report controller */
     public mvcController getAnalystReportController() {
         return aRcont;
     }

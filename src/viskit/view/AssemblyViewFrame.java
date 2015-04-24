@@ -89,6 +89,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private LegoTree lTree,  pclTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
+    private RecentProjFileSetListener recentProjFileSetListener;
 
     private int untitledCount = 0;
 
@@ -168,6 +169,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         this.toolBar = toolBar;
     }
 
+    /**
+     * @return the recentProjFileSetListener
+     */
+    public RecentProjFileSetListener getRecentProjFileSetListener() {
+        return recentProjFileSetListener;
+    }
+
     /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
 
@@ -183,8 +191,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
-            setModel((AssemblyModelImpl) myVgacw.assyModel);          // hold on locally
-            getController().setModel(getModel());  // tell controller
+            setModel((AssemblyModelImpl) myVgacw.assyModel); // hold on locally
+            getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null) {
@@ -280,9 +288,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
-        RecentProjFileSetListener listener = new RecentProjFileSetListener();
-        listener.setMenuItem(openRecentProjMenu);
-        controller.addRecentProjFileSetListener(listener);
+        // The EGViewFrame will get this listener for it's menu item of the same
+        recentProjFileSetListener = new RecentProjFileSetListener();
+        getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
+        controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
 
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close", null,

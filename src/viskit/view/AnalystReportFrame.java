@@ -65,7 +65,7 @@ import viskit.control.AnalystReportController;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.mvc.mvcModelEvent;
-import viskit.reports.AnalystReportBuilder;
+import viskit.model.AnalystReportModel;
 
 /**
  * MOVES Institute
@@ -80,7 +80,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
     private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
-    private AnalystReportBuilder arb;
+    private AnalystReportModel arb;
 
     /**
      * TODO: rewire this functionality?
@@ -95,7 +95,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         initMVC(controller);
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
-        doMenus();
+        buildMenus();
 
         locationImageFileChooser = new JFileChooser("./images/");
     }
@@ -150,8 +150,10 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         dirty = b;
     }
 
-    public void setReportBuilder(AnalystReportBuilder b) {
+    public void setReportBuilder(AnalystReportModel b) {
         arb = b;
+        setModel(arb); // hold on locally
+        getController().setModel(getModel()); // tell controller
     }
 
     public void fillLayout() {
@@ -849,7 +851,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setRecommendations(conRecRecsTA.getText());
     }
 
-    private void doMenus() {
+    private void buildMenus() {
 
         AnalystReportController controller = (AnalystReportController) getController();
 
