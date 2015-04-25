@@ -945,7 +945,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +
                     mod.getMetaData().name;
-            ((EventGraphView) getView()).showAndSaveSource(className, source, localLastFile.getName());
+            ((AssemblyView) VGlobals.instance()).showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 

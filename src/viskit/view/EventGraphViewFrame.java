@@ -1313,21 +1313,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void showAndSaveSource(String className, String s, String filename) {
-        final JFrame f = new SourceWindow(this, className, s);
-        f.setTitle("Generated source from " + filename);
-
-        Runnable r = new Runnable() {
-
-            @Override
-            public void run() {
-                f.setVisible(true);
-            }
-        };
-        SwingUtilities.invokeLater(r);
-    }
-
-    @Override
     public void displayXML(File f) {
         JComponent xt;
         try {

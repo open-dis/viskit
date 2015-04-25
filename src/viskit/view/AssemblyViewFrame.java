@@ -79,7 +79,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private String FULLPATH = VStatics.FULL_PATH;
     private String CLEARPATHFLAG = VStatics.CLEAR_PATH_FLAG;
     private Color background = new Color(0xFB, 0xFB, 0xE5);
-    private String filename;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
@@ -1058,9 +1057,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void showAndSaveSource(String className, String s) {
+    public void showAndSaveSource(String className, String s, String fileName) {
         final JFrame f = new SourceWindow(this, className, s);
-        f.setTitle("Generated source from " + filename);
+        f.setTitle("Generated source from " + fileName);
 
         Runnable r = new Runnable() {
 

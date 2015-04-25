@@ -102,16 +102,6 @@ public interface EventGraphView {
     Model[] getOpenModels();
 
     /**
-     * Called by the controller after source has been generated. Show to the
-     * user and provide him with the option to save.
-     *
-     * @param className the name of the source file to show
-     * @param s Java source
-     * @param filename the source file's name
-     */
-    void showAndSaveSource(String className, String s, String filename);
-
-    /**
      * Shows the XML representation of this EG
      * @param f the EG file to display
      */

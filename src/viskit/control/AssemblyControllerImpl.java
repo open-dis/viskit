@@ -1354,9 +1354,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void generateJavaSource() {
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
-        if (source != null && source.length() > 0) {
+        if (source != null && !source.isEmpty()) {
             String className = vmod.getMetaData().packageName + "." + vmod.getMetaData().name;
-            ((AssemblyView) getView()).showAndSaveSource(className, source);
+            ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
         }
     }
 

@@ -104,13 +104,14 @@ public interface AssemblyView {
     void setSelectedAssemblyName(String s);
 
     /**
-     * Called by the controller after source has been generated.  Show to the
-     * user and provide the option to save.
+     * Called by the controller after source has been generated. Show to the
+     * user and provide him with the option to save.
      *
-     * @param className the class name of the source file
+     * @param className the name of the source file to show
      * @param s Java source
+     * @param filename the source file's name
      */
-    void showAndSaveSource(String className, String s);
+    void showAndSaveSource(String className, String s, String filename);
 
     void displayXML(File f);
 
