@@ -45,6 +45,8 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed NP bug in the Source Window frame title when generating Assy souce code
+
   Added support for when a user wishes to generate a statistical run report in
   that when the report is ready for further editing/input by the user, the UI
   will auto select the analyst report tab
