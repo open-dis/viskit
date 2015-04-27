@@ -512,7 +512,7 @@ their descpritions.
             <package name="viskit.mvc"/>
             <package name="viskit.reports"/>
             <package name="viskit.util"/>
-            <package name="viskit.view.*"/>
+            <package name="viskit.view"/>
             <package name="viskit.xsd.bindings.assembly"/>
             <package name="viskit.xsd.bindings.assembly.stats"/>
             <package name="viskit.xsd.bindings.cli"/>
