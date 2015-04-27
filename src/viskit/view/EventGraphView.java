@@ -101,13 +101,8 @@ public interface EventGraphView {
 
     Model[] getOpenModels();
 
-    /**
-     * Shows the XML representation of this EG
-     * @param f the EG file to display
-     */
-    void displayXML(File f);
-
-    // The following 2 may be implemented by the view in some other way that an official GUI Dialog
+    // The following 2 may be implemented by the view in some other way than an
+    // official GUI Dialog
 
     /**
      * run the add parameter dialog

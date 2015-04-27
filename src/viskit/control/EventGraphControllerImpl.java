@@ -945,7 +945,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +
                     mod.getMetaData().name;
-            ((AssemblyView) VGlobals.instance()).showAndSaveSource(className, source, localLastFile.getName());
+            VGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
@@ -955,7 +955,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        ((EventGraphView) getView()).displayXML(((Model) getModel()).getLastFile());
+        VGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
     }
 
     @Override

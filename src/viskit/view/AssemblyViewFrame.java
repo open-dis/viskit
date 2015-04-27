@@ -1141,8 +1141,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         comp.setMinimumSize(d);
     }
 
-}
+} // end class file AssemblyViewFrame.java
 
+/** Utility class to handle EventNode DnD operations */
 interface DragStartListener {
     void startingDrag(Transferable trans);
 }

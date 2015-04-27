@@ -113,6 +113,10 @@ public interface AssemblyView {
      */
     void showAndSaveSource(String className, String s, String filename);
 
+    /**
+     * Shows the XML representation of the given file
+     * @param f the file to display
+     */
     void displayXML(File f);
 
     /** Add an Assembly tab to the Assembly View Editor
