@@ -28,7 +28,7 @@ import java.io.OutputStream;
  * Class that copies data between two streams as quickly as possible.  The copy
  * method reads from the input stream and writes onto the output stream until
  * the input stream is exhausted.
- *<p>
+ * <p>
  *   <b>History:</b>
  *   <pre><b>
  *     Date:     June 23, 2005
@@ -36,7 +36,7 @@ import java.io.OutputStream;
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.StreamCopier">Terry D. Norbraten</a>
  *     Comments: Initial
  *   </b></pre>
- *</p>
+ * </p>
  *
  * @author Elliotte Rusty Harold
  * @version $Id: StreamCopier.java 232 2011-12-26 20:44:41Z tdnorbra $
