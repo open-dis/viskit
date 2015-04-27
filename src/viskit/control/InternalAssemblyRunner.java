@@ -72,7 +72,6 @@ import viskit.model.AssemblyModelImpl;
  */
 public class InternalAssemblyRunner implements PropertyChangeListener {
 
-    static String lineSep = System.getProperty("line.separator");
     static Logger log = LogUtils.getLogger(InternalAssemblyRunner.class);
 
     /** The name of the assy to run */
@@ -114,7 +113,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         saver = new saveListener();
 
         // NOTE:
-        // Don't supply rewind or pause buttons on VCR, not hooked up, or working right
+        // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons.  Currently, only start and stop work
         runPanel = new RunnerPanel2("Assembly Runner", true, aRPanelVisible);
         doMenus();

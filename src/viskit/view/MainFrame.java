@@ -203,7 +203,7 @@ public class MainFrame extends JFrame {
             tabbedPane.add(runTabbedPanePanel);
             int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
             tabbedPane.setTitleAt(idx, "Assembly Run");
-            tabbedPane.setToolTipTextAt(idx, "Run simulation defined by assembly");
+            tabbedPane.setToolTipTextAt(idx, "Initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder
             tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
             assyCntlr.setAssemblyRunPane(tabbedPane, idx);
@@ -218,7 +218,7 @@ public class MainFrame extends JFrame {
             tabbedPane.add(reportPanel.getContentPane());
             int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
-            tabbedPane.setToolTipTextAt(idx, "Support analyst assessment and report generation");
+            tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
             menuBar = ((AnalystReportFrame)reportPanel).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
@@ -372,6 +372,10 @@ public class MainFrame extends JFrame {
             // back and change something, then handle that here
             if (tabbedPane.isEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX])) {
                 tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], false);
+
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
+            } else {
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Initialize assembly runner from Assembly tab");
             }
         }
     }
