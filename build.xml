@@ -510,7 +510,7 @@ their descpritions.
             <package name="viskit.jgraph"/>
             <package name="viskit.model"/>
             <package name="viskit.mvc"/>
-            <package name="viskit,reports"/>
+            <package name="viskit.reports"/>
             <package name="viskit.util"/>
             <package name="viskit.view.*"/>
             <package name="viskit.xsd.bindings.assembly"/>
