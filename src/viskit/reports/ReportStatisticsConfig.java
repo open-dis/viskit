@@ -80,7 +80,7 @@ public class ReportStatisticsConfig {
     private String assemblyName;
 
     /** Creates a new instance of ReportStatisticsConfig
-     * @param assemblyName
+     * @param assemblyName name of assembly
      */
     public ReportStatisticsConfig(String assemblyName) {
         this.assemblyName = assemblyName;
@@ -97,7 +97,7 @@ public class ReportStatisticsConfig {
     /**
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
-     * @param keyValues
+     * @param keyValues list of keyValues
      */
     public void setEntityIndex(List<String> keyValues) {
         entityIndex = new String[keyValues.size()];
@@ -148,8 +148,8 @@ public class ReportStatisticsConfig {
     /**
      * Creates a replication record for each SampleStatistics object after each
      * run.
-     * @param repNumber
-     * @param repStats
+     * @param repNumber replication number
+     * @param repStats  replication statistics
      */
     public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
         LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
