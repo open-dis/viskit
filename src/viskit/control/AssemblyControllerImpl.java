@@ -1020,7 +1020,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /**
      *
-     * @param pclNode
+     * @param pclNode Property Change Listener Node
      */
     @Override
     public void pcListenerEdit(PropChangeListenerNode pclNode) {
