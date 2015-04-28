@@ -152,7 +152,7 @@ public class FindClassesForInterface {
 
     /**
      * @param args the command line arguments
-     * @throws java.lang.Throwable
+     * @throws java.lang.Throwable pass along throwable exceptions
      */
     public static void main(String[] args) throws Throwable {
         String jarFileName = args.length > 0 ? args[0] : "/R:/Simkit/simkit.jar";
