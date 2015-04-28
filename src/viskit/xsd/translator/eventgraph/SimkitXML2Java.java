@@ -109,7 +109,7 @@ public class SimkitXML2Java {
         try {
             setUnMarshaller(jaxbCtx.createUnmarshaller());
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
-            this.root = (SimEntity) getUnMarshalledObject();
+            root = (SimEntity) getUnMarshalledObject();
         } catch (JAXBException ex) {
 
             // Silence attempting to unmarshal an Assembly here
@@ -195,10 +195,10 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(head);
 
-        className = this.root.getName();
-        packageName = this.root.getPackage();
-        extendz = this.root.getExtend();
-        String implementz = this.root.getImplement();
+        className = root.getName();
+        packageName = root.getPackage();
+        extendz = root.getExtend();
+        String implementz = root.getImplement();
 
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
@@ -228,7 +228,7 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(vars);
 
-        liParams = this.root.getParameter();
+        liParams = root.getParameter();
         superParams = resolveSuperParams(liParams);
 
         // Logger instantiation (for debugging only)
@@ -269,7 +269,7 @@ public class SimkitXML2Java {
 
         PrintWriter pw = new PrintWriter(vars);
 
-        liStateV = this.root.getStateVariable();
+        liStateV = root.getStateVariable();
 
         pw.println(SP_4 + "/* Simulation State Variables */");
         pw.println();
@@ -521,8 +521,8 @@ public class SimkitXML2Java {
         // Generate a zero parameter (default) constructor in addition to a
         // parameterized constructor if we are not an extension
         if (superParams.isEmpty()) {
-            pw.println(SP_4 + "/** Creates a new default instance of " + this.root.getName() + " */");
-            pw.println(SP_4 + "public " + this.root.getName() + LP + RP + SP + OB);
+            pw.println(SP_4 + "/** Creates a new default instance of " + root.getName() + " */");
+            pw.println(SP_4 + "public " + root.getName() + LP + RP + SP + OB);
             pw.println(SP_4 + CB);
             pw.println();
         }
@@ -539,7 +539,7 @@ public class SimkitXML2Java {
             }
 
             // Now, generate the parameterized consructor
-            pw.print(SP_4 + "public " + this.root.getName() + LP);
+            pw.print(SP_4 + "public " + root.getName() + LP);
             for (Parameter pt : liParams) {
 
                 pw.print(pt.getType() + SP + shortinate(pt.getName()));
@@ -627,7 +627,7 @@ public class SimkitXML2Java {
 
     void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
 
-        List<Event> events = this.root.getEvent();
+        List<Event> events = root.getEvent();
 
         // Bugfix 1398
         for (Event e : events) {
@@ -1070,7 +1070,7 @@ public class SimkitXML2Java {
         PrintWriter pw = new PrintWriter(t);
         String code = root.getCode();
         if (code != null) {
-            pw.println(SP_4 + "/* Inserted code for " + this.root.getName() + " */");
+            pw.println(SP_4 + "/* Inserted code for " + root.getName() + " */");
             String[] lines = code.split("\\n");
             for (String codeLines : lines) {
                 pw.println(SP_4 + codeLines);
