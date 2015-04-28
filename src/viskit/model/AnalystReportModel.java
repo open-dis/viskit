@@ -127,7 +127,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * @param aRPanel a reference to the Analyst Report Frame
      * @param xmlFile an existing temp Analyst Report
      * @param assyFile the current assembly file to process a report from
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception general catchall
      */
     public AnalystReportModel(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
         this(xmlFile);
@@ -182,7 +182,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * File I/O that saves the report in XML format
      * @param fil the initial temp file to save for further post-processing
      * @return the initial temp file to saved for further post-processing
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception general catchall
      */
     public File writeToXMLFile(File fil) throws Exception {
         if (fil == null) {return writeToXMLFile();}
@@ -192,7 +192,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     /** @return the initial temp file to be saved for further post-processing
-     * @throws java.lang.Exception
+     * @throws java.lang.Exception general catchall
      */
     public File writeToXMLFile() throws Exception {
         File fil = TempFileManager.createTempFile("AnalystReport", ".xml");
