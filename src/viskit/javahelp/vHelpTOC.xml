@@ -135,8 +135,8 @@
         <tocitem text="Adding Help" target="addHelp" />
     </tocitem>
     
-    <tocitem text="References" expand="false">
-        <tocitem text="Adding Help" target="references" />
+    <tocitem text="Additional Resources" expand="false">
+        <tocitem text="References" target="references" />
     </tocitem>
   </tocitem>
 </toc>
