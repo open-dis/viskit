@@ -229,7 +229,7 @@ public class VStatics {
 
     /**
      * Exec a file.
-     * @param path
+     * @param path fully qualified path and filename
      * @return null if exec was ok, else error message
      */
     public static String runOSFile(String path) {
