@@ -87,6 +87,7 @@ import viskit.ViskitProject;
  * @version $Id$
  * <p>
  *   <b>History:</b>
+ * </p>
  *   <pre><b>
  *     Date:     10 MAR 2008
  *     Time:     0120Z
@@ -94,7 +95,6 @@ import viskit.ViskitProject;
  *     Comments: 1) Initial
  *
  *   </b></pre>
- * </p>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class LinearRegressionChart {
