@@ -122,7 +122,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     /**
      * Assembly nodes don't hold onto edges.
-     * @param pce
+     * @param pce the edge to delete
      */
     void deletePropChangeEdge(PropChangeEdge pce);
 
