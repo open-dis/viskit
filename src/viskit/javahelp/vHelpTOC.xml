@@ -3,12 +3,12 @@
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
          "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0" topicimage="topic">
-  <tocitem text="VisKit">
-    <tocitem text="Big Picture" expand="false">
+  <tocitem text="VisKit Help">
+    <tocitem text="Overview" expand="false">
       <tocitem text="Introduction"  target="Introduction"/>
       <tocitem text="Contributors"  target="Contributors"/>
-      <tocitem text="Overview"			target="Overview"/>
-      <tocitem text="Terms"			    target="Terms"/>
+ <!-- <tocitem text="Overview"	    target="Overview"/> -->
+      <tocitem text="Terms"	    target="Terms"/>
     </tocitem>
 
     <tocitem text="Tutorial"				expand="true">
@@ -131,6 +131,12 @@
 
     </tocitem>
 
-    <tocitem text="Adding Help" target="addHelp" />
+    <tocitem text="Developers" expand="false">
+        <tocitem text="Adding Help" target="addHelp" />
+    </tocitem>
+    
+    <tocitem text="References" expand="false">
+        <tocitem text="Adding Help" target="references" />
+    </tocitem>
   </tocitem>
 </toc>

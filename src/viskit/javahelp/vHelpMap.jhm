@@ -10,6 +10,7 @@
   <mapID target="Terms"         url="Pages/Terms.html"/>
 
   <mapID target="addHelp"       url="Pages/AddingHelp.html"/>
+  <mapID target="references"    url="Pages/References.html"/>
 
 <!-- Tutorial items -->
 
