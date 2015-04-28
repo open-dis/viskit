@@ -3,7 +3,7 @@
 <!-- Seems to render in Mozilla Firefox the best.  Broken in IE7 -->
 <?xml-stylesheet type="text/xsl" href="./ant2html.xsl"?>
 
-<project basedir="." default="build.run.no.extensions" name="Viskit">
+<project basedir="." default="build" name="Viskit">
     <description>
         Ant build file for the NPS Viskit Discrete Event Simulation (DES) UI and
         associated libraries. Third-party jar files are not compiled from source
@@ -137,6 +137,9 @@
     <!--  === TARGET: all === -->
     <target name="all" description="clean then build everything" depends="dist" />
 
+    <!--  === TARGET: help === -->
+    <target name="build" depends="build.run.no.extensions" description="default build and run"/>
+    
     <!--  === TARGET: help === -->
     <target name="help"
             depends="javahelp"
@@ -480,8 +483,8 @@ their descpritions.
             depends="jar"
             description="Build viskit jar only, no DES extensions"/>
 
-    <!--  === TARGET: doc. Create javadocs and put the result in the docs directory. === -->
-    <target name="doc"
+    <!--  === TARGET: javadoc. Create javadocs and put the result in the docs directory. === -->
+    <target name="javadoc"
             depends="init,compile"
             description="Create the javadoc for Viskit.">
 
@@ -532,7 +535,7 @@ their descpritions.
     </target>
 
     <!-- === TARGET: dist === -->
-    <target name="dist" depends="clean,jar,doc">
+    <target name="dist" depends="clean,jar,javadoc">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/examples"/>
