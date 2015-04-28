@@ -118,7 +118,7 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
-     * @param hideGroups
+     * @param hideGroups whether or not to hide groups
      */
     public vAssemblyEgVertexRenderer(boolean hideGroups) {
         this();
