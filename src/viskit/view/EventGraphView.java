@@ -48,8 +48,8 @@ public interface EventGraphView {
     /**
      * Question dialog
      *
-     * @param title
-     * @param prompt
+     * @param title Dialog title
+     * @param prompt Dialog prompt
      * @return yes, no or cancel constants
      */
     int genericAsk(String title, String prompt);
