@@ -5,7 +5,6 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
-import javax.swing.JComponent;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
@@ -62,13 +61,6 @@ public interface AssemblyController {
      * client form to open for mailing to the viskit mailing list
      */
     void zipAndMailProject();
-
-    /**
-     * Sets the Assembly Run tabbed panel
-     * @param runPane the parent of the Assembly Run panel
-     * @param idx the index to retrieve the Assembly Run panel
-     */
-    void setAssemblyRunPane(JComponent runPane, int idx);
 
     void showXML();
 

@@ -77,8 +77,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFile;
-    private JTabbedPane runTabbedPane;
-    private int runTabbedPaneIdx;
 
     /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
@@ -144,13 +142,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             recordAssyFiles();
         }
         return openAssemblies;
-    }
-
-    @Override
-    public void setAssemblyRunPane(JComponent runTabbedPane, int idx) {
-        this.runTabbedPane = (JTabbedPane) runTabbedPane;
-        runTabbedPaneIdx = idx;
-        this.runTabbedPane.setEnabledAt(runTabbedPaneIdx, false);
     }
 
     private boolean checkSaveIfDirty() {
@@ -1713,7 +1704,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
-                    runTabbedPane.setEnabledAt(runTabbedPaneIdx, true);
 
                     // reset
                     execStrings = null;

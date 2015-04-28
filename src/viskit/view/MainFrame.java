@@ -56,7 +56,6 @@ import viskit.control.RecentProjFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
-import viskit.model.AnalystReportModel;
 import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
@@ -206,7 +205,7 @@ public class MainFrame extends JFrame {
             tabbedPane.setToolTipTextAt(idx, "Initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder
             tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
-            assyCntlr.setAssemblyRunPane(tabbedPane, idx);
+            tabbedPane.setEnabledAt(idx, false);
         } else {
             tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = -1;
         }
@@ -358,25 +357,26 @@ public class MainFrame extends JFrame {
             }
 
             int i = tabbedPane.getSelectedIndex();
+
+            // If we compiled and prepped an Assembly to run, but want to go
+            // back and change something, then handle that here
             if (i == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]) {
                 i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
+
+                // Resets the Viskit ClassLoader
+//                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
+            } else {
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Initialize assembly runner from Assembly tab");
+                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], false);
             }
 
             getJMenuBar().remove(hmen);
             JMenuBar newMB = menus.get(i);
             newMB.add(hmen);
             setJMenuBar(newMB);
-            setTitle(titles[i]);
+            myTitleListener.setTitle(titles[i], i);
 
-            // If we compiled and prepped an Assembly to run, but want to go
-            // back and change something, then handle that here
-            if (tabbedPane.isEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX])) {
-                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], false);
-
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
-            } else {
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Initialize assembly runner from Assembly tab");
-            }
         }
     }
 
@@ -550,11 +550,14 @@ public class MainFrame extends JFrame {
 
         @Override
         public void exec(String[] execStrings) {
-            if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != 0) {
+            if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
+
+                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], true);
 
                 // toggles a tab change listener
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
+
 
                 // initializes a fresh class loader
                 assyRunComponent.preInitRun(execStrings);
