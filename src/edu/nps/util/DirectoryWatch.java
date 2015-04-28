@@ -139,19 +139,19 @@ public class DirectoryWatch {
     private Set<DirectoryChangeListener> listeners = new HashSet<>();
 
     /**
-     * @param lis
+     * @param listener listener for this directory
      * @return true if was not already registered
      */
-    public final boolean addListener(DirectoryChangeListener lis) {
-        return listeners.add(lis);
+    public final boolean addListener(DirectoryChangeListener listener) {
+        return listeners.add(listener);
     }
 
     /**
-     * @param lis
+     * @param listener listener for this directory
      * @return true if it had been registered
      */
-    public boolean removeListener(DirectoryChangeListener lis) {
-        return listeners.remove(lis);
+    public boolean removeListener(DirectoryChangeListener listener) {
+        return listeners.remove(listener);
     }
 
     private void fireAction(File f, int action) {
