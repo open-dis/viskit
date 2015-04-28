@@ -30,13 +30,13 @@ import java.io.OutputStream;
  * the input stream is exhausted.
  * <p>
  *   <b>History:</b>
+ * </p>
  *   <pre><b>
  *     Date:     June 23, 2005
  *     Time:     1055:27
  *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.StreamCopier">Terry D. Norbraten</a>
  *     Comments: Initial
  *   </b></pre>
- * </p>
  *
  * @author Elliotte Rusty Harold
  * @version $Id: StreamCopier.java 232 2011-12-26 20:44:41Z tdnorbra $
