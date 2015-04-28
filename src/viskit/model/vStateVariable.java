@@ -66,7 +66,7 @@ public class vStateVariable extends ViskitElement {
 
     /**
      * Sets the current value of the state variable
-     * @param pCurrentValue
+     * @param pCurrentValue replacement value to apply
      */
     public void setCurrentValue(Object pCurrentValue) {
         currentValue = pCurrentValue;
