@@ -98,19 +98,19 @@ public class OpenAssembly {
     private Set<AssyChangeListener> listeners = new HashSet<>();
 
     /**
-     * @param lis
+     * @param listener assembly change listener
      * @return true if was not already registered
      */
-    public boolean addListener(AssyChangeListener lis) {
-        return listeners.add(lis);
+    public boolean addListener(AssyChangeListener listener) {
+        return listeners.add(listener);
     }
 
     /**
-     * @param lis
+     * @param listener assembly change listener
      * @return true if it had been registered
      */
-    public boolean removeListener(AssyChangeListener lis) {
-        return listeners.remove(lis);
+    public boolean removeListener(AssyChangeListener listener) {
+        return listeners.remove(listener);
     }
 
     public void doParamLocallyEditted(AssyChangeListener source) {
