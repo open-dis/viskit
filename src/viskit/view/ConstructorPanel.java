@@ -70,7 +70,7 @@ public class ConstructorPanel extends JPanel {
             add(Box.createVerticalGlue());
             setSelected(true);
         }
-        validate();
+        revalidate();
     }
 
     public List<Object> getData() {

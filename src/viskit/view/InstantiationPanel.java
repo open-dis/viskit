@@ -43,13 +43,13 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
 
+    private static final int FF = 0, CONSTR = 1, FACT = 2;
+
     private JLabel typeLab, methodLab;
 
     private JTextField typeTF;
 
     private JComboBox<String> methodCB;
-
-    private static final int FF = 0, CONSTR = 1, FACT = 2, ARR = 10;
 
     private JPanel instPane;
 
@@ -416,6 +416,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private ObjListPanel olp;
 
+        private String typ;
+
+        private Class<?> myObjClass;
+        private boolean noClassAction = false;
+
         // TODO: Sometimes, there is a weird artifact that appears that looks
         //       like [...], like a button with elipses.  It happens on this
         //       panel, but is proving difficult to track down.  (TDN 15 APR 15)
@@ -466,6 +471,70 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 //            factMethodTF.addCaretListener(myCarListener);
         }
 
+        public void setType(String clName) throws ClassNotFoundException {
+            typ = clName;
+            myObjClass = VStatics.classForName(typ);
+            if (myObjClass == null) {
+                throw new ClassNotFoundException(typ);
+            }
+//            factMethodLab.setEnabled(false);
+//            factMethodTF.setEnabled(false);
+//            factMethodButt.setEnabled(false);
+        }
+
+        public void setData(VInstantiator.Factory vi) {
+            if (vi == null) {
+                return;
+            }
+
+            removeAll();
+            noClassAction = true;
+            factClassCB.setSelectedItem(vi.getFactoryClass()); // this fires action event
+            noClassAction = false;
+//            factMethodTF.setText(vi.getMethod());
+            add(topP);
+
+            boolean foundString = false;
+            for (Object o : vi.getParams()) {
+                if (o instanceof String) {
+                    foundString = true;
+                    break;
+                }
+            }
+
+            if (foundString) {
+                Vector<Object> v = new Vector<>();
+                v.add(vi);
+                addObjListPanel(v, foundString);
+            } else {
+                addObjListPanel((Vector<Object>) vi.getParams(), !foundString);
+            }
+        }
+
+        private void addObjListPanel(Vector<Object> params, boolean showLabels) {
+            olp = new ObjListPanel(ip);
+            olp.setBorder(BorderFactory.createTitledBorder(
+                    BorderFactory.createLineBorder(Color.black),
+                    "Method arguments",
+                    TitledBorder.CENTER,
+                    TitledBorder.DEFAULT_POSITION));
+            olp.setDialogInfo(packMe);
+
+            olp.setData(params, showLabels);
+            add(olp);
+
+            add(Box.createVerticalGlue());
+            revalidate();
+        }
+
+        public VInstantiator getData() {
+            String fc = (String) factClassCB.getSelectedItem();
+            fc = (fc == null) ? "" : fc.trim();
+            String m = VStatics.RANDOM_VARIATE_FACTORY_METHOD;
+            List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
+            return new VInstantiator.Factory(typ, fc, m, lis);
+        }
+
         class MyChangedListener implements ActionListener {
 
             @Override
@@ -486,8 +555,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        boolean noClassAction = false;
-
         class MyClassListener implements ActionListener {
 
             @Override
@@ -495,6 +562,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 if (noClassAction) {
                     return;
                 }
+
                 Class<?> c;
                 String cName = factClassCB.getSelectedItem().toString();
                 try {
@@ -565,87 +633,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 //                factMethodLab.setEnabled(true);
 //                factMethodButt.setEnabled(true);
                 Vector<Object> vc = VInstantiator.buildDummyInstantiators(m);
-
-                olp = new ObjListPanel(ip);
-                olp.setBorder(BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(Color.black),
-                        "Method arguments",
-                        TitledBorder.CENTER,
-                        TitledBorder.DEFAULT_POSITION));
-                olp.setDialogInfo(packMe);
-                olp.setData(vc, true);
-                add(olp);
-
-                add(Box.createVerticalGlue());
+                addObjListPanel(vc, true);
 
                 if (ip.modifiedListener != null) {
                     ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Factory method chosen"));
                 }
             }
-        }
-
-        String typ;
-
-        Class<?> myObjClass;
-
-        public void setType(String clName) throws ClassNotFoundException {
-            typ = clName;
-            myObjClass = VStatics.classForName(typ);
-            if (myObjClass == null) {
-                throw new ClassNotFoundException(typ);
-            }
-//            factMethodLab.setEnabled(false);
-//            factMethodTF.setEnabled(false);
-//            factMethodButt.setEnabled(false);
-        }
-
-        public void setData(VInstantiator.Factory vi) {
-            if (vi == null) {
-                return;
-            }
-
-            removeAll();
-            noClassAction = true;
-            factClassCB.setSelectedItem(vi.getFactoryClass()); // this fires action event
-            noClassAction = false;
-//            factMethodTF.setText(vi.getMethod());
-            add(topP);
-
-            olp = new ObjListPanel(ip);
-            olp.setBorder(BorderFactory.createTitledBorder(
-                    BorderFactory.createLineBorder(Color.black),
-                    "Method arguments",
-                    TitledBorder.CENTER,
-                    TitledBorder.DEFAULT_POSITION));
-            olp.setDialogInfo(packMe);
-
-            boolean foundString = false;
-            for (Object o : vi.getParams()) {
-                if (o instanceof String) {
-                    foundString = true;
-                    break;
-                }
-            }
-
-            if (foundString) {
-                Vector<Object> v = new Vector<>();
-                v.add(vi);
-                olp.setData(v, foundString);
-            } else {
-                olp.setData(vi.getParams(), true);
-            }
-            add(olp);
-
-            add(Box.createVerticalGlue());
-            revalidate();
-        }
-
-        public VInstantiator getData() {
-            String fc = (String) factClassCB.getSelectedItem();
-            fc = (fc == null) ? "" : fc.trim();
-            String m = VStatics.RANDOM_VARIATE_FACTORY_METHOD;
-            List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
-            return new VInstantiator.Factory(typ, fc, m, lis);
         }
     }
 }

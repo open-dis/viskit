@@ -95,7 +95,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             VStatics.clampHeight(entryTF[i]);
 
             jTFText = inst.toString();
-            
+
             // A little more Object... (vararg) support
             if (inst instanceof VInstantiator.Array) {
                 VInstantiator.Array via = (VInstantiator.Array) inst;
@@ -194,12 +194,18 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 ((VInstantiator.FreeF) shadow[i]).setValue(entryTF[i].getText().trim());
             } else if (shadow[i] instanceof VInstantiator.Array) {
                 VInstantiator.Array via = (VInstantiator.Array) shadow[i];
-                List<Object> inst = via.getInstantiators();
-                inst.add(new VInstantiator.FreeF(via.getType(), entryTF[i].getText().trim()));
+                List<Object> insts = via.getInstantiators();
+
+                // TODO: Limit one instantiator per Array?
+                if (insts.isEmpty())
+                    insts.add(new VInstantiator.FreeF(via.getType(), entryTF[i].getText().trim()));
             } else if (shadow[i] instanceof VInstantiator.Factory) {
                 VInstantiator.Factory vif = (VInstantiator.Factory) shadow[i];
                 List<Object> params = vif.getParams();
-                params.add(new VInstantiator.FreeF(vif.getType(), entryTF[i].getText().trim()));
+
+                // TODO: Limit one parameter per Factory?
+                if (params.isEmpty())
+                    params.add(new VInstantiator.FreeF(vif.getType(), entryTF[i].getText().trim()));
             }
             v.add(shadow[i]);
         }
@@ -235,9 +241,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             if (ai.modified) {
                 shadow[idx] = ai.getData();
                 entryTF[idx].setText(shadow[idx].toString());
-                if (changeListener != null) {
-                    changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
-                }
+                caretUpdate(null);
             }
         } else {
             ObjectInspector oi = new ObjectInspector(parent);
@@ -260,11 +264,18 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 VInstantiator vi = oi.getData();
                 if (vi == null) {return;}
 
+                // Prevent something like RVF.getInstance(RandomVariate) from
+                // being entered in the text field
+                if (vi instanceof VInstantiator.Factory) {
+                    VInstantiator.Factory fac = (VInstantiator.Factory) vi;
+                    if (!fac.getParams().isEmpty()) {
+                        return;
+                    }
+                }
+
                 shadow[idx] = vi;
                 entryTF[idx].setText(vi.toString());
-                if (changeListener != null) {
-                    changeListener.actionPerformed(new ActionEvent(this, 0, "Obj changed"));
-                }
+                caretUpdate(null);
             }
         }
     }
