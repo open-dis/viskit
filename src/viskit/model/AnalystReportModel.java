@@ -827,7 +827,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * to add conclusions
      *
      * @param productionNotesTag the tag used to identify unique Production Notes (used by XSLT)
-     * @param productionNotesText
+     * @param productionNotesText author's text block
      * @return the ProductionNotes Element
      */
     public Element xmakeProductionNotes(String productionNotesTag, String productionNotesText) {
@@ -840,7 +840,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      *
      * @param parent the parent element to add content too
      * @param productionNotesTag the tag used to identify unique production notes (used by XSLT)
-     * @param productionNotesText
+     * @param productionNotesText author's text block
      */
     public void makeProductionNotes(Element parent, String productionNotesTag, String productionNotesText) {
         replaceChild(parent, _makeContent(productionNotesTag, "ProductionNotes", productionNotesText));
