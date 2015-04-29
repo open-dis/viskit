@@ -11,8 +11,9 @@
         </mainframe>
         <projecthome>
             <!-- These two attributes MUST always be at least zero length Strings -->
-            <path dir=""/>
-            <name value=""/>
+            <!-- DefaultProject coded here for convenience -->
+            <path dir="./MyViskitProjects"/>
+            <name value="DefaultProject"/>
         </projecthome>
         <tabs>
             <EventGraphEditor visible="true"/>
