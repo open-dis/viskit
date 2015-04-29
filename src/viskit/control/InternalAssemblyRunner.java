@@ -101,7 +101,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private ClassLoader lastLoaderWithReset;
 
     /** Captures the original RNG seed state */
-    long[] seeds;
+    private long[] seeds;
     private stopListener assemblyRunStopListener;
 
     /**
@@ -126,7 +126,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
         runPanel.vcrStep.setEnabled(false);
-        seeds = RandomVariateFactory.getDefaultRandomNumber().getSeeds();
         twiddleButtons(OFF);
 
         // Viskit's current working ClassLoader
@@ -229,6 +228,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             VGlobals.instance().resetFreshClassLoader();
             lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
+
+            seeds = RandomVariateFactory.getDefaultRandomNumber().getSeeds();
 
             // Test for Bug 1237
 //            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {

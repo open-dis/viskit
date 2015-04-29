@@ -52,6 +52,7 @@ import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;
 import simkit.SimEvent;
+import simkit.random.RandomVariateFactory;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
@@ -95,15 +96,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = false;
 
-    /**
-     * ***********************************************
-     */
     private ReportStatisticsConfig statsConfig;
     private int designPointID;
     private DecimalFormat form;
     private List<String> entitiesWithStats;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
+    private long seed;
 
     /**
      * Default constructor sets parameters of BasicAssembly to their
@@ -733,7 +732,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
-                long seed = simkit.random.RandomVariateFactory.getDefaultRandomNumber().getSeed();
+                seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
