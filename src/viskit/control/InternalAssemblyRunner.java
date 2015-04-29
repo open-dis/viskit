@@ -229,8 +229,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             VGlobals.instance().resetFreshClassLoader();
             lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
 
-            seeds = RandomVariateFactory.getDefaultRandomNumber().getSeeds();
-
             // Test for Bug 1237
 //            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
 //                LOG.info(s);
@@ -267,6 +265,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
                 Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumber.invoke(null);
+
+                Method getSeeds = rVFactClass.getMethod("getSeeds");
+                seeds = (long[]) getSeeds.invoke(null);
 
                 Class<?> rNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER);
                 Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
