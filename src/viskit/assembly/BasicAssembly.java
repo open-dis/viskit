@@ -606,6 +606,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @SuppressWarnings("unchecked")
     @Override
     public void run() {
+
+        seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             System.err.println("Assemby already running.");
@@ -733,7 +735,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
-                seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
