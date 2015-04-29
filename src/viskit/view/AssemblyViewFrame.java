@@ -683,8 +683,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             File file;
             for (String path : extraCP) { // tbd same for pcls
                 file = new File(path);
+                if (!file.exists()) {
+
+                    // Allow a relative path for Diskit-Test (Diskit)
+                    if (path.contains("..")) {
+                        file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+                    }
+                }
+
                 if (file.exists()) {
-                     addEventGraphsToLegoTree(file, file.isDirectory());
+                    addEventGraphsToLegoTree(file, file.isDirectory());
                 }
             }
         }

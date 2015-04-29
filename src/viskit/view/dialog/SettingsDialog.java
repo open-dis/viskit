@@ -619,12 +619,22 @@ public class SettingsDialog extends JDialog {
         if (extClassPaths == null) {return null;}
         URL[] extClassPathsUrls = new URL[extClassPaths.length];
         int i = 0;
+        File file;
         for (String path : extClassPaths) {
-            File extFile = new File(path);
-            try {
-                extClassPathsUrls[i++] = extFile.toURI().toURL();
-            } catch (MalformedURLException ex) {
-                LogUtils.getLogger(SettingsDialog.class).error(ex);
+            file = new File(path);
+            if (!file.exists()) {
+
+                // Allow a relative path for Diskit-Test (Diskit)
+                if (path.contains("..")) {
+                    file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+                }
+            }
+            if (file.exists()) {
+                try {
+                    extClassPathsUrls[i++] = file.toURI().toURL();
+                } catch (MalformedURLException ex) {
+                    LogUtils.getLogger(SettingsDialog.class).error(ex);
+                }
             }
         }
         return extClassPathsUrls;

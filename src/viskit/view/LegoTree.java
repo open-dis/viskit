@@ -24,8 +24,9 @@ import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.AssemblyControllerImpl;
 
-/** Class to support creating a Listener Event Graph Object (LEGO) tree on the
- * Assy Editor.  Used for dragging and dropping EG and PCL nodes to the pallete
+/**
+ * Class to support creating a Listener Event Graph Object (LEGO) tree on the
+ * Assy Editor. Used for dragging and dropping EG and PCL nodes to the pallete
  * for creating Assy files.
  *
  * <pre>
@@ -42,25 +43,38 @@ import viskit.control.AssemblyControllerImpl;
  */
 public class LegoTree extends JTree implements DragGestureListener, DragSourceListener {
 
-    static Logger log = LogUtils.getLogger(LegoTree.class);
+    static final Logger LOG = LogUtils.getLogger(LegoTree.class);
 
     private DefaultMutableTreeNode rootNode;
+
     private Class<?> targetClass;
+
     private String targetClassName;
+
     private Color background;
+
     private ImageIcon myLeafIcon;
+
     private Icon standardNonLeafIcon;
+
     private Image myLeafIconImage;
+
     private DefaultTreeModel mod;
+
     private DragStartListener lis;
+
     private String genericTableToolTip = "Drag onto canvas";
 
     String userDir = System.getProperty("user.dir");
+
     String userHome = System.getProperty("user.home");
+
     String projectPath;
+
     String name;
 
-    /** Constructor for Listener Event Graph Object Tree
+    /**
+     * Constructor for Listener Event Graph Object Tree
      *
      * @param className a class to evaluate as a LEGO
      * @param iconPath path to a LEGO icon
@@ -71,7 +85,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         this(className, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
-    /** Constructor for Listener Event Graph Object Tree
+    /**
+     * Constructor for Listener Event Graph Object Tree
      *
      * @param className a class to evaluate as a LEGO
      * @param icon a LEGO icon
@@ -125,6 +140,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             doBugHack();
         }
     }
+
     private boolean bugHack = true;
 
     private void doBugHack() {
@@ -147,7 +163,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         return s == null ? genericTableToolTip : s;
     }
 
-    /** @return a class of type simkit.BasicSimEntity */
+    /**
+     * @return a class of type simkit.BasicSimEntity
+     */
     public Class<?> getTargetClass() {
         return targetClass;
     }
@@ -166,7 +184,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
     }
 
-    /** Used to help prevent duplicate EG or PCL nodes from appearing in the LEGO
+    /**
+     * Used to help prevent duplicate EG or PCL nodes from appearing in the LEGO
      * tree on the Assy Editor in addition to simply supporting the user by
      * removing a node
      *
@@ -196,7 +215,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                             return n;
                         }
                     } catch (IOException e) {
-                        log.error(e);
+                        LOG.error(e);
                     }
                 }
             }
@@ -205,10 +224,11 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     // 4 May 06 JMB The filter down below checks for empty dirs.
-    /** Adds SimEntity icons to the Assembly Editor drag and drop tree.
-     * If there is a directory, or a jarfile with xml in it, it will show in
-     * the LEGO tree, but if its children have errors when marshaling they will
-     * not appear.
+    /**
+     * Adds SimEntity icons to the Assembly Editor drag and drop tree. If there
+     * is a directory, or a jarfile with xml in it, it will show in the LEGO
+     * tree, but if its children have errors when marshaling they will not
+     * appear.
      *
      * @param f the directory to recurse to find SimEntitiy based EGs
      * @param recurse if true, recurse the directory
@@ -216,11 +236,11 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     public void addContentRoot(File f, boolean recurse) {
         if (!f.getName().contains("svn")) {
 
-            if (f.getName().toLowerCase().endsWith(".jar"))
+            if (f.getName().toLowerCase().endsWith(".jar")) {
                 addJarFile(f.getPath());
-
-            else if (!f.getName().endsWith(".java"))
+            } else if (!f.getName().endsWith(".java")) {
                 _addContentRoot(f, recurse);
+            }
         }
     }
 
@@ -237,7 +257,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 rootNode.add(myNode);
                 directoryRoots.put(f.getPath(), myNode);
                 int idx = rootNode.getIndex(myNode);
-                mod.nodesWereInserted(rootNode, new int[] {idx});
+                mod.nodesWereInserted(rootNode, new int[]{idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa) {
@@ -256,7 +276,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         parent.add(myNode);
                         directoryRoots.put(f.getPath(), myNode);
                         int idx = parent.getIndex(myNode);
-                        mod.nodesWereInserted(parent, new int[] {idx});
+                        mod.nodesWereInserted(parent, new int[]{idx});
                     } else {
 
                         // Shorten long path names
@@ -265,7 +285,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         } else if (f.getPath().contains(userHome)) {
                             name = f.getPath().substring(userHome.length() + 1, f.getPath().length());
                         } else if (f.getPath().contains(projectPath)) {
-                            name = f.getPath().substring(projectPath.length()+1, f.getPath().length());
+                            name = f.getPath().substring(projectPath.length() + 1, f.getPath().length());
                         } else {
                             name = f.getPath();
                         }
@@ -274,7 +294,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         rootNode.add(myNode);
                         directoryRoots.put(f.getPath(), myNode);
                         int idx = rootNode.getIndex(myNode);
-                        mod.nodesWereInserted(rootNode, new int[] {idx});
+                        mod.nodesWereInserted(rootNode, new int[]{idx});
                     }
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
@@ -289,30 +309,31 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             try {
 
                 // This call generates the source, compiles and validates EG XML files
+                // Also checks for extensions of SimEntityBase in .class files
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
                 if (fban != null) {
                     myNode = new DefaultMutableTreeNode(fban);
+                    int idx;
                     DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
                     if (par != null) {
                         par.add(myNode);
-                        int idx = par.getIndex(myNode);
+                        idx = par.getIndex(myNode);
                         mod.nodesWereInserted(par, new int[] {idx});
                     } else {
                         rootNode.add(myNode);
-                        int idx = rootNode.getIndex(myNode);
+                        idx = rootNode.getIndex(myNode);
                         mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
-                    log.warn("Compile problem encountered with generated source code for " + f.getName());
-                    log.warn(f.getName() + " will not be listed in the Event Graphs node tree\n");
+                    LOG.info(f.getName() + " will not be listed in the LEGOs tree\n");
                 }
 
                 // Note:
                 // On initial startup with valid XML, but bad compilation,
                 // dirty won't get set b/c the graph model is null until the
                 // model tab is created and the EG file is opened.  First pass
-                // is only for inclusion on in the LEGOs tree
+                // is only for inclusion in the LEGOs tree
                 if (VGlobals.instance().getActiveEventGraphModel() != null) {
                     VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
                     VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
@@ -322,18 +343,14 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
                 // Uncomment to reveal common reason for Exceptions
 //                t.printStackTrace();
-                log.error(t);
+                LOG.error(t);
             }
         } // directory
     }
-    Map<String, DefaultMutableTreeNode> directoryRoots;
-    Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
 
-    private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
-        String pkg = c.getPackage().getName();
-        DefaultMutableTreeNode dmtn = getParent(pkg, myroot);
-        dmtn.add(new DefaultMutableTreeNode(c));
-    }
+    Map<String, DefaultMutableTreeNode> directoryRoots;
+
+    Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
 
     DefaultMutableTreeNode getParent(String pkg, DefaultMutableTreeNode lroot) {
         DefaultMutableTreeNode parent = packagesHM.get(pkg);
@@ -356,7 +373,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         return parent;
     }
 
-    /** Adds SimEntity icons to the Assembly Editor drag and drop tree
+    /**
+     * Adds SimEntity icons to the Assembly Editor drag and drop tree
      *
      * @param f the jar to evaluate for SimEntitiy based EGs
      */
@@ -365,7 +383,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         try {
             jf = new JarFile(jarFilePath);
         } catch (IOException e) {
-            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).messageUser(
+            ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "I/O Error", "Error reading " + jarFilePath);
             return;
@@ -397,18 +415,18 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         // Shorten long path names
         if (jarFile.getName().contains(userDir)) {
-            name = jarFile.getName().substring(userDir.length()+1, jarFile.getName().length());
+            name = jarFile.getName().substring(userDir.length() + 1, jarFile.getName().length());
         } else if (jarFile.getName().contains(userHome)) {
-            name = jarFile.getName().substring(userHome.length()+1, jarFile.getName().length());
+            name = jarFile.getName().substring(userHome.length() + 1, jarFile.getName().length());
         } else if (jarFile.getName().contains(projectPath)) {
-            name = jarFile.getName().substring(projectPath.length()+1, jarFile.getName().length());
+            name = jarFile.getName().substring(projectPath.length() + 1, jarFile.getName().length());
         } else {
             name = jarFile.getName();
         }
 
         if (list == null || list.isEmpty()) {
-            log.warn("No classes of type " + targetClassName + " found in " + name);
-            log.info(name + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+            LOG.warn("No classes of type " + targetClassName + " found in " + name);
+            LOG.info(name + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
@@ -420,16 +438,10 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
     }
 
-    class MyClassSorter implements Comparator {
-
-        @Override
-        public int compare(Object o1, Object o2) {
-            String s = ((Class) o1).getName();
-            s = s.substring(s.lastIndexOf('.') + 1);
-            String s2 = ((Class) o2).getName();
-            s2 = s2.substring(s2.lastIndexOf('.') + 1);
-            return (s.compareTo(s2));
-        }
+    private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
+        String pkg = c.getPackage().getName();
+        DefaultMutableTreeNode dmtn = getParent(pkg, myroot);
+        dmtn.add(new DefaultMutableTreeNode(c));
     }
 
     class MyRenderer extends DefaultTreeCellRenderer {
@@ -495,13 +507,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 return (fa != null || fa.length != 0);
             }
 
-            return f.isFile() &&
-                    (f.getName().endsWith(".class") || (f.getName().endsWith(".xml")));
+            return f.isFile()
+                    && (f.getName().endsWith(".class") || (f.getName().endsWith(".xml")));
         }
     }
 
     //** DragGestureListener **
-
     @Override
     public void dragGestureRecognized(DragGestureEvent e) {
         if (lis == null) {
@@ -535,13 +546,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
                     new Point(-myLeafIcon.getIconWidth() / 2, -myLeafIcon.getIconHeight() / 2), xfer, this);
         } catch (java.awt.dnd.InvalidDnDOperationException dnde) {
-             // Do nothing?
+            // Do nothing?
             // nop, it works, makes some complaint, but works, why?
         }
     }
 
     // ** DragSourceListener **
-
     @Override
     public void dragDropEnd(DragSourceDropEvent e) {
     }
@@ -584,7 +594,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         return null;
     }
 
-    /** Clear the queue of all SimEntities and Property Change Listeners */
+    /**
+     * Clear the queue of all SimEntities and Property Change Listeners
+     */
     public void clear() {
         rootNode.removeAllChildren();
         if (directoryRoots != null) {

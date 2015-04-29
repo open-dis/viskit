@@ -249,10 +249,6 @@ public class VStatics {
         return null;
     }
 
-    static String[] getExtraClassPathArray() {
-        return SettingsDialog.getExtraClassPath();
-    }
-
     /**
      * Call this method to instantiate a class representation of an entity.  We'll try first
      * the "standard" classpath-classloader, then try to instantiate any that were loaded by file.

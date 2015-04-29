@@ -298,7 +298,7 @@ public class VGlobals {
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = VStatics.getExtraClassPathArray();
+        String[] workCP = SettingsDialog.getExtraClassPath();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {

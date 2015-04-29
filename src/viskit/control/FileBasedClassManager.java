@@ -38,7 +38,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class FileBasedClassManager {
 
-    static Logger log = LogUtils.getLogger(FileBasedClassManager.class);
+    static final Logger LOG = LogUtils.getLogger(FileBasedClassManager.class);
 
     // Singleton:
     protected static FileBasedClassManager me;
@@ -134,7 +134,7 @@ public class FileBasedClassManager {
                 setFileBasedAssemblyNode(f);
             }
 
-        // Check, but don't cacheXML other .class files
+        // Check, but don't cacheXML .class files
         } else if (f.getName().toLowerCase().endsWith(".class")) {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
@@ -154,9 +154,12 @@ public class FileBasedClassManager {
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
             throw new Exception("Unsupported file type.");
         }
+
         if (fclass != null) {
             addFileClass(fclass);
             fileMap.put(fclass.getName(), fban);
+        } else {
+            fban = null;
         }
         return fban;
     }
@@ -184,10 +187,10 @@ public class FileBasedClassManager {
             pa[0].addAll(simEntity.getParameter());
             VStatics.putParameterList(fclass.getName(), pa);
 
-            log.debug("Put " + fclass.getName() + simEntity.getParameter());
+            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
         } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -205,9 +208,9 @@ public class FileBasedClassManager {
             List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
             if (viskit.VStatics.debug) {
                 if (cache == null) {
-                    log.debug("cache " + cache);
+                    LOG.debug("cache " + cache);
                 } else {
-                    log.debug("cache size " + cache.size());
+                    LOG.debug("cache size " + cache.size());
                 }
             }
 
@@ -215,12 +218,12 @@ public class FileBasedClassManager {
 //            if (cacheXML.isEmpty()) {
 //                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
 //                if (viskit.VStatics.debug) {
-//                    log.debug("Cache is empty, creating workDir entry at " + s);
+//                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }
 //                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
 //            }
             if (viskit.VStatics.debug) {
-                log.debug("Adding cache " + xmlEg + " " + classFile);
+                LOG.debug("Adding cache " + xmlEg + " " + classFile);
             }
 
             if (cache != null) {
@@ -231,7 +234,7 @@ public class FileBasedClassManager {
             // if used to miss, unmiss it
             removeCacheMiss(xmlEg);
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
     }
@@ -259,17 +262,17 @@ public class FileBasedClassManager {
 
                     // This can happen if the build/classes directory got nuked
                     // so, ignore
-//                    log.error(ex);
+//                    LOG.error(ex);
 //                    ex.printStackTrace();
                 }
             }
             byte[] hash = md.digest();
             if (viskit.VStatics.debug) {
-                log.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
+                LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
             retVal = new BigInteger(hash).toString(16);
         } catch (NoSuchAlgorithmException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
         return retVal;
@@ -279,8 +282,8 @@ public class FileBasedClassManager {
         List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
-            log.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
-            log.debug("chached " + cacheXML.contains(filePath));
+            LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
+            LOG.debug("chached " + cacheXML.contains(filePath));
             if (cacheXML.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);
@@ -292,7 +295,7 @@ public class FileBasedClassManager {
                 return false;
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
             return false;
         }
@@ -309,17 +312,17 @@ public class FileBasedClassManager {
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (viskit.VStatics.debug) {
-                log.debug("getCached index at " + index);
-                log.debug("will return " + cacheClass.get(index));
+                LOG.debug("getCached index at " + index);
+                LOG.debug("will return " + cacheClass.get(index));
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheClass.get(index));
         if (viskit.VStatics.debug) {
-            log.debug("cachedFile index at " + index);
-            log.debug("will return " + cachedFile);
+            LOG.debug("cachedFile index at " + index);
+            LOG.debug("will return " + cachedFile);
         }
         return cachedFile;
     }
@@ -335,17 +338,17 @@ public class FileBasedClassManager {
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (viskit.VStatics.debug) {
-                log.debug("getCachedXml index at " + index);
-                log.debug("will return " + cacheXML.get(index));
+                LOG.debug("getCachedXml index at " + index);
+                LOG.debug("will return " + cacheXML.get(index));
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheXML.get(index));
         if (viskit.VStatics.debug) {
-            log.debug("cachedFile index at " + index);
-            log.debug("will return " + cachedFile);
+            LOG.debug("cachedFile index at " + index);
+            LOG.debug("will return " + cachedFile);
         }
         return cachedFile;
     }
@@ -378,11 +381,11 @@ public class FileBasedClassManager {
                 if (deletedCache != null)
                     didDelete = deletedCache.delete();
                 if (viskit.VStatics.debug) {
-                    log.debug(didDelete + ": cachedFile deleted index at " + index);
+                    LOG.debug(didDelete + ": cachedFile deleted index at " + index);
                 }
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
     }
@@ -404,7 +407,7 @@ public class FileBasedClassManager {
                 return digest.equals(compare);
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
         return false;
@@ -418,7 +421,7 @@ public class FileBasedClassManager {
             projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
             projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
     }
@@ -432,7 +435,7 @@ public class FileBasedClassManager {
                 projectConfig.clearProperty("Cached.Miss(" + index + ")[@digest]");
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
     }
@@ -455,7 +458,7 @@ public class FileBasedClassManager {
                 return !cachedDigest.equals(compareDigest);
             }
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
         // if egFile not in cacheXML, it can't be stale
