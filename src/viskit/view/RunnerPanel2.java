@@ -68,7 +68,7 @@ public class RunnerPanel2 extends JPanel {
     public JCheckBox searchCB;
     public JDialog searchPopup;
     public JCheckBox printSummReportsCB;
-    public JCheckBox resetSeedCB;
+    public JCheckBox resetSeedStateCB;
     public JCheckBox analystReportCB;
     public JTextField numRepsTF;
     public JScrollBar bar;
@@ -213,11 +213,11 @@ public class RunnerPanel2 extends JPanel {
         flowPan.add(analystReportCB);
 
         // Initially, unselected
-        resetSeedCB = new JCheckBox("Reset seed state each rerun");
+        resetSeedStateCB = new JCheckBox("Reset seed state each rerun");
 
         // TODO: Expose at a later time when we have usefullness for this
-        resetSeedCB.setEnabled(false);
-//        flowPan.add(resetSeedCB);
+        resetSeedStateCB.setEnabled(false);
+//        flowPan.add(resetSeedStateCB);
         /* End DIFF between OA3302 branch and trunk */
 
         JPanel buttPan = new JPanel();
