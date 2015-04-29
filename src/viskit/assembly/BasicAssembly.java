@@ -80,6 +80,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected boolean stopRun;
     protected int startRepNumber = 0;
     protected Set<SimEntity> runEntities;
+    protected long seed;
+
     private double stopTime;
     private boolean singleStep;
     private int numberReplications;
@@ -102,7 +104,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private List<String> entitiesWithStats;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
-    private long seed;
 
     /**
      * Default constructor sets parameters of BasicAssembly to their

@@ -72,7 +72,7 @@ import viskit.model.AssemblyModelImpl;
  */
 public class InternalAssemblyRunner implements PropertyChangeListener {
 
-    static Logger log = LogUtils.getLogger(InternalAssemblyRunner.class);
+    static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
 
     /** The name of the assy to run */
     String assemblyClassName;
@@ -149,7 +149,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public void preInitRun(String[] params) {
 
 //        for (String s : params) {
-//            log.info("VM argument is: " + s);
+//            LOG.info("VM argument is: " + s);
 //        }
 
         assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
@@ -172,7 +172,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            throwable.printStackTrace();
             return;
         }
-        twiddleButtons(InternalAssemblyRunner.REWIND);
+        twiddleButtons(REWIND);
     }
 
     private void fillRepWidgetsFromPreRunAssy(boolean verbose, double stopTime) throws Throwable {
@@ -233,9 +233,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             // Test for Bug 1237
 //            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
-//                log.info(s);
+//                LOG.info(s);
 //            }
-//            log.info("\n");
+//            LOG.info("\n");
 
             // Now we are in the pure classloader realm where each assy run can
             // be independent of any other
@@ -306,7 +306,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
     }
 
@@ -325,7 +325,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             try {
                 waitOn.join();
             } catch (InterruptedException ex) {
-                log.error(ex);
+                LOG.error(ex);
 //                ex.printStackTrace();
             }
 
@@ -336,7 +336,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 Method getAnalystReport = assemblyClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReport.invoke(assemblyInstance);
             } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
-                log.fatal(ex);
+                LOG.fatal(ex);
             }
             signalReportReady();
         }
@@ -376,7 +376,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             runPanel.vcrSimTime.setText("0.0");    // because no pausing
-            twiddleButtons(InternalAssemblyRunner.START);
+            twiddleButtons(START);
             initRun();
         }
     }
@@ -385,7 +385,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            twiddleButtons(InternalAssemblyRunner.STEP);
+            twiddleButtons(STEP);
         }
     }
 
@@ -424,11 +424,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 // between the Assy editor and the Assy runner panel, but it
                 // won't impede a correct Assy run.  Catch the
                 // IllegalArgumentException and move on.
-//                log.error(ex);
+//                LOG.error(ex);
 //                ex.printStackTrace();
             }
 
-            twiddleButtons(InternalAssemblyRunner.STOP);
+            twiddleButtons(STOP);
         }
     }
 
@@ -436,7 +436,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            twiddleButtons(InternalAssemblyRunner.REWIND);
+            twiddleButtons(REWIND);
         }
     }
 
@@ -668,7 +668,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                   Runtime.getRuntime().exec(tool + " " + filePath);
               }
               catch (IOException ex1) {
-                  log.error(ex1);
+                  LOG.error(ex1);
 //                  ex1.printStackTrace();
               }
             }
@@ -700,7 +700,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        log.debug(evt.getPropertyName());
+        LOG.debug(evt.getPropertyName());
 
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
