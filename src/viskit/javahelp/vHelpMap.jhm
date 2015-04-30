@@ -4,7 +4,7 @@
          "http://java.sun.com/products/javahelp/map_2_0.dtd">
 
 <map version="2.0">
-  <mapID target="Introduction"  url="VisPages/intro_no_diskit.html"/>
+  <mapID target="Introduction"  url="VisPages/introduction_no_diskit.html"/>
   <mapID target="Contributors"  url="Pages/Contributors.html"/>
   <mapID target="Overview"      url="Pages/empty.html"/>
   <mapID target="Terms"         url="Pages/Terms.html"/>
