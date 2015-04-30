@@ -52,7 +52,7 @@
     <resources>
         <res src="images/ViskitLogo.png" id="Installer.image"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
-        <res src="stage/intro_no_diskit.html" id="HTMLInfoPanel.info"/>
+        <res src="stage/Introduction.html" id="HTMLInfoPanel.info"/>
         <res src="macosx/LegacyJava6.html" id="HTMLInfoPanel.java"/>
     </resources>
 
