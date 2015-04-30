@@ -84,8 +84,8 @@
             description="Build the installers with no runtime extensions">
 
         <copy todir="${installers.dir}/stage/">
-            <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-                <include name="intro_no_diskit.html"/>
+            <fileset dir="${dir.src}/viskit/javahelp/Pages">
+                <include name="Introduction.html"/>
             </fileset>
         </copy>
         <ant target="installers.common"/>
@@ -104,8 +104,8 @@
             <fileset refid="runtime.lib.ext"/>
         </copy>
         <copy todir="${installers.dir}/stage/">
-            <fileset dir="${dir.src}/viskit/javahelp/VisPages">
-                <include name="intro.html"/>
+            <fileset dir="${dir.src}/viskit/javahelp/Pages">
+                <include name="Introduction.html"/>
             </fileset>
         </copy>
         <ant target="installers.common"/>

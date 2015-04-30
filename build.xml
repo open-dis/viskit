@@ -137,8 +137,8 @@
     <!--  === TARGET: all === -->
     <target name="all" description="clean then build everything" depends="dist" />
 
-    <!--  === TARGET: help === -->
-    <target name="build" depends="build.run.no.extensions" description="default build and run"/>
+    <!--  === TARGET: build === -->
+    <target name="build" depends="build.no.extensions" description="default build, no run"/>
     
     <!--  === TARGET: help === -->
     <target name="help"
@@ -285,6 +285,7 @@ their descpritions.
             </fileset>
             <fileset dir="${basedir}">
                 <include name="${configuration.dir}/log4j.properties"/>
+                <include name="${license.dir}/*"/>
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
