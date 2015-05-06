@@ -10,7 +10,7 @@
 
 <body>
 
-<h1 align="center"><a name="Contents">Viskit Tutorial -- Create Assembly</a></h1>
+<h1 style="text-align:center"><a name="Contents">Viskit Tutorial -- Create Assembly</a></h1>
 
 <h2>Contents</h2><ol>
 <li><a href='tutorialEvent.html#Intro'>Introduction</a></li>
@@ -39,7 +39,7 @@ and SimpleServer icons in the upper left panel under "Event Graphs". This
 indicates they have been imported into the Java classpath and can be used
 to build an assembly. This is indicated in Figure 1.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage001.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage001.png"/></p>
 <p class="caption">Figure 1. Availability of Event Graphs in Assembly Editor.</p>
 
 
@@ -50,7 +50,7 @@ to build an assembly. This is indicated in Figure 1.</p>
 and go to examples directory as before (up 3 levels), select and open
 ServerAssembly.xml. You will see the view in Figure 2.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage002.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage002.png"/></p>
 <p class="caption">Figure 2. ServerAssembly.xml in the Assembly Editor.</p>
 
 
@@ -60,10 +60,10 @@ display an Event Graph Inspector (see Figure 3). The pink boxes generate a Prope
 Change Listener (PCL) Inspector (see Figure 4). The popups allow various parameter
 to be inspected or modified.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage003.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage003.png"/></p>
 <p class="caption">Figure 3. Event Graph Inspector for the 'sever' event.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage004.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage004.png"/></p>
 <p class="caption">Figure 4. Property Change Listener for 'numAvailServersStat'.</p>
 
 
@@ -80,7 +80,7 @@ to start the simulation. The simulation will take several minutes to run. While 
 running you will see a result something like Figure 5. You may choose to de-select the
 'Verbose output' check box to reduce the quantity of the output.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage005.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage005.png"/></p>
 <p class="caption">Figure 5. Assembly run screen during a simulation run.</p>
 
 
@@ -95,7 +95,7 @@ The 'Assembly Properties' panel is displayed (see Figure 6). Set the name to
 'MyServerAssembly' and the package to 'hello.world', and apply the changes. An empty
 assembly graph is now presented to the user.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage006.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage006.png"/></p>
 <p class="caption">Figure 6. New assembly properties panel.</p>
 
 
@@ -103,7 +103,7 @@ assembly graph is now presented to the user.</p>
 of process, it should go near the upper left. Do the same for the 'SimpleServer(XML)'
 behavior to the upper right. Figure 7 shows the process.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage007.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage007.png"/></p>
 <p class="caption">Figure 7. Process of adding behaviors to the assembly.</p>
 
 
@@ -112,7 +112,7 @@ Pattern" <img src='Tutorial_files/iconAdapterConnect.png' width='32' height='32'
 icon and draw a line from the "Arrival Process" event to the "Simple Server" event.
 This will bring up the "Adapter Connection" popup (see Figure 8).</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage008.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage008.png"/></p>
 <p class="caption">Figure 8. Adapter Connection popup allows you to enter
 adapter-specific information.</p>
 
@@ -135,13 +135,13 @@ to select the actual Java means for generating the values. Choose the entry
 <span class='code'>getInstance(java.lang.String,java.lang.Object[],simkit.random.RandomNumber)</span>
 and click "OK" to use.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage009.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage009.png"/></p>
 <p class="caption">Figure 9. Event Graph Inspector window does ???</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage010.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage010.png"/></p>
 <p class="caption">Figure 10. Object Inspector selects means for constructing variable??</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage011.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage011.png"/></p>
 <p class="caption">Figure 11. Java-specific means for generating random variable??</p>
 
 
@@ -154,10 +154,10 @@ are the two parameters that describe a normal distribution. The first parameter
 Type <span class='code'>new Double(5.0)</span> in the top of the two new boxes.
 In the bottom box type in <span class='code'>new Double(.5)</span>.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage012.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage012.png"/></p>
 <p class="caption">Figure 12. Define random number generator.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage013.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage013.png"/></p>
 <p class="caption">Figure 13. Normal distribution parameter (mean and standard deviation) entry.</p>
 
 
@@ -166,7 +166,7 @@ Click on the <img src='Tutorial_files/icon3dot.png' width='22' height='18'/> but
 Using the drop-down, set the method to 'factory' (see figure 14), then select the simkit.random.RandomVariateFactory
 class. The 'Factory methods' dialogue window will popup. Click 'OK'.</p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/assemblyImage014.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/assemblyImage014.png"/></p>
 <p class="caption">Figure 14. Define RandomNumber method.</p>
 
 
@@ -174,7 +174,7 @@ class. The 'Factory methods' dialogue window will popup. Click 'OK'.</p>
 and clicking on 'Apply changes' doesn't populate the other Object Inspector window.
 </p>
 
-<p class='BodyTextCentered'><img src="Tutorial_files/ZZrandomProblem.png"/></p>
+<p style="text-align:center"><img src="Tutorial_files/ZZrandomProblem.png"/></p>
 <p class="caption">Figure 14. Problem here.</p>
 
 
