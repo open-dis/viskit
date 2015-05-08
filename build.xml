@@ -139,7 +139,7 @@
 
     <!--  === TARGET: build === -->
     <target name="build" depends="build.no.extensions" description="default build, no run"/>
-    
+
     <!--  === TARGET: help === -->
     <target name="help"
             depends="javahelp"
@@ -379,19 +379,11 @@ their descpritions.
         </pathconvert>
     </target>
 
-    <target name="make.classpath.unix" if="isUnixNotMac">
-        <pathconvert dirsep="/"
-                     pathsep=" "
-                     property="launcher.classpath"
-                     refid="runtime.classpath">
-            <map from="*${dir.build.classes}" to=""/>
-            <mapper>
-                <globmapper from="${basedir}/lib/*" to="lib/*"/>
-            </mapper>
-        </pathconvert>
-    </target>
+    <target name="make.classpath.unix" depends="common.unix.classpath" if="isUnixNotMac"/>
 
-    <target name="make.classpath.mac" if="isMac">
+    <target name="make.classpath.mac" depends="common.unix.classpath" if="isMac"/>
+
+    <target name="common.unix.classpath">
         <pathconvert dirsep="/"
                      pathsep=" "
                      property="launcher.classpath"
