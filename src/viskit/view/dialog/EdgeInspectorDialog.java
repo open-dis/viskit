@@ -479,35 +479,17 @@ public class EdgeInspectorDialog extends JDialog {
 
         srcEvent.setText(edge.from.getName());
         targEvent.setText(edge.to.getName());
-        myParmPanel.setBorder(new CompoundBorder(
-                new EmptyBorder(0, 0, 5, 0),
-                BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
 
-        if (edge.to.getArguments() == null || edge.to.getArguments().isEmpty()) {
-            myParmPanel.setVisible(false);
-        } else {
+        if (edge.to.getArguments() != null || !edge.to.getArguments().isEmpty()) {
             parameters.setArgumentList(edge.to.getArguments());
             parameters.setData(edge.parameters);
-            myParmPanel.setVisible(true);
+            myParmPanel.setBorder(new CompoundBorder(
+                    new EmptyBorder(0, 0, 5, 0),
+                    BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
         }
 
         if (edge instanceof SchedulingEdge) {
-
-            if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
-                conditionalExpressionPanel.setText("");
-                hideShowConditionals(false);
-            } else {
-                conditionalExpressionPanel.setText(edge.conditional);
-                hideShowConditionals(true);
-            }
-
-            setDescription(edge.conditionalDescription);
-
-            if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
-                hideShowDescription(false);
-            } else {
-                hideShowDescription(true);
-            }
+            myParmPanel.setVisible(true);
 
             // Prepare default selections
             timeDelayVarsCB.setEnabled(timeDelayVarsCB.getItemCount() > 0);
@@ -539,18 +521,28 @@ public class EdgeInspectorDialog extends JDialog {
 
         } else {
 
-            if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
-                conditionalExpressionPanel.setText("");
-            } else {
-                conditionalExpressionPanel.setText(edge.conditional);
-            }
-
-            setDescription(edge.conditionalDescription);
+            myParmPanel.setVisible(false);
 
             timeDelayVarsCB.setEnabled(false);
             dotLabel.setVisible(false);
             timeDelayMethodsCB.setEnabled(false);
             timeDelayPanel.setBorder(delayPanDisabledBorder);
+        }
+
+        if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
+            conditionalExpressionPanel.setText("");
+            hideShowConditionals(false);
+        } else {
+            conditionalExpressionPanel.setText(edge.conditional);
+            hideShowConditionals(true);
+        }
+
+        if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
+            setDescription("");
+            hideShowDescription(false);
+        } else {
+            setDescription(edge.conditionalDescription);
+            hideShowDescription(true);
         }
 
         setSchedulingType(edge instanceof SchedulingEdge);

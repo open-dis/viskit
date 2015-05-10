@@ -245,15 +245,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         else
                             sb.append("<center>Scheduling Edge</center>");
 
-                        if (se.conditionalDescription != null) {
-                            String cmt = se.conditionalDescription.trim();
-                            if (cmt.length() > 0) {
-                                sb.append("<br><u>description</u><br>");
-                                sb.append(wrapAtPos(escapeLTGT(cmt), 60));
-                                sb.append("<br>");
-                            }
-                        }
-
                         double priority;
                         String s;
 
@@ -286,6 +277,28 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                                 sb.append("<br>");
                             }
                         }
+
+                        int idx = 1;
+                        if (!se.parameters.isEmpty()) {
+
+                            sb.append("<u>edge parameters</u><br>");
+                            for (ViskitElement e : se.parameters) {
+                                vEdgeParameter ep = (vEdgeParameter) e;
+                                sb.append("&nbsp;");
+                                sb.append(idx++);
+                                sb.append(" ");
+                                sb.append(ep.getValue());
+
+                                if (ep.getType() != null && !ep.getType().isEmpty()) {
+                                    sb.append(" ");
+                                    sb.append("(");
+                                    sb.append(ep.getType());
+                                    sb.append(")");
+                                }
+                                sb.append("<br>");
+                            }
+                        }
+
                     } else {
 
                         if (vc instanceof vSelfEdgeCell)
@@ -293,11 +306,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         else
                             sb.append("<center>Canceling Edge</center>");
 
-                        if (se.conditionalDescription != null) {
-                            String cmt = se.conditionalDescription.trim();
-                            if (cmt.length() > 0) {
-                                sb.append("<br><u>description</u><br>");
-                            }
+                    }
+
+                    if (se.conditionalDescription != null) {
+                        String cmt = se.conditionalDescription.trim();
+                        if (cmt.length() > 0) {
+                            sb.append("<br><u>description</u><br>");
                             sb.append(wrapAtPos(escapeLTGT(cmt), 60));
                             sb.append("<br>");
                         }
@@ -309,27 +323,6 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                             sb.append("<u>condition</u><br>&nbsp;if( ");
                             sb.append(escapeLTGT(cond));
                             sb.append(" )<br>");
-                        }
-                    }
-
-                    int idx = 1;
-                    if (!se.parameters.isEmpty()) {
-
-                        sb.append("<u>edge parameters</u><br>");
-                        for (ViskitElement e : se.parameters) {
-                            vEdgeParameter ep = (vEdgeParameter) e;
-                            sb.append("&nbsp;");
-                            sb.append(idx++);
-                            sb.append(" ");
-                            sb.append(ep.getValue());
-
-                            if (ep.getType() != null && !ep.getType().isEmpty()) {
-                                sb.append(" ");
-                                sb.append("(");
-                                sb.append(ep.getType());
-                                sb.append(")");
-                            }
-                            sb.append("<br>");
                         }
                     }
 
