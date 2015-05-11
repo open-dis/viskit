@@ -37,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
@@ -184,11 +186,16 @@ public class RunnerPanel2 extends JPanel {
         labTF.add(Box.createHorizontalStrut(10));
         flowPan.add(labTF);
 
+
         vcrVerbose = new JCheckBox("Verbose output", false);
+        vcrVerbose.addActionListener(new vcrVerboseCBListener());
         vcrVerbose.setToolTipText("Enables verbose output for all runs");
         flowPan.add(vcrVerbose);
 
         verboseRepNumberTF = new JTextField(7);
+        verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
+        verboseRepNumberTF.addActionListener(lis);
+        verboseRepNumberTF.addCaretListener(lis);
         VStatics.clampSize(verboseRepNumberTF);
         verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
         flowPan.add(verboseRepNumberTF);
@@ -263,5 +270,30 @@ public class RunnerPanel2 extends JPanel {
 
         flowPan.add(buttPan);
         return flowPan;
+    }
+
+    class vcrVerboseCBListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            if (vcrVerbose.isSelected()) {
+                verboseRepNumberTF.setText("");
+            }
+        }
+    }
+
+    class verboseRepNumberTFListener implements CaretListener, ActionListener {
+
+        @Override
+        public void caretUpdate(CaretEvent event) {
+            if (!verboseRepNumberTF.getText().isEmpty()) {
+                vcrVerbose.setSelected(false);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            caretUpdate(null);
+        }
     }
 }

@@ -45,6 +45,14 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed issue where user desires a specific replication to be verbose and only
+  that one in particular.  If a specific rep. is given, that will uncheck the
+  verbose box
+
+  Since canceling edges to nodes with parameters do not have to actually send
+  parameters, we've hidden the parameters sub-panel from the canceling edge
+  inspector
+
   Fixed NP bug in the Source Window frame title when generating Assy souce code
 
   Added support for when a user wishes to generate a statistical run report in
