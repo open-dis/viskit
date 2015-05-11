@@ -674,7 +674,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // directly modify entities. One possible way is to enforce
         // packages that wish to take advantage of exposed controls
         // all agree to be dependent on, i.e. viskit.simulation.Interface
-        SimEntity timer = null;
         SimEntity scenarioManager = null;
 
         runEntities = Schedule.getReruns();
@@ -682,9 +681,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // Convenience for Diskit if on the classpath
         for (SimEntity entity : runEntities) {
 
-            if (entity.getName().equals("Clock") || entity.getName().equals("DISPinger")) {
-                timer = entity;
-            } else if (entity.getName().contains("ScenarioManager")) {
+            if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
                 // access the SM's numberOfReplications parameter setter
                 try {
@@ -695,19 +692,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 }
             }
         }
+
         int runCount = runEntities.size();
-        boolean clockChecker = false; // tbd hook this up and fix properly
+
         for (int replication = 0; replication < getNumberReplications(); replication++) {
             firePropertyChange("replicationNumber", (replication + 1));
-            if (clockChecker && getVerboseReplication() >= 0) {
-                timer.waitDelay("Stop", 0.0);
-            }
             if ((replication + 1) == getVerboseReplication()) {
                 Schedule.setVerbose(true);
                 Schedule.setReallyVerbose(true);
-                if (clockChecker) {
-                    timer.waitDelay("Ping", 0.0);
-                }
             } else {
                 Schedule.setVerbose(isVerbose());
                 Schedule.setReallyVerbose(isVerbose());

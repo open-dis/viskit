@@ -356,7 +356,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     /**
-     * get the value of the RunnerPanel2 text field. This number
+     * Retrieves the value of the verboseRepNumber text field. This number
      * starts counting at 0, the method will return -1 for blank
      * or non-integer value.
      * @return the replication instance to output verbose on

@@ -185,12 +185,12 @@ public class RunnerPanel2 extends JPanel {
         flowPan.add(labTF);
 
         vcrVerbose = new JCheckBox("Verbose output", false);
-        vcrVerbose.setToolTipText("Enable or disable verbose simulation output");
+        vcrVerbose.setToolTipText("Enables verbose output for all runs");
         flowPan.add(vcrVerbose);
 
         verboseRepNumberTF = new JTextField(7);
         VStatics.clampSize(verboseRepNumberTF);
-        verboseRepNumberTF.setToolTipText("Input a single replication number (1...n) to be verbose");
+        verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
         flowPan.add(verboseRepNumberTF);
 
         closeButt = new JButton("Close");
