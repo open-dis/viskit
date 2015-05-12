@@ -29,37 +29,37 @@
     </TerminalParameter>
     <SimEntity name="arrivalProcess" type="examples.ArrivalProcess">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter name="arrivalProcess_1_1_1" linkRef="arrivalProcess_1_1_1" value="Exponential" type="java.lang.String"/>
+            <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter name="arrivalProcess_1_2_1_1_1" linkRef="arrivalProcess_1_2_1_1_1" value="1.5" type="double"/>
+                    <TerminalParameter name="p[0] : " value="1.5" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="40" y="140"/>
+        <Coordinate x="40.0" y="140.0"/>
     </SimEntity>
     <SimEntity name="creator" type="examples.Creator">
-        <Coordinate x="190" y="140"/>
+        <Coordinate x="190.0" y="140.0"/>
     </SimEntity>
     <SimEntity name="serverWithReneges" type="examples.ServerWithReneges">
-        <TerminalParameter name="serverWithReneges_1_1" linkRef="serverWithReneges_1_1" value="2" type="int"/>
+        <TerminalParameter name="numberServers" value="2" type="int"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter name="serverWithReneges_2_1_1" linkRef="serverWithReneges_2_1_1" value="Gamma" type="java.lang.String"/>
+            <TerminalParameter name="" value="Gamma" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter name="serverWithReneges_2_2_1_1" linkRef="serverWithReneges_2_2_1_1" value="new Double(2.5)" type="java.lang.Object"/>
+                <TerminalParameter name="" value="new Double(2.5)" type="java.lang.Object"/>
                 <MultiParameter type="java.lang.Double">
-                    <TerminalParameter name="serverWithReneges_2_2_2_1_1" linkRef="serverWithReneges_2_2_2_1_1" value="1.2" type="double"/>
+                    <TerminalParameter name="p[0] : " value="1.2" type="double"/>
                 </MultiParameter>
             </MultiParameter>
         </FactoryParameter>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter name="serverWithReneges_3_1_1" linkRef="serverWithReneges_3_1_1" value="Uniform" type="java.lang.String"/>
+            <TerminalParameter name="" value="Uniform" type="java.lang.String"/>
             <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter name="serverWithReneges_3_2_1_1" linkRef="serverWithReneges_3_2_1_1" value="new Integer(4)" type="java.lang.Object"/>
-                <TerminalParameter name="serverWithReneges_3_2_2_1" linkRef="serverWithReneges_3_2_2_1" value="new Integer(6)" type="java.lang.Object"/>
+                <TerminalParameter name="" value="new Integer(4)" type="java.lang.Object"/>
+                <TerminalParameter name="" value="new Integer(6)" type="java.lang.Object"/>
             </MultiParameter>
         </FactoryParameter>
-        <Coordinate x="350" y="140"/>
+        <Coordinate x="350.0" y="140.0"/>
     </SimEntity>
     <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat" meanStatistics="false" countStatistics="true">
         <TerminalParameter name="p[0] : " value="queue" type="java.lang.String"/>
@@ -77,9 +77,9 @@
         <TerminalParameter name="p[0] : " value="numberReneges" type="java.lang.String"/>
         <Coordinate x="560.0" y="140.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat">
-        <TerminalParameter value="numberArrivals" type="java.lang.String"/>
-        <Coordinate x="40" y="260"/>
+    <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+        <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
+        <Coordinate x="40.0" y="260.0"/>
     </PropertyChangeListener>
     <SimEventListenerConnection listener="creator" source="arrivalProcess"/>
     <PropertyChangeListenerConnection property="queue" listener="numberInQueueStat" source="serverWithReneges"/>
