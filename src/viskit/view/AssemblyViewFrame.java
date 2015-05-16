@@ -596,7 +596,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         graphPane.drawingSplitPane.setResizeWeight(0.25);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
-        graphPane.addMouseListener(new vCursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
@@ -806,27 +805,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             return FileBasedAssyNode.fromString(s);
         } catch (FileBasedAssyNode.exception e) {
             return null;
-        }
-    }
-
-    /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
-    class vCursorHandler extends MouseAdapter {
-
-        Cursor select;
-        Cursor arc;
-        Cursor cancel;
-
-        vCursorHandler() {
-            super();
-            select = Cursor.getDefaultCursor();
-            arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
-
-            Image img = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
-            cancel = Toolkit.getDefaultToolkit().createCustomCursor(img, new Point(0, 0), "CancelArcCursor");
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
         }
     }
 
