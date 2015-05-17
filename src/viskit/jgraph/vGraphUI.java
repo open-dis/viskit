@@ -4,7 +4,6 @@ import java.awt.event.MouseEvent;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.VGlobals;
 import viskit.control.EventGraphController;
-import viskit.model.CancelingEdge;
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.SchedulingEdge;
@@ -54,10 +53,10 @@ public class vGraphUI extends BasicGraphUI {
         if (cell instanceof vEdgeCell) {
             Edge e = (Edge) ((vEdgeCell) cell).getUserObject();
             if (e instanceof SchedulingEdge) {
-                cntl.schedulingArcEdit((SchedulingEdge) e);
+                cntl.schedulingArcEdit(e);
             } else
             {
-                cntl.cancellingArcEdit((CancelingEdge) e);
+                cntl.cancellingArcEdit(e);
             }
         } else if (cell instanceof CircleCell) {
             EventNode en = (EventNode) ((CircleCell) cell).getUserObject();

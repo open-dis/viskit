@@ -35,7 +35,6 @@ package viskit.jgraph;
 
 import edu.nps.util.LogUtils;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ import viskit.model.ViskitElement;
  * to/from a node.
  *
  * @author Mike Bailey
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitRouting">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vRouting">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
 public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {

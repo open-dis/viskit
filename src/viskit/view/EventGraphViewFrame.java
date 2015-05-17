@@ -1028,13 +1028,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
 
+        // TODO: The cursors don't always set unless it's been moved up to the
+        // frame's title bar.  Mac OS X 10.10.3 & JDK 1.8.0_45
         @Override
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
-                case SELECT_MODE:
-                case SELF_REF_MODE:
-                    getCurrentVgcw().setCursor(select);
-                    break;
                 case ARC_MODE:
                     getCurrentVgcw().setCursor(arc);
                     break;
@@ -1042,8 +1040,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                     getCurrentVgcw().setCursor(cancel);
                     break;
                 default:
-                    //assert false : "vCursorHandler";
-                    System.err.println("assert false : \"vCursorHandler\"");
+                    getCurrentVgcw().setCursor(select);
             }
         }
     }
@@ -1053,7 +1050,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     final static int SELF_REF_CANCEL_DRAG = 2;
     private int dragger;
 
-    // Two classes to support dragging and dropping on the jGraph
+    /** Class to support dragging and dropping on the jGraph pallette */
     class DragMouseAdapter extends MouseAdapter {
 
         @Override
@@ -1072,7 +1069,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    /** Class to facilitate dragging new nodes, or self-referential edges onto nodes  onto the pallette */
+    /** Class to facilitate dragging new nodes, or self-referential edges onto nodes on the jGraph pallette */
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
