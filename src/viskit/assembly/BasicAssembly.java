@@ -607,13 +607,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @Override
     public void run() {
 
-        seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             System.err.println("Assemby already running.");
         }
 
-        // Incase the user input bad parameters
+        // Incase the user input bad parameters in the XML
         try {
             createObjects();
             performHookups();
@@ -681,9 +680,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // Convenience for Diskit if on the classpath
         for (SimEntity entity : runEntities) {
 
+            // access the SM's numberOfReplications parameter setter for user
+            // dynamic input to override the XML value
             if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
-                // access the SM's numberOfReplications parameter setter
                 try {
                     Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
                     setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
@@ -696,6 +696,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         int runCount = runEntities.size();
 
         for (int replication = 0; replication < getNumberReplications(); replication++) {
+
             firePropertyChange("replicationNumber", (replication + 1));
             if ((replication + 1) == getVerboseReplication()) {
                 Schedule.setVerbose(true);
@@ -730,6 +731,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
+                seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 System.out.println("Starting Replication #" + (replication + 1) + " with RNG seed state of: " + seed);
                 try {
                     Schedule.reset();
@@ -795,16 +797,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 if (isPrintReplicationReports()) {
                     printWriter.println(getReplicationReport(replication));
                     printWriter.flush();
-                }
-            }
-
-            if (scenarioManager != null) {
-                try {
-                    Method doStop = scenarioManager.getClass().getMethod("doStopSimulation");
-                    doStop.invoke(scenarioManager, (Object[]) null);
-                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
-//                    ex.printStackTrace();
-                    LOG.error(ex);
                 }
             }
         }
