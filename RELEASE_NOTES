@@ -2,8 +2,15 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
+  JGraph pallete will revert back to the select cursor (arrow) when a node or
+  edge inspector pops up.  If the user selects cancel or or schedule mode again,
+  the cursor will not change (remains in select) mode until the user moves the
+  cursor out of the JPanel containing the JGraph component and menu bar up to
+  the parent Frame's title bar.  Then it will change as expected.
+
   Due to the way the SimkitXML2Java generates EG extensions of super
-  SimEntities, a default constructor will not be generated is subclasses
+  SimEntities, a default constructor will not be generated in subclasses
   accordingly.  When it is time to parameterize EG constructors at Assy creation
   time, an EG with a default (no arg) will conveniently establish a Random
   Variate Factory instance automatically within the Event Node Inspector.  A
