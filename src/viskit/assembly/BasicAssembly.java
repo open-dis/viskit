@@ -253,15 +253,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     LOG.debug("typeStat is: " + typeStat);
 
                     SampleStatistics stat = (SampleStatistics) getReplicationStats()[ix];
-                    if (stat.getName().equals("%unnamed%"))
+                    if (stat.getName().equals("%unnamed%")) {
                         stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
-
-                    if (getReplicationStats()[ix] instanceof SimpleStatsTally) {
-                        stat.setName(stat.getName() + typeStat);
-                        designPointStats[ix] = stat;
                     }
-                    else
-                        designPointStats[ix] = new SimpleStatsTally(stat.getName() + typeStat);
+
+                    designPointStats[ix] = new SimpleStatsTally(stat.getName() + typeStat);
 
                     LOG.debug(designPointStats[ix]);
                     ix++;
@@ -673,7 +669,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // directly modify entities. One possible way is to enforce
         // packages that wish to take advantage of exposed controls
         // all agree to be dependent on, i.e. viskit.simulation.Interface
-        SimEntity scenarioManager = null;
+        SimEntity scenarioManager;
 
         runEntities = Schedule.getReruns();
 
