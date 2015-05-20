@@ -8,7 +8,7 @@ Post release fixes / upgrades / issues:
 
     at com.apple.laf.AquaMenuPainter.paintSelectedMenuItemBackground(AquaMenuPainter.java:153)
 
-  Select the default platform L&F for OS X users as the work around.
+  Select the Platform L&F for OS X users as the work around.
 
   On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
   JGraph pallete will revert back to the select cursor (arrow) when a node or
