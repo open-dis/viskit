@@ -290,9 +290,9 @@ public abstract class VInstantiator {
                         } else {
                             FactoryParameter fp = of.createFactoryParameter();
                             fp.setName(name);
-                            fp.setFactory(VStatics.RANDOM_VARIATE_FACTORY);
+                            fp.setFactory(VStatics.RANDOM_VARIATE_FACTORY_CLASS);
                             fp.setType(type); // this is the type returned by method
-                            fp.setMethod(VStatics.RANDOM_VARIATE_FACTORY_METHOD);
+                            fp.setMethod(VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD);
 
                             instr.add(buildFactoryParameter(fp));
                         }

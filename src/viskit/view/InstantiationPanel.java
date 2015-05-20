@@ -151,7 +151,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         return;
                     }
                     ffPan.setData(new VInstantiator.FreeF(newType, ""));
-                    factPan.setData(new VInstantiator.Factory(newType, "", "", new Vector<>()));
+                    factPan.setData(new VInstantiator.Factory(newType,
+                            VStatics.RANDOM_VARIATE_FACTORY_CLASS,
+                            VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                            new Vector<>()
+                    ));
                 }
                 int idx = methodCB.getSelectedIndex();
                 if (lastIdx != idx) {
@@ -430,7 +434,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
-            factClassCB = new JComboBox<>(new Object[]{VStatics.RANDOM_VARIATE_FACTORY});
+            factClassCB = new JComboBox<>(new Object[]{VStatics.RANDOM_VARIATE_FACTORY_CLASS});
 //            factClassCB.setEditable(true);
             VStatics.clampHeight(factClassCB);
             factClassLab.setLabelFor(factClassCB);
@@ -529,8 +533,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public VInstantiator getData() {
             String fc = (String) factClassCB.getSelectedItem();
-            fc = (fc == null) ? "" : fc.trim();
-            String m = VStatics.RANDOM_VARIATE_FACTORY_METHOD;
+            fc = (fc == null) ? VStatics.RANDOM_VARIATE_FACTORY_CLASS : fc.trim();
+            String m = VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD;
             List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
             return new VInstantiator.Factory(typ, fc, m, lis);
         }

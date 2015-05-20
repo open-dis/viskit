@@ -141,8 +141,18 @@ public class ArrayInspector extends JDialog {
         }
 
         Vector<Object> v = new Vector<>(sz);
-        for (int i = 0; i < sz; i++) {
-            v.add(new VInstantiator.FreeF(myTyp, ""));
+        if (myTyp.equals(VStatics.RANDOM_VARIATE_CLASS)) {
+            for (int i = 0; i < sz; i++) {
+                v.add(new VInstantiator.Factory(myTyp,
+                        VStatics.RANDOM_VARIATE_FACTORY_CLASS,
+                        VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                        new Vector<>()
+                ));
+            }
+        } else {
+            for (int i = 0; i < sz; i++) {
+                v.add(new VInstantiator.FreeF(myTyp, ""));
+            }
         }
         setData(v);
     }

@@ -262,14 +262,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // enabled nor visible
             if (runPanel.resetSeedStateCB.isSelected()) {
 
-                Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY);
+                Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumber.invoke(null);
 
                 Method getSeeds = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeeds.invoke(rn);
 
-                Class<?> rNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER);
+                Class<?> rNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER_CLASS);
                 Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
                 setSeeds.invoke(rn, seeds);
 

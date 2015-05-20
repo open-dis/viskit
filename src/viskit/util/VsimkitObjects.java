@@ -41,7 +41,7 @@ public class VsimkitObjects {
                 String name = method.getName();
 
                 // we can skip these
-                if (name.equals(VStatics.RANDOM_VARIATE_FACTORY_METHOD) || name.equals("getFullName")) {
+                if (name.equals(VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD) || name.equals("getFullName")) {
                     continue;
                 }
 

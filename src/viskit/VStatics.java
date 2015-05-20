@@ -57,7 +57,6 @@ import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
-import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -77,10 +76,10 @@ public class VStatics {
     public static boolean debug = false;
 
     /* Commonly used class names */
-    public static final String RANDOM_NUMBER = "simkit.random.RandomNumber";
-    public static final String RANDOM_VARIATE = "simkit.random.RandomVariate";
-    public static final String RANDOM_VARIATE_FACTORY = RANDOM_VARIATE + "Factory";
-    public static final String RANDOM_VARIATE_FACTORY_METHOD = "getInstance";
+    public static final String RANDOM_NUMBER_CLASS = "simkit.random.RandomNumber";
+    public static final String RANDOM_VARIATE_CLASS = "simkit.random.RandomVariate";
+    public static final String RANDOM_VARIATE_FACTORY_CLASS = RANDOM_VARIATE_CLASS + "Factory";
+    public static final String RANDOM_VARIATE_FACTORY_DEFAULT_METHOD = "getInstance";
     public static final String SIMPLE_PROPERTY_DUMPER = "simkit.util.SimplePropertyDumper";
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
     public static final String JAVA_LANG_STRING = "java.lang.String";
@@ -350,11 +349,11 @@ public class VStatics {
                 break;
 
             case "RandomNumber":
-                retVal = RANDOM_NUMBER;
+                retVal = RANDOM_NUMBER_CLASS;
                 break;
 
             case "RandomVariate":
-                retVal = RANDOM_VARIATE;
+                retVal = RANDOM_VARIATE_CLASS;
                 break;
 
             default:

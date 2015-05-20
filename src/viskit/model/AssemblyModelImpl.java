@@ -873,7 +873,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
         return new VInstantiator.Factory(o.getType(),
                 o.getFactory(),
-                VStatics.RANDOM_VARIATE_FACTORY_METHOD,
+                VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
