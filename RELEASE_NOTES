@@ -4,7 +4,7 @@ Post release fixes / upgrades / issues:
 
   On Mac OS X 10.10.3 & JDK 1.8.0_45, in the default L&F mode, when inputing
   EG Parameters when the user selects more... to expose RandomVariate types,
-  a null pointer will be thrown:
+  a NPE will be thrown:
 
     at com.apple.laf.AquaMenuPainter.paintSelectedMenuItemBackground(AquaMenuPainter.java:153)
 
