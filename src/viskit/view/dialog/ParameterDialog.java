@@ -26,16 +26,17 @@ import viskit.VGlobals;
  */
 public class ParameterDialog extends JDialog {
 
+    private static ParameterDialog dialog;
+    private static boolean modified = false;
+    public static String newName,  newType,  newComment;
+    private static int count = 0;
+
     private JTextField parameterNameField;    // Text field that holds the parameter name
     private JTextField expressionField;       // Text field that holds the expression
     private JTextField commentField;          // Text field that holds the comment
     private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
-    private static ParameterDialog dialog;
-    private static boolean modified = false;
     private vParameter param;
     private JButton okButt, canButt;
-    public static String newName,  newType,  newComment;
-    private static int count = 0;
 
     public static boolean showDialog(JFrame f, vParameter parm) {
         if (dialog == null) {
@@ -52,8 +53,8 @@ public class ParameterDialog extends JDialog {
 
     private ParameterDialog(JFrame parent, vParameter param) {
         super(parent, "Parameter Inspector", true);
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new myCloseListener());
 
         Container cont = getContentPane();
         cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
@@ -105,10 +106,10 @@ public class ParameterDialog extends JDialog {
         okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
-        this.parameterNameField.addCaretListener(lis);
-        this.commentField.addCaretListener(lis);
-        this.expressionField.addCaretListener(lis);
-        this.parameterTypeCombo.addActionListener(lis);
+        parameterNameField.addCaretListener(lis);
+        commentField.addCaretListener(lis);
+        expressionField.addCaretListener(lis);
+        parameterTypeCombo.addActionListener(lis);
 
         setParams(parent, param);
     }
@@ -124,7 +125,6 @@ public class ParameterDialog extends JDialog {
 
         fillWidgets();
 
-        modified = (p == null);
         okButt.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
@@ -136,10 +136,9 @@ public class ParameterDialog extends JDialog {
         if (param != null) {
             parameterNameField.setText(param.getName());
             parameterTypeCombo.setSelectedItem(param.getType());
-            this.commentField.setText(param.getComment());
+            commentField.setText(param.getComment());
         } else {
             parameterNameField.setText("param_" + count++);
-            //expressionField.setText("type");
             commentField.setText("");
         }
     }

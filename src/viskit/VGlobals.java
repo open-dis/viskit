@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Vector;
@@ -87,7 +88,7 @@ import viskit.view.AnalystReportFrame;
 public class VGlobals {
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
-    static Logger log = LogUtils.getLogger(VGlobals.class);
+    static final Logger LOG = LogUtils.getLogger(VGlobals.class);
     private static VGlobals me;
     private Interpreter interpreter;
     private DefaultComboBoxModel<String> cbMod;
@@ -304,7 +305,7 @@ public class VGlobals {
                 try {
                     interpreter.getClassManager().addClassPath(new URL("file", "localhost", path));
                 } catch (IOException e) {
-                    log.error("Working classpath component: " + path);
+                    LOG.error("Working classpath component: " + path);
                 }
             }
         }
@@ -417,7 +418,7 @@ public class VGlobals {
 //             */
 //            if(!noCRs.contains("get") && !noCRs.contains("set")) {
 //                Object o = interpreter.eval(noCRs);
-//                log.debug("Interpreter evaluation result: " + o);
+//                LOG.debug("Interpreter evaluation result: " + o);
 //            }
 //        } catch (EvalError evalError) {
 //            if (!evalError.toString().contains("java.lang.ArrayIndexOutOfBoundsException")) {
@@ -480,7 +481,7 @@ public class VGlobals {
 
         } catch (Exception ex) {
             returnString =  ex.getMessage();
-            log.error(returnString);
+            LOG.error(returnString);
         }
 
         // good if remains null
@@ -504,7 +505,7 @@ public class VGlobals {
 
         ViskitConfig vConfig = ViskitConfig.instance();
         String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
-        log.debug(projectHome);
+        LOG.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitProjectButtonPanel.showDialog();
         } else {
@@ -538,7 +539,7 @@ public class VGlobals {
                 }
             }
         } catch (SecurityException | NegativeArraySizeException | InstantiationException | IllegalAccessException e) {
-            log.error(e);
+            LOG.error(e);
         }
 
         // TODO: Fix the call to VsimkitObjects someday
@@ -620,7 +621,7 @@ public class VGlobals {
                 return true;
             }
         } catch (EvalError evalError) {
-            log.error(evalError);
+            LOG.error(evalError);
 //            evalError.printStackTrace();
         }
         return false;
@@ -872,7 +873,7 @@ public class VGlobals {
         @Override
         public void doSysExit(int status) {
 
-            log.debug("Viskit is exiting with status: " + status);
+            LOG.debug("Viskit is exiting with status: " + status);
 
             /* If an application launched a JVM, and is still running, this will
              * only make Viskit disappear.  If Viskit is running standalone,
@@ -884,7 +885,7 @@ public class VGlobals {
             Frame[] frames = Frame.getFrames();
             int count = 0;
             for (Frame f : frames) {
-                log.debug("Frame count in Viskit: " + (++count));
+                LOG.debug("Frame count in Viskit: " + (++count));
 
                 /* Prevent non-viskit created components from disposing if
                  * launched from another application.  SwingUtilities is a
@@ -893,17 +894,17 @@ public class VGlobals {
                  * SwingUtilities
                  */
                 if (f.toString().toLowerCase().contains("viskit")) {
-                    log.debug("Frame is: " + f);
+                    LOG.debug("Frame is: " + f);
                     f.dispose();
                 }
                 if (f.toString().contains("SwingUtilities")) {
-                    log.debug("Frame is: " + f);
+                    LOG.debug("Frame is: " + f);
                     f.dispose();
                 }
 
                 // Case for XMLTree JFrames
                 if (f.getTitle().contains("xml")) {
-                    log.debug("Frame is: " + f);
+                    LOG.debug("Frame is: " + f);
                     f.dispose();
                 }
             }
@@ -916,7 +917,7 @@ public class VGlobals {
             Thread[] threads = new Thread[Thread.activeCount()];
             Thread.enumerate(threads);
             for (Thread t : threads) {
-                log.debug("Thread is: " + t);
+                LOG.debug("Thread is: " + t);
                 if (t.getName().contains("SwingWorker")) {
                     t.interrupt();
                 }
@@ -999,13 +1000,23 @@ public class VGlobals {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
                     Runnable r = new Runnable() {
+
                         @Override
                         public void run() {
                             if (cb.isShowing())
                                 popup.show(cb, 0, 0);
                         }
                     };
-                    SwingUtilities.invokeLater(r);
+
+                    if (SwingUtilities.isEventDispatchThread()) {
+                        SwingUtilities.invokeLater(r);
+                    } else {
+                        try {
+                            SwingUtilities.invokeAndWait(r);
+                        } catch (InterruptedException | InvocationTargetException ex) {
+                            LOG.error(ex);
+                        }
+                    }
                 }
             } else {
                 MyJMenuItem mi = (MyJMenuItem) o;
@@ -1021,7 +1032,6 @@ public class VGlobals {
 
     @SuppressWarnings("serial")
     class myTypeListRenderer extends JLabel implements ListCellRenderer<String> {
-        //Font specialFont = getFont().deriveFont(Font.ITALIC);
 
         @Override
         public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -1029,10 +1039,10 @@ public class VGlobals {
             JLabel lab = new JLabel(value);
             if (value.equals(moreTypesString)) {
                 lab.setBorder(BorderFactory.createRaisedBevelBorder());
-            } //createEtchedBorder());
-            //lab.setFont(specialFont);
+            }
+
             return lab;
         }
     }
 
-}
+} // end class file VGlobals.java
