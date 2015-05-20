@@ -111,11 +111,7 @@ public class ArrayInspector extends JDialog {
     public void setType(String typ) {
         Class<?> c = VStatics.getClassForInstantiatorType(typ);
 
-        // Convert [] to varargs (...)
-        if (c.isArray())
-            myTyp = typ;
-        else
-            myTyp = VStatics.convertClassName(c.getComponentType().getName());
+        myTyp = VStatics.convertClassName(c.getComponentType().getName());
 
         typeTF.setText(typ);
     }

@@ -94,16 +94,12 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     + "arguments here");
             VStatics.clampHeight(entryTF[i]);
 
+            // Show the formal parameter type in the TF
             jTFText = inst.toString();
 
-            // A little more Object... (vararg) support
-            if (inst instanceof VInstantiator.Array) {
-                VInstantiator.Array via = (VInstantiator.Array) inst;
-                if (!via.getInstantiators().isEmpty() && via.getInstantiators().get(0) instanceof VInstantiator.FreeF) {
-                    VInstantiator.FreeF vif = (VInstantiator.FreeF) via.getInstantiators().get(0);
-                    jTFText = vif.getValue();
-                }
-            } else if (inst instanceof VInstantiator.Factory) {
+            // If we have a factory, then reflect the Object... input to the
+            // getInstance() method of RVF
+            if (inst instanceof VInstantiator.Factory) {
                 VInstantiator.Factory vif = (VInstantiator.Factory) inst;
                 if (!vif.getParams().isEmpty() && vif.getParams().get(0) instanceof VInstantiator.FreeF) {
                     VInstantiator.FreeF viff = (VInstantiator.FreeF) vif.getParams().get(0);

@@ -290,7 +290,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         JLabel descriptionLabel = new JLabel("Description");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" panel (Ctrl-E) to modify description");
+        descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" or (Ctrl-E) to modify description");
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
