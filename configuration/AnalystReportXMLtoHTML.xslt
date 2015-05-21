@@ -5,7 +5,7 @@
     <meta name="author"      content="Patrick Sullivan"/>
     <meta name="created"     content="21 July 2006"/>
     <meta name="description" content="XSLT stylesheet, converts AnalystReportXML output into xhtml format"/>
-    <meta name="version"     content="$Id: AnalystReportXMLtoHTML.xslt 1620 2007-11-20 07:23:43Z tdnorbra $"/>
+    <meta name="version"     content="$Id$"/>
 </head>
 -->
 <xsl:stylesheet version="2.0"
