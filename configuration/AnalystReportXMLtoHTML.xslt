@@ -325,7 +325,7 @@
             </font>
         </p>
         <p align="center">
-            <b>Summary of Simulation Entities</b>
+            <b>Summary of SMAL Defined Simulation Entities</b>
         </p>
         <div align="center">
             <table border="1">
