@@ -68,7 +68,7 @@ import viskit.reports.LinearRegressionChart;
  */
 public final class AnalystReportModel extends mvcAbstractModel {
 
-    static Logger log = LogUtils.getLogger(AnalystReportModel.class);
+    static final Logger LOG = LogUtils.getLogger(AnalystReportModel.class);
 
     private boolean debug = false;
 
@@ -113,7 +113,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
             setStatsReportPath(statisticsReportPath);
             setStatsReport(doc);
         } catch (Exception e) {
-            log.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
+            LOG.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
         initDocument();
@@ -137,24 +137,26 @@ public final class AnalystReportModel extends mvcAbstractModel {
         aRPanel.add(jpb);
         aRPanel.validate();
 
-        log.debug("Successful parseXML");
+        LOG.debug("Successful parseXML");
         if (assyFile != null) {
             setAssemblyFile(assyFile);
-            log.debug("Successful setting of assembly file");
+            LOG.debug("Successful setting of assembly file");
             postProcessing();
-            log.debug("Successful post processing of Analyst Report");
+            LOG.debug("Successful post processing of Analyst Report");
         }
     }
 
-    /** This constructor for opening a fully annotated report for further
-     * annotations, or as required from the analyst/user.
-     * @param fullReport an existing fully annotated report to reopen
+    /** This constructor for opening a temp report for further
+     * annotations, or as required from the analyst/user.  Can be called from
+     * the InternalAssemblyRunner after a report is ready for display
+     *
+     * @param fullReport an existing report to open
      */
     public AnalystReportModel(File fullReport) {
         try {
             parseXML(fullReport);
         } catch (Exception ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
     }
 
@@ -210,8 +212,13 @@ public final class AnalystReportModel extends mvcAbstractModel {
         }
     }
 
-    private void parseXML(File fil) throws Exception {
-        reportJdomDocument = EventGraphCache.instance().loadXML(fil);
+    /**
+     * Parse a completed out report from XML
+     * @param file the XML file to parse
+     * @throws Exception is a parsing error is encountered
+     */
+    private void parseXML(File file) throws Exception {
+        reportJdomDocument = EventGraphCache.instance().loadXML(file);
         rootElement = reportJdomDocument.getRootElement();
         execSummary = rootElement.getChild("ExecutiveSummary");
         simulationLocation = rootElement.getChild("Location");
@@ -238,7 +245,6 @@ public final class AnalystReportModel extends mvcAbstractModel {
     public void createExecutiveSummary() {
         execSummary = new Element("ExecutiveSummary");
         execSummary.setAttribute("comments", "true");
-        // execSummary.addContent(makeComments("ES", ""));
         rootElement.addContent(execSummary);
     }
 
@@ -262,12 +268,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
         makeComments(simConfig, "SC", "");
         makeProductionNotes(simConfig, "SC", "");
         makeConclusions(simConfig, "SC", "");
-        if(assemblyFile != null) {
-            try {
-                simConfig.addContent(EventGraphCache.instance().getEntityTable());
-            } catch (Exception e) {
-                log.error("Error reading assembly file: " + e.getMessage());
-            }
+        if (assemblyFile != null) {
+            simConfig.addContent(EventGraphCache.instance().getEntityTable());
         }
 
         rootElement.addContent(simConfig);
@@ -280,7 +282,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         entityParameters.setAttribute("parameterTables", "true");
         makeComments(entityParameters, "EP", "");
         makeConclusions(entityParameters, "EP", "");
-        if(assemblyFile != null) {
+        if (assemblyFile != null) {
             entityParameters.addContent(makeParameterTables());
         }
 
@@ -419,57 +421,57 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    private Element processBehaviors(boolean descript, boolean image, boolean details) /*throws Exception*/ {
+    private Element processBehaviors(boolean descript, boolean image, boolean details) {
         Element behaviorList = new Element("BehaviorList");
-        if (EventGraphCache.instance().getEventGraphNamesList() != null) {
-            for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) {
-                Element behavior = new Element("Behavior");
-                Element localRootElement;
-                String descriptText;
-                behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNamesList().get(i));
 
-                if (descript) {
-                    Document tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
-                    localRootElement = tmp.getRootElement();
+        for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) {
+            Element behavior = new Element("Behavior");
+            Element localRootElement;
+            String descriptText;
+            behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNamesList().get(i));
 
-                    // prevent returning a null if there was no attribute value
-                    descriptText = (localRootElement.getChildText("Comment") == null) ? "no comment provided" : localRootElement.getChildText("Comment");
+            if (descript) {
+                Document tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
+                localRootElement = tmp.getRootElement();
 
-                    Element description = new Element("description");
-                    description.setAttribute("text", descriptText);
-                    behavior.addContent(description);
+                // prevent returning a null if there was no attribute value
+                descriptText = (localRootElement.getChildText("Comment") == null) ? "no comment provided" : localRootElement.getChildText("Comment");
 
-                    if (details) {
-                        List<Element> lre = localRootElement.getChildren("Parameter");
-                        for (Element temp : lre) {
-                            Element param = new Element("parameter");
-                            param.setAttribute("name", temp.getAttributeValue("name"));
-                            param.setAttribute("type", temp.getAttributeValue("type"));
+                Element description = new Element("description");
+                description.setAttribute("text", descriptText);
+                behavior.addContent(description);
 
-                            // The data "null" is not legal for a JDOM attribute
-                            param.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
-                            behavior.addContent(param);
-                        }
-                        List<Element> lre2 = localRootElement.getChildren("StateVariable");
-                        for (Element temp : lre2) {
-                            Element stvar = new Element("stateVariable");
-                            stvar.setAttribute("name", temp.getAttributeValue("name"));
-                            stvar.setAttribute("type", temp.getAttributeValue("type"));
+                if (details) {
+                    List<Element> lre = localRootElement.getChildren("Parameter");
+                    for (Element temp : lre) {
+                        Element param = new Element("parameter");
+                        param.setAttribute("name", temp.getAttributeValue("name"));
+                        param.setAttribute("type", temp.getAttributeValue("type"));
 
-                            // The data "null" is not legal for a JDOM attribute
-                            stvar.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
-                            behavior.addContent(stvar);
-                        }
+                        // The data "null" is not legal for a JDOM attribute
+                        param.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
+                        behavior.addContent(param);
+                    }
+                    List<Element> lre2 = localRootElement.getChildren("StateVariable");
+                    for (Element temp : lre2) {
+                        Element stvar = new Element("stateVariable");
+                        stvar.setAttribute("name", temp.getAttributeValue("name"));
+                        stvar.setAttribute("type", temp.getAttributeValue("type"));
+
+                        // The data "null" is not legal for a JDOM attribute
+                        stvar.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
+                        behavior.addContent(stvar);
                     }
                 }
-                if (image) {
-                    Element evtGraphImage = new Element("EventGraphImage");
-                    evtGraphImage.setAttribute("dir", EventGraphCache.instance().getEventGraphImagePathsList().get(i));
-                    behavior.addContent(evtGraphImage);
-                }
-                behaviorList.addContent(behavior);
             }
+            if (image) {
+                Element evtGraphImage = new Element("EventGraphImage");
+                evtGraphImage.setAttribute("dir", EventGraphCache.instance().getEventGraphImageFilesList().get(i).getPath());
+                behavior.addContent(evtGraphImage);
+            }
+            behaviorList.addContent(behavior);
         }
+
         return behaviorList;
     }
 
@@ -551,36 +553,45 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     /**
-     * Creates parameter tables for all files in the assembly that have SMAL definitions.
-     * TODO: extract all parameters?  How to format in the report?
+     * Creates parameter tables for all files in the assembly that have SMAL
+     * definitions.
+     *
      * @return a Parameter Table for a given event graph
      */
+    private Element makeParameterTables() {
+        return makeTablesCommon("ParameterTables");
+    }
+
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    private Element makeParameterTables() {
-        Element parameterTables = new Element("ParameterTables");
+    private Element makeTablesCommon(String tableName) {
+
+        Element table = new Element(tableName);
+
         Element localRootElement = EventGraphCache.instance().getAssemblyDocument().getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
         String entityName;
+
         for (Element temp : simEntityList) {
             entityName = temp.getAttributeValue("name");
             List<Element> entityParams = temp.getChildren("MultiParameter");
             for (Element param : entityParams) {
                 if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
-                    parameterTables.addContent(extractSMAL(entityName, param));
+                    table.addContent(extractSMAL(entityName, param));
                 }
             }
         }
-        return parameterTables;
+
+        return table;
     }
 
     /**
-     * Takes viskit.Assembly formatted SMAL.EntityDefinition data and formats it for the
-     * analyst report
+     * Takes viskit.Assembly formatted SMAL.EntityDefinition data and formats it
+     * for the analyst report
      *
      * @param entityName the name of the entity
      * @param entityDef  the entityDefinition for this file
-     * @return table the properly formatted table entries
+     * @return table of properly formatted entries
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
@@ -676,19 +687,19 @@ public final class AnalystReportModel extends mvcAbstractModel {
             for (Element dataPoint : dataPoints) {
                 String dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
-                    log.debug("entry is: " + entry);
+                    LOG.debug("entry is: " + entry);
                     Object obj;
                     if (entry.toString().contains("PropChangeListenerNode")) {
 
                         obj = getPclNodeCache().get(entry.getKey());
                         try {
-                            log.debug("AR obj is: " + obj);
+                            LOG.debug("AR obj is: " + obj);
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStat = isCount ? "count" : "mean";
-                            log.debug("AR typeStat is: " + typeStat);
+                            LOG.debug("AR typeStat is: " + typeStat);
                             break;
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
-                            log.error(ex);
+                            LOG.error(ex);
                         }
                     }
                 }
@@ -723,7 +734,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
                         entity.addContent(repRecord);
 
                         // Add the raw count, or mean of replication data to the chart generators
-                        log.debug(replication.getAttributeValue(typeStat));
+                        LOG.debug(replication.getAttributeValue(typeStat));
                         data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
                         idx++;
                     }
@@ -748,8 +759,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     /**
-     * Converts boolean input into a 'true'/'false' string representation for use as
-     * an attribute value in the Analyst report XML.
+     * Converts boolean input into a 'true'/'false' string representation for
+     * use as an attribute value in the Analyst report XML.
      *
      * @param booleanFlag the boolean variable to convert
      * @return the string representation of the boolean variable
@@ -944,8 +955,6 @@ public final class AnalystReportModel extends mvcAbstractModel {
     public Document   getStatsReport()           { return statsReport; }
     public Element    getRootElement()           { return rootElement; }
     public String     getFileName()              { return fileName; }
-    public File       getAssemblyFile()          { return assemblyFile; }
-
     public String     getAuthor()                { return rootElement.getAttributeValue("author"); }
     public String     getClassification()        { return rootElement.getAttributeValue("classification");}
     public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
@@ -957,6 +966,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     public void setAssemblyFile(File assyFile) {
         assemblyFile = assyFile;
+
+        // Subsequent calls within the same runtime require a cleared cache
+        // which this does
         EventGraphCache.instance().makeEntityTable(assemblyFile);
         simConfig.addContent(EventGraphCache.instance().getEntityTable());
         entityParameters.addContent(makeParameterTables());
@@ -979,14 +991,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
         jpb.setString("Analyst Report now generating...");
         jpb.setStringPainted(true);
 
-        log.debug("JProgressBar set");
+        LOG.debug("JProgressBar set");
 
         captureEventGraphImages();
-        log.debug("EGs captured");
+        LOG.debug("EGs captured");
         captureAssemblyImage();
-        log.debug("Assembly captured");
+        LOG.debug("Assembly captured");
         captureLocationImage();
-        log.debug("Location Image captured");
+        LOG.debug("Location Image captured");
 
         jpb.setIndeterminate(false);
         jpb.setStringPainted(false);
@@ -1003,7 +1015,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         EventGraphCache evc = EventGraphCache.instance();
         ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(
                 evc.getEventGraphFilesList(),
-                evc.getEventGraphImagePathsList());
+                evc.getEventGraphImageFilesList());
     }
 
     /** Utility method used here to invoke the capability to capture the
@@ -1014,7 +1026,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         String assemblyImageDir =
                 VGlobals.instance().getCurrentViskitProject().getAnalystReportAssemblyImagesDir().getAbsolutePath();
         assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
-        String assyFileName = getAssemblyFile().getName();
+        String assyFileName = assemblyFile.getName();
         setAssemblyImageLocation(assemblyImageDir + "/" + assyFileName + ".png");
         ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(
                 getAssemblyImageLocation());
@@ -1035,7 +1047,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      *  this location
      */
     private void captureLocationImage() {
-        String assyFile = getAssemblyFile().getAbsolutePath().replaceAll("\\\\", "/");
+        String assyFile = assemblyFile.getAbsolutePath().replaceAll("\\\\", "/");
         String baseName = assyFile.substring(assyFile.lastIndexOf("/"));
         if (baseName.contains("_")) {
             baseName = baseName.substring(0, baseName.lastIndexOf("_"));
@@ -1044,11 +1056,11 @@ public final class AnalystReportModel extends mvcAbstractModel {
                 VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir() +
                 baseName + ".png";
         locationImagePath = locationImagePath.replaceAll("\\\\", "/");
-        log.debug(locationImagePath);
+        LOG.debug(locationImagePath);
         if (new File(locationImagePath).exists()) {
             setLocationImage(locationImagePath);
         }
-        log.debug(getLocationImage());
+        LOG.debug(getLocationImage());
     }
 
     public void setFileName          (String fileName)           { this.fileName = fileName; }

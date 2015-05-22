@@ -1104,11 +1104,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void captureEventGraphImages(java.util.List<File> eventGraphs, java.util.List<String> eventGraphImages) {
-        ListIterator<String> itr = eventGraphImages.listIterator(0);
+    public void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages) {
+        Iterator<File> itr = eventGraphImages.listIterator(0);
 
-        String eventGraphImage;
-        File eventGraphImageFile;
+        File imageFile;
         TimerCallback tcb;
 
         // create and save the image
@@ -1130,14 +1129,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // Now capture and store the Event Graph images
             if (itr.hasNext()) {
-                eventGraphImage = itr.next();
-                eventGraphImageFile = new File(eventGraphImage);
-                LOG.debug("eventGraphImage is: " + eventGraphImage);
-                tcb = new TimerCallback(eventGraphImageFile, false, egvf.getCurrentJgraphComponent());
+                imageFile = itr.next();
+                LOG.debug("eventGraphImage is: " + imageFile);
+                tcb = new TimerCallback(imageFile, false, egvf.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
-                if (!eventGraphImageFile.getParentFile().isDirectory()) {
-                    eventGraphImageFile.getParentFile().mkdirs();
+                if (!imageFile.getParentFile().isDirectory()) {
+                    imageFile.getParentFile().mkdirs();
                 }
 
                 // Fire this quickly as another Event Graph will immediately load

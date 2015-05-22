@@ -515,6 +515,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         return p;
     }
 
+    @SuppressWarnings("unchecked")
     private void fillEntityParams() {
         wantEntityParameterDescriptions.setSelected(arb.isPrintParameterComments());
         wantEntityParameterTables.setSelected(arb.isPrintParameterTable());
@@ -526,27 +527,24 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         colNames.add("Name");
         colNames.add("Description");
 
-        Vector v = arb.getParameterTables();
+        Vector<Object[]> v = arb.getParameterTables();
 
-        for (Iterator itr = v.iterator(); itr.hasNext();) {
+        for (Object[] oa : v) {
             Vector<Vector<String>> tableVector = new Vector<>();
-            Object[] oa = (Object[]) itr.next();
             String nm = (String) oa[0];
-            Vector v0 = (Vector) oa[1];
-            for (Iterator itr0 = v0.iterator(); itr0.hasNext();) {
+            Vector<Object[]> v0 = (Vector) oa[1];
+            for (Object[] oa0 : v0) {
                 // Rows here
-                Object[] oa0 = (Object[]) itr0.next();
                 String nm0 = (String) oa0[0];
                 Vector<String> rowVect = new Vector<>(3);
                 rowVect.add(nm0);
                 rowVect.add("");
                 rowVect.add("");
                 tableVector.add(rowVect);
-                Vector v1 = (Vector) oa0[1];
-                for (Iterator itr1 = v1.iterator(); itr1.hasNext();) {
+                Vector<String[]> v1 = (Vector) oa0[1];
+                for (String[] sa : v1) {
                     rowVect = new Vector<>(3);
                     rowVect.add("");
-                    String[] sa = (String[]) itr1.next();
                     rowVect.add(sa[0]); // name
                     rowVect.add(sa[1]); // description
                     tableVector.add(rowVect);

@@ -3,6 +3,7 @@ package viskit.control;
 import edu.nps.util.DirectoryWatch;
 import java.awt.Point;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import viskit.model.*;
@@ -65,7 +66,7 @@ public interface EventGraphController {
      * @param eventGraphImages a list of Event Graph image paths to write .png
      * files
      */
-    void captureEventGraphImages(java.util.List<File> eventGraphs, java.util.List<String> eventGraphImages);
+    void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages);
 
     void editGraphMetaData();
 
@@ -78,7 +79,7 @@ public interface EventGraphController {
      * Creates a new Viskit Project
      */
     void newProject();
-    
+
     /** Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */

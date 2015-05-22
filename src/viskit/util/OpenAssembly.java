@@ -38,7 +38,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jdom.Document;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
@@ -72,7 +71,6 @@ public class OpenAssembly {
     }
 
     public File file;
-    public Document jdomDoc;
     public SimkitAssembly jaxbRoot;
     public ObjectFactory jaxbFactory;
 
@@ -91,7 +89,6 @@ public class OpenAssembly {
             // This is crucial for Viskit being able to open associated EGs for
             // this Assy
             EventGraphCache.instance().makeEntityTable(file);
-            jdomDoc = EventGraphCache.instance().getAssemblyDocument();
             doSendNewAssy(file);
         }
     }

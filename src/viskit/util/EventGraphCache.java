@@ -111,10 +111,10 @@ public class EventGraphCache {
      */
     private List<String> eventGraphNamesList;
     private List<File> eventGraphFilesList;
-    private List<String> eventGraphImagePathsList;
+    private List<File> eventGraphImageFilesList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
-            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir() + "/";
+            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
     private Element entityTable;
     private static EventGraphCache me;
 
@@ -128,19 +128,31 @@ public class EventGraphCache {
     private EventGraphCache() {
         eventGraphNamesList  = new LinkedList<>();
         eventGraphFilesList  = new LinkedList<>();
-        eventGraphImagePathsList = new LinkedList<>();
+        eventGraphImageFilesList = new LinkedList<>();
+    }
+
+    /**
+     * Converts a loaded assy file into a Document
+     *
+     * @param assyFile the assembly file loaded
+     */
+    public void setAssemblyFileDocument(File assyFile) {
+        assemblyDocument = loadXML(assyFile);
     }
 
     /**
      * Creates the entity table for an analyst report xml object.  Also aids in
-     * opening EG files that are SimEntity node of an Assy file
+     * opening EG files that are a SimEntity node of an Assy file
      *
-     * @param assemblyFile the assembly file loaded into the Assembly Runner
+     * @param assyFile the assembly file loaded
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public void makeEntityTable(File assemblyFile) {
-        setEntityTable(new Element("EntityTable"));
+    public void makeEntityTable(File assyFile) {
+
+        setAssemblyFileDocument(assyFile);
+
+        entityTable = new Element("EntityTable");
 
         // Clear the cache if currently full
         if (!getEventGraphNamesList().isEmpty()) {
@@ -149,23 +161,29 @@ public class EventGraphCache {
         if (!getEventGraphFilesList().isEmpty()) {
             getEventGraphFilesList().clear();
         }
-        if (!getEventGraphImagePathsList().isEmpty()) {
-            getEventGraphImagePathsList().clear();
-        }
-        setAssemblyDocument(loadXML(assemblyFile));
-
-        Element localRootElement = getAssemblyDocument().getRootElement();
-        List<Element> simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
-
-        for (Element temp : simEntityList) {
-            Element tableEntry = new Element("SimEntity");
-            tableEntry.setAttribute("name", temp.getAttributeValue("name"));
-            tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
-            saveEventGraphReferences(temp.getAttributeValue("type"));
-            getEntityTable().addContent(tableEntry);
+        if (!getEventGraphImageFilesList().isEmpty()) {
+            getEventGraphImageFilesList().clear();
         }
 
         setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+
+        Element localRootElement = assemblyDocument.getRootElement();
+        List<Element> simEntityList = localRootElement.getChildren("SimEntity");
+
+        // Only those entities defined via SMAL
+        for (Element temp : simEntityList) {
+            Element tableEntry = new Element("SimEntity");
+            List<Element> entityParams = temp.getChildren("MultiParameter");
+
+            for (Element param : entityParams) {
+                if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
+                    tableEntry.setAttribute("name", temp.getAttributeValue("name"));
+                    tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
+                    getEntityTable().addContent(tableEntry);
+                }
+            }
+        }
+
     }
 
     /**
@@ -190,65 +208,67 @@ public class EventGraphCache {
     }
 
     /**
-     * Processes the 'type' value from a Viskit assembly, if it is an xml file, and
-     * adds it to the list of event graphs with the proper formatting of the file's
-     * path
+     * Processes the 'type' value from a Viskit assembly, if it is an xml file
+     * in the project's EGs directory, and adds it to the list of event graphs
+     * with the proper formatting of the file's path
      *
-     * @param fileType the type of XML file being used that includes a package
-     * name
+     * @param egFile the EG file type and name to save
      */
-    private void saveEventGraphReferences(String fileType) {
-        log.debug("Parameter fileType: " + fileType);
-        eventGraphNamesList.add(fileType);
+    private void saveEventGraphReferences(File egFile) {
+        log.debug("EG: " + egFile);
 
         // find the package seperator
-        char letter;
-        int idx = 0;
-        int fileTypeLength = fileType.length();
-        for (int i = 0; i < fileTypeLength; i++) {
-            letter = fileType.charAt(i);
-            if (letter == '.') {
-                idx = i;
-            }
-        }
+        int lastSlash = egFile.getPath().lastIndexOf(File.separator);
+        int pos = egFile.getPath().lastIndexOf(".");
 
-        String fileTypePackageToPath = fileType.substring(0, idx) + "/";
-        String eventGraphName = fileType.substring(idx + 1, fileTypeLength);
-        log.debug("EventGraph Name: " + eventGraphName);
+        String pkg = egFile.getParentFile().getName();
+        String egName = egFile.getPath().substring(lastSlash + 1, pos);
+        eventGraphNamesList.add(pkg + "." + egName);
 
-        String imgFile = EVENT_GRAPH_IMAGE_DIR + fileTypePackageToPath + eventGraphName + ".xml.png";
-        imgFile = imgFile.replaceAll("\\\\", "/");
+        log.debug("EventGraph Name: " + egName);
+
+        File imgFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + pkg + "/" + egName + ".xml.png");
         log.debug("Event Graph Image location: " + imgFile);
 
-        eventGraphImagePathsList.add(imgFile);
+        eventGraphImageFilesList.add(imgFile);
     }
 
     /** Use recursion to find EventGraph XML files
      *
-     * @param f the path to begin evaluation
+     * @param dir the path the EGs directory to begin evaluation
      */
-    private void setEventGraphFiles(File f) {
+    // TODO: This version JDOM does not support generics
+    @SuppressWarnings("unchecked")
+    private void setEventGraphFiles(File dir) {
 
-        File[] files = f.listFiles();
+        Element localRootElement;
+        List<Element> simEntityList;
+        String egName;
+        int pos;
+
+        File[] files = dir.listFiles();
         for (File file : files) {
             if (file.isDirectory()) {
                 setEventGraphFiles(file);
             } else {
 
-                // Check against the eventGraphNamesList obtained from the Assembly
-                for (String eventGraphName : eventGraphNamesList) {
-                    eventGraphName = eventGraphName.substring(eventGraphName.lastIndexOf(".") + 1) + ".xml";
-                    if (file.getName().equals(eventGraphName)) {
+                localRootElement = assemblyDocument.getRootElement();
+                simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
+
+                // Check all names against the simEntityList obtained from the Assembly
+                for (Element entity : simEntityList) {
+                    egName = entity.getAttributeValue("type");
+
+                    pos = egName.lastIndexOf(".");
+                    egName = egName.substring(pos + 1, egName.length());
+
+                    if (file.getName().equals(egName + ".xml")) {
                         eventGraphFilesList.add(file);
+                        saveEventGraphReferences(file);
                     }
                 }
             }
         }
-    }
-
-    /** @param pDoc the JDOM Document to set */
-    public void setAssemblyDocument(Document pDoc) {
-        assemblyDocument = pDoc;
     }
 
     /** @return a JDOM document (Assembly XML file) */
@@ -256,20 +276,13 @@ public class EventGraphCache {
 
     public List<String> getEventGraphNamesList() {return eventGraphNamesList;}
     public List<File> getEventGraphFilesList() {return eventGraphFilesList;}
-    public List<String> getEventGraphImagePathsList() {return eventGraphImagePathsList;}
+    public List<File> getEventGraphImageFilesList() {return eventGraphImageFilesList;}
 
     /**
      * @return the entityTable
      */
     public Element getEntityTable() {
         return entityTable;
-    }
-
-    /**
-     * @param entityTable the entityTable to set
-     */
-    public void setEntityTable(Element entityTable) {
-        this.entityTable = entityTable;
     }
 
 } // end class file EventGraphCache.java

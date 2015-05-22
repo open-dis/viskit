@@ -50,7 +50,6 @@ import java.util.Map;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import simkit.Schedule;
-import simkit.random.RandomVariateFactory;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.VStatics;
