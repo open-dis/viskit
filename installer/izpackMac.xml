@@ -79,7 +79,6 @@
 
           <fileset dir="stage/lib"           targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources/Java">
               <include name="**/*.jar"/>
-              <exclude name="viskit-exe.jar"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$INSTALL_PATH">
