@@ -1674,15 +1674,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
                     } else {
-
-//                        URL url = null;
-//                        try {
-//                            url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
-//                                    + "?subject=Assembly%20Source%20Generation%20Error&body=log%20output:");
-//                        } catch (MalformedURLException ex) {
-//                            LOG.error(ex);
-//                        }
-
                         String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
                         messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
                     }
