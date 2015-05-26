@@ -311,6 +311,8 @@ public class EventStateTransitionDialog extends JDialog {
             if (VGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
+
+            // Beware of qualified types here
             type = VStatics.classForName(typ);
             methods = Arrays.asList(type.getMethods());
 
