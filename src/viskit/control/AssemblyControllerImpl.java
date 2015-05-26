@@ -1675,21 +1675,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "Please open an Assembly file");
                     } else {
 
-                        URL url = null;
-                        try {
-                            url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
-                                    + "?subject=Assembly%20Source%20Generation%20Error&body=log%20output:");
-                        } catch (MalformedURLException ex) {
-                            LOG.error(ex);
-                        }
+//                        URL url = null;
+//                        try {
+//                            url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
+//                                    + "?subject=Assembly%20Source%20Generation%20Error&body=log%20output:");
+//                        } catch (MalformedURLException ex) {
+//                            LOG.error(ex);
+//                        }
 
-                        String msg = "Assembly source generation/compilation failure.  <br/>Please "
-                                + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
-                                + "email the log to "
-                                + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                                + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
-
-                        LogUtils.showHyperlinkedDialog((Component) getView(), "Assembly Error", url, msg);
+                        String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
+                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
                     }
                 } else {
 
