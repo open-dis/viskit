@@ -36,6 +36,7 @@ package viskit;
 import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
+//import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +58,7 @@ import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
+//import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -271,7 +273,7 @@ public class VStatics {
         }
 
 //        if (c == null) {
-//            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), getExtraClassPathArray()));
+//            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), SettingsDialog.getExtraClassPath()));
 //        }
 
         return c;
@@ -346,6 +348,10 @@ public class VStatics {
 
             case "Queue":
                 retVal = "java.util.Queue";
+                break;
+
+            case "TreeSet":
+                retVal = "java.util.TreeSet";
                 break;
 
             case "RandomNumber":
