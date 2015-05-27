@@ -199,7 +199,8 @@ public class SimpleDirectoriesAndJarsClassLoader extends ClassLoader {
                 System.err.println("exc: " + e.getMessage());
             } finally {
                 try {
-                    is.close();
+                    if (is != null)
+                        is.close();
                 } catch (IOException e) {}
             }
         }
