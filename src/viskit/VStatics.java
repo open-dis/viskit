@@ -264,17 +264,9 @@ public class VStatics {
             c = tryUnqualifiedName(s);
         }
 
-//        if (c == null) {
-//            c = cForName(s, VStatics.class.getClassLoader());
-//        }
-
         if (c == null) {
             c = FileBasedClassManager.instance().getFileClass(s);
         }
-
-//        if (c == null) {
-//            c = cForName(s, new SimpleDirectoriesAndJarsClassLoader(VStatics.class.getClassLoader(), SettingsDialog.getExtraClassPath()));
-//        }
 
         return c;
     }
