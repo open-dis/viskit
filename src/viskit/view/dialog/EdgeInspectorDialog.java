@@ -678,6 +678,7 @@ public class EdgeInspectorDialog extends JDialog {
 
             // Set the ComboBox width to accomodate the string length
             timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
+            pack();
         }
 
         @Override
