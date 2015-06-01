@@ -126,6 +126,11 @@ public class LocalBootLoader extends URLClassLoader {
 
         // Now add any external classpaths
         for (URL ext : extUrls) {
+
+            // Can happen if a path is present in the viskitProject.xml, but the
+            // jar was removed from where is was supposed to be
+            if (ext == null) {continue;}
+
             stage1.addURL(ext);
             String[] tmp = new String[getClassPath().length + 1];
             System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
