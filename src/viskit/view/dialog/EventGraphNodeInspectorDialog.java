@@ -247,7 +247,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
         testLp:
         {
-            if (handleField.getText().trim().length() <= 0) {
+            if (handleField.getText().trim().isEmpty()) {
                 break testLp;
             }
             if (!vi.isValid()) {
