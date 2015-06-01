@@ -12,7 +12,7 @@ version #:
     version # only.  SVN will take care of the rest
 
 3) installer/Unix_shortcutSpec.xml
-   installer/launch4jConfix.xml
+   installer/launch4jConfig.xml
    installer/shortcutSpec.xml
    installer/macosx/Info.plist
         CFBundleVersion

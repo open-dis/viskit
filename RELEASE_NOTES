@@ -60,6 +60,9 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  Fixed NPE when unqualified names were being used for local variables as well
+  as in parameters.  User is now notified to fix by stating qualified names.
+
   Fixed issue where user desires a specific replication to be verbose and only
   that one in particular.  If a specific rep. is given, that will uncheck the
   verbose box
