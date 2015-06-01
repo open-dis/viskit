@@ -568,6 +568,8 @@ public class EventStateTransitionDialog extends JDialog {
 
             if (!localAssignmentField.getText().isEmpty())
                 param.setLocalVariableAssignment(localAssignmentField.getText().trim());
+            else
+                param.setLocalVariableAssignment("");
 
             param.setName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
             param.setType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
@@ -661,18 +663,6 @@ public class EventStateTransitionDialog extends JDialog {
                         if (ret != JOptionPane.YES_OPTION) {
                             return;
                         }
-                    }
-                }
-                // check for null action
-                if (actionField.getText().trim().isEmpty()) {
-                    int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
-                            "No transition (action) has been entered." +
-                            "\nIgnore and continue?",
-                            "Warning",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.WARNING_MESSAGE);
-                    if (ret != JOptionPane.YES_OPTION) {
-                        return;
                     }
                 }
                 unloadWidgets();
