@@ -77,10 +77,9 @@ public class EdgeInspectorDialog extends JDialog {
      * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Edge edge) {
-        if (dialog == null || !allGood)
-            dialog = new EdgeInspectorDialog(f, edge);
-        else
-            dialog.setParams(f, edge);
+
+        // New ones every time so that each EG has it's own time delay vars
+        dialog = new EdgeInspectorDialog(f, edge);
 
         if (allGood)
             dialog.setVisible(true);
@@ -195,7 +194,8 @@ public class EdgeInspectorDialog extends JDialog {
         timeDelayPanel.add(Box.createHorizontalStrut(25));
         timeDelayVarsCB = buildTimeDelayVarsComboBox();
         timeDelayVarsCB.setToolTipText("Select a simulation parameter, event "
-                + "node argument or local variable for method invocation");
+                + "node argument or local variable for method invocation, or "
+                + "leave blank for a zero time delay");
         timeDelayPanel.add(new OneLinePanel(
                 null,
                 0,
@@ -363,7 +363,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         ComboBoxModel<ViskitElement> m = VGlobals.instance().getSimParamsCBModel();
 
-        // First item should be empty
+        // First item should be empty to allow for default zero delay
         ((DefaultComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
         cb.setModel(m);
 
@@ -522,7 +522,9 @@ public class EdgeInspectorDialog extends JDialog {
             // Prepare default selections
             timeDelayVarsCB.setEnabled(timeDelayVarsCB.getItemCount() > 0);
             setTimeDelayVarsCBValue("");
-            setTimeDelayMethodsCBValue("");
+
+            // A zero delay will be the default
+            setTimeDelayMethodsCBValue("0.0");
 
             // We always want this enabled to be able to enter manual delay
             // values
@@ -660,14 +662,24 @@ public class EdgeInspectorDialog extends JDialog {
             public void run() {
                 conditionalExpressionPanel.showConditions(show);
                 addConditionalButton.setVisible(!show);
+                pack();
             }
         };
         SwingUtilities.invokeLater(r);
     }
 
-    private void hideShowDescription(boolean show) {
-        showDescription(show);
-        addDescriptionButton.setVisible(!show);
+    private void hideShowDescription(final boolean show) {
+
+        Runnable r = new Runnable() {
+
+            @Override
+            public void run() {
+                showDescription(show);
+                addDescriptionButton.setVisible(!show);
+                pack();
+            }
+        };
+        SwingUtilities.invokeLater(r);
     }
 
     class addHideButtonListener implements ActionListener {
@@ -679,7 +691,6 @@ public class EdgeInspectorDialog extends JDialog {
             } else if (e.getSource().equals(addDescriptionButton)) {
                 hideShowDescription(true);
             }
-            pack();
         }
     }
 
