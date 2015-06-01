@@ -421,6 +421,7 @@ public class EventStateTransitionDialog extends JDialog {
                 break;
             }
         }
+
         if (param != null) {
             if (stateVarsCB.getItemCount() > 0) {
                 descriptionField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());
