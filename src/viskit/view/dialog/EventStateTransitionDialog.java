@@ -37,6 +37,7 @@ public class EventStateTransitionDialog extends JDialog {
 
     private static EventStateTransitionDialog dialog;
     private static boolean modified = false;
+    private static boolean allGood;
 
     private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
@@ -55,13 +56,14 @@ public class EventStateTransitionDialog extends JDialog {
     private LocalVariablesPanel localVariablesPanel;
 
     public static boolean showDialog(JFrame f, EventStateTransition est, ArgumentsPanel ap, LocalVariablesPanel lvp) {
-        if (dialog == null) {
+        if (dialog == null)
             dialog = new EventStateTransitionDialog(f, est, ap, lvp);
-        } else {
+        else
             dialog.setParams(f, est);
-        }
 
-        dialog.setVisible(true);
+        if (allGood)
+            dialog.setVisible(true);
+
         // above call blocks
         return modified;
     }
@@ -365,6 +367,15 @@ public class EventStateTransitionDialog extends JDialog {
                 typ = typ.substring(0, typ.indexOf("["));
             }
             type = VStatics.classForName(typ);
+
+            if (type == null) {
+                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController()).messageUser(
+                        JOptionPane.WARNING_MESSAGE,
+                        typ + " not found on the Classpath",
+                        "Please make sure you are using fully qualified java "
+                                + "names when referencing a local type");
+                return null;
+            }
             methods = type.getMethods();
 
             // Filter out methods of Object, non-void return types and any
@@ -384,9 +395,12 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     public final void setParams(Component c, EventStateTransition p) {
+        allGood = true;
         param = p;
 
         fillWidgets();
+
+        if (!allGood) {return;}
 
         modified = (p == null);
         okButt.setEnabled(p == null);
@@ -515,7 +529,15 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     private void setLocalVariableCBValue(EventStateTransition est) {
-        localVarMethodsCB.setModel(resolveLocalMethodCalls());
+
+        ComboBoxModel<String> mod = resolveLocalMethodCalls();
+
+        if (mod == null) {
+            allGood = false;
+            return;
+        }
+
+        localVarMethodsCB.setModel(mod);
         localInvocationPanel.setVisible(opOn.isSelected());
         pack();
 

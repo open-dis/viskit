@@ -936,6 +936,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
 
             StateVariable sv = findStateVariable(transition.getName());
+
+            if (sv == null) {continue;}
+            
             st.setState(sv);
 
             if (sv.getType() != null && VGlobals.instance().isArray(sv.getType())) {

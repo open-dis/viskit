@@ -21,6 +21,7 @@ import java.util.Collections;
 import simkit.Priority;
 import viskit.VGlobals;
 import viskit.VStatics;
+import viskit.control.EventGraphControllerImpl;
 import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
 import viskit.model.SchedulingEdge;
@@ -43,6 +44,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     private static EdgeInspectorDialog dialog;
     private static boolean modified = false;
+    private static boolean allGood;
     private Edge edge;
     private boolean schedulingType = true; // true = scheduling, false = cancelling
     private JButton canButt, okButt;
@@ -75,10 +77,16 @@ public class EdgeInspectorDialog extends JDialog {
      * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Edge edge) {
-        dialog = new EdgeInspectorDialog(f, edge);
+        if (dialog == null || !allGood)
+            dialog = new EdgeInspectorDialog(f, edge);
+        else
+            dialog.setParams(f, edge);
 
-        dialog.setVisible(true);
-        // above call blocks
+        if (allGood)
+            dialog.setVisible(true);
+            // above call blocks
+        else
+            modified = false;
         return modified;
     }
 
@@ -203,15 +211,19 @@ public class EdgeInspectorDialog extends JDialog {
                 null,
                 Color.gray);
         timeDelayMethodsCB = buildTimeDelayMethodsCB();
-        timeDelayMethodsCB.setToolTipText("Select an invocable method, or type "
-                + "in floating point delay value");
-        timeDelayPanel.add(new OneLinePanel(null, 0, timeDelayMethodsCB));
-        timeDelayPanel.add(Box.createHorizontalStrut(25));
 
-        // NOTE: Apply and Cancel buttons are squished if we don't do this
-        BoxLayoutUtils.clampHeight(timeDelayPanel);
+        // Can happen of an unqualified name was used to create a parameter
+        if (timeDelayMethodsCB != null) {
+            timeDelayMethodsCB.setToolTipText("Select an invocable method, or type "
+                    + "in floating point delay value");
+            timeDelayPanel.add(new OneLinePanel(null, 0, timeDelayMethodsCB));
+            timeDelayPanel.add(Box.createHorizontalStrut(25));
 
-        edgeInspectorPanel.add(timeDelayPanel);
+            // NOTE: Apply and Cancel buttons are squished if we don't do this
+            BoxLayoutUtils.clampHeight(timeDelayPanel);
+
+            edgeInspectorPanel.add(timeDelayPanel);
+        }
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
         myParmPanel = new JPanel();
@@ -262,10 +274,14 @@ public class EdgeInspectorDialog extends JDialog {
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
         timeDelayVarsCB.addActionListener(chlis);
-        timeDelayMethodsCB.addActionListener(chlis);
+
+        if (timeDelayMethodsCB != null) {
+            timeDelayMethodsCB.addActionListener(chlis);
+            timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(chlis);
+        }
+
         priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
         timeDelayVarsCB.getEditor().getEditorComponent().addKeyListener(chlis);
-        timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(chlis);
 
         addHideButtonListener hideList = new addHideButtonListener();
         addConditionalButton.addActionListener(hideList);
@@ -289,10 +305,13 @@ public class EdgeInspectorDialog extends JDialog {
     }
 
     public final void setParams(Component c, Edge e) {
+        allGood = true;
 
         edge = e;
 
         fillWidgets();
+
+        if (!allGood) {return;}
 
         modified = false;
         okButt.setEnabled(false);
@@ -379,6 +398,15 @@ public class EdgeInspectorDialog extends JDialog {
                 typ = typ.substring(0, typ.indexOf("["));
             }
             type = VStatics.classForName(typ);
+
+            if (type == null) {
+                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController()).messageUser(
+                        JOptionPane.WARNING_MESSAGE,
+                        typ + " not found on the Classpath",
+                        "Please make sure you are using fully qualified java "
+                                + "names when referencing a parameter");
+                return null;
+            }
             methods = type.getMethods();
 
             // Filter out methods of Object and any
@@ -455,7 +483,7 @@ public class EdgeInspectorDialog extends JDialog {
 
     private void setTimeDelayMethodsCBValue(String value) {
 
-        if (timeDelayMethodsCB.getItemCount() <= 0) {return;}
+        if (timeDelayMethodsCB == null || timeDelayMethodsCB.getItemCount() <= 0) {return;}
 
         // Default
         timeDelayMethodsCB.setSelectedItem(value);
@@ -498,7 +526,10 @@ public class EdgeInspectorDialog extends JDialog {
 
             // We always want this enabled to be able to enter manual delay
             // values
-            timeDelayMethodsCB.setEnabled(true);
+            if (timeDelayMethodsCB != null)
+                timeDelayMethodsCB.setEnabled(true);
+            else
+                allGood = false;
 
             if (edge.delay != null && !edge.delay.trim().isEmpty()) {
 
@@ -525,7 +556,12 @@ public class EdgeInspectorDialog extends JDialog {
 
             timeDelayVarsCB.setEnabled(false);
             dotLabel.setVisible(false);
-            timeDelayMethodsCB.setEnabled(false);
+
+            if (timeDelayMethodsCB != null)
+                timeDelayMethodsCB.setEnabled(false);
+            else
+                allGood = false;
+
             timeDelayPanel.setBorder(delayPanDisabledBorder);
         }
 
@@ -677,7 +713,11 @@ public class EdgeInspectorDialog extends JDialog {
             dotLabel.setVisible(!((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName().isEmpty());
 
             // Set the ComboBox width to accomodate the string length
-            timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
+            if (timeDelayMethodsCB != null)
+                timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
+            else
+                allGood = false;
+
             pack();
         }
 
