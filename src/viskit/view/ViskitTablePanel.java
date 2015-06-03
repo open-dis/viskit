@@ -471,12 +471,15 @@ public abstract class ViskitTablePanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent e) {
-            String tip;
+            String tip = null;
             java.awt.Point p = e.getPoint();
             int rowIndex = rowAtPoint(p);
             int colIndex = columnAtPoint(p);
 
-            tip = getValueAt(rowIndex, colIndex).toString();  // tool tip is contents (for long contents)
+            Object o = getValueAt(rowIndex, colIndex); // tool tip is contents (for long contents)
+            if (o != null)
+                tip = (String) o;
+
             return (tip == null || tip.isEmpty()) ? null : tip;
         }
     }
