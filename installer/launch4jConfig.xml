@@ -4,7 +4,7 @@
     Document   : launch4jConfig.xml
     Created on : September 3, 2006, 2:34 PM
     Author     : rmgold
-    Version    : $Id:$
+    Version    : $Id$
 -->
 
 <launch4jConfig>
@@ -32,12 +32,12 @@
       <timeoutErr>false</timeoutErr>
     </splash-->
     <versionInfo>
-      <fileVersion>1.0.5.0</fileVersion>
-      <txtFileVersion>1.0.5</txtFileVersion>
+      <fileVersion>1.0.10.0</fileVersion>
+      <txtFileVersion>1.0.10</txtFileVersion>
       <fileDescription>Viskit launcher</fileDescription>
       <copyright>Copyright (c) 1995-2015 held by the author(s).  All rights reserved.</copyright>
-      <productVersion>1.0.5.0</productVersion>
-      <txtProductVersion>1.0.5</txtProductVersion>
+      <productVersion>1.0.10.0</productVersion>
+      <txtProductVersion>1.0.10</txtProductVersion>
       <productName>Viskit</productName>
       <companyName>MOVES Institute, Naval Postgraduate School</companyName>
       <internalName>Viskit</internalName>

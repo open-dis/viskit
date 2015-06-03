@@ -397,8 +397,8 @@ their descpritions.
 
     <target name="jar.executable" depends="jar,make.classpath">
 
-        <echo message="${toString:runtime.classpath}"/>
-        <echo message="${launcher.classpath}"/>
+        <!--echo message="${toString:runtime.classpath}"/>
+        <echo message="${launcher.classpath}"/-->
 
         <jar basedir="${dir.build.classes}"
              compress="false"

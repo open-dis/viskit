@@ -2,7 +2,7 @@
 
 <shortcuts>
   <skipIfNotSupported />
-  <programGroup defaultName="Viskit\Viskit-1.0.5" location="applications"/>
+  <programGroup defaultName="Viskit\Viskit-1.0.10" location="applications"/>
 
   <shortcut
      name="Viskit"
@@ -22,7 +22,7 @@
    </shortcut>
 
    <shortcut
-     name="Viskit-1.0.5 Uninstaller"
+     name="Viskit-1.0.10 Uninstaller"
      programGroup="yes"
      desktop="no"
      applications="no"
@@ -30,7 +30,7 @@
      startup="no"
      target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
      commandLine=""
-     description="This uninstalls Viskit 1.0.5"
+     description="This uninstalls Viskit v1.0.10"
      iconFile="%SystemRoot%\system32\SHELL32.dll"
      iconIndex="31">
 

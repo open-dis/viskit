@@ -2,7 +2,7 @@
 
 <shortcuts>
     <skipIfNotSupported/>
-    <programGroup defaultName="Viskit-1.0.5"
+    <programGroup defaultName="Viskit-1.0.10"
                   location="applications"/>
     <shortcut
         name="Viskit"
