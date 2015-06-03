@@ -630,7 +630,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-            LogUtils.showHyperlinkedDialog(null, t.toString(), url, msg);
+            VStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
 
             // Comment in to see what the matter is
 //            t.printStackTrace();

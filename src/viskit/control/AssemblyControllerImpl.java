@@ -554,17 +554,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             File projDir;
             File projZip;
+            File logFile;
 
             @Override
             public Void doInBackground() {
 
                 projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
-                projZip = new File(System.getProperty("user.dir"), projDir.getName() + ".zip");
+                projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
+                logFile = new File(projDir, "debug.log");
+
+                if (projZip.exists())
+                    projZip.delete();
+
+                if (logFile.exists())
+                    logFile.delete();
 
                 try {
 
                     // First, copy the debug.log to the project dir
-                    FileIO.copyFile(ViskitConfig.V_DEBUG_LOG, new File(projDir, "debug.log"), true);
+                    FileIO.copyFile(ViskitConfig.V_DEBUG_LOG, logFile, true);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -583,17 +591,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     URL url = null;
                     try {
                         url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
-                                + "?subject=Viskit%20Project%20Submission%20Name="
+                                + "?subject=Viskit%20Project%20Submission%20for%20"
                                 + projDir.getName() + "&body=see%20attachment");
                     } catch (MalformedURLException e) {
                         LOG.error(e);
                     }
 
-                    String msg = "Please "
-                            + "navigate to " + projZip.getParent() + " and "
-                            + "email the " + projZip.getName() + " zip file to "
-                            + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                            + "<br/><br/>Click the link to open up an email form, then attach the zip file";
+                    String msg = "Please navigate to<br/>"
+                            + projZip.getParent()
+                            + "<br/>and email the " + projZip.getName()
+                            + " file to "
+                            + "<b><a href=\"" + url.toString() + "\">"
+                            + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                            + "<br/><br/>Click the link to open up an email "
+                            + "form, then attach the zip file";
 
                     try {
                         Desktop.getDesktop().open(projZip.getParentFile());
@@ -601,7 +612,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         LOG.error(e);
                     }
 
-                    LogUtils.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg);
+                    VStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
 
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);

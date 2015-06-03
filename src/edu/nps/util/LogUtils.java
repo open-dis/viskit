@@ -1,23 +1,12 @@
 package edu.nps.util;
 
 //import java.io.File;
-import java.awt.Component;
-import java.awt.Desktop;
-import java.awt.Font;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Properties;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import viskit.ViskitConfig;
 
 /**
  * Log4j Logging utilities.
@@ -111,53 +100,6 @@ public class LogUtils {
         sb.append(new Throwable().fillInStackTrace().getStackTrace()[4].getLineNumber());
         sb.append(")");
         return sb.toString();
-    }
-
-    /** Utility method to bring up a hyperlinked message to allow the user to
-     * mail the debug.log to the Viskit mailing list if the user's machine has
-     * an installed email client
-     *
-     * @param parent the parent component to center the JOptionPane panel
-     * @param cause a throwable instance to reference
-     * @param url a URL used to populate an email form
-     * @param msg the message to inform the user with and for emailing
-     */
-    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg) {
-
-        // Bugfix 1377
-
-        // for copying style
-        JLabel label = new JLabel();
-        Font font = label.getFont();
-
-        // create some css from the label's font
-        StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
-        style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
-        style.append("font-size:").append(font.getSize()).append("pt;");
-
-        // html content
-        JEditorPane ep = new JEditorPane("text/html",
-                "<html><body style=\"" + style + "\">"
-                + msg + "</body></html>");
-
-        // handle link events to bring up mail client and debug.log
-        ep.addHyperlinkListener(new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                try {
-                    if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                        Desktop.getDesktop().mail(url.toURI());
-                        Desktop.getDesktop().browse(ViskitConfig.V_DEBUG_LOG.toURI());
-                    }
-                } catch (IOException | URISyntaxException ex) {
-                    LOG.error(ex);
-                }
-            }
-        });
-        ep.setEditable(false);
-        ep.setBackground(label.getBackground());
-
-        JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
 
 } // end class file LogUtils.java

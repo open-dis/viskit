@@ -36,13 +36,18 @@ package viskit;
 import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
+import java.awt.Component;
+import java.awt.Desktop;
 //import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,7 +57,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
@@ -749,5 +758,56 @@ public class VStatics {
                 return 0;
             }
         }
+    }
+
+    /** Utility method to bring up a hyperlinked message to allow the user to
+     * email the debug.log to the Viskit mailing list if the user's machine has
+     * an installed email client
+     *
+     * @param parent the parent component to center the JOptionPane panel
+     * @param cause a throwable instance name to reference
+     * @param url a URL used to populate an email form
+     * @param msg the message to inform the user with
+     * @param showLog a flag to denote showing the debug.log in an output text editor
+     */
+    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg, final boolean showLog) {
+
+        // Bugfix 1377
+
+        // for copying style
+        JLabel label = new JLabel();
+        Font font = label.getFont();
+
+        // create some css from the label's font
+        StringBuffer style = new StringBuffer("font-family:" + font.getFamily() + ";");
+        style.append("font-weight:").append(font.isBold() ? "bold" : "normal").append(";");
+        style.append("font-size:").append(font.getSize()).append("pt;");
+
+        // html content
+        JEditorPane ep = new JEditorPane("text/html",
+                "<html><body style=\"" + style + "\">"
+                + msg + "</body></html>");
+
+        // handle link events to bring up mail client and debug.log
+        ep.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                try {
+                    if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                        Desktop.getDesktop().mail(url.toURI());
+
+                        if (showLog)
+                            Desktop.getDesktop().browse(ViskitConfig.V_DEBUG_LOG.toURI());
+                    }
+                } catch (IOException | URISyntaxException ex) {
+                    LOG.error(ex);
+                }
+            }
+        });
+        ep.setEditable(false);
+        ep.setBackground(label.getBackground());
+
+        JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
 }

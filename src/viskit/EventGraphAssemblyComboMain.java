@@ -118,7 +118,7 @@ public class EventGraphAssemblyComboMain {
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-            LogUtils.showHyperlinkedDialog(null, e.toString(), url, msg);
+            VStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
         }
     }
 
