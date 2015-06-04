@@ -77,7 +77,7 @@ public class TempFileManager {
 
             // Make a temp directory that you will use for all future requests.
             if (!tmpDir.mkdirs()) {
-                throw new IOException("Unable to create temporary directory:" + tmpDir.getAbsolutePath());
+                LOG.warn("Unable to create temporary directory:" + tmpDir.getAbsolutePath());
             }
 
             sTmpDir = tmpDir;
@@ -140,7 +140,7 @@ public class TempFileManager {
                 // It is just a file so we are safe to
                 // delete it
                 if (!file.delete()) {
-                    throw new IOException("Could not delete: " + file.getAbsolutePath());
+                    LOG.warn("Could not delete: " + file.getAbsolutePath());
                 }
             }
         }
@@ -149,7 +149,7 @@ public class TempFileManager {
         // that all of the files in the directory have
         // been properly deleted.
         if (!rootDir.delete()) {
-            throw new IOException("Could not delete: " + rootDir.getAbsolutePath());
+            LOG.warn("Could not delete: " + rootDir.getAbsolutePath());
         }
     }
 
