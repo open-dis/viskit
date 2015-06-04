@@ -155,6 +155,10 @@ public class vEdgeRenderer extends EdgeRenderer {
                             .getY(), (float) b1.getX(), (float) b1.getY(),
                             (float) p[i].getX(), (float) p[i].getY());
                 }
+                // Had to regenerate the sharedPath as it was going null here (TDN)
+                if (view.sharedPath == null)
+                    view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
+
                 view.sharedPath.quadTo((float) b[b.length - 1].getX(),
                         (float) b[b.length - 1].getY(),
                         (float) p[n - 1].getX(), (float) p[n - 1].getY());
@@ -176,6 +180,11 @@ public class vEdgeRenderer extends EdgeRenderer {
 
                 view.sharedPath.lineTo((float) pe.getX(), (float) pe.getY());
             }
+
+            // Had to regenerate the sharedPath as it was going null here (TDN)
+            if (view.sharedPath == null)
+                view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
+
             view.sharedPath.moveTo((float) pe.getX(), (float) pe.getY());
             if (view.endShape == null && view.beginShape == null) {
 

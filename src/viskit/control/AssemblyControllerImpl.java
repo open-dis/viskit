@@ -9,12 +9,14 @@ import edu.nps.util.ZipUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1806,6 +1808,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param assyImage an image file to write the .png
      */
     public void captureAssemblyImage(File assyImage) {
+
+        // Don't display an extra frame while taking snapshots
         final Timer tim = new Timer(100, new timerCallback(assyImage, false));
         tim.setRepeats(false);
         tim.start();
@@ -1846,13 +1850,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
             }
-            Rectangle reg = component.getBounds();
-            BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
+            Rectangle rec = component.getBounds();
+            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_3BYTE_BGR);
 
-            // Tell the jgraph component to draw into our memory
+            // Tell the jgraph component to draw into memory
             component.paint(image.getGraphics());
+
             try {
-                ImageIO.write(image, "png", fil);
+                ImageIO.write((RenderedImage)image, "png", fil);
             } catch (IOException e) {
                 LOG.error(e);
             }
@@ -1860,7 +1865,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // display a scaled version
             if (display) {
                 final JFrame frame = new JFrame("Saved as " + fil.getName());
-                ImageIcon ii = new ImageIcon(image);
+                Icon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
                 frame.getContentPane().add(lab, BorderLayout.CENTER);

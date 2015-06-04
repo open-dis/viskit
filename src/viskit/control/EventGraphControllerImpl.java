@@ -7,11 +7,13 @@ import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -1131,6 +1133,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             if (itr.hasNext()) {
                 imageFile = itr.next();
                 LOG.debug("eventGraphImage is: " + imageFile);
+
+                // Don't display an extra frame while taking snapshots
                 tcb = new TimerCallback(imageFile, false, egvf.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
@@ -1166,13 +1170,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 component = ((JScrollPane) component).getViewport().getView();
                 LOG.debug("CurrentJgraphComponent is a JScrollPane: " + component);
             }
-            Rectangle reg = component.getBounds();
-            BufferedImage image = new BufferedImage(reg.width, reg.height, BufferedImage.TYPE_3BYTE_BGR);
+            Rectangle rec = component.getBounds();
+            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 
-            // Tell the jgraph component to draw into our memory
-            component.paint(image.getGraphics());
+            // Tell the jgraph component to draw into memory
             try {
-                ImageIO.write(image, "png", fil);
+                component.paint(image.getGraphics());
+            } catch (NullPointerException e) {
+                LOG.error(e);
+            }
+            // NPEs are happening in JGraph
+
+            try {
+                ImageIO.write((RenderedImage)image, "png", fil);
             } catch (IOException e) {
                 LOG.error(e);
             }
@@ -1180,7 +1190,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // display a scaled version
             if (display) {
                 frame = new JFrame("Saved as " + fil.getName());
-                ImageIcon ii = new ImageIcon(image);
+                Icon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
                 frame.getContentPane().add(lab, BorderLayout.CENTER);
