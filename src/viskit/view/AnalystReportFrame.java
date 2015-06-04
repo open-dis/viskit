@@ -367,13 +367,14 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setSimLocationProductionNotes(locProductionNotesTA.getText());
         arb.setSimLocationConclusions(locConclusionsTA.getText());
         arb.setPrintSimLocationImage(wantLocationImages.isSelected());
+        
         String s = simLocImgTF.getText().trim();
-        if (s != null & s.length() > 0) {
+        if (s != null && !s.isEmpty())
             arb.setLocationImage(s);
-        }
-        if (s != null & s.length() > 0) {
-            arb.setChartImage(simChartImgTF.getText());
-        }
+
+        s = simChartImgTF.getText();
+        if (s != null && !s.isEmpty())
+            arb.setChartImage(s);
     }
 
     /************************/

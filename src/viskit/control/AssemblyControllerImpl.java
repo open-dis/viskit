@@ -1803,10 +1803,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
      *
-     * @param assyImagePath an image modelPath to write the .png
+     * @param assyImage an image file to write the .png
      */
-    public void captureAssemblyImage(String assyImagePath) {
-        final Timer tim = new Timer(100, new timerCallback(new File(assyImagePath), false));
+    public void captureAssemblyImage(File assyImage) {
+        final Timer tim = new Timer(100, new timerCallback(assyImage, false));
         tim.setRepeats(false);
         tim.start();
     }

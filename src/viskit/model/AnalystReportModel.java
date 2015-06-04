@@ -466,7 +466,11 @@ public final class AnalystReportModel extends mvcAbstractModel {
             }
             if (image) {
                 Element evtGraphImage = new Element("EventGraphImage");
-                evtGraphImage.setAttribute("dir", EventGraphCache.instance().getEventGraphImageFilesList().get(i).getPath());
+
+                // Set relative path only
+                String imgPath = EventGraphCache.instance().getEventGraphImageFilesList().get(i).getPath();
+                imgPath = imgPath.substring(imgPath.indexOf("images"), imgPath.length());
+                evtGraphImage.setAttribute("dir", imgPath);
                 behavior.addContent(evtGraphImage);
             }
             behaviorList.addContent(behavior);
@@ -778,7 +782,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private Element makeImage(String imageID, String dir) {
         Element image = new Element(imageID + "Image");
-        image.setAttribute("dir", dir);
+
+        // Set relative path only
+        image.setAttribute("dir", dir.substring(dir.indexOf("images"), dir.length()));
         return image;
     }
 
@@ -912,7 +918,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         setSimLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
         setSimLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
         setSimLocationProductionNotes("***ENTER SIMULATION PRODUCTION NOTES HERE***");
-        //setChartImage(""); // TODO:  generate image, set file location
+        //setChartImage(""); // TODO:  generate nauthical chart image, set file location
 
         //Simulation Configuration Values
         setPrintSimConfigComments(true);
@@ -1023,13 +1029,18 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
-        String assemblyImageDir =
-                VGlobals.instance().getCurrentViskitProject().getAnalystReportAssemblyImagesDir().getAbsolutePath();
-        assemblyImageDir = assemblyImageDir.replaceAll("\\\\", "/");
-        String assyFileName = assemblyFile.getName();
-        setAssemblyImageLocation(assemblyImageDir + "/" + assyFileName + ".png");
+        String assyFile = assemblyFile.getPath();
+        assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
+        File assyImage = new File(
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                assyFile + ".png");
+
+        if (!assyImage.getParentFile().exists())
+            assyImage.mkdirs();
+
+        setAssemblyImageLocation(assyImage.getPath());
         ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(
-                getAssemblyImageLocation());
+                assyImage);
     }
 
     private void announceReportReadyToView() {
@@ -1047,18 +1058,15 @@ public final class AnalystReportModel extends mvcAbstractModel {
      *  this location
      */
     private void captureLocationImage() {
-        String assyFile = assemblyFile.getAbsolutePath().replaceAll("\\\\", "/");
-        String baseName = assyFile.substring(assyFile.lastIndexOf("/"));
-        if (baseName.contains("_")) {
-            baseName = baseName.substring(0, baseName.lastIndexOf("_"));
-        }
-        String locationImagePath =
-                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir() +
-                baseName + ".png";
-        locationImagePath = locationImagePath.replaceAll("\\\\", "/");
-        LOG.debug(locationImagePath);
-        if (new File(locationImagePath).exists()) {
-            setLocationImage(locationImagePath);
+        File locationImage = new File(
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                assemblyFile.getName() + ".png");
+
+        LOG.debug(locationImage);
+        if (locationImage.exists()) {
+
+            // Set relative path only
+            setLocationImage(locationImage.getPath());
         }
         LOG.debug(getLocationImage());
     }

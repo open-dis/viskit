@@ -214,7 +214,6 @@
         <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
-                    <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                     <xsl:value-of select="@dir"/>
                 </xsl:attribute>
                 <xsl:attribute name="style">
@@ -225,7 +224,6 @@
                         <xsl:text>1</xsl:text>
                     </xsl:attribute>
                     <xsl:attribute name="src">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="description">
@@ -250,7 +248,6 @@
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="style">
@@ -261,7 +258,6 @@
                             <xsl:text>1</xsl:text>
                         </xsl:attribute>
                         <xsl:attribute name="src">
-                            <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
 
@@ -343,7 +339,6 @@
         <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
-                    <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                     <xsl:value-of select="@dir"/>
                 </xsl:attribute>
                 <xsl:attribute name="style">
@@ -354,7 +349,6 @@
                         <xsl:text>1</xsl:text>
                     </xsl:attribute>
                     <xsl:attribute name="src">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="title">
@@ -617,7 +611,6 @@
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="style">
@@ -628,7 +621,6 @@
                             <xsl:text>1</xsl:text>
                         </xsl:attribute>
                         <xsl:attribute name="src">
-                            <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
                         <xsl:attribute name="description">
@@ -747,7 +739,6 @@
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="style">
@@ -758,7 +749,6 @@
                             <xsl:text>1</xsl:text>
                         </xsl:attribute>
                         <xsl:attribute name="src">
-                            <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
                         <xsl:attribute name="description">
@@ -776,7 +766,6 @@
             <div align="center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
-                        <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                         <xsl:value-of select="@dir"/>
                     </xsl:attribute>
                     <xsl:attribute name="style">
@@ -787,7 +776,6 @@
                             <xsl:text>1</xsl:text>
                         </xsl:attribute>
                         <xsl:attribute name="src">
-                            <xsl:text disable-output-escaping="yes">file:///</xsl:text>
                             <xsl:value-of select="@dir"/>
                         </xsl:attribute>
                         <xsl:attribute name="description">

@@ -27,7 +27,7 @@ import viskit.ViskitProject;
  * @since August 3, 2006, 10:21 AM
  */
 public class HistogramChart {
-    
+
     /** Creates a new instance of HistogramChart */
     public HistogramChart() {}
 
@@ -44,7 +44,9 @@ public class HistogramChart {
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
-        return fileLocation.getAbsolutePath().replaceAll("\\\\", "/");
+
+        // Set relative path only
+        return "charts/" + fileLocation.getName();
     }
 
     /**
@@ -57,16 +59,16 @@ public class HistogramChart {
 
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
-        
+
         double[] dataCopy = data.clone();
         Arrays.sort(dataCopy);
         double max = dataCopy[dataCopy.length - 1];
         double min = dataCopy[0];
-        
+
         // From: http://www.isixsigma.com/library/forum/c031022_number_bins_histogram.asp
         double result = 1 + (3.3 * Math.log((double) dataCopy.length));
         int binNum = (int) Math.rint(result);
-                       
+
         dataset.addSeries(label, data, binNum, min, max);
 
         return dataset;
@@ -93,7 +95,7 @@ public class HistogramChart {
         // NOW DO SOME OPTIONAL CUSTOMIZATION OF THE CHART...
         XYPlot plot = (XYPlot) chart.getPlot();
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
-        
+
         renderer.setDrawBarOutline(true);
         renderer.setSeriesOutlinePaint(0, Color.red);
         plot.setForegroundAlpha(0.75f);
@@ -104,7 +106,7 @@ public class HistogramChart {
         plot.setDomainGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.white);
         // OPTIONAL CUSTOMIZATION COMPLETED.
-        
+
         return chart;
     }
 

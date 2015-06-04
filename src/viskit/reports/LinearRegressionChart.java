@@ -115,7 +115,9 @@ public class LinearRegressionChart {
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "LinearRegression.png");
         XYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
-        return fileLocation.getAbsolutePath().replaceAll("\\\\", "/");
+
+        // Set relative path only
+        return "charts/" + fileLocation.getName();
     }
 
     /**
