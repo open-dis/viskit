@@ -71,14 +71,14 @@ Post release fixes / upgrades / issues:
   parameters, we've hidden the parameters sub-panel from the canceling edge
   inspector
 
-  Fixed NP bug in the Source Window frame title when generating Assy souce code
+  Fixed NPE in the Source Window frame title when generating Assy source code
 
   Added support for when a user wishes to generate a statistical run report in
   that when the report is ready for further editing/input by the user, the UI
   will auto select the analyst report tab
 
   Added support for the user to zip a current Viskit project, to include the
-  current debug.log and email it to the viskit mailing list
+  current debug.log and email it to the Viskit mailing list
 
   Fixed and exception issue when verbose debug was selected from the Settings
   dialog
