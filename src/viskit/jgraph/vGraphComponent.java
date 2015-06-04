@@ -2,9 +2,6 @@ package viskit.jgraph;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -695,105 +692,5 @@ class CircleView extends VertexView {
     @Override
     public CellViewRenderer getRenderer() {
         return localRenderer;
-    }
-}
-
-/**
- * Class to draw the self-referential edges as an arc attached to the node.
- */
-class vSelfEdgeRenderer extends vEdgeRenderer {
-
-    private double circleDiam = 30.0d;
-    private Arc2D arc;
-
-    @Override
-    protected Shape createShape() {
-        CircleView myCircle = (CircleView) view.getSource().getParentView();
-        Rectangle2D circBnds = myCircle.getBounds();
-        double circCenterX = circBnds.getCenterX();
-        double circCenterY = circBnds.getCenterY();
-
-        double topCenterX = circCenterX - circleDiam / 2;
-        double topCenterY = circBnds.getY() + circBnds.getHeight() - 7;  // 7 pixels up
-
-        AffineTransform rotater = new AffineTransform();
-        rotater.setToRotation(getAngle(), circCenterX, circCenterY);
-
-        if (view.sharedPath == null) {
-            double ex = topCenterX;
-            double ey = topCenterY;
-            double ew = circleDiam;
-            double eh = circleDiam;
-            arc = new Arc2D.Double(ex, ey, ew, eh, 135.0d, 270.0d, Arc2D.OPEN); // angles: start, extent
-            view.sharedPath = new GeneralPath(arc);
-            view.sharedPath = new GeneralPath(view.sharedPath.createTransformedShape(rotater));
-        } else {
-            view.sharedPath.reset();
-        }
-
-        view.beginShape = view.lineShape = view.endShape = null;
-
-        Point2D p2start = arc.getStartPoint();
-        Point2D p2end = arc.getEndPoint();
-        Point2D pstrt = new Point2D.Double(p2start.getX(), p2start.getY());
-        Point2D pend = new Point2D.Double(p2end.getX(), p2end.getY());
-
-        if (beginDeco != GraphConstants.ARROW_NONE) {
-            view.beginShape = createLineEnd(beginSize, beginDeco, pstrt, new Point2D.Double(pstrt.getX() + 15, pstrt.getY() + 15));
-            view.beginShape = rotater.createTransformedShape(view.beginShape);
-        }
-        if (endDeco != GraphConstants.ARROW_NONE) {
-            view.endShape = createLineEnd(endSize, endDeco, new Point2D.Double(pend.getX() + 15, pend.getY() + 25), pend);
-            view.endShape = rotater.createTransformedShape(view.endShape);
-        }
-
-        view.lineShape = (GeneralPath) view.sharedPath.clone();
-
-        if (view.endShape != null) {
-            view.sharedPath.append(view.endShape, true);
-        }
-        if (view.beginShape != null) {
-            view.sharedPath.append(view.beginShape, true);
-        }
-
-        return view.sharedPath;
-    }
-
-    /**
-     * Defines how much we increment the angle calculated in getAngle() for each
-     * self-referential edge discovered.  Since we want to advance 3/8 of
-     * a circle for each edge, the value below should be Pi that increments by
-     * Pi * 3/8.
-     * But since the iterator in getAngle discovers each edge twice (since the
-     * edge has a connection to both its head and tail, the math works out to
-     * rotate only half that much.
-     */
-    private final static double ROT_INCR = Math.PI;
-
-    /**
-     * This class will determine if there are other self-referential edges
-     * attached to this node and try to return a different angle for different
-     * edges, so they will be rendered at different "clock" points around the
-     * node circle.
-     *
-     * @return a different angle for each self-referential edge
-     */
-    private double getAngle() {
-        vEdgeCell vec = (vEdgeCell) view.getCell();
-        Edge edg = (Edge) vec.getUserObject();
-
-        CircleCell vcc = (CircleCell) view.getSource().getParentView().getCell();
-        EventNode en = (EventNode) vcc.getUserObject();
-        double retd = ROT_INCR;
-        for (ViskitElement ve : en.getConnections()) {
-            Edge e = (Edge) ve;
-            if (e.to == en && e.from == en) {
-                retd += (ROT_INCR * 3/8);
-                if (e == edg) {
-                    return retd;
-                 }
-            }
-        }
-        return 0.0d;      // should always find one
     }
 }
