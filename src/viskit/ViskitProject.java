@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,11 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
@@ -134,7 +134,7 @@ public class ViskitProject {
         if (!analystReportsDir.exists()) {
             getAnalystReportsDir().mkdirs();
             try {
-                FileIO.copyFile(new File(VISKIT_ICON_SOURCE), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME), true);
+                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
                 log.error(ex);
             }

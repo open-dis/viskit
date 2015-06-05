@@ -33,10 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JComponent;
@@ -70,7 +71,7 @@ public class AnalystReportController extends mvcAbstractController {
     public AnalystReportController() {}
 
     /** Called from the InternalAssemblyRunner when the temp Analyst report is
-     * filled out and ready to copy
+     * filled out and ready to copy from a temp to a permanent directory
      *
      * @param path the path to the temp Analyst Report that will be copied
      */
@@ -89,8 +90,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         File targetFile = new File(aRDir, outputFile);
         try {
-            FileIO.copyFile(srcFil, targetFile, true);
-            srcFil.deleteOnExit();
+            Files.copy(srcFil.toPath(), targetFile.toPath());
         } catch (IOException ioe) {
             LOG.fatal(ioe);
         }
@@ -276,18 +276,14 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     private void showHtmlViewer(File f) {
-        String errMsg = null;
+
         // pop up the system html viewer, or send currently running browser to html page
         try {
-            viskit.util.BareBonesBrowserLaunch.openURL(f.toURI().toURL().toString());
-        } catch (java.net.MalformedURLException mue) {
-            errMsg = f + " : malformed path error.";
-        }
-
-        if (errMsg != null) {
+            Desktop.getDesktop().browse(f.toURI());
+        } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame,
-                    "<html><center>Error displaying HTML:<br>" + errMsg,
-                    "Error",
+                    "<html><center>Error displaying HTML:<br>" + ex.getMessage(),
+                    "Browser Launch Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }

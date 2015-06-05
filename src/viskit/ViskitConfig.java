@@ -1,10 +1,10 @@
 package viskit;
 
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.configuration.*;
@@ -104,18 +104,20 @@ public class ViskitConfig {
             }
             File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
             if (!V_CONFIG_FILE.exists()) {
-                V_CONFIG_FILE.createNewFile();
-                FileIO.copyFile(vconfigSrc, V_CONFIG_FILE, true);
+                Files.copy(vconfigSrc.toPath(), V_CONFIG_FILE.toPath());
             }
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists()) {
-                C_APP_FILE.createNewFile();
-                FileIO.copyFile(cAppSrc, C_APP_FILE, true);
+                Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
             }
-            File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
+            File cGuiSrc;
+            if (VStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
+                cGuiSrc = new File("configuration/c_gui_mac.xml");
+            else
+                cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
+
             if (!C_GUI_FILE.exists()) {
-                C_GUI_FILE.createNewFile();
-                FileIO.copyFile(cGuiSrc, C_GUI_FILE, true);
+                Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
             }
         } catch (IOException ex) {
             LOG.error(ex);

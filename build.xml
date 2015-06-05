@@ -147,7 +147,7 @@
         <echo>
 This is the Ant build file for the NPS Viskit and associated libraries.
 Third-party jar files are not compiled from source here, but they are
-copied as necessary for the viskit distribution.  This buildfile was
+copied as necessary for Viskit distribution.  This buildfile was
 created and tested using ${ant.version}.
 Type "ant -p" on the command line for a list of targets to invoke and
 their descpritions.

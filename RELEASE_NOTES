@@ -2,13 +2,15 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
-  On Mac OS X 10.10.3 & JDK 1.8.0_45, in the default L&F mode, when inputing
-  EG Parameters when the user selects more... to expose RandomVariate types,
-  a NPE will be thrown:
+  On Mac OS X 10.10.3 (Yoseimite) & JDK 1.8.0_45, in the default L&F mode, when
+  inputing EG Parameters when the user selects more... to expose RandomVariate
+  types, a NPE will be thrown:
 
     at com.apple.laf.AquaMenuPainter.paintSelectedMenuItemBackground(AquaMenuPainter.java:153)
 
-  Select the Platform L&F for OS X users as the work around.
+  Select the Platform L&F for OS X users as the work around.  On Win machines,
+  the platform L&F is not the best choice as the background coloring for tabs is
+  quite quirky.  The default L&F for Win machines is recommended.
 
   On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
   JGraph pallete will revert back to the select cursor (arrow) when a node or
@@ -60,6 +62,12 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+  JavaHelp contents now render external links
+
+  Config files for initial startup will now force the platform L&F for Macs and
+  leave the default L&F for Win and other machines.  This is due to what is
+  described above under issues.
+
   Fixed NPE when unqualified names were being used for local variables as well
   as in parameters.  User is now notified to fix by stating qualified names.
 
@@ -91,7 +99,7 @@ Post release fixes / upgrades / issues:
   of stats data presented.
 
   Fixed issue where designPointStats names were not being correctly set during
-  Assy. runtime causing NPE and incorrect stat output due to name mismatches.
+  Assy. runtime causing a NPE and incorrect stat output due to name mismatches.
 
   Fixed an issue where the default Random Number Generator's seed reset call was
   performed incorrectly and was unnecessary.  The default RNG is the Mersenne

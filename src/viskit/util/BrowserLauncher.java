@@ -1,45 +1,42 @@
 package viskit.util;
 
 import edu.nps.util.LogUtils;
+import java.awt.Desktop;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
+import javax.help.JHelpContentViewer;
+import javax.help.plaf.basic.BasicContentViewerUI;
+import javax.swing.JComponent;
 import javax.swing.event.HyperlinkEvent;
-import static javax.swing.event.HyperlinkEvent.EventType.ACTIVATED;
-import javax.swing.event.HyperlinkListener;
+import javax.swing.event.HyperlinkEvent.EventType;
+import javax.swing.plaf.ComponentUI;
 import org.apache.log4j.Logger;
-import viskit.VGlobals;
 
 /**
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $
- * @author abuss
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.BrowserLauncher">Terry Norbraten, NPS MOVES</a>
  */
-public class BrowserLauncher implements HyperlinkListener {
+public class BrowserLauncher extends BasicContentViewerUI {
 
-    public static final String WINDOWS = "Windows";
-    public static final String MAC = "Mac OS X";
-    static Logger log = LogUtils.getLogger(BrowserLauncher.class);
+    static final Logger LOG = LogUtils.getLogger(BrowserLauncher.class);
+
+    public static ComponentUI createUI(JComponent x) {
+        return new BrowserLauncher((JHelpContentViewer) x);
+    }
+
+    public BrowserLauncher(JHelpContentViewer b) {
+        super(b);
+    }
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == ACTIVATED) {
+        if (e.getEventType() == EventType.ACTIVATED) {
             URL url = e.getURL();
             try {
-                String osName = System.getProperty("os.name");
-                if (osName.startsWith(WINDOWS)) {
-                    Runtime.getRuntime().exec(
-                            "rundll32 url.dll,FileProtocolHandler " +
-                            url);
-                } else if (osName.equals(MAC)) {
-                    Class<?> clazz = VGlobals.instance().getWorkClassLoader().loadClass(
-                            "com.apple.eio.FileManager");
-                    Method method = clazz.getMethod("openURL", String.class);
-                    method.invoke(null, url.toString());
-                }
-            }
-            catch (IOException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-                log.error(ex);
+                Desktop.getDesktop().browse(url.toURI());
+            } catch (IOException | URISyntaxException ex) {
+                LOG.error(ex);
             }
         }
     }

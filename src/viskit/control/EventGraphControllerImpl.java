@@ -2,7 +2,6 @@ package viskit.control;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.BorderLayout;
@@ -17,6 +16,8 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -312,7 +313,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         File ofile = new File(watchDir, nm);
         LOG.debug("f is: " + f + " and ofile is: " + ofile);
         try {
-            FileIO.copyFile(f, ofile, true);
+            Files.copy(f.toPath(), ofile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOG.error(e);
 //            e.printStackTrace();

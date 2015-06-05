@@ -126,7 +126,7 @@ public class EventGraphAssemblyComboMain {
      * .viskit config directory in the user's profile space
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfig.V_DEBUG_LOG;
+        File dotViskit = ViskitConfig.VISKIT_CONFIG_DIR;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
@@ -143,7 +143,7 @@ public class EventGraphAssemblyComboMain {
 
     private static void createGUI(String[] args) {
 
-        boolean onMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+        boolean isMac = VStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
         String initialFile = null;
 
         if (args.length > 0) {
@@ -162,7 +162,7 @@ public class EventGraphAssemblyComboMain {
         JFrame mainFrame = new MainFrame(initialFile);
         VGlobals.instance().setMainAppWindow(mainFrame);
 
-        if (onMac) {
+        if (isMac) {
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
@@ -198,7 +198,7 @@ public class EventGraphAssemblyComboMain {
                             break;
                         case "handleAbout":
                             try {
-                                Help help = new Help(VGlobals.instance().getMainAppWindow());
+                                Help help = VGlobals.instance().getHelp();
                                 help.aboutEventGraphEditor();
                                 Class<?> applicationEventClass = VStatics.classForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);

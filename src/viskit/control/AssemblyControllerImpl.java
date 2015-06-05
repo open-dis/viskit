@@ -2,7 +2,6 @@ package viskit.control;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtils;
@@ -26,6 +25,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -574,7 +575,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 try {
 
                     // First, copy the debug.log to the project dir
-                    FileIO.copyFile(ViskitConfig.V_DEBUG_LOG, logFile, true);
+                    Files.copy(ViskitConfig.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);

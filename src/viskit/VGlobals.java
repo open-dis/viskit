@@ -110,6 +110,9 @@ public class VGlobals {
     /** The current project base directory */
     private File projectsBaseDir;
 
+    /** The main app JavaHelp set */
+    private Help help;
+
     public static synchronized VGlobals instance() {
         if (me == null) {
             me = new VGlobals();
@@ -952,6 +955,18 @@ public class VGlobals {
 
     public void setMainAppWindow(JFrame mainAppWindow) {
         this.mainAppWindow = mainAppWindow;
+    }
+
+    public Help getHelp() {
+        return help;
+    }
+
+    /** The EventGraph Editor is the first to start so it will set the instance
+     * of Help for Viskit
+     * @param help the JavaHelp instance to set for Viskit
+     */
+    public void setHelp(Help help) {
+        this.help = help;
     }
 
     public boolean isSysExitCalled() {

@@ -76,9 +76,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public final static int SELF_REF_MODE = 4;
     public final static int SELF_REF_CANCEL_MODE = 5;
 
-    // The main frame and the view need this
-    public Help help;
-
     private static final String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
     private static final String LOOK_AND_FEEL = SettingsDialog.getLookAndFeel();;
 
@@ -510,14 +507,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void setVisible(boolean b) {
-        super.setVisible(b);
-
-        // tell the help screen where we are so he can center himself
-        help.mainFrameLocated(this.getBounds());
-    }
-
-    @Override
     public String addParameterDialog() {
 
         if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
@@ -709,7 +698,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        help = new Help(this);
+        Help help = new Help(this);
+        help.mainFrameLocated(this.getBounds());
+        VGlobals.instance().setHelp(help);
+
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
@@ -957,7 +949,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
-            if (d.width != 0 && d.height != 0 && System.getProperty("os.name").contains("Windows")) {
+            if (d.width != 0 && d.height != 0 && VStatics.OPERATING_SYSTEM.contains("Windows")) {
 
                 // Only works on windoze
                 buildCancelCursor(img);

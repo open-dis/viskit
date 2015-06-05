@@ -14,6 +14,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.*;
 import viskit.VGlobals;
+import viskit.VStatics;
 
 /**
  * A class to present an XML file in a JTree widget
@@ -224,7 +225,7 @@ public class XTree extends JTree {
     }
     static int wrapSiz = 50;//100;
     static String nl = System.getProperty("line.separator");
-    static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+    static boolean isWindows = VStatics.OPERATING_SYSTEM.toLowerCase().contains("windows");
 
     static private String wrap(String s) {
         if (isWindows) {

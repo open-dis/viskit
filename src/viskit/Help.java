@@ -11,6 +11,7 @@ import javax.help.HelpBroker;
 import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import javax.help.SwingHelpUtilities;
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 
@@ -22,10 +23,6 @@ public class Help {
 
     public static final Version VERSION = new Version("viskit/version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();
-    private Component parent;
-    private Icon icon;
-    private JEditorPane aboutEGEditorPane;
-    private JEditorPane aboutAssemblyEditorPane;
     public static final String CR = "<br>";
     public static final String ABOUT_EG_STRING =
             "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
@@ -37,7 +34,7 @@ public class Help {
     public static final String VISKIT_URL = "http://diana.nps.edu/Viskit/";
     public static final String BUGZILLA_URL = "https://diana.nps.edu/bugzilla/";
     public static final String DEVELOPERS =
-            "Copyright &copy; 2004-2010 under the Lesser GNU License" + CR + CR
+            "Copyright &copy; 2004-2015 under the Lesser GNU License" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
@@ -61,41 +58,48 @@ public class Help {
     public static final String BUGZILLA_PAGE = CR
             + "Please register for the Viskit Issue tracker:" + CR
             + LinkURLString(BUGZILLA_URL);
-    private static HelpBroker hb;
+
+    private HelpBroker hb;
+
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private static final Component TUTORIAL_COMPONENT;
-    private static final ActionListener TUTORIAL_LISTENER_LAUNCHER;
+    private Component TUTORIAL_COMPONENT;
+    private ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
-    static {
-        ClassLoader cl = viskit.Help.class.getClassLoader();
-        URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
-        HelpSet hs;
-        try {
-            hs = new HelpSet(null, helpSetURL);
-            hb = hs.createHelpBroker();
-        } catch (HelpSetException e) {
-//        e.printStackTrace();
-            LogUtils.getLogger(Help.class).error(e);
-        }
-
-        // Here we're setting up the action event peripherals for the tutorial menu selection
-        TUTORIAL_COMPONENT = new Button();
-        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(hb);
-        CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
-    }
+    private Component parent;
+    private Icon icon;
+    private JEditorPane aboutEGEditorPane;
+    private JEditorPane aboutAssemblyEditorPane;
 
     /** Creates a new instance of Help
      * @param parent main frame to center on
      */
     public Help(Component parent) {
         this.parent = parent;
+
+        ClassLoader cl = viskit.Help.class.getClassLoader();
+        URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
+        try {
+            hb = new HelpSet(null, helpSetURL).createHelpBroker();
+        } catch (HelpSetException e) {
+//        e.printStackTrace();
+            LogUtils.getLogger(Help.class).error(e);
+        }
+
+        // Here we're setting up the action event peripherals for the tutorial menu selection
+        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(hb);
+        TUTORIAL_COMPONENT = new Button();
+
+        CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
+
         icon = new ImageIcon(
                 VGlobals.instance().getWorkClassLoader().getResource(
                 "viskit/images/ViskitLogo.png"));
-        aboutEGEditorPane = new JEditorPane();
 
-        aboutEGEditorPane.addHyperlinkListener(
-                new BrowserLauncher());
+        BrowserLauncher bl = new BrowserLauncher(null);
+        SwingHelpUtilities.setContentViewerUI("viskit.util.BrowserLauncher");
+
+        aboutEGEditorPane = new JEditorPane();
+        aboutEGEditorPane.addHyperlinkListener(bl);
         aboutEGEditorPane.setContentType("text/html");
         aboutEGEditorPane.setEditable(false);
         aboutEGEditorPane.setText(ABOUT_EG_STRING
@@ -103,8 +107,7 @@ public class Help {
                 + SIMKIT_PAGE + VERSIONS);
 
         aboutAssemblyEditorPane = new JEditorPane();
-        aboutAssemblyEditorPane.addHyperlinkListener(
-                new BrowserLauncher());
+        aboutAssemblyEditorPane.addHyperlinkListener(bl);
         aboutAssemblyEditorPane.setContentType("text/html");
         aboutAssemblyEditorPane.setEditable(false);
         aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY_STRING
@@ -120,7 +123,7 @@ public class Help {
 
     public void aboutAssemblyEditor() {
         JOptionPane.showMessageDialog(parent, aboutAssemblyEditorPane,
-                "About Viskit Event Graph Editor...",
+                "About Viskit Assembly Editor...",
                 JOptionPane.OK_OPTION, icon);
     }
 
@@ -138,19 +141,10 @@ public class Help {
         ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
         TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }
-    /*
-    public void help() {
-    JOptionPane.showMessageDialog(parent, "Viskit help not yet implemented",
-    "Viskit Help", JOptionPane.OK_OPTION, icon);
-    }
-     */
-    // message when the main frame has been positioned on the screen
 
     public void mainFrameLocated(Rectangle bounds) {
         Point p = new Point(bounds.x, bounds.y);
         Dimension d = new Dimension(bounds.width, bounds.height);
-        //Dimension hd = hb.getSize();
-        //hd.width+=100;
         Dimension hd = new Dimension(1200, 700);
         hb.setSize(hd);
         p.x = p.x + d.width / 2 - hd.width / 2;
@@ -162,11 +156,8 @@ public class Help {
         String linkString = "";
         try {
             URL url = new URL(urlString);
-            linkString = "<a href = " + url
-                    + ">" + url + "<a>";
-
-        } catch (MalformedURLException ex) {
-        }
+            linkString = "<a href = " + url + ">" + url + "</a>";
+        } catch (MalformedURLException ex) {}
         return linkString;
 
     }

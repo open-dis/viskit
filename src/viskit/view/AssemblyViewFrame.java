@@ -362,7 +362,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(this);
+        Help help = VGlobals.instance().getHelp();
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
@@ -371,7 +371,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         helpMenu.addSeparator();
 
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
+        helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
     }

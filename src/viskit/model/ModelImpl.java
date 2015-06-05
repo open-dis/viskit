@@ -1,11 +1,12 @@
 package viskit.model;
 
-import edu.nps.util.FileIO;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -212,7 +213,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             m.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            FileIO.copyFile(tmpF, f, true);
+            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             setDirty(false);
             currentFile = f;
@@ -938,7 +939,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             StateVariable sv = findStateVariable(transition.getName());
 
             if (sv == null) {continue;}
-            
+
             st.setState(sv);
 
             if (sv.getType() != null && VGlobals.instance().isArray(sv.getType())) {

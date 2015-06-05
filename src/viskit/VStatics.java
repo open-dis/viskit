@@ -38,7 +38,6 @@ import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import java.awt.Component;
 import java.awt.Desktop;
-//import edu.nps.util.SimpleDirectoriesAndJarsClassLoader;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
@@ -67,7 +66,6 @@ import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
-//import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
@@ -99,6 +97,8 @@ public class VStatics {
 
     public static final String FULL_PATH = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
+
+    public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
     static final Logger LOG = LogUtils.getLogger(VStatics.class);
 
@@ -244,11 +244,10 @@ public class VStatics {
      */
     public static String runOSFile(String path) {
         Runtime run = Runtime.getRuntime();
-        String os = System.getProperty("os.name");
         try {
-            if (os.contains("Mac")) {
+            if (OPERATING_SYSTEM.contains("Mac")) {
                 run.exec(new String[]{"open", path});
-            } else if (os.contains("Win")) {
+            } else if (OPERATING_SYSTEM.contains("Win")) {
                 run.exec(new String[]{"start", "iexplore", path});
             } else {
                 run.exec(new String[]{path});

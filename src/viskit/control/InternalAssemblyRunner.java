@@ -640,7 +640,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e)
         {
             File f; // = tmpFile;
-            String osName = System.getProperty("os.name");
+            String osName = VStatics.OPERATING_SYSTEM;
             String filePath = "";
             String tool;
             if (osName.toLowerCase().contains("win")) {

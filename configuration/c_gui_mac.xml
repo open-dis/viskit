@@ -29,6 +29,6 @@
     <projecttitle>
         <name value="DefaultProject"/>
     </projecttitle>
-    <lookandfeel>default</lookandfeel>
+    <lookandfeel>platform</lookandfeel>
   </gui>
 </ViskitConfig>

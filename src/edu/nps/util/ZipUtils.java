@@ -20,20 +20,20 @@
 package edu.nps.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/** Class that zips a directory that is pointed to.  The  processFoler method
+/** Class that zips a directory that is pointed to.  The  processFolder method
  * reads from the input stream and writes onto the output stream until the input
  * stream is exhausted.
  *
  * @author Tony BenBrahim
  * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.ZipUtils">Terry Norbraten, NPS MOVES</a>
- * @version $Id:$
+ * @version $Id$
  */
 public final class ZipUtils {
 
@@ -53,12 +53,15 @@ public final class ZipUtils {
             if (file.isFile()) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
-                try (FileInputStream inputStream = new FileInputStream(file)) {
-                    StreamCopier.copy(inputStream, zipOutputStream);
-                }
+                Files.copy(file.toPath(), zipOutputStream);
                 zipOutputStream.closeEntry();
             } else if (file.isDirectory()) {
-                processFolder(file, zipOutputStream, prefixLength);
+
+                // hard code hack here, but so far, this utility is only being
+                // used to zip Viskit Projects, so, don't include the project's
+                // /build directory, or a NetBeans project private directory
+                if (!file.getName().equals("build") && !file.getName().equals("private"))
+                    processFolder(file, zipOutputStream, prefixLength);
             }
         }
     }

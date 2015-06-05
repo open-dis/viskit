@@ -1,12 +1,13 @@
 package viskit.model;
 
-import edu.nps.util.FileIO;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.xml.bind.JAXBContext;
@@ -204,7 +205,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             m.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            FileIO.copyFile(tmpF, f, true);
+            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             modelDirty = false;
             currentFile = f;
