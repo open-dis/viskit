@@ -74,7 +74,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         for (Iterator<Object> itr = lis.iterator(); itr.hasNext(); i++) {
             VInstantiator inst = (VInstantiator) itr.next();
             shadow[i] = inst;
-            typeLab[i] = new JLabel(/*"<html>(<i>"+*/inst.getType()/*+")"*/, JLabel.TRAILING);     // html screws up table sizing below
+            typeLab[i] = new JLabel("(" + inst.getType() + ")" + " " + inst.getName(), JLabel.TRAILING); // html screws up table sizing below
             String s = inst.getName();
             nameLab[i] = new JLabel(s);
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
@@ -146,23 +146,11 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
         if (showLabels) {
             for (int x = 0; x < typeLab.length; x++) {
-
-//                if (nameLab != null) {
-//                    if (nameLab[x].getText().length() <= 0) {
-//                        nameLab[x].setText(":");
-//                        nameLab[x].setBorder(new LineBorder(Color.cyan));
-//                    }
-//                    add(nameLab[x]);
-//                }
                 add(typeLab[x]);
                 add(contentObj[x]);
             }
 
-//            if (nameLab != null) {
-//                SpringUtilities.makeCompactGrid(this, typeLab.length, 3, 5, 5, 5, 5);
-//            } else {
-                SpringUtilities.makeCompactGrid(this, typeLab.length, 2, 5, 5, 5, 5);
-//            }
+            SpringUtilities.makeCompactGrid(this, typeLab.length, 2, 5, 5, 5, 5);
         } else {
             for (int x = 0; x < typeLab.length; x++) {
                 add(contentObj[x]);

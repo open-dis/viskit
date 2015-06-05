@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-//import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -410,11 +409,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         private InstantiationPanel ip;
 
         private JLabel factClassLab;
-//        private JLabel factMethodLab;
 
         private JComboBox<Object> factClassCB;
-//        private JTextField factMethodTF;
-//        private JButton factMethodButt;
 
         private JPanel topP;
 
@@ -435,7 +431,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             topP = new JPanel(new SpringLayout());
             factClassLab = new JLabel("Factory class", JLabel.TRAILING);
             factClassCB = new JComboBox<>(new Object[]{VStatics.RANDOM_VARIATE_FACTORY_CLASS});
-//            factClassCB.setEditable(true);
             VStatics.clampHeight(factClassCB);
             factClassLab.setLabelFor(factClassCB);
 
@@ -445,34 +440,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             classHelp.setFont(factClassCB.getFont());
             dummy.setLabelFor(classHelp);
 
-//            factMethodLab = new JLabel("Class method", JLabel.TRAILING);
-//            factMethodTF = new JTextField();
-//            VStatics.clampHeight(factMethodTF);
-//            factMethodLab.setLabelFor(factMethodTF);
-//            JPanel tinyP = new JPanel();
-//            tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
-//            tinyP.add(factMethodTF);
-//            factMethodButt = new JButton("...");
-//            factMethodButt.setBorder(
-//                    BorderFactory.createCompoundBorder(
-//                            BorderFactory.createEtchedBorder(),
-//                            BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-//            VStatics.clampSize(factMethodButt, factMethodTF, factMethodButt);
-//            tinyP.add(factMethodButt);
             topP.add(factClassLab);
             topP.add(factClassCB);
             topP.add(dummy);
             topP.add(classHelp);
-//            topP.add(factMethodLab);
-//            topP.add(tinyP);
             SpringUtilities.makeCompactGrid(topP, 2, 2, 5, 5, 5, 5);
 
             add(topP);
 
             factClassCB.addActionListener(new MyClassListener());
-//            MyCaretListener myCarListener = new MyCaretListener();
-//            factMethodButt.addActionListener(new MyChangedListener());
-//            factMethodTF.addCaretListener(myCarListener);
         }
 
         public void setType(String clName) throws ClassNotFoundException {
@@ -481,9 +457,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (myObjClass == null) {
                 throw new ClassNotFoundException(typ);
             }
-//            factMethodLab.setEnabled(false);
-//            factMethodTF.setEnabled(false);
-//            factMethodButt.setEnabled(false);
         }
 
         public void setData(VInstantiator.Factory vi) {
@@ -495,7 +468,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             noClassAction = true;
             factClassCB.setSelectedItem(vi.getFactoryClass()); // this fires action event
             noClassAction = false;
-//            factMethodTF.setText(vi.getMethod());
             add(topP);
 
             boolean foundString = false;
@@ -632,10 +604,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
 
                 Method m = hm.get((String) ret);
-//                factMethodTF.setText(m.getName());
-//                factMethodTF.setEnabled(true);
-//                factMethodLab.setEnabled(true);
-//                factMethodButt.setEnabled(true);
                 Vector<Object> vc = VInstantiator.buildDummyInstantiators(m);
                 addObjListPanel(vc, true);
 

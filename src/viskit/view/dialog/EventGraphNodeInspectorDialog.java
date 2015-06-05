@@ -257,8 +257,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }   // testLp
 
         // Here if we found a problem
-        int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "All fields must be completed. Close anyway?",
-                "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        int ret = JOptionPane.showConfirmDialog(
+                EventGraphNodeInspectorDialog.this,
+                "All fields must be completed. Close anyway?",
+                "Question",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
         return ret != JOptionPane.YES_OPTION; // don't cancel
         // cancel close
     }
@@ -268,8 +272,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(EventGraphNodeInspectorDialog.this, "Apply changes?",
-                        "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                int ret = JOptionPane.showConfirmDialog(
+                        EventGraphNodeInspectorDialog.this,
+                        "Apply changes?",
+                        "Question",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButt.doClick();
                 } else {

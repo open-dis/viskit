@@ -1133,7 +1133,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * the Actions library.
      */
     public void openProject() {
-        ((AssemblyViewFrame) VGlobals.instance().getAssemblyController().getView()).openProject();
+        VGlobals.instance().getAssemblyEditor().openProject();
     }
 
     /**
@@ -1238,17 +1238,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public int genericAsk(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
+        return VGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
     }
 
     @Override
     public int genericAskYN(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
+        return VGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
     }
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        JOptionPane.showMessageDialog(this, msg, title, type);
+        VGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
     }
 
     @Override

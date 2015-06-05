@@ -1,12 +1,11 @@
 package viskit.view.dialog;
 
-import viskit.model.VInstantiator;
-
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import viskit.model.VInstantiator;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -17,6 +16,8 @@ import viskit.view.InstantiationPanel;
  * By:   Mike Bailey
  * Date: Jun 16, 2004
  * Time: 3:27:42 PM
+ *
+ * @version $Id:$
  */
 public class ObjectInspector extends JDialog
 {

@@ -52,7 +52,6 @@ public class OneLinePanel extends JPanel {
     public final static String OPEN_LABEL_BOLD = "<html><p><b>";
     public final static String CLOSE_LABEL_BOLD = "</b></p></html>";
 
-
     /** Default constructor for a OneLinePanel
      *
      * @param lab the label for this panel
