@@ -2,6 +2,159 @@ These are release notes for Viskit from 0.1 forward.  Each release will
 detail its functionality in meeting the applicable specifications and document
 any known issues.
 
+Release: 1.0.0(March 10, 2015)
+-------------------------
+Major changes since 0.7.0:
+
+  Major refactor of the MVC components to implement undo / redo on both the EG
+  and Assy editors
+
+  Fixed potential NPE when attempting to capture a frame image with no file
+  loaded in either the EG or Assy. editors
+
+  Further improvements to the state transitions panel in that when we wish to
+  invoke methods on state variables, a combo box of choices is presented.  If a
+  method requires a parameter, the parameter is typed into the action field
+
+  Fixed issue where canceling a local variable method call in the state
+  transition dialog did not initiate an auto row delete
+
+  Improvements to the state transitions panel in that we can now invoke void
+  return type, zero parameter method calls as part of a state transition.  This
+  is accomplished by declaring a local variable within an EventNode, or by using
+  an event argument supplied by an Edge.  The type will be used to reflect on
+  which method types will be available for use on either the local variable, or
+  the argument
+
+  Implemented capability to provide an unqualified Java class name and have the
+  fully qualified class found on the classpath.  Implemented in viskit.VStatics
+
+  Fixed bug to prevent edge parameter values from being wiped out during a node
+  modification
+
+  Preventing a case where we have simkit.jar in both the working classpath and
+  in a project's /lib directory.  We don't need to expose multiple libs of the
+  same name in the LEGOs tree because they happen to be in two different places
+
+  Added a feature to the state transition panel whereby we can now assign local
+  variables to return type invoke on "." methods, i.e. boolean b = queue.add(E);
+  Before, we could only accomplish this type call and fire the state transition
+  manually via code block entries.  This is a step in reducing code block usage.
+
+  Fixed and issue where super type more than one level up were not being
+  resolved in the EG to Java translator
+
+  Corrected issue with EG image capture being stuck on the last showing EG and
+  not cycling through open EG tabs
+
+  Improved EG Node tooltips by including code blocks
+
+  The translator for generation of Event Graph XML to Java now handles generic
+  array types as well as primitive array types, generic containers, and of
+  course, primitive types.
+
+  JGraph extended and overridden components now behave like actual DES EG nodes
+  in that EG node edges take on the classic parabolic shape when two edges
+  connect between nodes.  Self-referential edges now begin hear the top of the
+  node instead of at the bottom and form around the node in a clockwise fashion.
+
+  Fixed issue with the StateVariableDialog where if an array type was entered in
+  the type field, the array length field was still disabled
+
+  Fixed issue of the metadata description field not updating after an edit
+
+  Fixed potential NPE in the PclEdgeInspectorDialog when the Introspector can't
+  determine a property type
+
+  Fixed an issue where EG and Assy file open history was not being preserved
+
+  Fixed an issue where a PropertyChangeListener edge with no selected property
+  was forcing a "" (empty string) property which is non-existent.
+
+  Implemented a self-referential drag and drop, or menu selected canceling edge
+  option for the EG editor.
+
+  Implemented an extension feature for EGs.  Instead of extending the default
+  SimEntityBase, type in your SimEntityBase subclass name instead when creating
+  a new event graph, i.e. extends ArrivalProcess.
+
+  Fixed an issue where and IllegalStateException would occur when added a
+  simkit.random.RandomVariate to the parameter list
+
+  Fixed an issue with not being able to use normal java package naming
+  conventions when crafting EG package names
+
+  Fixed an issue with cut & paste where the selected cache was not being cleared
+  after a confirmed delete by the user.
+
+  Fixed a bug where canceling the edit on any of the Assembly edge dialogs
+  caused that edge to delete.
+
+  Fixed an issue where a good intention to have nodes snap to grid on either
+  editor pallette caused the node cluster to keep positioning down and to the
+  right upon every file save.
+
+If an EG XML file save goes bad, or its corresponding source code
+compilation reveals an error, the tab that represents the EG will change from
+a green color (signifying good XML, good source compilation) to red which
+signifies either an XML save, or its source compilation went bad.  The user will
+be unable to advance to the Assembly Editor tab until the problem is corrected.
+If an EG compilation went bad, any previously compiled byte code *.class files
+of the same name will be deleted preventing inclusion on the classpath.  A bad
+compile will also cause removal of the EG MD5 hash entry from the project's
+viskitProject.xml file.  If upon start up, a previously opened XML file passes
+validation, but fails compilation, the user will again be unable to advance to
+the Assy Editor tab.
+
+  Fixed an issue where if a EG did not compile correctly, the whole EG LEGO tree
+  for would dissappear
+
+  Bugfix 1425
+
+  More gracefully handle and inform the user of a missing third party library
+
+  Fixed issue where if we had already compiled an Assembly, then the ClassLoader
+  has changed, and we need to go back and fix something in the Assembly.  Switch
+  back to the Viskit ClassLoader and disable the Assembly Run tab until the
+  Assy is recompiled.
+
+  Fixed timing issue when an Assembly file is given as an argument at startup
+  which firsts loads associated Event Graphs, but the Assembly was being
+  compiled before the Event Graphs finished loading causing ClassLoader issues
+  due to the Assembly being compiled in a separate ClassLoader.
+
+  Shortened the path names for the LEGOs tree to be more readable.  If the user
+  does not select the Analyst Report tab to be visible, then the Enable Analyst
+  Report checkbox on the Assembly Runner panel will not be enabled.
+
+  Better Mac OS X installer support by upgrading the javaApplicationStub to work
+  better with Oracle's JDK 8+.  Better Windows installer support by actually
+  getting it to work with the executable jar's Class-Path header.  Still need to
+  fully test on Unix though.
+
+  Implemented better message pop-up reporting during EG and Assy loading for the
+  user to better determine what errors have occurred
+
+  Bugfix 1377
+
+  Allow deselection of both the Design of Experiments (DOE) and Cluster Run
+  panels via the Files -> Settings dialog -> Tabs Visible
+
+  Ensure that when switching Event Graph tabs, or to the Assembly Editor, any
+  unsaved EGs will be saved, revalidated and re-compiled
+
+  Remember user set sizes for the main app frame so that it will restart at
+  those dimensions
+
+  Fix a long standing bug where modifications to EGs did not get re-validate
+  XML, generate java source, or re-compile.  Fix bug where a duplicate icon
+  could reappear in the EG node pallette
+
+  Fix UI issue where a node name could be changed for either an EG or Assy and
+  would not reflect until a mouse was re-clicked on the editor canvas
+
+  Refactor source code packaging to more closely resemble MVC organization
+
 Release: 0.7.0(November 14, 2014)
 -------------------------
 Major changes since 0.6.2:
