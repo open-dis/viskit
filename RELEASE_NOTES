@@ -62,10 +62,6 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
-Release: 1.0.10(June 03, 2015)
--------------------------
-Major changes since 1.0.5:
-
   We now label the name of the parameter in addition to its type for the Event
   Graph Node Inspector Dialog's Instantiation Panels.  This will aid in proper
   EG parameterization
@@ -76,6 +72,14 @@ Major changes since 1.0.5:
   Config files for initial startup will now force the platform L&F for Macs and
   leave the default L&F for Win and other machines.  This is due to what is
   described above under issues.
+
+  Now using relative paths for all images generated for the Analyst Report
+
+Release: 1.0.10(June 03, 2015)
+-------------------------
+Major changes since 1.0.5:
+
+  Attempted to fix some buggy NPE within JGraph lib when running on Mac OS X
 
 Release: 1.0.5(June 01, 2015)
 -------------------------
