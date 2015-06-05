@@ -85,6 +85,7 @@
               <include name="Schemas/**"/>
               <exclude name="Schemas/legacyDTDs/**"/>
               <include name="configuration/**"/>
+              <exclude name="configuration/c_gui.xml"/>
               <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
               <include name="images/**"/>
               <exclude name="images/american-flag.gif"/>
