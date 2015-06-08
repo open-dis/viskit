@@ -2,7 +2,7 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
-  On Mac OS X 10.10.3 (Yoseimite) & JDK 1.8.0_45, in the default L&F mode, when
+  On Mac OS X 10.10.3 (Yoseimite) & JDK 1.8.0_45, in the default L&F mode, while
   inputing EG Parameters when the user selects more... to expose RandomVariate
   types, a NPE will be thrown:
 
@@ -75,11 +75,13 @@ Post release fixes / upgrades / issues:
 
   Now using relative paths for all images generated for the Analyst Report
 
+
 Release: 1.0.10(June 03, 2015)
 -------------------------
 Major changes since 1.0.5:
 
   Attempted to fix some buggy NPE within JGraph lib when running on Mac OS X
+
 
 Release: 1.0.5(June 01, 2015)
 -------------------------
@@ -100,10 +102,10 @@ Major changes since 1.0.0:
 
   Added support for when a user wishes to generate a statistical run report in
   that when the report is ready for further editing/input by the user, the UI
-  will auto select the analyst report tab
+  will auto select to the analyst report tab
 
   Added support for the user to zip a current Viskit project, to include the
-  current debug.log and email it to the Viskit mailing list
+  current debug.log, and email it to the Viskit mailing list
 
   Fixed and exception issue when verbose debug was selected from the Settings
   dialog

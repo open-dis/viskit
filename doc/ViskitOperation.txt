@@ -55,7 +55,10 @@ The most important feature of the viskitProject.xml file is the MD5 caching of
 successfully validated and compiled EventGraph files.  This is to prevent
 unnecessary recompilation of project materials once Viskit re-launches and opens
 an existing project.  The MD5 hashes are recorded under the Cached element of
-the viskitProject.xml file.
+the viskitProject.xml file.  If a successfully cached and opened EG is modified
+such that its XML is no longer valid, or doesn't compile, the cached line will
+be removed from the project's cache element until the issue is resolved.  A new
+MD5 hash will then be generated and recorded in the project's cache element.
 
 MD5 caching is not performed on Assemblies.  Assy files are validated and
 compiled each time the Assembly runner is launched.
@@ -152,11 +155,11 @@ the DOE Job Launcher.  This file saves the DOE inputs for future use.  DOE is an
 advanced feature and not necessary for pure vanilla Viskit operation.
 
 6) All corresponding EGs are opened in the Event Graph Editor panel when an
-Assembly file is opened in the Assembly Editor panel.  However, if any EGs are
-subclassed from other EGs, these will not open automatically.  Also, if the last
-remaining Assy file will closed, all open EGs will close including
-non-associated EG files.  This is due to the EG caching system that relies on
-parsing SimEntities of Assy files to know which EG to keep open
+Assembly file is opened in the Assembly Editor panel.  This is accomplished by
+parsing SimEntitiy elements of Assy files to know which EGs to open.  However,
+if any EGs are subclassed from other EGs, these will not open automatically.
+Also, if the last remaining Assy file will closed, all open EGs will close
+including any on-associated EG files that were also opened.
 
 7) At this point, the paths of the any opened Assembly and EG files are recorded
 in the .viskit/c_app.xml file and will be opened upon next Viskit launch.  The
