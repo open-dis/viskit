@@ -13,6 +13,7 @@ version #:
 
 3) installer/Unix_shortcutSpec.xml
    installer/launch4jConfig.xml
+        versionInfo
    installer/shortcutSpec.xml
    installer/macosx/Info.plist
         CFBundleVersion
