@@ -2,7 +2,7 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
-  On Mac OS X 10.10.3 (Yoseimite) & JDK 1.8.0_45, in the default L&F mode, while
+  On Mac OS X 10.10.3 (Yosemite) & JDK 1.8.0_45, in the default L&F mode, while
   inputing EG Parameters when the user selects more... to expose RandomVariate
   types, a NPE will be thrown:
 
