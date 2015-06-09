@@ -15,7 +15,7 @@
         <key>CFBundleName</key>
         <string>Viskit</string>
         <key>CFBundleVersion</key>
-        <string>1.0.10</string>
+        <string>1.0.15</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Copyright © 1995-2015. All rights reserved.</string>
         <key>CFBundleShortVersionString</key>
