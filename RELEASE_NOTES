@@ -2,6 +2,11 @@ Post release fixes / upgrades / issues:
 
   ***** ISSUES:
 
+  Do to the nature of XML to Java translation, any derived class from a super
+  type must list the super type's fields in identical order so that type
+  matching can verify the super type for correct calls to super from the
+  derived tranlated java source.
+
   On Mac OS X 10.10.3 (Yosemite) & JDK 1.8.0_45, in the default L&F mode, while
   inputing EG Parameters when the user selects more... to expose RandomVariate
   types, a NPE will be thrown:
