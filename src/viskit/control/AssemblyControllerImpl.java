@@ -1550,7 +1550,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             /* We may have forgotten a parameter required for a super class */
             if (src == null) {
                 String msg = xmlFile + " did not compile.\n" +
-                        "Please check that you have provided the correct parameters for any super classes";
+                        "Please check that you have provided parameters in \n" +
+                        "identical order declared for any super classes";
                 LOG.error(xmlFile + " " + msg);
                 messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
