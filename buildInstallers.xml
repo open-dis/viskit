@@ -8,6 +8,9 @@
         Ant build file for the NPS Viskit installer build tasks.
     </description>
 
+    <!-- Override the install location for Launch4J -->
+    <property file="nbproject/private/private.properties"/>
+
     <!-- ID properties (this file) -->
     <property name="SVNId" value="$Id$"/>
     <property name="installers.dir" value="${basedir}/installer"/>
