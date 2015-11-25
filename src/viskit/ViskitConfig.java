@@ -57,7 +57,7 @@ public class ViskitConfig {
     public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String DOE_EDIT_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
     public static final String CLUSTER_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
-    public static final String ANALYST_RPT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
+    public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MSGS_KEY = "app.debug";
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */

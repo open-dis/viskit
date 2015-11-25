@@ -80,7 +80,7 @@ public class SettingsDialog extends JDialog {
     private JCheckBox runCB;
     private JCheckBox doeCB;
     private JCheckBox clusterRunCB;
-    private JCheckBox analRptCB;
+    private JCheckBox analystReportCB;
     private JCheckBox debugMsgsCB;
 
     private JRadioButton defaultLafRB;
@@ -136,7 +136,7 @@ public class SettingsDialog extends JDialog {
         runCB.addActionListener(vis);
         doeCB.addActionListener(vis);
         clusterRunCB.addActionListener(vis);
-        analRptCB.addActionListener(vis);
+        analystReportCB.addActionListener(vis);
         debugMsgsCB.addActionListener(vis);
 
         setParams();
@@ -216,8 +216,8 @@ public class SettingsDialog extends JDialog {
         innerP.add(doeCB);
         clusterRunCB = new JCheckBox("Cluster Run");
         innerP.add(clusterRunCB);
-        analRptCB = new JCheckBox("Analyst Report");
-        innerP.add(analRptCB);
+        analystReportCB = new JCheckBox("Analyst Report");
+        innerP.add(analystReportCB);
         debugMsgsCB = new JCheckBox("Verbose debug messages");
         innerP.add(debugMsgsCB);
         innerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3, 3, 3, 3)));
@@ -327,8 +327,8 @@ public class SettingsDialog extends JDialog {
             } else if (src == debugMsgsCB) {
                 appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
                 VStatics.debug = debugMsgsCB.isSelected();
-            } else if (src == analRptCB) {
-                appConfig.setProperty(ViskitConfig.ANALYST_RPT_VISIBLE_KEY, analRptCB.isSelected());
+            } else if (src == analystReportCB) {
+                appConfig.setProperty(ViskitConfig.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
             } else if (src == doeCB) {
                 appConfig.setProperty(ViskitConfig.DOE_EDIT_VISIBLE_KEY, doeCB.isSelected());
             } else if (src == clusterRunCB) {
@@ -441,7 +441,7 @@ public class SettingsDialog extends JDialog {
         runCB.setSelected(isAssemblyRunVisible());
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
-        analRptCB.setSelected(isAnalystReportVisible());
+        analystReportCB.setSelected(isAnalystReportVisible());
         debugMsgsCB.setSelected(VStatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
@@ -686,7 +686,7 @@ public class SettingsDialog extends JDialog {
      * @return if the Analyst Report Editor is to be visible
      */
     public static boolean isAnalystReportVisible() {
-        return getVisibilitySense(ViskitConfig.ANALYST_RPT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfig.ANALYST_REPORT_VISIBLE_KEY);
     }
 
     /**

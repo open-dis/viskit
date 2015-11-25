@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -96,7 +96,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private File analystReportFile;
 
     /** A checkbox is user enabled from the Analyst Report Panel */
-    private boolean enableAnalystReports = false;
+    private boolean enableAnalystReports = true;
 
     private ReportStatisticsConfig statsConfig;
     private int designPointID;
