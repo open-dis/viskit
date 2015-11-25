@@ -483,7 +483,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("  Initialize assembly runner: "));
+        
+        JLabel initializeLabel = new JLabel ("  Initialize assembly runner: ");
+        initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
+        getToolBar().add(initializeLabel);
         getToolBar().add(runButt);
 
         // Let the opening of Assembliess make this visible
