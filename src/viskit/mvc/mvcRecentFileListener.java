@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2014 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,7 +36,7 @@ package viskit.mvc;
 /** Handles recent assembly and event graphs files that were opened for a project
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.mvc.mvcRecentFileListener">Terry Norbraten, NPS MOVES</a>
- * @version $Id:$
+ * @version $Id$
  */
 public interface mvcRecentFileListener {
 
