@@ -21,7 +21,7 @@
             <AssemblyRun visible="true"/>
             <DesignOfExperiments visible="false"/>
             <ClusterRun visible="false"/>
-            <AnalystReport visible="false"/>
+            <AnalystReport visible="true"/>
         </tabs>
         <debug>false</debug>
     </app>
