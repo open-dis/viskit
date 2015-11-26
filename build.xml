@@ -755,7 +755,7 @@ their descpritions.
 
     <!--  === TARGET: clean === -->
     <target name="clean"
-            depends="nuke.dot.viskit"
+            depends="clean.dot.viskit"
             description="Deletes build directory, xsd bindings, dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
@@ -771,7 +771,7 @@ their descpritions.
         </delete>
     </target>
 
-    <target name="nuke.dot.viskit" description="Abolish an out of synch confituration and metadata directory">
+    <target name="clean.dot.viskit" description="Abolish an out-of-synch configuration and metadata directory">
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
     </target>
 
