@@ -63,9 +63,9 @@ public class AnalystReportController extends mvcAbstractController {
     static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
 
     private AnalystReportFrame frame;
-    private File reportFile;
+    private File analystReportFile;
     private File currentAssyFile;
-    private AnalystReportModel arb;
+    private AnalystReportModel analystReportModel;
 
     /** Creates a new instance of AnalystReportController */
     public AnalystReportController() {}
@@ -80,7 +80,7 @@ public class AnalystReportController extends mvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File analystReportDirectory = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -88,7 +88,7 @@ public class AnalystReportController extends mvcAbstractController {
         String usr = System.getProperty("user.name");
         String outputFile = (usr + "AnalystReport_" + output + ".xml");
 
-        File targetFile = new File(aRDir, outputFile);
+        File targetFile = new File(analystReportDirectory, outputFile);
         try {
             Files.copy(srcFil.toPath(), targetFile.toPath());
         } catch (IOException ioe) {
@@ -100,7 +100,7 @@ public class AnalystReportController extends mvcAbstractController {
         }
 
         frame.showProjectName();
-        buildArb(targetFile);
+        buildAnalystReport(targetFile);
     }
 
     JTabbedPane mainTabbedPane;
@@ -150,14 +150,14 @@ public class AnalystReportController extends mvcAbstractController {
     public void setCurrentAssyFile(File f) {
         currentAssyFile = f;
 
-        if (arb != null) {
-            arb.setAssemblyFile(currentAssyFile);
+        if (analystReportModel != null) {
+            analystReportModel.setAssemblyFile(currentAssyFile);
         }
     }
 
     public void saveAnalystReport() {
-        JFileChooser saveChooser = new JFileChooser(reportFile.getParent());
-        saveChooser.setSelectedFile(reportFile);
+        JFileChooser saveChooser = new JFileChooser(analystReportFile.getParent());
+        saveChooser.setSelectedFile(analystReportFile);
         saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
         int resp = saveChooser.showSaveDialog(frame);
@@ -169,13 +169,13 @@ public class AnalystReportController extends mvcAbstractController {
         frame.unFillLayout();
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
-        reportFile = saveChooser.getSelectedFile();
-        saveReport(reportFile);
-        String outFile = reportFile.getAbsolutePath();
+        analystReportFile = saveChooser.getSelectedFile();
+        saveReport(analystReportFile);
+        String outFile = analystReportFile.getAbsolutePath();
         int idx = outFile.lastIndexOf(".");
 
         outFile = outFile.substring(0, idx) + ".html";
-        XsltUtility.runXslt(reportFile.getAbsolutePath(),
+        XsltUtility.runXslt(analystReportFile.getAbsolutePath(),
                 outFile, "configuration/AnalystReportXMLtoHTML.xslt");
     }
 
@@ -191,9 +191,9 @@ public class AnalystReportController extends mvcAbstractController {
         }
 
         frame.unFillLayout();
-        saveReport(reportFile);
+        saveReport(analystReportFile);
 
-        String outFile = reportFile.getAbsolutePath();
+        String outFile = analystReportFile.getAbsolutePath();
         int idx = outFile.lastIndexOf(".");
 
         outFile = outFile.substring(0, idx) + ".html";
@@ -212,7 +212,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         // always generate new report before display, regardless of old or new name
         // TODO:  change XML input to temp file, rather than final file, if possible
-        XsltUtility.runXslt(reportFile.getAbsolutePath(), // XML  input
+        XsltUtility.runXslt(analystReportFile.getAbsolutePath(), // XML  input
                 genChooser.getSelectedFile().getAbsolutePath(), // HTML output
                 "configuration/AnalystReportXMLtoHTML.xslt");  // stylesheet
 
@@ -221,12 +221,12 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     private void saveReport() {
-        saveReport(reportFile);
+        saveReport(analystReportFile);
     }
 
     private void saveReport(File f) {
         try {
-            arb.writeToXMLFile(f);
+            analystReportModel.writeToXMLFile(f);
             frame.setReportDirty(false);
         } catch (Exception e) {
             LOG.error(e);
@@ -234,29 +234,29 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     private void openAnalystReport(File selectedFile) {
-        AnalystReportModel arbLocal = new AnalystReportModel(selectedFile);
-        setContent(arbLocal);
-        reportFile = selectedFile;
+        AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
+        setContent(analystReportModelLocal);
+        analystReportFile = selectedFile;
         frame.setReportDirty(false);
     }
 
-    private void buildArb(File targetFile) {
+    private void buildAnalystReport(File targetFile) {
         LOG.debug("TargetFile is: " + targetFile);
-        AnalystReportModel arbLocal;
+        AnalystReportModel analystReportModelLocal;
         try {
-            arbLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
+            analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
         } catch (Exception e) {
             LOG.error("Error parsing analyst report: " + e.getMessage());
 //            e.printStackTrace();
             return;
         }
-        setContent(arbLocal);
-        reportFile = targetFile;
+        setContent(analystReportModelLocal);
+        analystReportFile = targetFile;
         frame.setReportDirty(false);
     }
 
-    private void setContent(AnalystReportModel arb) {
-        if (arb != null && frame.isReportDirty()) {
+    private void setContent(AnalystReportModel analystReportModelLocal) {
+        if (analystReportModelLocal != null && frame.isReportDirty()) {
             int resp = JOptionPane.showConfirmDialog(frame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
                     "The current report data has not been saved. Save current report before continuing?</p></body></html>",
@@ -270,8 +270,8 @@ public class AnalystReportController extends mvcAbstractController {
 
         frame.setReportDirty(false);
 
-        this.arb = arb;
-        frame.setReportBuilder(arb);
+        this.analystReportModel = analystReportModelLocal;
+        frame.setReportBuilder(analystReportModelLocal);
         frame.fillLayout();
     }
 

@@ -1009,7 +1009,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         jpb.setIndeterminate(false);
         jpb.setStringPainted(false);
 
-        announceReportReadyToView();
+        announceAnalystReportReadyToView();
         reportReady = true;
     }
 
@@ -1043,7 +1043,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
                 assyImage);
     }
 
-    private void announceReportReadyToView() {
+    private void announceAnalystReportReadyToView() {
 
         // NOTE: This method may be called with the classloader set during Assy
         // Run initialization, so, we can't center this dialog via reference to

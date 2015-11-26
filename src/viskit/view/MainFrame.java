@@ -83,13 +83,16 @@ public class MainFrame extends JFrame {
     private DoeMain doeMain;
 
     /** The initial assembly to load. */
-    private String initialFile;
-    private int TAB0_EGEDITOR_IDX = 0;
-    private int TAB0_ASSYEDITOR_IDX = 1;
-    private int TAB0_ASSYRUN_SUBTABS_IDX = 2;
-    private int TAB0_ANALYST_REPORT_IDX = 3;
-    private int[] tabIndices = {TAB0_EGEDITOR_IDX, TAB0_ASSYEDITOR_IDX,
-            TAB0_ASSYRUN_SUBTABS_IDX, TAB0_ANALYST_REPORT_IDX};
+    private final String initialFile;
+    private final int TAB0_EVENTGRAPH_EDITOR_IDX = 0;
+    private final int TAB0_ASSEMBLY_EDITOR_IDX = 1;
+    private final int TAB0_ASSEMBLYRUN_SUBTABS_IDX = 2;
+    private final int TAB0_ANALYST_REPORT_IDX = 3;
+    private final int[] tabIndices = {
+        TAB0_EVENTGRAPH_EDITOR_IDX, 
+        TAB0_ASSEMBLY_EDITOR_IDX,
+        TAB0_ASSEMBLYRUN_SUBTABS_IDX,
+        TAB0_ANALYST_REPORT_IDX};
     private final int TAB1_LOCALRUN_IDX = 0;
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
@@ -152,9 +155,9 @@ public class MainFrame extends JFrame {
             egFrame.setTitleListener(myTitleListener, idx);
             setJMenuBar(menuBar);
             jamQuitHandler(egFrame.getQuitMenuItem(), myQuitAction, menuBar);
-            tabIndices[TAB0_EGEDITOR_IDX] = idx;
+            tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = idx;
         } else {
-            tabIndices[TAB0_EGEDITOR_IDX] = -1;
+            tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
 
         // Assembly editor
@@ -174,9 +177,9 @@ public class MainFrame extends JFrame {
             }
             assyFrame.setTitleListener(myTitleListener, idx);
             jamQuitHandler(assyFrame.getQuitMenuItem(), myQuitAction, menuBar);
-            tabIndices[TAB0_ASSYEDITOR_IDX] = idx;
+            tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
         } else {
-            tabIndices[TAB0_ASSYEDITOR_IDX] = -1;
+            tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
         }
 
         final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
@@ -202,17 +205,17 @@ public class MainFrame extends JFrame {
             tabbedPane.add(runTabbedPanePanel);
             int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
             tabbedPane.setTitleAt(idx, "Assembly Run");
-            tabbedPane.setToolTipTextAt(idx, "Initialize assembly runner from Assembly tab");
+            tabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder
-            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = idx;
-            tabbedPane.setEnabledAt(idx, false);
+            tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = idx;
+//          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } else {
-            tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] = -1;
+            tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = -1;
         }
 
         // Analyst report
-        boolean aRPanelVisible = SettingsDialog.isAnalystReportVisible();
-        if (aRPanelVisible) {
+        boolean analystReportPanelVisible = SettingsDialog.isAnalystReportVisible();
+        if (analystReportPanelVisible) {
             reportPanel = VGlobals.instance().buildAnalystReportFrame();
             tabbedPane.add(reportPanel.getContentPane());
             int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
@@ -236,7 +239,7 @@ public class MainFrame extends JFrame {
         }
 
         // Assembly runner
-        assyRunComponent = new InternalAssemblyRunner(aRPanelVisible);
+        assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
         runTabbedPane.add(assyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
@@ -352,7 +355,7 @@ public class MainFrame extends JFrame {
             if (dirtyMod != null && dirtyMod.isDirty()) {
 
                 // This will fire another call to stateChanged()
-                tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
+                tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
                 return;
             }
 
@@ -360,15 +363,15 @@ public class MainFrame extends JFrame {
 
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            if (i == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]) {
+            if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
                 i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
 
                 // Resets the Viskit ClassLoader
 //                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
             } else {
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], "Initialize assembly runner from Assembly tab");
-                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], false);
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
+//                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
             }
 
             getJMenuBar().remove(hmen);
@@ -464,22 +467,22 @@ public class MainFrame extends JFrame {
 
             outer:
             {
-                if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_EGEDITOR_IDX]);
+                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
+                    tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
                     if (!((EventGraphController) egFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
-                if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYEDITOR_IDX]);
+                if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
+                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_IDX]);
                     if (!((AssemblyController) assyFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
+                if (tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] != -1) {
+                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]);
                     if (doeMain != null) {
                         if (!doeMain.getController().preQuit()) {
                             break outer;
@@ -491,10 +494,10 @@ public class MainFrame extends JFrame {
                 // TODO: other preQuits here if needed
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
-                if (tabIndices[TAB0_EGEDITOR_IDX] != -1) {
+                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     ((EventGraphController) egFrame.getController()).postQuit();
                 }
-                if (tabIndices[TAB0_ASSYEDITOR_IDX] != -1) {
+                if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     ((AssemblyController) assyFrame.getController()).postQuit();
                 }
 
@@ -543,12 +546,12 @@ public class MainFrame extends JFrame {
 
         @Override
         public void exec(String[] execStrings) {
-            if (tabIndices[TAB0_ASSYRUN_SUBTABS_IDX] != -1) {
+            if (tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] != -1) {
 
-                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX], true);
+                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], true);
 
                 // toggles a tab change listener
-                tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]);
+                tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]);
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
 
 
@@ -567,7 +570,7 @@ public class MainFrame extends JFrame {
         public void setTitle(String title, int key) {
             titles[key] = title;
             int tabIdx = tabbedPane.getSelectedIndex();
-            if (tabIdx == tabIndices[TAB0_ASSYRUN_SUBTABS_IDX]) {
+            if (tabIdx == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
                 tabIdx = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
             }
 

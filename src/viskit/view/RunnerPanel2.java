@@ -87,10 +87,10 @@ public class RunnerPanel2 extends JPanel {
      * @param skipCloseButt if ture, don't supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A false will enable all VCR buttons.
      * Currently, only start and stop work
-     * @param aRPanelVisible if true, will enable the analyst report check box
+     * @param analystReportPanelVisible if true, will enable the analyst report check box
      */
-    public RunnerPanel2(String title, boolean skipCloseButt, boolean aRPanelVisible) {
-        this.aRPanelVisible = aRPanelVisible;
+    public RunnerPanel2(String title, boolean skipCloseButt, boolean analystReportPanelVisible) {
+        this.aRPanelVisible = analystReportPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         if (title != null) {
@@ -125,7 +125,7 @@ public class RunnerPanel2 extends JPanel {
         int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
-        leftSplit.setDividerLocation((h/2) - 25);
+        leftSplit.setDividerLocation((h/2) - 50); // TODO check with Ben, else -1
 
         leftRightSplit.setLeftComponent(leftSplit);
         leftRightSplit.setRightComponent(jsp);
@@ -216,6 +216,7 @@ public class RunnerPanel2 extends JPanel {
 
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable Analyst Reports");
+        analystReportCB.setSelected(true);
         analystReportCB.setEnabled(aRPanelVisible);
         flowPan.add(analystReportCB);
 

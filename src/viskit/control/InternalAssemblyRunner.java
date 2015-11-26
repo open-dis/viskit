@@ -105,16 +105,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     /**
      * The internal logic for the Assembly Runner panel
-     * @param aRPanelVisible if true, the analyst report panel will be visible
+     * @param analystReportPanelVisible if true, the analyst report panel will be visible
      */
-    public InternalAssemblyRunner(boolean aRPanelVisible) {
+    public InternalAssemblyRunner(boolean analystReportPanelVisible) {
 
         saver = new saveListener();
 
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons.  Currently, only start and stop work
-        runPanel = new RunnerPanel2("Assembly Runner", true, aRPanelVisible);
+        runPanel = new RunnerPanel2("Assembly Runner", true, analystReportPanelVisible);
         doMenus();
         runPanel.vcrStop.addActionListener(assemblyRunStopListener = new stopListener());
         runPanel.vcrPlay.addActionListener(new startResumeListener());
@@ -338,7 +338,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                 LOG.fatal(ex);
             }
-            signalReportReady();
+            signalAnalystReportReady();
         }
 
         /** Perform simulation stop and reset calls */
@@ -488,22 +488,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     String returnedSimTime;
 
-    private void signalReportReady() {
+    private void signalAnalystReportReady() {
         if (analystReportTempFile == null) {
             // No report to print
             return;
         }
 
-        AnalystReportController cont = (AnalystReportController) VGlobals.instance().getAnalystReportController();
-        if (cont != null) {
-            cont.setReportXML(analystReportTempFile);
+        AnalystReportController analystReportController = (AnalystReportController) VGlobals.instance().getAnalystReportController();
+        if (analystReportController != null) {
+            analystReportController.setReportXML(analystReportTempFile);
 
             // Switch over to the analyst report tab if we have a report ready
             // for editing
-            AnalystReportModel mod = (AnalystReportModel) cont.getModel();
-            if (mod != null && mod.isReportReady()) {
-                cont.mainTabbedPane.setSelectedIndex(cont.mainTabbedPaneIdx);
-                mod.setReportReady(false);
+            AnalystReportModel analystReportModel = (AnalystReportModel) analystReportController.getModel();
+            if (analystReportModel != null && analystReportModel.isReportReady()) {
+                analystReportController.mainTabbedPane.setSelectedIndex(analystReportController.mainTabbedPaneIdx);
+                analystReportModel.setReportReady(false);
             }
         } else {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
