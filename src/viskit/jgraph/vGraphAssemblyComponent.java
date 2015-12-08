@@ -401,12 +401,18 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         Object[] oa = new Object[]{src, tar};
         AssemblyController controller = (AssemblyController) parent.getController();
 
-        if (parent.getCurrentMode() == AssemblyViewFrame.ADAPTER_MODE) {
-            controller.newAdapterArc(oa);
-        } else if (parent.getCurrentMode() == AssemblyViewFrame.SIMEVLIS_MODE) {
-            controller.newSimEvListArc(oa);
-        } else if (parent.getCurrentMode() == AssemblyViewFrame.PCL_MODE) {
-            controller.newPropChangeListArc(oa);
+        switch (parent.getCurrentMode()) {
+            case AssemblyViewFrame.ADAPTER_MODE:
+                controller.newAdapterArc(oa);
+                break;
+            case AssemblyViewFrame.SIMEVLIS_MODE:
+                controller.newSimEvListArc(oa);
+                break;
+            case AssemblyViewFrame.PCL_MODE:
+                controller.newPropChangeListArc(oa);
+                break;
+            default:
+                break;
         }
     }
 
