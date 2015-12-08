@@ -264,15 +264,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return sb.toString();
     }
 
-    private void manglePCLName(PropChangeListenerNode node) {
+    private void mangleName(ViskitElement node) {
         do {
-            node.setName(mangleName(node.getName()));
-        } while (!nameCheck());
-    }
-
-    private void mangleEGName(EvGraphNode node) {
-        do {
-            node.setName(mangleName(node.getName()));
+            node.setName(AssemblyModelImpl.this.mangleName(node.getName()));
         } while (!nameCheck());
     }
 
@@ -280,6 +274,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
+                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                        "XML file contains duplicate event name", n.getName() +
+                        "\nUnique name substituted.");
                 return false;
             }
         }
@@ -320,7 +317,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         node.setInstantiator(vc);
 
         if (!nameCheck()) {
-            mangleEGName(node);
+            mangleName(node);
         }
 
         getNodeCache().put(node.getName(), node);   // key = ev
@@ -387,7 +384,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         pcNode.setInstantiator(vc);
 
         if (!nameCheck()) {
-            manglePCLName(pcNode);
+            mangleName(pcNode);
         }
 
         getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
@@ -644,10 +641,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changePclNode(PropChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate name detected", pclNode.getName() +
-                    "\nUnique name substituted.");
-            manglePCLName(pclNode);
+            mangleName(pclNode);
             retcode = false;
         }
         PropertyChangeListener jaxBPcl = (PropertyChangeListener) pclNode.opaqueModelObject;
@@ -707,10 +701,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changeEvGraphNode(EvGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate name detected", evNode.getName() +
-                    "\nUnique name substituted.");
-            mangleEGName(evNode);
+            mangleName(evNode);
             retcode = false;
         }
         SimEntity jaxbSE = (SimEntity) evNode.opaqueModelObject;
@@ -1076,10 +1067,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         getNodeCache().put(pNode.getName(), pNode);   // key = se
 
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML file contains duplicate event name", pNode.getName() +
-                    "\nUnique name substituted.");
-            manglePCLName(pNode);
+            mangleName(pNode);
         }
         notifyChanged(new ModelEvent(pNode, ModelEvent.PCLADDED, "PCL added"));
         return pNode;
@@ -1115,10 +1103,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         getNodeCache().put(en.getName(), en);   // key = se
 
         if (!nameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML file contains duplicate event name", en.getName() +
-                    "\nUnique name substituted.");
-            mangleEGName(en);
+            mangleName(en);
         }
         notifyChanged(new ModelEvent(en, ModelEvent.EVENTGRAPHADDED, "Event added"));
 

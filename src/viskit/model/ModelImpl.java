@@ -265,13 +265,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         evNodeCache.put(ev, en);   // key = ev
 
-        // Ensure a unique Event name
-        if (!eventNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate Event Name",
-                    "XML file contains duplicate event name: " + en.getName() +
-                    "\nUnique name substituted.");
-            mangleNodeName(en);
+        // Ensure a unique Event name for XML IDREFs
+        if (!nameCheck()) {
+            mangleName(en);
         }
         notifyChanged(new ModelEvent(en, ModelEvent.EVENTADDED, "Event added"));
 
@@ -313,28 +309,20 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         return sb.toString();
     }
 
-    private void mangleNodeName(EventNode node) {
+    private void mangleName(ViskitElement node) {
         do {
-            node.setName(mangleName(node.getName()));
-        } while (!eventNameCheck());
+            node.setName(ModelImpl.this.mangleName(node.getName()));
+        } while (!nameCheck());
     }
 
-    private void mangleStateVarName(vStateVariable vsv) {
-        do {
-            vsv.setName(mangleName(vsv.getName()));
-        } while (!stateVarParamNameCheck());
-    }
-
-    private void mangleParamName(vParameter vp) {
-        do {
-            vp.setName(mangleName(vp.getName()));
-        } while (!stateVarParamNameCheck());
-    }
-
-    private boolean eventNameCheck() {
+    private boolean nameCheck() {
         Set<String> hs = new HashSet<>(10);
         for (EventNode en : evNodeCache.values()) {
             if (!hs.add(en.getName())) {
+                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                        "Duplicate Event Name",
+                        "Duplicate event name detected: " + en.getName() +
+                        "\nUnique name will be substituted.");
                 return false;
             }
         }
@@ -583,11 +571,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             stateVariables.add(v);
 
             if (!stateVarParamNameCheck()) {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                        "Duplicate Variable Name",
-                        "XML file contains duplicate state variable name." +
-                        "\nUnique name substituted.");
-                mangleStateVarName(v);
+                mangleName(v);
             }
 
             notifyChanged(new ModelEvent(v, ModelEvent.STATEVARIABLEADDED, "New state variable"));
@@ -608,11 +592,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             simParameters.add(vp);
 
             if (!stateVarParamNameCheck()) {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                        "Duplicate Parameter Name",
-                        "XML file contains duplicate parameter name." +
-                        "\nUnique name substituted.");
-                mangleParamName(vp);
+                mangleName(vp);
             }
             notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
         }
@@ -647,11 +627,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         simParameters.add(vp);
 
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate Parameter Name",
-                    "Duplicate parameter name detected: " + nm +
-                    "\nUnique name substituted.");
-            mangleParamName(vp);
+            mangleName(vp);
         }
 
         //p.setValue(initVal);
@@ -693,11 +669,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeSimParameter(vParameter vp) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate Parameter Name",
-                    "Duplicate parameter name detected: " + vp.getName() +
-                    "\nUnique name substituted.");
-            mangleParamName(vp);
+            mangleName(vp);
             retcode = false;
         }
         // fill out jaxb variable
@@ -723,11 +695,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         vStateVariable vsv = new vStateVariable(name, type, comment);
         stateVariables.add(vsv);
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate Variable Name",
-                    "Duplicate state variable name detected: " + name +
-                    "\nUnique name substituted.");
-            mangleStateVarName(vsv);
+            mangleName(vsv);
         }
         StateVariable s = this.oFactory.createStateVariable();
         s.setName(nIe(name));
@@ -759,11 +727,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public boolean changeStateVariable(vStateVariable vsv) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "Duplicate Variable Name",
-                    "Duplicate state variable name detected: " + vsv.getName() +
-                    "\nUnique name substituted.");
-            mangleStateVarName(vsv);
+            mangleName(vsv);
             retcode = false;
         }
         // fill out jaxb variable
@@ -794,8 +758,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         evNodeCache.put(jaxbEv, node);   // key = ev
 
         // Ensure a unique Event name
-        if (!eventNameCheck()) {
-            mangleNodeName(node);
+        if (!nameCheck()) {
+            mangleName(node);
         }
 
         jaxbEv.setName(nIe(nodeName));
@@ -1013,12 +977,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         boolean retcode = true;
 
         // Ensure a unique Event name
-        if (!eventNameCheck()) {
-            controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
-                    "Duplicate Event Name",
-                    "Duplicate event name detected: " + node.getName() +
-                    "\nUnique name will be substituted.");
-            mangleNodeName(node);
+        if (!nameCheck()) {
+            mangleName(node);
             retcode = false;
         }
         Event jaxbEv = (Event) node.opaqueModelObject;
