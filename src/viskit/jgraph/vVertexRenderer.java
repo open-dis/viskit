@@ -254,7 +254,14 @@ public class vVertexRenderer
         String nm = cell.getUserObject().toString();
         FontMetrics metrics = g2.getFontMetrics();
         nm = breakName(nm, 50, metrics);
-        String[] lns = nm.split("\n");       // handle multi-line titles
+
+        // Show event node names w/ corresponding parameters if any
+        String[] arr = nm.split("_");
+
+        if (arr.length > 1)
+            nm = arr[0] + "\n(" + arr[1] + ")";
+
+        String[] lns = nm.split("\n"); // handle multi-line titles
 
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord

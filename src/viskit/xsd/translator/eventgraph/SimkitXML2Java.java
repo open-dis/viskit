@@ -828,7 +828,12 @@ public class SimkitXML2Java {
             pw.println(SP_4 + "@Override");
         }
 
-        pw.print(SP_4 + "public void do" + e.getName() + LP);
+        // Strip out name mangling artifacts imposed by the EventGraph Model.
+        // This is done to keep XML happy with no identical IDREFs, but let's
+        // Simkit work its magic with reflection
+        String eventName = e.getName().replaceAll("_\\w+_*", "");
+
+        pw.print(SP_4 + "public void do" + eventName + LP);
 
         for (Argument a : liArgs) {
             pw.print(a.getType() + SP + a.getName());
@@ -878,7 +883,7 @@ public class SimkitXML2Java {
         }
 
         if (e.getCode() != null && !e.getCode().isEmpty()) {
-            pw.println(SP_8 + "/* Code insertion for Event " + e.getName() + " */");
+            pw.println(SP_8 + "/* Code insertion for Event " + eventName + " */");
             String[] lines = e.getCode().split("\\n");
             for (String line : lines) {
                 pw.println(SP_8 + line);
@@ -987,13 +992,19 @@ public class SimkitXML2Java {
 
     void doSchedule(Schedule s, Event e, PrintWriter pw) {
         String condent = "";
+        Event event = (Event) s.getEvent();
 
         if (s.getCondition() != null && !s.getCondition().equals("true")) {
             condent = SP_4;
             pw.println(SP_8 + "if" + SP + LP + s.getCondition() + RP + SP + OB);
         }
 
-        pw.print(SP_8 + condent + "waitDelay" + LP + QU + ((Event) s.getEvent()).getName() + QU + CM + SP);
+        // Strip out name mangling artifacts imposed by the EventGraph Model.
+        // This is done to keep XML happy with no identical IDREFs, but lets
+        // Simkit work its magic with reflection
+        String eventName = event.getName().replaceAll("_\\w+_*", "");
+
+        pw.print(SP_8 + condent + "waitDelay" + LP + QU + eventName + QU + CM + SP);
 
         // according to schema, to meet Priority class definition, the following
         // tags should be permitted:
@@ -1036,7 +1047,12 @@ public class SimkitXML2Java {
             pw.println(SP_8 + "if" + SP + LP + c.getCondition() + RP + SP + OB);
         }
 
-        pw.print(SP_8 + condent + "interrupt" + LP + QU + event.getName() + QU);
+        // Strip out name mangling artifacts imposed by the EventGraph Model.
+        // This is done to keep XML happy with no identical IDREFs, but let's
+        // Simkit work its magic with reflection
+        String eventName = event.getName().replaceAll("_\\w+_*", "");
+
+        pw.print(SP_8 + condent + "interrupt" + LP + QU + eventName + QU);
 
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether

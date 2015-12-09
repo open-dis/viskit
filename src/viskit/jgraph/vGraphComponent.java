@@ -334,7 +334,21 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     CircleCell cc = (CircleCell) c;
                     EventNode en = (EventNode) cc.getUserObject();
                     sb.append("<center>");
-                    sb.append(en.getName());
+
+                    // Show event node names w/ corresponding parameters if any
+                    String nodeName = en.getName();
+                    String[] arr = nodeName.split("_");
+
+                    if (arr.length > 1) {
+                        sb.append(arr[0]);
+                        sb.append("<br>");
+                        sb.append("(");
+                        sb.append(arr[1]);
+                        sb.append(")");
+                        sb.append("<br>");
+                    } else {
+                        sb.append(nodeName);
+                    }
                     sb.append("</center>");
 
                     if (!en.getComments().isEmpty()) {

@@ -131,8 +131,13 @@ SimEntity icons onto the Assy pallette for Assy creation.
 
 4) At this time, EG files can be manually opened and modified, or created new.
 Due to the unique nature of XML IDs, each method within the same EG file must
-have a unique name to pass XML validation.  This is unlike Java which can
-distinguish between methods with similar name, but differing method signatures.
+have a unique name to pass XML validation.  Unique naming can be accomplished
+using an underscore character, i.e. Arrival, Arrival_e.  The "e" would denote
+some method argument name.  The names Arrival and Arrival_e would only be used
+in the corresponding XML file representation of the EG.  The node names will
+render correctly without the underscore character.  Java will be generated with
+normally observed method name overloading conventions.
+
 If a new empty Viskit project was just created, a new default EG will be opened.
 If an EG XML file doesn't validate during a file save, or its corresponding
 source code compilation reveals an error, the tab that represents the EG will
@@ -147,7 +152,7 @@ opened XML file passes validation, but fails compilation, the user will again be
 unable to advance to the Assy Editor tab.
 
 Of note is that to ensure all intended entries are made to each node and edge,
-be sure to mouse over each and review the tooltip for correct entries.
+be sure to mouse over each and review the tooltip for correct notation.
 
 5) When an Assembly file is opened, the Design of Experiments (DOE) panel is
 initialized with the Assembly and a /tmp DOE input file is created and passed to
