@@ -73,7 +73,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
 
-    /** The name of the assy to run */
+    /** The name of the assembly to run */
     String assemblyClassName;
     RunnerPanel2 runPanel;
     ActionListener closer, saver;
@@ -158,7 +158,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
-        double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
+        double defaultStopTime =  Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
             fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
@@ -310,6 +310,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
+	/**
+	 * @return the runMenu
+	 */
+	public JMenu getRunMenu() {
+		return runMenu;
+	}
+
     /** Class to perform end of simulation run cleanup items */
     public class SimThreadMonitor extends Thread {
 
@@ -458,6 +465,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+                saveChooser.setDialogTitle("Save Assembly Output");
             }
             File fil = VGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
@@ -576,34 +584,35 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 break;
         }
     }
+	
+        private JMenu  runMenu = new JMenu("Assembly Run");
 
     private void doMenus() {
-        myMenuBar = new JMenuBar();
-        JMenu file = new JMenu("File");
+             myMenuBar = new JMenuBar();
         JMenuItem save = new JMenuItem("Save output streams");
-        JMenu edit = new JMenu("Edit");
+        JMenu editMenu = new JMenu("Edit");
         JMenuItem copy = new JMenuItem("Copy");
-        JMenuItem selAll = new JMenuItem("Select all");
-        JMenuItem clrAll = new JMenuItem("Clear all");
-        JMenuItem view = new JMenuItem("View output in text editor");
+        JMenuItem  selectAll = new JMenuItem("Select all");
+        JMenuItem   clearAll = new JMenuItem("Clear all");
+        JMenuItem viewOutput = new JMenuItem("View output in text editor");
 
-        save.addActionListener(saver);
-        copy.addActionListener(new copyListener());
-        selAll.addActionListener(new selectAllListener());
-        clrAll.addActionListener(new clearListener());
-        view.addActionListener(new viewListener());
+              save.addActionListener(saver);
+              copy.addActionListener(new copyListener());
+         selectAll.addActionListener(new selectAllListener());
+          clearAll.addActionListener(new clearListener());
+        viewOutput.addActionListener(new viewListener());
 
-        file.add(save);
-        file.add(view);
+        runMenu.add(save);
+        runMenu.add(viewOutput);
 
-        file.addSeparator();
-        file.add(new JMenuItem("Settings"));
+//        fileMenu.addSeparator();
+//        fileMenu.add(new JMenuItem("Settings"));
 
-        edit.add(copy);
-        edit.add(selAll);
-        edit.add(clrAll);
-        myMenuBar.add(file);
-        myMenuBar.add(edit);
+         editMenu.add(copy);
+         editMenu.add(selectAll);
+         editMenu.add(clearAll);
+        myMenuBar.add(runMenu);
+        myMenuBar.add(editMenu);
     }
 
     class copyListener implements ActionListener {

@@ -351,6 +351,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     if (outputDirty) {
                         if (JOptionPane.showConfirmDialog(JobLauncher.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
+							jfc.setDialogTitle("Save Design of Experiment (DOE) file");
                             jfc.setSelectedFile(new File("DOEOutput.txt"));
                             jfc.showSaveDialog(JobLauncher.this);
                             if (jfc.getSelectedFile() != null) {

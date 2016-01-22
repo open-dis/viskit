@@ -96,6 +96,8 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
             }
         });
 
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Viskit Project"));
+
         existingButt.setText("Open existing project");
         existingButt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -95,7 +95,7 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
  * @since 2:07:37 PM
  * @version $Id$
  */
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
+public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
 
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
@@ -126,7 +126,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(mvcController controller) {
+    public AssemblyEditViewFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI();   // build widgets
@@ -208,6 +208,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public RecentProjFileSetListener getRecentProjFileSetListener() {
         return recentProjFileSetListener;
     }
+
+	/**
+	 * @return the fileMenu
+	 */
+	public JMenu getFileMenu() {
+		return fileMenu;
+	}
+
+	/**
+	 * @return the editMenu
+	 */
+	public JMenu getEditMenu() {
+		return editMenu;
+	}
 
     /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
@@ -294,6 +308,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             }
         }
     }
+        private JMenu fileMenu = new JMenu("Assemblies");
+        private JMenu editMenu = new JMenu("Assembly Editor");
 
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
@@ -303,59 +319,58 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Set up file menu
-        JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
-        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
+		// no longer need to duplicate menu items on Projects menu
+//        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
+//                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
+//        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
+//                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
+//        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
+//        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
+//                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
+		
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "open", "Open", KeyEvent.VK_O,
+        fileMenu.add(buildMenuItem(controller, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
         controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
 
-        // Bug fix: 1195
-        fileMenu.add(buildMenuItem(controller, "close", "Close", null,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All", null, null));
-        fileMenu.add(buildMenuItem(controller, "save", "Save", KeyEvent.VK_S,
+        fileMenu.add(buildMenuItem(controller, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(controller, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
+        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Assemblies", null, null));
         fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
+        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Diagram",
+                KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
+                KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
         ActionIntrospector.getAction(controller, "export2grid").setEnabled(false);
-        fileMenu.addSeparator();
-
-        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
-        fileMenu.addSeparator();
-
-        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+//        fileMenu.addSeparator();
+//
+//        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
+//        fileMenu.addSeparator();
+//
+//        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,
+//                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
-        JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
         editMenu.add(buildMenuItem(controller, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
@@ -454,7 +469,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         if (propChangeListenerMode.isSelected()) {
             return PCL_MODE;
         }
-        LogUtils.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
+        LogUtils.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -636,7 +651,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger(AssemblyViewFrame.class).error(tmle);
+            LogUtils.getLogger(AssemblyEditViewFrame.class).error(tmle);
         }
 
         // the view holds only one assyModel, so it gets overwritten with each tab
@@ -829,7 +844,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
                     dragged = null;
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LogUtils.getLogger(AssemblyViewFrame.class).error(e);
+                    LogUtils.getLogger(AssemblyEditViewFrame.class).error(e);
                 }
             }
         }
@@ -942,7 +957,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 null, null, initval);
     }    // ViskitView-required methods:
 
-    private JFileChooser jfc;
+    private JFileChooser assemblyFileChooser;
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
@@ -955,17 +970,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public File[] openFilesAsk() {
-        jfc = buildOpenSaveChooser();
-        jfc.setDialogTitle("Open Assembly Files");
+        assemblyFileChooser = buildOpenSaveChooser();
+        assemblyFileChooser.setDialogTitle("Open Assembly File");
 
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
-        jfc.setFileFilter(filter);
+        assemblyFileChooser.setFileFilter(filter);
 
-        jfc.setMultiSelectionEnabled(true);
+        assemblyFileChooser.setMultiSelectionEnabled(true);
 
-        int returnVal = jfc.showOpenDialog(this);
-        return (returnVal == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
+        int returnVal = assemblyFileChooser.showOpenDialog(this);
+        return (returnVal == JFileChooser.APPROVE_OPTION) ? assemblyFileChooser.getSelectedFiles() : null;
     }
 
     @Override
@@ -1033,11 +1048,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-        if (jfc == null) {
-            jfc = buildOpenSaveChooser();
+        if (assemblyFileChooser == null) {
+            assemblyFileChooser = buildOpenSaveChooser();
         }
 
-        jfc.setDialogTitle("Save Assembly File");
+        assemblyFileChooser.setDialogTitle("Save Assembly File"); // TODO distinguish title if saving image
         File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
@@ -1046,20 +1061,20 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             fil = getUniqueName(suggName);
         }
 
-        jfc.setSelectedFile(fil);
-        int retv = jfc.showSaveDialog(this);
+        assemblyFileChooser.setSelectedFile(fil);
+        int retv = assemblyFileChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
-            if (jfc.getSelectedFile().exists()) {
+            if (assemblyFileChooser.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
-            return jfc.getSelectedFile();
+            return assemblyFileChooser.getSelectedFile();
         }
 
         // We canceled
         deleteCanceledSave(fil.getParentFile());
-        jfc = null;
+        assemblyFileChooser = null;
         return null;
     }
 
@@ -1096,7 +1111,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void displayXML(File f) {
         JComponent xt;
         try {
-            xt = XTree.getTreeInPanel(f);
+            xt = XmlTree.getTreeInPanel(f);
         } catch (Exception e) {
             genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
@@ -1162,7 +1177,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         comp.setMinimumSize(d);
     }
 
-} // end class file AssemblyViewFrame.java
+} // end class file AssemblyEditViewFrame.java
 
 /** Utility class to handle EventNode DnD operations */
 interface DragStartListener {

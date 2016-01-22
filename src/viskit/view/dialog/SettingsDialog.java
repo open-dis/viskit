@@ -506,6 +506,7 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             if (addChooser == null) {
                 addChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+				addChooser.setDialogTitle("Open Project Settings");
                 addChooser.setMultiSelectionEnabled(false);
                 addChooser.setAcceptAllFileFilterUsed(false);
                 addChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

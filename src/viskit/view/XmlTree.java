@@ -22,7 +22,7 @@ import viskit.VStatics;
  * @since 27 Aug 2004
  * @version $Id$
  */
-public class XTree extends JTree {
+public class XmlTree extends JTree {
 
     DefaultTreeModel mod;
 
@@ -30,7 +30,7 @@ public class XTree extends JTree {
         return new XTreePanel(xmlF);
     }
 
-    public XTree(File xmlF) throws Exception {
+    public XmlTree(File xmlF) throws Exception {
         super();
         setFile(xmlF);
     }
@@ -209,7 +209,7 @@ public class XTree extends JTree {
                     setToolTipText(tt);
                 }
                 if (idx == 0) {
-                    setToolTipText(((XTree) tree).doc.toString());
+                    setToolTipText(((XmlTree) tree).doc.toString());
                 }
                 setIcon(icons[idx % icons.length]);
             } else {
@@ -267,6 +267,7 @@ public class XTree extends JTree {
                 JFrame f = new JFrame("XML Tree Widget Test");
 
                 JFileChooser jfc = new JFileChooser();
+				jfc.setDialogTitle("XML Tree of Viskit Model");
                 jfc.showOpenDialog(f);
                 File fil = jfc.getSelectedFile();
                 if (fil == null) {
@@ -281,7 +282,7 @@ public class XTree extends JTree {
                 //c.add(new JScrollPane(xt), BorderLayout.CENTER);
                 XTreePanel p = null;
                 try {
-                    p = XTree.getTreeInPanel(fil);
+                    p = XmlTree.getTreeInPanel(fil);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -311,7 +312,7 @@ public class XTree extends JTree {
 
 class XTreePanel extends JPanel {
 
-    public XTree xtree;
+    public XmlTree xtree;
     public JTextArea srcXML;
 
     XTreePanel(File xmlF) throws Exception {
@@ -319,7 +320,7 @@ class XTreePanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         try {
-            xtree = new XTree(xmlF);
+            xtree = new XmlTree(xmlF);
         } catch (Exception e) {
             xtree = null;
             throw (e);
@@ -365,8 +366,8 @@ class XTreePanel extends JPanel {
 
     final String getElementText(DefaultMutableTreeNode dmt) {
         Object o = dmt.getUserObject();
-        if (o instanceof XTree.nElement) {
-            Element elm = ((XTree.nElement) o).elem;
+        if (o instanceof XmlTree.nElement) {
+            Element elm = ((XmlTree.nElement) o).elem;
             return xtree.xmlOut.outputString(elm);
         } else {
             return "";

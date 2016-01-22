@@ -45,6 +45,7 @@ public class SourceWindow extends JFrame {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
+		    saveChooser.setDialogTitle("Java Source Code");
             saveChooser.setCurrentDirectory(VGlobals.instance().getCurrentViskitProject().getSrcDir());
         }
         contentPane = new JPanel(new BorderLayout());

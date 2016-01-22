@@ -135,6 +135,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser openChooser = new JFileChooser(aRDir);
+		openChooser.setDialogTitle("Open Analyst Report");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
         openChooser.setFileFilter(filter);
         openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

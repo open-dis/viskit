@@ -671,6 +671,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     if (outputDirty) {
                         if (JOptionPane.showConfirmDialog(JobLauncherTab2.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
+							jfc.setDialogTitle("Save Design of Experiment (DOE) file");
                             jfc.setSelectedFile(new File("DOEOutput.txt"));
                             jfc.showSaveDialog(JobLauncherTab2.this);
                             if (jfc.getSelectedFile() != null) {

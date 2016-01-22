@@ -89,7 +89,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JToggleButton cancelArcMode;
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
-    private JMenuItem quitMenuItem;
 
     private String FULLPATH = VStatics.FULL_PATH;
     private String CLEARPATHFLAG = VStatics.CLEAR_PATH_FLAG;
@@ -111,10 +110,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     public JMenuBar getMenus() {
         return myMenuBar;
-    }
-
-    public JMenuItem getQuitMenuItem() {
-        return quitMenuItem;
     }
 
     /** @return the current mode--select, add, arc, cancelArc */
@@ -199,6 +194,34 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public JMenu getOpenRecentProjMenu() {
         return openRecentProjMenu;
     }
+
+	/**
+	 * @return the fileMenu
+	 */
+	public JMenu getFileMenu() {
+		return fileMenu;
+	}
+
+	/**
+	 * @return the editMenu
+	 */
+	public JMenu getEditMenu() {
+		return editMenu;
+	}
+
+	/**
+	 * @return the projectsMenu
+	 */
+	public JMenu getProjectsMenu() {
+		return projectsMenu;
+	}
+
+	/**
+	 * @return the helpMenu
+	 */
+	public JMenu getHelpMenu() {
+		return helpMenu;
+	}
 
     /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
@@ -539,7 +562,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         //todo
     }
 
-    class RecentEgFileListener implements mvcRecentFileListener {
+    class RecentEventGraphFileListener implements mvcRecentFileListener {
 
         @Override
         public void listChanged() {
@@ -594,64 +617,64 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     private JMenu openRecentEGMenu, openRecentProjMenu;
+	
+	private JMenu projectsMenu = new JMenu("Projects");
+	private JMenu fileMenu     = new JMenu("Event Graphs");
+	private JMenu editMenu     = new JMenu("Event Graph Editor");
+    private JMenu helpMenu     = new JMenu("Help");
 
-    private void buildMenus() {
+    private void buildMenus() 
+	{
         EventGraphController controller = (EventGraphController) getController();
 
-        controller.addRecentEgFileListener(new RecentEgFileListener());
+        controller.addRecentEgFileListener(new RecentEventGraphFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
+        // Set up Projects menu
+        projectsMenu.setMnemonic(KeyEvent.VK_P);
+
+        projectsMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project",
+                KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
+        projectsMenu.add(buildMenuItem(this, "openProject", "Open Project",
+                KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
+        projectsMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
+        projectsMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip and Mail Project File",
+                KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
+
         // Set up file menu
-        JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+//        fileMenu.addSeparator();
+        fileMenu.add(buildMenuItem(controller, "newEventGraph", "New Event Graph",
+                KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
 
-        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
-        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
-        fileMenu.add(buildMenuItem(controller, "newEventGraph", "New Event Graph", KeyEvent.VK_N,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        fileMenu.addSeparator();
-
-        fileMenu.add(buildMenuItem(controller, "open", "Open", KeyEvent.VK_O,
+        fileMenu.add(buildMenuItem(controller, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentEGMenu = buildMenu("Open Recent Event Graph"));
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
 
         // The recently opened project file listener will be set with the
         // openRecentProjMenu in the MainFrame after the AssemblyView is
         // instantiated
 
-        fileMenu.add(buildMenuItem(controller, "close", "Close", null,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All", null, null));
-        fileMenu.add(buildMenuItem(controller, "save", "Save", KeyEvent.VK_S,
+        fileMenu.add(buildMenuItem(controller, "save", "Save Event Graph", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(controller, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(controller, "close", "Close Event Graph", null,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
+        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Event Graphs", null, null));
         fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
+        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Event Graph Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.addSeparator();
-
-        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
-        fileMenu.addSeparator();
-
-        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
-        JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
-        editMenu.add(buildMenuItem(controller, "undo", "Undo", KeyEvent.VK_Z,
+        editMenu.add(buildMenuItem(controller, "undo", "Undo Edit", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
-        editMenu.add(buildMenuItem(controller, "redo", "Redo", KeyEvent.VK_Y,
+        editMenu.add(buildMenuItem(controller, "redo", "Redo Edit", KeyEvent.VK_Y,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
 
         ActionIntrospector.getAction(controller, "undo").setEnabled(false);
@@ -702,7 +725,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         help.mainFrameLocated(this.getBounds());
         VGlobals.instance().setHelp(help);
 
-        JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
         helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));

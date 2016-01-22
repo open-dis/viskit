@@ -593,6 +593,7 @@ public class ViskitProject {
     private static void initializeProjectChooser(String startPath) {
         if (projectChooser == null) {
             projectChooser = new JFileChooser(startPath);
+		    projectChooser.setDialogTitle("Open Project");
 
             projectChooser.addPropertyChangeListener(myChangeListener);
 
@@ -636,7 +637,7 @@ public class ViskitProject {
         File projectDir = null;
         initializeProjectChooser(startingDirPath);
 
-        projectChooser.setDialogTitle("Open an Existing Viskit Project");
+        projectChooser.setDialogTitle("Open Existing Viskit Project");
         boolean isProjectDir;
 
         do {

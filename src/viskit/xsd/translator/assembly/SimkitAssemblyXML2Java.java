@@ -1,5 +1,7 @@
 package viskit.xsd.translator.assembly;
 
+// TODO new pattern for instantiating SimEntity objects 
+
 import edu.nps.util.LogUtils;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

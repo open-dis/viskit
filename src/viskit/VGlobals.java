@@ -38,7 +38,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.RunnerPanel2;
 import viskit.view.dialog.SettingsDialog;
-import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyEditViewFrame;
 import viskit.view.EventGraphViewFrame;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -137,24 +137,24 @@ public class VGlobals {
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
-    public AssemblyViewFrame getAssemblyEditor() {
-        return (AssemblyViewFrame) avf;
+    public AssemblyEditViewFrame getAssemblyEditor() {
+        return (AssemblyEditViewFrame) avf;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
-     * @return the component AssemblyViewFrame
+     * @return the component AssemblyEditViewFrame
      */
     public mvcAbstractJFrameView buildAssemblyViewFrame() {
         acont = new AssemblyControllerImpl();
-        avf = new AssemblyViewFrame(acont);
+        avf = new AssemblyEditViewFrame(acont);
         acont.setView(avf);
         return avf;
     }
 
     /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
     public void rebuildLEGOTreePanels() {
-        ((AssemblyViewFrame)avf).rebuildLEGOTreePanels();
+        ((AssemblyEditViewFrame)avf).rebuildLEGOTreePanels();
     }
 
     public AssemblyModel getActiveAssemblyModel() {

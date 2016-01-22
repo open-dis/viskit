@@ -58,7 +58,7 @@ import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetaDataDialog;
 import viskit.view.RunnerPanel2;
-import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyEditViewFrame;
 import viskit.view.AssemblyView;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -249,7 +249,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
     private void resetRedoUndoStatus() {
 
-        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
 
         if (view.getCurrentVgacw() != null) {
             vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
@@ -1248,7 +1248,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         isUndo = true;
 
-        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
         vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         Object[] roots = view.getCurrentVgacw().getRoots();
@@ -1305,7 +1305,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
 
-        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
         vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
@@ -1318,7 +1318,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
-        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
         vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
@@ -1661,7 +1661,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             @Override
             public void run() {
-                ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
+                ((AssemblyEditViewFrame) getView()).runButt.setEnabled(false);
             }
         };
         if (SwingUtilities.isEventDispatchThread())
@@ -1724,7 +1724,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     LOG.error(e);
 //                    e.printStackTrace();
                 } finally {
-                    ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
+                    ((AssemblyEditViewFrame) getView()).runButt.setEnabled(true);
                     mutex--;
                 }
             }
@@ -1844,7 +1844,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         public void actionPerformed(ActionEvent ev) {
 
             // create and save the image
-            AssemblyViewFrame avf = (AssemblyViewFrame) getView();
+            AssemblyEditViewFrame avf = (AssemblyEditViewFrame) getView();
 
             // Get only the jgraph part
             Component component = avf.getCurrentJgraphComponent();

@@ -98,6 +98,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         buildMenus();
 
         locationImageFileChooser = new JFileChooser("./images/");
+		locationImageFileChooser.setDialogTitle("Open Image");
     }
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
@@ -235,14 +236,14 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
 
-        tabs.add("1 Header", headerPanel);
-        tabs.add("2 Executive Summary", makeExecutiveSummaryPanel());
-        tabs.add("3 Simulation Location", makeSimulationLocationPanel());
-        tabs.add("4 Assembly Configuration", makeAssemblyDesignPanel());
-        tabs.add("5 Entity Parameters", makeEntityParamsPanel());
-        tabs.add("6 Behavior Descriptions", makeBehaviorsPanel());
-        tabs.add("7 Statistical Results", makeStatisticsPanel());
-        tabs.add("8 Conclusions, Recommendations", makeConclusionsRecommendationsPanel());
+        tabs.add("1. Document Header", headerPanel);
+        tabs.add("2. Executive Summary", makeExecutiveSummaryPanel());
+        tabs.add("3. Simulation Location", makeSimulationLocationPanel());
+        tabs.add("4. Simulation Assembly Configuration", makeAssemblyDesignPanel());
+        tabs.add("5. Entity Parameters", makeEntityParamsPanel());
+        tabs.add("6. Model Behavior Descriptions", makeBehaviorsPanel());
+        tabs.add("7. Statistical Results", makeStatisticsPanel());
+        tabs.add("8. Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
 
         add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
@@ -849,6 +850,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setConclusions(conRecConclusionsTA.getText());
         arb.setRecommendations(conRecRecsTA.getText());
     }
+        private JMenu fileMenu = new JMenu("Analyst Report");
 
     private void buildMenus() {
 
@@ -858,12 +860,11 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
         // Setup the File Menu
         myMenuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
         fileMenu.add(buildMenuItem(controller,
                 "openAnalystReport",
-                "Open another analyst report",
+                "Open saved Analyst Report",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
 
@@ -875,13 +876,13 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         fileMenu.add(view);
         fileMenu.add(buildMenuItem(controller,
                 "saveAnalystReport",
-                "Save analyst report XML",
+                "Save Analyst Report (XML)",
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
 
         fileMenu.add(buildMenuItem(controller,
                 "generateHtmlReport",
-                "Display analyst report HTML",
+                "Display Analyst Report (HTML)",
                 KeyEvent.VK_D,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
@@ -910,6 +911,20 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
     @Override
     public void modelChanged(mvcModelEvent event) {}
+
+	/**
+	 * @return the fileMenu
+	 */
+	public JMenu getFileMenu() {
+		return fileMenu;
+	}
+
+	/**
+	 * @param fileMenu the fileMenu to set
+	 */
+	public void setFileMenu(JMenu fileMenu) {
+		this.fileMenu = fileMenu;
+	}
 
     class fileChoiceListener implements ActionListener {
 

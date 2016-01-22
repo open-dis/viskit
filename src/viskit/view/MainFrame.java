@@ -33,6 +33,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
+import actions.ActionIntrospector;
+import actions.ActionUtilities;
 import edu.nps.util.LogUtils;
 import java.awt.*;
 import java.awt.event.*;
@@ -43,6 +45,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.nps.util.SysExitHandler;
+import java.util.HashMap;
+import java.util.Map;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
@@ -74,13 +78,14 @@ public class MainFrame extends JFrame {
 
     private JTabbedPane tabbedPane;
     private JTabbedPane runTabbedPane;
-    EventGraphViewFrame egFrame;
-    AssemblyViewFrame assyFrame;
-    InternalAssemblyRunner assyRunComponent;
+    EventGraphViewFrame eventGraphViewFrame;
+    AssemblyEditViewFrame assemblyEditViewFrame;
+    InternalAssemblyRunner assemblyRunComponent;
     JobLauncherTab2 runGridComponent;
-    mvcAbstractJFrameView reportPanel;
+    mvcAbstractJFrameView analystReportFrame;
     public Action myQuitAction;
-    private DoeMain doeMain;
+    private DoeMain designOfExperimentsMain;
+    private JMenuItem quitMenuItem;
 
     /** The initial assembly to load. */
     private final String initialFile;
@@ -102,7 +107,7 @@ public class MainFrame extends JFrame {
 
         this.initialFile = initialFile;
 
-        initUI();
+        initializeUserInterface();
 
         int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
@@ -131,69 +136,96 @@ public class MainFrame extends JFrame {
 
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
-    private void initUI() {
+    private void initializeUserInterface() {
         VGlobals.instance().setAssemblyQuitHandler(null);
         VGlobals.instance().setEventGraphQuitHandler(null);
-        JMenuBar menuBar;
+        JMenuBar mainMenuBar, fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
+				 designOfExperimentsMenuBar, clusterGridMenuBar;
+		
+        myQuitAction = new ExitAction("Exit");
+        
+        mainMenuBar = new JMenuBar();
+        setJMenuBar(mainMenuBar);
+		
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+		mainMenuBar.add(fileMenu);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
 
-        myQuitAction = new ExitAction("Exit");
-
+		// =============================================================================================
         // Tabbed event graph editor
-        egFrame = (EventGraphViewFrame) VGlobals.instance().buildEventGraphViewFrame();
+        eventGraphViewFrame = (EventGraphViewFrame) VGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
-            tabbedPane.add(egFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(egFrame.getContent());
+            tabbedPane.add(eventGraphViewFrame.getContent());
+            int idx = tabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
             tabbedPane.setTitleAt(idx, "Event Graph Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
-            menuBar = egFrame.getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
-            egFrame.setTitleListener(myTitleListener, idx);
-            setJMenuBar(menuBar);
-            jamQuitHandler(egFrame.getQuitMenuItem(), myQuitAction, menuBar);
+
+			fileMenu.add(eventGraphViewFrame.getProjectsMenu()); // submenu
+            fileMenu.add(eventGraphViewFrame.getFileMenu());     // submenu
+            mainMenuBar.add(eventGraphViewFrame.getEditMenu());  // top level
+			// also Help menu bar below
+			
+            eventGraphMenuBar = eventGraphViewFrame.getMenus();
+            menus.add(eventGraphMenuBar);
+//            doCommonHelp(mainMenuBar);
+//            jamSettingsHandler(mainMenuBar);
+            eventGraphViewFrame.setTitleListener(myTitleListener, idx);
+//            setJMenuBar(mainMenuBar);
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
 
+		// =============================================================================================
         // Assembly editor
-        assyFrame = (AssemblyViewFrame) VGlobals.instance().buildAssemblyViewFrame();
+        assemblyEditViewFrame = (AssemblyEditViewFrame) VGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
-            tabbedPane.add(assyFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(assyFrame.getContent());
+            tabbedPane.add(assemblyEditViewFrame.getContent());
+            int idx = tabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
             tabbedPane.setTitleAt(idx, "Assembly Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
 
-            menuBar = assyFrame.getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
-            if (getJMenuBar() == null) {
-                setJMenuBar(menuBar);
-            }
-            assyFrame.setTitleListener(myTitleListener, idx);
-            jamQuitHandler(assyFrame.getQuitMenuItem(), myQuitAction, menuBar);
+            fileMenu.add(assemblyEditViewFrame.getFileMenu());    // submenu
+            mainMenuBar.add(assemblyEditViewFrame.getEditMenu()); // top level
+			
+            assemblyEditMenuBar = assemblyEditViewFrame.getMenus();
+            menus.add(assemblyEditMenuBar);
+//            doCommonHelp(mainMenuBar);
+//            jamSettingsHandler(mainMenuBar);
+//            if (getJMenuBar() == null) {
+//                setJMenuBar(mainMenuBar);
+//            }
+            assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
+//            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myQuitAction, mainMenuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
         }
 
-        final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
-        final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
+        final EventGraphController eventGraphController = (EventGraphController) eventGraphViewFrame.getController();
+        final   AssemblyController   assemblyController =   (AssemblyController)   assemblyEditViewFrame.getController();
+
+        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(); // copied from EventGraphViewFrame
+
+        fileMenu.addSeparator();
+        fileMenu.add(buildMenuItem(eventGraphController, "settings", "Settings", null, null));
+        fileMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_Q,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+            jamQuitHandler(getQuitMenuItem(), myQuitAction, mainMenuBar);
 
         // Now set the recent open project's file listener for the egFrame now
-        // that we have an assyFrame reference
-        RecentProjFileSetListener listener = assyFrame.getRecentProjFileSetListener();
-        listener.addMenuItem(egFrame.getOpenRecentProjMenu());
+        // that we have an assemblyFrame reference
+        RecentProjFileSetListener listener = assemblyEditViewFrame.getRecentProjFileSetListener();
+        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjMenu());
 
         // Now setup the assembly and event graph file change listener(s)
-        assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
+          assemblyController.addAssemblyFileListener  (assemblyController.getAssemblyChangeListener());
+        eventGraphController.addEventGraphFileListener(assemblyController.getOpenEventGraphListener());
 
+		// =============================================================================================
         // Assembly Run
         runTabbedPane = new JTabbedPane();
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
@@ -213,100 +245,117 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = -1;
         }
 
-        // Analyst report
+		// =============================================================================================
+        // Assembly Run
+		
         boolean analystReportPanelVisible = SettingsDialog.isAnalystReportVisible();
+        assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
+        runTabbedPane.add(assemblyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
+        runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
+        runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
+		
+		
+        assemblyRunMenuBar = assemblyRunComponent.getMenus();
+        mainMenuBar.add(assemblyRunComponent.getRunMenu());
+        menus.add(assemblyRunMenuBar);
+//        doCommonHelp(mainMenuBar);
+//        jamSettingsHandler(mainMenuBar);
+        assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
+//        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myQuitAction, mainMenuBar);
+        AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyEditViewFrame.getController());
+        controller.setInitialFile(initialFile);
+        controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
+
+		// =============================================================================================
+        // Analyst report
         if (analystReportPanelVisible) {
-            reportPanel = VGlobals.instance().buildAnalystReportFrame();
-            tabbedPane.add(reportPanel.getContentPane());
-            int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
+            analystReportFrame = VGlobals.instance().buildAnalystReportFrame();
+            tabbedPane.add(analystReportFrame.getContentPane());
+            int idx = tabbedPane.indexOfComponent(analystReportFrame.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
             tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
-            menuBar = ((AnalystReportFrame)reportPanel).getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
-            if (getJMenuBar() == null) {
-                setJMenuBar(menuBar);
-            }
-            ((AnalystReportFrame)reportPanel).setTitleListener(myTitleListener, idx);
-            jamQuitHandler(null, myQuitAction, menuBar);
+            analystReportMenuBar = ((AnalystReportFrame)analystReportFrame).getMenus();
+            mainMenuBar.add(((AnalystReportFrame)analystReportFrame).getFileMenu());
+            menus.add(analystReportMenuBar);
+//            doCommonHelp(mainMenuBar);
+//            jamSettingsHandler(mainMenuBar);
+//            if (getJMenuBar() == null) {
+//                setJMenuBar(mainMenuBar);
+//            }
+            ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
+//            jamQuitHandler(null, myQuitAction, mainMenuBar);
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
-            AnalystReportController cntlr = (AnalystReportController) reportPanel.getController();
+            AnalystReportController cntlr = (AnalystReportController) analystReportFrame.getController();
             cntlr.setMainTabbedPane(tabbedPane, idx);
-            assyCntlr.addAssemblyFileListener((AnalystReportFrame) reportPanel);
+            assemblyController.addAssemblyFileListener((AnalystReportFrame) analystReportFrame);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
 
-        // Assembly runner
-        assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
-        runTabbedPane.add(assyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
-        runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
-        runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
-        menuBar = assyRunComponent.getMenus();
-        menus.add(menuBar);
-        doCommonHelp(menuBar);
-        jamSettingsHandler(menuBar);
-        assyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
-        jamQuitHandler(assyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
-        AssemblyControllerImpl controller = ((AssemblyControllerImpl) assyFrame.getController());
-        controller.setInitialFile(initialFile);
-        controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
-
-        /* DIFF between OA3302 branch and trunk */
-
+		// =============================================================================================
         // Design of experiments
-        DoeMainFrame doeFrame = null;
+        DoeMainFrame designOfExperimentsFrame = null;
         boolean isDOEVisible = SettingsDialog.isDOEVisible();
         if (isDOEVisible) {
-            doeMain = DoeMain.main2();
-            doeFrame = doeMain.getMainFrame();
-            runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
+            designOfExperimentsMain = DoeMain.main2();
+            designOfExperimentsFrame = designOfExperimentsMain.getMainFrame();
+            runTabbedPane.add(designOfExperimentsFrame.getContent(), TAB1_DOE_IDX);
             runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
             runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
-            menuBar = doeMain.getMenus();
-            if (menuBar == null) {
-                menuBar = new JMenuBar();
-                menuBar.add(new JMenu("File"));
-            }
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            doeFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
-            jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
-            assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
-            egCntlr.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
+            designOfExperimentsMenuBar = designOfExperimentsMain.getMenus();
+//            if (mainMenuBar == null) {
+//                mainMenuBar = new JMenuBar();
+//                mainMenuBar.add(new JMenu("File"));
+//            }
+			for (int i = 0; i < designOfExperimentsMenuBar.getMenuCount(); i++)
+			{
+				mainMenuBar.add(designOfExperimentsMenuBar.getMenu(i));                      
+			}
+            menus.add(designOfExperimentsMenuBar);
+//            doCommonHelp(mainMenuBar);
+            designOfExperimentsFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
+//            jamQuitHandler(designOfExperimentsMain.getQuitMenuItem(), myQuitAction, mainMenuBar);
+            assemblyController.addAssemblyFileListener(designOfExperimentsFrame.getController().getOpenAssemblyListener());
+            eventGraphController.addEventGraphFileListener(designOfExperimentsFrame.getController().getOpenEventGraphListener());
         }
 
+		// =============================================================================================
         // Grid run panel
         if (SettingsDialog.isClusterRunVisible()) {
-            runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
-            doeFrame.getController().setJobLauncher(runGridComponent);
+            runGridComponent = new JobLauncherTab2(designOfExperimentsMain.getController(), null, null, this);
+			designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
             runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
             runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
-            menuBar = new JMenuBar();
-            menuBar.add(new JMenu("File"));
-            jamQuitHandler(null, myQuitAction, menuBar);
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
+			
+			// TODO clusterGridMenuBar
+			
+//            mainMenuBar = new JMenuBar();
+//            mainMenuBar.add(new JMenu("File"));
+//            jamQuitHandler(null, myQuitAction, mainMenuBar);
+//            menus.add(mainMenuBar);
+//            doCommonHelp(mainMenuBar);
             runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
-            assyCntlr.addAssemblyFileListener(runGridComponent);
+            assemblyController.addAssemblyFileListener(runGridComponent);
         }
-        /* End DIFF between OA3302 branch and trunk */
+		// =============================================================================================
+//		doCommonHelp(mainMenuBar);
+        mainMenuBar.add(eventGraphViewFrame.getHelpMenu());
+//        jamSettingsHandler(mainMenuBar); // TODO investigate
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
         runLater(0L, new Runnable() {
             @Override
             public void run() {
-                egCntlr.begin();
+                eventGraphController.begin();
             }
         });
 
         runLater(500L, new Runnable() {
             @Override
             public void run() {
-                assyCntlr.begin();
+                assemblyController.begin();
             }
         });
 
@@ -339,80 +388,109 @@ public class MainFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            Model[] mods = VGlobals.instance().getEventGraphEditor().getOpenModels();
-            Model dirtyMod = null;
+            Model[] eventGraphModels = VGlobals.instance().getEventGraphEditor().getOpenModels();
+            Model dirtyEventGraphModel = null;
 
-            // Make sure we save modified EGs if we wander off to the Assy tab
-            for (Model mod : mods) {
+            // Make sure we save modified EGs if we wander off to the Assembly tab
+            for (Model eventGraphModel : eventGraphModels) {
 
-                if (mod.isDirty()) {
-                    dirtyMod = mod;
-                    VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
+                if (eventGraphModel.isDirty()) {
+                    dirtyEventGraphModel = eventGraphModel;
+                    VGlobals.instance().getEventGraphController().setModel((mvcModel) eventGraphModel);
                     ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
                 }
             }
 
-            if (dirtyMod != null && dirtyMod.isDirty()) {
-
+            if (dirtyEventGraphModel != null && dirtyEventGraphModel.isDirty())
+			{
                 // This will fire another call to stateChanged()
                 tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
+				eventGraphViewFrame.getEditMenu().setEnabled(true);
+			   	  assemblyEditViewFrame.getEditMenu().setEnabled(false);
+			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
                 return;
             }
-
-            int i = tabbedPane.getSelectedIndex();
-
+            
+			int i = tabbedPane.getSelectedIndex();
+			
+			if (i == tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX])
+			{
+				eventGraphViewFrame.getEditMenu().setEnabled(true);
+			   	  assemblyEditViewFrame.getEditMenu().setEnabled(false);
+			   assemblyRunComponent.getRunMenu().setEnabled(false);
+			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
+            }
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
+			else if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX])
+			{
                 i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
+                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "Run simulation defined by Assembly");
+				eventGraphViewFrame.getEditMenu().setEnabled(false);
+			   	  assemblyEditViewFrame.getEditMenu().setEnabled(false);
+			   assemblyRunComponent.getRunMenu().setEnabled(true);
+			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
 
                 // Resets the Viskit ClassLoader
 //                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
-            } else {
+            } 
+			else if (i == tabIndices[TAB0_ANALYST_REPORT_IDX])
+			{
+				eventGraphViewFrame.getEditMenu().setEnabled(false);
+			   	  assemblyEditViewFrame.getEditMenu().setEnabled(false);
+			   assemblyRunComponent.getRunMenu().setEnabled(false);
+			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(true);
+            }
+			else // Assembly Edit
+			{
                 tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
 //                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
+				eventGraphViewFrame.getEditMenu().setEnabled(false);
+			   	  assemblyEditViewFrame.getEditMenu().setEnabled(true);
+			   assemblyRunComponent.getRunMenu().setEnabled(false);
+			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
             }
 
-            getJMenuBar().remove(hmen);
-            JMenuBar newMB = menus.get(i);
-            newMB.add(hmen);
-            setJMenuBar(newMB);
+//            getJMenuBar().remove(hmen);
+//            JMenuBar newMB = menus.get(i);
+//            newMB.add(hmen);
+//            setJMenuBar(newMB);
             myTitleListener.setTitle(titles[i], i);
 
         }
     }
 
-    private JMenu hmen;
+    private JMenu helpMenu;
 
     /**
      * Stick the first Help menu we see into all the following ones.
-     * @param mb
+     * @param menuBar
      */
-    private void doCommonHelp(JMenuBar mb) {
-        for (int i = 0; i < mb.getMenuCount(); i++) {
-            JMenu men = mb.getMenu(i);
-            if (men.getText().equalsIgnoreCase("Help")) {
-                if (hmen == null) {
-                    hmen = men;
+	@Deprecated
+    private void doCommonHelp(JMenuBar menuBar) {
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            JMenu menu = menuBar.getMenu(i);
+            if (menu.getText().equalsIgnoreCase("Help")) {
+                if (helpMenu == null) {
+                    helpMenu = menu;
                 } else {
-                    mb.remove(i);
+                    menuBar.remove(i);
                 }
                 return;
             }
         }
     }
 
-    private void jamSettingsHandler(JMenuBar mb) {
-        for (int i = 0; i < mb.getMenuCount(); i++) {
-            JMenu men = mb.getMenu(i);
-            if (men.getText().equalsIgnoreCase("File")) {
-                for (int j = 0; j < men.getMenuComponentCount(); j++) {
-                    Component c = men.getMenuComponent(j);
+    private void jamSettingsHandler(JMenuBar menuBar) {
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            JMenu nextMenu = menuBar.getMenu(i);
+            if (nextMenu.getText().equalsIgnoreCase("Project")) {
+                for (int j = 0; j < nextMenu.getMenuComponentCount(); j++) {
+                    Component c = nextMenu.getMenuComponent(j);
                     if (c instanceof JMenuItem) {
-                        JMenuItem jmi = (JMenuItem) c;
-                        if (jmi.getText().equalsIgnoreCase("settings")) {
-                            jmi.addActionListener(mySettingsHandler);
+                        JMenuItem menuItem = (JMenuItem) c;
+                        if (menuItem.getText().equalsIgnoreCase("Settings")) {
+                            menuItem.addActionListener(mySettingsHandler);
                             return;
                         }
                     }
@@ -469,13 +547,13 @@ public class MainFrame extends JFrame {
             {
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
-                    if (!((EventGraphController) egFrame.getController()).preQuit()) {
+                    if (!((EventGraphController) eventGraphViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_IDX]);
-                    if (!((AssemblyController) assyFrame.getController()).preQuit()) {
+                    if (!((AssemblyController) assemblyEditViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -483,8 +561,8 @@ public class MainFrame extends JFrame {
                 /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]);
-                    if (doeMain != null) {
-                        if (!doeMain.getController().preQuit()) {
+                    if (designOfExperimentsMain != null) {
+                        if (!designOfExperimentsMain.getController().preQuit()) {
                             break outer;
                         }
                     }
@@ -495,15 +573,15 @@ public class MainFrame extends JFrame {
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
-                    ((EventGraphController) egFrame.getController()).postQuit();
+                    ((EventGraphController) eventGraphViewFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
-                    ((AssemblyController) assyFrame.getController()).postQuit();
+                    ((AssemblyController) assemblyEditViewFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (doeMain != null) {
-                    doeMain.getController().postQuit();
+                if (designOfExperimentsMain != null) {
+                    designOfExperimentsMain.getController().postQuit();
                 }
                 /* End DIFF between OA3302 branch and trunk */
 
@@ -539,7 +617,7 @@ public class MainFrame extends JFrame {
         }
     };
 
-    /** Prepares the Assy with a fresh class loader free of static artifacts for
+    /** Prepares the Assembly with a fresh class loader free of static artifacts for
      * a completely independent run
      */
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
@@ -556,7 +634,7 @@ public class MainFrame extends JFrame {
 
 
                 // initializes a fresh class loader
-                assyRunComponent.preInitRun(execStrings);
+                assemblyRunComponent.preInitRun(execStrings);
             }
         }
     }
@@ -578,5 +656,29 @@ public class MainFrame extends JFrame {
                 MainFrame.this.setTitle(title);
             }
         }
+    }
+
+    // Use the actions package
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+        Action a = ActionIntrospector.getAction(source, method);
+        Map<String, Object> map = new HashMap<>();
+        if (mn != null) {
+            map.put(Action.MNEMONIC_KEY, mn);
+        }
+        if (accel != null) {
+            map.put(Action.ACCELERATOR_KEY, accel);
+        }
+        if (name != null) {
+            map.put(Action.NAME, name);
+        }
+        if (!map.isEmpty()) {
+            ActionUtilities.decorateAction(a, map);
+        }
+
+        return ActionUtilities.createMenuItem(a);
+    }
+
+    public JMenuItem getQuitMenuItem() {
+        return quitMenuItem;
     }
 }

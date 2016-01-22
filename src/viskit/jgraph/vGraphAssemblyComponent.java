@@ -14,7 +14,7 @@ import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
-import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyEditViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.AssemblyController;
 import viskit.model.*;
@@ -31,10 +31,10 @@ import viskit.model.*;
 public class vGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
     vGraphAssemblyModel vGAModel;
-    AssemblyViewFrame parent;
+    AssemblyEditViewFrame parent;
     private UndoManager undoManager;
 
-    public vGraphAssemblyComponent(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public vGraphAssemblyComponent(vGraphAssemblyModel model, AssemblyEditViewFrame frame) {
         super(model);
         parent = frame;
 
@@ -402,13 +402,13 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         AssemblyController controller = (AssemblyController) parent.getController();
 
         switch (parent.getCurrentMode()) {
-            case AssemblyViewFrame.ADAPTER_MODE:
+            case AssemblyEditViewFrame.ADAPTER_MODE:
                 controller.newAdapterArc(oa);
                 break;
-            case AssemblyViewFrame.SIMEVLIS_MODE:
+            case AssemblyEditViewFrame.SIMEVLIS_MODE:
                 controller.newSimEvListArc(oa);
                 break;
-            case AssemblyViewFrame.PCL_MODE:
+            case AssemblyEditViewFrame.PCL_MODE:
                 controller.newPropChangeListArc(oa);
                 break;
             default:

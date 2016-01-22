@@ -60,7 +60,7 @@ package viskit.jgraph;
 
 import javax.swing.JSplitPane;
 import viskit.model.AssemblyModel;
-import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyEditViewFrame;
 
 /**
  * A class to serve as the jgraph object, while carrying other objects needed
@@ -86,7 +86,7 @@ public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
     public JSplitPane trees;
     public boolean isActive = true;
 
-    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyEditViewFrame frame) {
         super(model, frame);
     }
 

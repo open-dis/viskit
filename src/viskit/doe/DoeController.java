@@ -317,6 +317,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     private JFileChooser initFileChooser() {
         JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Open Design of Experiment (DOE) file");
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         FileFilterEx[] filter = {new FileFilterEx(".grd", "Doe files (*.grd)", true),

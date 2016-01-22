@@ -30,19 +30,19 @@ public class Help {
     public static final String ABOUT_ASSEMBLY_STRING =
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + VERSION.getLastModified() + CR + CR;
-    public static final String SIMKIT_URL = "http://diana.nps.edu/Simkit/";
-    public static final String VISKIT_URL = "http://diana.nps.edu/Viskit/";
+    public static final String   SIMKIT_URL = "http://diana.nps.edu/Simkit/";
+    public static final String   VISKIT_URL = "http://diana.nps.edu/Viskit/";
     public static final String BUGZILLA_URL = "https://diana.nps.edu/bugzilla/";
     public static final String DEVELOPERS =
-            "Copyright &copy; 2004-2015 under the Lesser GNU License" + CR + CR
+            "Copyright &copy; 2004-2016 under the Lesser GNU Public License ((LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
+            + "&nbsp;&nbsp;&nbsp;Terry Norbraten" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
+            + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
             + "&nbsp;&nbsp;&nbsp;Rick Goldberg" + CR
             + "&nbsp;&nbsp;&nbsp;Don McGregor" + CR
-            + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
-            + "&nbsp;&nbsp;&nbsp;Patrick Sullivan" + CR
-            + "&nbsp;&nbsp;&nbsp;Terry Norbraten";
+            + "&nbsp;&nbsp;&nbsp;Patrick Sullivan";
     public static final String SIMKIT_PAGE =
             CR
             + "Visit the Simkit home page at" + CR
