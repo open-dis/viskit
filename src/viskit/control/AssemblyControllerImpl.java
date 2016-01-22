@@ -124,15 +124,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             LOG.debug("Loading initial file: " + initialFile);
             compileAssembly(initialFile);
         } else {
-            List<File> lis = getOpenAssyFileList(false);
+            List<File> lis = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: " + lis.size());
 
             for (File f : lis) {
                 _doOpen(f);
             }
         }
-
-        recordProjFiles();
+        recordProjectFiles();
     }
 
     /** Information required by the EventGraphControllerImpl to see if an Assembly
@@ -140,7 +139,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param refresh flag to refresh the list from viskitConfig.xml
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
-    public final List<File> getOpenAssyFileList(boolean refresh) {
+    public final List<File> getOpenAssemblyFileList(boolean refresh) {
         if (refresh || openAssemblies == null) {
             recordAssyFiles();
         }
@@ -369,25 +368,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
-        OpenAssembly.inst().addListener(lis);
+    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener listener) {
+        OpenAssembly.inst().addListener(listener);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
-        OpenAssembly.inst().removeListener(lis);
+    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener listener) {
+        OpenAssembly.inst().removeListener(listener);
     }
 
     Set<mvcRecentFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssyFileSetListener(mvcRecentFileListener lis) {
-        recentAssyListeners.add(lis);
+    public void addRecentAssemblyFileSetListener(mvcRecentFileListener listener) {
+        recentAssyListeners.add(listener);
     }
 
     @Override
-    public void removeRecentAssyFileSetListener(mvcRecentFileListener lis) {
-        recentAssyListeners.remove(lis);
+    public void removeRecentAssemblyFileSetListener(mvcRecentFileListener listener) {
+        recentAssyListeners.remove(listener);
     }
 
     /** Here we are informed of open Event Graphs */
@@ -401,13 +400,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjFileSetListener(mvcRecentFileListener lis) {
-        recentProjListeners.add(lis);
+    public void addRecentProjectFileSetListener(mvcRecentFileListener listener) {
+        recentProjListeners.add(listener);
     }
 
     @Override
-    public void removeRecentProjFileSetListener(mvcRecentFileListener lis) {
-        recentProjListeners.remove(lis);
+    public void removeRecentProjectFileSetListener(mvcRecentFileListener listener) {
+        recentProjListeners.remove(listener);
     }
 
     private void notifyRecentProjFileListeners() {
@@ -650,8 +649,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
-        clearRecentAssyFileList();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
+        clearRecentAssemblyFileList();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
@@ -1628,7 +1627,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     // Known modelPath for Assy compilation
     @Override
-    public void initAssemblyRun() {
+    public void initializeAssemblyRun() {
         String src = produceJavaAssemblyClass(); // asks to save
 
         PkgAndFile paf = compileJavaClassAndSetPackage(src);
@@ -1680,7 +1679,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             public Void doInBackground() {
 
                 // Compile and prep the execStrings
-                initAssemblyRun();
+                initializeAssemblyRun();
 
                 if (execStrings == null) {
 
@@ -1784,7 +1783,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private int imgSaveInt = -1;
 
     @Override
-    public void captureWindow() {
+    public void windowImageCapture() {
 
         AssemblyModel vmod = (AssemblyModel) getModel();
         String fileName = "AssemblyScreenCapture";
@@ -1987,7 +1986,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @SuppressWarnings("unchecked")
-    private void recordProjFiles() {
+    private void recordProjectFiles() {
         if (historyConfig == null) {initConfig();}
         List<String> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
@@ -2022,14 +2021,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void clearRecentAssyFileList() {
+    public void clearRecentAssemblyFileList() {
         recentAssyFileSet.clear();
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();
     }
 
     @Override
-    public Set<File> getRecentAssyFileSet() {
+    public Set<File> getRecentAssemblyFileSet() {
         return getRecentAssyFileSet(false);
     }
 
@@ -2041,20 +2040,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void clearRecentProjFileSet() {
+    public void clearRecentProjectFileSet() {
         recentProjFileSet.clear();
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
 
     @Override
-    public Set<File> getRecentProjFileSet() {
+    public Set<File> getRecentProjectFileSet() {
         return getRecentProjFileSet(false);
     }
 
     private Set<File> getRecentProjFileSet(boolean refresh) {
         if (refresh || recentProjFileSet == null) {
-            recordProjFiles();
+            recordProjectFiles();
         }
         return recentProjFileSet;
     }

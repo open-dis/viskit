@@ -341,13 +341,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     Set<mvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentEgFileListener(mvcRecentFileListener lis)
+    public void addRecentEventGraphFileListener(mvcRecentFileListener lis)
     {
       recentListeners.add(lis);
     }
 
     @Override
-    public void removeRecentEgFileListener(mvcRecentFileListener lis)
+    public void removeRecentEventGraphFileListener(mvcRecentFileListener lis)
     {
       recentListeners.remove(lis);
     }
@@ -417,14 +417,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void clearRecentEGFileSet() {
+    public void clearRecentEventGraphFileSet() {
         recentEGFileSet.clear();
         saveEgHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
 
     @Override
-    public Set<File> getRecentEGFileSet() {
+    public Set<File> getRecentEventGraphFileSet() {
         return getRecentEGFileSet(false);
     }
 
@@ -1079,7 +1079,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private int imgSaveInt = -1;
 
     @Override
-    public void captureWindow() {
+    public void windowImageCapture() {
         String fileName = "ViskitScreenCapture";
 
         // create and save the image

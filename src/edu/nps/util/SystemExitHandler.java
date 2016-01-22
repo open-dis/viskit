@@ -44,11 +44,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package edu.nps.util;
 
 /** Interface to handle JVM exiting */
-public interface SysExitHandler {
+public interface SystemExitHandler {
 
     /** Perform a customized JVM exit
      *
      * @param status the JVM exiting status integer
      */
-    void doSysExit(int status);
+    void doSystemExit(int status);
 }

@@ -18,7 +18,7 @@ import viskit.mvc.mvcRecentFileListener;
 public interface EventGraphController {
 
     /**
-     * Start app
+     * Start application
      */
     void begin();
 
@@ -195,22 +195,20 @@ public interface EventGraphController {
      * Generates Java source code from an Event Graph file
      */
     void generateJavaSource();
+	
+    /** Screen capture an image snapshot of the Event Graph Editor frame */
+    void windowImageCapture();
 
-    /**
-     * Provides a single screenshot capture capability
-     */
-    void captureWindow();
+    void            addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener);
 
-    void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
+    void         removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener);
 
-    void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
+    void      addRecentEventGraphFileListener(mvcRecentFileListener listener);
 
-    void addRecentEgFileListener(mvcRecentFileListener lis);
+    void   removeRecentEventGraphFileListener(mvcRecentFileListener listener);
 
-    void removeRecentEgFileListener(mvcRecentFileListener lis);
+    Set<File> getRecentEventGraphFileSet();
 
-    Set<File> getRecentEGFileSet();
-
-    /** Clears the recent EG file list thus far generated */
-    void clearRecentEGFileSet();
+    /** Clears the recent Event Graph file list thus far generated */
+    void    clearRecentEventGraphFileSet();
 }

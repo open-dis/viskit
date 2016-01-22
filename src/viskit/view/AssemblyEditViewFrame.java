@@ -260,7 +260,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
-            Set<File> lis = acontroller.getRecentAssyFileSet();
+            Set<File> lis = acontroller.getRecentAssemblyFileSet();
             openRecentAssyMenu.removeAll();
             for (File fullPath : lis) {
                 if (!fullPath.exists()) {
@@ -302,7 +302,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 fullPath = (File) obj;
 
             if (fullPath.getPath().equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentAssyFileList();
+                acontroller.clearRecentAssemblyFileList();
             } else {
                 acontroller.openRecentAssembly(fullPath);
             }
@@ -314,7 +314,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
 
-        controller.addRecentAssyFileSetListener(new RecentAssyFileListener());
+        controller.addRecentAssemblyFileSetListener(new RecentAssyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -341,7 +341,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
-        controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
+        controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
         fileMenu.add(buildMenuItem(controller, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
@@ -354,7 +354,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Diagram",
+        fileMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Assembly Diagram",
                 KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
         // TODO: Unknown as to what this does exactly

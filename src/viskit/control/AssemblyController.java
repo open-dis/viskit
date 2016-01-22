@@ -229,26 +229,26 @@ public interface AssemblyController {
     void compileAssemblyAndPrepSimRunner();
 
     /** Generating java source and compilation are taken care of here */
-    void initAssemblyRun();
+    void initializeAssemblyRun();
 
     void export2grid();
 
-    /** Screen capture a snapshot of the Assembly View Frame */
-    void captureWindow();
+    /** Screen capture an image snapshot of the Assembly Editor frame */
+    void windowImageCapture();
 
-    void addRecentAssyFileSetListener(mvcRecentFileListener lis);
+    void      addRecentAssemblyFileSetListener(mvcRecentFileListener listener);
 
-    void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
+    void   removeRecentAssemblyFileSetListener(mvcRecentFileListener listener);
 
-    Set<File> getRecentAssyFileSet();
+    Set<File> getRecentAssemblyFileSet();
 
-    void clearRecentAssyFileList();
+    void    clearRecentAssemblyFileList();
 
-    void addRecentProjFileSetListener(mvcRecentFileListener lis);
+    void      addRecentProjectFileSetListener(mvcRecentFileListener listener);
 
-    void removeRecentProjFileSetListener(mvcRecentFileListener lis);
+    void   removeRecentProjectFileSetListener(mvcRecentFileListener listener);
 
-    Set<File> getRecentProjFileSet();
+    Set<File> getRecentProjectFileSet();
 
-    void clearRecentProjFileSet();
+    void    clearRecentProjectFileSet();
 }

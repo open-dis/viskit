@@ -567,7 +567,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void listChanged() {
             EventGraphController vcontroller = (EventGraphController) getController();
-            Set<File> lis = vcontroller.getRecentEGFileSet();
+            Set<File> lis = vcontroller.getRecentEventGraphFileSet();
             openRecentEGMenu.removeAll();
             for (File fullPath : lis) {
                 if (!fullPath.exists()) {
@@ -609,7 +609,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 fullPath = (File) obj;
 
             if (fullPath.getPath().equals(CLEARPATHFLAG)) {
-                vcontroller.clearRecentEGFileSet();
+                vcontroller.clearRecentEventGraphFileSet();
             } else {
                 vcontroller.openRecentEventGraph(fullPath);
             }
@@ -627,7 +627,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	{
         EventGraphController controller = (EventGraphController) getController();
 
-        controller.addRecentEgFileListener(new RecentEventGraphFileListener());
+        controller.addRecentEventGraphFileListener(new RecentEventGraphFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -667,7 +667,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Event Graph Diagram", KeyEvent.VK_I,
+        fileMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Event Graph Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
 
         // Set up edit menu

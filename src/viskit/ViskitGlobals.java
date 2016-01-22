@@ -45,7 +45,7 @@ import bsh.Interpreter;
 import bsh.NameSpace;
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
-import edu.nps.util.SysExitHandler;
+import edu.nps.util.SystemExitHandler;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -871,10 +871,10 @@ public class ViskitGlobals {
         return sb.toString();
     }
 
-    private SysExitHandler sysexithandler = new SysExitHandler() {
+    private SystemExitHandler sysexithandler = new SystemExitHandler() {
 
         @Override
-        public void doSysExit(int status) {
+        public void doSystemExit(int status) {
 
             LOG.debug("Viskit is exiting with status: " + status);
 
@@ -930,11 +930,11 @@ public class ViskitGlobals {
         }
     };
 
-    public void setSysExitHandler(SysExitHandler handler) {
+    public void setSysExitHandler(SystemExitHandler handler) {
         sysexithandler = handler;
     }
 
-    public SysExitHandler getSysExitHandler() {
+    public SystemExitHandler getSysExitHandler() {
         return sysexithandler;
     }
 
@@ -944,7 +944,7 @@ public class ViskitGlobals {
      */
     public void sysExit(int status) {
         if (!isSysExitCalled()) {
-            sysexithandler.doSysExit(status);
+            sysexithandler.doSystemExit(status);
             setSysExitCalled(true);
         }
     }

@@ -44,7 +44,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.nps.util.SysExitHandler;
+import edu.nps.util.SystemExitHandler;
 import java.util.HashMap;
 import java.util.Map;
 import viskit.util.TitleListener;
@@ -105,8 +105,9 @@ public class ViskitMainFrame extends JFrame {
 	private JMenuBar mainMenuBar;
 	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
-    public ViskitMainFrame(String initialFile) {
-        super("Viskit");
+    public ViskitMainFrame(String initialFile)
+	{
+        super("Viskit"); // title
 
         this.initialFile = initialFile;
 
@@ -139,7 +140,8 @@ public class ViskitMainFrame extends JFrame {
 
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
-    private void initializeUserInterface() {
+    private void initializeUserInterface()
+	{
         ViskitGlobals.instance().setAssemblyQuitHandler(null);
         ViskitGlobals.instance().setEventGraphQuitHandler(null);
         JMenuBar fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
@@ -545,8 +547,8 @@ public class ViskitMainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SysExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
-            ViskitGlobals.instance().setSysExitHandler(nullSysExitHandler);
+            SystemExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
+            ViskitGlobals.instance().setSysExitHandler(nullSystemExitHandler);
 
             // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
@@ -618,10 +620,10 @@ public class ViskitMainFrame extends JFrame {
         }
     }
 
-    private SysExitHandler nullSysExitHandler = new SysExitHandler() {
+    private SystemExitHandler nullSystemExitHandler = new SystemExitHandler() {
 
         @Override
-        public void doSysExit(int status) {
+        public void doSystemExit(int status) {
             // do nothing
         }
     };
