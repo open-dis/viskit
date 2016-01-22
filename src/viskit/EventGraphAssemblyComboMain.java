@@ -44,7 +44,7 @@ import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.swing.*;
-import viskit.view.MainFrame;
+import viskit.view.ViskitMainFrame;
 import viskit.view.dialog.SettingsDialog;
 
 /**
@@ -159,7 +159,7 @@ public class EventGraphAssemblyComboMain {
         ToolTipManager ttm = ToolTipManager.sharedInstance();
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
-        JFrame mainFrame = new MainFrame(initialFile);
+        JFrame mainFrame = new ViskitMainFrame(initialFile);
         ViskitGlobals.instance().setMainAppWindow(mainFrame);
 
         if (isMac) {
@@ -194,7 +194,7 @@ public class EventGraphAssemblyComboMain {
                 public Object invoke(Object proxy, Method method, Object[] args) {
                     switch (method.getName()) {
                         case "handleQuit":
-                            ((MainFrame)ViskitGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
+                            ((ViskitMainFrame)ViskitGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
                             break;
                         case "handleAbout":
                             try {

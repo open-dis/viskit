@@ -74,7 +74,7 @@ import viskit.view.dialog.SettingsDialog;
  * @since 3:25:11 PM
  * @version $Id$
  */
-public class MainFrame extends JFrame {
+public class ViskitMainFrame extends JFrame {
 
     private JTabbedPane tabbedPane;
     private JTabbedPane runTabbedPane;
@@ -101,8 +101,11 @@ public class MainFrame extends JFrame {
     private final int TAB1_LOCALRUN_IDX = 0;
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
+	
+	private JMenuBar mainMenuBar;
+	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
-    public MainFrame(String initialFile) {
+    public ViskitMainFrame(String initialFile) {
         super("Viskit");
 
         this.initialFile = initialFile;
@@ -139,17 +142,17 @@ public class MainFrame extends JFrame {
     private void initializeUserInterface() {
         ViskitGlobals.instance().setAssemblyQuitHandler(null);
         ViskitGlobals.instance().setEventGraphQuitHandler(null);
-        JMenuBar mainMenuBar, fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
+        JMenuBar fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
 				 designOfExperimentsMenuBar, clusterGridMenuBar;
-		
-        myQuitAction = new ExitAction("Exit");
         
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);
 		
-        JMenu fileMenu = new JMenu("File");
+        fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		mainMenuBar.add(fileMenu);
+		
+        myQuitAction = new ExitAction("Exit");
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
@@ -163,13 +166,16 @@ public class MainFrame extends JFrame {
             tabbedPane.setTitleAt(idx, "Event Graph Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
 
-			fileMenu.add(eventGraphViewFrame.getProjectsMenu()); // submenu
-            fileMenu.add(eventGraphViewFrame.getFileMenu());     // submenu
+			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, cleanup
+			eventGraphEditMenu = eventGraphViewFrame.getFileMenu();
+			eventGraphEditMenu.setEnabled(true); // activated when corresponding tabbed pane selected
+			fileMenu.add(projectsMenu);       // submenu
+            fileMenu.add(eventGraphEditMenu); // submenu
             mainMenuBar.add(eventGraphViewFrame.getEditMenu());  // top level
 			// also Help menu bar below
 			
-            eventGraphMenuBar = eventGraphViewFrame.getMenus();
-            menus.add(eventGraphMenuBar);
+//            eventGraphMenuBar = eventGraphViewFrame.getMenus();
+//            menus.add(eventGraphMenuBar);
 //            doCommonHelp(mainMenuBar);
 //            jamSettingsHandler(mainMenuBar);
             eventGraphViewFrame.setTitleListener(myTitleListener, idx);
@@ -187,12 +193,15 @@ public class MainFrame extends JFrame {
             int idx = tabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
             tabbedPane.setTitleAt(idx, "Assembly Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
-
-            fileMenu.add(assemblyEditViewFrame.getFileMenu());    // submenu
-            mainMenuBar.add(assemblyEditViewFrame.getEditMenu()); // top level
 			
-            assemblyEditMenuBar = assemblyEditViewFrame.getMenus();
-            menus.add(assemblyEditMenuBar);
+			assemblyFileMenu = assemblyEditViewFrame.getFileMenu();
+            fileMenu.add(assemblyFileMenu);    // submenu
+			assemblyEditMenu = assemblyEditViewFrame.getEditMenu();
+			assemblyEditMenu.setEnabled(true); // activated when corresponding tabbed pane selected
+            mainMenuBar.add(assemblyEditMenu); // top level
+			
+//            assemblyEditMenuBar = assemblyEditViewFrame.getMenus();
+//            menus.add(assemblyEditMenuBar);
 //            doCommonHelp(mainMenuBar);
 //            jamSettingsHandler(mainMenuBar);
 //            if (getJMenuBar() == null) {
@@ -204,20 +213,21 @@ public class MainFrame extends JFrame {
         } else {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
         }
+		// =============================================================================================
+        // File menu continued
 
-        final EventGraphController eventGraphController = (EventGraphController) eventGraphViewFrame.getController();
-        final   AssemblyController   assemblyController =   (AssemblyController)   assemblyEditViewFrame.getController();
+        final EventGraphController eventGraphController = (EventGraphController)   eventGraphViewFrame.getController();
+        final   AssemblyController   assemblyController =   (AssemblyController) assemblyEditViewFrame.getController();
 
-        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(); // copied from EventGraphViewFrame
+        int accelKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(); // copied from EventGraphViewFrame
 
         fileMenu.addSeparator();
-        fileMenu.add(buildMenuItem(eventGraphController, "settings", "Settings", null, null));
-        fileMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_Q,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+        fileMenu.add(buildMenuItem(eventGraphController, "settings", "Settings", null, null)); // TODO fix
+        fileMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit",
+                KeyEvent.VK_Q, KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelKeyMask)));
             jamQuitHandler(getQuitMenuItem(), myQuitAction, mainMenuBar);
 
-        // Now set the recent open project's file listener for the egFrame now
-        // that we have an assemblyFrame reference
+        // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
         RecentProjFileSetListener listener = assemblyEditViewFrame.getRecentProjFileSetListener();
         listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjMenu());
 
@@ -238,7 +248,7 @@ public class MainFrame extends JFrame {
             int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
             tabbedPane.setTitleAt(idx, "Assembly Run");
             tabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
-            menus.add(null); // placeholder
+            menus.add(null); // placeholder TODO?
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } else {
@@ -254,10 +264,12 @@ public class MainFrame extends JFrame {
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
 		
-		
-        assemblyRunMenuBar = assemblyRunComponent.getMenus();
+		assemblyRunMenu = assemblyRunComponent.getRunMenu();
+		assemblyRunMenu.setEnabled(true); // activated when corresponding tabbed pane selected
         mainMenuBar.add(assemblyRunComponent.getRunMenu());
-        menus.add(assemblyRunMenuBar);
+		
+//        assemblyRunMenuBar = assemblyRunComponent.getMenus();
+//        menus.add(assemblyRunMenuBar);
 //        doCommonHelp(mainMenuBar);
 //        jamSettingsHandler(mainMenuBar);
         assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
@@ -274,9 +286,13 @@ public class MainFrame extends JFrame {
             int idx = tabbedPane.indexOfComponent(analystReportFrame.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
             tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
-            analystReportMenuBar = ((AnalystReportFrame)analystReportFrame).getMenus();
-            mainMenuBar.add(((AnalystReportFrame)analystReportFrame).getFileMenu());
-            menus.add(analystReportMenuBar);
+		
+			analystReportMenu = ((AnalystReportFrame)analystReportFrame).getFileMenu();
+			analystReportMenu.setEnabled(true); // activated when corresponding tabbed pane selected
+            mainMenuBar.add(analystReportMenu);
+			
+//            analystReportMenuBar = ((AnalystReportFrame)analystReportFrame).getMenus();
+//            menus.add(analystReportMenuBar);
 //            doCommonHelp(mainMenuBar);
 //            jamSettingsHandler(mainMenuBar);
 //            if (getJMenuBar() == null) {
@@ -307,7 +323,7 @@ public class MainFrame extends JFrame {
 //                mainMenuBar = new JMenuBar();
 //                mainMenuBar.add(new JMenu("File"));
 //            }
-			for (int i = 0; i < designOfExperimentsMenuBar.getMenuCount(); i++)
+			for (int i = 0; i < designOfExperimentsMenuBar.getMenuCount(); i++) // TODO upgrade
 			{
 				mainMenuBar.add(designOfExperimentsMenuBar.getMenu(i));                      
 			}
@@ -340,7 +356,7 @@ public class MainFrame extends JFrame {
         }
 		// =============================================================================================
 //		doCommonHelp(mainMenuBar);
-        mainMenuBar.add(eventGraphViewFrame.getHelpMenu());
+        mainMenuBar.add(eventGraphViewFrame.getHelpMenu()); // TODO move here
 //        jamSettingsHandler(mainMenuBar); // TODO investigate
 
         // let the event graph controller establish the Viskit classpath and open
@@ -460,13 +476,11 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private JMenu helpMenu;
-
     /**
      * Stick the first Help menu we see into all the following ones.
      * @param menuBar
      */
-	@Deprecated
+	@Deprecated // TODO remove
     private void doCommonHelp(JMenuBar menuBar) {
         for (int i = 0; i < menuBar.getMenuCount(); i++) {
             JMenu menu = menuBar.getMenu(i);
@@ -503,7 +517,7 @@ public class MainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SettingsDialog.showDialog(MainFrame.this);
+            SettingsDialog.showDialog(ViskitMainFrame.this);
         }
     };
 
@@ -653,7 +667,7 @@ public class MainFrame extends JFrame {
             }
 
             if (tabIdx == key) {
-                MainFrame.this.setTitle(title);
+                ViskitMainFrame.this.setTitle(title);
             }
         }
     }
