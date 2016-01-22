@@ -117,7 +117,7 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     public void openAnalystReport() {
-        if (frame.isReportDirty()) {
+        if (frame.isReportFileDirty()) {
             int result = JOptionPane.showConfirmDialog(frame,
                     "Save current simulation data and analyst report annotations?",
                     "Confirm",
@@ -228,7 +228,7 @@ public class AnalystReportController extends mvcAbstractController {
     private void saveReport(File f) {
         try {
             analystReportModel.writeToXMLFile(f);
-            frame.setReportDirty(false);
+            frame.setReportFileDirty(false);
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -238,7 +238,7 @@ public class AnalystReportController extends mvcAbstractController {
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
         analystReportFile = selectedFile;
-        frame.setReportDirty(false);
+        frame.setReportFileDirty(false);
     }
 
     private void buildAnalystReport(File targetFile) {
@@ -253,11 +253,11 @@ public class AnalystReportController extends mvcAbstractController {
         }
         setContent(analystReportModelLocal);
         analystReportFile = targetFile;
-        frame.setReportDirty(false);
+        frame.setReportFileDirty(false);
     }
 
     private void setContent(AnalystReportModel analystReportModelLocal) {
-        if (analystReportModelLocal != null && frame.isReportDirty()) {
+        if (analystReportModelLocal != null && frame.isReportFileDirty()) {
             int resp = JOptionPane.showConfirmDialog(frame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
                     "The current report data has not been saved. Save current report before continuing?</p></body></html>",
@@ -269,7 +269,7 @@ public class AnalystReportController extends mvcAbstractController {
             }
         }
 
-        frame.setReportDirty(false);
+        frame.setReportFileDirty(false);
 
         this.analystReportModel = analystReportModelLocal;
         frame.setReportBuilder(analystReportModelLocal);

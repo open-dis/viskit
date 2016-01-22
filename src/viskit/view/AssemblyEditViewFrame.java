@@ -356,8 +356,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Diagram",
                 KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
-                KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
@@ -371,7 +369,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 //                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
-        editMenu.setMnemonic(KeyEvent.VK_E);
+        editMenu.setMnemonic(KeyEvent.VK_A);
         editMenu.add(buildMenuItem(controller, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
         editMenu.add(buildMenuItem(controller, "redo", "Redo", KeyEvent.VK_Y,
@@ -405,6 +403,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
+        editMenu.addSeparator();
+        editMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
+                KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // Create a new menu bar and add the menus we created above to it
         myMenuBar = new JMenuBar();

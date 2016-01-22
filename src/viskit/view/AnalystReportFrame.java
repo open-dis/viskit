@@ -46,6 +46,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,8 +87,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * TODO: rewire this functionality?
      * boolean to show that raw report has not been saved to AnalystReports
      */
-    private boolean dirty = false;
+    private boolean reportFileDirty = false;
     private JMenuBar myMenuBar;
+    private JMenu    analystReportMenu = new JMenu("Analyst Report");
     private JFileChooser locationImageFileChooser;
 
     public AnalystReportFrame(mvcController controller) {
@@ -103,7 +105,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
     JComboBox<String> classifiedTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
-    JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+	DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+    JTextField dateTF = new JTextField(dateFormat.format(new Date()));
     File currentAssyFile;
 
     private void initMVC(mvcController cntlr) {
@@ -143,12 +146,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         return myMenuBar;
     }
 
-    public boolean isReportDirty() {
-        return dirty;
+    public boolean isReportFileDirty() {
+        return reportFileDirty;
     }
 
-    public void setReportDirty(boolean b) {
-        dirty = b;
+    public void setReportFileDirty(boolean b) {
+        reportFileDirty = b;
     }
 
     public void setReportBuilder(AnalystReportModel b) {
@@ -215,11 +218,31 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
         JTabbedPane tabs = new JTabbedPane();
 
+//      tabs.add("1. Document Header",     headerPanel);
+        tabs.add("1. Executive Summary",   makeExecutiveSummaryPanel());
+        tabs.add("2. Scenario Location",   makeSimulationLocationPanel());
+        tabs.add("3. Simulation Assembly", makeAssemblyDesignPanel());
+        tabs.add("4. Entity Parameters",   makeEntityParamsPanel());
+        tabs.add("5. Model Behaviors",     makeBehaviorsPanel());
+        tabs.add("6. Statistical Results", makeStatisticsPanel());
+        tabs.add("7. Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+
+        add(tabs);
+    //setBorder(new EmptyBorder(10,10,10,10));
+    }
+    JCheckBox wantExecutiveSummary;
+    JTextArea execSummTA;
+
+    private JPanel makeExecutiveSummaryPanel() 
+	{
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+
         JPanel headerPanel = new JPanel(new SpringLayout());
         headerPanel.add(new JLabel("Title"));
-        headerPanel.add(titleTF);
+        headerPanel.add(titleTF); // TODO setting defaults
         headerPanel.add(new JLabel("Author"));
-        headerPanel.add(analystNameTF);
+        headerPanel.add(analystNameTF); // TODO setting defaults
         headerPanel.add(new JLabel("Analysis Date"));
         headerPanel.add(dateTF);
         headerPanel.add(new JLabel("Report Classification"));
@@ -235,32 +258,17 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
-
-        tabs.add("1. Document Header", headerPanel);
-        tabs.add("2. Executive Summary", makeExecutiveSummaryPanel());
-        tabs.add("3. Simulation Location", makeSimulationLocationPanel());
-        tabs.add("4. Simulation Assembly Configuration", makeAssemblyDesignPanel());
-        tabs.add("5. Entity Parameters", makeEntityParamsPanel());
-        tabs.add("6. Model Behavior Descriptions", makeBehaviorsPanel());
-        tabs.add("7. Statistical Results", makeStatisticsPanel());
-        tabs.add("8. Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
-
-        add(tabs);
-    //setBorder(new EmptyBorder(10,10,10,10));
-    }
-    JCheckBox wantExecutiveSummary;
-    JTextArea execSummTA;
-
-    private JPanel makeExecutiveSummaryPanel() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantExecutiveSummary = new JCheckBox("Include executive summary", true);
-        wantExecutiveSummary.setToolTipText("Include entries in output report");
+		
+		p.add(headerPanel);
+		
+        wantExecutiveSummary = new JCheckBox("include Executive Summary", true);
+        wantExecutiveSummary.setToolTipText("include in output report");
         wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantExecutiveSummary);
 
         JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        jsp.setBorder(new TitledBorder("Description of Location Features"));
         p.add(jsp);
 
         execSummTA.setLineWrap(true);
@@ -291,8 +299,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     private JPanel makeSimulationLocationPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
-        wantLocationDescriptions.setToolTipText("Include entries in output report");
+        wantLocationDescriptions = new JCheckBox("include Location Features and notes", true);
+        wantLocationDescriptions.setToolTipText("include in output report");
         wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantLocationDescriptions);
 
@@ -850,7 +858,6 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setConclusions(conRecConclusionsTA.getText());
         arb.setRecommendations(conRecRecsTA.getText());
     }
-        private JMenu fileMenu = new JMenu("Analyst Report");
 
     private void buildMenus() {
 
@@ -860,33 +867,38 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
         // Setup the File Menu
         myMenuBar = new JMenuBar();
-        fileMenu.setMnemonic(KeyEvent.VK_F);
+        analystReportMenu.setMnemonic(KeyEvent.VK_N);
 
-        fileMenu.add(buildMenuItem(controller,
+        analystReportMenu.add(buildMenuItem(controller,
                 "openAnalystReport",
-                "Open saved Analyst Report",
+                "Open Previous Analyst Report",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
 
-        JMenuItem view = new JMenuItem("View analyst report XML");
-        view.setMnemonic(KeyEvent.VK_V);
-        view.setToolTipText("Currently not implemented");
-        view.setEnabled(false); // TODO:  implement listener and view functionality
-
-        fileMenu.add(view);
-        fileMenu.add(buildMenuItem(controller,
+        JMenuItem saveMI = buildMenuItem(controller,
                 "saveAnalystReport",
-                "Save Analyst Report (XML)",
+                "Save Analyst Report",
                 KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod));
+        saveMI.setToolTipText("Save Analyst Report as XML file");
+        analystReportMenu.add(saveMI);
 
-        fileMenu.add(buildMenuItem(controller,
+		
+        JMenuItem generateMI = buildMenuItem(controller,
                 "generateHtmlReport",
-                "Display Analyst Report (HTML)",
+                "Display Analyst Report",
                 KeyEvent.VK_D,
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod));
+        saveMI.setToolTipText("Save Analyst Report as HTML page");
+        analystReportMenu.add(generateMI);
 
-        myMenuBar.add(fileMenu);
+        JMenuItem viewMI = new JMenuItem("View analyst report XML");
+        viewMI.setMnemonic(KeyEvent.VK_V);
+        viewMI.setToolTipText("Currently not implemented");
+        viewMI.setEnabled(false); // TODO:  implement listener and view functionality
+        analystReportMenu.add(viewMI);
+
+        myMenuBar.add(analystReportMenu);
     }
 
     // Use the actions package
@@ -913,17 +925,17 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     public void modelChanged(mvcModelEvent event) {}
 
 	/**
-	 * @return the fileMenu
+	 * @return the analystReportMenu
 	 */
 	public JMenu getFileMenu() {
-		return fileMenu;
+		return analystReportMenu;
 	}
 
 	/**
-	 * @param fileMenu the fileMenu to set
+	 * @param fileMenu the analystReportMenu to set
 	 */
 	public void setFileMenu(JMenu fileMenu) {
-		this.fileMenu = fileMenu;
+		this.analystReportMenu = fileMenu;
 	}
 
     class fileChoiceListener implements ActionListener {
