@@ -81,7 +81,7 @@ public class SettingsDialog extends JDialog {
     private JCheckBox doeCB;
     private JCheckBox clusterRunCB;
     private JCheckBox analystReportCB;
-    private JCheckBox debugMsgsCB;
+    private JCheckBox debugMessagesCB;
 
     private JRadioButton defaultLafRB;
     private JRadioButton platformLafRB;
@@ -137,7 +137,7 @@ public class SettingsDialog extends JDialog {
         doeCB.addActionListener(vis);
         clusterRunCB.addActionListener(vis);
         analystReportCB.addActionListener(vis);
-        debugMsgsCB.addActionListener(vis);
+        debugMessagesCB.addActionListener(vis);
 
         setParams();
     }
@@ -212,14 +212,14 @@ public class SettingsDialog extends JDialog {
         innerP.add(assyCB);
         runCB = new JCheckBox("Assembly Run");
         innerP.add(runCB);
+        analystReportCB = new JCheckBox("Analyst Report");
+        innerP.add(analystReportCB);
         doeCB = new JCheckBox("Design Of Experiments");
         innerP.add(doeCB);
         clusterRunCB = new JCheckBox("Cluster Run");
         innerP.add(clusterRunCB);
-        analystReportCB = new JCheckBox("Analyst Report");
-        innerP.add(analystReportCB);
-        debugMsgsCB = new JCheckBox("Verbose debug messages");
-        innerP.add(debugMsgsCB);
+        debugMessagesCB = new JCheckBox("Verbose debug messages");
+        innerP.add(debugMessagesCB);
         innerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3, 3, 3, 3)));
 
         visibleP.add(innerP, BorderLayout.CENTER);
@@ -324,9 +324,9 @@ public class SettingsDialog extends JDialog {
                     } // reenter here
                 }
                 appConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
-            } else if (src == debugMsgsCB) {
-                appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
-                ViskitStatics.debug = debugMsgsCB.isSelected();
+            } else if (src == debugMessagesCB) {
+                appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMessagesCB.isSelected());
+                ViskitStatics.debug = debugMessagesCB.isSelected();
             } else if (src == analystReportCB) {
                 appConfig.setProperty(ViskitConfig.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
             } else if (src == doeCB) {
@@ -442,7 +442,7 @@ public class SettingsDialog extends JDialog {
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
         analystReportCB.setSelected(isAnalystReportVisible());
-        debugMsgsCB.setSelected(ViskitStatics.debug = isVerboseDebug());
+        debugMessagesCB.setSelected(ViskitStatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
         if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {

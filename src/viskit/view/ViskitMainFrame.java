@@ -83,7 +83,7 @@ public class ViskitMainFrame extends JFrame {
     InternalAssemblyRunner assemblyRunComponent;
     JobLauncherTab2 runGridComponent;
     mvcAbstractJFrameView analystReportFrame;
-    public Action myQuitAction;
+    public Action myExitAction;
     private DoeMain designOfExperimentsMain;
     private JMenuItem quitMenuItem;
 
@@ -125,7 +125,7 @@ public class ViskitMainFrame extends JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                myQuitAction.actionPerformed(null);
+                myExitAction.actionPerformed(null);
             }
         });
         ImageIcon icon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
@@ -134,7 +134,7 @@ public class ViskitMainFrame extends JFrame {
 
     /** @return the quit action class for Viskit */
     public Action getMyQuitAction() {
-        return myQuitAction;
+        return myExitAction;
     }
 
     java.util.List<JMenuBar> menus = new ArrayList<>();
@@ -143,7 +143,7 @@ public class ViskitMainFrame extends JFrame {
         ViskitGlobals.instance().setAssemblyQuitHandler(null);
         ViskitGlobals.instance().setEventGraphQuitHandler(null);
         JMenuBar fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
-				 designOfExperimentsMenuBar, clusterGridMenuBar;
+				 designOfExperimentsMenuBar, clusterGridMenuBar; // TODO delete
         
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);
@@ -152,7 +152,7 @@ public class ViskitMainFrame extends JFrame {
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		mainMenuBar.add(fileMenu); // initialize
 		
-        myQuitAction = new ExitAction("Exit");
+        myExitAction = new ExitAction("Exit");
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
@@ -209,7 +209,7 @@ public class ViskitMainFrame extends JFrame {
 //                setJMenuBar(mainMenuBar);
 //            }
             assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
-//            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myQuitAction, mainMenuBar);
+//            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myExitAction, mainMenuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
@@ -254,7 +254,7 @@ public class ViskitMainFrame extends JFrame {
 //        doCommonHelp(mainMenuBar);
 //        jamSettingsHandler(mainMenuBar);
         assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
-//        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myQuitAction, mainMenuBar);
+//        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myExitAction, mainMenuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyEditViewFrame.getController());
         controller.setInitialFile(initialFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
@@ -284,7 +284,7 @@ public class ViskitMainFrame extends JFrame {
 //                setJMenuBar(mainMenuBar);
 //            }
             ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
-//            jamQuitHandler(null, myQuitAction, mainMenuBar);
+//            jamQuitHandler(null, myExitAction, mainMenuBar);
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
             AnalystReportController cntlr = (AnalystReportController) analystReportFrame.getController();
             cntlr.setMainTabbedPane(tabbedPane, idx);
@@ -296,10 +296,14 @@ public class ViskitMainFrame extends JFrame {
         // File menu continued
 
         fileMenu.addSeparator();
-        fileMenu.add(buildMenuItem(eventGraphController, "settings", "Settings", null, null)); // TODO fix
-        fileMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit",
-                KeyEvent.VK_Q, KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelKeyMask)));
-            jamQuitHandler(getQuitMenuItem(), myQuitAction, mainMenuBar);
+		JMenuItem settingsMenuItem = buildMenuItem(eventGraphController, "settings", "Settings", null, null);
+        fileMenu.add(settingsMenuItem);
+        settingsMenuItem.addActionListener(mySettingsHandler);
+//        jamSettingsHandler(fileMenu); // TODO investigate
+		
+		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", null, null); // do not change "quit", no hotkey for reliability
+        fileMenu.add(quitMenuItem); // TODO omit hotkey
+        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // necessary
 
         // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
         RecentProjFileSetListener listener = assemblyEditViewFrame.getRecentProjFileSetListener();
@@ -331,7 +335,7 @@ public class ViskitMainFrame extends JFrame {
             menus.add(designOfExperimentsMenuBar);
 //            doCommonHelp(mainMenuBar);
             designOfExperimentsFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
-//            jamQuitHandler(designOfExperimentsMain.getQuitMenuItem(), myQuitAction, mainMenuBar);
+//            jamQuitHandler(designOfExperimentsMain.getQuitMenuItem(), myExitAction, mainMenuBar);
             assemblyController.addAssemblyFileListener(designOfExperimentsFrame.getController().getOpenAssemblyListener());
             eventGraphController.addEventGraphFileListener(designOfExperimentsFrame.getController().getOpenEventGraphListener());
         }
@@ -349,7 +353,7 @@ public class ViskitMainFrame extends JFrame {
 			
 //            mainMenuBar = new JMenuBar();
 //            mainMenuBar.add(new JMenu("File"));
-//            jamQuitHandler(null, myQuitAction, mainMenuBar);
+//            jamQuitHandler(null, myExitAction, mainMenuBar);
 //            menus.add(mainMenuBar);
 //            doCommonHelp(mainMenuBar);
             runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
@@ -358,7 +362,6 @@ public class ViskitMainFrame extends JFrame {
 		// =============================================================================================
 //		doCommonHelp(mainMenuBar);
         mainMenuBar.add(eventGraphViewFrame.getHelpMenu()); // TODO move here
-//        jamSettingsHandler(mainMenuBar); // TODO investigate
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first

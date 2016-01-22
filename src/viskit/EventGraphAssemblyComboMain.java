@@ -194,7 +194,7 @@ public class EventGraphAssemblyComboMain {
                 public Object invoke(Object proxy, Method method, Object[] args) {
                     switch (method.getName()) {
                         case "handleQuit":
-                            ((ViskitMainFrame)ViskitGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
+                            ((ViskitMainFrame)ViskitGlobals.instance().getMainAppWindow()).myExitAction.actionPerformed(null);
                             break;
                         case "handleAbout":
                             try {
