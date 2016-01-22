@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -48,7 +48,7 @@ import edu.nps.util.SysExitHandler;
 import java.util.HashMap;
 import java.util.Map;
 import viskit.util.TitleListener;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
@@ -125,7 +125,7 @@ public class MainFrame extends JFrame {
                 myQuitAction.actionPerformed(null);
             }
         });
-        ImageIcon icon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
+        ImageIcon icon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         this.setIconImage(icon.getImage());
     }
 
@@ -137,8 +137,8 @@ public class MainFrame extends JFrame {
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
     private void initializeUserInterface() {
-        VGlobals.instance().setAssemblyQuitHandler(null);
-        VGlobals.instance().setEventGraphQuitHandler(null);
+        ViskitGlobals.instance().setAssemblyQuitHandler(null);
+        ViskitGlobals.instance().setEventGraphQuitHandler(null);
         JMenuBar mainMenuBar, fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
 				 designOfExperimentsMenuBar, clusterGridMenuBar;
 		
@@ -156,7 +156,7 @@ public class MainFrame extends JFrame {
 
 		// =============================================================================================
         // Tabbed event graph editor
-        eventGraphViewFrame = (EventGraphViewFrame) VGlobals.instance().buildEventGraphViewFrame();
+        eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(eventGraphViewFrame.getContent());
             int idx = tabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
@@ -181,7 +181,7 @@ public class MainFrame extends JFrame {
 
 		// =============================================================================================
         // Assembly editor
-        assemblyEditViewFrame = (AssemblyEditViewFrame) VGlobals.instance().buildAssemblyViewFrame();
+        assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(assemblyEditViewFrame.getContent());
             int idx = tabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
@@ -269,7 +269,7 @@ public class MainFrame extends JFrame {
 		// =============================================================================================
         // Analyst report
         if (analystReportPanelVisible) {
-            analystReportFrame = VGlobals.instance().buildAnalystReportFrame();
+            analystReportFrame = ViskitGlobals.instance().buildAnalystReportFrame();
             tabbedPane.add(analystReportFrame.getContentPane());
             int idx = tabbedPane.indexOfComponent(analystReportFrame.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
@@ -301,7 +301,7 @@ public class MainFrame extends JFrame {
             designOfExperimentsFrame = designOfExperimentsMain.getMainFrame();
             runTabbedPane.add(designOfExperimentsFrame.getContent(), TAB1_DOE_IDX);
             runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
-            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
             designOfExperimentsMenuBar = designOfExperimentsMain.getMenus();
 //            if (mainMenuBar == null) {
 //                mainMenuBar = new JMenuBar();
@@ -326,7 +326,7 @@ public class MainFrame extends JFrame {
 			designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
             runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
-            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
 			
 			// TODO clusterGridMenuBar
 			
@@ -388,7 +388,7 @@ public class MainFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            Model[] eventGraphModels = VGlobals.instance().getEventGraphEditor().getOpenModels();
+            Model[] eventGraphModels = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
             Model dirtyEventGraphModel = null;
 
             // Make sure we save modified EGs if we wander off to the Assembly tab
@@ -396,8 +396,8 @@ public class MainFrame extends JFrame {
 
                 if (eventGraphModel.isDirty()) {
                     dirtyEventGraphModel = eventGraphModel;
-                    VGlobals.instance().getEventGraphController().setModel((mvcModel) eventGraphModel);
-                    ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
+                    ViskitGlobals.instance().getEventGraphController().setModel((mvcModel) eventGraphModel);
+                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }
 
@@ -536,12 +536,12 @@ public class MainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
-            VGlobals.instance().setSysExitHandler(nullSysExitHandler);
+            SysExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
+            ViskitGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
             // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
-            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).setCloseAll(true);
+            ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
 
             outer:
             {
@@ -570,7 +570,7 @@ public class MainFrame extends JFrame {
                 /* End DIFF between OA3302 branch and trunk */
 
                 // TODO: other preQuits here if needed
-                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
+                ViskitGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     ((EventGraphController) eventGraphViewFrame.getController()).postQuit();
@@ -589,7 +589,7 @@ public class MainFrame extends JFrame {
 
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
-                if (viskit.VStatics.debug) {
+                if (viskit.ViskitStatics.debug) {
                     LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
                 }
 
@@ -601,11 +601,11 @@ public class MainFrame extends JFrame {
                 // Pretty-fy all xml docs used for configuration
                 ViskitConfig.instance().cleanup();
 
-                VGlobals.instance().sysExit(0);  // quit application
+                ViskitGlobals.instance().sysExit(0);  // quit application
             } //outer
 
             // Here if somebody cancelled.
-            VGlobals.instance().setSysExitHandler(defaultHandler);
+            ViskitGlobals.instance().setSysExitHandler(defaultHandler);
         }
     }
 

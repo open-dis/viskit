@@ -15,7 +15,7 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -40,7 +40,7 @@ public class HistogramChart {
      * @return the path url of the created object
      */
     public String createChart(String title, String label, double[] data) {
-        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);

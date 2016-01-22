@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**Implements a Local Doe Driver, to be interchangeable with the remote
  * (Grid Engine) Driver
@@ -27,11 +27,11 @@ public class LocalDriverImpl implements DoeRunDriver {
 
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        this(new URL[] {}, viskit.VGlobals.instance().getWorkDirectory());
+        this(new URL[] {}, viskit.ViskitGlobals.instance().getWorkDirectory());
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
-        loader = new LocalBootLoader(extClassPaths, viskit.VGlobals.instance().getWorkClassLoader(), workDir);
+        loader = new LocalBootLoader(extClassPaths, viskit.ViskitGlobals.instance().getWorkClassLoader(), workDir);
         initGridRunner(loader);
     }
 
@@ -41,12 +41,12 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             gridRunnerz = loader.loadClass("viskit.gridlet.GridRunner");
             try {
-                Class<?> loaderz = loader.loadClass(VStatics.LOCAL_BOOT_LOADER);
+                Class<?> loaderz = loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 Constructor lconstr = loaderz.getConstructor(URL[].class, ClassLoader.class, File.class);
                 Object rloader = lconstr.newInstance(loader.getExtUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDir());
                 Method initr = loaderz.getMethod("init");
                 rloader = initr.invoke(rloader);
-                Constructor constr = gridRunnerz.getConstructor(loader.loadClass(VStatics.LOCAL_BOOT_LOADER)); //yep
+                Constructor constr = gridRunnerz.getConstructor(loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER)); //yep
                 runner = constr.newInstance(rloader);
                 Method[] mthds = gridRunnerz.getMethods();
                 methods = new Hashtable<>();

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -61,8 +61,8 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
 import viskit.Help;
 import viskit.model.ModelEvent;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
 import viskit.doe.LocalBootLoader;
@@ -110,8 +110,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
 
-    private final String FULLPATH = VStatics.FULL_PATH;
-    private final String CLEARPATHFLAG = VStatics.CLEAR_PATH_FLAG;
+    private final String FULLPATH = ViskitStatics.FULL_PATH;
+    private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
     private final Color background = new Color(0xFB, 0xFB, 0xE5);
 
     /** Toolbar for dropping icons, connecting, etc. */
@@ -249,7 +249,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             GraphMetaData gmd = mod.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
-            } else if (viskit.VStatics.debug) {
+            } else if (viskit.ViskitStatics.debug) {
                 System.err.println("error: AssemblyViewFrame gmd null..");
             }
         }
@@ -295,7 +295,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             AssemblyController acontroller = (AssemblyController) getController();
 
             File fullPath;
-            Object obj = getValue(VStatics.FULL_PATH);
+            Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
                 fullPath = new File((String) obj);
             else
@@ -411,7 +411,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = VGlobals.instance().getHelp();
+        Help help = ViskitGlobals.instance().getHelp();
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
@@ -614,7 +614,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(icPath)));
+        b.setIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(icPath)));
         return buttonCommon2(b, tt);
     }
 
@@ -738,7 +738,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
                     // Allow a relative path for Diskit-Test (Diskit)
                     if (path.contains("..")) {
-                        file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+                        file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
                     }
                 }
 
@@ -749,7 +749,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
-        VGlobals vGlobals = VGlobals.instance();
+        ViskitGlobals vGlobals = ViskitGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
@@ -961,8 +961,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
-        if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
@@ -1024,7 +1024,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public void showProjectName() {
         super.showProjectName();
-        VGlobals.instance().getEventGraphEditor().showProjectName();
+        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
     }
 
     private File getUniqueName(String suggName) {
@@ -1053,7 +1053,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         assemblyFileChooser.setDialogTitle("Save Assembly File"); // TODO distinguish title if saving image
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }
@@ -1085,7 +1085,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
                     deleteCanceledSave(file.getParentFile());
                 }
             }

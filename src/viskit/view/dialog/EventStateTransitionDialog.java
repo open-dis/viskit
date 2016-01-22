@@ -13,8 +13,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
 
 import viskit.model.EventStateTransition;
@@ -216,7 +216,7 @@ public class EventStateTransitionDialog extends JDialog {
                 vStateVariable sv = (vStateVariable) cb.getSelectedItem();
                 descriptionField.setText(sv.getComment());
                 okButt.setEnabled(true);
-                indexPanel.setVisible(VGlobals.instance().isArray(sv.getType()));
+                indexPanel.setVisible(ViskitGlobals.instance().isArray(sv.getType()));
                 modified = true;
                 pack();
             }
@@ -225,9 +225,9 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
+                String nm = ViskitGlobals.instance().getEventGraphEditor().addStateVariableDialog();
                 if (nm != null) {
-                    stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+                    stateVarsCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
                     for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
                         vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
                         if (vsv.getName().contains(nm)) {
@@ -287,10 +287,10 @@ public class EventStateTransitionDialog extends JDialog {
             ViskitElement e = stateVarsCB.getItemAt(i);
             typ = e.getType();
 
-            if (VGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (VGlobals.instance().isArray(typ)) {
+            if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
 
@@ -307,22 +307,22 @@ public class EventStateTransitionDialog extends JDialog {
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (VGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (VGlobals.instance().isArray(typ)) {
+            if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
 
             // Beware of qualified types here
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
             methods = Arrays.asList(type.getMethods());
 
             // Filter out methods of Object, and any
             // methods requiring more then one parameter
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
 
                 if (method.getParameterCount() == 0) {
                     methodNames.add(method.getName() + "()");
@@ -360,16 +360,16 @@ public class EventStateTransitionDialog extends JDialog {
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (VGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (VGlobals.instance().isArray(typ)) {
+            if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController()).messageUser(
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "
@@ -382,7 +382,7 @@ public class EventStateTransitionDialog extends JDialog {
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (!method.getReturnType().getName().contains("void")) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 
@@ -477,12 +477,12 @@ public class EventStateTransitionDialog extends JDialog {
 
         // We have an indexing argument already set
         String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
-        indexPanel.setVisible(VGlobals.instance().isArray(typ));
+        indexPanel.setVisible(ViskitGlobals.instance().isArray(typ));
         localAssignmentPanel.setVisible(opOn.isSelected());
     }
 
     private void setStateVariableCBValue(EventStateTransition est) {
-        stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+        stateVarsCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
         stateVarsCB.setSelectedIndex(0);
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
             vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
@@ -495,7 +495,7 @@ public class EventStateTransitionDialog extends JDialog {
         // TODO: determine if this is necessary
 //        if (est.getStateVarName().isEmpty()) // for first time
 //        {
-//            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+//            ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
 //                    JOptionPane.ERROR_MESSAGE,
 //                    "Alert",
 //                    "State variable " + est.getStateVarName() + "not found.");
@@ -609,7 +609,7 @@ public class EventStateTransitionDialog extends JDialog {
             arrayIndexField.setText("");
             actionField.setText("");
             localInvocationField.setText("");
-            VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
+            ViskitGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
             dispose();
         }
     }
@@ -627,8 +627,8 @@ public class EventStateTransitionDialog extends JDialog {
                 actionLab2.setText("");
             } else if (opOn.isSelected()) {
                 String ty = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
-                if (VGlobals.instance().isPrimitive(ty)) {
-                    ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
+                if (ViskitGlobals.instance().isPrimitive(ty)) {
+                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Java Language Error",
                             "A method may not be invoked on a primitive type.");
@@ -653,7 +653,7 @@ public class EventStateTransitionDialog extends JDialog {
             if (modified) {
                 // check for array index
                 String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
-                if (VGlobals.instance().isArray(typ)) {
+                if (ViskitGlobals.instance().isArray(typ)) {
                     if (arrayIndexField.getText().trim().isEmpty()) {
                         int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
                                 "Using a state variable which is an array" +

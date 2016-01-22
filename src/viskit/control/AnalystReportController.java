@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -46,7 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.log4j.Logger;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
@@ -80,7 +80,7 @@ public class AnalystReportController extends mvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -133,7 +133,7 @@ public class AnalystReportController extends mvcAbstractController {
             }
         }
 
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser openChooser = new JFileChooser(aRDir);
 		openChooser.setDialogTitle("Open Analyst Report");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
@@ -181,7 +181,7 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     public void generateHtmlReport() {
-        if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
+        if (!ViskitGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
                     + " currently selected.  Please select on the <code>Assembly Run </code>panel,"
@@ -199,7 +199,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         outFile = outFile.substring(0, idx) + ".html";
 
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser genChooser = new JFileChooser(aRDir);
         genChooser.setSelectedFile(new File(outFile));
         genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

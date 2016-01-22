@@ -17,8 +17,8 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EvGraphNode;
 import viskit.model.PropChangeEdge;
@@ -118,7 +118,7 @@ public class PclEdgeInspectorDialog extends JDialog {
     }
 
     private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
-        VStatics.clampHeight(tf);
+        ViskitStatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
             ((JTextComponent) tf).setEditable(edit);
@@ -233,16 +233,16 @@ public class PclEdgeInspectorDialog extends JDialog {
             }
 
             try {
-                Class<?> c = VStatics.classForName(classname);
+                Class<?> c = ViskitStatics.classForName(classname);
                 if (c == null) {
                     throw new ClassNotFoundException(classname + " not found");
                 }
 
-                Class<?> stopClass = VStatics.classForName("simkit.BasicSimEntity");
+                Class<?> stopClass = ViskitStatics.classForName("simkit.BasicSimEntity");
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
+                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -85,11 +85,11 @@ import viskit.view.AnalystReportFrame;
  * @since 3:20:33 PM
  * @version $Id$
  */
-public class VGlobals {
+public class ViskitGlobals {
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
-    static final Logger LOG = LogUtils.getLogger(VGlobals.class);
-    private static VGlobals me;
+    static final Logger LOG = LogUtils.getLogger(ViskitGlobals.class);
+    private static ViskitGlobals me;
     private Interpreter interpreter;
     private DefaultComboBoxModel<String> cbMod;
     private JPopupMenu popup;
@@ -113,14 +113,14 @@ public class VGlobals {
     /** The main app JavaHelp set */
     private Help help;
 
-    public static synchronized VGlobals instance() {
+    public static synchronized ViskitGlobals instance() {
         if (me == null) {
-            me = new VGlobals();
+            me = new ViskitGlobals();
         }
         return me;
     }
 
-    private VGlobals() {
+    private ViskitGlobals() {
         cbMod = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
@@ -525,7 +525,7 @@ public class VGlobals {
             isArr = true;
         }
         try {
-            Class<?> c = VStatics.classForName(type);
+            Class<?> c = ViskitStatics.classForName(type);
             if (c != null) {
 
                 Constructor<?>[] constructors = c.getConstructors();
@@ -1060,4 +1060,4 @@ public class VGlobals {
         }
     }
 
-} // end class file VGlobals.java
+} // end class file ViskitGlobals.java

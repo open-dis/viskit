@@ -111,7 +111,7 @@ public class ViskitConfig {
                 Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
             }
             File cGuiSrc;
-            if (VStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
+            if (ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
                 cGuiSrc = new File("configuration/c_gui_mac.xml");
             else
                 cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
@@ -259,8 +259,8 @@ public class ViskitConfig {
             xout.output(doc, new FileWriter(V_CONFIG_FILE));
 
             // For the current Viskit project file
-            doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
-            xout.output(doc, new FileWriter(VGlobals.instance().getCurrentViskitProject().getProjectFile()));
+            doc = FileHandler.unmarshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile());
+            xout.output(doc, new FileWriter(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile()));
         } catch (Exception e) {
             LOG.error("Bad jdom op: " + e.getMessage());
         }

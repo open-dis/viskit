@@ -92,7 +92,7 @@ public class Help {
         CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
 
         icon = new ImageIcon(
-                VGlobals.instance().getWorkClassLoader().getResource(
+                ViskitGlobals.instance().getWorkClassLoader().getResource(
                 "viskit/images/ViskitLogo.png"));
 
         BrowserLauncher bl = new BrowserLauncher(null);

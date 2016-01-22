@@ -11,7 +11,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.model.PropChangeListenerNode;
 import viskit.view.InstantiationPanel;
 
@@ -79,20 +79,20 @@ public class PclNodeInspectorDialog extends JDialog {
                 BorderFactory.createLineBorder(Color.green, 2)));
 
         nameField = new JTextField();
-        VStatics.clampHeight(nameField);
+        ViskitStatics.clampHeight(nameField);
         nameField.addCaretListener(lis);
         nameLabel = new JLabel("name", JLabel.TRAILING);
         nameLabel.setLabelFor(nameField);
 
         descTF = new JTextField();
-        VStatics.clampHeight(descTF);
+        ViskitStatics.clampHeight(descTF);
         descTF.addCaretListener(lis);
         descLab = new JLabel("description", JLabel.TRAILING);
         descLab.setLabelFor(descTF);
 
         typeLab = new JLabel("type", JLabel.TRAILING);
         typeField = new JTextField();
-        VStatics.clampHeight(typeField);
+        ViskitStatics.clampHeight(typeField);
         typeField.setEditable(false);
         typeLab.setLabelFor(typeField);
 
@@ -139,7 +139,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
     private void fillWidgets() throws ClassNotFoundException {
         if (pclNode != null) {
-            myClass = VStatics.classForName(pclNode.getType());
+            myClass = ViskitStatics.classForName(pclNode.getType());
             if (myClass == null) {
                 JOptionPane.showMessageDialog(this, "Class " + pclNode.getType() + " not found.");
                 return;

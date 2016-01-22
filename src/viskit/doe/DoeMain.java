@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import javax.swing.*;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * MOVES Institute
@@ -123,7 +123,7 @@ public class DoeMain implements DoeEvents {
     public static void setLookAndFeel() {
         String laf;
 
-        String os = VStatics.OPERATING_SYSTEM.toLowerCase();
+        String os = ViskitStatics.OPERATING_SYSTEM.toLowerCase();
         if (os.contains("windows")) {
             laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         } else {

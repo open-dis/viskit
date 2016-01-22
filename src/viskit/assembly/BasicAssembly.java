@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -56,8 +56,8 @@ import simkit.random.RandomVariateFactory;
 import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.ViskitConfig;
 import viskit.model.AssemblyNode;
 
@@ -241,7 +241,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                     // This is not a designPoint, so skip
-                    if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
+                    if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                         LOG.debug("SimplePropertyDumper encountered");
                         continue;
                     }
@@ -618,7 +618,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             URL url = null;
             try {
-                url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST
+                url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:");
             } catch (MalformedURLException ex) {
                 LOG.error(ex);
@@ -627,10 +627,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             String msg = "Assembly run aborted.  <br/>Please "
                     + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-            VStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
+            ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
 
             // Comment in to see what the matter is
 //            t.printStackTrace();
@@ -770,7 +770,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                                 // This is not a designPoint, so skip
-                                if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
+                                if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                                     LOG.debug("SimplePropertyDumper encountered");
                                     continue;
                                 }
@@ -809,7 +809,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
-            ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
+            ClassLoader localLoader = ViskitGlobals.instance().getWorkClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);

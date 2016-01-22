@@ -19,8 +19,8 @@ import edu.nps.util.LogUtils;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import simkit.Priority;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
 import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
@@ -334,7 +334,7 @@ public class EdgeInspectorDialog extends JDialog {
         JComboBox<String> jcb = new JComboBox<>(priorityNames);
         priorityList = new ArrayList<>(10);
         try {
-            Class<?> c = VStatics.classForName("simkit.Priority");
+            Class<?> c = ViskitStatics.classForName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
@@ -361,7 +361,7 @@ public class EdgeInspectorDialog extends JDialog {
     private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
         JComboBox<ViskitElement> cb = new JComboBox<>();
 
-        ComboBoxModel<ViskitElement> m = VGlobals.instance().getSimParamsCBModel();
+        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsCBModel();
 
         // First item should be empty to allow for default zero delay
         ((DefaultComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
@@ -385,22 +385,22 @@ public class EdgeInspectorDialog extends JDialog {
 
         java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
         types.addAll(edge.from.getArguments());
-        types.addAll(VGlobals.instance().getSimParametersList());
+        types.addAll(ViskitGlobals.instance().getSimParametersList());
 
         String className;
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (VGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (VGlobals.instance().isArray(typ)) {
+            if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController()).messageUser(
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "
@@ -413,7 +413,7 @@ public class EdgeInspectorDialog extends JDialog {
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 
                 if (!methodNames.contains(method.getName() + "()"))

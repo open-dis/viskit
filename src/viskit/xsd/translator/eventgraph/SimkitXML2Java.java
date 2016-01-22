@@ -10,8 +10,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.eventgraph.*;
 
 /** A generator of source code from Event Graph XML
@@ -93,7 +93,7 @@ public class SimkitXML2Java {
      * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
-        this(VStatics.classForName(
+        this(ViskitStatics.classForName(
                 SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
         setEventGraphFile(new File(xmlFile));
@@ -293,10 +293,10 @@ public class SimkitXML2Java {
                     pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
             } else {
 
-                c = VStatics.classForName(s.getType());
+                c = ViskitStatics.classForName(s.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
-                if (c == null || VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
+                if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
 
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
@@ -1120,7 +1120,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isGeneric(String type) {
-        return VGlobals.instance().isGeneric(type);
+        return ViskitGlobals.instance().isGeneric(type);
     }
 
     private String stripLength(String s) {
@@ -1143,9 +1143,9 @@ public class SimkitXML2Java {
         Class<?> c;
         if (!extendz.contains(".")) {
             unqualifiedExtends = packageName + "." + extendz;
-            c = VStatics.classForName(unqualifiedExtends.split("\\s")[0]);
+            c = ViskitStatics.classForName(unqualifiedExtends.split("\\s")[0]);
         } else {
-            c = VStatics.classForName(extendz.split("\\s")[0]);
+            c = ViskitStatics.classForName(extendz.split("\\s")[0]);
         }
         return c;
     }
@@ -1208,7 +1208,7 @@ public class SimkitXML2Java {
      * @return indication of a match
      */
     private boolean unqualifiedMatch(String fromXml, String fromClazz) {
-        fromClazz = VStatics.convertClassName(fromClazz);
+        fromClazz = ViskitStatics.convertClassName(fromClazz);
         if (fromXml.equals(fromClazz)) {
             return true;
         }
@@ -1243,7 +1243,7 @@ public class SimkitXML2Java {
         Class<?> aClass = null;
 
         try {
-            aClass = VGlobals.instance().getWorkClassLoader().loadClass(c);
+            aClass = ViskitGlobals.instance().getWorkClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
 //            log.error(cnfe);
         }
@@ -1255,7 +1255,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isArray(String a) {
-        return VGlobals.instance().isArray(a);
+        return ViskitGlobals.instance().isArray(a);
     }
 
     /** Report and exit the JVM

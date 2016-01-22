@@ -13,8 +13,8 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.*;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 
 /**
  * A class to present an XML file in a JTree widget
@@ -225,7 +225,7 @@ public class XmlTree extends JTree {
     }
     static int wrapSiz = 50;//100;
     static String nl = System.getProperty("line.separator");
-    static boolean isWindows = VStatics.OPERATING_SYSTEM.toLowerCase().contains("windows");
+    static boolean isWindows = ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("windows");
 
     static private String wrap(String s) {
         if (isWindows) {
@@ -271,7 +271,7 @@ public class XmlTree extends JTree {
                 jfc.showOpenDialog(f);
                 File fil = jfc.getSelectedFile();
                 if (fil == null) {
-                    VGlobals.instance().sysExit(0);
+                    ViskitGlobals.instance().sysExit(0);
                 }
 
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

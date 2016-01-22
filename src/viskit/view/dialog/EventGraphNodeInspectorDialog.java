@@ -12,7 +12,7 @@ import javax.swing.event.CaretListener;
 
 import viskit.model.EvGraphNode;
 import viskit.model.VInstantiator;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -85,18 +85,18 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         handleField = new JTextField();
-        VStatics.clampHeight(handleField);
+        ViskitStatics.clampHeight(handleField);
         handleLab = new JLabel("name", JLabel.TRAILING);
         handleLab.setLabelFor(handleField);
         outputCheck = new JCheckBox("detailed output");
         outputCheck.setToolTipText("Enable a list dump of all entity names to the console");
 
         descField = new JTextField();
-        VStatics.clampHeight(descField);
+        ViskitStatics.clampHeight(descField);
         descLab = new JLabel("description", JLabel.TRAILING);
         descLab.setLabelFor(descField);
 
-        VStatics.cloneSize(handleLab, descLab);    // make handle same size
+        ViskitStatics.cloneSize(handleLab, descLab);    // make handle same size
 
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));

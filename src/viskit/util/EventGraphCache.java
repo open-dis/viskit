@@ -24,7 +24,7 @@
  *
  * TODO:
  *
- * Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+ * Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -70,7 +70,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
@@ -114,7 +114,7 @@ public class EventGraphCache {
     private List<File> eventGraphImageFilesList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
-            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
+            ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
     private Element entityTable;
     private static EventGraphCache me;
 
@@ -165,7 +165,7 @@ public class EventGraphCache {
             getEventGraphImageFilesList().clear();
         }
 
-        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+        setEventGraphFiles(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
 
         Element localRootElement = assemblyDocument.getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");

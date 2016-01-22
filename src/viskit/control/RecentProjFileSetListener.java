@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,8 +43,8 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.view.AssemblyEditViewFrame;
 
@@ -68,7 +68,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
     @Override
     public void listChanged() {
-        AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
+        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Set<File> lis = acontroller.getRecentProjFileSet();
 
         for (JMenu m : openRecentProjMenus) {
@@ -84,7 +84,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
             for (JMenu m : openRecentProjMenus) {
                 String nameOnly = fullPath.getName();
                 Action act = new ParameterizedProjAction(nameOnly);
-                act.putValue(VStatics.FULL_PATH, fullPath);
+                act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath.getPath());
                 m.add(mi);
@@ -95,7 +95,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
             for (JMenu m : openRecentProjMenus) {
                 m.add(new JSeparator());
                 Action act = new ParameterizedProjAction("clear");
-                act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
+                act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
                 m.add(mi);
@@ -111,16 +111,16 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
+            AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;
-            Object obj = getValue(VStatics.FULL_PATH);
+            Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
                 fullPath = new File((String) obj);
             else
                 fullPath = (File) obj;
 
-            if (fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
+            if (fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
                 acontroller.clearRecentProjFileSet();
             } else {
                 acontroller.doProjectCleanup();

@@ -21,7 +21,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import simkit.stat.SampleStatistics;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -231,7 +231,7 @@ public class ReportStatisticsConfig {
             outputter.setFormat(fmt);
 
             // Create a unique file name for each DTG/Location Pair
-            ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+            ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
             File anStatDir = vkp.getAnalystReportStatisticsDir();
 
             String outputFile = (author + assemblyName + "_" + output + ".xml");

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -50,7 +50,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import viskit.util.EventGraphCache;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.mvc.mvcAbstractModel;
@@ -1019,7 +1019,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
-        ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(
+        ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).captureEventGraphImages(
                 evc.getEventGraphFilesList(),
                 evc.getEventGraphImageFilesList());
     }
@@ -1032,14 +1032,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
         String assyFile = assemblyFile.getPath();
         assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
         File assyImage = new File(
-                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
                 assyFile + ".png");
 
         if (!assyImage.getParentFile().exists())
             assyImage.mkdirs();
 
         setAssemblyImageLocation(assyImage.getPath());
-        ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(
+        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
                 assyImage);
     }
 
@@ -1059,7 +1059,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private void captureLocationImage() {
         File locationImage = new File(
-                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
                 assemblyFile.getName() + ".png");
 
         LOG.debug(locationImage);

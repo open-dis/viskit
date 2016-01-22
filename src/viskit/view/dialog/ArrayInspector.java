@@ -9,7 +9,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.model.VInstantiator;
 import viskit.view.ObjListPanel;
 
@@ -43,11 +43,11 @@ public class ArrayInspector extends JDialog {
         JLabel typeLab = new JLabel("Array type", JLabel.TRAILING);
         typeTF = new JTextField();
         typeTF.setEditable(false);
-        VStatics.clampHeight(typeTF);
+        ViskitStatics.clampHeight(typeTF);
         typeLab.setLabelFor(typeTF);
         JLabel countLab = new JLabel("Array length", JLabel.TRAILING);
         sizeTF = new JTextField();
-        VStatics.clampHeight(sizeTF);
+        ViskitStatics.clampHeight(sizeTF);
         countLab.setLabelFor(sizeTF);
 
         JLabel helpLab = new JLabel("");
@@ -109,9 +109,9 @@ public class ArrayInspector extends JDialog {
     String myTyp;
 
     public void setType(String typ) {
-        Class<?> c = VStatics.getClassForInstantiatorType(typ);
+        Class<?> c = ViskitStatics.getClassForInstantiatorType(typ);
 
-        myTyp = VStatics.convertClassName(c.getComponentType().getName());
+        myTyp = ViskitStatics.convertClassName(c.getComponentType().getName());
 
         typeTF.setText(typ);
     }
@@ -141,11 +141,11 @@ public class ArrayInspector extends JDialog {
         }
 
         Vector<Object> v = new Vector<>(sz);
-        if (myTyp.equals(VStatics.RANDOM_VARIATE_CLASS)) {
+        if (myTyp.equals(ViskitStatics.RANDOM_VARIATE_CLASS)) {
             for (int i = 0; i < sz; i++) {
                 v.add(new VInstantiator.Factory(myTyp,
-                        VStatics.RANDOM_VARIATE_FACTORY_CLASS,
-                        VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                        ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS,
+                        ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                         new Vector<>()
                 ));
             }

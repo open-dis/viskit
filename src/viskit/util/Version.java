@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 /**
  * Reads a file assumed to be in the following form (2 lines):
@@ -48,7 +48,7 @@ public class Version {
 
     public Version(String fileName) {
         InputStream versionStream =
-                VGlobals.instance().getWorkClassLoader().getResourceAsStream(fileName);
+                ViskitGlobals.instance().getWorkClassLoader().getResourceAsStream(fileName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(versionStream));
         try {
             versionString = reader.readLine();

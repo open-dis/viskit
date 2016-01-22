@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -80,7 +80,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:27:07 AM
  * @version $Id$
  */
-public class VStatics {
+public class ViskitStatics {
 
     public static boolean debug = false;
 
@@ -100,7 +100,7 @@ public class VStatics {
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
-    static final Logger LOG = LogUtils.getLogger(VStatics.class);
+    static final Logger LOG = LogUtils.getLogger(ViskitStatics.class);
 
     /** Utility method to configure a Viskit project
      *
@@ -266,7 +266,7 @@ public class VStatics {
      */
     public static Class<?> classForName(String s) {
 
-        Class<?> c = cForName(s, VGlobals.instance().getWorkClassLoader());
+        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkClassLoader());
 
         if (c == null) {
             c = tryUnqualifiedName(s);
@@ -296,14 +296,14 @@ public class VStatics {
                 c = tryCommonClasses(s, clsLoader);
                 if (c == null) {
                     try {
-                        c = VGlobals.instance().getWorkClassLoader().loadClass(s);
+                        c = ViskitGlobals.instance().getWorkClassLoader().loadClass(s);
                     } catch (ClassNotFoundException cnfe) {
                         // sometimes happens, ignore
                     }
                 }
             }
         } catch (NoClassDefFoundError e) {
-            ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+            ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s
@@ -462,13 +462,13 @@ public class VStatics {
 
         String userDir = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
-        String workDir = VGlobals.instance().getWorkDirectory().getPath();
+        String workDir = ViskitGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
         Path startingDir;
         String pattern = name + "\\.class";
         Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader)ViskitGlobals.instance().getWorkClassLoader();
         String[] classpaths = loader.getClassPath();
 
         for (String cpath : classpaths) {
@@ -578,7 +578,7 @@ public class VStatics {
 //                ex.printStackTrace();
             } catch (NoSuchFieldException ex) {}
 
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 System.out.println("adding " + type.getName());
                 System.out.println("\t # constructors: " + constr.length);
             }
@@ -587,7 +587,7 @@ public class VStatics {
                 Class<?>[] ptypes = constr[i].getParameterTypes();
                 paramAnnots = constr[i].getDeclaredAnnotations();
                 plist[i] = new ArrayList<>();
-                if (viskit.VStatics.debug) {
+                if (viskit.ViskitStatics.debug) {
                     System.out.println("\t # params " + ptypes.length + " in constructor " + i);
                 }
 
@@ -614,7 +614,7 @@ public class VStatics {
                     }
 
                 } else if (f != null) {
-                    if (viskit.VStatics.debug) {
+                    if (viskit.ViskitStatics.debug) {
                         System.out.println(f + " is a parameterMap");
                     }
                     try {
@@ -641,7 +641,7 @@ public class VStatics {
                                         p.setType(ptype);
 
                                         plist[n].add(p);
-                                        if (viskit.VStatics.debug) {
+                                        if (viskit.ViskitStatics.debug) {
                                             System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
                                         }
                                     } catch (Exception ex) {
@@ -661,7 +661,7 @@ public class VStatics {
                     for (Class<?> ptype : ptypes) {
                         try {
                             Parameter p = of.createParameter();
-                            String ptType = VStatics.convertClassName(ptype.getName());
+                            String ptType = ViskitStatics.convertClassName(ptype.getName());
                             if (ptType.indexOf(".class") > 0) { //??
                                 ptType = ptType.split("\\.")[0];
                             }
@@ -670,7 +670,7 @@ public class VStatics {
                             p.setName("p[" + k++ + "] : ");
                             p.setType(ptType);
                             plist[i].add(p);
-                            if (viskit.VStatics.debug) {
+                            if (viskit.ViskitStatics.debug) {
                                 System.out.println("\t " + p.getName() + p.getType());
                             }
                         } catch (Exception ex) {
@@ -736,7 +736,7 @@ public class VStatics {
         if (debug) {
             System.out.print("number of constructors for " + type + ":");
         }
-        if (VGlobals.instance().isArray(type)) {
+        if (ViskitGlobals.instance().isArray(type)) {
             if (debug) {
                 System.out.print("1");
             }

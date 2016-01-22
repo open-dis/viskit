@@ -39,9 +39,9 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -113,7 +113,7 @@ public class RunnerPanel2 extends JPanel {
 
         JComponent vcrPanel = makeVCRPanel(skipCloseButt);
 
-        Icon npsIcon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
+        Icon npsIcon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
         String npsString = "";
 
         npsLabel = new JLabel(npsString, npsIcon, JLabel.CENTER);
@@ -134,7 +134,7 @@ public class RunnerPanel2 extends JPanel {
         add(leftRightSplit, BorderLayout.CENTER);
 
         // Provide access to Enable Analyst Report checkbox
-        VGlobals.instance().setRunPanel(RunnerPanel2.this);
+        ViskitGlobals.instance().setRunPanel(RunnerPanel2.this);
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButt) {
@@ -146,7 +146,7 @@ public class RunnerPanel2 extends JPanel {
         // TODO:  can a user use this to advance to a certain time in the sim?
         vcrSimTime = new JTextField(10);
         vcrSimTime.setEditable(false);
-        VStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
+        ViskitStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
         JPanel labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrSimTimeLab);
@@ -157,7 +157,7 @@ public class RunnerPanel2 extends JPanel {
         JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
-        VStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
+        ViskitStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrStopTimeLabel);
@@ -177,7 +177,7 @@ public class RunnerPanel2 extends JPanel {
                     }
                 }
             });
-        VStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
+        ViskitStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
         JLabel numRepsLab = new JLabel("# replications: ");
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
@@ -196,7 +196,7 @@ public class RunnerPanel2 extends JPanel {
         verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
         verboseRepNumberTF.addActionListener(lis);
         verboseRepNumberTF.addCaretListener(lis);
-        VStatics.clampSize(verboseRepNumberTF);
+        ViskitStatics.clampSize(verboseRepNumberTF);
         verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
         flowPan.add(verboseRepNumberTF);
 
@@ -231,14 +231,14 @@ public class RunnerPanel2 extends JPanel {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
 
-        vcrStop = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
+        vcrStop = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStop.setToolTipText("Stop the simulation run");
         vcrStop.setEnabled(false);
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
         vcrStop.setText(null);
         buttPan.add(vcrStop);
 
-        vcrRewind = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Rewind24.gif")));
+        vcrRewind = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Rewind24.gif")));
         vcrRewind.setToolTipText("Reset the simulation run");
         vcrRewind.setEnabled(false);
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
@@ -247,7 +247,7 @@ public class RunnerPanel2 extends JPanel {
             buttPan.add(vcrRewind);
         }
 
-        vcrPlay = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
+        vcrPlay = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
         vcrPlay.setToolTipText("Begin or resume the simulation run");
         if (skipCloseButt) {
             vcrPlay.setToolTipText("Begin the simulation run");
@@ -256,7 +256,7 @@ public class RunnerPanel2 extends JPanel {
         vcrPlay.setText(null);
         buttPan.add(vcrPlay);
 
-        vcrStep = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/StepForward24.gif")));
+        vcrStep = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStep.setToolTipText("Step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -106,7 +106,7 @@ public class EventGraphAssemblyComboMain {
 
             URL url = null;
             try {
-                url = new URL("mailto:" + VStatics.VISKIT_MAILING_LIST +
+                url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error&body=log%20output:");
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
@@ -115,10 +115,10 @@ public class EventGraphAssemblyComboMain {
             String msg = "Viskit has experienced a startup glitch.  <br/>Please "
                     + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-            VStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
+            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
         }
     }
 
@@ -143,14 +143,14 @@ public class EventGraphAssemblyComboMain {
 
     private static void createGUI(String[] args) {
 
-        boolean isMac = VStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
+        boolean isMac = ViskitStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
         String initialFile = null;
 
         if (args.length > 0) {
             initialFile = args[0];
         }
 
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             System.out.println("***Inside EventGraphAssembly main: " + args.length);
         }
         setLandFandFonts();
@@ -160,7 +160,7 @@ public class EventGraphAssemblyComboMain {
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
         JFrame mainFrame = new MainFrame(initialFile);
-        VGlobals.instance().setMainAppWindow(mainFrame);
+        ViskitGlobals.instance().setMainAppWindow(mainFrame);
 
         if (isMac) {
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
@@ -187,20 +187,20 @@ public class EventGraphAssemblyComboMain {
 
     private static void setupMacGUI() {
         try {
-            Class<?> applicationListener = VStatics.classForName("com.apple.eawt.ApplicationListener");
+            Class<?> applicationListener = ViskitStatics.classForName("com.apple.eawt.ApplicationListener");
             Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
 
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) {
                     switch (method.getName()) {
                         case "handleQuit":
-                            ((MainFrame)VGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
+                            ((MainFrame)ViskitGlobals.instance().getMainAppWindow()).myQuitAction.actionPerformed(null);
                             break;
                         case "handleAbout":
                             try {
-                                Help help = VGlobals.instance().getHelp();
+                                Help help = ViskitGlobals.instance().getHelp();
                                 help.aboutEventGraphEditor();
-                                Class<?> applicationEventClass = VStatics.classForName("com.apple.eawt.ApplicationEvent");
+                                Class<?> applicationEventClass = ViskitStatics.classForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -211,7 +211,7 @@ public class EventGraphAssemblyComboMain {
                 }
             });
 
-            Class<?> applicationClass = VStatics.classForName("com.apple.eawt.Application");
+            Class<?> applicationClass = ViskitStatics.classForName("com.apple.eawt.Application");
             Object applicationInstance = applicationClass.newInstance();
 
             Method m = applicationClass.getMethod("addApplicationListener", applicationListener);

@@ -16,9 +16,9 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.FindClassesForInterface;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
@@ -110,7 +110,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
@@ -144,9 +144,9 @@ public class FileBasedClassManager {
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = VStatics.resolveParameters(fclass);
+                List<Object>[] pMap = ViskitStatics.resolveParameters(fclass);
                 if (pMap != null && pMap.length > 0)
-                    VStatics.putParameterList(fclass.getName(), pMap);
+                    ViskitStatics.putParameterList(fclass.getName(), pMap);
             }
 
         // TODO: Check if this is really necessary and should be dealt with
@@ -167,7 +167,7 @@ public class FileBasedClassManager {
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = VGlobals.instance().getWorkClassLoader();
+        ClassLoader loader = ViskitGlobals.instance().getWorkClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
@@ -185,7 +185,7 @@ public class FileBasedClassManager {
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
-            VStatics.putParameterList(fclass.getName(), pa);
+            ViskitStatics.putParameterList(fclass.getName(), pa);
 
             LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
@@ -206,7 +206,7 @@ public class FileBasedClassManager {
         }
         try {
             List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 if (cache == null) {
                     LOG.debug("cache " + cache);
                 } else {
@@ -216,13 +216,13 @@ public class FileBasedClassManager {
 
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
-//                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
-//                if (viskit.VStatics.debug) {
+//                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                if (viskit.ViskitStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }
 //                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
 //            }
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("Adding cache " + xmlEg + " " + classFile);
             }
 
@@ -267,7 +267,7 @@ public class FileBasedClassManager {
                 }
             }
             byte[] hash = md.digest();
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
             retVal = new BigInteger(hash).toString(16);
@@ -311,7 +311,7 @@ public class FileBasedClassManager {
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("getCached index at " + index);
                 LOG.debug("will return " + cacheClass.get(index));
             }
@@ -320,7 +320,7 @@ public class FileBasedClassManager {
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheClass.get(index));
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LOG.debug("cachedFile index at " + index);
             LOG.debug("will return " + cachedFile);
         }
@@ -337,7 +337,7 @@ public class FileBasedClassManager {
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("getCachedXml index at " + index);
                 LOG.debug("will return " + cacheXML.get(index));
             }
@@ -346,7 +346,7 @@ public class FileBasedClassManager {
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheXML.get(index));
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LOG.debug("cachedFile index at " + index);
             LOG.debug("will return " + cachedFile);
         }
@@ -380,7 +380,7 @@ public class FileBasedClassManager {
                 boolean didDelete = false;
                 if (deletedCache != null)
                     didDelete = deletedCache.delete();
-                if (viskit.VStatics.debug) {
+                if (viskit.ViskitStatics.debug) {
                     LOG.debug(didDelete + ": cachedFile deleted index at " + index);
                 }
             }

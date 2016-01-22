@@ -16,8 +16,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
@@ -78,7 +78,7 @@ public class SimkitAssemblyXML2Java {
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
-        this(VStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(ViskitStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
     }
 
@@ -233,7 +233,7 @@ public class SimkitAssemblyXML2Java {
 //        printImports(pw);
 //        pw.println();
 
-        if (extendz.equals(VStatics.JAVA_LANG_OBJECT)) {
+        if (extendz.equals(ViskitStatics.JAVA_LANG_OBJECT)) {
             extendz = "";
         } else {
             extendz = "extends" + sp + extendz + sp;
@@ -469,9 +469,9 @@ public class SimkitAssemblyXML2Java {
     String castIfSimEntity(String type) {
         String sret = "";
         try {
-            if ((Class.forName("simkit.SimEntityBase", true, VGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type, true, VGlobals.instance().getWorkClassLoader()))
+            if ((Class.forName("simkit.SimEntityBase", true, ViskitGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type, true, ViskitGlobals.instance().getWorkClassLoader()))
                     ||
-                    (Class.forName("simkit.SimEntity", true, VGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type))) {
+                    (Class.forName("simkit.SimEntity", true, ViskitGlobals.instance().getWorkClassLoader())).isAssignableFrom(Class.forName(type))) {
                 sret = lp + type + rp;
             }
         } catch (ClassNotFoundException cnfe) {
@@ -522,7 +522,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     public boolean isPrimitive(String type) {
-        return VGlobals.instance().isPrimitive(type);
+        return ViskitGlobals.instance().isPrimitive(type);
     }
 
     public boolean isString(String type) {
@@ -530,7 +530,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     public boolean isArray(String type) {
-        return VGlobals.instance().isArray(type);
+        return ViskitGlobals.instance().isArray(type);
     }
 
     void doMultiParameter(MultiParameter p, String indent, PrintWriter pw) {

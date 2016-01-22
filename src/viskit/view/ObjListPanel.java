@@ -23,11 +23,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.model.VInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 
 /**
@@ -66,7 +66,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         shadow = new VInstantiator[sz];
         JComponent[] contentObj = new JComponent[sz];
 
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
@@ -80,7 +80,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
             nameLab[i].setOpaque(true);
             nameLab[i].setBackground(new Color(255, 255, 255, 64));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 System.out.println("really set label " + s);
             }
 
@@ -92,7 +92,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             entryTF[i] = new JTextField(8);
             entryTF[i].setToolTipText("Manually enter/override method "
                     + "arguments here");
-            VStatics.clampHeight(entryTF[i]);
+            ViskitStatics.clampHeight(entryTF[i]);
 
             // Show the formal parameter type in the TF
             jTFText = inst.toString();
@@ -110,7 +110,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             entryTF[i].setText(jTFText);
             entryTF[i].addCaretListener(this);
 
-            Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
+            Class<?> c = ViskitStatics.getClassForInstantiatorType(inst.getType());
 
             if (c == null) {
                 System.err.println("what to do here for " + inst.getType());
@@ -126,7 +126,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     b.setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createEtchedBorder(),
                             BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-                    VStatics.clampSize(b, entryTF[i], b);
+                    ViskitStatics.clampSize(b, entryTF[i], b);
 
                     tinyP.add(b);
                     if (showLabels) {
@@ -203,7 +203,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
         VInstantiator inst = shadow[idx];
 
-        Class<?> c = VStatics.getClassForInstantiatorType(inst.getType());
+        Class<?> c = ViskitStatics.getClassForInstantiatorType(inst.getType());
         if (c == null) {
             System.err.println("what to do here for " + inst.getType());
             return;
@@ -236,7 +236,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             } catch (ClassNotFoundException e1) {
                 String msg = "An object type specified in this element (probably " + inst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
-                ((AssemblyController)VGlobals.instance().getAssemblyEditor().getController()).messageUser(
+                ((AssemblyController)ViskitGlobals.instance().getAssemblyEditor().getController()).messageUser(
                         JOptionPane.ERROR_MESSAGE,
                         e1.getMessage(),
                         msg);

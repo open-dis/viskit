@@ -28,9 +28,9 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -81,7 +81,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         } else {
 
             // For a brand new empty project open a default EG
-            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (egFiles.length == 0) {
                 newEventGraph();
             }
@@ -95,12 +95,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void newProject() {
-        ((AssemblyController)VGlobals.instance().getAssemblyController()).newProject();
+        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
     }
 
     @Override
     public void zipAndMailProject() {
-        ((AssemblyController)VGlobals.instance().getAssemblyController()).zipAndMailProject();
+        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).zipAndMailProject();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Don't allow a new event graph to be created is a current project is
         // not open
-        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
         GraphMetaData oldGmd = null;
         Model viskitModel = (Model) getModel();
@@ -324,7 +324,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
         ofile.delete();
-        AssemblyView view = (AssemblyView) VGlobals.instance().getAssemblyController().getView();
+        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getAssemblyController().getView();
         view.removeEventGraphFromLEGOTree(f);
     }
 
@@ -473,7 +473,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void postQuit() {
-        VGlobals.instance().quitEventGraphEditor();
+        ViskitGlobals.instance().quitEventGraphEditor();
     }
 
     @Override
@@ -563,8 +563,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         GraphMetaData gmd = mod.getMetaData();
 
         // Allow the user to type specific package names
-        String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
+        String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();
@@ -599,7 +599,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated.  model.isDirty will be set from
             // this call.
-            VGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
+            ViskitGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
         }
 
         // Don't watch a an XML file whose source couldn't be compiled correctly
@@ -943,12 +943,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOG.error(fnfe);
         }
 
-        String source = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
+        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +
                     mod.getMetaData().name;
-            VGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
@@ -958,13 +958,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        VGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
+        ViskitGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
     }
 
     @Override
     public void eventList() {
         // not used
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             System.out.println("EventListAction in " + this);
         }
     }

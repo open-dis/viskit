@@ -20,8 +20,8 @@ import org.apache.log4j.Logger;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.AssemblyControllerImpl;
 
 /**
@@ -82,7 +82,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * @param tooltip description for this LEGO tree
      */
     LegoTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
-        this(className, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
+        this(className, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
     /**
@@ -104,7 +104,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         targetClassName = className;
         genericTableToolTip = tooltip;
 
-        targetClass = VStatics.classForName(targetClassName);
+        targetClass = ViskitStatics.classForName(targetClassName);
 
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -129,7 +129,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
 
-        projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+        projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
     }
 
     // beginning of hack to hide the tree rootNode
@@ -334,9 +334,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // dirty won't get set b/c the graph model is null until the
                 // model tab is created and the EG file is opened.  First pass
                 // is only for inclusion in the LEGOs tree
-                if (VGlobals.instance().getActiveEventGraphModel() != null) {
-                    VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
-                    VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
+                if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
+                    ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
+                    ViskitGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
                 }
 
             } catch (Throwable t) {
@@ -383,7 +383,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         try {
             jf = new JarFile(jarFilePath);
         } catch (IOException e) {
-            ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).messageUser(
+            ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "I/O Error", "Error reading " + jarFilePath);
             return;
@@ -410,7 +410,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, targetClass);
         for (Class<?> c : list) {
-            VStatics.resolveParameters(c);
+            ViskitStatics.resolveParameters(c);
         }
 
         // Shorten long path names

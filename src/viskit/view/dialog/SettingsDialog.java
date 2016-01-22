@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -52,10 +52,10 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.configuration.XMLConfiguration;
 import viskit.control.EventGraphController;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 
 /**
@@ -249,12 +249,12 @@ public class SettingsDialog extends JDialog {
         otherPan.add(otherLafRB);
         otherPan.add(Box.createHorizontalStrut(5));
         otherTF = new JTextField();
-        VStatics.clampHeight(otherTF);
+        ViskitStatics.clampHeight(otherTF);
         otherPan.add(otherTF);
         otherPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(otherPan);
         lAndFeelInnerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3,3,3,3)));
-        VStatics.clampHeight(lAndFeelInnerP);
+        ViskitStatics.clampHeight(lAndFeelInnerP);
         lookAndFeelP.add(lAndFeelInnerP);
         lookAndFeelP.add(Box.createVerticalStrut(3));
         lab = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
@@ -326,7 +326,7 @@ public class SettingsDialog extends JDialog {
                 appConfig.setProperty(ViskitConfig.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
             } else if (src == debugMsgsCB) {
                 appConfig.setProperty(ViskitConfig.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
-                VStatics.debug = debugMsgsCB.isSelected();
+                ViskitStatics.debug = debugMsgsCB.isSelected();
             } else if (src == analystReportCB) {
                 appConfig.setProperty(ViskitConfig.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
             } else if (src == doeCB) {
@@ -341,7 +341,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphController();
+            EventGraphController ctrlr = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
             ctrlr.clearRecentEGFileSet();
         }
     }
@@ -350,7 +350,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyController aCtrlr = (AssemblyController) VGlobals.instance().getAssemblyController();
+            AssemblyController aCtrlr = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
             aCtrlr.clearRecentAssyFileList();
         }
     }
@@ -407,8 +407,8 @@ public class SettingsDialog extends JDialog {
             }
 
             // Incase we have custom jars, need to add these to the ClassLoader
-            VGlobals.instance().resetWorkClassLoader();
-            VGlobals.instance().rebuildLEGOTreePanels();
+            ViskitGlobals.instance().resetWorkClassLoader();
+            ViskitGlobals.instance().rebuildLEGOTreePanels();
             return null;
         }
 
@@ -442,7 +442,7 @@ public class SettingsDialog extends JDialog {
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
         analystReportCB.setSelected(isAnalystReportVisible());
-        debugMsgsCB.setSelected(VStatics.debug = isVerboseDebug());
+        debugMsgsCB.setSelected(ViskitStatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
         if(laf == null || laf.equals(ViskitConfig.LAF_PLATFORM)) {
@@ -627,7 +627,7 @@ public class SettingsDialog extends JDialog {
 
                 // Allow a relative path for Diskit-Test (Diskit)
                 if (path.contains("..")) {
-                    file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+                    file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
                 }
             }
             if (file.exists()) {

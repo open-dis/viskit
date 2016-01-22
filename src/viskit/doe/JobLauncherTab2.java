@@ -161,27 +161,27 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         //clusPan.setBorder(new EtchedBorder());
 
         JLabel clusLab = new JLabel("Target grid engine");
-        VStatics.clampHeight(clusLab);
+        ViskitStatics.clampHeight(clusLab);
         clusterTF = new ttJTextField(15);
         clusterTF.setText(serverCfg);//clusterDNS);
         clusterTF.setToolTipText("dummy"); // overridden
-        VStatics.clampHeight(clusterTF);
+        ViskitStatics.clampHeight(clusterTF);
         JLabel portLab = new JLabel("RPC port");
-        VStatics.clampHeight(portLab);
+        ViskitStatics.clampHeight(portLab);
         portTF = new ttJTextField(10);
         portTF.setToolTipText("dummy"); // overridden
         portTF.setText(portCfg);
-        VStatics.clampHeight(portTF);
+        ViskitStatics.clampHeight(portTF);
         JLabel unameLab = new JLabel("User name");
-        VStatics.clampHeight(unameLab);
-        VStatics.clampMaxSize(unameLab);
+        ViskitStatics.clampHeight(unameLab);
+        ViskitStatics.clampMaxSize(unameLab);
         unameTF = new JTextField(10);
         unameTF.setText(unameDecrCfg);
-        VStatics.clampHeight(unameTF);
+        ViskitStatics.clampHeight(unameTF);
         JLabel upwLab = new JLabel("Password");
         upwPF = new JPasswordField(10);
         upwPF.setText(pwordDecrCfg);
-        VStatics.clampHeight(upwPF);
+        ViskitStatics.clampHeight(upwPF);
         JPanel adminPan = new JPanel();
         adminButt = new JButton("admin");
         adminPan.setLayout(new BoxLayout(adminPan, BoxLayout.X_AXIS));
@@ -346,14 +346,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JPanel vPan = new JPanel();
         vPan.setLayout(new BoxLayout(vPan, BoxLayout.X_AXIS));
-        canButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
+        canButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         canButt.setToolTipText("Stop the Grid run");
         canButt.setEnabled(false);
         canButt.setBorder(BorderFactory.createEtchedBorder());
         canButt.setText(null);
         vPan.add(canButt);
 
-        runButt = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
+        runButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
         runButt.setToolTipText("Begin the Grid run");
         runButt.setBorder(BorderFactory.createEtchedBorder());
         runButt.setText(null);
@@ -776,7 +776,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     // remove, for testing some loader stuff while writing it
     public void runTesting() {
         writeStatus("JobLauncherTab2.run()");
-        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
         //loader.setTab(this);
 
         // loader gets own copy of Viskit's libs, init method here
@@ -799,7 +799,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (gridMode) {
                 doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()));
             } else {
-                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.VGlobals.instance().getWorkDirectory());
+                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
             }
             System.gc();
             qstatConsole.setDoe(doe);
@@ -842,7 +842,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
                     doe.setAssembly(dataS);
 
-                    if (viskit.VStatics.debug) {
+                    if (viskit.ViskitStatics.debug) {
                         writeStatus(dataS);
                     }
 
@@ -1035,7 +1035,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         List content = propCh.getContent();
         Text txt = (Text) content.get(0);
         String cstr = txt.getTextTrim();
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             System.out.println("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
@@ -1392,7 +1392,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         // creating an unmarshaller each time here is supposed to be more thread safe
                         // if slower, however, this only gets hit by the swing thread
                         // unmarshaller = jaxbCtx.createUnmarshaller();
-                        if (viskit.VStatics.debug) {
+                        if (viskit.ViskitStatics.debug) {
                             System.out.println("\tAdding data " + data);
                         }
                         SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));

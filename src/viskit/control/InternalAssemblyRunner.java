@@ -51,8 +51,8 @@ import javax.swing.*;
 import org.apache.log4j.Logger;
 import simkit.Schedule;
 import viskit.util.TitleListener;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
 import viskit.model.AnalystReportModel;
@@ -128,7 +128,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(OFF);
 
         // Viskit's current working ClassLoader
-        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
+        lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
     }
 
     public JComponent getRunnerPanel() {return runPanel;}
@@ -163,7 +163,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         try {
             fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
-            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).messageUser(
+            ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage());
@@ -176,7 +176,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private void fillRepWidgetsFromPreRunAssy(boolean verbose, double stopTime) throws Throwable {
 
-        assemblyClass = VStatics.classForName(assemblyClassName);
+        assemblyClass = ViskitStatics.classForName(assemblyClassName);
         if (assemblyClass == null) {
             throw new ClassNotFoundException();
         }
@@ -225,8 +225,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
-            VGlobals.instance().resetFreshClassLoader();
-            lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
+            ViskitGlobals.instance().resetFreshClassLoader();
+            lastLoaderWithReset = ViskitGlobals.instance().getFreshClassLoader();
 
             // Test for Bug 1237
 //            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
@@ -261,14 +261,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // enabled nor visible
             if (runPanel.resetSeedStateCB.isSelected()) {
 
-                Class<?> rVFactClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_VARIATE_FACTORY_CLASS);
+                Class<?> rVFactClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumber.invoke(null);
 
                 Method getSeeds = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeeds.invoke(rn);
 
-                Class<?> rNClass = lastLoaderWithReset.loadClass(VStatics.RANDOM_NUMBER_CLASS);
+                Class<?> rNClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
                 Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
                 setSeeds.invoke(rn, seeds);
 
@@ -294,7 +294,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setVerbose.invoke(assemblyInstance, getVerbose());
 
             setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListener.invoke(assemblyInstance, this);
             assemblyRunnable = (Runnable) assemblyInstance;
 
@@ -464,10 +464,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+                saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
                 saveChooser.setDialogTitle("Save Assembly Output");
             }
-            File fil = VGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
+            File fil = ViskitGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
             int retv = saveChooser.showSaveDialog(null);
@@ -502,7 +502,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             return;
         }
 
-        AnalystReportController analystReportController = (AnalystReportController) VGlobals.instance().getAnalystReportController();
+        AnalystReportController analystReportController = (AnalystReportController) ViskitGlobals.instance().getAnalystReportController();
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
 
@@ -649,7 +649,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e)
         {
             File f; // = tmpFile;
-            String osName = VStatics.OPERATING_SYSTEM;
+            String osName = ViskitStatics.OPERATING_SYSTEM;
             String filePath = "";
             String tool;
             if (osName.toLowerCase().contains("win")) {

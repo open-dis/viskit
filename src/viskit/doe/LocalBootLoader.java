@@ -15,65 +15,65 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import org.apache.log4j.Logger;
-import viskit.VGlobals;
-import viskit.VStatics;
+import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
  * class loading that can be used in "Local Grid" mode.
  *
  * In "Remote Grid" mode, Grid nodes can't have already loaded classes
- * from the Viskit panel, not unless we serialize the classes and their
- * instances, which could be problematic.
- *
- * So in Remote ( or Regular ) Grid mode, a class loader
- * called Boot loads up all the Event Graphs from XML, the Assembly,
- * and any jars sent via the XML-RPC call, or any jars packaged within
- * the Gridkit deployment jar.
- *
- * In Local mode, all these classes should be loaded by Viskit already,
- * by DOE time, and we'd like to run a DOE with little interaction from
- * Viskit other than the API's already used for Gridkit, so basically
- * 'logging in' to a local service. It should still build up class definitions
- * from the Assembly XML since in each replication a new class definition
- * of the same type is used.
- *
- * Viskit caches all generated classes in the VGlobals workDirectory,
- * however, it also caches the Assembly classes, which need to be
- * "zero turn-around" for each DesignPoint in the experiment, meaning
- * a class loader has to "forget" the Assembly class each time since
- * the parameters are coded into the class and these change per
- * DesignPoint. Since DesignPoint runs can be done in parallel threads,
- * each thread should own its own individual context instance.
- *
- * This class should read from the workDirectory, discard any Assembly
- * classes, jar the remaining ones or otherwise pass the new directory
- * to the super-class which then adds them to the current context
- * in a disposable manner. Aside from the common runtime classes,
- * the current context class loader should already resolve Viskit specific
- * libs, such as simkit.jar. Then LocalBoot should add all jars found
- * in Viskit's lib before loading the pruned workDirectory and then
- * be ready to accept a modified Assembly; in this way one or many
- * threads can be executed, each with their own LocalBoot context.
- *
- * In other words, this is a two stage process, first capture the cache as
- * last left by Viskit and prune it, then spawn as many threads per
- * DesignPoint modified Assemblies, which inherit stage one context but
- * individually create the second stage. Both stages can be handled by
- * the LocalBootLoader class. The zero'th stage is adding all classes
- * required to run Simkit and the ViskitAssembly.
- *
- * Each thread that uses a LocalBootLoader should set the contextClassLoader
- * to be its own LocalBootLoaders's parent's parent; this should enable multiple
- * threads to use class methods in a unique context, e.g. Schedule.reset();
- *
- * In order to do that, as in create a separate context for Simkit per Thread,
- * without running an external Process, everything must be read into a
- * ClassLoader that has the current Viskit running Thread's parent's
- * contextClassLoader, above from where simkit.jar got loaded in, i.e., the
- * stage prior to reading in the lib directory during JVM initialization. Then
- * each new ClassLoader so constructed can have a unique Simkit run
- * simultaneously. Furthermore, it can now have a unique Assembly per Thread
- * as originally expected.
+ from the Viskit panel, not unless we serialize the classes and their
+ instances, which could be problematic.
+
+ So in Remote ( or Regular ) Grid mode, a class loader
+ called Boot loads up all the Event Graphs from XML, the Assembly,
+ and any jars sent via the XML-RPC call, or any jars packaged within
+ the Gridkit deployment jar.
+
+ In Local mode, all these classes should be loaded by Viskit already,
+ by DOE time, and we'd like to run a DOE with little interaction from
+ Viskit other than the API's already used for Gridkit, so basically
+ 'logging in' to a local service. It should still build up class definitions
+ from the Assembly XML since in each replication a new class definition
+ of the same type is used.
+
+ Viskit caches all generated classes in the ViskitGlobals workDirectory,
+ however, it also caches the Assembly classes, which need to be
+ "zero turn-around" for each DesignPoint in the experiment, meaning
+ a class loader has to "forget" the Assembly class each time since
+ the parameters are coded into the class and these change per
+ DesignPoint. Since DesignPoint runs can be done in parallel threads,
+ each thread should own its own individual context instance.
+
+ This class should read from the workDirectory, discard any Assembly
+ classes, jar the remaining ones or otherwise pass the new directory
+ to the super-class which then adds them to the current context
+ in a disposable manner. Aside from the common runtime classes,
+ the current context class loader should already resolve Viskit specific
+ libs, such as simkit.jar. Then LocalBoot should add all jars found
+ in Viskit's lib before loading the pruned workDirectory and then
+ be ready to accept a modified Assembly; in this way one or many
+ threads can be executed, each with their own LocalBoot context.
+
+ In other words, this is a two stage process, first capture the cache as
+ last left by Viskit and prune it, then spawn as many threads per
+ DesignPoint modified Assemblies, which inherit stage one context but
+ individually create the second stage. Both stages can be handled by
+ the LocalBootLoader class. The zero'th stage is adding all classes
+ required to run Simkit and the ViskitAssembly.
+
+ Each thread that uses a LocalBootLoader should set the contextClassLoader
+ to be its own LocalBootLoaders's parent's parent; this should enable multiple
+ threads to use class methods in a unique context, e.g. Schedule.reset();
+
+ In order to do that, as in create a separate context for Simkit per Thread,
+ without running an external Process, everything must be read into a
+ ClassLoader that has the current Viskit running Thread's parent's
+ contextClassLoader, above from where simkit.jar got loaded in, i.e., the
+ stage prior to reading in the lib directory during JVM initialization. Then
+ each new ClassLoader so constructed can have a unique Simkit run
+ simultaneously. Furthermore, it can now have a unique Assembly per Thread
+ as originally expected.
  *
  * @author Rick Goldberg
  * @since December 27, 2006, 11:47 AM
@@ -98,7 +98,7 @@ public class LocalBootLoader extends URLClassLoader {
         super(new URL[] {}, parent);
         extUrls = classes;
         this.workDir = workDir;
-        LogUtils.getLogger(LocalBootLoader.class).debug(VGlobals.instance().printCallerLog());
+        LogUtils.getLogger(LocalBootLoader.class).debug(ViskitGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with the generated
@@ -301,9 +301,9 @@ public class LocalBootLoader extends URLClassLoader {
         while (loop) {
             try {
                 if (reloadSimkit) {
-                    stage1.loadClass(VStatics.RANDOM_VARIATE_CLASS);
+                    stage1.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS);
                 } else {
-                    stage1.loadClass(VStatics.LOCAL_BOOT_LOADER);
+                    stage1.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
