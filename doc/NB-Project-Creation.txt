@@ -1,0 +1,47 @@
+22 JAN 2016
+
+In order to closely study, without the overhead for how Viskit creates and
+runs a project, once a project is produced, it can be easily ported
+over to a NetBeans (or standalone) project, both of which can be launched via
+Apache Ant.
+
+1) Move/Copy the ${myViskitProjects/${projectName}/build/src directory up two
+levels to the ${projectName} directory.  The build/src directory is created by
+Viskit before it generates Java source out of all Event Graph XML files in the
+project and is continually overwritten during Viskit runtime.
+
+2) Modify the assembly source code (now located in ${projectName}src/) as
+detailed here:
+
+In the constructor under setNumberReplications(1), paste:
+        setVerboseReplication(-1);
+        setSaveReplicationData(false);
+        setPrintReplicationReports(true);
+        setPrintSummaryReport(true);
+        setOutputStream(System.out);
+
+These are all Viskit Runtime specific and will cause errors to be thrown when
+run from a standalone (non-Viskit) context if set otherwise.
+
+Modify setStopTime(1000); to the desired # of milliseconds of runtime
+
+3) In the method createDesignPointStats(), comment out
+super.createDesignPointStats().  Again, we are not in the Viskit Runtime
+environment.  We are only using some of Viskit's classpath for standalone
+operation.
+
+4) Copy over Viskit's configuration, Schemas and lib directories into your
+standalone project directory.  It will help to modify two configuration files
+found in the /configuration directory, c_app.xml -> modify the projecthome.path
+and projecthome.name attributes to be the parent directory (use full path names)
+and the project directory name.  For c_gui.xml, modify the projecttitle.name
+attribute to be the same name as the project.name.  This will ensure correct
+viskit.jar use for your standalone project.
+
+5) Next, create a new NetBeans Java project stating "with source code."  Set up
+the classpath to point to the project's "lib" directory.  The viskit.jar will
+also be required in the classpath, but you will not be running Viskit.  It is
+found in Viskit's build/lib directory.  The Assembly source will be your
+project's "Main."
+
+Select "Run" from Netbeans, or type: java -jar YourProjectName.jar into the CLI
