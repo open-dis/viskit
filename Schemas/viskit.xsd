@@ -213,6 +213,32 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:element name="AssemblySchedule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
+      </xs:sequence>
+      <xs:attribute name="delay" default="0.0"/>
+      <xs:attribute name="event" use="required" type="xs:IDREF"/>
+      <xs:attribute name="condition"/>
+      <xs:attribute name="priority" default="DEFAULT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="HIGHEST"/>
+            <xs:enumeration value="HIGHER"/>
+            <xs:enumeration value="HIGH"/>
+            <xs:enumeration value="DEFAULT"/>
+            <xs:enumeration value="LOW"/>
+            <xs:enumeration value="LOWER"/>
+            <xs:enumeration value="LOWEST"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="description"/>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Adapter">
     <xs:complexType>
       <xs:sequence>
@@ -382,19 +408,6 @@
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="head">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="meta"/>
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="meta">
-    <xs:complexType>
-      <xs:attribute name="name" use="required"/>
-      <xs:attribute name="content"/>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="Comment" type="xs:string"/>
   <xs:element name="Parameter">
     <xs:complexType>
@@ -425,10 +438,9 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="LocalVariable"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="StateTransition"/>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="Schedule"/>
+          <xs:element ref="AssemblySchedule"/>
           <xs:element ref="Cancel"/>
         </xs:choice>
-
         <!-- Regardless of this sequence, code blocks will appear in the correct
              place in generated source code -->
         <xs:element minOccurs="0" ref="Code"/>
@@ -459,12 +471,6 @@
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="value"/>
       <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Coordinate">
-    <xs:complexType>
-      <xs:attribute name="x" use="required"/>
-      <xs:attribute name="y" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Operation">
@@ -511,32 +517,6 @@
   <xs:element name="EdgeParameter">
     <xs:complexType>
       <xs:attribute name="value" use="required"/>
-      <xs:attribute name="description"/>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Schedule">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
-      </xs:sequence>
-      <xs:attribute name="delay" default="0.0"/>
-      <xs:attribute name="event" use="required" type="xs:IDREF"/>
-      <xs:attribute name="condition"/>
-      <xs:attribute name="priority" default="DEFAULT">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="HIGHEST"/>
-            <xs:enumeration value="HIGHER"/>
-            <xs:enumeration value="HIGH"/>
-            <xs:enumeration value="DEFAULT"/>
-            <xs:enumeration value="LOW"/>
-            <xs:enumeration value="LOWER"/>
-            <xs:enumeration value="LOWEST"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
