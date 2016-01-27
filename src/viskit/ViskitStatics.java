@@ -557,9 +557,12 @@ public class ViskitStatics {
      * @return a List of parameter map object arrays
      */
     static public List<Object>[] resolveParameters(Class<?> type) {
-        List<Object>[] resolved = parameterMap.get(type.getName());
-        if (debug) {
-            if (resolved != null) {
+        Object testResult = parameterMap.get(type.getName());
+        List<Object>[] resolved = null;
+        if (debug) 
+        {
+            if (testResult != null) {
+                resolved = parameterMap.get(type.getName());
                 System.out.println("parameters already resolved");
             }
         }
