@@ -349,13 +349,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Assemblies", null, null));
-        fileMenu.addSeparator();
-
-        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Assembly Diagram",
-                KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
@@ -377,8 +370,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         ActionIntrospector.getAction(controller, "undo").setEnabled(false);
         ActionIntrospector.getAction(controller, "redo").setEnabled(false);
-        editMenu.addSeparator();
 
+        editMenu.addSeparator();
         // the next four are disabled until something is selected
         editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
@@ -399,8 +392,15 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
         editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
-        editMenu.addSeparator();
 
+        editMenu.addSeparator();
+        editMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
+        editMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
+        editMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Assembly Diagram",
+                KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+
+        editMenu.addSeparator();
         editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         editMenu.addSeparator();

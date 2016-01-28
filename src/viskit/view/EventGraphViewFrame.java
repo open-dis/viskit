@@ -662,13 +662,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         fileMenu.add(buildMenuItem(controller, "close", "Close Event Graph", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Event Graphs", null, null));
-        fileMenu.addSeparator();
-
-        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Event Graph Diagram", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
 
         // Set up edit menu
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -679,8 +672,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         ActionIntrospector.getAction(controller, "undo").setEnabled(false);
         ActionIntrospector.getAction(controller, "redo").setEnabled(false);
-        editMenu.addSeparator();
 
+        editMenu.addSeparator();
         // the next four are disabled until something is selected
         editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
@@ -697,8 +690,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         ActionIntrospector.getAction(controller, "remove").setEnabled(false);
         ActionIntrospector.getAction(controller, "copy").setEnabled(false);
         ActionIntrospector.getAction(controller, "paste").setEnabled(false);
-        editMenu.addSeparator();
 
+        editMenu.addSeparator();
         editMenu.add(buildMenuItem(controller, "newNode", "Add Event Node", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK)));
         editMenu.add(buildMenuItem(controller, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S,
@@ -711,8 +704,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(controller, "newSelfRefSchedulingEdge").setEnabled(false);
         ActionIntrospector.getAction(controller, "newSelfRefCancelingEdge").setEnabled(false);
-        editMenu.addSeparator();
 
+        editMenu.addSeparator();
+        editMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
+        editMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
+        editMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Event Graph Diagram", KeyEvent.VK_I,
+                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
+
+        editMenu.addSeparator();
         editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
 
