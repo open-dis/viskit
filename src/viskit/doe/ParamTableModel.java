@@ -340,10 +340,10 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
 
         fireTableCellUpdated(row, col);
     }
-    OpenAssembly.AssyChangeListener dummyListener = new OpenAssembly.AssyChangeListener() {
+    OpenAssembly.AssemblyChangeListener dummyListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         }
 
         @Override

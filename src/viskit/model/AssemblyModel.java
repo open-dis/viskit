@@ -3,7 +3,7 @@ package viskit.model;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**
@@ -39,7 +39,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * @param node the cached node from parsing the EG directory of the current project
      * @param p the point on the pallete to place the node icon
      */
-    void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
+    void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
     void newPropChangeListener(String widgetName, String className, Point2D p);
 
@@ -49,7 +49,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     void redoPropChangeListener(PropChangeListenerNode node);
 
-    void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
+    void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
     /**
      * Boolean to signify whether the model has been changed since last disk

@@ -60,7 +60,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
 /**
  * Note:  The filechooser stuff is not used since the DOE panel does not expose the corresponding menu items.
  */
-public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssyChangeListener {
+public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssemblyChangeListener {
 
     private JFileChooser openSaveFileChooser;
     private DoeMainFrame doeFrame;
@@ -342,7 +342,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         doeFrame.getModel().saveTableEditsToJaxb();
     }
 
-    public OpenAssembly.AssyChangeListener getOpenAssemblyListener() {
+    public OpenAssembly.AssemblyChangeListener getOpenAssemblyListener() {
         return this;
     }
 
@@ -352,7 +352,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
                 break;

@@ -58,7 +58,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
@@ -106,7 +106,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     // The view needs access to this
     public JButton runButton;
 
-    JMenu openRecentAssyMenu, openRecentProjMenu;
+    JMenu openRecentAssemblyMenu, openRecentProjMenu;
 
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
 
@@ -131,8 +131,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     public AssemblyEditViewFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
-        initMVC(controller);   // set up mvc linkages
-        initUI();   // build widgets
+        initializeMVC(controller);   // set up mvc linkages
+        initializeUserInterface();   // build widgets
     }
 
     public JComponent getContent() {
@@ -151,14 +151,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initializeMVC(mvcController ctrl) {
         setController(ctrl);
     }
 
     /**
      * Initialize the user interface
      */
-    private void initUI() {
+    private void initializeUserInterface() {
 
         buildMenus();
         buildToolbar();
@@ -246,7 +246,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null) {
-                ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
+                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
             GraphMetaData gmd = mod.getMetaData();
@@ -258,38 +258,38 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
     }
 
-    class RecentAssyFileListener implements mvcRecentFileListener {
+    class RecentAssemblyFileListener implements mvcRecentFileListener {
 
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
             Set<File> lis = acontroller.getRecentAssemblyFileSet();
-            openRecentAssyMenu.removeAll();
+            openRecentAssemblyMenu.removeAll();
             for (File fullPath : lis) {
                 if (!fullPath.exists()) {
                     continue;
                 }
                 String nameOnly = fullPath.getName();
-                Action act = new ParameterizedAssyAction(nameOnly);
+                Action act = new ParameterizedAssemblyAction(nameOnly);
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath.getPath());
-                openRecentAssyMenu.add(mi);
+                openRecentAssemblyMenu.add(mi);
             }
             if (lis.size() > 0) {
-                openRecentAssyMenu.add(new JSeparator());
-                Action act = new ParameterizedAssyAction("clear");
+                openRecentAssemblyMenu.add(new JSeparator());
+                Action act = new ParameterizedAssemblyAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                openRecentAssyMenu.add(mi);
+                openRecentAssemblyMenu.add(mi);
             }
         }
     }
 
-    class ParameterizedAssyAction extends javax.swing.AbstractAction {
+    class ParameterizedAssemblyAction extends javax.swing.AbstractAction {
 
-        ParameterizedAssyAction(String s) {
+        ParameterizedAssemblyAction(String s) {
             super(s);
         }
 
@@ -313,9 +313,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     private void buildMenus() {
-        AssemblyController controller = (AssemblyController) getController();
+        AssemblyController assemblyController = (AssemblyController) getController();
 
-        controller.addRecentAssemblyFileSetListener(new RecentAssyFileListener());
+        assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
@@ -331,29 +331,29 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 //        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
 //                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
 		
-        fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
+        fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "open", "Open Assembly", KeyEvent.VK_O,
+        fileMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
+        fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
 
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
-        controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
+        assemblyController.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
-        fileMenu.add(buildMenuItem(controller, "save", "Save Assembly", KeyEvent.VK_S,
+        fileMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
-        fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
+        fileMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Assemblies", null, null));
+        fileMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies", null, null));
 
         // TODO: Unknown as to what this does exactly
-        fileMenu.add(buildMenuItem(controller, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
-        ActionIntrospector.getAction(controller, "export2grid").setEnabled(false);
+        fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
+        ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
 //        fileMenu.addSeparator();
 //
 //        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
@@ -364,48 +364,48 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // Set up edit menu
         editMenu.setMnemonic(KeyEvent.VK_A);
-        editMenu.add(buildMenuItem(controller, "undo", "Undo", KeyEvent.VK_Z,
+        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
-        editMenu.add(buildMenuItem(controller, "redo", "Redo", KeyEvent.VK_Y,
+        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
 
-        ActionIntrospector.getAction(controller, "undo").setEnabled(false);
-        ActionIntrospector.getAction(controller, "redo").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(controller, "cut", "Cut", KeyEvent.VK_X,
+        editMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(controller, "copy", "Copy", KeyEvent.VK_C,
+        editMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(controller, "paste", "Paste Events", KeyEvent.VK_V,
+        editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editMenu.add(buildMenuItem(controller, "remove", "Delete", KeyEvent.VK_DELETE,
+        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
 
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(controller, "cut").setEnabled(false);
-        ActionIntrospector.getAction(controller, "remove").setEnabled(false);
-        ActionIntrospector.getAction(controller, "copy").setEnabled(false);
-        ActionIntrospector.getAction(controller, "paste").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "cut").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "remove").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "copy").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
-        editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
+        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
+        editMenu.add(buildMenuItem(assemblyController, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        editMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+        editMenu.add(buildMenuItem(assemblyController, "showXML", "View Saved XML", KeyEvent.VK_X, null));
+        editMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        editMenu.add(buildMenuItem(controller, "windowImageCapture", "Save Assembly Diagram",
+        editMenu.add(buildMenuItem(assemblyController, "windowImageCapture", "Save Assembly Diagram",
                 KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
+        editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
                 KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
         // Create a new menu bar and add the menus we created above to it
@@ -481,31 +481,35 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // Buttons for what mode we are in
 
-        selectMode = makeJTButton(null, "viskit/images/selectNode.png",
+        selectMode = makeToolbarButton(null, "viskit/images/selectNode.png",
                 "Select items on the graph");
-        Border defBor = selectMode.getBorder();
-        selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
+        Border border = selectMode.getBorder();
+        selectMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        adapterMode = makeJTButton(null, new AdapterIcon(24, 24),
+        adapterMode = makeToolbarButton(null, new AdapterIcon(24, 24),
                 "Connect assembly nodes (event graph instances) with adapter pattern");
-        defBor = adapterMode.getBorder();
-        adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        border = adapterMode.getBorder();
+        adapterMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        simEventListenerMode = makeJTButton(null, new SimEventListenerIcon(24, 24),
+        simEventListenerMode = makeToolbarButton(null, new SimEventListenerIcon(24, 24),
                 "Connect assembly nodes (event graph instances) with a SimEvent listener pattern");
-        defBor = simEventListenerMode.getBorder();
-        simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        border = simEventListenerMode.getBorder();
+        simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeJTButton(null, new PropertyChangeListenerIcon(24, 24),
+        propChangeListenerMode = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity");
-        defBor = propChangeListenerMode.getBorder();
-        propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        border = propChangeListenerMode.getBorder();
+        propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
 
         JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
+
+        JButton saveButton = makeButton(null, "viskit/images/save.png",
+                "Save and compile assembly (Ctrl-S)");
+		saveButton.setSize(new Dimension (24, 24));
 
         Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
         runButton = makeButton(runAction, "viskit/images/Play24.gif",
@@ -534,6 +538,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
+
+        getToolBar().add(new JLabel("Save: "));
+        getToolBar().add(saveButton);
+        getToolBar().addSeparator(new Dimension(24, 24));
         
         JLabel initializeLabel = new JLabel ("  Initialize assembly runner: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
@@ -555,6 +563,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgacw().setScale(Math.max(getCurrentVgacw().getScale() - 0.1d, 0.1d));
+            }
+        });
+        saveButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+			   AssemblyController assemblyController = (AssemblyController) getController();
+               assemblyController.save();
             }
         });
 
@@ -584,7 +600,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         propChangeListenerMode.addActionListener(portsOn);
     }
 
-    private JToggleButton makeJTButton(Action a, String icPath, String tt) {
+    private JToggleButton makeToolbarButton(Action a, String icPath, String tt) {
         JToggleButton jtb;
         if (a != null) {
             jtb = new JToggleButton(a);
@@ -594,7 +610,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         return (JToggleButton) buttonCommon(jtb, icPath, tt);
     }
 
-    private JToggleButton makeJTButton(Action a, Icon ic, String tt) {
+    private JToggleButton makeToolbarButton(Action a, Icon ic, String tt) {
         JToggleButton jtb;
         if (a != null) {
             jtb = new JToggleButton(a);
@@ -822,7 +838,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-                    FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
+                    FileBasedAssemblyNode xn = isFileBasedAssemblyNode(sa[1]);
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
@@ -852,10 +868,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
     }
 
-    private FileBasedAssyNode isFileBasedAssyNode(String s) {
+    private FileBasedAssemblyNode isFileBasedAssemblyNode(String s) {
         try {
-            return FileBasedAssyNode.fromString(s);
-        } catch (FileBasedAssyNode.exception e) {
+            return FileBasedAssemblyNode.fromString(s);
+        } catch (FileBasedAssemblyNode.exception e) {
             return null;
         }
     }
@@ -1049,21 +1065,21 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public File saveFileAsk(String suggName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName) {
         if (assemblyFileChooser == null) {
             assemblyFileChooser = buildOpenSaveChooser();
         }
 
         assemblyFileChooser.setDialogTitle("Save Assembly File"); // TODO distinguish title if saving image
-        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
-        if (!fil.getParentFile().isDirectory()) {
-            fil.getParentFile().mkdirs();
+        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggestedName);
+        if (!file.getParentFile().isDirectory()) {
+             file.getParentFile().mkdirs();
         }
         if (showUniqueName) {
-            fil = getUniqueName(suggName);
+             file = getUniqueName(suggestedName);
         }
 
-        assemblyFileChooser.setSelectedFile(fil);
+        assemblyFileChooser.setSelectedFile(file);
         int retv = assemblyFileChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (assemblyFileChooser.getSelectedFile().exists()) {
@@ -1075,7 +1091,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         // We canceled
-        deleteCanceledSave(fil.getParentFile());
+        deleteCanceledSave(file.getParentFile());
         assemblyFileChooser = null;
         return null;
     }
@@ -1132,9 +1148,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
-        JButton closeButt = new JButton("Close");
+        JButton closeButton = new JButton("Close");
         buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(closeButt);
+        buttonPanel.add(closeButton);
         content.add(buttonPanel, BorderLayout.SOUTH);
 
         //jf.pack();
@@ -1150,7 +1166,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         };
         SwingUtilities.invokeLater(r);
 
-        closeButt.addActionListener(new ActionListener() {
+        closeButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

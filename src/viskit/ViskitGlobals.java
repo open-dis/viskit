@@ -129,8 +129,8 @@ public class ViskitGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    mvcAbstractJFrameView avf;
-    mvcController acont;
+    mvcAbstractJFrameView assemblyEditViewFrame;
+    mvcController assemblyControllerImpl;
     boolean assyFirstRun = false;
 
     /**
@@ -138,7 +138,7 @@ public class ViskitGlobals {
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
     public AssemblyEditViewFrame getAssemblyEditor() {
-        return (AssemblyEditViewFrame) avf;
+        return (AssemblyEditViewFrame) assemblyEditViewFrame;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
@@ -146,44 +146,44 @@ public class ViskitGlobals {
      * @return the component AssemblyEditViewFrame
      */
     public mvcAbstractJFrameView buildAssemblyViewFrame() {
-        acont = new AssemblyControllerImpl();
-        avf = new AssemblyEditViewFrame(acont);
-        acont.setView(avf);
-        return avf;
+        assemblyControllerImpl = new AssemblyControllerImpl();
+        assemblyEditViewFrame = new AssemblyEditViewFrame(assemblyControllerImpl);
+        assemblyControllerImpl.setView(assemblyEditViewFrame);
+        return assemblyEditViewFrame;
     }
 
     /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
     public void rebuildLEGOTreePanels() {
-        ((AssemblyEditViewFrame)avf).rebuildLEGOTreePanels();
+        ((AssemblyEditViewFrame)assemblyEditViewFrame).rebuildLEGOTreePanels();
     }
 
     public AssemblyModel getActiveAssemblyModel() {
-        return (AssemblyModel) acont.getModel();
+        return (AssemblyModel) assemblyControllerImpl.getModel();
     }
 
     public mvcController getAssemblyController() {
-        return acont;
+        return assemblyControllerImpl;
     }
 
     ActionListener defaultAssyQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (avf != null) {
-                avf.setVisible(false);
+            if (assemblyEditViewFrame != null) {
+                assemblyEditViewFrame.setVisible(false);
             }
         }
     };
-    ActionListener assyQuitHandler = defaultAssyQuitHandler;
+    ActionListener assemblyQuitHandler = defaultAssyQuitHandler;
 
     public void quitAssemblyEditor() {
-        if (assyQuitHandler != null) {
-            assyQuitHandler.actionPerformed(new ActionEvent(this, 0, "quit assy editor"));
+        if (assemblyQuitHandler != null) {
+            assemblyQuitHandler.actionPerformed(new ActionEvent(this, 0, "Quit Assembly Editor"));
         }
     }
 
-    public void setAssemblyQuitHandler(ActionListener lis) {
-        assyQuitHandler = lis;
+    public void setAssemblyQuitHandler(ActionListener listener) {
+        assemblyQuitHandler = listener;
     }
 
     /* EventGraphViewFrame / EventGraphControllerImpl */

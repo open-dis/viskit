@@ -41,7 +41,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.util.EventGraphCache;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
@@ -74,7 +74,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 9:26:02 AM
  * @version $Id$
  */
-public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
+public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
@@ -150,7 +150,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
@@ -235,7 +235,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             markAssyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssyWatch(file, mod.getJaxbRoot());
+            initOpenAssemblyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
 
         } else {
@@ -280,21 +280,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param f the XML Assembly file
      * @param jaxbroot the JAXB root of this XML file
      */
-    public void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
+    public void initOpenAssemblyWatch(File f, SimkitAssembly jaxbroot) {
         OpenAssembly.inst().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
-    public OpenAssembly.AssyChangeListener getAssemblyChangeListener() {
+    public OpenAssembly.AssemblyChangeListener getAssemblyChangeListener() {
         return assyChgListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
+    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
+    OpenAssembly.AssemblyChangeListener assyChgListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -363,17 +363,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         assyChgListener.assyChanged(action, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener listener) {
+    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
         OpenAssembly.inst().addListener(listener);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener listener) {
+    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
         OpenAssembly.inst().removeListener(listener);
     }
 
@@ -825,8 +825,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedEventGraphNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -841,7 +841,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
@@ -855,8 +855,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedPropChangeListenerNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedPropChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -871,7 +871,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }

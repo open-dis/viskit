@@ -43,10 +43,10 @@ abstract public class MetaDataDialog extends JDialog {
         this.addWindowListener(new myCloseListener());
 
         //Create and populate the panel.
-        JPanel c = new JPanel();
-        setContentPane(c);
-        c.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+        JPanel metaDataDialogPanel = new JPanel();
+        setContentPane(metaDataDialogPanel);
+        metaDataDialogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        metaDataDialogPanel.setLayout(new BoxLayout(metaDataDialogPanel, BoxLayout.Y_AXIS));
 
         JPanel textFieldPanel = new JPanel(new SpringLayout());
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -96,7 +96,7 @@ abstract public class MetaDataDialog extends JDialog {
 
         Dimension d = textFieldPanel.getPreferredSize();
         textFieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
-        c.add(textFieldPanel);
+        metaDataDialogPanel.add(textFieldPanel);
 
         runtimePanel = new JPanel(new SpringLayout());
         runtimePanel.setBorder(BorderFactory.createTitledBorder("Runtime defaults"));
@@ -119,12 +119,12 @@ abstract public class MetaDataDialog extends JDialog {
         runtimePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
         runtimePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        c.add(runtimePanel);
+        metaDataDialogPanel.add(runtimePanel);
 
         JLabel descriptionLabel = new JLabel("Description");
         descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        c.add(descriptionLabel);
-        c.add(Box.createVerticalStrut(5));
+        metaDataDialogPanel.add(descriptionLabel);
+        metaDataDialogPanel.add(Box.createVerticalStrut(5));
 
         descriptionTextArea = new JTextArea(6, 40);
         descriptionTextArea.setWrapStyleWord(true);
@@ -134,8 +134,8 @@ abstract public class MetaDataDialog extends JDialog {
         descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         descriptionScrollPane.setBorder(authorTf.getBorder());
 
-        c.add(descriptionScrollPane);
-        c.add(Box.createVerticalStrut(5));
+        metaDataDialogPanel.add(descriptionScrollPane);
+        metaDataDialogPanel.add(Box.createVerticalStrut(5));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -147,7 +147,7 @@ abstract public class MetaDataDialog extends JDialog {
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
-        c.add(buttonPanel);
+        metaDataDialogPanel.add(buttonPanel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());

@@ -77,7 +77,7 @@ import viskit.model.AnalystReportModel;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssyChangeListener {
+public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssemblyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
     private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
@@ -119,7 +119,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * @param param the object to act upon
      */
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;

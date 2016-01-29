@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.FindClassesForInterface;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
@@ -43,7 +43,7 @@ public class FileBasedClassManager {
     // Singleton:
     protected static FileBasedClassManager me;
     private static XMLConfiguration projectConfig;
-    private Map<String, FileBasedAssyNode> fileMap;
+    private Map<String, FileBasedAssemblyNode> fileMap;
     private Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
@@ -58,7 +58,7 @@ public class FileBasedClassManager {
 
     private FileBasedClassManager() {
         classMap = new HashMap<>();
-        fileMap = Collections.synchronizedMap(new HashMap<String, FileBasedAssyNode>());
+        fileMap = Collections.synchronizedMap(new HashMap<String, FileBasedAssemblyNode>());
     }
 
     public void addFileClass(Class<?> c) {
@@ -77,11 +77,11 @@ public class FileBasedClassManager {
         return classMap.get(s);
     }
 
-    public void unloadFile(FileBasedAssyNode fban) {
+    public void unloadFile(FileBasedAssemblyNode fban) {
         removeFileClass(fban.loadedClass);
         fileMap.remove(fban.loadedClass);
     }
-    FileBasedAssyNode fban = null;
+    FileBasedAssemblyNode fban = null;
     Class<?> fclass = null;
     JAXBContext jaxbCtx = null;
     Unmarshaller um = null;
@@ -96,7 +96,7 @@ public class FileBasedClassManager {
      * @return a node tree for viewing in the Assembly Editor
      * @throws java.lang.Throwable for a problem finding a class
      */
-    public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
+    public FileBasedAssemblyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
@@ -139,7 +139,7 @@ public class FileBasedClassManager {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-                fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
+                fban = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
 
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
@@ -180,8 +180,8 @@ public class FileBasedClassManager {
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
             fban =  (fXml == null) ?
-                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
-                new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
+                new FileBasedAssemblyNode(paf.f, fclass.getName(), f, paf.pkg) :
+                new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
