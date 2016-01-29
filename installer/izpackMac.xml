@@ -93,6 +93,7 @@
               <include name="viskit/**"/>
               <include name="RELEASE_NOTES*"/>
               <include name="ViskitOperation.txt"/>
+              <include name="NB-Project-Creation.txt"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$USER_HOME">

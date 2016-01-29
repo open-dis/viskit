@@ -148,6 +148,7 @@
         <copy todir="${installers.dir}/stage">
             <fileset dir="${basedir}/doc">
                 <include name="ViskitOperation.txt"/>
+                <include name="NB-Project-Creation.txt"/>
             </fileset>
         </copy>
         <mkdir dir="${installers.dir}/build" />
