@@ -802,7 +802,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Buttons for what mode we are in
 
         addEvent = makeJLabel("viskit/images/eventNode.png",
-                "Drag onto canvas to add new events to the event graph");
+                "Drag a new SimEntity onto canvas to add new events to the event graph");
         addEvent.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
@@ -824,11 +824,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 "Select items on the graph");
 
         arcMode = makeJTButton(null, "viskit/images/schedArc.png",
-                "Connect nodes with a scheduling edge");
+                "Connect SimEntity  nodes with a scheduling edge");
         arcMode.setIcon(new SchedArcIcon());
 
         cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
-                "Connect nodes with a cancelling edge");
+                "Connect SimEntity nodes with a cancelling edge");
         cancelArcMode.setIcon(new CanArcIcon());
 
         modeButtonGroup.add(selectMode);
