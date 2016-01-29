@@ -10,10 +10,10 @@ import java.awt.*;
  * www.nps.navy.edu
  * By:   Mike Bailey
  * Date: May 25, 2004
- * Time: 9:18:11 PM
+ * Time: 9:03:56 PM
  */
 
-public class CanArcIcon implements Icon
+public class SchedulingArcIcon implements Icon
 {
   @Override
   public int getIconHeight()
@@ -40,13 +40,9 @@ public class CanArcIcon implements Icon
     g2d.setColor(Color.black);
     g2d.drawOval(0,15,8,8);
     g2d.drawOval(15,0,8,8);
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
-    g2d.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,
-        10.0f,new float[]{1.0f,1.0f},0.0f));
     g2d.drawLine(12,8,16,8);
     g2d.drawLine(16,8,16,12);
-    g2d.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_BEVEL,
-        10.0f,new float[]{0.5f,0.5f},0.5f));
-    g2d.drawLine(7,17,16,8);
+
+    g2d.drawLine(7,17,17,7);
   }
 }

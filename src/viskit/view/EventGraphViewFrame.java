@@ -23,9 +23,9 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
-import viskit.images.CanArcIcon;
+import viskit.images.CancellationArcIcon;
 import viskit.images.EventNodeIcon;
-import viskit.images.SchedArcIcon;
+import viskit.images.SchedulingArcIcon;
 import viskit.jgraph.VgraphComponentWrapper;
 import viskit.jgraph.vGraphModel;
 import viskit.model.*;
@@ -825,11 +825,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         arcMode = makeJTButton(null, "viskit/images/schedArc.png",
                 "Connect SimEntity  nodes with a scheduling edge");
-        arcMode.setIcon(new SchedArcIcon());
+        arcMode.setIcon(new SchedulingArcIcon());
 
         cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
                 "Connect SimEntity nodes with a cancelling edge");
-        cancelArcMode.setIcon(new CanArcIcon());
+        cancelArcMode.setIcon(new CancellationArcIcon());
 
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(arcMode);

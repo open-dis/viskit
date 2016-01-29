@@ -161,7 +161,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((EventGraphView) getView()).genericAsk("Question", "Save modified graph?"));
+        int yn = (((EventGraphView) getView()).genericAsk("Question", "Save modified event graph?"));
 
         boolean retVal;
 

@@ -67,8 +67,8 @@ import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
-import viskit.images.PropChangListenerImageIcon;
-import viskit.images.PropChangeListenerIcon;
+import viskit.images.PropertyChangListenerImageIcon;
+import viskit.images.PropertyChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
@@ -496,7 +496,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeJTButton(null, new PropChangeListenerIcon(24, 24),
+        propChangeListenerMode = makeJTButton(null, new PropertyChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity");
         defBor = propChangeListenerMode.getBorder();
         propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
@@ -727,7 +727,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
+        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropertyChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         String[] extraCP = SettingsDialog.getExtraClassPath();

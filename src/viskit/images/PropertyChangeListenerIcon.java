@@ -13,10 +13,10 @@ import java.awt.*;
  * Time: 9:18:11 PM
  */
 
-public class PropChangeListenerIcon implements Icon
+public class PropertyChangeListenerIcon implements Icon
 {
   int width,height;
-  public PropChangeListenerIcon(int w, int h)
+  public PropertyChangeListenerIcon(int w, int h)
   {
     width = w;
     height = h;
