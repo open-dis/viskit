@@ -44,14 +44,14 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private GraphMetaData metaData;
 
     /** We require specific order on this Map's contents */
-    private Map<String, AssemblyNode> nodeCache;
-    private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private final Map<String, AssemblyNode> nodeCache;
+    private final String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
-    private AssemblyControllerImpl controller;
+    private final AssemblyControllerImpl assemblyController;
 
     public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
-        controller = (AssemblyControllerImpl) cont;
+        assemblyController = (AssemblyControllerImpl) cont;
         metaData = new GraphMetaData(this);
         nodeCache = new LinkedHashMap<>();
     }
@@ -62,7 +62,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -113,7 +113,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 } catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
-                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "Wrong File Format",
                             "Use the event graph editor to" +
                             "\n" + "work with this file."
@@ -142,7 +142,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
             } catch (JAXBException e) {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                         "XML I/O Error",
                         "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
@@ -173,7 +173,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
@@ -185,7 +185,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
@@ -210,7 +210,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             modelDirty = false;
             currentFile = f;
         } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
                     "Exception on JAXB marshalling" +
                     "\n" + f +
@@ -218,7 +218,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     "\n(check for blank data fields)"
                     );
         } catch (IOException ex) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage());
@@ -239,7 +239,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void externalClassesChanged(Vector<String> v) {
 
     }
-    private char[] hdigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private final char[] hdigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private String _fourHexDigits(int i) {
         char[] ca = new char[4];
@@ -274,7 +274,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
-                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                assemblyController.messageUser(JOptionPane.INFORMATION_MESSAGE,
                         "XML file contains duplicate event name", n.getName() +
                         "\nUnique name substituted.");
                 return false;
@@ -300,7 +300,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newEventGraph(String widgetName, String className, Point2D p) {
-        EvGraphNode node = new EvGraphNode(widgetName, className);
+        EventGraphNode node = new EventGraphNode(widgetName, className);
         if (p == null) {
             node.setPosition(pointLess);
         } else {
@@ -329,7 +329,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoEventGraph(EvGraphNode node) {
+    public void redoEventGraph(EventGraphNode node) {
         SimEntity jaxbEG = oFactory.createSimEntity();
 
         jaxbEG.setName(node.getName());
@@ -345,17 +345,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteEvGraphNode(EvGraphNode evNode) {
-        SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
+    public void deleteEvGraphNode(EventGraphNode eventNode) {
+        SimEntity jaxbEv = (SimEntity) eventNode.opaqueModelObject;
         getNodeCache().remove(jaxbEv.getName());
         jaxbRoot.getSimEntity().remove(jaxbEv);
 
         modelDirty = true;
 
-        if (!controller.isUndo())
-            notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event Graph deleted"));
+        if (!assemblyController.isUndo())
+            notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENTGRAPHDELETED, "Event Graph deleted"));
         else
-            notifyChanged(new ModelEvent(evNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
+            notifyChanged(new ModelEvent(eventNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
     }
 
     @Override
@@ -419,7 +419,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
         else
             notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL, "Property Change Listener undone"));
@@ -560,7 +560,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
         else
             notifyChanged(new ModelEvent(pce, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
@@ -574,7 +574,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
         else
             notifyChanged(new ModelEvent(sele, ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE, "SimEvList edge undone"));
@@ -587,7 +587,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
         else
             notifyChanged(new ModelEvent(ae, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
@@ -605,8 +605,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeAdapterEdge(AdapterEdge ae) {
-        EvGraphNode src = (EvGraphNode) ae.getFrom();
-        EvGraphNode targ = (EvGraphNode) ae.getTo();
+        EventGraphNode src = (EventGraphNode) ae.getFrom();
+        EventGraphNode targ = (EventGraphNode) ae.getTo();
 
         Adapter jaxbAE = (Adapter) ae.opaqueModelObject;
 
@@ -625,8 +625,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeSimEvEdge(SimEvListenerEdge seEdge) {
-        EvGraphNode src = (EvGraphNode) seEdge.getFrom();
-        EvGraphNode targ = (EvGraphNode) seEdge.getTo();
+        EventGraphNode src = (EventGraphNode) seEdge.getFrom();
+        EventGraphNode targ = (EventGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
 
         selc.setListener(targ.getName());
@@ -698,30 +698,30 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changeEvGraphNode(EvGraphNode evNode) {
+    public boolean changeEvGraphNode(EventGraphNode eventNode) {
         boolean retcode = true;
         if (!nameCheck()) {
-            mangleName(evNode);
+            mangleName(eventNode);
             retcode = false;
         }
-        SimEntity jaxbSE = (SimEntity) evNode.opaqueModelObject;
+        SimEntity jaxbSE = (SimEntity) eventNode.opaqueModelObject;
 
-        jaxbSE.setName(evNode.getName());
-        jaxbSE.setType(evNode.getType());
-        jaxbSE.setDescription(evNode.getDescriptionString());
+        jaxbSE.setName(eventNode.getName());
+        jaxbSE.setType(eventNode.getType());
+        jaxbSE.setDescription(eventNode.getDescriptionString());
 
-        double x = evNode.getPosition().getX();
-        double y = evNode.getPosition().getY();
+        double x = eventNode.getPosition().getX();
+        double y = eventNode.getPosition().getY();
         Coordinate coor = oFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
-        evNode.getPosition().setLocation(x, y);
+        eventNode.getPosition().setLocation(x, y);
         jaxbSE.setCoordinate(coor);
 
         List<Object> lis = jaxbSE.getParameters();
         lis.clear();
 
-        VInstantiator inst = evNode.getInstantiator();
+        VInstantiator inst = eventNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the SimEntity object
@@ -738,20 +738,20 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             lis.add(o);
         }
 
-        if (evNode.isOutputMarked()) {
+        if (eventNode.isOutputMarked()) {
             addToOutputList(jaxbSE);
         } else {
             removeFromOutputList(jaxbSE);
         }
 
-        if (evNode.isVerboseMarked()) {
+        if (eventNode.isVerboseMarked()) {
             addToVerboseList(jaxbSE);
         } else {
             removeFromVerboseList(jaxbSE);
         }
 
         modelDirty = true;
-        this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
+        this.notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
         return retcode;
     }
 
@@ -1073,12 +1073,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return pNode;
     }
 
-    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
-        EvGraphNode en = (EvGraphNode) getNodeCache().get(se.getName());
+    private EventGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
+        EventGraphNode en = (EventGraphNode) getNodeCache().get(se.getName());
         if (en != null) {
             return en;
         }
-        en = new EvGraphNode(se.getName(), se.getType());
+        en = new EventGraphNode(se.getName(), se.getType());
 
         Coordinate coor = se.getCoordinate();
         if (coor == null) {

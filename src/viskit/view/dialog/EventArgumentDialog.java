@@ -24,13 +24,13 @@ import viskit.ViskitGlobals;
  */
 public class EventArgumentDialog extends JDialog {
 
-    private JTextField nameField;    // Text field that holds the parameter name
-    private JTextField descriptionField;          // Text field that holds the description
-    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
+    private final JTextField nameField;    // Text field that holds the parameter name
+    private final JTextField descriptionField;          // Text field that holds the description
+    private final JComboBox<String> parameterTypeCombo;    // Editable combo box that lets us select a type
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
     private EventArgument myEA;
-    private JButton okButton,  cancelButton;
+    private final JButton okButton,  cancelButton;
     public static String newName,  newType,  newDescription;
 
     public static boolean showDialog(JFrame f, EventArgument parm) {

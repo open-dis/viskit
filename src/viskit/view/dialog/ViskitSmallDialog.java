@@ -38,12 +38,12 @@ public abstract class ViskitSmallDialog extends JDialog {
     protected static boolean showDialog(String className, JFrame f, Object var) {
         if (dialog == null) {
             try {
-                Class[] args = new Class[] {
+                Class<?>[] args = new Class[] {
                     ViskitStatics.classForName("javax.swing.JFrame"),
                     ViskitStatics.classForName(ViskitStatics.JAVA_LANG_OBJECT)
                 };
                 Class<?> c = ViskitStatics.classForName(className);
-                Constructor constr = c.getDeclaredConstructor(args);
+                Constructor<?> constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
                 LogUtils.getLogger(ViskitSmallDialog.class).error(e);
@@ -94,7 +94,7 @@ public abstract class ViskitSmallDialog extends JDialog {
 
     class enableApplyButtonListener implements ActionListener, DocumentListener {
 
-        private JButton applyButton;
+        private final JButton applyButton;
 
         enableApplyButtonListener(JButton applyButton) {
             this.applyButton = applyButton;
@@ -129,9 +129,9 @@ public abstract class ViskitSmallDialog extends JDialog {
 
     class WindowClosingListener extends WindowAdapter {
 
-        private Component parent;
-        private JButton okButton;
-        private JButton cancelButton;
+        private final Component parent;
+        private final JButton okButton;
+        private final JButton cancelButton;
 
         WindowClosingListener(Component parent, JButton okButton, JButton cancelButton) {
             this.parent = parent;

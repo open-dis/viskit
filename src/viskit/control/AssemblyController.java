@@ -93,9 +93,9 @@ public interface AssemblyController {
 
     /** Handles editing of Event Graph nodes
      *
-     * @param evNode the node to edit
+     * @param eventNode the node to edit
      */
-    void evGraphEdit(EvGraphNode evNode);
+    void evGraphEdit(EventGraphNode eventNode);
 
     /** Edits the PropertyChangeListner edge
      *

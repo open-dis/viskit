@@ -10,7 +10,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.model.VInstantiator;
 import viskit.ViskitStatics;
 import viskit.view.InstantiationPanel;
@@ -32,20 +32,20 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
-    private JLabel handleLab; //,outputLab;
-    private JTextField handleField;
+    private final JLabel handleLabel; //,outputLab;
+    private final JTextField handleField;
 
     // verboseCheck not used, does nothing for Viskit
-    private JCheckBox outputCheck /*, verboseCheck*/;
-    private InstantiationPanel ip;
-    private EvGraphNode egNode;
-    private JButton okButton, cancelButton;
-    private enableApplyButtonListener lis;
-    private JPanel buttonPanel;
-    private JTextField descriptionField;
-    private JLabel descriptionLabel;
+    private final JCheckBox outputCheck /*, verboseCheck*/;
+    private InstantiationPanel instantiationPanel;
+    private EventGraphNode eventGraphNode;
+    private final JButton okButton, cancelButton;
+    private final enableApplyButtonListener listener;
+    private final JPanel buttonPanel;
+    private final JTextField descriptionField;
+    private final JLabel descriptionLabel;
 
-    public static boolean showDialog(JFrame f, EvGraphNode parm) {
+    public static boolean showDialog(JFrame f, EventGraphNode parm) {
         try {
             if (dialog == null) {
                 dialog = new EventGraphNodeInspectorDialog(f, parm);
@@ -71,13 +71,13 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventGraphNodeInspectorDialog(JFrame parent, EvGraphNode node) throws ClassNotFoundException {
+    private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException {
         super(parent, "Event Graph Inspector", true);
-        this.egNode = node;
+        this.eventGraphNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        lis = new enableApplyButtonListener();
+        listener = new enableApplyButtonListener();
 
         JPanel content = new JPanel();
         setContentPane(content);
@@ -86,8 +86,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         handleField = new JTextField();
         ViskitStatics.clampHeight(handleField);
-        handleLab = new JLabel("name", JLabel.TRAILING);
-        handleLab.setLabelFor(handleField);
+        handleLabel = new JLabel("name", JLabel.TRAILING);
+        handleLabel.setLabelFor(handleField);
         outputCheck = new JCheckBox("detailed output");
         outputCheck.setToolTipText("Enable a list dump of all entity names to the console");
 
@@ -96,7 +96,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
         descriptionLabel.setLabelFor(descriptionField);
 
-        ViskitStatics.cloneSize(handleLab, descriptionLabel);    // make handle same size
+        ViskitStatics.cloneSize(handleLabel, descriptionLabel);    // make handle same size
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -113,15 +113,15 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        handleField.addCaretListener(lis);
-        descriptionField.addCaretListener(lis);
-        outputCheck.addActionListener(lis);
+        handleField.addCaretListener(listener);
+        descriptionField.addCaretListener(listener);
+        outputCheck.addActionListener(listener);
 
         setParams(parent, node);
     }
 
-    public final void setParams(Component c, EvGraphNode p) throws ClassNotFoundException {
-        egNode = p;
+    public final void setParams(Component c, EventGraphNode p) throws ClassNotFoundException {
+        eventGraphNode = p;
 
         fillWidgets();
         getContentPane().invalidate();
@@ -138,7 +138,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         JPanel bcont = new JPanel();
         bcont.setLayout(new BoxLayout(bcont, BoxLayout.X_AXIS));
-        bcont.add(handleLab);
+        bcont.add(handleLabel);
         bcont.add(Box.createHorizontalStrut(5));
         bcont.add(handleField);
         bcont.add(Box.createHorizontalStrut(2));
@@ -152,23 +152,23 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         dcont.add(descriptionField);
 
         content.add(dcont);
-        ip = new InstantiationPanel(this, lis, true);
+        instantiationPanel = new InstantiationPanel(this, listener, true);
 
-        ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+        instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
-        ip.setAlignmentX(Box.CENTER_ALIGNMENT);
-        content.add(ip);
+        instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
+        content.add(instantiationPanel);
         content.add(Box.createVerticalStrut(5));
         content.add(buttonPanel);
     }
 
     private void fillWidgets() throws ClassNotFoundException {
-        if (egNode != null) {
-            handleField.setText(egNode.getName());
-            outputCheck.setSelected(egNode.isOutputMarked());
-            descriptionField.setText(egNode.getDescriptionString());
-            ip.setData(egNode.getInstantiator());
+        if (eventGraphNode != null) {
+            handleField.setText(eventGraphNode.getName());
+            outputCheck.setSelected(eventGraphNode.isOutputMarked());
+            descriptionField.setText(eventGraphNode.getDescriptionString());
+            instantiationPanel.setData(eventGraphNode.getInstantiator());
         } else {
             handleField.setText("egNode name");
             outputCheck.setSelected(false);
@@ -179,14 +179,14 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private void unloadWidgets() {
         String nm = handleField.getText();
         nm = nm.replaceAll("\\s", "");
-        if (egNode != null) {
-            egNode.setName(nm);
-            egNode.setDescriptionString(descriptionField.getText().trim());
-            egNode.setInstantiator(ip.getData());
-            egNode.setOutputMarked(outputCheck.isSelected());
+        if (eventGraphNode != null) {
+            eventGraphNode.setName(nm);
+            eventGraphNode.setDescriptionString(descriptionField.getText().trim());
+            eventGraphNode.setInstantiator(instantiationPanel.getData());
+            eventGraphNode.setOutputMarked(outputCheck.isSelected());
         } else {
             newName = nm;
-            newInstantiator = ip.getData();
+            newInstantiator = instantiationPanel.getData();
         }
     }
 
@@ -240,8 +240,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     boolean checkBlankFields() {
         VInstantiator vi;
 
-        if (egNode != null) {
-            vi = egNode.getInstantiator();
+        if (eventGraphNode != null) {
+            vi = eventGraphNode.getInstantiator();
         } else {
             vi = newInstantiator;
         }

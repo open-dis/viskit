@@ -230,7 +230,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     AttributeMap m = cc.getAttributes();
                     Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        EvGraphNode en = (EvGraphNode) cc.getUserObject();
+                        EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
@@ -313,7 +313,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     String desc;
                     if (c instanceof AssemblyCircleCell) {
                         AssemblyCircleCell cc = (AssemblyCircleCell) c;
-                        EvGraphNode en = (EvGraphNode) cc.getUserObject();
+                        EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
                         desc = en.getDescriptionString();
@@ -377,8 +377,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         if (view instanceof AssemblyCircleView) {
             AssemblyCircleCell cc = (AssemblyCircleCell) view.getCell();
             Object en = cc.getUserObject();
-            if (en instanceof EvGraphNode) {
-                return ((EvGraphNode) en).getName();
+            if (en instanceof EventGraphNode) {
+                return ((EventGraphNode) en).getName();
             }    // label name is actually gotten in paintComponent
         }
         return null;
@@ -471,7 +471,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
 
         DefaultGraphCell cell;
-        if (node instanceof EvGraphNode) {
+        if (node instanceof EventGraphNode) {
             cell = new AssemblyCircleCell(node);
         } else {
             cell = new AssemblyPropListCell(node);

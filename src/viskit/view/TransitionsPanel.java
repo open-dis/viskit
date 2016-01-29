@@ -153,8 +153,8 @@ public class TransitionsPanel extends JPanel {
      */
     public String getString() {
         String s = "";
-        for (Enumeration en = model.elements(); en.hasMoreElements();) {
-            s += (String) en.nextElement();
+        for (Enumeration<String> en = model.elements(); en.hasMoreElements();) {
+            s += en.nextElement();
             s += "\n";
         }
 

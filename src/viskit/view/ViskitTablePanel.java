@@ -39,10 +39,10 @@ public abstract class ViskitTablePanel extends JPanel {
     private int defaultWidth = 0,  defaultNumRows = 3;
 
     // List has no implemented clone method
-    private ArrayList<ViskitElement> shadow = new ArrayList<>();
-    private ActionListener myEditLis,  myPlusLis,  myMinusLis;
-    private String plusToolTip = "Add a row to this table";
-    private String minusToolTip = "Delete the selected row from this table;";
+    private final ArrayList<ViskitElement> shadow = new ArrayList<>();
+    private ActionListener myEditListener,  myPlusListener,  myMinusListener;
+    private final String  plusToolTip = "Add a row to this table";
+    private final String minusToolTip = "Delete the selected row from this table;";
     private boolean plusMinusEnabled = false;
     private boolean shouldDoAddsAndDeletes = true;
 
@@ -165,7 +165,7 @@ public abstract class ViskitTablePanel extends JPanel {
      * @param edLis
      */
     public void addDoubleClickedListener(ActionListener edLis) {
-        myEditLis = edLis;
+        myEditListener = edLis;
     }
 
     /**
@@ -173,7 +173,7 @@ public abstract class ViskitTablePanel extends JPanel {
      * @param addLis
      */
     public void addPlusListener(ActionListener addLis) {
-        myPlusLis = addLis;
+        myPlusListener = addLis;
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class ViskitTablePanel extends JPanel {
      * @param delLis
      */
     public void addMinusListener(ActionListener delLis) {
-        myMinusLis = delLis;
+        myMinusListener = delLis;
     }
 
     /**
@@ -317,10 +317,10 @@ public abstract class ViskitTablePanel extends JPanel {
      * object to be edited.
      */
     private void doEdit() {
-        if (myEditLis != null) {
+        if (myEditListener != null) {
             Object o = shadow.get(tab.getSelectedRow());
             ActionEvent ae = new ActionEvent(o, 0, "");
-            myEditLis.actionPerformed(ae);
+            myEditListener.actionPerformed(ae);
         }
     }
 
@@ -416,8 +416,8 @@ public abstract class ViskitTablePanel extends JPanel {
         public void actionPerformed(ActionEvent event) {
             switch (event.getActionCommand()) {
                 case "p":
-                    if (myPlusLis != null) {
-                        myPlusLis.actionPerformed(event);
+                    if (myPlusListener != null) {
+                        myPlusListener.actionPerformed(event);
                     }
                     if (shouldDoAddsAndDeletes) {
                         addRow();
@@ -428,9 +428,9 @@ public abstract class ViskitTablePanel extends JPanel {
                     if (reti != JOptionPane.YES_OPTION) {
                         return;
                     }
-                    if (myMinusLis != null) {
+                    if (myMinusListener != null) {
                         event.setSource(shadow.get(tab.getSelectedRow()));
-                        myMinusLis.actionPerformed(event);
+                        myMinusListener.actionPerformed(event);
                     }
 
                     // Begin T/S for Bug 1373.  This process should remove edge

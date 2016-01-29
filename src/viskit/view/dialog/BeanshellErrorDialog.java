@@ -19,18 +19,18 @@ import viskit.ViskitConfig;
  */
 public class BeanshellErrorDialog extends JDialog {
 
-    private JTextArea errorMsg;
+    private final JTextArea errorMessage;
     private boolean returnBool = false;
     private static BeanshellErrorDialog me;
-    private JCheckBox current,  permanent,  nullCB;
-    private JCheckBox selectedButt;
+    private final JCheckBox current,  permanent,  nullCB;
+    private JCheckBox selectedButton;
 
     public static boolean showDialog(String errMsg, Component locationComp) {
         if (me == null) {
             me = new BeanshellErrorDialog();
         }
-        me.errorMsg.setText(errMsg);
-        me.errorMsg.setCaretPosition(0);
+        me.errorMessage.setText(errMsg);
+        me.errorMessage.setCaretPosition(0);
         me.setLocationRelativeTo(locationComp);
         me.setVisible(true);
         return me.returnBool;
@@ -57,11 +57,11 @@ public class BeanshellErrorDialog extends JDialog {
         JLabel lab = new JLabel(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_LABEL), ic, JLabel.LEFT);//"Java language error:"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
-        errorMsg = new JTextArea(4, 40);
-        errorMsg.setLineWrap(true);
-        errorMsg.setWrapStyleWord(true);
-        errorMsg.setBackground(lab.getBackground());      // lose the white
-        JScrollPane jsp = new JScrollPane(errorMsg);
+        errorMessage = new JTextArea(4, 40);
+        errorMessage.setLineWrap(true);
+        errorMessage.setWrapStyleWord(true);
+        errorMessage.setBackground(lab.getBackground());      // lose the white
+        JScrollPane jsp = new JScrollPane(errorMessage);
         jsp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0),
                 BorderFactory.createLineBorder(Color.black, 1)));
         jsp.setAlignmentX(JTextArea.LEFT_ALIGNMENT);
@@ -82,7 +82,7 @@ public class BeanshellErrorDialog extends JDialog {
         current.setSelected(false);
         permanent.setSelected(false);
         nullCB.setSelected(true);
-        selectedButt = nullCB;
+        selectedButton = nullCB;
         ButtonGroup bg = new ButtonGroup();
         bg.add(current);
         bg.add(permanent);
@@ -154,7 +154,7 @@ public class BeanshellErrorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (selectedButt == cb) {// need to turn it off
+            if (selectedButton == cb) {// need to turn it off
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -162,9 +162,9 @@ public class BeanshellErrorDialog extends JDialog {
                         nullCB.setSelected(true);
                     }
                 });
-                selectedButt = nullCB;
+                selectedButton = nullCB;
             } else {
-                selectedButt = cb;
+                selectedButton = cb;
             }
         }
     }

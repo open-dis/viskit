@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitStatics;
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.model.SimEvListenerEdge;
 
 /**
@@ -122,8 +122,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if(simEvEdge != null) {
-      EvGraphNode egnS = (EvGraphNode)simEvEdge.getFrom();
-      EvGraphNode egnT = (EvGraphNode)simEvEdge.getTo();
+      EventGraphNode egnS = (EventGraphNode)simEvEdge.getFrom();
+      EventGraphNode egnT = (EventGraphNode)simEvEdge.getTo();
       sourceTF.setText(egnS.getName() + " (" + egnS.getType()+")");
       targetTF.setText(egnT.getName() + " (" + egnT.getType()+")");
       descriptionTF  .setText(simEvEdge.getDescriptionString());

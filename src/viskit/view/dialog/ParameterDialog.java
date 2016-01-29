@@ -31,12 +31,12 @@ public class ParameterDialog extends JDialog {
     public static String newName,  newType,  newComment;
     private static int count = 0;
 
-    private JTextField parameterNameField;    // Text field that holds the parameter name
-    private JTextField expressionField;       // Text field that holds the expression
-    private JTextField commentField;          // Text field that holds the comment
-    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
-    private vParameter param;
-    private JButton okButton, cancelButton;
+    private final JTextField parameterNameField;    // Text field that holds the parameter name
+    private final JTextField expressionField;       // Text field that holds the expression
+    private final JTextField commentField;          // Text field that holds the comment
+    private final JComboBox<String> parameterTypeCombo;    // Editable combo box that lets us select a type
+    private vParameter parameter;
+    private final JButton okButton, cancelButton;
 
     public static boolean showDialog(JFrame f, vParameter parm) {
         if (dialog == null) {
@@ -121,7 +121,7 @@ public class ParameterDialog extends JDialog {
     }
 
     public final void setParams(Component c, vParameter p) {
-        param = p;
+        parameter = p;
 
         fillWidgets();
 
@@ -133,10 +133,10 @@ public class ParameterDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        if (param != null) {
-            parameterNameField.setText(param.getName());
-            parameterTypeCombo.setSelectedItem(param.getType());
-            commentField.setText(param.getComment());
+        if (parameter != null) {
+            parameterNameField.setText(parameter.getName());
+            parameterTypeCombo.setSelectedItem(parameter.getType());
+            commentField.setText(parameter.getComment());
         } else {
             parameterNameField.setText("param_" + count++);
             commentField.setText("");
@@ -148,14 +148,14 @@ public class ParameterDialog extends JDialog {
         ty = ViskitGlobals.instance().typeChosen(ty);
         String nm = parameterNameField.getText();
         nm = nm.replaceAll("\\s", "");
-        if (param != null) {
-            param.setName(nm);
+        if (parameter != null) {
+            parameter.setName(nm);
             //
             if (ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
                 ty = "java.lang." + ty;
             }
-            param.setType(ty);
-            param.setComment(commentField.getText());
+            parameter.setType(ty);
+            parameter.setComment(commentField.getText());
         } else {
             newName = nm;
             newType = ty;

@@ -20,10 +20,10 @@ public interface AssemblyView {
     boolean doEditPclNode(PropChangeListenerNode pclNode);
 
     /** Permits user to edit existing entities
-     * @param evNode the event graph node to edit
+     * @param eventNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEvGraphNode(EvGraphNode evNode);
+    boolean doEditEvGraphNode(EventGraphNode eventNode);
 
     boolean doEditPclEdge(PropChangeEdge pclEdge);
 

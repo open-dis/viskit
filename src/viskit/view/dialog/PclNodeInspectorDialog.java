@@ -27,21 +27,21 @@ import viskit.view.InstantiationPanel;
  */
 public class PclNodeInspectorDialog extends JDialog {
 
-    private JLabel nameLabel;
-    private JLabel typeLab;
-    private JTextField nameField;    // Text field that holds the parameter name
-    private JTextField typeField;
+    private final JLabel nameLabel;
+    private final JLabel typeLabel;
+    private final JTextField nameField;    // Text field that holds the parameter name
+    private final JTextField typeField;
     private InstantiationPanel ip;
     private Class<?> myClass;
     private static PclNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeListenerNode pclNode;
-    private JButton okButton, cancelButton;
-    private enableApplyButtonListener lis;
+    private final JButton okButton, cancelButton;
+    private final enableApplyButtonListener lis;
     JPanel buttonPanel;
-    private JCheckBox clearStatsCB, getMeanStatsCB, getCountStatsCB;
-    private JTextField descriptionTF;
-    private JLabel descriptionLabel;
+    private final JCheckBox clearStatisticsCB, getMeanStatisticsCB, getCountStatisticsCB;
+    private final JTextField descriptionTF;
+    private final JLabel descriptionLabel;
 
     public static boolean showDialog(JFrame f, PropChangeListenerNode parm) {
         try {
@@ -90,24 +90,24 @@ public class PclNodeInspectorDialog extends JDialog {
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
         descriptionLabel.setLabelFor(descriptionTF);
 
-        typeLab = new JLabel("type", JLabel.TRAILING);
+        typeLabel = new JLabel("type", JLabel.TRAILING);
         typeField = new JTextField();
         ViskitStatics.clampHeight(typeField);
         typeField.setEditable(false);
-        typeLab.setLabelFor(typeField);
+        typeLabel.setLabelFor(typeField);
 
-        clearStatsCB = new JCheckBox("Clear statistics after each replication");
-        clearStatsCB.setSelected(true); // bug 706
-        clearStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        clearStatsCB.addActionListener(lis);
+        clearStatisticsCB = new JCheckBox("Clear statistics after each replication");
+        clearStatisticsCB.setSelected(true); // bug 706
+        clearStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
+        clearStatisticsCB.addActionListener(lis);
 
-        getMeanStatsCB = new JCheckBox("Obtain mean statistics only");
-        getMeanStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getMeanStatsCB.addActionListener(new getMeanStatsCBListener());
+        getMeanStatisticsCB = new JCheckBox("Obtain mean statistics only");
+        getMeanStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
+        getMeanStatisticsCB.addActionListener(new getMeanStatsCBListener());
 
-        getCountStatsCB = new JCheckBox("Obtain raw count statistics only");
-        getCountStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatsCB.addActionListener(new getCountStatsCBListener());
+        getCountStatisticsCB = new JCheckBox("Obtain raw count statistics only");
+        getCountStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
+        getCountStatisticsCB.addActionListener(new getCountStatsCBListener());
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -167,7 +167,7 @@ public class PclNodeInspectorDialog extends JDialog {
             cont.add(descriptionLabel);
             cont.add(descriptionTF);
 
-            cont.add(typeLab);
+            cont.add(typeLabel);
             cont.add(typeField);
             SpringUtilities.makeCompactGrid(cont, 3, 2, 10, 10, 5, 5);
 
@@ -177,19 +177,19 @@ public class PclNodeInspectorDialog extends JDialog {
              * type is descendent of one of these:
              */
             if (pclNode.isSampleStats()) {
-                clearStatsCB.setSelected(pclNode.isClearStatsAfterEachRun());
-                content.add(clearStatsCB);
+                clearStatisticsCB.setSelected(pclNode.isClearStatsAfterEachRun());
+                content.add(clearStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
             }
 
             // No need to display mean and count CBs for a SPD PCL
             if (!pclNode.getType().contains("SimplePropertyDumper")) {
-                getMeanStatsCB.setSelected(pclNode.isGetMean());
-                content.add(getMeanStatsCB);
+                getMeanStatisticsCB.setSelected(pclNode.isGetMean());
+                content.add(getMeanStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
 
-                getCountStatsCB.setSelected(pclNode.isGetCount());
-                content.add(getCountStatsCB);
+                getCountStatisticsCB.setSelected(pclNode.isGetCount());
+                content.add(getCountStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
             }
 
@@ -210,11 +210,11 @@ public class PclNodeInspectorDialog extends JDialog {
             pclNode.setDescriptionString(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
             if (pclNode.isSampleStats()) {
-                pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
+                pclNode.setClearStatsAfterEachRun(clearStatisticsCB.isSelected());
             }
 
-            pclNode.setGetCount(getCountStatsCB.isSelected());
-            pclNode.setGetMean(getMeanStatsCB.isSelected());
+            pclNode.setGetCount(getCountStatisticsCB.isSelected());
+            pclNode.setGetMean(getMeanStatisticsCB.isSelected());
         }
     }
 
@@ -235,8 +235,8 @@ public class PclNodeInspectorDialog extends JDialog {
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
-            boolean isSelected = getMeanStatsCB.isSelected();
-            getCountStatsCB.setSelected(!isSelected);
+            boolean isSelected = getMeanStatisticsCB.isSelected();
+            getCountStatisticsCB.setSelected(!isSelected);
             caretUpdate(null);
         }
     }
@@ -250,8 +250,8 @@ public class PclNodeInspectorDialog extends JDialog {
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
-            boolean isSelected = getCountStatsCB.isSelected();
-            getMeanStatsCB.setSelected(!isSelected);
+            boolean isSelected = getCountStatisticsCB.isSelected();
+            getMeanStatisticsCB.setSelected(!isSelected);
             caretUpdate(null);
         }
     }

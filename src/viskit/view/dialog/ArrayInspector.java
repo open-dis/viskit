@@ -26,25 +26,25 @@ import viskit.view.ObjListPanel;
 public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
-    private JButton cancelButton,  okButton;
-    private JPanel buttonPanel,  contentP;
-    private JTextField typeTF,  sizeTF;
+    private final JButton cancelButton,  okButton;
+    private final JPanel buttonPanel,  contentPanel;
+    private final JTextField typeTF,  sizeTF;
     private JPanel upPan;
-    private enableApplyButtonListener listnr;
+    private final enableApplyButtonListener listener;
 
     public ArrayInspector(JDialog parent) {
         super(parent, "Array Inspector", true);
-        contentP = new JPanel();
-        contentP.setLayout(new BoxLayout(contentP, BoxLayout.Y_AXIS));
-        contentP.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        setContentPane(contentP);
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setContentPane(contentPanel);
 
         upPan = new JPanel(new SpringLayout());
-        JLabel typeLab = new JLabel("Array type", JLabel.TRAILING);
+        JLabel typeLabel = new JLabel("Array type", JLabel.TRAILING);
         typeTF = new JTextField();
         typeTF.setEditable(false);
         ViskitStatics.clampHeight(typeTF);
-        typeLab.setLabelFor(typeTF);
+        typeLabel.setLabelFor(typeTF);
         JLabel countLab = new JLabel("Array length", JLabel.TRAILING);
         sizeTF = new JTextField();
         ViskitStatics.clampHeight(sizeTF);
@@ -55,7 +55,7 @@ public class ArrayInspector extends JDialog {
         helpTextLabel.setFont(sizeTF.getFont());
         helpLab.setLabelFor(helpTextLabel);
 
-        upPan.add(typeLab);
+        upPan.add(typeLabel);
         upPan.add(typeTF);
         upPan.add(countLab);
         upPan.add(sizeTF);
@@ -73,9 +73,9 @@ public class ArrayInspector extends JDialog {
         buttonPanel.add(okButton);
 
         // attach listeners
-        listnr = new enableApplyButtonListener();
-        typeTF.addCaretListener(listnr);
-        sizeTF.addCaretListener(listnr);
+        listener = new enableApplyButtonListener();
+        typeTF.addCaretListener(listener);
+        sizeTF.addCaretListener(listener);
         sizeTF.addActionListener(new sizeListener());
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
@@ -85,18 +85,18 @@ public class ArrayInspector extends JDialog {
 
     public void setData(List<Object> lis) // of instantiators
     {
-        olp = new ObjListPanel(listnr);
+        olp = new ObjListPanel(listener);
         olp.setDialogInfo((JDialog) getParent());
         olp.setData(lis, false); // don't show the type
 
-        contentP.removeAll();
-        contentP.add(upPan);
-        contentP.add(Box.createVerticalStrut(5));
+        contentPanel.removeAll();
+        contentPanel.add(upPan);
+        contentPanel.add(Box.createVerticalStrut(5));
         JScrollPane jsp = new JScrollPane(olp);
         jsp.getViewport().setPreferredSize(new Dimension(Integer.MAX_VALUE, 240));
-        contentP.add(jsp);
-        contentP.add(Box.createVerticalStrut(5));
-        contentP.add(buttonPanel);
+        contentPanel.add(jsp);
+        contentPanel.add(Box.createVerticalStrut(5));
+        contentPanel.add(buttonPanel);
 
         sizeTF.setText("" + lis.size());
         pack();

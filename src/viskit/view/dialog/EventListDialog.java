@@ -33,9 +33,9 @@ public class EventListDialog extends JDialog {
     private static EventListDialog dialog;
     private static int selection = -1;
     private String[] names;
-    private JButton okButton,  cancelButton;
-    private JList<String> list;
-    private JPanel buttonPanel;
+    private final JButton okButton,  cancelButton;
+    private final JList<String> eventList;
+    private final JPanel buttonPanel;
     public static String newName;
 
     public static int showDialog(Dialog f, String title, String[] names) {
@@ -56,9 +56,9 @@ public class EventListDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        list = new JList<>();
-        list.getSelectionModel().addListSelectionListener(new mySelectionListener());
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        eventList = new JList<>();
+        eventList.getSelectionModel().addListSelectionListener(new mySelectionListener());
+        eventList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -97,15 +97,15 @@ public class EventListDialog extends JDialog {
         if (names != null) {
             DefaultListModel<String> dlm = new myUneditableListModel(names);
             //DefaultTableModel dtm = new myUneditableTableModel(names,colNames);
-            list.setModel(dlm);
-            list.setVisibleRowCount(5);
+            eventList.setModel(dlm);
+            eventList.setVisibleRowCount(5);
         //list.setPreferredScrollableViewportSize(new Dimension(400,200));
         }
         JPanel content = new JPanel();
         content.setLayout(new BorderLayout());
         content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        JScrollPane jsp = new JScrollPane(list);
+        JScrollPane jsp = new JScrollPane(eventList);
         content.add(jsp, BorderLayout.CENTER);
 
         content.add(buttonPanel, BorderLayout.SOUTH);

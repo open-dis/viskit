@@ -55,7 +55,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             }
         } else if (cell instanceof AssemblyCircleCell) {
             Object nodeObj = ((AssemblyCircleCell) cell).getUserObject();
-            cntl.evGraphEdit((EvGraphNode) nodeObj);
+            cntl.evGraphEdit((EventGraphNode) nodeObj);
         } else if (cell instanceof AssemblyPropListCell) {
             Object nodeObj = ((AssemblyPropListCell) cell).getUserObject();
             cntl.pcListenerEdit((PropChangeListenerNode) nodeObj);

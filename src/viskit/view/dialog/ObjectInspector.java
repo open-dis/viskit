@@ -22,18 +22,18 @@ import viskit.view.InstantiationPanel;
 public class ObjectInspector extends JDialog
 {
   public boolean modified = false;
-  private JButton cancelButton,okButton;
-  private JPanel buttonPanel,contentP;
+  private final JButton cancelButton,okButton;
+  private final JPanel buttonPanel,contentPanel;
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 
   public ObjectInspector(JDialog parent)
   {
     super(parent,"Object Inspector",true);
-    contentP = new JPanel();
-    contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
-    contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-    setContentPane(contentP);
+    contentPanel = new JPanel();
+    contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.Y_AXIS));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    setContentPane(contentPanel);
 
     buttonPanel = new JPanel();
     buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -52,15 +52,15 @@ public class ObjectInspector extends JDialog
 
   public void setType(String typ)
   {
-    contentP.removeAll();
+    contentPanel.removeAll();
 
     ip = new InstantiationPanel(this,lis,false,true);  // allow type editing
     ip.setBorder(null);
 
-    contentP.add(ip);
+    contentPanel.add(ip);
     //contentP.add(Box.createVerticalGlue());
-    contentP.add(Box.createVerticalStrut(5));
-    contentP.add(buttonPanel);
+    contentPanel.add(Box.createVerticalStrut(5));
+    contentPanel.add(buttonPanel);
 
     pack();     // do this prior to next
     setLocationRelativeTo(getParent());

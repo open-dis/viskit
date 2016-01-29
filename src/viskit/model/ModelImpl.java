@@ -47,21 +47,21 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
     File currentFile;
-    Map<Event, EventNode> evNodeCache = new HashMap<>();
-    Map<Object, Edge> edgeCache = new HashMap<>();
+    Map<Event, EventNode> eventNodeCache = new HashMap<>();
+    Map<Object, Edge>     edgeCache = new HashMap<>();
     Vector<ViskitElement> stateVariables = new Vector<>();
-    Vector<ViskitElement> simParameters = new Vector<>();
-    private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
-    private String privateIdxVarPrefix = "_idxvar_";
-    private String privateLocVarPrefix = "locvar_";
-    private String stateVarPrefix = "state_";
+    Vector<ViskitElement> simulationParameters = new Vector<>();
+    private final String schemaLocation = XMLValidationTool.EVENT_GRAPH_SCHEMA;
+    private final String privateIndexVariablePrefix = "_idxvar_";
+    private final String privateLocationVariablePrefix = "locvar_";
+    private final String stateVariablePrefix = "state_";
     private GraphMetaData metaData;
-    private EventGraphControllerImpl controller;
+    private final EventGraphControllerImpl eventGraphController;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
     public ModelImpl(mvcController controller) {
-        this.controller = (EventGraphControllerImpl) controller;
+        this.eventGraphController = (EventGraphControllerImpl) controller;
         metaData = new GraphMetaData(this);
     }
 
@@ -72,7 +72,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -105,8 +105,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public boolean newModel(File f) {
         stateVariables.removeAllElements();
-        simParameters.removeAllElements();
-        evNodeCache.clear();
+        simulationParameters.removeAllElements();
+        eventNodeCache.clear();
         edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
 
@@ -144,13 +144,13 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     Unmarshaller um = assyCtx.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.
-                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "Wrong File Format",
                             "Use the assembly editor to" +
                             "\n" + "work with this file."
                             );
                 } catch (JAXBException e) {
-                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "XML I/O Error",
                             "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
@@ -183,7 +183,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, Model.saveModel():" +
                     "\n" + e.getMessage()
@@ -195,7 +195,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
             jaxbRoot.setName(nIe(metaData.name));
             jaxbRoot.setVersion(nIe(metaData.version));
@@ -219,7 +219,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             currentFile = f;
             retVal = true;
         } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
                     "Exception on JAXB marshalling" +
                     "\n" + f.getName() +
@@ -227,7 +227,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     );
             retVal = false;
         } catch (IOException ex) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage()
@@ -255,7 +255,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private EventNode buildNodeFromJaxbEvent(Event ev) {
-        EventNode en = evNodeCache.get(ev);
+        EventNode en = eventNodeCache.get(ev);
         if (en != null) {
             return en;
         }
@@ -263,7 +263,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         jaxbEventToNode(ev, en);
         en.opaqueModelObject = ev;
 
-        evNodeCache.put(ev, en);   // key = ev
+        eventNodeCache.put(ev, en);   // key = ev
 
         // Ensure a unique Event name for XML IDREFs
         if (!nameCheck()) {
@@ -284,7 +284,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
         return sb.toString().trim();
     }
-    private char[] hdigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private final char[] hdigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private String _fourHexDigits(int i) {
         char[] ca = new char[4];
@@ -317,9 +317,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     private boolean nameCheck() {
         Set<String> hs = new HashSet<>(10);
-        for (EventNode en : evNodeCache.values()) {
+        for (EventNode en : eventNodeCache.values()) {
             if (!hs.add(en.getName())) {
-                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                eventGraphController.messageUser(JOptionPane.INFORMATION_MESSAGE,
                         "Duplicate Event Name",
                         "Duplicate event name detected: " + en.getName() +
                         "\nUnique name will be substituted.");
@@ -345,7 +345,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 return false;
             }
         }
-        for (ViskitElement sp : simParameters) {
+        for (ViskitElement sp : simulationParameters) {
             if (!hs.add(sp.getName())) {
                 return false;
             }
@@ -374,7 +374,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         node.getLocalVariables().clear();
         for (LocalVariable lv : event.getLocalVariable()) {
-            if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
+            if (!lv.getName().startsWith(privateIndexVariablePrefix)) {    // only if it's a "public" one
                 EventLocalVariable elv = new EventLocalVariable(
                         lv.getName(), lv.getType(), lv.getValue());
                 elv.setComment(concatStrings(lv.getComment()));
@@ -589,7 +589,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             vParameter vp = new vParameter(p.getName(), p.getType(), c.trim());
             vp.opaqueModelObject = p;
 
-            simParameters.add(vp);
+            simulationParameters.add(vp);
 
             if (!stateVariableParamNameCheck()) {
                 mangleName(vp);
@@ -600,7 +600,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     @Override
     public Vector<ViskitElement> getAllNodes() {
-        return new Vector<ViskitElement>(evNodeCache.values());
+        return new Vector<ViskitElement>(eventNodeCache.values());
     }
 
     // TODO: Known unchecked cast to ViskitElement
@@ -614,7 +614,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @SuppressWarnings("unchecked")
     @Override
     public Vector<ViskitElement> getSimParameters() {
-        return (Vector<ViskitElement>) simParameters.clone();
+        return (Vector<ViskitElement>) simulationParameters.clone();
     }
 
     // parameter mods
@@ -624,7 +624,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         setDirty(true);
 
         vParameter vp = new vParameter(nm, typ, comment);
-        simParameters.add(vp);
+        simulationParameters.add(vp);
 
         if (!stateVariableParamNameCheck()) {
             mangleName(vp);
@@ -655,7 +655,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
         }
         setDirty(true);
-        simParameters.remove(vp);
+        simulationParameters.remove(vp);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
     }
 
@@ -755,7 +755,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         node.setPosition(p);
         Event jaxbEv = oFactory.createEvent();
 
-        evNodeCache.put(jaxbEv, node);   // key = ev
+        eventNodeCache.put(jaxbEv, node);   // key = ev
 
         // Ensure a unique Event name
         if (!nameCheck()) {
@@ -778,7 +778,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public void redoEvent(EventNode node) {
         Event jaxbEv = oFactory.createEvent();
-        evNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
+        eventNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
         jaxbEv.setName(node.getName());
         node.opaqueModelObject = jaxbEv;
         jaxbRoot.getEvent().add(jaxbEv);
@@ -790,12 +790,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public void deleteEvent(EventNode node) {
         Event jaxbEv = (Event) node.opaqueModelObject;
-        evNodeCache.remove(jaxbEv);
+        eventNodeCache.remove(jaxbEv);
         jaxbRoot.getEvent().remove(jaxbEv);
 
         setDirty(true);
 
-        if (!controller.isUndo())
+        if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
         else
             notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone"));
@@ -816,7 +816,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public String generateLocalVariableName() {
         String nm = null;
         do {
-            nm = privateLocVarPrefix + locVarNameSequence++;
+            nm = privateLocationVariablePrefix + locVarNameSequence++;
         } while (!isUniqueLVorIdxVname(nm));
         return nm;
     }
@@ -831,7 +831,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public String generateIndexVariableName() {
         String nm = null;
         do {
-            nm = privateIdxVarPrefix + idxVarNameSequence++;
+            nm = privateIndexVariablePrefix + idxVarNameSequence++;
         } while (!isUniqueLVorIdxVname(nm));
         return nm;
     }
@@ -842,7 +842,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private boolean isUniqueLVorIdxVname(String nm) {
-        for (EventNode event : evNodeCache.values()) {
+        for (EventNode event : eventNodeCache.values()) {
             for (ViskitElement lv : event.getLocalVariables()) {
                 if (lv.getName().equals(nm)) {
                     return false;
@@ -872,7 +872,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         String nm = null;
         int startnum = 0;
         do {
-            nm = stateVarPrefix + startnum++;
+            nm = stateVariablePrefix + startnum++;
         } while (!isUniqueSVname(nm));
         return nm;
     }
@@ -1109,7 +1109,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void deleteSchedulingEdge(Edge edge) {
         _commonEdgeDelete(edge);
 
-        if (!controller.isUndo())
+        if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
         else
             notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Edge undone"));
@@ -1119,7 +1119,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void deleteCancelingEdge(Edge edge) {
         _commonEdgeDelete(edge);
 
-        if (!controller.isUndo())
+        if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
         else
             notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELING_EDGE, "Canceling edge undone"));

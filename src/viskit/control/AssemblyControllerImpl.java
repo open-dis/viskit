@@ -1039,13 +1039,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void evGraphEdit(EvGraphNode evNode) {
+    public void evGraphEdit(EventGraphNode eventNode) {
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditEvGraphNode(evNode);
+            boolean modified = ((AssemblyView) getView()).doEditEvGraphNode(eventNode);
             if (modified) {
-                done = ((AssemblyModel) getModel()).changeEvGraphNode(evNode);
+                done = ((AssemblyModel) getModel()).changeEvGraphNode(eventNode);
             }
         } while (!done);
     }
@@ -1175,7 +1175,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
 
             Point2D p = new Point(x + (offset * copyCount), y + (offset * copyCount));
-            if (o instanceof EvGraphNode) {
+            if (o instanceof EventGraphNode) {
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
@@ -1195,8 +1195,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (Object elem : v) {
             if (elem instanceof AssemblyEdge) {
                 removeEdge((AssemblyEdge) elem);
-            } else if (elem instanceof EvGraphNode) {
-                EvGraphNode en = (EvGraphNode) elem;
+            } else if (elem instanceof EventGraphNode) {
+                EventGraphNode en = (EventGraphNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
@@ -1299,7 +1299,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeListener(node);
             } else {
-                EvGraphNode node = (EvGraphNode) redoGraphCell.getUserObject();
+                EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoEventGraph(node);
             }
         }

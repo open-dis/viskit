@@ -13,10 +13,10 @@ import viskit.xsd.bindings.assembly.SimEntity;
  * @since Mar 8, 2004
  * @since 9:08:08 AM
  * @version $Id$
- *
- * An event as seen by the model (not the view)
+
+ An event as seen by the model (not the view)
  */
-public class EvGraphNode extends AssemblyNode {
+public class EventGraphNode extends AssemblyNode {
 
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
@@ -27,7 +27,7 @@ public class EvGraphNode extends AssemblyNode {
     private String value;
     private String comment;
 
-    EvGraphNode(String name, String type) // package access on constructor
+    EventGraphNode(String name, String type) // package access on constructor
     {
         super(name, type);
     }

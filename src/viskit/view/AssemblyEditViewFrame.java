@@ -869,8 +869,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public boolean doEditEvGraphNode(EvGraphNode evNode) {
-        return EventGraphNodeInspectorDialog.showDialog(this, evNode);
+    public boolean doEditEvGraphNode(EventGraphNode eventNode) {
+        return EventGraphNodeInspectorDialog.showDialog(this, eventNode);
     }
 
     @Override

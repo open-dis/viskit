@@ -20,7 +20,7 @@ import javax.swing.text.JTextComponent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.model.PropChangeEdge;
 import viskit.model.PropChangeListenerNode;
 import viskit.model.ViskitElement;
@@ -37,17 +37,17 @@ import viskit.model.ViskitElement;
  */
 public class PclEdgeInspectorDialog extends JDialog {
 
-    private JLabel sourceLabel,  targetLabel,  propertyLabel,  descriptionLabel;
-    private JTextField sourceTF,  targetTF,  propertyTF,  descriptionTF;
-    private JPanel propertyTFPan;
-    private JLabel emptyLab,  emptyTF;
+    private final JLabel sourceLabel,  targetLabel,  propertyLabel,  descriptionLabel;
+    private final JTextField sourceTF,  targetTF,  propertyTF,  descriptionTF;
+    private final JPanel propertyTFPan;
+    private final JLabel emptyLabel,  emptyTF;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeEdge pclEdge;
-    private JButton okButton,  cancelButton;
-    private JButton propButt;
-    private JPanel buttonPanel;
-    private enableApplyButtonListener lis;
+    private final JButton okButton,  cancelButton;
+    private final JButton propertyButton;
+    private final JPanel buttonPanel;
+    private final enableApplyButtonListener listener;
 
     public static boolean showDialog(JFrame f, PropChangeEdge parm) {
         if (dialog == null) {
@@ -67,14 +67,14 @@ public class PclEdgeInspectorDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        lis = new enableApplyButtonListener();
-        propButt = new JButton("...");
-        propButt.addActionListener(new findPropertiesAction());
-        propButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        listener = new enableApplyButtonListener();
+        propertyButton = new JButton("...");
+        propertyButton.addActionListener(new findPropertiesAction());
+        propertyButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
         sourceLabel = new JLabel("source event graph", JLabel.TRAILING);
         targetLabel = new JLabel("property change listener", JLabel.TRAILING);
         propertyLabel = new JLabel("property", JLabel.TRAILING);
-        emptyLab = new JLabel();
+        emptyLabel = new JLabel();
         descriptionLabel = new JLabel("description");
 
         sourceTF = new JTextField();
@@ -88,12 +88,12 @@ public class PclEdgeInspectorDialog extends JDialog {
         propertyTFPan = new JPanel();
         propertyTFPan.setLayout(new BoxLayout(propertyTFPan, BoxLayout.X_AXIS));
         propertyTFPan.add(propertyTF);
-        propertyTFPan.add(propButt);
+        propertyTFPan.add(propertyButton);
         pairWidgets(sourceLabel, sourceTF, false);
         pairWidgets(targetLabel, targetTF, false);
         pairWidgets(propertyLabel, propertyTFPan, true);
-        propertyTF.addCaretListener(lis);
-        pairWidgets(emptyLab, emptyTF, false);
+        propertyTF.addCaretListener(listener);
+        pairWidgets(emptyLabel, emptyTF, false);
         pairWidgets(descriptionLabel, descriptionTF, true);
 
         buttonPanel = new JPanel();
@@ -123,7 +123,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         if (tf instanceof JTextField) {
             ((JTextComponent) tf).setEditable(edit);
             if (edit) {
-                ((JTextComponent) tf).addCaretListener(lis);
+                ((JTextComponent) tf).addCaretListener(listener);
             }
         }
     }
@@ -165,7 +165,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         cont.add(targetTF);
         cont.add(propertyLabel);
         cont.add(propertyTFPan);
-        cont.add(emptyLab);
+        cont.add(emptyLabel);
         cont.add(emptyTF);
         cont.add(descriptionLabel);
         cont.add(descriptionTF);
@@ -226,7 +226,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             Object o = pclEdge.getFrom();
             String classname = null;
-            if (o instanceof EvGraphNode) {
+            if (o instanceof EventGraphNode) {
                 classname = ((ViskitElement) o).getType();
             } else if (o instanceof PropChangeListenerNode) {
                 classname = ((ViskitElement) o).getType();
