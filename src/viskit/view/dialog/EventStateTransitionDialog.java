@@ -44,7 +44,7 @@ public class EventStateTransitionDialog extends JDialog {
     private JComboBox<String> stateTranMethodsCB, localVarMethodsCB;
     private JRadioButton assTo, opOn;
     private EventStateTransition param;
-    private JButton okButt, canButt;
+    private JButton okButton, cancelButton;
     private JButton newSVButt;
     private JLabel actionLab1, actionLab2, localInvokeDot;
     private JPanel localAssignmentPanel, indexPanel, stateTransInvokePanel, localInvocationPanel;
@@ -186,20 +186,20 @@ public class EventStateTransitionDialog extends JDialog {
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
-        con.add(buttPan);
+        con.add(buttonPanel);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         descriptionField.addCaretListener(lis);
@@ -215,7 +215,7 @@ public class EventStateTransitionDialog extends JDialog {
                 JComboBox cb = (JComboBox) e.getSource();
                 vStateVariable sv = (vStateVariable) cb.getSelectedItem();
                 descriptionField.setText(sv.getComment());
-                okButt.setEnabled(true);
+                okButton.setEnabled(true);
                 indexPanel.setVisible(ViskitGlobals.instance().isArray(sv.getType()));
                 modified = true;
                 pack();
@@ -242,7 +242,7 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                okButt.setEnabled(true);
+                okButton.setEnabled(true);
                 modified = true;
             }
         });
@@ -250,7 +250,7 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                okButt.setEnabled(true);
+                okButton.setEnabled(true);
                 modified = true;
             }
         });
@@ -403,9 +403,9 @@ public class EventStateTransitionDialog extends JDialog {
         if (!allGood) {return;}
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack(); // do this prior to next
         setLocationRelativeTo(c);
     }
@@ -619,7 +619,7 @@ public class EventStateTransitionDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             modified = true;
-            okButt.setEnabled(true);
+            okButton.setEnabled(true);
 
             Dimension d = actionLab1.getPreferredSize();
             if (assTo.isSelected()) {
@@ -679,8 +679,8 @@ public class EventStateTransitionDialog extends JDialog {
             localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
             localInvokeDot.setEnabled(!localInvocationField.getText().isEmpty());
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
             pack();
         }
 
@@ -698,12 +698,12 @@ public class EventStateTransitionDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

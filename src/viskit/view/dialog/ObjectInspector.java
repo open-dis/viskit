@@ -17,13 +17,13 @@ import viskit.view.InstantiationPanel;
  * Date: Jun 16, 2004
  * Time: 3:27:42 PM
  *
- * @version $Id:$
+ * @version $Id$
  */
 public class ObjectInspector extends JDialog
 {
   public boolean modified = false;
-  private JButton canButt,okButt;
-  private JPanel buttPan,contentP;
+  private JButton cancelButton,okButton;
+  private JPanel buttonPanel,contentP;
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 
@@ -35,19 +35,19 @@ public class ObjectInspector extends JDialog
     contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
     setContentPane(contentP);
 
-    buttPan = new JPanel();
-    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-    canButt = new JButton("Cancel");
-    okButt = new JButton("Apply changes");
-    okButt.setEnabled(false);
-    buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttPan.add(canButt);
-    buttPan.add(okButt);
+    buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+    cancelButton = new JButton("Cancel");
+    okButton = new JButton("Apply changes");
+    okButton.setEnabled(false);
+    buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+    buttonPanel.add(cancelButton);
+    buttonPanel.add(okButton);
 
     // attach listeners
     lis = new enableApplyButtonListener();
-    canButt.addActionListener(new cancelButtonListener());
-    okButt.addActionListener(new applyButtonListener());
+    cancelButton.addActionListener(new cancelButtonListener());
+    okButton.addActionListener(new applyButtonListener());
   }
 
   public void setType(String typ)
@@ -60,7 +60,7 @@ public class ObjectInspector extends JDialog
     contentP.add(ip);
     //contentP.add(Box.createVerticalGlue());
     contentP.add(Box.createVerticalStrut(5));
-    contentP.add(buttPan);
+    contentP.add(buttonPanel);
 
     pack();     // do this prior to next
     setLocationRelativeTo(getParent());
@@ -102,8 +102,8 @@ public class ObjectInspector extends JDialog
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
-      okButt.setEnabled(true);
-      getRootPane().setDefaultButton(okButt);
+      okButton.setEnabled(true);
+      getRootPane().setDefaultButton(okButton);
     }
 
     @Override

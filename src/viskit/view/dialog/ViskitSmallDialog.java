@@ -94,10 +94,10 @@ public abstract class ViskitSmallDialog extends JDialog {
 
     class enableApplyButtonListener implements ActionListener, DocumentListener {
 
-        private JButton applyButt;
+        private JButton applyButton;
 
         enableApplyButtonListener(JButton applyButton) {
-            this.applyButt = applyButton;
+            this.applyButton = applyButton;
         }
 
         @Override
@@ -122,21 +122,21 @@ public abstract class ViskitSmallDialog extends JDialog {
 
         private void enableButt() {
             modified = true;
-            applyButt.setEnabled(true);
-            getRootPane().setDefaultButton(applyButt);       // in JDialog
+            applyButton.setEnabled(true);
+            getRootPane().setDefaultButton(applyButton);       // in JDialog
         }
     }
 
     class WindowClosingListener extends WindowAdapter {
 
         private Component parent;
-        private JButton okButt;
-        private JButton cancelButt;
+        private JButton okButton;
+        private JButton cancelButton;
 
-        WindowClosingListener(Component parent, JButton okButt, JButton cancelButt) {
+        WindowClosingListener(Component parent, JButton okButton, JButton cancelButton) {
             this.parent = parent;
-            this.okButt = okButt;
-            this.cancelButt = cancelButt;
+            this.okButton = okButton;
+            this.cancelButton = cancelButton;
         }
 
         @Override
@@ -145,12 +145,12 @@ public abstract class ViskitSmallDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(parent, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    cancelButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                cancelButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

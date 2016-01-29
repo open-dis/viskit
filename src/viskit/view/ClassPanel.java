@@ -38,9 +38,9 @@ public class ClassPanel extends JPanel {
         jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(jsp);
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.add(Box.createHorizontalGlue());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.add(Box.createHorizontalGlue());
         plus = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
         plus.setBorder(null);
         plus.setText(null);
@@ -48,8 +48,8 @@ public class ClassPanel extends JPanel {
         Dimension dd = plus.getPreferredSize();
         plus.setMinimumSize(dd);
         plus.setMaximumSize(dd);
-        buttPan.add(plus);
-        buttPan.add(Box.createHorizontalStrut(10));
+        buttonPanel.add(plus);
+        buttonPanel.add(Box.createHorizontalStrut(10));
 
         minus = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
         minus.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
@@ -61,9 +61,9 @@ public class ClassPanel extends JPanel {
         minus.setMaximumSize(dd);
         minus.setActionCommand("m");
         //minus.setEnabled(false);
-        buttPan.add(minus);
-        buttPan.add(Box.createHorizontalGlue());
-        add(buttPan);
+        buttonPanel.add(minus);
+        buttonPanel.add(Box.createHorizontalGlue());
+        add(buttonPanel);
         minus.addActionListener(new ActionListener() {
 
             @Override

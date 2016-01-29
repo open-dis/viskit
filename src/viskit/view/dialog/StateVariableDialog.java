@@ -35,7 +35,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
     private JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
     private JLabel arrSizeLab;
     private vStateVariable stVar;
-    private JButton okButt,  canButt;
+    private JButton okButton,  cancelButton;
     public static String newName,  newType,  newComment;
     private myFocusListener focList;
     private Component myTyperComponent;       // i.e., the editor of the type JComboBox
@@ -91,22 +91,22 @@ public class StateVariableDialog extends ViskitSmallDialog {
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
-        con.add(buttPan);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        con.add(buttonPanel);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
 
-        enableApplyButtonListener lis = new enableApplyButtonListener(okButt);
+        enableApplyButtonListener lis = new enableApplyButtonListener(okButton);
         stateVarNameField.getDocument().addDocumentListener(lis);//addCaretListener(lis);
         commentField.getDocument().addDocumentListener(lis);// addCaretListener(lis);
         stateVarTypeCombo.addActionListener(lis);
@@ -114,7 +114,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         myTyperComponent = stateVarTypeCombo.getEditor().getEditorComponent();
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowClosingListener(this, okButt, canButt));
+        addWindowListener(new WindowClosingListener(this, okButton, cancelButton));
 
         setParams(parent, param);
     }
@@ -136,12 +136,12 @@ public class StateVariableDialog extends ViskitSmallDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         if (p == null) {
-            getRootPane().setDefaultButton(okButt);
+            getRootPane().setDefaultButton(okButton);
         } else {
-            getRootPane().setDefaultButton(canButt);
+            getRootPane().setDefaultButton(cancelButton);
         }
         pack();
         setLocationRelativeTo(c);

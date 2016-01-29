@@ -47,7 +47,7 @@ public class EdgeInspectorDialog extends JDialog {
     private static boolean allGood;
     private Edge edge;
     private boolean schedulingType = true; // true = scheduling, false = cancelling
-    private JButton canButt, okButt;
+    private JButton cancelButton, okButton;
     private JLabel srcEvent, targEvent;
     private EdgeParametersPanel parameters;
     private ConditionalExpressionPanel conditionalExpressionPanel;
@@ -253,21 +253,21 @@ public class EdgeInspectorDialog extends JDialog {
         twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(canButt);
-        buttPan.add(okButt);
-        twoRowButtonPanel.add(buttPan);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        twoRowButtonPanel.add(buttonPanel);
 
         edgeInspectorPanel.add(twoRowButtonPanel);
         cont.add(edgeInspectorPanel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         final myChangeListener chlis = new myChangeListener();
         descriptionJta.addKeyListener(chlis);
@@ -314,9 +314,9 @@ public class EdgeInspectorDialog extends JDialog {
         if (!allGood) {return;}
 
         modified = false;
-        okButt.setEnabled(false);
+        okButton.setEnabled(false);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -719,8 +719,8 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void stateChanged(ChangeEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
             dotLabel.setVisible(!((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName().isEmpty());
 
             // Set the ComboBox width to accomodate the string length
@@ -767,7 +767,7 @@ public class EdgeInspectorDialog extends JDialog {
     public void setDescription(String s) {
         descriptionJta.setText(s);
         modified = true;
-        okButt.setEnabled(true);
+        okButton.setEnabled(true);
     }
 
     public String getDescription() {
@@ -783,12 +783,12 @@ public class EdgeInspectorDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

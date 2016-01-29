@@ -36,12 +36,12 @@ public class PclNodeInspectorDialog extends JDialog {
     private static PclNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeListenerNode pclNode;
-    private JButton okButt, canButt;
+    private JButton okButton, cancelButton;
     private enableApplyButtonListener lis;
-    JPanel buttPan;
+    JPanel buttonPanel;
     private JCheckBox clearStatsCB, getMeanStatsCB, getCountStatsCB;
-    private JTextField descTF;
-    private JLabel descLab;
+    private JTextField descriptionTF;
+    private JLabel descriptionLabel;
 
     public static boolean showDialog(JFrame f, PropChangeListenerNode parm) {
         try {
@@ -84,11 +84,11 @@ public class PclNodeInspectorDialog extends JDialog {
         nameLabel = new JLabel("name", JLabel.TRAILING);
         nameLabel.setLabelFor(nameField);
 
-        descTF = new JTextField();
-        ViskitStatics.clampHeight(descTF);
-        descTF.addCaretListener(lis);
-        descLab = new JLabel("description", JLabel.TRAILING);
-        descLab.setLabelFor(descTF);
+        descriptionTF = new JTextField();
+        ViskitStatics.clampHeight(descriptionTF);
+        descriptionTF.addCaretListener(lis);
+        descriptionLabel = new JLabel("description", JLabel.TRAILING);
+        descriptionLabel.setLabelFor(descriptionTF);
 
         typeLab = new JLabel("type", JLabel.TRAILING);
         typeField = new JTextField();
@@ -109,17 +109,17 @@ public class PclNodeInspectorDialog extends JDialog {
         getCountStatsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
         getCountStatsCB.addActionListener(new getCountStatsCBListener());
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, lv);
     }
@@ -130,9 +130,9 @@ public class PclNodeInspectorDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -147,7 +147,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
             nameField.setText(pclNode.getName());
             typeField.setText(pclNode.getType());
-            descTF.setText(pclNode.getDescriptionString());
+            descriptionTF.setText(pclNode.getDescriptionString());
 
             ip = new InstantiationPanel(this, lis, true);
             setupIP();
@@ -164,8 +164,8 @@ public class PclNodeInspectorDialog extends JDialog {
             cont.add(nameLabel);
             cont.add(nameField);
 
-            cont.add(descLab);
-            cont.add(descTF);
+            cont.add(descriptionLabel);
+            cont.add(descriptionTF);
 
             cont.add(typeLab);
             cont.add(typeField);
@@ -195,7 +195,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
             content.add(ip);
             content.add(Box.createVerticalStrut(5));
-            content.add(buttPan);
+            content.add(buttonPanel);
             setContentPane(content);
         } else {
             nameField.setText("pclNode name");
@@ -207,7 +207,7 @@ public class PclNodeInspectorDialog extends JDialog {
         nm = nm.replaceAll("\\s", "");
         if (pclNode != null) {
             pclNode.setName(nm);
-            pclNode.setDescriptionString(descTF.getText().trim());
+            pclNode.setDescriptionString(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
             if (pclNode.isSampleStats()) {
                 pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
@@ -230,8 +230,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -245,8 +245,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -281,8 +281,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -299,12 +299,12 @@ public class PclNodeInspectorDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(PclNodeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

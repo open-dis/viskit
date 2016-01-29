@@ -104,7 +104,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public static final int PCL_MODE = 3;
 
     // The view needs access to this
-    public JButton runButt;
+    public JButton runButton;
 
     JMenu openRecentAssyMenu, openRecentProjMenu;
 
@@ -507,7 +507,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 "Zoom out on the graph");
 
         Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
-        runButt = makeButton(runAction, "viskit/images/Play24.gif",
+        runButton = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -537,7 +537,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         JLabel initializeLabel = new JLabel ("  Initialize assembly runner: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
-        getToolBar().add(runButt);
+        getToolBar().add(runButton);
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
@@ -1128,13 +1128,13 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         content.setLayout(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         content.add(xt, BorderLayout.CENTER);
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
         JButton closeButt = new JButton("Close");
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(closeButt);
-        content.add(buttPan, BorderLayout.SOUTH);
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(closeButt);
+        content.add(buttonPanel, BorderLayout.SOUTH);
 
         //jf.pack();
         jf.setSize(475, 500);

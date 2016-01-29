@@ -92,9 +92,9 @@ public abstract class ViskitTablePanel extends JPanel {
 
         if (wantAddDelButts) {// plus, minus and edit buttons
             add(Box.createVerticalStrut(5));
-            JPanel buttPan = new JPanel();
-            buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-            buttPan.add(Box.createHorizontalGlue());
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+            buttonPanel.add(Box.createHorizontalGlue());
             // add button
             plusButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
             plusButt.setBorder(null);
@@ -104,7 +104,7 @@ public abstract class ViskitTablePanel extends JPanel {
             plusButt.setMinimumSize(dd);
             plusButt.setMaximumSize(dd);
             plusButt.setActionCommand("p");
-            buttPan.add(plusButt);
+            buttonPanel.add(plusButt);
             // delete button
             minusButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
             minusButt.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
@@ -116,9 +116,9 @@ public abstract class ViskitTablePanel extends JPanel {
             minusButt.setMaximumSize(dd);
             minusButt.setActionCommand("m");
             minusButt.setEnabled(false);
-            buttPan.add(minusButt);
-            buttPan.add(Box.createHorizontalGlue());
-            add(buttPan);
+            buttonPanel.add(minusButt);
+            buttonPanel.add(Box.createHorizontalGlue());
+            add(buttonPanel);
 
             // install local add, delete handlers
             plusButt.addActionListener(lis);

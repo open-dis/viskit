@@ -26,8 +26,8 @@ import viskit.view.ObjListPanel;
 public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
-    private JButton canButt,  okButt;
-    private JPanel buttPan,  contentP;
+    private JButton cancelButton,  okButton;
+    private JPanel buttonPanel,  contentP;
     private JTextField typeTF,  sizeTF;
     private JPanel upPan;
     private enableApplyButtonListener listnr;
@@ -64,22 +64,22 @@ public class ArrayInspector extends JDialog {
 
         SpringUtilities.makeCompactGrid(upPan, 3, 2, 5, 5, 5, 5);
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
         // attach listeners
         listnr = new enableApplyButtonListener();
         typeTF.addCaretListener(listnr);
         sizeTF.addCaretListener(listnr);
         sizeTF.addActionListener(new sizeListener());
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
-        okButt.setEnabled(false);
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
+        okButton.setEnabled(false);
     }
     ObjListPanel olp;
 
@@ -96,7 +96,7 @@ public class ArrayInspector extends JDialog {
         jsp.getViewport().setPreferredSize(new Dimension(Integer.MAX_VALUE, 240));
         contentP.add(jsp);
         contentP.add(Box.createVerticalStrut(5));
-        contentP.add(buttPan);
+        contentP.add(buttonPanel);
 
         sizeTF.setText("" + lis.size());
         pack();
@@ -179,8 +179,8 @@ public class ArrayInspector extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override

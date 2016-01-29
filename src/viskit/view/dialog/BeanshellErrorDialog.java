@@ -103,19 +103,19 @@ public class BeanshellErrorDialog extends JDialog {
         cbPan.add(permanent);
         p.add(cbPan);
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
-        buttPan.add(Box.createHorizontalGlue());
+        buttonPanel.add(Box.createHorizontalGlue());
         JButton noButton = new JButton("No");
         JButton yesButton = new JButton("Yes");
 
-        buttPan.add(noButton);
-        buttPan.add(yesButton);
+        buttonPanel.add(noButton);
+        buttonPanel.add(yesButton);
 
         p.add(Box.createVerticalStrut(5));
-        p.add(buttPan);
+        p.add(buttonPanel);
 
         setContentPane(p);
         pack();

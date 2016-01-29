@@ -71,8 +71,8 @@ public class SettingsDialog extends JDialog {
 
     private static SettingsDialog dialog;
     private static boolean modified = false;
-    private JButton canButt;
-    private JButton okButt;
+    private JButton cancelButton;
+    private JButton okButton;
     private JTabbedPane tabbedPane;
     private JList<String> classpathAdditionsJlist;
     private JCheckBox eventGraphEditorPreferenceCB;
@@ -116,22 +116,22 @@ public class SettingsDialog extends JDialog {
         tabbedPane = new JTabbedPane();
         buildWidgets();
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Close");
-        buttPan.add(Box.createHorizontalGlue());
-        //buttPan.add(canButt);
-        buttPan.add(okButt);
-        //buttPan.add(Box.createHorizontalGlue());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Close");
+        buttonPanel.add(Box.createHorizontalGlue());
+        //buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        //buttonPanel.add(Box.createHorizontalGlue());
 
         content.add(tabbedPane);
         content.add(Box.createVerticalStrut(5));
-        content.add(buttPan);
+        content.add(buttonPanel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
         VisibilityHandler vis = new VisibilityHandler();
         eventGraphEditorPreferenceCB.addActionListener(vis);
         assemblyEditorPreferenceCB.addActionListener(vis);
@@ -146,7 +146,7 @@ public class SettingsDialog extends JDialog {
 
     private void setParams() {
         fillWidgets();
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
 
         modified = false;
 
@@ -521,12 +521,12 @@ public class SettingsDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(SettingsDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

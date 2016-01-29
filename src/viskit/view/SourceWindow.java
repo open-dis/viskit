@@ -97,21 +97,21 @@ public class SourceWindow extends JFrame {
         JScrollPane jsp = new JScrollPane(jta);
         con.add(jsp);
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-        buttPan.add(Box.createHorizontalGlue());
+        buttonPanel.add(Box.createHorizontalGlue());
 
         JButton compileButt = new JButton("Compile test");
-        buttPan.add(compileButt);
+        buttonPanel.add(compileButt);
 
         JButton saveButt = new JButton("Save source and close");
-        buttPan.add(saveButt);
+        buttonPanel.add(saveButt);
 
         JButton closeButt = new JButton("Close");
-        buttPan.add(closeButt);
+        buttonPanel.add(closeButt);
 
-        con.add(buttPan);
+        con.add(buttonPanel);
 
         setupSearchKeys();
         searchButt.setAction(startAct);

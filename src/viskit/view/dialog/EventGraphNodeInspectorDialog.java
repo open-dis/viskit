@@ -39,11 +39,11 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private JCheckBox outputCheck /*, verboseCheck*/;
     private InstantiationPanel ip;
     private EvGraphNode egNode;
-    private JButton okButt, canButt;
+    private JButton okButton, cancelButton;
     private enableApplyButtonListener lis;
-    private JPanel buttPan;
-    private JTextField descField;
-    private JLabel descLab;
+    private JPanel buttonPanel;
+    private JTextField descriptionField;
+    private JLabel descriptionLabel;
 
     public static boolean showDialog(JFrame f, EvGraphNode parm) {
         try {
@@ -91,30 +91,30 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         outputCheck = new JCheckBox("detailed output");
         outputCheck.setToolTipText("Enable a list dump of all entity names to the console");
 
-        descField = new JTextField();
-        ViskitStatics.clampHeight(descField);
-        descLab = new JLabel("description", JLabel.TRAILING);
-        descLab.setLabelFor(descField);
+        descriptionField = new JTextField();
+        ViskitStatics.clampHeight(descriptionField);
+        descriptionLabel = new JLabel("description", JLabel.TRAILING);
+        descriptionLabel.setLabelFor(descriptionField);
 
-        ViskitStatics.cloneSize(handleLab, descLab);    // make handle same size
+        ViskitStatics.cloneSize(handleLab, descriptionLabel);    // make handle same size
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        okButt.setEnabled(false);
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        okButton.setEnabled(false);
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
         placeWidgets();
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         handleField.addCaretListener(lis);
-        descField.addCaretListener(lis);
+        descriptionField.addCaretListener(lis);
         outputCheck.addActionListener(lis);
 
         setParams(parent, node);
@@ -125,7 +125,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         fillWidgets();
         getContentPane().invalidate();
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
 
         pack();     // do this prior to next
         setLocationRelativeTo(c);
@@ -147,9 +147,9 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         JPanel dcont = new JPanel();
         dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
-        dcont.add(descLab);
+        dcont.add(descriptionLabel);
         dcont.add(Box.createHorizontalStrut(5));
-        dcont.add(descField);
+        dcont.add(descriptionField);
 
         content.add(dcont);
         ip = new InstantiationPanel(this, lis, true);
@@ -160,19 +160,19 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         ip.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(ip);
         content.add(Box.createVerticalStrut(5));
-        content.add(buttPan);
+        content.add(buttonPanel);
     }
 
     private void fillWidgets() throws ClassNotFoundException {
         if (egNode != null) {
             handleField.setText(egNode.getName());
             outputCheck.setSelected(egNode.isOutputMarked());
-            descField.setText(egNode.getDescriptionString());
+            descriptionField.setText(egNode.getDescriptionString());
             ip.setData(egNode.getInstantiator());
         } else {
             handleField.setText("egNode name");
             outputCheck.setSelected(false);
-            descField.setText("");
+            descriptionField.setText("");
        }
     }
 
@@ -181,7 +181,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         nm = nm.replaceAll("\\s", "");
         if (egNode != null) {
             egNode.setName(nm);
-            egNode.setDescriptionString(descField.getText().trim());
+            egNode.setDescriptionString(descriptionField.getText().trim());
             egNode.setInstantiator(ip.getData());
             egNode.setOutputMarked(outputCheck.isSelected());
         } else {
@@ -228,8 +228,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         private void common()
         {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
     }
 
@@ -279,12 +279,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

@@ -24,8 +24,8 @@ abstract public class MetaDataDialog extends JDialog {
 
     protected static boolean modified = false;
     protected JComponent runtimePanel;
-    private JButton canButt;
-    private JButton okButt;
+    private JButton cancelButton;
+    private JButton okButton;
     GraphMetaData param;
     JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
@@ -137,21 +137,21 @@ abstract public class MetaDataDialog extends JDialog {
         c.add(descriptionScrollPane);
         c.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        getRootPane().setDefaultButton(okButt);
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(canButt);
-        buttPan.add(okButt);
-        c.add(buttPan);
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        getRootPane().setDefaultButton(okButton);
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        c.add(buttonPanel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(f, gmd);
     }
@@ -247,12 +247,12 @@ abstract public class MetaDataDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(MetaDataDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

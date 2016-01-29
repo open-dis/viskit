@@ -30,7 +30,7 @@ public class EventArgumentDialog extends JDialog {
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
     private EventArgument myEA;
-    private JButton okButt,  canButt;
+    private JButton okButton,  cancelButton;
     public static String newName,  newType,  newDescription;
 
     public static boolean showDialog(JFrame f, EventArgument parm) {
@@ -81,20 +81,20 @@ public class EventArgumentDialog extends JDialog {
         panel.add(fieldsPanel);
         panel.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
-        panel.add(buttPan);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        panel.add(buttonPanel);
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(panel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener listener = new enableApplyButtonListener();
         this.nameField.addCaretListener(listener);
@@ -116,9 +116,9 @@ public class EventArgumentDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -184,8 +184,8 @@ public class EventArgumentDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -202,12 +202,12 @@ public class EventArgumentDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

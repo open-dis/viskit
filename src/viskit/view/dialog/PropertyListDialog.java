@@ -33,9 +33,9 @@ public class PropertyListDialog extends JDialog {
     private static PropertyListDialog dialog;
     private static int selection = -1;
     private String[][] pnamesTypes;
-    private JButton okButt,  canButt;
+    private JButton okButton,  cancelButton;
     private JTable table;
-    private JPanel buttPan;
+    private JPanel buttonPanel;
     public static String newProperty;
 
     public static int showDialog(Dialog f, String title, String[][] namesTypes) {
@@ -60,18 +60,18 @@ public class PropertyListDialog extends JDialog {
         table.getSelectionModel().addListSelectionListener(new mySelectionListener());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
-        buttPan.add(okButt);
-        buttPan.add(Box.createHorizontalStrut(5));
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
+        buttonPanel.add(Box.createHorizontalStrut(5));
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, namesTypes);
     }
@@ -84,9 +84,9 @@ public class PropertyListDialog extends JDialog {
         if (pnamesTypes == null) {
             selection = 0;
         }
-        okButt.setEnabled(pnamesTypes == null);
+        okButton.setEnabled(pnamesTypes == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -106,7 +106,7 @@ public class PropertyListDialog extends JDialog {
         JScrollPane jsp = new JScrollPane(table);
         content.add(jsp, BorderLayout.CENTER);
 
-        content.add(buttPan, BorderLayout.SOUTH);
+        content.add(buttonPanel, BorderLayout.SOUTH);
         //content.add(Box.createVerticalStrut(5));
         setContentPane(content);
     }
@@ -143,8 +143,8 @@ public class PropertyListDialog extends JDialog {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
             if (!lsm.isSelectionEmpty()) {
                 selection = lsm.getMinSelectionIndex();
-                okButt.setEnabled(true);
-                getRootPane().setDefaultButton(okButt);
+                okButton.setEnabled(true);
+                getRootPane().setDefaultButton(okButton);
             }
         }
     }
@@ -157,12 +157,12 @@ public class PropertyListDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(PropertyListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

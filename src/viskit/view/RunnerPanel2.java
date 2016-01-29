@@ -64,7 +64,7 @@ public class RunnerPanel2 extends JPanel {
     public JSplitPane xsplPn;
     public JButton vcrStop,  vcrPlay,  vcrRewind,  vcrStep,  closeButt;
     public JCheckBox vcrVerbose;
-    public JTextField vcrSimTime,  vcrStopTime;
+    public JTextField vcrSimulationTime,  vcrStopTime;
     public JCheckBox saveRepDataCB;
     public JCheckBox printRepReportsCB;
     public JCheckBox searchCB;
@@ -72,7 +72,7 @@ public class RunnerPanel2 extends JPanel {
     public JCheckBox printSummReportsCB;
     public JCheckBox resetSeedStateCB;
     public JCheckBox analystReportCB;
-    public JTextField numRepsTF;
+    public JTextField numberOfReplicationsTF;
     public JScrollBar bar;
     public JTextField verboseRepNumberTF;
     public JLabel npsLabel;
@@ -144,13 +144,13 @@ public class RunnerPanel2 extends JPanel {
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
-        vcrSimTime = new JTextField(10);
-        vcrSimTime.setEditable(false);
-        ViskitStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
+        vcrSimulationTime = new JTextField(10);
+        vcrSimulationTime.setEditable(false);
+        ViskitStatics.clampSize(vcrSimulationTime, vcrSimulationTime, vcrSimulationTime);
         JPanel labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrSimTimeLab);
-        labTF.add(vcrSimTime);
+        labTF.add(vcrSimulationTime);
         labTF.add(Box.createHorizontalStrut(10));
         flowPan.add(labTF);
 
@@ -165,24 +165,23 @@ public class RunnerPanel2 extends JPanel {
         labTF.add(Box.createHorizontalStrut(10));
         flowPan.add(labTF);
 
-        numRepsTF = new JTextField(10);
-        numRepsTF.addActionListener(
-            new ActionListener() {
+        numberOfReplicationsTF = new JTextField(10);
+        numberOfReplicationsTF.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int numReps = Integer.parseInt(numRepsTF.getText().trim());
+                    int numReps = Integer.parseInt(numberOfReplicationsTF.getText().trim());
                     if (numReps < 1) {
-                        numRepsTF.setText("1");
+                        numberOfReplicationsTF.setText("1");
                     }
                 }
             });
-        ViskitStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
+        ViskitStatics.clampSize(numberOfReplicationsTF, numberOfReplicationsTF, numberOfReplicationsTF);
         JLabel numRepsLab = new JLabel("# replications: ");
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(numRepsLab);
-        labTF.add(numRepsTF);
+        labTF.add(numberOfReplicationsTF);
         labTF.add(Box.createHorizontalStrut(10));
         flowPan.add(labTF);
 
@@ -228,15 +227,15 @@ public class RunnerPanel2 extends JPanel {
 //        flowPan.add(resetSeedStateCB);
         /* End DIFF between OA3302 branch and trunk */
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         vcrStop = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStop.setToolTipText("Stop the simulation run");
         vcrStop.setEnabled(false);
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
         vcrStop.setText(null);
-        buttPan.add(vcrStop);
+        buttonPanel.add(vcrStop);
 
         vcrRewind = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Rewind24.gif")));
         vcrRewind.setToolTipText("Reset the simulation run");
@@ -244,7 +243,7 @@ public class RunnerPanel2 extends JPanel {
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
         vcrRewind.setText(null);
         if (!skipCloseButt) {
-            buttPan.add(vcrRewind);
+            buttonPanel.add(vcrRewind);
         }
 
         vcrPlay = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
@@ -254,22 +253,22 @@ public class RunnerPanel2 extends JPanel {
         }
         vcrPlay.setBorder(BorderFactory.createEtchedBorder());
         vcrPlay.setText(null);
-        buttPan.add(vcrPlay);
+        buttonPanel.add(vcrPlay);
 
         vcrStep = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStep.setToolTipText("Step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);
         if (!skipCloseButt) {
-            buttPan.add(vcrStep);
+            buttonPanel.add(vcrStep);
         }
 
-        buttPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         flowPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
         flowPan.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
 
-        flowPan.add(buttPan);
+        flowPan.add(buttonPanel);
         return flowPan;
     }
 
