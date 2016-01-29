@@ -26,7 +26,7 @@ abstract public class MetaDataDialog extends JDialog {
     protected JComponent runtimePanel;
     private JButton cancelButton;
     private JButton okButton;
-    GraphMetaData param;
+    GraphMetaData graphMetaData;
     JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
     JCheckBox verboseCb;
@@ -38,7 +38,7 @@ abstract public class MetaDataDialog extends JDialog {
 
     public MetaDataDialog(JFrame f, GraphMetaData gmd, String title) {
         super(f, title, true);
-        this.param = gmd;
+        this.graphMetaData = gmd;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -51,41 +51,41 @@ abstract public class MetaDataDialog extends JDialog {
         JPanel textFieldPanel = new JPanel(new SpringLayout());
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        JLabel nmLab = new JLabel("name", JLabel.TRAILING);
+        JLabel nameLabel = new JLabel("name", JLabel.TRAILING);
         nameTf = new JTextField(20);
-        nmLab.setLabelFor(nameTf);
-        textFieldPanel.add(nmLab);
+        nameLabel.setLabelFor(nameTf);
+        textFieldPanel.add(nameLabel);
         textFieldPanel.add(nameTf);
 
-        JLabel pkgLab = new JLabel("package", JLabel.TRAILING);
+        JLabel packageLabel = new JLabel("package", JLabel.TRAILING);
         packageTf = new JTextField(20);
         packageTf.setToolTipText("Use standard Java dot notation for package naming");
-        pkgLab.setLabelFor(packageTf);
-        textFieldPanel.add(pkgLab);
+        packageLabel.setLabelFor(packageTf);
+        textFieldPanel.add(packageLabel);
         textFieldPanel.add(packageTf);
 
-        JLabel authLab = new JLabel("author", JLabel.TRAILING);
+        JLabel authorLabel = new JLabel("author", JLabel.TRAILING);
         authorTf = new JTextField(20);
-        authLab.setLabelFor(authorTf);
-        textFieldPanel.add(authLab);
+        authorLabel.setLabelFor(authorTf);
+        textFieldPanel.add(authorLabel);
         textFieldPanel.add(authorTf);
 
-        JLabel versLab = new JLabel("version", JLabel.TRAILING);
+        JLabel verssionLabel = new JLabel("version", JLabel.TRAILING);
         versionTf = new JTextField(20);
-        versLab.setLabelFor(versionTf);
-        textFieldPanel.add(versLab);
+        verssionLabel.setLabelFor(versionTf);
+        textFieldPanel.add(verssionLabel);
         textFieldPanel.add(versionTf);
 
-        JLabel extendsLab = new JLabel("extends", JLabel.TRAILING);
+        JLabel extendsLabel = new JLabel("extends", JLabel.TRAILING);
         extendsTf = new JTextField(20);
-        extendsLab.setLabelFor(extendsTf);
-        textFieldPanel.add(extendsLab);
+        extendsLabel.setLabelFor(extendsTf);
+        textFieldPanel.add(extendsLabel);
         textFieldPanel.add(extendsTf);
 
-        JLabel implementsLab = new JLabel("implements", JLabel.TRAILING);
+        JLabel implementsLabel = new JLabel("implements", JLabel.TRAILING);
         implementsTf = new JTextField(20);
-        implementsLab.setLabelFor(implementsTf);
-        textFieldPanel.add(implementsLab);
+        implementsLabel.setLabelFor(implementsTf);
+        textFieldPanel.add(implementsLabel);
         textFieldPanel.add(implementsTf);
 
         // Lay out the panel.
@@ -101,16 +101,16 @@ abstract public class MetaDataDialog extends JDialog {
         runtimePanel = new JPanel(new SpringLayout());
         runtimePanel.setBorder(BorderFactory.createTitledBorder("Runtime defaults"));
 
-        JLabel stopTimeLab = new JLabel("stop time", JLabel.TRAILING);
+        JLabel stopTimeLabel = new JLabel("stop time", JLabel.TRAILING);
         stopTimeTf = new JTextField(20);
-        stopTimeLab.setLabelFor(stopTimeTf);
-        runtimePanel.add(stopTimeLab);
+        stopTimeLabel.setLabelFor(stopTimeTf);
+        runtimePanel.add(stopTimeLabel);
         runtimePanel.add(stopTimeTf);
 
-        JLabel verboseLab = new JLabel("verbose output", JLabel.TRAILING);
+        JLabel verboseLabel = new JLabel("verbose output", JLabel.TRAILING);
         verboseCb = new JCheckBox();
-        verboseLab.setLabelFor(verboseCb);
-        runtimePanel.add(verboseLab);
+        verboseLabel.setLabelFor(verboseCb);
+        runtimePanel.add(verboseLabel);
         runtimePanel.add(verboseCb);
 
         SpringUtilities.makeCompactGrid(runtimePanel,
@@ -153,11 +153,12 @@ abstract public class MetaDataDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        setParams(f, gmd);
+        setGraphMetaData(f, gmd);
     }
 
-    public final void setParams(Component c, GraphMetaData gmd) {
-        param = gmd;
+    public final void setGraphMetaData(Component c, GraphMetaData gmd) 
+	{
+        graphMetaData = gmd;
 
         fillWidgets();
 
@@ -166,44 +167,45 @@ abstract public class MetaDataDialog extends JDialog {
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() {
-        if (param == null) {
-            param = new GraphMetaData();
+    private void fillWidgets() 
+	{
+        if (graphMetaData == null) {
+            graphMetaData = new GraphMetaData();
         }
-        nameTf.setText(param.name);
-        packageTf.setText(param.packageName);
-        authorTf.setText(param.author);
-        versionTf.setText(param.version);
-        descriptionTextArea.setText(param.description);
-        extendsTf.setText(param.extendsPackageName);
-        implementsTf.setText(param.implementsPackageName);
-        stopTimeTf.setText(param.stopTime);
-        verboseCb.setSelected(param.verbose);
-        nameTf.selectAll();
+                     nameTf.setText(graphMetaData.name);
+                  packageTf.setText(graphMetaData.packageName);
+                   authorTf.setText(graphMetaData.author);
+                  versionTf.setText(graphMetaData.version);
+        descriptionTextArea.setText(graphMetaData.description);
+                  extendsTf.setText(graphMetaData.extendsPackageName);
+               implementsTf.setText(graphMetaData.implementsPackageName);
+                 stopTimeTf.setText(graphMetaData.stopTime);
+                  verboseCb.setSelected(graphMetaData.verbose);
+                     nameTf.selectAll();
     }
 
     private void unloadWidgets() {
-        param.author = authorTf.getText().trim();
-        param.description = descriptionTextArea.getText().trim();
+        graphMetaData.author = authorTf.getText().trim();
+        graphMetaData.description = descriptionTextArea.getText().trim();
 
         if (this instanceof AssemblyMetaDataDialog) {
 
             // The default names are AssemblyName, or EventGraphName
-            if (!param.name.contains("Assembly") || param.name.equals("AssemblyName"))
+            if (!graphMetaData.name.contains("Assembly") || graphMetaData.name.equals("AssemblyName"))
 
                 // Note: we need to force "Assembly" in the file name for special recognition
-                param.name = nameTf.getText().trim() + "Assembly";
+                graphMetaData.name = nameTf.getText().trim() + "Assembly";
             else
-                param.name = nameTf.getText().trim();
+                graphMetaData.name = nameTf.getText().trim();
         } else {
-            param.name = nameTf.getText().trim();
+            graphMetaData.name = nameTf.getText().trim();
         }
-        param.packageName = packageTf.getText().trim();
-        param.version = versionTf.getText().trim();
-        param.extendsPackageName = extendsTf.getText().trim();
-        param.implementsPackageName = implementsTf.getText().trim();
-        param.stopTime = stopTimeTf.getText().trim();
-        param.verbose = verboseCb.isSelected();
+        graphMetaData.packageName = packageTf.getText().trim();
+        graphMetaData.version = versionTf.getText().trim();
+        graphMetaData.extendsPackageName = extendsTf.getText().trim();
+        graphMetaData.implementsPackageName = implementsTf.getText().trim();
+        graphMetaData.stopTime = stopTimeTf.getText().trim();
+        graphMetaData.verbose = verboseCb.isSelected();
     }
 
     class cancelButtonListener implements ActionListener {

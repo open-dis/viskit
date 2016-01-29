@@ -14,11 +14,11 @@ import java.awt.image.BufferedImage;
  * @since 8:43:39 AM
  * @version $Id$
  */
-public class PropertyChangListenerImageIcon extends ImageIcon {
+public class PropertyChangeListenerImageIcon extends ImageIcon {
 
     int w, h;
 
-    public PropertyChangListenerImageIcon(int width, int height) {
+    public PropertyChangeListenerImageIcon(int width, int height) {
         w = width;
         h = height;
 

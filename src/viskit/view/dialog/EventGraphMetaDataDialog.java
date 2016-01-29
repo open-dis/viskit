@@ -22,7 +22,7 @@ public class EventGraphMetaDataDialog extends MetaDataDialog {
         if (dialog == null) {
             dialog = new EventGraphMetaDataDialog(f, gmd);
         } else {
-            dialog.setParams(f, gmd);
+            dialog.setGraphMetaData(f, gmd);
         }
         dialog.setVisible(true);
         // above call blocks

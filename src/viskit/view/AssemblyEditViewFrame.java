@@ -67,7 +67,7 @@ import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
-import viskit.images.PropertyChangListenerImageIcon;
+import viskit.images.PropertyChangeListenerImageIcon;
 import viskit.images.PropertyChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.vGraphAssemblyModel;
@@ -727,7 +727,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropertyChangListenerImageIcon(20, 20),
+        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropertyChangeListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         String[] extraCP = SettingsDialog.getExtraClassPath();

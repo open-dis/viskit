@@ -22,7 +22,7 @@ public class AssemblyMetaDataDialog extends MetaDataDialog {
         if (dialog == null) {
             dialog = new AssemblyMetaDataDialog(f, gmd);
         } else {
-            dialog.setParams(f, gmd);
+            dialog.setGraphMetaData(f, gmd);
         }
 
         dialog.setVisible(true);
