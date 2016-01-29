@@ -40,7 +40,7 @@ public class EventStateTransitionDialog extends JDialog {
     private static boolean allGood;
 
     private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
-    private JComboBox<ViskitElement> stateVarsCB;
+    private JComboBox<ViskitElement> stateVariablesCB;
     private JComboBox<String> stateTranMethodsCB, localVarMethodsCB;
     private JRadioButton assTo, opOn;
     private EventStateTransition param;
@@ -111,9 +111,9 @@ public class EventStateTransitionDialog extends JDialog {
         JLabel methodLab = new JLabel("invoke local var method");
         JLabel stateTranInvokeLab = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD);
 
-        stateVarsCB = new JComboBox<>();
-        setMaxHeight(stateVarsCB);
-        stateVarsCB.setBackground(Color.white);
+        stateVariablesCB = new JComboBox<>();
+        setMaxHeight(stateVariablesCB);
+        stateVariablesCB.setBackground(Color.white);
         newSVButt = new JButton("new");
         descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
@@ -150,7 +150,7 @@ public class EventStateTransitionDialog extends JDialog {
                 localAssignmentField,
                 new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "=" + OneLinePanel.CLOSE_LABEL_BOLD)));
         fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
+        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVariablesCB, newSVButt));
         fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
         fieldsPanel.add(new OneLinePanel(new JLabel(""), w, assTo));
         fieldsPanel.add(new OneLinePanel(new JLabel(""), w, opOn));
@@ -208,7 +208,7 @@ public class EventStateTransitionDialog extends JDialog {
         actionField.addCaretListener(lis);
         localInvocationField.addCaretListener(lis);
 
-        stateVarsCB.addActionListener(new ActionListener() {
+        stateVariablesCB.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -227,11 +227,11 @@ public class EventStateTransitionDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 String nm = ViskitGlobals.instance().getEventGraphEditor().addStateVariableDialog();
                 if (nm != null) {
-                    stateVarsCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
-                    for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-                        vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
+                    stateVariablesCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
+                    for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
+                        vStateVariable vsv = (vStateVariable) stateVariablesCB.getItemAt(i);
                         if (vsv.getName().contains(nm)) {
-                            stateVarsCB.setSelectedIndex(i);
+                            stateVariablesCB.setSelectedIndex(i);
                             break;
                         }
                     }
@@ -256,8 +256,8 @@ public class EventStateTransitionDialog extends JDialog {
         });
 
         // to start off:
-        if (stateVarsCB.getItemCount() > 0) {
-            descriptionField.setText(((vStateVariable) stateVarsCB.getItemAt(0)).getComment());
+        if (stateVariablesCB.getItemCount() > 0) {
+            descriptionField.setText(((vStateVariable) stateVariablesCB.getItemAt(0)).getComment());
         } else {
             descriptionField.setText("");
         }
@@ -283,8 +283,8 @@ public class EventStateTransitionDialog extends JDialog {
         java.util.List<ViskitElement> types = new ArrayList<>();
 
         // Prevent duplicate types
-        for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-            ViskitElement e = stateVarsCB.getItemAt(i);
+        for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
+            ViskitElement e = stateVariablesCB.getItemAt(i);
             typ = e.getType();
 
             if (ViskitGlobals.instance().isGeneric(typ)) {
@@ -423,8 +423,8 @@ public class EventStateTransitionDialog extends JDialog {
         }
 
         if (param != null) {
-            if (stateVarsCB.getItemCount() > 0) {
-                descriptionField.setText(((vStateVariable) stateVarsCB.getSelectedItem()).getComment());
+            if (stateVariablesCB.getItemCount() > 0) {
+                descriptionField.setText(((vStateVariable) stateVariablesCB.getSelectedItem()).getComment());
             } else {
                 descriptionField.setText("");
             }
@@ -466,7 +466,7 @@ public class EventStateTransitionDialog extends JDialog {
         } else {
             descriptionField.setText("");
             localAssignmentField.setText("");
-            stateVarsCB.setSelectedIndex(0);
+            stateVariablesCB.setSelectedIndex(0);
             arrayIndexField.setText(indexArg);
             stateTranMethodsCB.setSelectedIndex(0);
             actionField.setText("");
@@ -476,18 +476,18 @@ public class EventStateTransitionDialog extends JDialog {
         }
 
         // We have an indexing argument already set
-        String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
+        String typ = ((vStateVariable) stateVariablesCB.getSelectedItem()).getType();
         indexPanel.setVisible(ViskitGlobals.instance().isArray(typ));
         localAssignmentPanel.setVisible(opOn.isSelected());
     }
 
     private void setStateVariableCBValue(EventStateTransition est) {
-        stateVarsCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
-        stateVarsCB.setSelectedIndex(0);
-        for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-            vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
+        stateVariablesCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
+        stateVariablesCB.setSelectedIndex(0);
+        for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
+            vStateVariable sv = (vStateVariable) stateVariablesCB.getItemAt(i);
             if (est.getName().equalsIgnoreCase(sv.getName())) {
-                stateVarsCB.setSelectedIndex(i);
+                stateVariablesCB.setSelectedIndex(i);
                 return;
             }
         }
@@ -572,8 +572,8 @@ public class EventStateTransitionDialog extends JDialog {
             else
                 param.setLocalVariableAssignment("");
 
-            param.setName(((vStateVariable) stateVarsCB.getSelectedItem()).getName());
-            param.setType(((vStateVariable) stateVarsCB.getSelectedItem()).getType());
+            param.setName(((vStateVariable) stateVariablesCB.getSelectedItem()).getName());
+            param.setType(((vStateVariable) stateVariablesCB.getSelectedItem()).getType());
             param.setIndexingExpression(arrayIndexField.getText().trim());
 
             String arg = actionField.getText().trim();
@@ -626,7 +626,7 @@ public class EventStateTransitionDialog extends JDialog {
                 actionLab1.setText("=");
                 actionLab2.setText("");
             } else if (opOn.isSelected()) {
-                String ty = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
+                String ty = ((vStateVariable) stateVariablesCB.getSelectedItem()).getType();
                 if (ViskitGlobals.instance().isPrimitive(ty)) {
                     ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
@@ -652,7 +652,7 @@ public class EventStateTransitionDialog extends JDialog {
         public void actionPerformed(ActionEvent event) {
             if (modified) {
                 // check for array index
-                String typ = ((vStateVariable) stateVarsCB.getSelectedItem()).getType();
+                String typ = ((vStateVariable) stateVariablesCB.getSelectedItem()).getType();
                 if (ViskitGlobals.instance().isArray(typ)) {
                     if (arrayIndexField.getText().trim().isEmpty()) {
                         int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,

@@ -154,7 +154,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(assemblyClassName);
 
-        runPanel.vcrSimTime.setText("0.0");
+        runPanel.vcrSimulationTime.setText("0.0");
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
@@ -198,7 +198,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
         Method getStopTime = assemblyClass.getMethod("getStopTime");
 
-        runPanel.numRepsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
+        runPanel.numberOfReplicationsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
         runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
         runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
@@ -280,7 +280,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numRepsTF.getText().trim()));
+            setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numberOfReplicationsTF.getText().trim()));
             setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
@@ -382,7 +382,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.vcrSimTime.setText("0.0");    // because no pausing
+            runPanel.vcrSimulationTime.setText("0.0");    // because no pausing
             twiddleButtons(START);
             initRun();
         }
@@ -715,7 +715,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue());
             npsString.append(" of ");
-            npsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
+            npsString.append(Integer.parseInt(runPanel.numberOfReplicationsTF.getText()));
             npsString.append("</b>\n");
             npsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(npsString.toString());

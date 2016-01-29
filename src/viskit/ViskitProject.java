@@ -654,7 +654,9 @@ public class ViskitProject {
             // Give user a chance to select an iconized project directory
             if (!isProjectDir) {
                 Object[] options = {"Select project", "Cancel"};
-                int retrn = JOptionPane.showOptionDialog(parent, "Your selection is not a valid Viskit project.", "Please try another selection",
+				String TRY_AGAIN = "Please try another selection";
+                int retrn = JOptionPane.showOptionDialog(parent, "<html><p>Your selection is not a valid Viskit project.</p>" +
+						    "<p>" + TRY_AGAIN + "</p>", TRY_AGAIN,
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
                 if (retrn != 0) {

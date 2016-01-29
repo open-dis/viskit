@@ -1660,7 +1660,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             @Override
             public void run() {
-                ((AssemblyEditViewFrame) getView()).runButt.setEnabled(false);
+                ((AssemblyEditViewFrame) getView()).runButton.setEnabled(false);
             }
         };
         if (SwingUtilities.isEventDispatchThread())
@@ -1723,7 +1723,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     LOG.error(e);
 //                    e.printStackTrace();
                 } finally {
-                    ((AssemblyEditViewFrame) getView()).runButt.setEnabled(true);
+                    ((AssemblyEditViewFrame) getView()).runButton.setEnabled(true);
                     mutex--;
                 }
             }

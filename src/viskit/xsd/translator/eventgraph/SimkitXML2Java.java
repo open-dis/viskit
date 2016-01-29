@@ -140,7 +140,7 @@ public class SimkitXML2Java {
         StringBuilder source = new StringBuilder();
         StringWriter head = new StringWriter();
         StringWriter parameters = new StringWriter();
-        StringWriter stateVars = new StringWriter();
+        StringWriter stateVariables = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
         StringWriter parameterMap = new StringWriter();
         StringWriter constructors = new StringWriter();
@@ -151,14 +151,14 @@ public class SimkitXML2Java {
 
         buildHead(head);
         buildParameters(parameters, accessorBlock);
-        buildStateVariables(stateVars, accessorBlock);
+        buildStateVariables(stateVariables, accessorBlock);
         buildParameterMap(parameterMap);
         buildConstructors(constructors);
         buildEventBlock(runBlock, eventBlock);
         buildToString(toStringBlock);
         buildCodeBlock(codeBlock);
 
-        buildSource(source, head, parameters, stateVars, parameterMap,
+        buildSource(source, head, parameters, stateVariables, parameterMap,
                 constructors, runBlock, eventBlock, accessorBlock,
                 toStringBlock, codeBlock);
 

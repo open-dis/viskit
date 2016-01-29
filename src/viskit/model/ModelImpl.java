@@ -260,7 +260,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             return en;
         }
         en = new EventNode(ev.getName());
-        jaxbEvToNode(ev, en);
+        jaxbEventToNode(ev, en);
         en.opaqueModelObject = ev;
 
         evNodeCache.put(ev, en);   // key = ev
@@ -338,7 +338,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         numericPriority = b;
     }
 
-    private boolean stateVarParamNameCheck() {
+    private boolean stateVariableParamNameCheck() {
         Set<String> hs = new HashSet<>(10);
         for (ViskitElement sv : stateVariables) {
             if (!hs.add(sv.getName())) {
@@ -353,14 +353,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         return true;
     }
 
-    private void jaxbEvToNode(Event ev, EventNode node) {
-        node.setName(ev.getName());
+    private void jaxbEventToNode(Event event, EventNode node) {
+        node.setName(event.getName());
 
         node.getComments().clear();
-        node.getComments().addAll(ev.getComment());
+        node.getComments().addAll(event.getComment());
 
         node.getArguments().clear();
-        for (Argument arg : ev.getArgument()) {
+        for (Argument arg : event.getArgument()) {
             EventArgument ea = new EventArgument();
             ea.setName(arg.getName());
             ea.setType(arg.getType());
@@ -373,7 +373,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         node.getLocalVariables().clear();
-        for (LocalVariable lv : ev.getLocalVariable()) {
+        for (LocalVariable lv : event.getLocalVariable()) {
             if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
                 EventLocalVariable elv = new EventLocalVariable(
                         lv.getName(), lv.getType(), lv.getValue());
@@ -384,10 +384,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
         }
 
-        node.setCodeBLock(ev.getCode());
+        node.setCodeBLock(event.getCode());
 
         node.getTransitions().clear();
-        for (StateTransition st : ev.getStateTransition()) {
+        for (StateTransition st : event.getStateTransition()) {
 
             EventStateTransition est = new EventStateTransition();
 
@@ -425,7 +425,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             node.getTransitions().add(est);
         }
 
-        Coordinate coor = ev.getCoordinate();
+        Coordinate coor = event.getCoordinate();
         if (coor != null) //todo lose this after all xmls updated
         {
             node.setPosition(new Point2D.Double(
@@ -570,7 +570,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
             stateVariables.add(v);
 
-            if (!stateVarParamNameCheck()) {
+            if (!stateVariableParamNameCheck()) {
                 mangleName(v);
             }
 
@@ -591,7 +591,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
             simParameters.add(vp);
 
-            if (!stateVarParamNameCheck()) {
+            if (!stateVariableParamNameCheck()) {
                 mangleName(vp);
             }
             notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
@@ -626,7 +626,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         vParameter vp = new vParameter(nm, typ, comment);
         simParameters.add(vp);
 
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParamNameCheck()) {
             mangleName(vp);
         }
 
@@ -668,7 +668,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public boolean changeSimParameter(vParameter vp) {
         boolean retcode = true;
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParamNameCheck()) {
             mangleName(vp);
             retcode = false;
         }
@@ -694,7 +694,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         // get the new one here and show it around
         vStateVariable vsv = new vStateVariable(name, type, comment);
         stateVariables.add(vsv);
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParamNameCheck()) {
             mangleName(vsv);
         }
         StateVariable s = this.oFactory.createStateVariable();
@@ -726,7 +726,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     @Override
     public boolean changeStateVariable(vStateVariable vsv) {
         boolean retcode = true;
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParamNameCheck()) {
             mangleName(vsv);
             retcode = false;
         }

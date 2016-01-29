@@ -84,8 +84,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
     String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
     String clusterWebStatus = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
-    private JButton canButt;
-    private JButton runButt;
+    private JButton cancelButton;
+    private JButton runButton;
     private JButton closeButt;
     private Document doc;
     private JTextField sampsTF;
@@ -133,7 +133,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             });
         }
@@ -186,12 +186,12 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         SpringUtilities.makeCompactGrid(topPan, 6, 2, 10, 10, 5, 5);
         topPan.setMaximumSize(topPan.getPreferredSize());
 
-        canButt = new JButton("Cancel job");
-        canButt.setEnabled(false);
-        runButt = new JButton("Run job");
+        cancelButton = new JButton("Cancel job");
+        cancelButton.setEnabled(false);
+        runButton = new JButton("Run job");
         botBar.add(Box.createHorizontalGlue());
-        botBar.add(canButt);
-        botBar.add(runButt);
+        botBar.add(cancelButton);
+        botBar.add(runButton);
         if (!isSubComponent) {
             botBar.add(Box.createHorizontalStrut(20));
             closeButt = new JButton("Close");
@@ -288,11 +288,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     }
 
     private void doListeners() {
-        canButt.setActionCommand("cancel");
-        runButt.setActionCommand("run");
+        cancelButton.setActionCommand("cancel");
+        runButton.setActionCommand("run");
         ActionListener al = new ButtListener();
-        canButt.addActionListener(al);
-        runButt.addActionListener(al);
+        cancelButton.addActionListener(al);
+        runButton.addActionListener(al);
         if (!isSubComponent) {
             closeButt.setActionCommand("x");
             closeButt.addActionListener(al);
@@ -333,8 +333,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand().charAt(0)) {
                 case 'r':
-                    runButt.setEnabled(false);
-                    canButt.setEnabled(true);
+                    runButton.setEnabled(false);
+                    cancelButton.setEnabled(true);
                     if (!isSubComponent) {
                         closeButt.setEnabled(false);
                     }
@@ -346,8 +346,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     stopRun();
                     break;
                 case 'x':
-                    runButt.setEnabled(true);  // for next time (probably not used)
-                    canButt.setEnabled(false);
+                    runButton.setEnabled(true);  // for next time (probably not used)
+                    cancelButton.setEnabled(false);
                     if (outputDirty) {
                         if (JOptionPane.showConfirmDialog(JobLauncher.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
@@ -397,11 +397,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     private void stopRun() {
         outputList.clear();
 
-        canButt.setEnabled(false);
+        cancelButton.setEnabled(false);
         if (!isSubComponent) {
             closeButt.setEnabled(true);
         }
-        runButt.setEnabled(true);
+        runButton.setEnabled(true);
 
         if (thread == null) {
             return;

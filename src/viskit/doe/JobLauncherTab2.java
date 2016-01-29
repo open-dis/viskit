@@ -104,8 +104,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private String portCfg;
     private String unameDecrCfg = "";
     private String pwordDecrCfg = "";
-    private JButton canButt;
-    private JButton runButt;
+    private JButton cancelButton;
+    private JButton runButton;
     private JButton adminButt;
     private JButton dotDotButt;
     private JPasswordField upwPF;
@@ -209,21 +209,21 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Dimension d = clusPan.getPreferredSize();
         clusPan.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.setBorder(new EmptyBorder(5, 10, 10, 10));
-        buttPan.add(Box.createHorizontalGlue());
-        JButton cancelButt = new JButton("Cancel");
-        JButton okButt = new JButton("Apply changes");
-        buttPan.add(cancelButt);
-        buttPan.add(okButt);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBorder(new EmptyBorder(5, 10, 10, 10));
+        buttonPanel.add(Box.createHorizontalGlue());
+        JButton cancelButton = new JButton("Cancel");
+        JButton okButton = new JButton("Apply changes");
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
         JPanel allPan = new JPanel();
         allPan.setLayout(new BoxLayout(allPan, BoxLayout.Y_AXIS));
         allPan.add(clusPan);
-        allPan.add(buttPan);
+        allPan.add(buttonPanel);
 
-        cancelButt.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -232,7 +232,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 configDialog = null;
             }
         });
-        okButt.addActionListener(new ActionListener() {
+        okButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -346,18 +346,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JPanel vPan = new JPanel();
         vPan.setLayout(new BoxLayout(vPan, BoxLayout.X_AXIS));
-        canButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
-        canButt.setToolTipText("Stop the Grid run");
-        canButt.setEnabled(false);
-        canButt.setBorder(BorderFactory.createEtchedBorder());
-        canButt.setText(null);
-        vPan.add(canButt);
+        cancelButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
+        cancelButton.setToolTipText("Stop the Grid run");
+        cancelButton.setEnabled(false);
+        cancelButton.setBorder(BorderFactory.createEtchedBorder());
+        cancelButton.setText(null);
+        vPan.add(cancelButton);
 
-        runButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
-        runButt.setToolTipText("Begin the Grid run");
-        runButt.setBorder(BorderFactory.createEtchedBorder());
-        runButt.setText(null);
-        vPan.add(runButt);
+        runButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
+        runButton.setToolTipText("Begin the Grid run");
+        runButton.setBorder(BorderFactory.createEtchedBorder());
+        runButton.setText(null);
+        vPan.add(runButton);
         vPan.add(Box.createHorizontalGlue());
         controlP.add(vPan);
 
@@ -555,14 +555,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void doListeners() {
-        canButt.setActionCommand("cancel");
-        runButt.setActionCommand("run");
+        cancelButton.setActionCommand("cancel");
+        runButton.setActionCommand("run");
         adminButt.setActionCommand("admin");
         dotDotButt.setActionCommand("dotdot");
 
         ActionListener al = new ButtListener();
-        canButt.addActionListener(al);
-        runButt.addActionListener(al);
+        cancelButton.addActionListener(al);
+        runButton.addActionListener(al);
         dotDotButt.addActionListener(al);
         adminButt.addActionListener(al);
 
@@ -606,14 +606,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void doStartRun() {
-        runButt.setEnabled(false);
-        canButt.setEnabled(true);
+        runButton.setEnabled(false);
+        cancelButton.setEnabled(true);
 
         // call back to the controller to put design parms and egs in place in a temp file
         // prepRun() access the DOE tab and puts the dps into the
         if (!cntlr.prepRun()) {
-            runButt.setEnabled(true);
-            canButt.setEnabled(false);
+            runButton.setEnabled(true);
+            cancelButton.setEnabled(false);
             return;
         }
         // put the local stuff in place
@@ -666,8 +666,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
                     break;
                 case 'x':
-                    runButt.setEnabled(true);  // for next time (probably not used)
-                    canButt.setEnabled(false);
+                    runButton.setEnabled(true);  // for next time (probably not used)
+                    cancelButton.setEnabled(false);
                     if (outputDirty) {
                         if (JOptionPane.showConfirmDialog(JobLauncherTab2.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
@@ -707,8 +707,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private void stopRun() {
         outputList.clear();
 
-        canButt.setEnabled(false);
-        runButt.setEnabled(true);
+        cancelButton.setEnabled(false);
+        runButton.setEnabled(true);
 
         if (thread == null) {
             return;

@@ -179,16 +179,16 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     actionPanel.setEnabled(false); //todo test
 
     closeButt = new JButton("Close");
-    JPanel buttPan = new JPanel();
-    buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
-    buttPan.add(Box.createHorizontalGlue());
-    buttPan.add(closeButt);
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
+    buttonPanel.add(Box.createHorizontalGlue());
+    buttonPanel.add(closeButt);
 
     c.add(loginP);
     c.add(Box.createVerticalStrut(5));
     c.add(actionPanel);
     c.add(Box.createVerticalStrut(5));
-    c.add(buttPan);
+    c.add(buttonPanel);
 
     c.setBorder(new EmptyBorder(10,10,10,10));
     setContentPane(c);
