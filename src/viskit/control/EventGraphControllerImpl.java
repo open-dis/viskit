@@ -152,7 +152,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
             ((Model) getModel()).setDirty(dirty);
         } else {
-           ((EventGraphView) getView()).delTab(mod);
+           ((EventGraphView) getView()).deleteTab(mod);
         }
     }
 
@@ -246,7 +246,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // Check for good compilation
             handleCompileAndSave(mod, file);
         } else {
-            viskitView.delTab(mod);   // Not a good open, tell view
+            viskitView.deleteTab(mod);   // Not a good open, tell view
         }
 
         resetRedoUndoStatus();
@@ -516,7 +516,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             markConfigClosed(mod.getLastFile());
         }
 
-        ((EventGraphView) getView()).delTab(mod);
+        ((EventGraphView) getView()).deleteTab(mod);
     }
 
     private void markConfigClosed(File f) {

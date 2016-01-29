@@ -172,10 +172,10 @@ public class ViskitMainFrame extends JFrame {
 			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, cleanup
 			eventGraphFileMenu = eventGraphViewFrame.getFileMenu();
 			eventGraphEditMenu = eventGraphViewFrame.getEditMenu();
-			eventGraphEditMenu.setEnabled(true); // activated when corresponding tabbed pane selected
-		   	   fileMenu.add(projectsMenu);       // submenu
-               fileMenu.add(eventGraphFileMenu); // submenu
-            mainMenuBar.add(eventGraphEditMenu); // top level
+			eventGraphEditMenu.setEnabled(false); // activated when corresponding tabbed pane selected and event graph present
+		   	   fileMenu.add(projectsMenu);        // submenu
+               fileMenu.add(eventGraphFileMenu);  // submenu
+            mainMenuBar.add(eventGraphEditMenu);  // top level
 			
 //            eventGraphMenuBar = eventGraphViewFrame.getMenus();
 //            menus.add(eventGraphMenuBar);
@@ -200,7 +200,7 @@ public class ViskitMainFrame extends JFrame {
 			assemblyFileMenu = assemblyEditViewFrame.getFileMenu();
             fileMenu.add(assemblyFileMenu);    // submenu
 			assemblyEditMenu = assemblyEditViewFrame.getEditMenu();
-			assemblyEditMenu.setEnabled(true); // activated when corresponding tabbed pane selected
+			assemblyEditMenu.setEnabled(false); // activated when corresponding tabbed pane selected and assembly present
             mainMenuBar.add(assemblyEditMenu); // top level
 			
 //            assemblyEditMenuBar = assemblyEditViewFrame.getMenus();
@@ -436,7 +436,9 @@ public class ViskitMainFrame extends JFrame {
 			
 			if (i == tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX])
 			{
-				eventGraphEditMenu.setEnabled(true);
+				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
+				boolean hasEventGraph = eventGraphViewFrame.hasOpenModels(); // TODO fix
+				eventGraphEditMenu.setEnabled(true); // hasEventGraph);
 			   	  assemblyEditMenu.setEnabled(false);
             }
             // If we compiled and prepped an Assembly to run, but want to go
@@ -458,10 +460,12 @@ public class ViskitMainFrame extends JFrame {
             }
 			else // Assembly Edit
 			{
+				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
+				boolean hasAssembly = assemblyEditViewFrame.hasOpenModels();
                 tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
 //                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
 				eventGraphEditMenu.setEnabled(false);
-			   	  assemblyEditMenu.setEnabled(true);
+			   	  assemblyEditMenu.setEnabled(true); // hasAssembly);
             }
 
 //            getJMenuBar().remove(hmen);

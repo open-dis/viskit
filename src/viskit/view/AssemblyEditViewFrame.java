@@ -715,6 +715,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
     }
 
+    public boolean hasOpenModels() {
+		return (tabbedPane.getComponentCount() > 0);
+    }
+
     @Override
     public AssemblyModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();

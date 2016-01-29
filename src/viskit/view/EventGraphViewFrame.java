@@ -307,10 +307,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         JPanel parametersPanel = new JPanel();
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
+		
+		String usageHint = "Use \"Event Graph Editor > Edit Properties...\" menu or (Ctrl-E) to modify this field";
+		
+//        JLabel implementsLabel = new JLabel("Implements");
+//        implementsLabel.setToolTipText("Event graph superclass (if any)");
+//        implementsLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+//        implementsLabel.setToolTipText(usageHint);
+//		implementsLabel.setEnabled(false); // TODO callback
+//
+//        parametersPanel.add(implementsLabel);
+//        parametersPanel.add(Box.createVerticalStrut(5));
 
         JLabel descriptionLabel = new JLabel("Description");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" or (Ctrl-E) to modify description");
+        descriptionLabel.setToolTipText(usageHint);
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
@@ -320,6 +331,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         descriptionTA.setWrapStyleWord(true);
         descriptionTA.setLineWrap(true);
         descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        descriptionTA.setToolTipText(usageHint);
+		descriptionTA.setEnabled(false); // TODO callback
 
         JScrollPane descriptionSP = new JScrollPane(descriptionTA);
         descriptionSP.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -430,6 +443,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
+    public void setSelectedImplementsName(String s) {
+        boolean nullString = !(s != null && s.length() > 0);
+        if (!nullString) {
+            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
+        }
+    }
+
     @Override
     public void setSelectedEventGraphDescription(String description) {
         JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
@@ -492,7 +512,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void delTab(Model mod) {
+    public void deleteTab(Model mod) {
         for (Component c : tabbedPane.getComponents()) {
             JSplitPane jsplt = (JSplitPane) c;
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
@@ -514,6 +534,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 return;
             }
         }
+    }
+
+    public boolean hasOpenModels() {
+		return (tabbedPane.getComponentCount() > 0);
     }
 
     @Override
