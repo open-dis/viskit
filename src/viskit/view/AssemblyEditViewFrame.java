@@ -487,12 +487,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
         adapterMode = makeJTButton(null, new AdapterIcon(24, 24),
-                "Connect assemblies with adapter pattern");
+                "Connect assembly nodes (event graph instances) with adapter pattern");
         defBor = adapterMode.getBorder();
         adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
         simEventListenerMode = makeJTButton(null, new SimEventListenerIcon(24, 24),
-                "Connect assemblies through a SimEvent listener pattern");
+                "Connect assembly nodes (event graph instances) with a SimEvent listener pattern");
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
