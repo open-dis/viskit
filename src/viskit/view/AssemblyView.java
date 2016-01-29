@@ -89,11 +89,11 @@ public interface AssemblyView {
 
     /** Saves the current Assembly "as" desired by the user
      *
-     * @param suggName the package and file name of the Assembly
-     * @param suggUniqueName show Assembly name only
+     * @param suggestedName the package and file name of the Assembly
+     * @param suggestedUniqueName show Assembly name only
      * @return a File object of the saved Assembly
      */
-    File saveFileAsk(String suggName, boolean suggUniqueName);
+    File saveFileAsk(String suggestedName, boolean suggestedUniqueName);
 
     /** Open an already existing Viskit Project */
     void openProject();
@@ -129,7 +129,7 @@ public interface AssemblyView {
      *
      * @param mod the Assembly model to remove from view
      */
-    void delTab(AssemblyModel mod);
+    void deleteTab(AssemblyModel mod);
 
     /** @return an array of open ViskitAssemblyModels */
     AssemblyModel[] getOpenModels();

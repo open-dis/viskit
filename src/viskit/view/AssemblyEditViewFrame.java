@@ -241,7 +241,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
-            setModel((AssemblyModelImpl) myVgacw.assyModel); // hold on locally
+            setModel((AssemblyModelImpl) myVgacw.assemblyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
@@ -649,7 +649,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.setjGraph(graphPane);                               // todo fix this
 
-        graphPane.assyModel = mod;
+        graphPane.assemblyModel = mod;
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
@@ -672,8 +672,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             LogUtils.getLogger(AssemblyEditViewFrame.class).error(tmle);
         }
 
-        // the view holds only one assyModel, so it gets overwritten with each tab
-        // but this call serves also to register the view with the passed assyModel
+        // the view holds only one assemblyModel, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed assemblyModel
         // by virtue of calling stateChanged()
         tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
@@ -689,14 +689,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void delTab(AssemblyModel mod) {
+    public void deleteTab(AssemblyModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
         for (int i = 0; i < ca.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
             VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
-            if (vgacw.assyModel == mod) {
+            if (vgacw.assemblyModel == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
 
@@ -723,7 +723,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
             VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
-            vm[i] = vgacw.assyModel;
+            vm[i] = vgacw.assemblyModel;
         }
         return vm;
     }
@@ -1016,10 +1016,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void setSelectedAssemblyName(String s) {
-        boolean nullString = !(s != null && !s.isEmpty());
+    public void setSelectedAssemblyName(String selectedAssemblyName) {
+        boolean nullString = !(selectedAssemblyName != null && !selectedAssemblyName.isEmpty());
         if (!nullString) {
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
+            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyName);
         }
     }
 

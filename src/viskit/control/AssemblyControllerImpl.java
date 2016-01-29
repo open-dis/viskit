@@ -239,7 +239,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             openEventGraphs(file);
 
         } else {
-            vaw.delTab(mod);
+            vaw.deleteTab(mod);
         }
 
         resetRedoUndoStatus();
@@ -327,7 +327,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     markAssyConfigClosed(vAMod.getLastFile());
 
                     AssemblyView view = (AssemblyView) getView();
-                    view.delTab(vAMod);
+                    view.deleteTab(vAMod);
 
                     // NOTE: This doesn't work quite right.  If no Assy is open,
                     // then any non-associated EGs that were also open will
@@ -700,7 +700,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // TODO: Implement this
 //            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
         } else {
-            ((AssemblyView) getView()).delTab(mod);
+            ((AssemblyView) getView()).deleteTab(mod);
         }
     }
 
@@ -1693,10 +1693,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     }
                 } else {
 
-                    // Ensure a cleared Assembly Run panel upon every Assembly compile
+                    // Ensure a cleared Simulation Run panel upon every Assembly compile
                     RunnerPanel2 rp2 = ViskitGlobals.instance().getRunPanel();
-                    rp2.soutTA.setText(null);
-                    rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
+                    rp2.simulationOutputTA.setText(null);
+                    rp2.simulationOutputTA.setText("Assembly output stream:" + rp2.lineEnd
                             + "----------------------" + rp2.lineEnd);
 
                     // Ensure changes to the Assembly Properties dialog get saved

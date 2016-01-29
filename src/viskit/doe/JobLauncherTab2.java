@@ -669,7 +669,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     runButton.setEnabled(true);  // for next time (probably not used)
                     cancelButton.setEnabled(false);
                     if (outputDirty) {
-                        if (JOptionPane.showConfirmDialog(JobLauncherTab2.this, "Save output?") == JOptionPane.YES_OPTION) {
+                        if (JOptionPane.showConfirmDialog(JobLauncherTab2.this, "Save simulation output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
 							jfc.setDialogTitle("Save Design of Experiment (DOE) file");
                             jfc.setSelectedFile(new File("DOEOutput.txt"));

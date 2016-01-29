@@ -76,7 +76,7 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class ViskitMainFrame extends JFrame {
 
-    private JTabbedPane tabbedPane;
+    private JTabbedPane    tabbedPane;
     private JTabbedPane runTabbedPane;
     EventGraphViewFrame eventGraphViewFrame;
     AssemblyEditViewFrame assemblyEditViewFrame;
@@ -218,7 +218,7 @@ public class ViskitMainFrame extends JFrame {
         }
 
 		// =============================================================================================
-        // Assembly Run
+        // Simulation Run
         runTabbedPane = new JTabbedPane();
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
         runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
@@ -228,7 +228,7 @@ public class ViskitMainFrame extends JFrame {
         if (SettingsDialog.isAssemblyRunVisible()) {
             tabbedPane.add(runTabbedPanePanel);
             int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
-            tabbedPane.setTitleAt(idx, "Assembly Run");
+            tabbedPane.setTitleAt(idx, "Simulation Run");
             tabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder TODO?
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = idx;
@@ -238,7 +238,7 @@ public class ViskitMainFrame extends JFrame {
         }
 
 		// =============================================================================================
-        // Assembly Run
+        // Simulation Run
 		
         boolean analystReportPanelVisible = SettingsDialog.isAnalystReportVisible();
         assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
@@ -288,8 +288,8 @@ public class ViskitMainFrame extends JFrame {
             ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(null, myExitAction, mainMenuBar);
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
-            AnalystReportController cntlr = (AnalystReportController) analystReportFrame.getController();
-            cntlr.setMainTabbedPane(tabbedPane, idx);
+            AnalystReportController analystReportController = (AnalystReportController) analystReportFrame.getController();
+            analystReportController.setMainTabbedPane(tabbedPane, idx);
             assemblyController.addAssemblyFileListener((AnalystReportFrame) analystReportFrame);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
@@ -385,7 +385,7 @@ public class ViskitMainFrame extends JFrame {
         getContentPane().add(tabbedPane);
 
         ChangeListener tabChangeListener = new myTabChangeListener();
-        tabbedPane.addChangeListener(tabChangeListener);
+           tabbedPane.addChangeListener(tabChangeListener);
         runTabbedPane.addChangeListener(tabChangeListener);
     }
 
@@ -468,7 +468,11 @@ public class ViskitMainFrame extends JFrame {
 //            JMenuBar newMB = menus.get(i);
 //            newMB.add(hmen);
 //            setJMenuBar(newMB);
-            myTitleListener.setTitle(titles[i], i);
+			if (titles[i].isEmpty())
+			{
+				System.out.println ("No title for tab " + i); // TODO fix improper setup
+			}
+			else myTitleListener.setTitle(titles[i], i);
 
         }
     }
@@ -658,12 +662,16 @@ public class ViskitMainFrame extends JFrame {
         @Override
         public void setTitle(String title, int key) {
             titles[key] = title;
-            int tabIdx = tabbedPane.getSelectedIndex();
-            if (tabIdx == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
-                tabIdx = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
+            int tabIndex = tabbedPane.getSelectedIndex();
+            if (tabIndex == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
+                tabIndex = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
             }
-
-            if (tabIdx == key) {
+			
+			if ((title == null) && title.isEmpty())
+			{
+				System.out.println ("Blank title set of tab " + key);
+			}
+			else if (tabIndex == key) {
                 ViskitMainFrame.this.setTitle(title);
             }
         }

@@ -183,8 +183,8 @@ public class AnalystReportController extends mvcAbstractController {
     public void generateHtmlReport() {
         if (!ViskitGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>"
-                    + "The checkbox for <code>Enable Analyst Reports </code>is not"
-                    + " currently selected.  Please select on the <code>Assembly Run </code>panel,"
+                    + "The checkbox for <code>Enable Analyst Reports</code> is not"
+                    + " currently selected.  Please select on the <code>Simulation Run</code> panel,"
                     + " re-run the experiment and the report will then be available to "
                     + "view.</p></body></html>", "Enable Analyst Reports not selected",
                     JOptionPane.INFORMATION_MESSAGE);

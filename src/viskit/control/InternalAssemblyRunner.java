@@ -58,7 +58,7 @@ import viskit.assembly.JTextAreaOutputStream;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 
-/** Controller for the Assembly Run panel
+/** Controller for the Simulation Run panel
  *
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -142,8 +142,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     /**
-     * Pre-initialization this runner for a sim run
-     * @param params arguments to initialize the Assembly runner
+     * Pre-initialization this runner for a simulation run
+     * @param params arguments to initialize the Simulation runner
      */
     public void preInitRun(String[] params) {
 
@@ -277,7 +277,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
             // *** End RNG seed state reset ***
 
-            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
+            textAreaOutputStream = new JTextAreaOutputStream(runPanel.simulationOutputTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numberOfReplicationsTF.getText().trim()));
@@ -486,7 +486,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             try {
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
-                    bw.write(runPanel.soutTA.getText());
+                    bw.write(runPanel.simulationOutputTA.getText());
                 }
             } catch (IOException e1) {
                 JOptionPane.showMessageDialog(null, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);
@@ -585,11 +585,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 	
-        private JMenu  runMenu = new JMenu("Assembly Run");
+    private JMenu  runMenu = new JMenu("Simulation Run");
 
     private void doMenus() {
              myMenuBar = new JMenuBar();
-        JMenuItem save = new JMenuItem("Save output streams");
+        JMenuItem save = new JMenuItem("Save simulation output streams");
         JMenu editMenu = new JMenu("Edit");
         JMenuItem copy = new JMenuItem("Copy");
         JMenuItem  selectAll = new JMenuItem("Select all");
@@ -619,7 +619,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String s = runPanel.soutTA.getSelectedText();
+            String s = runPanel.simulationOutputTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbd.setContents(ss, ss);
@@ -630,8 +630,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.requestFocus();
-            runPanel.soutTA.selectAll();
+            runPanel.simulationOutputTA.requestFocus();
+            runPanel.simulationOutputTA.selectAll();
         }
     }
 
@@ -639,7 +639,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.setText(null);
+            runPanel.simulationOutputTA.setText(null);
         }
     }
 
@@ -660,7 +660,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 tool = "gedit"; // assuming Linux here
             }
 
-            String s = runPanel.soutTA.getText().trim();
+            String s = runPanel.simulationOutputTA.getText().trim();
             try {
                 f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
@@ -702,10 +702,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public void setTitleListener(TitleListener lis, int key) {
         titlList = lis;
         titlkey = key;
-        doTitle(null);
+//        doTitle(null); // don't blow away title while setting up listener, let it be set elsewhere
     }
 
-    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
+    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

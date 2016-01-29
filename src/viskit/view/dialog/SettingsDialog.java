@@ -175,7 +175,7 @@ public class SettingsDialog extends JDialog {
         innerCheckBoxPanel.add(eventGraphEditorPreferenceCB);
         assemblyEditorPreferenceCB = new JCheckBox("Assembly Editor");
         innerCheckBoxPanel.add(assemblyEditorPreferenceCB);
-        runAssemblyPreferenceCB = new JCheckBox("Assembly Run");
+        runAssemblyPreferenceCB = new JCheckBox("Simulation Run");
         innerCheckBoxPanel.add(runAssemblyPreferenceCB);
         analystReportPreferenceCB = new JCheckBox("Analyst Report");
         innerCheckBoxPanel.add(analystReportPreferenceCB);

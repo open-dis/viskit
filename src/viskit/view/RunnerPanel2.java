@@ -60,7 +60,7 @@ public class RunnerPanel2 extends JPanel {
     public boolean search;
     public String lineEnd = System.getProperty("line.separator");
     public JScrollPane jsp;
-    public JTextArea soutTA;
+    public JTextArea simulationOutputTA;
     public JSplitPane xsplPn;
     public JButton vcrStop,  vcrPlay,  vcrRewind,  vcrStep,  closeButt;
     public JCheckBox vcrVerbose;
@@ -79,7 +79,7 @@ public class RunnerPanel2 extends JPanel {
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     private JLabel titl;
-    private boolean aRPanelVisible;
+    private final boolean assemblyRunPanelVisible;
 
     /**
      * Create an Assembly Runner panel
@@ -87,13 +87,14 @@ public class RunnerPanel2 extends JPanel {
      * @param skipCloseButt if ture, don't supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A false will enable all VCR buttons.
      * Currently, only start and stop work
-     * @param analystReportPanelVisible if true, will enable the analyst report check box
+     * @param assemblyRunPanelPanelVisible if true, will enable the analyst report check box
      */
-    public RunnerPanel2(String title, boolean skipCloseButt, boolean analystReportPanelVisible) {
-        this.aRPanelVisible = analystReportPanelVisible;
+    public RunnerPanel2(String title, boolean skipCloseButt, boolean assemblyRunPanelPanelVisible) {
+        this.assemblyRunPanelVisible = assemblyRunPanelPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        if (title != null) {
+        if (title != null)
+		{
             titl = new JLabel(title);
             titl.setHorizontalAlignment(JLabel.CENTER);
             add(titl, BorderLayout.NORTH);
@@ -101,13 +102,13 @@ public class RunnerPanel2 extends JPanel {
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSplit;
 
-        soutTA = new JTextArea("Assembly output stream:" + lineEnd +
-                "----------------------" + lineEnd);
-        soutTA.setEditable(true); //false);
-        soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
-        // don't force an initial scroller soutTA.setRows(100);
-        jsp = new JScrollPane(soutTA);
+        simulationOutputTA = new JTextArea("Simulation output stream:" + lineEnd +
+                                           "-------------------------" + lineEnd);
+        simulationOutputTA.setEditable(true); //false);
+        simulationOutputTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        simulationOutputTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
+        // don't force an initial scroller simulationOutputTA.setRows(100);
+        jsp = new JScrollPane(simulationOutputTA);
         bar = jsp.getVerticalScrollBar();
         bar.setUnitIncrement(STEPSIZE);
 
@@ -138,32 +139,32 @@ public class RunnerPanel2 extends JPanel {
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButt) {
-        JPanel flowPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrSimTimeLab = new JLabel("Sim start time: ");
+        JLabel vcrSimulationStartTimeLabel = new JLabel("Simulation start time: ");
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
         vcrSimulationTime = new JTextField(10);
         vcrSimulationTime.setEditable(false);
         ViskitStatics.clampSize(vcrSimulationTime, vcrSimulationTime, vcrSimulationTime);
-        JPanel labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(vcrSimTimeLab);
-        labTF.add(vcrSimulationTime);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        JPanel vcrPanel = new JPanel();
+        vcrPanel.setLayout(new BoxLayout(vcrPanel, BoxLayout.X_AXIS));
+        vcrPanel.add(vcrSimulationStartTimeLabel);
+        vcrPanel.add(vcrSimulationTime);
+        vcrPanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrPanel);
 
-        JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
-        vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
+        JLabel vcrSimulationStopTimeLabel = new JLabel("Simulation stop time: ");
+        vcrSimulationStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
         ViskitStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
-        labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(vcrStopTimeLabel);
-        labTF.add(vcrStopTime);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        vcrPanel = new JPanel();
+        vcrPanel.setLayout(new BoxLayout(vcrPanel, BoxLayout.X_AXIS));
+        vcrPanel.add(vcrSimulationStopTimeLabel);
+        vcrPanel.add(vcrStopTime);
+        vcrPanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrPanel);
 
         numberOfReplicationsTF = new JTextField(10);
         numberOfReplicationsTF.addActionListener(new ActionListener() {
@@ -178,18 +179,18 @@ public class RunnerPanel2 extends JPanel {
             });
         ViskitStatics.clampSize(numberOfReplicationsTF, numberOfReplicationsTF, numberOfReplicationsTF);
         JLabel numRepsLab = new JLabel("# replications: ");
-        labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(numRepsLab);
-        labTF.add(numberOfReplicationsTF);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        vcrPanel = new JPanel();
+        vcrPanel.setLayout(new BoxLayout(vcrPanel, BoxLayout.X_AXIS));
+        vcrPanel.add(numRepsLab);
+        vcrPanel.add(numberOfReplicationsTF);
+        vcrPanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrPanel);
 
 
         vcrVerbose = new JCheckBox("Verbose output", false);
         vcrVerbose.addActionListener(new vcrVerboseCBListener());
         vcrVerbose.setToolTipText("Enables verbose output for all runs");
-        flowPan.add(vcrVerbose);
+        flowPanel.add(vcrVerbose);
 
         verboseRepNumberTF = new JTextField(7);
         verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
@@ -197,27 +198,27 @@ public class RunnerPanel2 extends JPanel {
         verboseRepNumberTF.addCaretListener(lis);
         ViskitStatics.clampSize(verboseRepNumberTF);
         verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
-        flowPan.add(verboseRepNumberTF);
+        flowPanel.add(verboseRepNumberTF);
 
         closeButt = new JButton("Close");
         closeButt.setToolTipText("Close this window");
         if (!skipCloseButt) {
-            flowPan.add(closeButt);
+            flowPanel.add(closeButt);
         }
 
         saveRepDataCB = new JCheckBox("Save replication data");
         saveRepDataCB.setToolTipText("If using only a SimplePropertyDumper, no need to check this");
-        flowPan.add(saveRepDataCB);
+        flowPanel.add(saveRepDataCB);
         printRepReportsCB = new JCheckBox("Print replication reports");
-        flowPan.add(printRepReportsCB);
+        flowPanel.add(printRepReportsCB);
         printSummReportsCB = new JCheckBox("Print summary reports");
-        flowPan.add(printSummReportsCB);
+        flowPanel.add(printSummReportsCB);
 
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable Analyst Reports");
         analystReportCB.setSelected(true);
-        analystReportCB.setEnabled(aRPanelVisible);
-        flowPan.add(analystReportCB);
+        analystReportCB.setEnabled(assemblyRunPanelVisible);
+        flowPanel.add(analystReportCB);
 
         // Initially, unselected
         resetSeedStateCB = new JCheckBox("Reset seed state each rerun");
@@ -264,12 +265,12 @@ public class RunnerPanel2 extends JPanel {
         }
 
         buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        flowPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        flowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        flowPan.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
+        flowPanel.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
 
-        flowPan.add(buttonPanel);
-        return flowPan;
+        flowPanel.add(buttonPanel);
+        return flowPanel;
     }
 
     class vcrVerboseCBListener implements ActionListener {

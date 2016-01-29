@@ -120,7 +120,7 @@ public class RunnerPanel2Original extends JPanel {
         soutTA.setEditable(true); //false);
         soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
-        // don't force an initial scroller soutTA.setRows(100);
+        // don't force an initial scroller simulationOutputTA.setRows(100);
         jsp = new JScrollPane(soutTA);
         bar = jsp.getVerticalScrollBar();
         bar.setUnitIncrement(STEPSIZE);
