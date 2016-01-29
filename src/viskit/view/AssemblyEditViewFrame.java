@@ -119,12 +119,15 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JToolBar toolBar;
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
-    private LegoTree lTree,  pclTree;
+    private LegoTree legoTree,  propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjFileSetListener recentProjFileSetListener;
 
     private int untitledCount = 0;
+	
+    private final JMenu fileMenu = new JMenu("Assemblies");
+    private final JMenu editMenu = new JMenu("Assembly Editor");
 
     public AssemblyEditViewFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
@@ -308,8 +311,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             }
         }
     }
-        private JMenu fileMenu = new JMenu("Assemblies");
-        private JMenu editMenu = new JMenu("Assembly Editor");
 
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
@@ -713,20 +714,20 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
     public void rebuildLEGOTreePanels() {
-        lTree.clear();
+        legoTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
-        lTree.repaint();
+        legoTree.repaint();
     }
     private JSplitPane treePanels;
 
     private JSplitPane buildTreePanels() {
 
-        lTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
+        legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
+        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         String[] extraCP = SettingsDialog.getExtraClassPath();
@@ -768,11 +769,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             }
         }
 
-        LegosPanel lPan = new LegosPanel(lTree);
-        PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
+        LegosPanel lPan = new LegosPanel(legoTree);
+        PropChangeListenersPanel pclPan = new PropChangeListenersPanel(propertyChangeListenerTree);
 
-        lTree.setBackground(background);
-        pclTree.setBackground(background);
+        legoTree.setBackground(background);
+        propertyChangeListenerTree.setBackground(background);
 
         treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
         treePanels.setBorder(null);
@@ -782,8 +783,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         lPan.setMinimumSize(new Dimension(20, 80));
         lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
-        lTree.setDragEnabled(true);
-        pclTree.setDragEnabled(true);
+        legoTree.setDragEnabled(true);
+        propertyChangeListenerTree.setDragEnabled(true);
 
         return treePanels;
     }
@@ -904,35 +905,35 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     @Override
     public Object getSelectedEventGraph() {
-        return getLeafUO(lTree);
+        return getLeafUO(legoTree);
     }
 
     @Override
     public Object getSelectedPropChangeListener() {
-        return getLeafUO(pclTree);
+        return getLeafUO(propertyChangeListenerTree);
     }
 
     @Override
     public void addEventGraphsToLegoTree(File f, boolean b) {
         if (f.exists()) {
-            lTree.addContentRoot(f, b);
+            legoTree.addContentRoot(f, b);
         }
     }
 
     @Override
     public void addPCLsToLegoTree(File f, boolean b) {
-        pclTree.addContentRoot(f, b);
+        propertyChangeListenerTree.addContentRoot(f, b);
     }
 
     @Override
     public void removeEventGraphFromLEGOTree(File f) {
-        lTree.removeContentRoot(f);
+        legoTree.removeContentRoot(f);
     }
 
     // Not used
     @Override
     public void removePropChangeFromLEGOTree(File f) {
-        pclTree.removeContentRoot(f);
+        propertyChangeListenerTree.removeContentRoot(f);
     }
 
     @Override
