@@ -125,6 +125,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();
+                mymetaData.description = jaxbRoot.getDescription();
 
                 Schedule sch = jaxbRoot.getSchedule();
                 if (sch != null) {
@@ -187,9 +188,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nIe(metaData.name));
-            jaxbRoot.setVersion(nIe(metaData.version));
-            jaxbRoot.setPackage(nIe(metaData.packageName));
+            jaxbRoot.setName(nullIfEmpty(metaData.name));
+            jaxbRoot.setVersion(nullIfEmpty(metaData.version));
+            jaxbRoot.setPackage(nullIfEmpty(metaData.packageName));
+            jaxbRoot.setDescription(nullIfEmpty(metaData.description));
 
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(oFactory.createSchedule());
@@ -309,7 +311,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         SimEntity jaxbEG = oFactory.createSimEntity();
 
-        jaxbEG.setName(nIe(widgetName));
+        jaxbEG.setName(nullIfEmpty(widgetName));
         jaxbEG.setType(className);
         node.opaqueModelObject = jaxbEG;
 
@@ -374,7 +376,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         PropertyChangeListener pcl = oFactory.createPropertyChangeListener();
 
-        pcl.setName(nIe(widgetName));
+        pcl.setName(nullIfEmpty(widgetName));
         pcl.setType(className);
         pcNode.opaqueModelObject = pcl;
 
@@ -991,8 +993,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             AssemblyNode frNode = getNodeCache().get(jaxbAdapter.getFrom());
             ae.setTo(toNode);
             ae.setFrom(frNode);
-            ae.setSourceEvent(jaxbAdapter.getEventHeard());
-            ae.setTargetEvent(jaxbAdapter.getEventSent());
+            // Handle XML names with underscores (XML IDREF issue)
+            String event = jaxbAdapter.getEventHeard();
+            if (event.contains("_"))
+                event = event.substring(0, event.indexOf("_"));
+            ae.setSourceEvent(event);
+
+            event = jaxbAdapter.getEventSent();
+            if (event.contains("_"))
+                event = event.substring(0, event.indexOf("_"));
+            ae.setTargetEvent(event);
+			
             ae.setName(jaxbAdapter.getName());
             ae.setDescriptionString(jaxbAdapter.getDescription());
             ae.opaqueModelObject = jaxbAdapter;
@@ -1115,7 +1126,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
      * @param s the string to check for non-zero length
      * @return the passed string if non-zero length, else null
      */
-    private String nIe(String s) {
+    private String nullIfEmpty(String s) {
         if (s != null) {
             if (s.length() == 0) {
                 s = null;
