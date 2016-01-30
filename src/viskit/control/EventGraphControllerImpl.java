@@ -88,10 +88,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    @Override
-    public void settings() {
-        // placeholder for multi-tabbed combo app.
-    }
+//    TODO delete, reflection method no longer needed
+//	  @Override
+//    public void settings() {
+//        // placeholder for multi-tabbed combo app.
+//    }
 
     @Override
     public void newProject() {

@@ -63,7 +63,7 @@ import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.UserPreferencesDialog;
 
 /**
  * MOVES Institute
@@ -166,7 +166,7 @@ public class ViskitMainFrame extends JFrame {
         // Event graph editor
 		
         eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
-        if (SettingsDialog.isEventGraphEditorVisible()) {
+        if (UserPreferencesDialog.isEventGraphEditorVisible()) {
             mainTabbedPane.add(eventGraphViewFrame.getContent());
             int idx = mainTabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
             mainTabbedPane.setTitleAt(idx, "Event Graph Editor");
@@ -194,7 +194,7 @@ public class ViskitMainFrame extends JFrame {
 		// =============================================================================================
         // Assembly editor
         assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
-        if (SettingsDialog.isAssemblyEditorVisible()) {
+        if (UserPreferencesDialog.isAssemblyEditorVisible()) {
             mainTabbedPane.add(assemblyEditViewFrame.getContent());
             int idx = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
             mainTabbedPane.setTitleAt(idx, "Assembly Editor");
@@ -228,7 +228,7 @@ public class ViskitMainFrame extends JFrame {
         runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
 
         // Always selected as visible
-        if (SettingsDialog.isAssemblyRunVisible()) {
+        if (UserPreferencesDialog.isAssemblyRunVisible()) {
             mainTabbedPane.add(runTabbedPanePanel);
             int idx = mainTabbedPane.indexOfComponent(runTabbedPanePanel);
             mainTabbedPane.setTitleAt(idx, "Simulation Run");
@@ -243,7 +243,7 @@ public class ViskitMainFrame extends JFrame {
 		// =============================================================================================
         // Simulation Run
 		
-        boolean analystReportPanelVisible = SettingsDialog.isAnalystReportVisible();
+        boolean analystReportPanelVisible = UserPreferencesDialog.isAnalystReportVisible();
         assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
 		
         runTabbedPane.add(assemblyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
@@ -301,9 +301,9 @@ public class ViskitMainFrame extends JFrame {
         // File menu continued
 
         fileMenu.addSeparator();
-		JMenuItem settingsMenuItem = buildMenuItem(eventGraphController, "settings", "Settings", null, null);
+		JMenuItem settingsMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
         fileMenu.add(settingsMenuItem);
-        settingsMenuItem.addActionListener(mySettingsHandler);
+        settingsMenuItem.addActionListener(myUserPreferencesHandler);
 //        jamSettingsHandler(fileMenu); // TODO investigate
 		
 		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", null, null); // do not change "quit", no hotkey for reliability
@@ -321,7 +321,7 @@ public class ViskitMainFrame extends JFrame {
 		// =============================================================================================
         // Design of experiments
         DoeMainFrame designOfExperimentsFrame = null;
-        boolean isDOEVisible = SettingsDialog.isDOEVisible();
+        boolean isDOEVisible = UserPreferencesDialog.isDOEVisible();
         if (isDOEVisible) {
             designOfExperimentsMain = DoeMain.main2();
             designOfExperimentsFrame = designOfExperimentsMain.getMainFrame();
@@ -347,7 +347,7 @@ public class ViskitMainFrame extends JFrame {
 
 		// =============================================================================================
         // Grid run panel
-        if (SettingsDialog.isClusterRunVisible()) {
+        if (UserPreferencesDialog.isClusterRunVisible()) {
             runGridComponent = new JobLauncherTab2(designOfExperimentsMain.getController(), null, null, this);
 			designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
@@ -503,29 +503,29 @@ public class ViskitMainFrame extends JFrame {
         }
     }
 
-    private void jamSettingsHandler(JMenuBar menuBar) {
-        for (int i = 0; i < menuBar.getMenuCount(); i++) {
-            JMenu nextMenu = menuBar.getMenu(i);
-            if (nextMenu.getText().equalsIgnoreCase("Project")) {
-                for (int j = 0; j < nextMenu.getMenuComponentCount(); j++) {
-                    Component c = nextMenu.getMenuComponent(j);
-                    if (c instanceof JMenuItem) {
-                        JMenuItem menuItem = (JMenuItem) c;
-                        if (menuItem.getText().equalsIgnoreCase("Settings")) {
-                            menuItem.addActionListener(mySettingsHandler);
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    private void jamSettingsHandler(JMenuBar menuBar) {
+//        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+//            JMenu nextMenu = menuBar.getMenu(i);
+//            if (nextMenu.getText().equalsIgnoreCase("Project")) {
+//                for (int j = 0; j < nextMenu.getMenuComponentCount(); j++) {
+//                    Component c = nextMenu.getMenuComponent(j);
+//                    if (c instanceof JMenuItem) {
+//                        JMenuItem menuItem = (JMenuItem) c;
+//                        if (menuItem.getText().equalsIgnoreCase("Settings")) {
+//                            menuItem.addActionListener(myUserPreferencesHandler);
+//                            return;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    ActionListener mySettingsHandler = new ActionListener() {
+    ActionListener myUserPreferencesHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SettingsDialog.showDialog(ViskitMainFrame.this);
+            UserPreferencesDialog.showDialog(ViskitMainFrame.this);
         }
     };
 

@@ -175,7 +175,7 @@ public interface EventGraphController {
 
     void selectNodeOrEdge(Vector<Object> v);
 
-    void settings();
+//    void settings();
 
     boolean preClose();
 

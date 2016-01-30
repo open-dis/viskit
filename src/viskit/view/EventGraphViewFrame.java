@@ -38,7 +38,7 @@ import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.UserPreferencesDialog;
 
 /**
  * Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -77,7 +77,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public final static int SELF_REF_CANCEL_MODE = 5;
 
     private static final String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
-    private static final String LOOK_AND_FEEL = SettingsDialog.getLookAndFeel();;
+    private static final String LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel();;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar
@@ -874,7 +874,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Make selection mode the default mode
         selectMode.setSelected(true);
 
-        getToolBar().add(new JLabel("Add: "));
+        getToolBar().add(new JLabel("Add"));
         getToolBar().add(addEvent);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(addSelfReferential);
@@ -883,7 +883,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        getToolBar().add(new JLabel("Mode: "));
+        getToolBar().add(new JLabel("Mode"));
         getToolBar().add(selectMode);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(arcMode);
@@ -891,15 +891,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().add(cancelArcMode);
 
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("Zoom: "));
+        getToolBar().add(new JLabel("Zoom"));
         getToolBar().add(zoomIn);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
 
+		// right aligned
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("Save, compile: "));
+		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile </p></html>");
+		saveLabel.setHorizontalAlignment(JButton.RIGHT);
+        getToolBar().add(saveLabel);
+        getToolBar().addSeparator(new Dimension(5, 24));
+		saveButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(saveButton);
-        getToolBar().addSeparator(new Dimension(24, 24));
+        getToolBar().addSeparator(new Dimension(5, 24));
 
         // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);

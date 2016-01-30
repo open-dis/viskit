@@ -67,13 +67,13 @@ import viskit.control.AssemblyController;
  * @since 11:24:06 AM
  * @version $Id$
  */
-public class SettingsDialog extends JDialog {
+public class UserPreferencesDialog extends JDialog {
 
-    private static SettingsDialog dialog;
+    private static UserPreferencesDialog projectSettingsDialog;
     private static boolean modified = false;
-    private JButton cancelButton;
-    private JButton okButton;
-    private JTabbedPane tabbedPane;
+    private final JButton cancelButton;
+    private final JButton okButton;
+    private final JTabbedPane tabbedPane;
     private JList<String> classpathAdditionsJlist;
     private JCheckBox eventGraphEditorPreferenceCB;
     private JCheckBox assemblyEditorPreferenceCB;
@@ -91,27 +91,38 @@ public class SettingsDialog extends JDialog {
 	public final String PREFERENCE_CHANGE_MESSAGE = "Changes are applied when Viskit launches";
 
     public static boolean showDialog(JFrame mother) {
-        if (dialog == null) {
-            dialog = new SettingsDialog(mother);
+        if (projectSettingsDialog == null) {
+            projectSettingsDialog = new UserPreferencesDialog(mother);
         } else {
-            dialog.setParams();
+            projectSettingsDialog.setParams();
         }
-        dialog.setVisible(true);
+        projectSettingsDialog.setVisible(true);
         // above call blocks
         return modified;
     }
 
-    private SettingsDialog(JFrame mother) {
-        super(mother, "Viskit Application Settings", true);
+    private UserPreferencesDialog(JFrame parent) {
+        super(parent, "User Preferences", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
         initConfigs();
 
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
-        setContentPane(content);
+        JPanel contentPane = new JPanel();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
+        setContentPane(contentPane);
+		
+//		JPanel     headerPanel      = new JPanel ();
+//		JLabel     projectNameLabel = new JLabel ("Project name");
+//		JTextField projectNameTF    = new JTextField ();
+//		projectNameTF.setText(ViskitGlobals.instance().getCurrentViskitProject().getProjectName());
+//		projectNameTF.setEditable(false);
+//		headerPanel.add(projectNameLabel);
+//        headerPanel.add(Box.createVerticalStrut(5));
+//		headerPanel.add(projectNameTF);
+//        contentPane.add(headerPanel);
+				
 
         tabbedPane = new JTabbedPane();
         buildWidgets();
@@ -125,9 +136,9 @@ public class SettingsDialog extends JDialog {
         buttonPanel.add(okButton);
         //buttonPanel.add(Box.createHorizontalGlue());
 
-        content.add(tabbedPane);
-        content.add(Box.createVerticalStrut(5));
-        content.add(buttonPanel);
+        contentPane.add(tabbedPane);
+        contentPane.add(Box.createVerticalStrut(5));
+        contentPane.add(buttonPanel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
@@ -199,31 +210,6 @@ public class SettingsDialog extends JDialog {
         visibilityPreferencesPanel.add(Box.createVerticalGlue());
 
         tabbedPane.addTab("Capabilities", visibilityPreferencesPanel);
-		
-		// ================================================================
-		// Recent File Lists
-
-        JPanel recentP = new JPanel();
-        recentP.setLayout(new BoxLayout(recentP, BoxLayout.Y_AXIS));
-
-        JButton clearRecentEventGraphsButton = new JButton("Clear List: Recent Event Graphs");
-        clearRecentEventGraphsButton.addActionListener(new ClearRecentEventGraphsHandler());
-        clearRecentEventGraphsButton.setAlignmentX(Box.CENTER_ALIGNMENT);
-		
-        JButton clearRecentAssembliesButton = new JButton("Clear List:  Recent Assemblies");
-        clearRecentAssembliesButton.addActionListener(new ClearRecentAssembliesHandler());
-        clearRecentAssembliesButton.setAlignmentX(Box.CENTER_ALIGNMENT);
-		clearRecentAssembliesButton.setSize(clearRecentEventGraphsButton.getSize());
-		AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-		assemblyController.clearRecentAssemblyFileList();
-		
-        recentP.add(Box.createVerticalGlue());
-        recentP.add(clearRecentEventGraphsButton);
-        recentP.add(Box.createVerticalGlue());
-        recentP.add(clearRecentAssembliesButton);
-        recentP.add(Box.createVerticalGlue());
-
-        tabbedPane.addTab("Recent File Lists", recentP);
 		
 		// ================================================================
 		// CLASSPATH Additions
@@ -307,6 +293,31 @@ public class SettingsDialog extends JDialog {
         otherTF.addActionListener(lis);
 
         tabbedPane.addTab("Look and Feel",lookAndFeelPanel);
+		
+		// ================================================================
+		// Recent File Lists
+
+        JPanel recentP = new JPanel();
+        recentP.setLayout(new BoxLayout(recentP, BoxLayout.Y_AXIS));
+
+        JButton clearRecentEventGraphsButton = new JButton("Clear List: Recent Event Graphs");
+        clearRecentEventGraphsButton.addActionListener(new ClearRecentEventGraphsHandler());
+        clearRecentEventGraphsButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+		
+        JButton clearRecentAssembliesButton = new JButton("Clear List:  Recent Assemblies");
+        clearRecentAssembliesButton.addActionListener(new ClearRecentAssembliesHandler());
+        clearRecentAssembliesButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+		clearRecentAssembliesButton.setSize(clearRecentEventGraphsButton.getSize());
+		AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+		assemblyController.clearRecentAssemblyFileList();
+		
+        recentP.add(Box.createVerticalGlue());
+        recentP.add(clearRecentEventGraphsButton);
+        recentP.add(Box.createVerticalGlue());
+        recentP.add(clearRecentAssembliesButton);
+        recentP.add(Box.createVerticalGlue());
+
+        tabbedPane.addTab("Recent File Lists", recentP);
      }
 
     class lafListener implements ActionListener {
@@ -406,14 +417,14 @@ public class SettingsDialog extends JDialog {
         if (lis != null) {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
-                LogUtils.getLogger(SettingsDialog.class).debug("lis[" + ix + "]: " + s);
+                LogUtils.getLogger(UserPreferencesDialog.class).debug("lis[" + ix + "]: " + s);
                 projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
         }
 
-        if (dialog != null) {
-            progressDialog = new JDialog(dialog);
+        if (projectSettingsDialog != null) {
+            progressDialog = new JDialog(projectSettingsDialog);
             progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             progress.setIndeterminate(true);
             progress.setString("Loading Libraries");
@@ -433,7 +444,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public Void doInBackground() {
-            if (dialog != null) {
+            if (projectSettingsDialog != null) {
                 progressDialog.setVisible(true);
                 progressDialog.toFront();
             }
@@ -446,7 +457,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void done() {
-            if (dialog != null && progressDialog != null) {
+            if (projectSettingsDialog != null && progressDialog != null) {
                 progress.setIndeterminate(false);
                 progress.setValue(100);
                 progressDialog.dispose();
@@ -518,7 +529,7 @@ public class SettingsDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(SettingsDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(UserPreferencesDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
@@ -568,7 +579,7 @@ public class SettingsDialog extends JDialog {
                 });
             }
 
-            int retv = addChooser.showOpenDialog(SettingsDialog.this);
+            int retv = addChooser.showOpenDialog(UserPreferencesDialog.this);
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
@@ -666,7 +677,7 @@ public class SettingsDialog extends JDialog {
                 try {
                     extClassPathsUrls[i++] = file.toURI().toURL();
                 } catch (MalformedURLException ex) {
-                    LogUtils.getLogger(SettingsDialog.class).error(ex);
+                    LogUtils.getLogger(UserPreferencesDialog.class).error(ex);
                 }
             }
         }

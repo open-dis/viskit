@@ -61,7 +61,7 @@ import org.jdom.Text;
 import viskit.*;
 import viskit.util.TitleListener;
 import viskit.util.OpenAssembly;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.UserPreferencesDialog;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.Schedule;
@@ -799,7 +799,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (gridMode) {
                 doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()));
             } else {
-                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
+                doe = new LocalDriverImpl(UserPreferencesDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
             }
             System.gc();
             qstatConsole.setDoe(doe);

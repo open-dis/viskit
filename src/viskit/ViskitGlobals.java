@@ -37,7 +37,7 @@ import viskit.control.EventGraphControllerImpl;
 import viskit.control.AssemblyControllerImpl;
 import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.RunnerPanel2;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.UserPreferencesDialog;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.EventGraphViewFrame;
 import bsh.EvalError;
@@ -304,7 +304,7 @@ public class ViskitGlobals {
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = SettingsDialog.getExtraClassPath();
+        String[] workCP = UserPreferencesDialog.getExtraClassPath();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {
@@ -800,7 +800,7 @@ public class ViskitGlobals {
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (currentViskitProject.initializeProject()) {
-            SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
+            UserPreferencesDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
         } else {
             throw new RuntimeException("Unable to create project directory");
         }
@@ -817,7 +817,7 @@ public class ViskitGlobals {
      */
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
-            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] urlArray = UserPreferencesDialog.getExtraClassPathArraytoURLArray();
 
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     Thread.currentThread().getContextClassLoader(),
@@ -844,7 +844,7 @@ public class ViskitGlobals {
         if (freshLoader == null) {
 
             // Forcing exposure of extra classpaths here.  Bugfix 1237
-            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] urlArray = UserPreferencesDialog.getExtraClassPathArraytoURLArray();
 
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                     null,

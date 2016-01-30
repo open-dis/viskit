@@ -80,7 +80,7 @@ import viskit.util.AssemblyFileFilter;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.SimEventListenerConnectionInspectorDialog;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.UserPreferencesDialog;
 import viskit.view.dialog.PclNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
@@ -506,7 +506,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Make selection mode the default mode
         selectMode.setSelected(true);
 
-        getToolBar().add(new JLabel("Mode: "));
+        getToolBar().add(new JLabel("Mode"));
 
         getToolBar().add(selectMode);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -517,20 +517,29 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().add(propChangeListenerMode);
 
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("Zoom: "));
+        getToolBar().add(new JLabel("Zoom"));
         getToolBar().add(zoomIn);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        getToolBar().add(new JLabel("Save, compile: "));
+		// right aligned
+		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile</p></html>");
+		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
+        getToolBar().add(saveLabel);
+        getToolBar().addSeparator(new Dimension(5, 24));
+		saveButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(saveButton);
-        getToolBar().addSeparator(new Dimension(24, 24));
+        getToolBar().addSeparator(new Dimension(5, 24));
         
-        JLabel initializeLabel = new JLabel ("  Initialize assembly for simulation run: ");
+		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize assembly<br /> for simulation run </p></html>");
+		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
+        getToolBar().addSeparator(new Dimension(5, 24));
+		runButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(runButton);
+        getToolBar().addSeparator(new Dimension(5, 24));
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
@@ -734,7 +743,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropertyChangeListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
-        String[] extraCP = SettingsDialog.getExtraClassPath();
+        String[] extraCP = UserPreferencesDialog.getExtraClassPath();
 
         if (extraCP != null) {
             File file;
