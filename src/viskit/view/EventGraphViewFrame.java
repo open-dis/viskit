@@ -590,27 +590,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         @Override
         public void listChanged() {
-            EventGraphController vcontroller = (EventGraphController) getController();
-            Set<File> lis = vcontroller.getRecentEventGraphFileSet();
+            EventGraphController eventGraphController = (EventGraphController) getController();
+            Set<File> fileSet = eventGraphController.getRecentEventGraphFileSet();
             openRecentEGMenu.removeAll();
-            for (File fullPath : lis) {
+            for (File fullPath : fileSet) {
                 if (!fullPath.exists()) {
                     continue;
                 }
                 String nameOnly = fullPath.getName();
-                Action act = new ParameterizedAction(nameOnly);
-                act.putValue(FULLPATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath.getPath());
-                openRecentEGMenu.add(mi);
+                Action menuItemAction = new ParameterizedAction(nameOnly);
+                menuItemAction.putValue(FULLPATH, fullPath);
+                JMenuItem menuItem = new JMenuItem(menuItemAction);
+                menuItem.setToolTipText(fullPath.getPath());
+                openRecentEGMenu.add(menuItem);
             }
-            if (lis.size() > 0) {
+            if (fileSet.size() > 0) {
                 openRecentEGMenu.add(new JSeparator());
-                Action act = new ParameterizedAction("clear");
-                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText("Clear this list");
-                openRecentEGMenu.add(mi);
+                Action menuItemAction = new ParameterizedAction("clear");
+                menuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+                JMenuItem menuItem = new JMenuItem(menuItemAction);
+                menuItem.setToolTipText("Clear this list");
+                openRecentEGMenu.add(menuItem);
             }
         }
     }
@@ -623,7 +623,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            EventGraphController vcontroller = (EventGraphController) getController();
+            EventGraphController eventGraphController = (EventGraphController) getController();
 
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
@@ -633,9 +633,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 fullPath = (File) obj;
 
             if (fullPath.getPath().equals(CLEARPATHFLAG)) {
-                vcontroller.clearRecentEventGraphFileSet();
+                eventGraphController.clearRecentEventGraphFileSet();
             } else {
-                vcontroller.openRecentEventGraph(fullPath);
+                eventGraphController.openRecentEventGraph(fullPath);
+				ViskitGlobals.instance().getMainAppWindow().selectEventGraphEditorTab();
             }
         }
     }

@@ -631,7 +631,7 @@ public class ViskitMainFrame extends JFrame {
         }
     }
 
-    private SystemExitHandler nullSystemExitHandler = new SystemExitHandler() {
+    private final SystemExitHandler nullSystemExitHandler = new SystemExitHandler() {
 
         @Override
         public void doSystemExit(int status) {
@@ -674,7 +674,7 @@ public class ViskitMainFrame extends JFrame {
                 tabIndex = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
             }
 			
-			if ((title == null) && title.isEmpty())
+			if ((title != null) && title.isEmpty())
 			{
 				System.out.println ("Blank title set of tab " + key);
 			}

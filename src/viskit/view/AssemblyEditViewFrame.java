@@ -106,9 +106,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     // The view needs access to this
     public JButton runButton;
 
-    JMenu openRecentAssemblyMenu, openRecentProjMenu;
+    JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
-    private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
+    private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
 
     private final String FULLPATH = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
@@ -262,27 +262,27 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         @Override
         public void listChanged() {
-            AssemblyController acontroller = (AssemblyController) getController();
-            Set<File> lis = acontroller.getRecentAssemblyFileSet();
+            AssemblyController assemblyController = (AssemblyController) getController();
+            Set<File> fileSet = assemblyController.getRecentAssemblyFileSet();
             openRecentAssemblyMenu.removeAll();
-            for (File fullPath : lis) {
+            for (File fullPath : fileSet) {
                 if (!fullPath.exists()) {
                     continue;
                 }
                 String nameOnly = fullPath.getName();
-                Action act = new ParameterizedAssemblyAction(nameOnly);
-                act.putValue(FULLPATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath.getPath());
-                openRecentAssemblyMenu.add(mi);
+                Action menuItemAction = new ParameterizedAssemblyAction(nameOnly);
+                menuItemAction.putValue(FULLPATH, fullPath);
+                JMenuItem menuItem = new JMenuItem(menuItemAction);
+                menuItem.setToolTipText(fullPath.getPath());
+                openRecentAssemblyMenu.add(menuItem);
             }
-            if (lis.size() > 0) {
+            if (fileSet.size() > 0) {
                 openRecentAssemblyMenu.add(new JSeparator());
-                Action act = new ParameterizedAssemblyAction("clear");
-                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText("Clear this list");
-                openRecentAssemblyMenu.add(mi);
+                Action menuItemAction = new ParameterizedAssemblyAction("clear");
+                menuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+                JMenuItem menuItem = new JMenuItem(menuItemAction);
+                menuItem.setToolTipText("Clear this list");
+                openRecentAssemblyMenu.add(menuItem);
             }
         }
     }
@@ -295,7 +295,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) getController();
+            AssemblyController assemblyController = (AssemblyController) getController();
 
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
@@ -305,9 +305,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 fullPath = (File) obj;
 
             if (fullPath.getPath().equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentAssemblyFileList();
+                assemblyController.clearRecentAssemblyFileList();
             } else {
-                acontroller.openRecentAssembly(fullPath);
+                assemblyController.openRecentAssembly(fullPath);
+				ViskitGlobals.instance().getMainAppWindow().selectAssemblyEditorTab();
             }
         }
     }
@@ -332,7 +333,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
-        getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
+        getRecentProjFileSetListener().addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
         fileMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
