@@ -525,14 +525,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
-		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile</p></html>");
-		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
-        getToolBar().add(saveLabel);
-        getToolBar().addSeparator(new Dimension(5, 24));
-		saveButton.setHorizontalAlignment(JButton.RIGHT);
-        getToolBar().add(saveButton);
-        getToolBar().addSeparator(new Dimension(5, 24));
-        
 		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize assembly<br /> for simulation run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
@@ -540,6 +532,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(5, 24));
 		runButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(runButton);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        
+		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile</p></html>");
+		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
+        getToolBar().add(saveLabel);
+        getToolBar().addSeparator(new Dimension(5, 24));
+		saveButton.setHorizontalAlignment(JButton.RIGHT);
+        getToolBar().add(saveButton);
         getToolBar().addSeparator(new Dimension(5, 24));
 
         // Let the opening of Assembliess make this visible
