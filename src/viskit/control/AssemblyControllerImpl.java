@@ -464,7 +464,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false);
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false, "Save Assembly File As");
 
         if (saveFile != null) {
 
@@ -1825,7 +1825,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             fileName = vmod.getLastFile().getName();
         }
 
-        File fil = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true);
+        File fil = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true, "Save Assembly Diagram Image");
         if (fil == null) {
             return;
         }

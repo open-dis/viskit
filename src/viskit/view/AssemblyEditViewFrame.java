@@ -386,7 +386,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(assemblyController, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        editMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+        editMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         editMenu.add(buildMenuItem(assemblyController, "windowImageCapture", "Save Assembly Diagram",
                 KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
@@ -532,14 +532,18 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		// right aligned
 		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize Assembly<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
-        initializeLabel.setToolTipText("Prepare currently selected assembly for Simulation Run");
+        initializeLabel.setToolTipText("Prepare selected assembly for Simulation Run");
+              runButton.setToolTipText("Prepare selected assembly for Simulation Run");
         getToolBar().add(initializeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
 		runButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(runButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         
-		JLabel saveLabel = new JLabel("<html><p align='right'>Save,&nbsp;<br /> compile</p></html>");
+		JLabel saveLabel = new JLabel(EventGraphViewFrame.saveCompileLabelText);
+		saveLabel.setToolTipText(     EventGraphViewFrame.saveCompileLabelTooltip);		
+		saveButton.setToolTipText(    EventGraphViewFrame.saveCompileLabelTooltip);
+
 		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
         getToolBar().add(saveLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -1069,11 +1073,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     @Override
     public File saveFileAsk(String suggestedName, boolean showUniqueName) {
+		 return saveFileAsk(suggestedName,  showUniqueName, "Save Assembly File");
+    }
+
+    @Override
+    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle) {
         if (assemblyFileChooser == null) {
             assemblyFileChooser = buildOpenSaveChooser();
         }
 
-        assemblyFileChooser.setDialogTitle("Save Assembly File"); // TODO distinguish title if saving image
+        assemblyFileChooser.setDialogTitle(dialogTitle);
         File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory(), suggestedName);
         if (!file.getParentFile().isDirectory()) {
              file.getParentFile().mkdirs();

@@ -95,6 +95,15 @@ public interface AssemblyView {
      */
     File saveFileAsk(String suggestedName, boolean suggestedUniqueName);
 
+    /** Saves the current Event Graph "as" desired by the user
+     *
+     * @param suggestedName the package and file name of the EG
+     * @param showUniqueName show EG name only
+	 * @param dialogTitle File chooser title
+     * @return a File object of the saved Event Graph
+     */
+    File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle);
+
     /** Open an already existing Viskit Project */
     void openProject();
 

@@ -92,6 +92,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     private final String  FULLPATH     = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
+	
+	public static String saveCompileLabelText    = "<html><p align='right'>Save and<br /> Compile </p></html>";
+	public static String saveCompileLabelTooltip = "Save file (Ctrl-S) then generate source code and compile Java (Ctrl-J)";
 
     /**
      * Constructor; lays out initial GUI objects
@@ -735,7 +738,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(eventGraphController, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         editMenu.add(buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
@@ -788,7 +791,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return new JMenu(name);
     }
 
-    private JToggleButton makeJTButton(Action a, String icPath, String tt) {
+    private JToggleButton makeJToggleButton(Action a, String icPath, String tt) {
         JToggleButton jtb;
         if (a != null) {
             jtb = new JToggleButton(a);
@@ -847,14 +850,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        selectMode = makeJTButton(null, "viskit/images/selectNode.png",
+        selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
                 "Select items on the graph");
 
-        arcMode = makeJTButton(null, "viskit/images/schedulingArc.png",
+        arcMode = makeJToggleButton(null, "viskit/images/schedulingArc.png",
                 "Connect SimEntity  nodes with a scheduling edge");
         arcMode.setIcon(new SchedulingArcIcon());
 
-        cancelArcMode = makeJTButton(null, "viskit/images/cancellationArc.png",
+        cancelArcMode = makeJToggleButton(null, "viskit/images/cancellationArc.png",
                 "Connect SimEntity nodes with a cancelling edge");
         cancelArcMode.setIcon(new CancellationArcIcon());
 
@@ -899,7 +902,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
 		// right aligned
         getToolBar().addSeparator(new Dimension(24, 24));
-		JLabel saveLabel = new JLabel("<html><p align='right'>Save,&nbsp;<br /> compile </p></html>");
+		JLabel saveLabel = new JLabel(saveCompileLabelText);
+		saveLabel.setToolTipText(     saveCompileLabelTooltip);
 		saveLabel.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(saveLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -1237,21 +1241,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public File saveFileAsk(String suggName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName) {
+		 return saveFileAsk(suggestedName,  showUniqueName, "Save Event Graph File");
+    }
+
+    @Override
+    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle) {
         if (jfc == null) {
             jfc = buildOpenSaveChooser();
         }
-        jfc.setDialogTitle("Save Event Graph");
+        jfc.setDialogTitle(dialogTitle);
 
-        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggName);
-        if (!fil.getParentFile().isDirectory()) {
-            fil.getParentFile().mkdirs();
+        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggestedName);
+        if (!file.getParentFile().isDirectory()) {
+            file.getParentFile().mkdirs();
         }
         if (showUniqueName) {
-            fil = getUniqueName(suggName, fil.getParentFile());
+            file = getUniqueName(suggestedName, file.getParentFile());
         }
 
-        jfc.setSelectedFile(fil);
+        jfc.setSelectedFile(file);
         int retv = jfc.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (jfc.getSelectedFile().exists()) {
@@ -1263,7 +1272,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
 
         // We canceled
-        deleteCanceledSave(fil.getParentFile());
+        deleteCanceledSave(file.getParentFile());
         jfc = null;
         return null;
     }

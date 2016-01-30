@@ -77,11 +77,20 @@ public interface EventGraphView {
 
     /** Saves the current Event Graph "as" desired by the user
      *
-     * @param suggName the package and file name of the EG
+     * @param suggestedName the package and file name of the EG
      * @param showUniqueName show EG name only
-     * @return a File object of the saved EG
+     * @return a File object of the saved Event Graph
      */
-    File saveFileAsk(String suggName, boolean showUniqueName);
+    File saveFileAsk(String suggestedName, boolean showUniqueName);
+
+    /** Saves the current Event Graph "as" desired by the user
+     *
+     * @param suggestedName the package and file name of the EG
+     * @param showUniqueName show EG name only
+	 * @param dialogTitle File chooser title
+     * @return a File object of the saved Event Graph
+     */
+    File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle);
 
     /**
      * Update the name of the EventGraph in the component title bar
