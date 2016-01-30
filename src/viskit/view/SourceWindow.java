@@ -46,7 +46,7 @@ public class SourceWindow extends JFrame {
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
 		    saveChooser.setDialogTitle("Java Source Code");
-            saveChooser.setCurrentDirectory(ViskitGlobals.instance().getCurrentViskitProject().getSrcDir());
+            saveChooser.setCurrentDirectory(ViskitGlobals.instance().getCurrentViskitProject().getSrcDirectory());
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
@@ -219,7 +219,7 @@ public class SourceWindow extends JFrame {
                     JOptionPane.showMessageDialog(null, "Exception on source file write" +
                             "\n" + f.getName() +
                             "\n" + ex.getMessage(),
-                            "File I/O Error", JOptionPane.ERROR_MESSAGE);
+                            "File Input/Output Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

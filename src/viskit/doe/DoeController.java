@@ -377,27 +377,27 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
-        return myEGListener;
+        return myEventGraphListener;
     }
-    private DirectoryWatch.DirectoryChangeListener myEGListener = new EGListener();
+    private DirectoryWatch.DirectoryChangeListener myEventGraphListener = new EventGraphListener();
     Vector<File> loadedEventGraphs = new Vector<>();
 
     /* and here we hear about open event graphs */
-    class EGListener implements DirectoryWatch.DirectoryChangeListener {
+    class EventGraphListener implements DirectoryWatch.DirectoryChangeListener {
 
         @Override
         public void fileChanged(File file, int action, DirectoryWatch source) {
             switch (action) {
                 case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-                    //System.out.println("DoeController got eg change message: FILE_ADDED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got event-graph change message: FILE_ADDED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.add(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-                    //System.out.println("DoeController got eg change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got event-graph change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.remove(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-                    //System.out.println("DoeController got eg change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got event-graph change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
                     break;
                 default:
             }

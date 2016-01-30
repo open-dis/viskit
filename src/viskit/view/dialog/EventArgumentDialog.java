@@ -72,7 +72,7 @@ public class EventArgumentDialog extends JDialog {
         setMaxHeight(nameField);
         descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
-        parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
+        parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));

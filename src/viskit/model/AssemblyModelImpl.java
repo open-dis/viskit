@@ -62,7 +62,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } catch (JAXBException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -113,8 +113,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 } catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
-                    assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
-                            "Wrong File Format",
+                    assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                            "Wrong File Type", // TODO confirm
                             "Use the event graph editor to" +
                             "\n" + "work with this file."
                             );
@@ -143,8 +143,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
             } catch (JAXBException e) {
-                assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
-                        "XML I/O Error",
+                assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                        "XML Input/Output Error",
                         "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
                             "\n" + e.getMessage() +
@@ -174,7 +174,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
@@ -212,16 +212,16 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             modelDirty = false;
             currentFile = f;
         } catch (JAXBException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML I/O Error",
+            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                    "XML Input/Output Error",
                     "Exception on JAXB marshalling" +
                     "\n" + f +
                     "\n" + e.getMessage() +
                     "\n(check for blank data fields)"
                     );
         } catch (IOException ex) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "File I/O Error",
+            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                    "File Input/Output Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage());
         } finally {
@@ -276,7 +276,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
-                assemblyController.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                assemblyController.messageToUser(JOptionPane.INFORMATION_MESSAGE,
                         "XML file contains duplicate event name", n.getName() +
                         "\nUnique name substituted.");
                 return false;

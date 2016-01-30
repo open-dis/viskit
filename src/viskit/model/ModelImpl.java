@@ -72,7 +72,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } catch (JAXBException e) {
-            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -144,14 +144,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     Unmarshaller um = assyCtx.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.
-                    eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
-                            "Wrong File Format",
+                    eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                            "Wrong File Type", // TODO confirm
                             "Use the assembly editor to" +
                             "\n" + "work with this file."
                             );
                 } catch (JAXBException e) {
-                    eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
-                            "XML I/O Error",
+                    eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                            "XML Input/Output Error",
                             "Exception on JAXB unmarshalling of" +
                             "\n" + f.getName() +
                             "\nError is: " + e.getMessage() +
@@ -183,7 +183,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
-            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
+            eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, Model.saveModel():" +
                     "\n" + e.getMessage()
@@ -219,16 +219,16 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             currentFile = f;
             retVal = true;
         } catch (JAXBException e) {
-            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "XML I/O Error",
+            eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                    "XML Input/Output Error",
                     "Exception on JAXB marshalling" +
                     "\n" + f.getName() +
                     "\n" + e.getMessage()
                     );
             retVal = false;
         } catch (IOException ex) {
-            eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
-                    "File I/O Error",
+            eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
+                    "File Input/Output Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage()
                     );
@@ -319,7 +319,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         Set<String> hs = new HashSet<>(10);
         for (EventNode en : eventNodeCache.values()) {
             if (!hs.add(en.getName())) {
-                eventGraphController.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE,
                         "Duplicate Event Name",
                         "Duplicate event name detected: " + en.getName() +
                         "\nUnique name will be substituted.");

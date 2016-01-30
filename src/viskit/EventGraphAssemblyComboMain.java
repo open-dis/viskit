@@ -151,23 +151,23 @@ public class EventGraphAssemblyComboMain {
         }
 
         if (viskit.ViskitStatics.debug) {
-            System.out.println("***Inside EventGraphAssembly main: " + args.length);
+            System.out.println("***Inside EventGraphAssemblyComboMain: " + args.length);
         }
         setLandFandFonts();
 
         // Leave tooltips on the screen until mouse movement causes removal
-        ToolTipManager ttm = ToolTipManager.sharedInstance();
-        ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
-        JFrame mainFrame = new ViskitMainFrame(initialFile);
-        ViskitGlobals.instance().setMainAppWindow(mainFrame);
+        ViskitMainFrame viskitMainFrame = new ViskitMainFrame(initialFile);
+        ViskitGlobals.instance().setMainAppWindow(viskitMainFrame);
 
         if (isMac) {
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
 
-        mainFrame.setVisible(true);
+        viskitMainFrame.setVisible(true);
     }
 
     private static void setLandFandFonts() {

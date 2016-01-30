@@ -114,7 +114,7 @@ public class EventGraphCache {
     private List<File> eventGraphImageFilesList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
-            ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
+            ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDirectory().getPath();
     private Element entityTable;
     private static EventGraphCache me;
 
@@ -165,7 +165,7 @@ public class EventGraphCache {
             getEventGraphImageFilesList().clear();
         }
 
-        setEventGraphFiles(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+        setEventGraphFiles(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory());
 
         Element localRootElement = assemblyDocument.getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");

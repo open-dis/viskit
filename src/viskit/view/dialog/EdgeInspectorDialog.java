@@ -400,7 +400,7 @@ public class EdgeInspectorDialog extends JDialog {
             type = ViskitStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageToUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "

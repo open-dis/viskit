@@ -47,11 +47,11 @@ public class ViskitConfig {
     public static final String X_CLASS_PATHS_PATH_KEY = X_CLASS_PATHS_CLEAR_KEY + ".path";
     public static final String X_CLASS_PATHS_KEY = X_CLASS_PATHS_PATH_KEY + "[@value]";
     public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
-    public static final String RECENT_ASSY_CLEAR_KEY = "history.AssemblyEditor.Recent";
+    public static final String RECENT_ASSEMBLY_CLEAR_KEY = "history.AssemblyEditor.Recent";
     public static final String RECENT_PROJ_CLEAR_KEY = "history.ProjectEditor.Recent";
     public static final String EG_HISTORY_KEY = RECENT_EG_CLEAR_KEY + ".EventGraphFile";
-    public static final String ASSY_HISTORY_KEY = RECENT_ASSY_CLEAR_KEY + ".AssemblyFile";
-    public static final String PROJ_HISTORY_KEY = RECENT_PROJ_CLEAR_KEY + ".Project";
+    public static final String ASSEMBLY_HISTORY_KEY = RECENT_ASSEMBLY_CLEAR_KEY + ".AssemblyFile";
+    public static final String PROJECT_HISTORY_KEY = RECENT_PROJ_CLEAR_KEY + ".Project";
     public static final String EG_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
     public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
@@ -230,7 +230,7 @@ public class ViskitConfig {
         setVal(ViskitConfig.PROJECT_PATH_KEY, "");
         setVal(ViskitConfig.PROJECT_NAME_KEY, "");
         getViskitAppConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
-        getViskitAppConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfig.RECENT_ASSEMBLY_CLEAR_KEY);
 
         // TODO: Other clears?
     }

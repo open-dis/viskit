@@ -308,7 +308,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 		
-		String usageHint = "Use \"Event Graph Editor > Edit Properties...\" menu or (Ctrl-E) to modify this field";
+		String usageHint = "Use menu item \"Event Graph Editor > Edit Properties...\" 0(Ctrl-E) to modify this field";
 		
 //        JLabel implementsLabel = new JLabel("Implements");
 //        implementsLabel.setToolTipText("Event graph superclass (if any)");
@@ -665,6 +665,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         projectsMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
         projectsMenu.add(buildMenuItem(eventGraphController, "zipAndMailProject", "Zip and Mail Project File",
                 KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
+		
+		// TODO rename project
+		// TODO close project
 
         // Set up file menu
         fileMenu.setMnemonic(KeyEvent.VK_F);
@@ -777,7 +780,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (!map.isEmpty()) {
             ActionUtilities.decorateAction(a, map);
         }
-
         return ActionUtilities.createMenuItem(a);
     }
 
@@ -895,7 +897,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().add(zoomOut);
 
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("Save: "));
+        getToolBar().add(new JLabel("Save, compile: "));
         getToolBar().add(saveButton);
         getToolBar().addSeparator(new Dimension(24, 24));
 
@@ -1171,7 +1173,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // Try to open in the current project directory for EventGraphs
         if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
@@ -1235,7 +1237,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
         jfc.setDialogTitle("Save Event Graph");
 
-        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }

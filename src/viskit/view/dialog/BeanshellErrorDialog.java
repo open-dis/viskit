@@ -171,6 +171,6 @@ public class BeanshellErrorDialog extends JDialog {
 
     public static void main(String[] args) {
         BeanshellErrorDialog.showDialog("Mama Leone and \nblah blah", null);
-        ViskitGlobals.instance().sysExit(0);
+        ViskitGlobals.instance().systemExit(0);
     }
 }

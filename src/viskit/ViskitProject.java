@@ -70,11 +70,11 @@ public class ViskitProject {
      * to determine a project location space on the user's machine.  A default
      * location will be in the user's profile, or home directory.
      */
-    public static String DEFAULT_PROJECT_NAME = "DefaultProject";
+    public static       String        DEFAULT_PROJECT_NAME = "DefaultProject";
 
-    public static final String VISKIT_ROOT_NAME = "ViskitProject";
-    public static final String PROJECT_FILE_NAME = "viskitProject.xml";
-    public static final String ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
+    public static final String            VISKIT_ROOT_NAME = "ViskitProject";     // fixed
+    public static final String           PROJECT_FILE_NAME = "viskitProject.xml"; // fixed
+    public static final String   ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
     public static final String EVENT_GRAPHS_DIRECTORY_NAME = "EventGraphs";
 
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
@@ -87,35 +87,37 @@ public class ViskitProject {
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
-    public static final String BUILD_DIRECTORY_NAME = "build";
+    public static final String   BUILD_DIRECTORY_NAME = "build";
     public static final String CLASSES_DIRECTORY_NAME = "classes";
-    public static final String SOURCE_DIRECTORY_NAME = "src";
-    public static final String DIST_DIRECTORY_NAME = "dist";
-    public static final String LIB_DIRECTORY_NAME = "lib";
+    public static final String  SOURCE_DIRECTORY_NAME = "src";
+    public static final String    DIST_DIRECTORY_NAME = "dist";
+    public static final String     LIB_DIRECTORY_NAME = "lib";
 
     static Logger log = LogUtils.getLogger(ViskitProject.class);
 
+	private String projectName;
     private File projectRoot;
     private File projectFile;
-    private File analystReportsDir;
-    private File analystReportChartsDir;
-    private File analystReportImagesDir;
-    private File analystReportAssemblyImagesDir;
-    private File analystReportEventGraphImagesDir;
+    private File analystReportsDirectory;
+    private File analystReportChartsDirectory;
+    private File analystReportImagesDirectory;
+    private File analystReportAssemblyImagesDirectory;
+    private File analystReportEventGraphImagesDirectory;
     private File analystReportStatisticsDir;
     private File assembliesDir;
-    private File eventGraphsDir;
-    private File buildDir;
-    private File classesDir;
-    private File srcDir;
+    private File eventGraphsDirectory;
+    private File buildDirectory;
+    private File classesDirectory;
+    private File srcDirectory;
     private File distDir;
-    private File libDir;
+    private File libDirectory;
     private boolean projectFileExists = false;
     private boolean dirty;
     private boolean projectOpen = false;
     private Document projectDocument;
 
-    public ViskitProject(File projectRoot) {
+    public ViskitProject (File projectRoot)
+	{
         if (projectRoot.exists() && !projectRoot.isDirectory()) {
             throw new IllegalArgumentException(
                     "Project root must be directory: " +
@@ -124,58 +126,58 @@ public class ViskitProject {
         setProjectRoot(projectRoot);
     }
 
-    public boolean initProject() {
+    public boolean initializeProject() {
 
         if (!projectRoot.exists()) {
             projectRoot.mkdir();
         }
 
-        setAnalystReportsDir(new File(projectRoot, ANALYST_REPORTS_DIRECTORY_NAME));
-        if (!analystReportsDir.exists()) {
-            getAnalystReportsDir().mkdirs();
+        setAnalystReportsDirectory(new File(projectRoot, ANALYST_REPORTS_DIRECTORY_NAME));
+        if (!analystReportsDirectory.exists()) {
+            getAnalystReportsDirectory().mkdirs();
             try {
-                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME).toPath());
+                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
                 log.error(ex);
             }
         }
 
-        setAnalystReportChartsDir(new File(getAnalystReportsDir(), ANALYST_REPORT_CHARTS_DIRECTORY_NAME));
-        if (!analystReportChartsDir.exists()) {
-            getAnalystReportChartsDir().mkdirs();
+        setAnalystReportChartsDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_CHARTS_DIRECTORY_NAME));
+        if (!analystReportChartsDirectory.exists()) {
+            getAnalystReportChartsDirectory().mkdirs();
         }
 
-        setAnalystReportImagesDir(new File(getAnalystReportsDir(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
+        setAnalystReportImagesDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
 
-        setAnalystReportAssemblyImagesDir(new File(getAnalystReportImagesDir(), ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME));
-        if (!analystReportAssemblyImagesDir.exists()) {
-            getAnalystReportAssemblyImagesDir().mkdirs();
+        setAnalystReportAssemblyImagesDirectory(new File(getAnalystReportImagesDirectory(), ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME));
+        if (!analystReportAssemblyImagesDirectory.exists()) {
+            getAnalystReportAssemblyImagesDirectory().mkdirs();
         }
 
-        setAnalystReportEventGraphImagesDir(new File(getAnalystReportImagesDir(), ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME));
-        if (!analystReportEventGraphImagesDir.exists()) {
-            getAnalystReportEventGraphImagesDir().mkdirs();
+        setAnalystReportEventGraphImagesDirectory(new File(getAnalystReportImagesDirectory(), ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME));
+        if (!analystReportEventGraphImagesDirectory.exists()) {
+            getAnalystReportEventGraphImagesDirectory().mkdirs();
         }
 
-        setAnalystReportStatisticsDir(new File(getAnalystReportsDir(), ANALYST_REPORT_STATISTICS_DIRECTORY_NAME));
+        setAnalystReportStatisticsDir(new File(getAnalystReportsDirectory(), ANALYST_REPORT_STATISTICS_DIRECTORY_NAME));
         if (!analystReportStatisticsDir.exists()) {
-            getAnalystReportStatisticsDir().mkdirs();
+            getAnalystReportStatisticsDirectory().mkdirs();
         }
 
-        setAssembliesDir(new File(projectRoot, ASSEMBLIES_DIRECTORY_NAME));
+        setAssembliesDirectory(new File(projectRoot, ASSEMBLIES_DIRECTORY_NAME));
         if (!assembliesDir.exists()) {
-            getAssembliesDir().mkdir();
+            getAssembliesDirectory().mkdir();
         }
 
-        setEventGraphsDir(new File(projectRoot, EVENT_GRAPHS_DIRECTORY_NAME));
-        if (!eventGraphsDir.exists()) {
-            getEventGraphsDir().mkdir();
+        setEventGraphsDirectory(new File(projectRoot, EVENT_GRAPHS_DIRECTORY_NAME));
+        if (!eventGraphsDirectory.exists()) {
+            getEventGraphsDirectory().mkdir();
         }
 
-        setBuildDir(new File(projectRoot, BUILD_DIRECTORY_NAME));
+        setBuildDirectory(new File(projectRoot, BUILD_DIRECTORY_NAME));
 
         // Start with a fresh build directory
-//        if (getBuildDir().exists()) {
+//        if (getBuildDirectory().exists()) {
 //            clean();
 //        }
 
@@ -184,19 +186,19 @@ public class ViskitProject {
         // ClassNotFoundException.  Caching of EGs is a convenience for large
         // directories of EGs that take time to compile the first time
 
-        setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
-        if (!srcDir.exists()) {
-            getSrcDir().mkdirs();
+        setSrcDirectory(new File(getBuildDirectory(), SOURCE_DIRECTORY_NAME));
+        if (!srcDirectory.exists()) {
+            getSrcDirectory().mkdirs();
         }
 
-        setClassesDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
-        if (!classesDir.exists()) {
-            getClassesDir().mkdirs();
+        setClassesDirectory(new File(getBuildDirectory(), CLASSES_DIRECTORY_NAME));
+        if (!classesDirectory.exists()) {
+            getClassesDirectory().mkdirs();
         }
 
-        setLibDir(new File(projectRoot, LIB_DIRECTORY_NAME));
-        if (!libDir.exists()) {
-            getLibDir().mkdir();
+        setLibDirectory(new File(projectRoot, LIB_DIRECTORY_NAME));
+        if (!libDirectory.exists()) {
+            getLibDirectory().mkdir();
         }
 
         // If we already have a project file, then load it.  If not, create it
@@ -216,6 +218,11 @@ public class ViskitProject {
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }
+	
+	public String getProjectName ()
+	{
+		return projectRoot.getName();
+	}
 
     private Document createProjectDocument() {
         Document document = new Document();
@@ -292,6 +299,7 @@ public class ViskitProject {
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }
             projectFileExists = true;
+			projectName = root.getAttribute("name").getValue();
         } catch (JDOMException | IOException ex) {
             log.error(ex);
             throw new RuntimeException(ex);
@@ -306,14 +314,14 @@ public class ViskitProject {
 
         // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
-            for (File f : getLibDir().listFiles()) {
+            for (File f : getLibDirectory().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
                     String file = f.getCanonicalPath().replaceAll("\\\\", "/");
                     log.debug(file);
                     cp.add(file);
                 }
             }
-            log.debug(getEventGraphsDir().getCanonicalPath());
+            log.debug(getEventGraphsDirectory().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY);
@@ -330,8 +338,8 @@ public class ViskitProject {
     }
 
     public void clean() {
-        if (getBuildDir().exists()) {
-            deleteDirectoryContents(getBuildDir());
+        if (getBuildDirectory().exists()) {
+            deleteDirectoryContents(getBuildDirectory());
         }
     }
 
@@ -348,23 +356,23 @@ public class ViskitProject {
     }
 
     public void generateSource() {
-        if (!buildDir.exists()) {
-            getBuildDir().mkdir();
+        if (!buildDirectory.exists()) {
+            getBuildDirectory().mkdir();
         }
-        if (!srcDir.exists()) {
-            getSrcDir().mkdir();
+        if (!srcDirectory.exists()) {
+            getSrcDirectory().mkdir();
         }
-        System.out.println("Generate source into " + getSrcDir());
+        System.out.println("Generate source into " + getSrcDirectory());
     }
 
     public void compileSource() {
-        if (!buildDir.exists()) {
+        if (!buildDirectory.exists()) {
             generateSource();
         }
-        if (!classesDir.exists()) {
-            getClassesDir().mkdir();
+        if (!classesDirectory.exists()) {
+            getClassesDirectory().mkdir();
         }
-        System.out.println("Compile Source to " + getClassesDir());
+        System.out.println("Compile Source to " + getClassesDirectory());
     }
 
     public void deleteProject() {
@@ -384,10 +392,18 @@ public class ViskitProject {
         return projectRoot;
     }
 
-    public final void setProjectRoot(File projectRoot) {
-        this.projectRoot = projectRoot;
-        XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
-        guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
+    public final void setProjectRoot(File projectRoot)
+	{
+		try
+		{
+			this.projectRoot = projectRoot.getCanonicalFile();
+			XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
+			guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
+		}
+		catch (Exception e)
+		{
+			
+		}
     }
 
     public boolean isDirty() {
@@ -398,15 +414,15 @@ public class ViskitProject {
         this.dirty = dirty;
     }
 
-    public File getBuildDir() {
-        return buildDir;
+    public File getBuildDirectory() {
+        return buildDirectory;
     }
 
     /**
-     * @param buildDir the buildDir to set
+     * @param buildDirectory the buildDirectory to set
      */
-    public void setBuildDir(File buildDir) {
-        this.buildDir = buildDir;
+    public void setBuildDirectory(File buildDirectory) {
+        this.buildDirectory = buildDirectory;
     }
 
     /**
@@ -424,60 +440,60 @@ public class ViskitProject {
     }
 
     /**
-     * @return the analystReportsDir
+     * @return the analystReportsDirectory
      */
-    public File getAnalystReportsDir() {
-        return analystReportsDir;
+    public File getAnalystReportsDirectory() {
+        return analystReportsDirectory;
     }
 
     /**
-     * @param analystReportsDir the analystReportsDir to set
+     * @param analystReportsDirectory the analystReportsDirectory to set
      */
-    public void setAnalystReportsDir(File analystReportsDir) {
-        this.analystReportsDir = analystReportsDir;
+    public void setAnalystReportsDirectory(File analystReportsDirectory) {
+        this.analystReportsDirectory = analystReportsDirectory;
     }
 
     /** Retrieve the project's src directory (located in build)
      *
      * @return the project's src directory (located in build)
      */
-    public File getSrcDir() {
-        return srcDir;
+    public File getSrcDirectory() {
+        return srcDirectory;
     }
 
-    public void setSrcDir(File srcDir) {
-        this.srcDir = srcDir;
+    public void setSrcDirectory(File srcDir) {
+        this.srcDirectory = srcDir;
     }
 
-    public File getClassesDir() {
-        return classesDir;
+    public File getClassesDirectory() {
+        return classesDirectory;
     }
 
-    public void setClassesDir(File classDir) {
-        this.classesDir = classDir;
+    public void setClassesDirectory(File classDirectory) {
+        this.classesDirectory = classDirectory;
     }
 
-    public File getEventGraphsDir() {
-        return eventGraphsDir;
+    public File getEventGraphsDirectory() {
+        return eventGraphsDirectory;
     }
 
-    public void setEventGraphsDir(File eventGraphDir) {
-        this.eventGraphsDir = eventGraphDir;
+    public void setEventGraphsDirectory(File eventGraphDir) {
+        this.eventGraphsDirectory = eventGraphDir;
     }
 
-    public File getLibDir() {
-        return libDir;
+    public File getLibDirectory() {
+        return libDirectory;
     }
 
-    public void setLibDir(File libDir) {
-        this.libDir = libDir;
+    public void setLibDirectory(File libDirectory) {
+        this.libDirectory = libDirectory;
     }
 
-    public File getAssembliesDir() {
+    public File getAssembliesDirectory() {
         return assembliesDir;
     }
 
-    public void setAssembliesDir(File assemblyDir) {
+    public void setAssembliesDirectory(File assemblyDir) {
         this.assembliesDir = assemblyDir;
     }
 
@@ -497,65 +513,65 @@ public class ViskitProject {
 
 
     /**
-     * @return the analystReportChartsDir
+     * @return the analystReportChartsDirectory
      */
-    public File getAnalystReportChartsDir() {
-        return analystReportChartsDir;
+    public File getAnalystReportChartsDirectory() {
+        return analystReportChartsDirectory;
     }
 
     /**
-     * @param analystReportChartsDir the analystReportChartsDir to set
+     * @param analystReportChartsDirectory the analystReportChartsDirectory to set
      */
-    public void setAnalystReportChartsDir(File analystReportChartsDir) {
-        this.analystReportChartsDir = analystReportChartsDir;
+    public void setAnalystReportChartsDirectory(File analystReportChartsDirectory) {
+        this.analystReportChartsDirectory = analystReportChartsDirectory;
     }
 
     /**
      * @return the analystReportImagesDir
      */
-    public File getAnalystReportImagesDir() {
-        return analystReportImagesDir;
+    public File getAnalystReportImagesDirectory() {
+        return analystReportImagesDirectory;
     }
 
     /**
-     * @param analystReportImagesDir the analystReportImagesDir to set
+     * @param analystReportImagesDirectory the analystReportImagesDir to set
      */
-    public void setAnalystReportImagesDir(File analystReportImagesDir) {
-        this.analystReportImagesDir = analystReportImagesDir;
+    public void setAnalystReportImagesDirectory(File analystReportImagesDirectory) {
+        this.analystReportImagesDirectory = analystReportImagesDirectory;
     }
 
     /**
-     * @return the analystReportAssemblyImagesDir
+     * @return the analystReportAssemblyImagesDirectory
      */
-    public File getAnalystReportAssemblyImagesDir() {
-        return analystReportAssemblyImagesDir;
+    public File getAnalystReportAssemblyImagesDirectory() {
+        return analystReportAssemblyImagesDirectory;
     }
 
     /**
-     * @param analystReportAssemblyImagesDir the analystReportAssemblyImagesDir to set
+     * @param analystReportAssemblyImagesDirectory the analystReportAssemblyImagesDirectory to set
      */
-    public void setAnalystReportAssemblyImagesDir(File analystReportAssemblyImagesDir) {
-        this.analystReportAssemblyImagesDir = analystReportAssemblyImagesDir;
+    public void setAnalystReportAssemblyImagesDirectory(File analystReportAssemblyImagesDirectory) {
+        this.analystReportAssemblyImagesDirectory = analystReportAssemblyImagesDirectory;
     }
 
     /**
-     * @return the analystReportEventGraphImagesDir
+     * @return the analystReportEventGraphImagesDirectory
      */
-    public File getAnalystReportEventGraphImagesDir() {
-        return analystReportEventGraphImagesDir;
+    public File getAnalystReportEventGraphImagesDirectory() {
+        return analystReportEventGraphImagesDirectory;
     }
 
     /**
-     * @param analystReportEventGraphImagesDir the analystReportEventGraphImagesDir to set
+     * @param analystReportEventGraphImagesDirectory the analystReportEventGraphImagesDirectory to set
      */
-    public void setAnalystReportEventGraphImagesDir(File analystReportEventGraphImagesDir) {
-        this.analystReportEventGraphImagesDir = analystReportEventGraphImagesDir;
+    public void setAnalystReportEventGraphImagesDirectory(File analystReportEventGraphImagesDirectory) {
+        this.analystReportEventGraphImagesDirectory = analystReportEventGraphImagesDirectory;
     }
 
     /**
      * @return the analystReportStatisticsDir
      */
-    public File getAnalystReportStatisticsDir() {
+    public File getAnalystReportStatisticsDirectory() {
         return analystReportStatisticsDir;
     }
 
@@ -575,7 +591,7 @@ public class ViskitProject {
     private static JFileChooser projectChooser;
 
     /** When a user selects an iconized Viskit Project directory, then load it */
-    private static PropertyChangeListener myChangeListener = new PropertyChangeListener() {
+    private static final PropertyChangeListener myChangeListener = new PropertyChangeListener() {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -610,14 +626,14 @@ public class ViskitProject {
         }
     }
 
-    /** Used to aid in new project path creation
+    /** User directory chooser to aid in creating a new project path 
      *
      * @param parent the component to center the FileChooser against
-     * @param startingDirPath a path to start looking
+     * @param startingDirectoryPath a path to start looking
      * @return a selected file
      */
-    public static File newProjectPath(JComponent parent, String startingDirPath) {
-        initializeProjectChooser(startingDirPath);
+    public static File newProjectPath(JComponent parent, String startingDirectoryPath) {
+        initializeProjectChooser(startingDirectoryPath);
 
         projectChooser.setDialogTitle("New Viskit Project Directory");
         int ret = projectChooser.showSaveDialog(parent);
@@ -627,35 +643,36 @@ public class ViskitProject {
         return projectChooser.getSelectedFile();
     }
 
-    /** Utility method to aid in Viskit specific project directory selection
+    /** User directory chooser to aid in Viskit-specific project directory selection
      *
-     * @param parent the component parent for JOptionPane orientation
-     * @param startingDirPath a path to start looking from in the chooser
+     * @param parentFrame the component parent for JOptionPane initialization
+     * @param startingDirectoryPath a path to start looking from in the chooser
      * @return a path to a valid project directory
      */
-    public static File openProjectDir(JFrame parent, String startingDirPath) {
-        File projectDir = null;
-        initializeProjectChooser(startingDirPath);
+    public static File openProjectDirectory(JFrame parentFrame, String startingDirectoryPath) {
+        File projectDirectory;
+        initializeProjectChooser(startingDirectoryPath);
 
         projectChooser.setDialogTitle("Open Existing Viskit Project");
-        boolean isProjectDir;
+        boolean isProjectDirectory;
 
         do {
-            int ret = projectChooser.showOpenDialog(parent);
+            int ret = projectChooser.showOpenDialog(parentFrame);
 
             // User may have exited the chooser
             if (ret == JFileChooser.CANCEL_OPTION) {
                 return null;
             }
 
-            projectDir = projectChooser.getSelectedFile();
-            isProjectDir = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDir);
+            projectDirectory = projectChooser.getSelectedFile();
+            isProjectDirectory = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDirectory);
 
             // Give user a chance to select an iconized project directory
-            if (!isProjectDir) {
+            if (!isProjectDirectory) {
                 Object[] options = {"Select project", "Cancel"};
-				String TRY_AGAIN = "Please try another selection";
-                int retrn = JOptionPane.showOptionDialog(parent, "<html><p>Your selection is not a valid Viskit project.</p>" +
+				String TRY_AGAIN = "Please try another selection...";
+                int retrn = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Viskit project.</p>" + 
+						    "<p>Look for the Viskit icon when choosing the correct directory.)</p>" + "<<p>&nbsp;</p>" +
 						    "<p>" + TRY_AGAIN + "</p>", TRY_AGAIN,
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
@@ -665,9 +682,9 @@ public class ViskitProject {
                 } // cancelled
             }
 
-        } while (!isProjectDir);
+        } while (!isProjectDirectory);
 
-        return projectDir;
+        return projectDirectory;
     }
 
     /**

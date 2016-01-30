@@ -77,7 +77,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         commentField.addFocusListener(focusListener);
         setMaxHeight(commentField);
 
-        stateVariableTypeCombo = ViskitGlobals.instance().getTypeCB();
+        stateVariableTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         stateVariableTypeCombo.getEditor().getEditorComponent().addFocusListener(focusListener);
         setMaxHeight(stateVariableTypeCombo);
 
@@ -297,7 +297,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                 if (nam.length() <= 0 ||
                         typ.length() <= 0 ||
                         (ViskitGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
-                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Name, type and (if array) array size must be entered.");
@@ -305,13 +305,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     arraySizeField.requestFocus();
                     return;
                 } else if (ViskitGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
-                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.");
                     return;
                 } else if (isGeneric(typ)) {
-                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Actual Keys, Values or Element types must replace " +

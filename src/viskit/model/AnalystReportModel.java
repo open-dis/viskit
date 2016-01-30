@@ -1032,7 +1032,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         String assyFile = assemblyFile.getPath();
         assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
         File assyImage = new File(
-                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDirectory(),
                 assyFile + ".png");
 
         if (!assyImage.getParentFile().exists())
@@ -1059,7 +1059,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private void captureLocationImage() {
         File locationImage = new File(
-                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDirectory(),
                 assemblyFile.getName() + ".png");
 
         LOG.debug(locationImage);

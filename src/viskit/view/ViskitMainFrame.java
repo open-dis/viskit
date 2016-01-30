@@ -76,7 +76,7 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class ViskitMainFrame extends JFrame {
 
-    private JTabbedPane    tabbedPane;
+    private JTabbedPane    mainTabbedPane;
     private JTabbedPane runTabbedPane;
     EventGraphViewFrame eventGraphViewFrame;
     AssemblyEditViewFrame assemblyEditViewFrame;
@@ -89,15 +89,18 @@ public class ViskitMainFrame extends JFrame {
 
     /** The initial assembly to load. */
     private final String initialFile;
-    private final int TAB0_EVENTGRAPH_EDITOR_IDX = 0;
-    private final int TAB0_ASSEMBLY_EDITOR_IDX = 1;
-    private final int TAB0_ASSEMBLYRUN_SUBTABS_IDX = 2;
-    private final int TAB0_ANALYST_REPORT_IDX = 3;
+    private final int TAB_EVENTGRAPH_EDITOR     = 0;
+    private final int TAB_ASSEMBLY_EDITOR       = 1;
+    private final int TAB_SIMULATION_RUN        = 2;
+    private final int TAB_ANALYST_REPORT        = 3;
+//  private final int TAB_DESIGN_OF_EXPERIMENTS = 4;
     private final int[] tabIndices = {
-        TAB0_EVENTGRAPH_EDITOR_IDX, 
-        TAB0_ASSEMBLY_EDITOR_IDX,
-        TAB0_ASSEMBLYRUN_SUBTABS_IDX,
-        TAB0_ANALYST_REPORT_IDX};
+        TAB_EVENTGRAPH_EDITOR, 
+        TAB_ASSEMBLY_EDITOR,
+        TAB_SIMULATION_RUN,
+        TAB_ANALYST_REPORT,
+//		TAB_DESIGN_OF_EXPERIMENTS
+	};
     private final int TAB1_LOCALRUN_IDX = 0;
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
@@ -156,18 +159,18 @@ public class ViskitMainFrame extends JFrame {
 		
         myExitAction = new ExitAction("Exit");
 
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
+        mainTabbedPane = new JTabbedPane();
+        mainTabbedPane.setFont(mainTabbedPane.getFont().deriveFont(Font.BOLD));
 
 		// =============================================================================================
         // Event graph editor
 		
         eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
-            tabbedPane.add(eventGraphViewFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
-            tabbedPane.setTitleAt(idx, "Event Graph Editor");
-            tabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
+            mainTabbedPane.add(eventGraphViewFrame.getContent());
+            int idx = mainTabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
+            mainTabbedPane.setTitleAt(idx, "Event Graph Editor");
+            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
 
 			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, cleanup
 			eventGraphFileMenu = eventGraphViewFrame.getFileMenu();
@@ -183,19 +186,19 @@ public class ViskitMainFrame extends JFrame {
 //            jamSettingsHandler(mainMenuBar);
             eventGraphViewFrame.setTitleListener(myTitleListener, idx);
 //            setJMenuBar(mainMenuBar);
-            tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = idx;
+            tabIndices[TAB_EVENTGRAPH_EDITOR] = idx;
         } else {
-            tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
+            tabIndices[TAB_EVENTGRAPH_EDITOR] = -1;
         }
 
 		// =============================================================================================
         // Assembly editor
         assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
-            tabbedPane.add(assemblyEditViewFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
-            tabbedPane.setTitleAt(idx, "Assembly Editor");
-            tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
+            mainTabbedPane.add(assemblyEditViewFrame.getContent());
+            int idx = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
+            mainTabbedPane.setTitleAt(idx, "Assembly Editor");
+            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
 			
 			assemblyFileMenu = assemblyEditViewFrame.getFileMenu();
             fileMenu.add(assemblyFileMenu);    // submenu
@@ -212,9 +215,9 @@ public class ViskitMainFrame extends JFrame {
 //            }
             assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myExitAction, mainMenuBar);
-            tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
+            tabIndices[TAB_ASSEMBLY_EDITOR] = idx;
         } else {
-            tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
+            tabIndices[TAB_ASSEMBLY_EDITOR] = -1;
         }
 
 		// =============================================================================================
@@ -226,15 +229,15 @@ public class ViskitMainFrame extends JFrame {
 
         // Always selected as visible
         if (SettingsDialog.isAssemblyRunVisible()) {
-            tabbedPane.add(runTabbedPanePanel);
-            int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
-            tabbedPane.setTitleAt(idx, "Simulation Run");
-            tabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
+            mainTabbedPane.add(runTabbedPanePanel);
+            int idx = mainTabbedPane.indexOfComponent(runTabbedPanePanel);
+            mainTabbedPane.setTitleAt(idx, "Simulation Run");
+            mainTabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder TODO?
-            tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = idx;
+            tabIndices[TAB_SIMULATION_RUN] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } else {
-            tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] = -1;
+            tabIndices[TAB_SIMULATION_RUN] = -1;
         }
 
 		// =============================================================================================
@@ -255,7 +258,7 @@ public class ViskitMainFrame extends JFrame {
 //        menus.add(assemblyRunMenuBar);
 //        doCommonHelp(mainMenuBar);
 //        jamSettingsHandler(mainMenuBar);
-        assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
+        assemblyRunComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
 //        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myExitAction, mainMenuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyEditViewFrame.getController());
         controller.setInitialFile(initialFile);
@@ -270,10 +273,10 @@ public class ViskitMainFrame extends JFrame {
         // Analyst report
         if (analystReportPanelVisible) {
             analystReportFrame = ViskitGlobals.instance().buildAnalystReportFrame();
-            tabbedPane.add(analystReportFrame.getContentPane());
-            int idx = tabbedPane.indexOfComponent(analystReportFrame.getContentPane());
-            tabbedPane.setTitleAt(idx, "Analyst Report");
-            tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
+            mainTabbedPane.add(analystReportFrame.getContentPane());
+            int idx = mainTabbedPane.indexOfComponent(analystReportFrame.getContentPane());
+            mainTabbedPane.setTitleAt(idx, "Analyst Report");
+            mainTabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
 		
 			analystReportMenu = ((AnalystReportFrame)analystReportFrame).getFileMenu();
             fileMenu.add(analystReportMenu);
@@ -287,12 +290,12 @@ public class ViskitMainFrame extends JFrame {
 //            }
             ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(null, myExitAction, mainMenuBar);
-            tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
+            tabIndices[TAB_ANALYST_REPORT] = idx;
             AnalystReportController analystReportController = (AnalystReportController) analystReportFrame.getController();
-            analystReportController.setMainTabbedPane(tabbedPane, idx);
+            analystReportController.setMainTabbedPane(mainTabbedPane, idx);
             assemblyController.addAssemblyFileListener((AnalystReportFrame) analystReportFrame);
         } else {
-            tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
+            tabIndices[TAB_ANALYST_REPORT] = -1;
         }
 		// =============================================================================================
         // File menu continued
@@ -336,7 +339,7 @@ public class ViskitMainFrame extends JFrame {
 			}
             menus.add(designOfExperimentsMenuBar);
 //            doCommonHelp(mainMenuBar);
-            designOfExperimentsFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
+            designOfExperimentsFrame.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_DOE_IDX);
 //            jamQuitHandler(designOfExperimentsMain.getQuitMenuItem(), myExitAction, mainMenuBar);
             assemblyController.addAssemblyFileListener(designOfExperimentsFrame.getController().getOpenAssemblyListener());
             eventGraphController.addEventGraphFileListener(designOfExperimentsFrame.getController().getOpenEventGraphListener());
@@ -358,7 +361,7 @@ public class ViskitMainFrame extends JFrame {
 //            jamQuitHandler(null, myExitAction, mainMenuBar);
 //            menus.add(mainMenuBar);
 //            doCommonHelp(mainMenuBar);
-            runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
+            runGridComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
             assemblyController.addAssemblyFileListener(runGridComponent);
         }
 		// =============================================================================================
@@ -382,10 +385,10 @@ public class ViskitMainFrame extends JFrame {
         });
 
         // Swing:
-        getContentPane().add(tabbedPane);
+        getContentPane().add(mainTabbedPane);
 
         ChangeListener tabChangeListener = new myTabChangeListener();
-           tabbedPane.addChangeListener(tabChangeListener);
+           mainTabbedPane.addChangeListener(tabChangeListener);
         runTabbedPane.addChangeListener(tabChangeListener);
     }
 
@@ -426,15 +429,15 @@ public class ViskitMainFrame extends JFrame {
             if (dirtyEventGraphModel != null && dirtyEventGraphModel.isDirty())
 			{
                 // This will fire another call to stateChanged()
-                tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
+                mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
 				eventGraphEditMenu.setEnabled(true);
 			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
                 return;
             }
             
-			int i = tabbedPane.getSelectedIndex();
+			int i = mainTabbedPane.getSelectedIndex();
 			
-			if (i == tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX])
+			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
 				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
 				boolean hasEventGraph = eventGraphViewFrame.hasOpenModels(); // TODO fix
@@ -443,17 +446,17 @@ public class ViskitMainFrame extends JFrame {
             }
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-			else if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX])
+			else if (i == tabIndices[TAB_SIMULATION_RUN])
 			{
-                i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "Run simulation defined by Assembly");
+                i = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
+                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "Run simulation defined by Assembly");
 				eventGraphEditMenu.setEnabled(false);
 			   	  assemblyEditMenu.setEnabled(false);
 
                 // Resets the Viskit ClassLoader
 //                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
             } 
-			else if (i == tabIndices[TAB0_ANALYST_REPORT_IDX])
+			else if (i == tabIndices[TAB_ANALYST_REPORT])
 			{
 				eventGraphEditMenu.setEnabled(false);
 			   	  assemblyEditMenu.setEnabled(false);
@@ -462,10 +465,10 @@ public class ViskitMainFrame extends JFrame {
 			{
 				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
 				boolean hasAssembly = assemblyEditViewFrame.hasOpenModels();
-                tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
+                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First initialize assembly runner from Assembly tab");
 //                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
 				eventGraphEditMenu.setEnabled(false);
-			   	  assemblyEditMenu.setEnabled(true); // hasAssembly);
+			   	  assemblyEditMenu.setEnabled(true); // hasAssembly); // TODO enable/disable menu
             }
 
 //            getJMenuBar().remove(hmen);
@@ -555,31 +558,31 @@ public class ViskitMainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SystemExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
-            ViskitGlobals.instance().setSysExitHandler(nullSystemExitHandler);
+            SystemExitHandler defaultHandler = ViskitGlobals.instance().getSystemExitHandler();
+            ViskitGlobals.instance().setSystemExitHandler(nullSystemExitHandler);
 
-            // Tell Visit to not recompile open EGs from any remaining open
-            // Assemblies when we perform a Viskit exit
+            // Tell Visit to not recompile open Event Graphss from any remaining open Assemblies
+			// when we perform a Viskit exit
             ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
 
             outer:
             {
-                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
+                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1) {
+                    mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
                     if (!((EventGraphController) eventGraphViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
-                if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_IDX]);
+                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1) {
+                    mainTabbedPane.setSelectedIndex(tabIndices[TAB_ASSEMBLY_EDITOR]);
                     if (!((AssemblyController) assemblyEditViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] != -1) {
-                    tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]);
+                if (tabIndices[TAB_SIMULATION_RUN] != -1) {
+                    mainTabbedPane.setSelectedIndex(tabIndices[TAB_SIMULATION_RUN]);
                     if (designOfExperimentsMain != null) {
                         if (!designOfExperimentsMain.getController().preQuit()) {
                             break outer;
@@ -589,12 +592,12 @@ public class ViskitMainFrame extends JFrame {
                 /* End DIFF between OA3302 branch and trunk */
 
                 // TODO: other preQuits here if needed
-                ViskitGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
+                ViskitGlobals.instance().setSystemExitHandler(defaultHandler);    // reset default handler
 
-                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
+                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1) {
                     ((EventGraphController) eventGraphViewFrame.getController()).postQuit();
                 }
-                if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
+                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1) {
                     ((AssemblyController) assemblyEditViewFrame.getController()).postQuit();
                 }
 
@@ -620,11 +623,11 @@ public class ViskitMainFrame extends JFrame {
                 // Pretty-fy all xml docs used for configuration
                 ViskitConfig.instance().cleanup();
 
-                ViskitGlobals.instance().sysExit(0);  // quit application
+                ViskitGlobals.instance().systemExit(0);  // quit application
             } //outer
 
             // Here if somebody cancelled.
-            ViskitGlobals.instance().setSysExitHandler(defaultHandler);
+            ViskitGlobals.instance().setSystemExitHandler(defaultHandler);
         }
     }
 
@@ -643,12 +646,12 @@ public class ViskitMainFrame extends JFrame {
 
         @Override
         public void exec(String[] execStrings) {
-            if (tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX] != -1) {
+            if (tabIndices[TAB_SIMULATION_RUN] != -1) {
 
-                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], true);
+                mainTabbedPane.setEnabledAt(tabIndices[TAB_SIMULATION_RUN], true);
 
                 // toggles a tab change listener
-                tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]);
+                mainTabbedPane.setSelectedIndex(tabIndices[TAB_SIMULATION_RUN]);
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
 
 
@@ -666,9 +669,9 @@ public class ViskitMainFrame extends JFrame {
         @Override
         public void setTitle(String title, int key) {
             titles[key] = title;
-            int tabIndex = tabbedPane.getSelectedIndex();
-            if (tabIndex == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
-                tabIndex = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
+            int tabIndex = mainTabbedPane.getSelectedIndex();
+            if (tabIndex == tabIndices[TAB_SIMULATION_RUN]) {
+                tabIndex = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
             }
 			
 			if ((title == null) && title.isEmpty())
@@ -704,4 +707,21 @@ public class ViskitMainFrame extends JFrame {
     public JMenuItem getQuitMenuItem() {
         return quitMenuItem;
     }
+	
+	public void selectEventGraphEditorTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_EVENTGRAPH_EDITOR);
+	}
+	public void selectSimulationRunTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
+	}
+	public void selectAssemblyEditorTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_ASSEMBLY_EDITOR);
+	}
+	public void selectAnalystReportTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_ANALYST_REPORT);
+	}
 }

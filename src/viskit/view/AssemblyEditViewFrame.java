@@ -321,15 +321,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // Set up file menu
         fileMenu.setMnemonic(KeyEvent.VK_F);
-
-		// no longer need to duplicate menu items on Projects menu
-//        fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
-//                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
-//        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
-//                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
-//        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
-//        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
-//                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
 		
         fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
@@ -354,13 +345,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
-//        fileMenu.addSeparator();
-//
-//        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
-//        fileMenu.addSeparator();
-//
-//        fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,
-//                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
 
         // Set up edit menu
         editMenu.setMnemonic(KeyEvent.VK_A);
@@ -539,11 +523,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        getToolBar().add(new JLabel("Save: "));
+        getToolBar().add(new JLabel("Save, compile: "));
         getToolBar().add(saveButton);
         getToolBar().addSeparator(new Dimension(24, 24));
         
-        JLabel initializeLabel = new JLabel ("  Initialize assembly runner: ");
+        JLabel initializeLabel = new JLabel ("  Initialize assembly for simulation run: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
         getToolBar().add(runButton);
@@ -777,7 +761,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphsToLegoTree(vkp.getEventGraphsDir(), true);
+        addEventGraphsToLegoTree(vkp.getEventGraphsDirectory(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
@@ -984,7 +968,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // Try to open in the current project directory for Assemblies
         if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory());
         } else {
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
@@ -1035,7 +1019,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             return;
         }
 
-        File file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
             aController.openProject(file);
         }
@@ -1075,7 +1059,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         assemblyFileChooser.setDialogTitle("Save Assembly File"); // TODO distinguish title if saving image
-        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggestedName);
+        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory(), suggestedName);
         if (!file.getParentFile().isDirectory()) {
              file.getParentFile().mkdirs();
         }
@@ -1107,7 +1091,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory())) {
                     deleteCanceledSave(file.getParentFile());
                 }
             }

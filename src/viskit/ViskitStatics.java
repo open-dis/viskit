@@ -114,7 +114,7 @@ public class ViskitStatics {
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
 
         XMLConfiguration historyConfig = ViskitConfig.instance().getViskitAppConfig();
-        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJECT_HISTORY_KEY + "[@value]");
         boolean match = false;
         for (String s : valueAr) {
             if (s.equals(projFile.getPath())) {
@@ -123,7 +123,7 @@ public class ViskitStatics {
             }
         }
         if (!match) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
+            historyConfig.setProperty(ViskitConfig.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
             historyConfig.getDocument().normalize();
         }
     }
@@ -303,7 +303,7 @@ public class ViskitStatics {
                 }
             }
         } catch (NoClassDefFoundError e) {
-            ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+            ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s

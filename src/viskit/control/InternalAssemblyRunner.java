@@ -163,7 +163,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         try {
             fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
-            ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).messageUser(
+            ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage());

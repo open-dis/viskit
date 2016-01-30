@@ -193,8 +193,24 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
         for (File file : files) {
             if (file != null) {
-                _doOpen(file);
-            }
+				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
+				{
+					_doOpen(file);
+					ViskitGlobals.instance().getMainAppWindow().selectAssemblyEditorTab();
+				}
+				else 
+				{
+					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", 
+							"<html><p>Open assemblies must be within the currently open project.</p>" +
+							"<p>&nbsp</p>" +
+							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath() + "</p>" +
+							"<p>&nbsp</p>" +
+							"<p>Please choose another assembly or else open a different project.</p>");
+					// TODO offer to copy?
+					return;
+				}
+			}
         }
     }
 
@@ -324,7 +340,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel vAMod = (AssemblyModel) getModel();
-                    markAssyConfigClosed(vAMod.getLastFile());
+                    markAssemblyConfigurationClosed(vAMod.getLastFile());
 
                     AssemblyView view = (AssemblyView) getView();
                     view.deleteTab(vAMod);
@@ -391,7 +407,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Here we are informed of open Event Graphs */
 
-    private void notifyRecentAssyFileListeners() {
+    private void notifyRecentAssemblyFileListeners() {
         for (mvcRecentFileListener lis : recentAssyListeners) {
             lis.listChanged();
         }
@@ -480,33 +496,33 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
         }
     }
-    private int egNodeCount = 0;
-    private int adptrNodeCount = 0;
-    private int pclNodeCount = 0;    // A little experiment in class introspection
-    private static Field egCountField;
-    private static Field adptrCountField;
-    private static Field pclCountField;
+    private int eventGraphNodeCount = 0;
+    private int adapterNodeCount = 0;
+    private int propertyChangeListenerNodeCount = 0;    // A little experiment in class introspection
+    private static Field eventGraphCountField;
+    private static Field adapterCountField;
+    private static Field propertyChangeListenerCountField;
 
     static { // do at class init time
         try {
-            egCountField = AssemblyControllerImpl.class.getDeclaredField("egNodeCount");
-            adptrCountField = AssemblyControllerImpl.class.getDeclaredField("adptrNodeCount");
-            pclCountField = AssemblyControllerImpl.class.getDeclaredField("pclNodeCount");
+                        eventGraphCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
+                           adapterCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
+            propertyChangeListenerCountField = AssemblyControllerImpl.class.getDeclaredField("propertyChangeListenerNodeCount");
         } catch (NoSuchFieldException | SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private String shortEgName(String typeName) {
-        return shortName(typeName, "evgr_", egCountField);
+    private String shortEventGraphName(String typeName) {
+        return shortName(typeName, "evgr_", eventGraphCountField);
     }
 
-    private String shortPCLName(String typeName) {
-        return shortName(typeName, "lstnr_", pclCountField); // use same counter
+    private String shortPropertyChangeListenerName(String typeName) {
+        return shortName(typeName, "lstnr_", propertyChangeListenerCountField); // use same counter
     }
 
     private String shortAdapterName(String typeName) {
-        return shortName(typeName, "adptr_", adptrCountField); // use same counter
+        return shortName(typeName, "adptr_", adapterCountField); // use same counter
     }
 
     private String shortName(String typeName, String prefix, Field intField) {
@@ -538,11 +554,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newProject() {
         if (handleProjectClosing()) {
-            ViskitGlobals.instance().initProjectHome();
+            ViskitGlobals.instance().initializeProjectHomeDirectory();
             ViskitGlobals.instance().createWorkDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
             if (egFiles.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
@@ -591,10 +607,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     get();
 
                     URL url = null;
+					String urlString = "[not found]";
                     try {
                         url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Submission%20for%20"
                                 + projDir.getName() + "&body=see%20attachment");
+						urlString =  url.toString();
                     } catch (MalformedURLException e) {
                         LOG.error(e);
                     }
@@ -603,7 +621,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             + projZip.getParent()
                             + "<br/>and email the " + projZip.getName()
                             + " file to "
-                            + "<b><a href=\"" + url.toString() + "\">"
+                            + "<b><a href=\"" + urlString + "\">"
                             + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                             + "<br/><br/>Click the link to open up an email "
                             + "form, then attach the zip file";
@@ -666,9 +684,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newAssembly() {
 
-        // Don't allow a new event graph to be created is a current project is
+        // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+		{
+			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
+					"<html><p>New assemblies are only created within an open project.</p>" +
+					"<p>Please open or create a project first.</p>");
+			return;
+		}
 
         GraphMetaData oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -704,13 +728,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    /**
+     * A component wants to say something.
+     *
+     * @param dialogType the type of dialog popup, i.e. WARN, ERROR, INFO, QUESTION
+     * @param title the title of the dialog frame
+     * @param message the information to present
+     */
     @Override
-    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
+    public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
     {   AssemblyView view = (AssemblyView) getView();
         if (view != null)
-            ((AssemblyView) getView()).genericReport(typ, title, msg);
+            ((AssemblyView) getView()).genericReport(dialogType, title, message);
         else {
-            JOptionPane.showMessageDialog(null, msg, title, typ);
+            JOptionPane.showMessageDialog(null, message, title, dialogType);
         }
     }
 
@@ -782,7 +813,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         OpenAssembly.inst().doSendCloseAssy();
     }
 
-    private void markAssyConfigClosed(File f) {
+    private void markAssemblyConfigurationClosed(File f) {
 
         // Someone may try to close a file that hasn't been saved
         if (f == null) {return;}
@@ -790,7 +821,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         int idx = 0;
         for (File key : recentAssyFileSet) {
             if (key.getPath().contains(f.getName())) {
-                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -803,13 +834,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (File tempPath : recentAssyFileSet) {
 
             if (tempPath.getPath().equals(path)) {
-                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
     }
 
-    private Point nextPoint = new Point(25, 25);
+    private final Point nextPoint = new Point(25, 25);
     private Point getNextPoint() {
         nextPoint.x = nextPoint.x >= 200 ? 25 : nextPoint.x + 25;
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
@@ -831,18 +862,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         // Nothing selected or non-leaf
-        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select an Event Graph from the panel on the left.");
+        messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create a new node", "You must first open an Event Graph before adding a new node.");
     }
 
     @Override
     public void newEventGraphNode(String typeName, Point p) {
-        String shName = shortEgName(typeName);
+        String shName = shortEventGraphName(typeName);
         ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
     @Override
     public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortEgName(xnode.loadedClass);
+        String shName = shortEventGraphName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
@@ -861,18 +892,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         // If nothing selected or a non-leaf
-        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
+        messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
 
     @Override
     public void newPropChangeListenerNode(String name, Point p) {
-        String shName = shortPCLName(name);
+        String shName = shortPropertyChangeListenerName(name);
         ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
     @Override
     public void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortPCLName(xnode.loadedClass);
+        String shName = shortPropertyChangeListenerName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }
 
@@ -917,11 +948,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             oArr = checkLegalForSEListenerArc(oA, oB);
         } catch (Exception e) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
@@ -935,7 +966,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
 
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
@@ -950,7 +981,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
 
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
         pcListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
@@ -1143,7 +1174,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     public void copy() {
         if (selectionVector.isEmpty()) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
                     "Edges cannot be copied.");
             return;
@@ -1280,7 +1311,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
 
             // Handles both arcs and self-referential arcs
             if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
@@ -1382,9 +1413,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public String buildJavaAssemblySource(File f) {
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
-        if ((xvt == null) || !xvt.isValidXML()) {
+        if (!xmlValidationTool.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
@@ -1399,7 +1430,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } catch (FileNotFoundException e) {
             LOG.error(e);
         }
-        return x2j.translate();
+		if  (x2j != null)
+		  	 return x2j.translate();
+		else return "Error, no Java source produced";
     }
 
     // NOTE: above are routines to operate on current assembly
@@ -1415,10 +1448,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(),
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(x2j.getEventGraphFile(),
                 new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
 
-        if ((xvt == null) || !xvt.isValidXML()) {
+        if (!xmlValidationTool.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
@@ -1431,6 +1464,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } catch (Exception e) {
             LOG.error("Error building Java from " + x2j.getFileBaseName() +
                     ": " + e.getMessage() + ", erroneous event-graph xml found");
+			eventGraphSource = "Error, no Java source produced";
         }
         return eventGraphSource;
     }
@@ -1481,7 +1515,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
+            File srcPkg = new File(viskitProj.getSrcDirectory(), packagePath);
             if (!srcPkg.isDirectory()) {
                 srcPkg.mkdirs();
             }
@@ -1495,7 +1529,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
             Compiler.setOutPutStream(baosOut);
 
-            File classesDir = viskitProj.getClassesDir();
+            File classesDir = viskitProj.getClassesDirectory();
 
             LOG.info("Test compiling " + javaFile.getCanonicalPath());
 
@@ -1552,7 +1586,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         "Please check that you have provided parameters in \n" +
                         "identical order declared for any super classes";
                 LOG.error(xmlFile + " " + msg);
-                messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
+                messageToUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
             }
 
@@ -1617,7 +1651,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
         } catch (IOException e) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
+            messageToUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
         model.saveModel(tFile);
@@ -1684,12 +1718,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 if (execStrings == null) {
 
                     if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
-                        messageUser(JOptionPane.WARNING_MESSAGE,
+                        messageToUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
                     } else {
                         String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
-                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
+                        messageToUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
                     }
                 } else {
 
@@ -1909,7 +1943,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            messageToUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
                     );
@@ -1919,8 +1953,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
-    private Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -1938,8 +1972,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         recentAssyFileSet.add(file); // to the top
-        saveAssyHistoryXML(recentAssyFileSet);
-        notifyRecentAssyFileListeners();
+        saveAssemblyHistoryXML(recentAssyFileSet);
+        notifyRecentAssemblyFileListeners();
     }
 
     /**
@@ -1958,7 +1992,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         recentProjFileSet.add(file); // to the top
-        saveProjHistoryXML(recentProjFileSet);
+        saveProjectHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
 
@@ -1968,18 +2002,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void recordAssyFiles() {
         if (historyConfig == null) {initConfig();}
         openAssemblies = new ArrayList<>(4);
-        List<String> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
+        List<String> valueAr = historyConfig.getList(ViskitConfig.ASSEMBLY_HISTORY_KEY + "[@value]");
         LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
         int idx = 0;
         for (String s : valueAr) {
             if (recentAssyFileSet.add(new File(s))) {
-                String op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
+                String op = historyConfig.getString(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openAssemblies.add(new File(s));
                 }
 
-                notifyRecentAssyFileListeners();
+                notifyRecentAssemblyFileListeners();
             }
             idx++;
         }
@@ -1988,20 +2022,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordProjectFiles() {
         if (historyConfig == null) {initConfig();}
-        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJECT_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
         for (String value : valueAr) {
             adjustRecentProjSet(new File(value));
         }
     }
 
-    private void saveAssyHistoryXML(Set<File> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+    private void saveAssemblyHistoryXML(Set<File> recentFiles) {
+        historyConfig.clearTree(ViskitConfig.RECENT_ASSEMBLY_CLEAR_KEY);
         int idx = 0;
 
         // The value's modelPath is already delimited with "/"
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
+            historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -2011,10 +2045,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      *
      * @param recentFiles a Set of recently opened projects
      */
-    private void saveProjHistoryXML(Set<File> recentFiles) {
+    private void saveProjectHistoryXML(Set<File> recentFiles) {
         int ix = 0;
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
+            historyConfig.setProperty(ViskitConfig.PROJECT_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
             ix++;
         }
         historyConfig.getDocument().normalize();
@@ -2023,8 +2057,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void clearRecentAssemblyFileList() {
         recentAssyFileSet.clear();
-        saveAssyHistoryXML(recentAssyFileSet);
-        notifyRecentAssyFileListeners();
+        saveAssemblyHistoryXML(recentAssyFileSet);
+        notifyRecentAssemblyFileListeners();
     }
 
     @Override
@@ -2042,7 +2076,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void clearRecentProjectFileSet() {
         recentProjFileSet.clear();
-        saveProjHistoryXML(recentProjFileSet);
+        saveProjectHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
 

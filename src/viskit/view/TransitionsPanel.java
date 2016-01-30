@@ -197,7 +197,7 @@ public class TransitionsPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (ViskitGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
-                ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Alert",
                     "No state variables have been defined," +

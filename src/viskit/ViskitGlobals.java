@@ -74,6 +74,7 @@ import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.view.AnalystReportFrame;
+import viskit.view.ViskitMainFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -91,18 +92,18 @@ public class ViskitGlobals {
     static final Logger LOG = LogUtils.getLogger(ViskitGlobals.class);
     private static ViskitGlobals me;
     private Interpreter interpreter;
-    private DefaultComboBoxModel<String> cbMod;
+    private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popup;
-    private myTypeListener myListener;
-    private JFrame mainAppWindow;
+    private final myTypeListener myListener;
+    private ViskitMainFrame mainApplicationWindow;
 
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox */
     private RunnerPanel2 runPanel;
 
-    /** Flag to denote called sysExit only once */
-    private boolean sysExitCalled = false;
+    /** Flag to denote called systemExit only once */
+    private boolean systemExitCalled = false;
 
     /** The current project working directory */
     private File workDirectory;
@@ -110,7 +111,7 @@ public class ViskitGlobals {
     /** The current project base directory */
     private File projectsBaseDir;
 
-    /** The main app JavaHelp set */
+    /** JavaHelp set for the main application */
     private Help help;
 
     public static synchronized ViskitGlobals instance() {
@@ -119,12 +120,13 @@ public class ViskitGlobals {
         }
         return me;
     }
-
+	/** Constructor for initialization
+	 */
     private ViskitGlobals() {
-        cbMod = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
+        defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
-        initProjectHome();
+        initializeProjectHomeDirectory();
         createWorkDirectory();
     }
 
@@ -283,7 +285,7 @@ public class ViskitGlobals {
     }
 
     /** @return the analyst report builder (model) */
-    public AnalystReportModel getAnalystReoprtModel() {
+    public AnalystReportModel getAnalystReportModel() {
         return (AnalystReportModel) aRcont.getModel();
     }
 
@@ -504,15 +506,15 @@ public class ViskitGlobals {
      * recorded project space, or launch a dialog asking the user to either
      * create a new project space, or open another existing one, or exit Viskit
      */
-    public final void initProjectHome() {
+    public final void initializeProjectHomeDirectory() {
 
         ViskitConfig vConfig = ViskitConfig.instance();
-        String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
-        LOG.debug(projectHome);
-        if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
+        String projectHomeDirectory = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
+        LOG.debug(projectHomeDirectory);
+        if (projectHomeDirectory.isEmpty() || !(new File(projectHomeDirectory).exists())) {
             ViskitProjectButtonPanel.showDialog();
         } else {
-            ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
+            ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHomeDirectory;
         }
     }
 
@@ -633,20 +635,20 @@ public class ViskitGlobals {
     /* Dynamic variable type list processing.  Build Type combo boxes and manage
      * user-typed object types.
      */
-    private String moreTypesString = "more...";
-    private String[] defaultTypeStrings = {
+    private final String moreTypesString = "more...";
+    private final String[] defaultTypeStrings = {
             "int",
             "double",
             "Integer",
             "Double",
             "String",
             moreTypesString};
-    private String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
+    private final String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
 
     // these are for the moreClasses array
     private final int PRIMITIVES_INDEX = 0;
 
-    private String[][] moreClasses =
+    private final String[][] moreClasses =
             {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
             {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuilder"},
             {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
@@ -711,23 +713,23 @@ public class ViskitGlobals {
      */
     public String typeChosen(String ty) {
         ty = ty.replaceAll("\\s", "");              // every whitespace removed
-        for (int i = 0; i < cbMod.getSize(); i++) {
-            if (cbMod.getElementAt(i).equals(ty)) {
+        for (int i = 0; i < defaultComboBoxModel.getSize(); i++) {
+            if (defaultComboBoxModel.getElementAt(i).equals(ty)) {
                 return ty;
             }
         }
         // else, put it at the end, but before the "more"
-        cbMod.insertElementAt(ty, cbMod.getSize() - 1);
+        defaultComboBoxModel.insertElementAt(ty, defaultComboBoxModel.getSize() - 1);
         return ty;
     }
 
-    public JComboBox<String> getTypeCB() {
-        JComboBox<String> cb = new JComboBox<>(cbMod);
-        cb.addActionListener(myListener);
-        cb.addItemListener(myListener);
-        cb.setRenderer(new myTypeListRenderer());
-        cb.setEditable(true);
-        return cb;
+    public JComboBox<String> getTypeComboBox() {
+        JComboBox<String> newComboBox = new JComboBox<>(defaultComboBoxModel);
+        newComboBox.addActionListener(myListener);
+        newComboBox.addItemListener(myListener);
+        newComboBox.setRenderer(new myTypeListRenderer());
+        newComboBox.setEditable(true);
+        return newComboBox;
     }
 
     private void buildTypePopup() {
@@ -757,7 +759,7 @@ public class ViskitGlobals {
             }
         }
     }
-    JComboBox pending;
+    JComboBox<String> pendingComboBox;
     Object lastSelected = "void";
 
     public RunnerPanel2 getRunPanel() {
@@ -781,7 +783,7 @@ public class ViskitGlobals {
     }
 
     /**
-     * Not the best Java Bean convention, but performs as a no argument setter
+     * Not the best Java Bean convention, but performs as a no-argument setter
      * for the an open project's working directory (build/classes)
      */
     public final void createWorkDirectory() {
@@ -797,12 +799,12 @@ public class ViskitGlobals {
         projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
-        if (currentViskitProject.initProject()) {
+        if (currentViskitProject.initializeProject()) {
             SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
         } else {
             throw new RuntimeException("Unable to create project directory");
         }
-        workDirectory = currentViskitProject.getClassesDir();
+        workDirectory = currentViskitProject.getClassesDirectory();
     }
 
     private ClassLoader workLoader, freshLoader;
@@ -871,7 +873,7 @@ public class ViskitGlobals {
         return sb.toString();
     }
 
-    private SystemExitHandler sysexithandler = new SystemExitHandler() {
+    private SystemExitHandler systemExitHandler = new SystemExitHandler() {
 
         @Override
         public void doSystemExit(int status) {
@@ -930,31 +932,31 @@ public class ViskitGlobals {
         }
     };
 
-    public void setSysExitHandler(SystemExitHandler handler) {
-        sysexithandler = handler;
+    public void setSystemExitHandler(SystemExitHandler handler) {
+        systemExitHandler = handler;
     }
 
-    public SystemExitHandler getSysExitHandler() {
-        return sysexithandler;
+    public SystemExitHandler getSystemExitHandler() {
+        return systemExitHandler;
     }
 
     /** Called to perform proper thread shutdown without calling System.exit(0)
      *
      * @param status the status of JVM shutdown
      */
-    public void sysExit(int status) {
-        if (!isSysExitCalled()) {
-            sysexithandler.doSystemExit(status);
-            setSysExitCalled(true);
+    public void systemExit(int status) {
+        if (!isSystemExitCalled()) {
+            systemExitHandler.doSystemExit(status);
+            setSystemExitCalled(true);
         }
     }
 
-    public JFrame getMainAppWindow() {
-        return mainAppWindow;
+    public ViskitMainFrame getMainAppWindow() {
+        return mainApplicationWindow;
     }
 
-    public void setMainAppWindow(JFrame mainAppWindow) {
-        this.mainAppWindow = mainAppWindow;
+    public void setMainAppWindow(ViskitMainFrame mainAppWindow) {
+        this.mainApplicationWindow = mainAppWindow;
     }
 
     public Help getHelp() {
@@ -969,12 +971,12 @@ public class ViskitGlobals {
         this.help = help;
     }
 
-    public boolean isSysExitCalled() {
-        return sysExitCalled;
+    public boolean isSystemExitCalled() {
+        return systemExitCalled;
     }
 
-    public void setSysExitCalled(boolean sysExitCalled) {
-        this.sysExitCalled = sysExitCalled;
+    public void setSystemExitCalled(boolean systemExitCalled) {
+        this.systemExitCalled = systemExitCalled;
     }
 
     /**
@@ -984,7 +986,7 @@ public class ViskitGlobals {
     @SuppressWarnings("serial")
     class MyJMenuItem extends JMenuItem {
 
-        private String fullName;
+        private final String fullName;
 
         MyJMenuItem(String nm, String fullName) {
             super(nm);
@@ -1009,17 +1011,17 @@ public class ViskitGlobals {
         public void actionPerformed(ActionEvent e) {
             Object o = e.getSource();
             if (o instanceof JComboBox) {
-                final JComboBox cb = (JComboBox) o;
-                pending = cb;
-                if (cb.getSelectedItem().toString().equals(moreTypesString)) {
+                final JComboBox<String> comboBox = (JComboBox) o;
+                pendingComboBox = comboBox;
+                if (comboBox.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
                     Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
-                            if (cb.isShowing())
-                                popup.show(cb, 0, 0);
+                            if (comboBox.isShowing())
+                                popup.show(comboBox, 0, 0);
                         }
                     };
 
@@ -1036,10 +1038,10 @@ public class ViskitGlobals {
             } else {
                 MyJMenuItem mi = (MyJMenuItem) o;
                 if (!mi.getText().equals("cancel")) {
-                    pending.setSelectedItem(mi.getFullName());
+                    pendingComboBox.setSelectedItem(mi.getFullName());
                 } //mi.getText());
                 else {
-                    pending.setSelectedItem(lastSelected);
+                    pendingComboBox.setSelectedItem(lastSelected);
                 }
             }
         }

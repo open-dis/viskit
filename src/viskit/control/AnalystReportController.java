@@ -80,7 +80,7 @@ public class AnalystReportController extends mvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -133,7 +133,7 @@ public class AnalystReportController extends mvcAbstractController {
             }
         }
 
-        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
         JFileChooser openChooser = new JFileChooser(aRDir);
 		openChooser.setDialogTitle("Open Analyst Report");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
@@ -199,7 +199,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         outFile = outFile.substring(0, idx) + ".html";
 
-        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
         JFileChooser genChooser = new JFileChooser(aRDir);
         genChooser.setSelectedFile(new File(outFile));
         genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

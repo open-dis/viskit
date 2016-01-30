@@ -242,7 +242,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
+                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageToUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");

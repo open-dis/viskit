@@ -165,7 +165,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             }
         }
     } else {
-        file = ViskitProject.openProjectDir(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        file = ViskitProject.openProjectDirectory(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         ViskitStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
 
@@ -223,7 +223,7 @@ private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     // I don't like the idea of a SysExit call right here, but the way each
     // frame component needs to develop while starting Viskit; each has to
-    // finish before the ViskitGlobals.instance().sysExit(0) call will work
+    // finish before the ViskitGlobals.instance().systemExit(0) call will work
     // properly, so, reluctantly...
     System.exit(0);
 }//GEN-LAST:event_exitButtActionPerformed

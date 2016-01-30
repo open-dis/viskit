@@ -383,7 +383,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         try {
             jf = new JarFile(jarFilePath);
         } catch (IOException e) {
-            ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).messageUser(
+            ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "I/O Error", "Error reading " + jarFilePath);
             return;

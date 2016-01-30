@@ -64,7 +64,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public EventGraphControllerImpl() {
         initConfig();
-        initOpenEgWatch();
+        initOpenEventGraphWatch();
     }
 
     @Override
@@ -73,16 +73,16 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         if (!lis.isEmpty()) {
 
-            // Open whatever EG were marked open on last closing
+            // Open whatever Event Graphs were marked open on last closing
             for (File f : lis) {
                 _doOpen(f);
             }
 
         } else {
 
-            // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
-            if (egFiles.length == 0) {
+            // For a brand new empty project open a default Event Graph
+            File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
+            if (eventGraphFiles.length == 0) {
                 newEventGraph();
             }
         }
@@ -106,9 +106,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void newEventGraph() {
 
-        // Don't allow a new event graph to be created is a current project is
-        // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        // Don't allow a new event graph to be created if a current project is not open
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+		{
+			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
+					"<html><p>New event graphs are only created within an open project.</p>" +
+					"<p>Please open or create a project first.</p>");
+			return;
+		}
 
         GraphMetaData oldGmd = null;
         Model viskitModel = (Model) getModel();
@@ -125,14 +130,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ((EventGraphView) getView()).addTab(mod);
 
         // If we have models already opened, then use their package names for
-        // this new EG
+        // this new EventGraph
         GraphMetaData gmd = mod.getMetaData();
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
 
-        boolean modified =
-                EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
+        boolean modified = EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
+		
         if (modified) {
 
             // update title bar
@@ -141,7 +146,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // Bugfix 1398
             String msg =
-                    "<html><body><p align='center'>Do you wish to start with a <b>\"Run\"</b> Event?</p></body></html>";
+                    "<html><body><p align='center'>Do you want Event Graphi execution to start with a <b>\"Run\"</b> Event?</p></body></html>";
             String title = "Confirm Run Event";
 
             int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
@@ -161,14 +166,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((EventGraphView) getView()).genericAsk("Question", "Save modified event graph?"));
+        int yesNo = (((EventGraphView) getView()).genericAsk("Question", "Save modified event graph?"));
 
-        boolean retVal;
+        boolean returnValue;
 
-        switch (yn) {
+        switch (yesNo) {
             case JOptionPane.YES_OPTION:
                 save();
-                retVal = true;
+                returnValue = true;
                 break;
             case JOptionPane.NO_OPTION:
 
@@ -176,18 +181,18 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 if (((Model) getModel()).isDirty()) {
                     ((Model) getModel()).setDirty(false);
                 }
-                retVal = true;
+                returnValue = true;
                 break;
             case JOptionPane.CANCEL_OPTION:
-                retVal = false;
+                returnValue = false;
                 break;
 
             // Something funny if we're here
             default:
-                retVal = false;
+                returnValue = false;
                 break;
         }
-        return retVal;
+        return returnValue;
     }
 
     @Override
@@ -199,8 +204,25 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
         for (File file : files) {
             if (file != null) {
-                _doOpen(file);
-            }
+				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
+				{
+					_doOpen(file);
+					ViskitGlobals.instance().getMainAppWindow().selectEventGraphEditorTab();
+					// TODO switch pane
+				}
+				else 
+				{
+					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", 
+							"<html><p>Event graphs must be within the currently open project.</p>" +
+							"<p>&nbsp</p>" +
+							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath() + "</p>" +
+							"<p>&nbsp</p>" +
+							"<p>Please choose another event graph or else open a different project.</p>");
+					// TODO offer to copy?
+					return;
+				}
+			}
         }
     }
 
@@ -282,7 +304,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private DirectoryWatch dirWatch;
     private File watchDir;
 
-    private void initOpenEgWatch() {
+    private void initOpenEventGraphWatch() {
         try { // TBD this may be obsolete
             watchDir = TempFileManager.createTempFile("egs", "current");   // actually creates
             watchDir = TempFileManager.createTempDir(watchDir);
@@ -442,10 +464,17 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return openEventGraphs;
     }
 
+    /**
+     * A component wants to say something.
+     *
+     * @param dialogType the type of dialog popup, i.e. WARN, ERROR, INFO, QUESTION
+     * @param title the title of the dialog frame
+     * @param message the information to present
+     */
     @Override
-    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
+    public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
     {
-        ((EventGraphView) getView()).genericReport(typ, title, msg);
+        ((EventGraphView) getView()).genericReport(dialogType, title, message);
     }
 
     @Override
@@ -738,7 +767,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void copy() //----------------
     {
         if (!nodeSelected()) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
                     "Edges cannot be copied.");
             return;

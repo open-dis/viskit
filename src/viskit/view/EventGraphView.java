@@ -57,13 +57,13 @@ public interface EventGraphView {
     int genericAskYN(String title, String msg);
 
     /**
-     * A component, e.g., vMod, wants to say something.
+     * A component wants to say something.
      *
-     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
-     * @param title the title of the message in the dialog frame
-     * @param msg the message to transmit
+     * @param dialogType the type of dialog popup, i.e. WARN, ERROR, INFO, QUESTION
+     * @param title the title of the dialog frame
+     * @param message the information to present
      */
-    void genericReport(int typ, String title, String msg);
+    void genericReport(int dialogType, String title, String message);
 
     String promptForStringOrCancel(String title, String message, String initval);
 

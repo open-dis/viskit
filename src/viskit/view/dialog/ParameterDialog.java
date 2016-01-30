@@ -81,7 +81,7 @@ public class ParameterDialog extends JDialog {
         commentField = new JTextField(25);
         setMaxHeight(commentField);
 
-        parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
+        parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));

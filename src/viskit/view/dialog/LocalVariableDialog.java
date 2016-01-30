@@ -82,7 +82,7 @@ public class LocalVariableDialog extends JDialog {
         setMaxHeight(valueField);
         commentField = new JTextField(25);
         setMaxHeight(commentField);
-        typeComboBox = ViskitGlobals.instance().getTypeCB();
+        typeComboBox = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(typeComboBox);
         //typeCombo = new JComboBox();
         //typeCombo.setModel(ViskitGlobals.instance().getTypeCBModel(typeCombo));
