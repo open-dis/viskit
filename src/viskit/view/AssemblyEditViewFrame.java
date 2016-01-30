@@ -532,8 +532,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		// right aligned
 		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize Assembly<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
-        initializeLabel.setToolTipText("Prepare selected assembly for Simulation Run");
-              runButton.setToolTipText("Prepare selected assembly for Simulation Run");
+        initializeLabel.setToolTipText("Prepare selected Assembly for Simulation Run");
+              runButton.setToolTipText("Prepare selected Assembly for Simulation Run");
         getToolBar().add(initializeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
 		runButton.setHorizontalAlignment(JButton.RIGHT);
