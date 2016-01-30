@@ -54,11 +54,11 @@ import viskit.view.AssemblyEditViewFrame;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.ParameterizedProjectAction">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class RecentProjFileSetListener implements mvcRecentFileListener {
+public class RecentProjectFileSetListener implements mvcRecentFileListener {
 
     private List<JMenu> openRecentProjMenus;
 
-    public RecentProjFileSetListener() {
+    public RecentProjectFileSetListener() {
         openRecentProjMenus = new ArrayList<>();
     }
 
@@ -131,4 +131,4 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
         }
     }
 
-} // end class file RecentProjFileSetListener.java
+} // end class file RecentProjectFileSetListener.java

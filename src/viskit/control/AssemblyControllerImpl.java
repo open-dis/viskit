@@ -158,7 +158,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int yn = (((AssemblyView) getView()).genericAsk2Butts("Question", sb.toString(), "Stop and let me save",
+            int yn = (((AssemblyView) getView()).genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
                     "Ignore my execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -266,8 +266,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
 
-        if (view.getCurrentVgacw() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        if (view.getCurrentVgraphAssemblyComponentWrapper() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -880,7 +880,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newPropChangeListenerNode() // menu click
     {
-        Object o = ((AssemblyView) getView()).getSelectedPropChangeListener();
+        Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
 
         if (o != null) {
             if (o instanceof Class<?>) {
@@ -1058,11 +1058,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param pclNode Property Change Listener Node
      */
     @Override
-    public void pcListenerEdit(PropChangeListenerNode pclNode) {
+    public void pcListenerEdit(PropertyChangeListenerNode pclNode) {
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditPclNode(pclNode);
+            boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerNode(pclNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changePclNode(pclNode);
             }
@@ -1074,7 +1074,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditEvGraphNode(eventNode);
+            boolean modified = ((AssemblyView) getView()).doEditEventGraphNode(eventNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changeEvGraphNode(eventNode);
             }
@@ -1082,8 +1082,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void pcListenerEdgeEdit(PropChangeEdge pclEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
+    public void pcListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
+        boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
         }
@@ -1099,7 +1099,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void simEvListenerEdgeEdit(SimEvListenerEdge seEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditSimEvListEdge(seEdge);
+        boolean modified = ((AssemblyView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
@@ -1210,7 +1210,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
@@ -1232,8 +1232,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     removeEdge(ed);
                 }
                 ((AssemblyModel) getModel()).deleteEvGraphNode(en);
-            } else if (elem instanceof PropChangeListenerNode) {
-                PropChangeListenerNode en = (PropChangeListenerNode) elem;
+            } else if (elem instanceof PropertyChangeListenerNode) {
+                PropertyChangeListenerNode en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
@@ -1249,8 +1249,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropChangeEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropChangeEdge) e);
+        } else if (e instanceof PropertyChangeListenerEdge) {
+            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
         } else if (e instanceof SimEvListenerEdge) {
             ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
         }
@@ -1279,9 +1279,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         isUndo = true;
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
 
-        Object[] roots = view.getCurrentVgacw().getRoots();
+        Object[] roots = view.getCurrentVgraphAssemblyComponentWrapper().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
 
         // Prevent dups
@@ -1295,7 +1295,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentVgacw().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
             LOG.error("Unable to undo: " + ex);
         } finally {
@@ -1317,8 +1317,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropChangeEdge) {
-                PropChangeEdge ed = (PropChangeEdge) redoGraphCell.getUserObject();
+            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge) {
+                PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
                 SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
@@ -1326,8 +1326,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } else {
 
-            if (redoGraphCell.getUserObject() instanceof PropChangeListenerNode) {
-                PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
+            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
+                PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeListener(node);
             } else {
                 EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
@@ -1336,9 +1336,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
             LOG.error("Unable to redo: " + ex);
         } finally {
@@ -1349,10 +1349,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }

@@ -56,7 +56,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
 import viskit.control.InternalAssemblyRunner;
-import viskit.control.RecentProjFileSetListener;
+import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
@@ -311,7 +311,7 @@ public class ViskitMainFrame extends JFrame {
         jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // necessary
 
         // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
-        RecentProjFileSetListener listener = assemblyEditViewFrame.getRecentProjFileSetListener();
+        RecentProjectFileSetListener listener = assemblyEditViewFrame.getRecentProjectFileSetListener();
         listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjMenu());
 
         // Now setup the assembly and event graph file change listener(s)

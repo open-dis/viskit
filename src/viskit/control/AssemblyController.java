@@ -89,7 +89,7 @@ public interface AssemblyController {
 
     void newPropChangeListArc(Object[] nodes);
 
-    void pcListenerEdit(PropChangeListenerNode pclNode);
+    void pcListenerEdit(PropertyChangeListenerNode pclNode);
 
     /** Handles editing of Event Graph nodes
      *
@@ -101,7 +101,7 @@ public interface AssemblyController {
      *
      * @param pclEdge the PCL edite to edit
      */
-    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
+    void pcListenerEdgeEdit(PropertyChangeListenerEdge pclEdge);
 
     /** Edits the Adapter edge
      *

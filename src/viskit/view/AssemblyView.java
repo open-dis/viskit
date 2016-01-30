@@ -17,21 +17,21 @@ import viskit.model.*;
 public interface AssemblyView {
 
     // permit user to edit existing entities
-    boolean doEditPclNode(PropChangeListenerNode pclNode);
+    boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode pclNode);
 
     /** Permits user to edit existing entities
      * @param eventNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEvGraphNode(EventGraphNode eventNode);
+    boolean doEditEventGraphNode(EventGraphNode eventNode);
 
-    boolean doEditPclEdge(PropChangeEdge pclEdge);
+    boolean doEditPropertyChangeListenerEdge(PropertyChangeListenerEdge pclEdge);
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
-    boolean doEditSimEvListEdge(SimEvListenerEdge seEdge);
+    boolean doEditSimEventListEdge(SimEvListenerEdge seEdge);
 
-    Object getSelectedPropChangeListener();
+    Object getSelectedPropertyChangeListener();
 
     Object getSelectedEventGraph();
 
@@ -52,19 +52,19 @@ public interface AssemblyView {
      * @param f the path to evaluate for PropertyChangeListeners
      * @param b flag to indicate recursion checking of the given path
      */
-    void addPCLsToLegoTree(File f, boolean b);
+    void addPropertyChangeListenersToLegoTree(File f, boolean b);
 
     /** Not currently used
      *
      * @param f the PCL to remove from the node tree
      */
-    void removePropChangeFromLEGOTree(File f);
+    void removePropertyChangeListenerFromLEGOTree(File f);
 
     int genericAsk(String title, String prompt);      // returns JOptionPane constants
 
     int genericAskYN(String title, String prompt);
 
-    int genericAsk2Butts(String title, String prompt, String button1, String button2);
+    int genericAsk2Buttons(String title, String prompt, String button1, String button2);
 
     /** A component, e.g., vAMod, wants to say something.
      *

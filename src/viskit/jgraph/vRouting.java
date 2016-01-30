@@ -48,7 +48,7 @@ import viskit.model.AssemblyEdge;
 import viskit.model.Edge;
 import viskit.model.EventGraphNode;
 import viskit.model.EventNode;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.PropertyChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -191,7 +191,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         } else if (o instanceof AssemblyPropListView) {
             AssemblyPropListView apv = (AssemblyPropListView) o;
             AssemblyPropListCell apc = (AssemblyPropListCell) apv.getCell();
-            PropChangeListenerNode pn = (PropChangeListenerNode) apc.getUserObject();
+            PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
             LogUtils.getLogger(getClass()).warn("ParentView of " + pv + " is " + o);

@@ -21,8 +21,8 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EventGraphNode;
-import viskit.model.PropChangeEdge;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.PropertyChangeListenerEdge;
+import viskit.model.PropertyChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -43,13 +43,13 @@ public class PclEdgeInspectorDialog extends JDialog {
     private final JLabel emptyLabel,  emptyTF;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropChangeEdge pclEdge;
+    private PropertyChangeListenerEdge pclEdge;
     private final JButton okButton,  cancelButton;
     private final JButton propertyButton;
     private final JPanel buttonPanel;
     private final enableApplyButtonListener listener;
 
-    public static boolean showDialog(JFrame f, PropChangeEdge parm) {
+    public static boolean showDialog(JFrame f, PropertyChangeListenerEdge parm) {
         if (dialog == null) {
             dialog = new PclEdgeInspectorDialog(f, parm);
         } else {
@@ -61,7 +61,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclEdgeInspectorDialog(JFrame parent, PropChangeEdge ed) {
+    private PclEdgeInspectorDialog(JFrame parent, PropertyChangeListenerEdge ed) {
         super(parent, "Property Change Connection", true);
         this.pclEdge = ed;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -128,7 +128,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         }
     }
 
-    public final void setParams(Component c, PropChangeEdge p) {
+    public final void setParams(Component c, PropertyChangeListenerEdge p) {
         pclEdge = p;
 
         fillWidgets();
@@ -228,7 +228,7 @@ public class PclEdgeInspectorDialog extends JDialog {
             String classname = null;
             if (o instanceof EventGraphNode) {
                 classname = ((ViskitElement) o).getType();
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 classname = ((ViskitElement) o).getType();
             }
 

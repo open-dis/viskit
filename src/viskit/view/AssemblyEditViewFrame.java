@@ -64,7 +64,7 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
-import viskit.control.RecentProjFileSetListener;
+import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
 import viskit.images.PropertyChangeListenerImageIcon;
@@ -81,7 +81,7 @@ import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.SimEventListenerConnectionInspectorDialog;
 import viskit.view.dialog.UserPreferencesDialog;
-import viskit.view.dialog.PclNodeInspectorDialog;
+import viskit.view.dialog.PropertyChangeListenerNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
 
@@ -122,7 +122,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private LegoTree legoTree,  propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
-    private RecentProjFileSetListener recentProjFileSetListener;
+    private RecentProjectFileSetListener recentProjectFileSetListener;
 
     private int untitledCount = 0;
 	
@@ -181,7 +181,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphAssemblyComponentWrapper getCurrentVgacw() {
+    public VgraphAssemblyComponentWrapper getCurrentVgraphAssemblyComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
@@ -192,7 +192,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        VgraphAssemblyComponentWrapper vcw = getCurrentVgraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
@@ -204,12 +204,17 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void setToolBar(JToolBar toolBar) {
         this.toolBar = toolBar;
     }
+	
+	public Component getSelectedAssembly () // TODO stricter typing
+	{
+		return tabbedPane.getSelectedComponent();
+	}
 
     /**
-     * @return the recentProjFileSetListener
+     * @return the recentProjectFileSetListener
      */
-    public RecentProjFileSetListener getRecentProjFileSetListener() {
-        return recentProjFileSetListener;
+    public RecentProjectFileSetListener getRecentProjectFileSetListener() {
+        return recentProjectFileSetListener;
     }
 
 	/**
@@ -231,7 +236,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         @Override
         public void stateChanged(ChangeEvent e) {
-            VgraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
+            VgraphAssemblyComponentWrapper myVgacw = getCurrentVgraphAssemblyComponentWrapper();
 
             if (myVgacw == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
@@ -332,9 +337,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
 
         // The EGViewFrame will get this listener for it's menu item of the same
-        recentProjFileSetListener = new RecentProjFileSetListener();
-        getRecentProjFileSetListener().addMenuItem(openRecentProjectMenu);
-        assemblyController.addRecentProjectFileSetListener(getRecentProjFileSetListener());
+        recentProjectFileSetListener = new RecentProjectFileSetListener();
+        getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
+        assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
 
         fileMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
@@ -525,16 +530,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
-		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize assembly<br /> for simulation run </p></html>");
+		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize Assembly<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
-        initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
+        initializeLabel.setToolTipText("Prepare currently selected assembly for Simulation Run");
         getToolBar().add(initializeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
 		runButton.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(runButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         
-		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile</p></html>");
+		JLabel saveLabel = new JLabel("<html><p align='right'>Save,&nbsp;<br /> compile</p></html>");
 		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
         getToolBar().add(saveLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -549,14 +554,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgacw().setScale(getCurrentVgacw().getScale() + 0.1d);
+                getCurrentVgraphAssemblyComponentWrapper().setScale(getCurrentVgraphAssemblyComponentWrapper().getScale() + 0.1d);
             }
         });
         zoomOut.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgacw().setScale(Math.max(getCurrentVgacw().getScale() - 0.1d, 0.1d));
+                getCurrentVgraphAssemblyComponentWrapper().setScale(Math.max(getCurrentVgraphAssemblyComponentWrapper().getScale() - 0.1d, 0.1d));
             }
         });
         saveButton.addActionListener(new ActionListener() {
@@ -582,7 +587,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgacw().setPortsVisible(tOrF);
+                getCurrentVgraphAssemblyComponentWrapper().setPortsVisible(tOrF);
             }
         }
 
@@ -730,7 +735,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void rebuildLEGOTreePanels() {
         legoTree.clear();
         JSplitPane treeSplit = buildTreePanels();
-        getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);
+        getCurrentVgraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         legoTree.repaint();
     }
@@ -765,21 +770,21 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
-        ViskitGlobals vGlobals = ViskitGlobals.instance();
-        ViskitProject vkp = vGlobals.getCurrentViskitProject();
+        ViskitGlobals viskitGlobalsInstance = ViskitGlobals.instance();
+        ViskitProject viskitProject = viskitGlobalsInstance.getCurrentViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphsToLegoTree(vkp.getEventGraphsDirectory(), true);
+        addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
-        String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
+        String[] classPath = ((LocalBootLoader) viskitGlobalsInstance.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);
-                addPCLsToLegoTree(new File(path), false);
+                addPropertyChangeListenersToLegoTree(new File(path), false);
             }
         }
 
@@ -878,24 +883,24 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void modelChanged(mvcModelEvent event) {
         switch (event.getID()) {
             default:
-                getCurrentVgacw().viskitModelChanged((ModelEvent) event);
+                getCurrentVgraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
                 break;
         }
     }
 
     @Override
-    public boolean doEditEvGraphNode(EventGraphNode eventNode) {
+    public boolean doEditEventGraphNode(EventGraphNode eventNode) {
         return EventGraphNodeInspectorDialog.showDialog(this, eventNode);
     }
 
     @Override
-    public boolean doEditPclNode(PropChangeListenerNode pclNode) {
-        return PclNodeInspectorDialog.showDialog(this, pclNode); // blocks
+    public boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode propertyChangeListenerNode) {
+        return PropertyChangeListenerNodeInspectorDialog.showDialog(this, propertyChangeListenerNode); // blocks
     }
 
     @Override
-    public boolean doEditPclEdge(PropChangeEdge pclEdge) {
-        return PclEdgeInspectorDialog.showDialog(this, pclEdge);
+    public boolean doEditPropertyChangeListenerEdge(PropertyChangeListenerEdge propertyChangeListenerEdge) {
+        return PclEdgeInspectorDialog.showDialog(this, propertyChangeListenerEdge);
     }
 
     @Override
@@ -904,7 +909,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
+    public boolean doEditSimEventListEdge(SimEvListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
     }
 
@@ -923,7 +928,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public Object getSelectedPropChangeListener() {
+    public Object getSelectedPropertyChangeListener() {
         return getLeafUO(propertyChangeListenerTree);
     }
 
@@ -935,7 +940,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void addPCLsToLegoTree(File f, boolean b) {
+    public void addPropertyChangeListenersToLegoTree(File f, boolean b) {
         propertyChangeListenerTree.addContentRoot(f, b);
     }
 
@@ -946,25 +951,25 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     // Not used
     @Override
-    public void removePropChangeFromLEGOTree(File f) {
+    public void removePropertyChangeListenerFromLEGOTree(File f) {
         propertyChangeListenerTree.removeContentRoot(f);
     }
 
     @Override
-    public int genericAsk(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
+    public int genericAsk(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
     @Override
-    public int genericAskYN(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
+    public int genericAskYN(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
     }
 
     @Override
-    public int genericAsk2Butts(String title, String msg, String butt1, String butt2) {
-        return JOptionPane.showOptionDialog(this, msg, title, JOptionPane.DEFAULT_OPTION,
+    public int genericAsk2Buttons(String title, String message, String button1, String button2) {
+        return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
-                new String[]{butt1, butt2}, butt1);
+                new String[]{button1, button2}, button1);
     }
 
     @Override

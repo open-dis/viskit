@@ -12,7 +12,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitStatics;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.PropertyChangeListenerNode;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -25,7 +25,7 @@ import viskit.view.InstantiationPanel;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class PclNodeInspectorDialog extends JDialog {
+public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
     private final JLabel nameLabel;
     private final JLabel typeLabel;
@@ -33,9 +33,9 @@ public class PclNodeInspectorDialog extends JDialog {
     private final JTextField typeField;
     private InstantiationPanel ip;
     private Class<?> myClass;
-    private static PclNodeInspectorDialog dialog;
+    private static PropertyChangeListenerNodeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropChangeListenerNode pclNode;
+    private PropertyChangeListenerNode pclNode;
     private final JButton okButton, cancelButton;
     private final enableApplyButtonListener lis;
     JPanel buttonPanel;
@@ -43,10 +43,10 @@ public class PclNodeInspectorDialog extends JDialog {
     private final JTextField descriptionTF;
     private final JLabel descriptionLabel;
 
-    public static boolean showDialog(JFrame f, PropChangeListenerNode parm) {
+    public static boolean showDialog(JFrame f, PropertyChangeListenerNode parm) {
         try {
             if (dialog == null) {
-                dialog = new PclNodeInspectorDialog(f, parm);
+                dialog = new PropertyChangeListenerNodeInspectorDialog(f, parm);
             } else {
                 dialog.setParams(f, parm);
             }
@@ -63,7 +63,7 @@ public class PclNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclNodeInspectorDialog(JFrame parent, PropChangeListenerNode lv) throws ClassNotFoundException {
+    private PropertyChangeListenerNodeInspectorDialog(JFrame parent, PropertyChangeListenerNode lv) throws ClassNotFoundException {
         super(parent, "Property Change Listener (PCL) Inspector", true);
         this.pclNode = lv;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -124,7 +124,7 @@ public class PclNodeInspectorDialog extends JDialog {
         setParams(parent, lv);
     }
 
-    public final void setParams(Component c, PropChangeListenerNode p) throws ClassNotFoundException {
+    public final void setParams(Component c, PropertyChangeListenerNode p) throws ClassNotFoundException {
         pclNode = p;
 
         fillWidgets();
@@ -296,7 +296,7 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(PclNodeInspectorDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(PropertyChangeListenerNodeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();

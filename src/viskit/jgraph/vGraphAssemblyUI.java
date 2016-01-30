@@ -48,8 +48,8 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             Object edgeObj = ((vAssemblyEdgeCell) cell).getUserObject();
             if (edgeObj instanceof AdapterEdge) {
                 cntl.adapterEdgeEdit((AdapterEdge) edgeObj);
-            } else if (edgeObj instanceof PropChangeEdge) {
-                cntl.pcListenerEdgeEdit((PropChangeEdge) edgeObj);
+            } else if (edgeObj instanceof PropertyChangeListenerEdge) {
+                cntl.pcListenerEdgeEdit((PropertyChangeListenerEdge) edgeObj);
             } else {
                 cntl.simEvListenerEdgeEdit((SimEvListenerEdge) edgeObj);
             }
@@ -58,7 +58,7 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             cntl.evGraphEdit((EventGraphNode) nodeObj);
         } else if (cell instanceof AssemblyPropListCell) {
             Object nodeObj = ((AssemblyPropListCell) cell).getUserObject();
-            cntl.pcListenerEdit((PropChangeListenerNode) nodeObj);
+            cntl.pcListenerEdit((PropertyChangeListenerNode) nodeObj);
         }
     }
 }

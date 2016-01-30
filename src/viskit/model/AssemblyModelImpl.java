@@ -367,7 +367,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
-        PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
+        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className);
         if (p == null) {
             pcNode.setPosition(pointLess);
         } else {
@@ -398,7 +398,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeListener(PropChangeListenerNode node) {
+    public void redoPropChangeListener(PropertyChangeListenerNode node) {
 
         PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
@@ -414,7 +414,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeListener(PropChangeListenerNode pclNode) {
+    public void deletePropChangeListener(PropertyChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
         getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
@@ -474,8 +474,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
-        PropChangeEdge pce = new PropChangeEdge();
+    public PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
+        PropertyChangeListenerEdge pce = new PropertyChangeListenerEdge();
         pce.setFrom(src);
         pce.setTo(target);
 
@@ -497,7 +497,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeEdge(PropChangeEdge pce) {
+    public void redoPropChangeEdge(PropertyChangeListenerEdge pce) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) pce.getFrom();
@@ -555,7 +555,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeEdge(PropChangeEdge pce) {
+    public void deletePropChangeEdge(PropertyChangeListenerEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
@@ -596,7 +596,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changePclEdge(PropChangeEdge pclEdge) {
+    public void changePclEdge(PropertyChangeListenerEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
         pclc.setDescription(pclEdge.getDescriptionString());
@@ -640,7 +640,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changePclNode(PropChangeListenerNode pclNode) {
+    public boolean changePclNode(PropertyChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(pclNode);
@@ -954,7 +954,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            PropChangeEdge pce = new PropChangeEdge();
+            PropertyChangeListenerEdge pce = new PropertyChangeListenerEdge();
             pce.setProperty(pclc.getProperty());
             pce.setDescriptionString(pclc.getDescription());
             AssemblyNode toNode = getNodeCache().get(pclc.getListener());
@@ -1046,12 +1046,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
     }
 
-    private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
-        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl.getName());
+    private PropertyChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
+        PropertyChangeListenerNode pNode = (PropertyChangeListenerNode) getNodeCache().get(pcl.getName());
         if (pNode != null) {
             return pNode;
         }
-        pNode = new PropChangeListenerNode(pcl.getName(), pcl.getType());
+        pNode = new PropertyChangeListenerNode(pcl.getName(), pcl.getType());
 
         // For backwards compatibility, bug 706
         pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));

@@ -44,10 +44,10 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
     void newPropChangeListener(String widgetName, String className, Point2D p);
 
     /**
-     * Supports redo of a PropChangeListenerNode
+     * Supports redo of a PropertyChangeListenerNode
      * @param node the node to redo
      */
-    void redoPropChangeListener(PropChangeListenerNode node);
+    void redoPropChangeListener(PropertyChangeListenerNode node);
 
     void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
@@ -94,15 +94,15 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
 
-    PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
+    PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropertyChangeListenerNode target);
 
     void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
 
-    boolean changePclNode(PropChangeListenerNode pclNode);
+    boolean changePclNode(PropertyChangeListenerNode pclNode);
 
     boolean changeEvGraphNode(EventGraphNode eventNode);
 
-    void changePclEdge(PropChangeEdge pclEdge);
+    void changePclEdge(PropertyChangeListenerEdge pclEdge);
 
     void changeAdapterEdge(AdapterEdge aEdge);
 
@@ -110,7 +110,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     void deleteEvGraphNode(EventGraphNode eventNode);
 
-    void deletePropChangeListener(PropChangeListenerNode pclNode);
+    void deletePropChangeListener(PropertyChangeListenerNode pclNode);
 
     void deleteAdapterEdge(AdapterEdge ae);
 
@@ -124,13 +124,13 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Assembly nodes don't hold onto edges.
      * @param pce the edge to delete
      */
-    void deletePropChangeEdge(PropChangeEdge pce);
+    void deletePropChangeEdge(PropertyChangeListenerEdge pce);
 
     /**
-     * Supports redo of a PropChangeEdge
+     * Supports redo of a PropertyChangeListenerEdge
      * @param pce the edge to redo
      */
-    void redoPropChangeEdge(PropChangeEdge pce);
+    void redoPropChangeEdge(PropertyChangeListenerEdge pce);
 
     void deleteSimEvLisEdge(SimEvListenerEdge sele);
 

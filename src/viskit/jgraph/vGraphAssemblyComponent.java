@@ -88,7 +88,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 EdgeView view = null;
                 if (e instanceof vAssemblyEdgeCell) {
                     Object o = ((vAssemblyEdgeCell) e).getUserObject();
-                    if (o instanceof PropChangeEdge) {
+                    if (o instanceof PropertyChangeListenerEdge) {
                         view = new vAssyPclEdgeView(e);
                     }
                     if (o instanceof AdapterEdge) {
@@ -241,7 +241,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     AttributeMap m = plc.getAttributes();
                     Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
+                        PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent. getModel()).changePclNode(pcln);
                         m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
@@ -286,7 +286,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                     } else {
-                        String prop = ((PropChangeEdge) se).getProperty();
+                        String prop = ((PropertyChangeListenerEdge) se).getProperty();
                         prop = (prop != null && prop.length() > 0) ? prop : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
                         sb.append(to);
@@ -319,7 +319,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         desc = en.getDescriptionString();
                     } else /*if (c instanceof AssemblyPropListCell)*/ {
                         AssemblyPropListCell cc = (AssemblyPropListCell) c;
-                        PropChangeListenerNode pcln = (PropChangeListenerNode) cc.getUserObject();
+                        PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
                         typ = pcln.getType();
                         name = pcln.getName();
                         desc = pcln.getDescriptionString();

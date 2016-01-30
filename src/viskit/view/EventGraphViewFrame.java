@@ -899,7 +899,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
 		// right aligned
         getToolBar().addSeparator(new Dimension(24, 24));
-		JLabel saveLabel = new JLabel("<html><p align='right'>Save,<br /> compile </p></html>");
+		JLabel saveLabel = new JLabel("<html><p align='right'>Save,&nbsp;<br /> compile </p></html>");
 		saveLabel.setHorizontalAlignment(JButton.RIGHT);
         getToolBar().add(saveLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
