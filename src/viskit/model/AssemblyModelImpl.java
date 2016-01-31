@@ -654,9 +654,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         // Modes should be singular.  All new Assemblies will be with singular mode
         if (pclNode.isSampleStatistics()) {
             if (pclNode.isClearStatisticsAfterEachRun()) {
-                jaxBPcl.setMode("replicationStatistic");
+                jaxBPcl.setMode("replicationStat"); // TODO replicationStatistic
             } else {
-                jaxBPcl.setMode("designPointStatistic");
+                jaxBPcl.setMode("designPointStat"); // TODO designPointStatistic
             }
         }
 

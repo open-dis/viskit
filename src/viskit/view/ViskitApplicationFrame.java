@@ -45,11 +45,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.nps.util.SystemExitHandler;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import viskit.EventGraphAssemblyComboMain;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
@@ -119,8 +121,8 @@ public class ViskitApplicationFrame extends JFrame {
 		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         initializeUserInterface();
 
-        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - w) / 2, (d.height - h) / 2);
@@ -440,8 +442,7 @@ public class ViskitApplicationFrame extends JFrame {
             }
             
 			int i = mainTabbedPane.getSelectedIndex();
-			ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // refresh to keep current
-			ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+			buildMenus();
 			
 			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
@@ -490,6 +491,11 @@ public class ViskitApplicationFrame extends JFrame {
 			else myTitleListener.setTitle(titles[i], i);
         }
     }
+	public void buildMenus ()
+	{
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // refresh to keep current
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+	}
 
     /**
      * Stick the first Help menu we see into all the following ones.
@@ -624,11 +630,11 @@ public class ViskitApplicationFrame extends JFrame {
 
                 // Remember the size of this main frame set by the user
                 Rectangle bounds = getBounds();
-                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
-                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+                ViskitConfiguration.instance().setValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitConfiguration.instance().setValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
-                ViskitConfig.instance().cleanup();
+                ViskitConfiguration.instance().cleanup();
 
                 ViskitGlobals.instance().systemExit(0);  // quit application
             } //outer
@@ -742,31 +748,27 @@ public class ViskitApplicationFrame extends JFrame {
 	public void selectEventGraphEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_EVENTGRAPH_EDITOR);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		buildMenus();
 	}
 	public void selectSimulationRunTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		buildMenus();
 		
 		String  assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetaData().name;
 		int selectedRunIndex = getRunTabbedPane().getSelectedIndex();
-		ViskitGlobals.instance().getRunPanel().setTitle(assemblyName);
+		ViskitGlobals.instance().getSimulationRunPanel().setTitle(assemblyName);
 		getRunTabbedPane().setTitleAt(selectedRunIndex, assemblyName);
 	}
 	public void selectAssemblyEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ASSEMBLY_EDITOR);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		buildMenus();
 	}
 	public void selectAnalystReportTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ANALYST_REPORT);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		buildMenus();
 	}
 	public JTabbedPane getRunTabbedPane ()
 	{
@@ -780,4 +782,24 @@ public class ViskitApplicationFrame extends JFrame {
 	{
 		return runTabbedPane.getSelectedIndex();
 	}
+
+    /** Draconian process for restoring from a possibly corrupt, or out if synch
+     * .viskit config directory in the user's profile space.
+	 * TODO expose this functionality on User Preferences
+     */
+    public static void nukeDotViskit() {
+        File dotViskit = ViskitConfiguration.VISKIT_CONFIG_DIR;
+        if (dotViskit.exists()) {
+
+            // Can't delete .viskit dir unless it's empty
+            File[] files = dotViskit.listFiles();
+            for (File file : files) {
+                file.delete();
+            }
+            if (dotViskit.delete())
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
+
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+        }
+    }
 }

@@ -58,7 +58,7 @@ import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.model.AssemblyNode;
 
 /**
@@ -100,7 +100,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     private ReportStatisticsConfig statisticsConfig;
     private int designPointID;
-    private DecimalFormat form;
+    private DecimalFormat format = new DecimalFormat("0.0000");
     private List<String> entitiesWithStatistics;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
@@ -116,7 +116,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * </pre>
      */
     public BasicAssembly() {
-        form = new DecimalFormat("0.0000");
         setPrintReplicationReports(false);
         setPrintSummaryReport(true);
         replicationData = new LinkedHashMap<>();
@@ -530,15 +529,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             buf.append('\t');
             buf.append(stat.getCount());
             buf.append('\t');
-            buf.append(form.format(stat.getMinObs()));
+            buf.append(format.format(stat.getMinObs()));
             buf.append('\t');
-            buf.append(form.format(stat.getMaxObs()));
+            buf.append(format.format(stat.getMaxObs()));
             buf.append('\t');
-            buf.append(form.format(stat.getMean()));
+            buf.append(format.format(stat.getMean()));
             buf.append('\t');
-            buf.append(form.format(stat.getStandardDeviation()));
+            buf.append(format.format(stat.getStandardDeviation()));
             buf.append('\t');
-            buf.append(form.format(stat.getVariance()));
+            buf.append(format.format(stat.getVariance()));
 
             ((SampleStatistics) replicationStatistics[i++]).reset();
         }
@@ -627,9 +626,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             }
 
             String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + url.getPath() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
             ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);

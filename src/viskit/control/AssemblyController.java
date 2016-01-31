@@ -230,6 +230,10 @@ public interface AssemblyController {
 
     /** Generating java source and compilation are taken care of here */
     void initializeAssemblyRun();
+	
+    /** Whether active Assembly is ready for Simulation Run 
+	 * @return Whether initializeAssemblyRun was successful */
+	public boolean isAssemblyReady ();
 
     void export2grid();
 

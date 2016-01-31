@@ -86,58 +86,39 @@ public class EventGraphAssemblyComboMain {
                     }
                 });
             }
-
-        } catch (InterruptedException | InvocationTargetException e) {
+        } 
+		catch (InterruptedException | InvocationTargetException e) // catch all
+		{
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
             if (e instanceof InvocationTargetException) {
 
-                // not convinced we need to do this anymore.  A corrupted
-                // viskitProject can cause an InvocationTargetException.  The
-                // Apache Commons config files have behaved rather well and don't
-                // need to be nuked as of late: 03 DEC 2014.
-//                nukeDotViskit();
+			// A corrupted viskitProject can cause an InvocationTargetException. 
+			// The Apache Commons config files have behaved rather well and don't
+			// need to be nuked as of late: 03 DEC 2014.
+//                nukeDotViskit(); moved to user preferences
 
-                // If we encounter this case, then uncomment printStackTrace() to
-                // drill down on the cause.  Easier than setting a breakpoint and
-                // debugging!
+                // If we encounter this case, then uncomment printStackTrace() to drill down on the cause.
+                // Sometimes easier than setting a breakpoint and debugging!
                 e.printStackTrace();
             }
 
             URL url = null;
+			String mailtoString = new String();
             try {
                 url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
-                        "?subject=Viskit%20startup%20error&body=log%20output:");
+                        "?subject=Viskit%20startup%20error%20log&body=log%20output:");
+				mailtoString = "<a href=\"" + url.toString()+ "\">" + "email the error log" + "</a>";
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }
+            String message = "Viskit has experienced a startup problem.   "
+                    + "Details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " <br/> "
+                    + "Please " + mailtoString + " to " 
+					+ "<b>" + ViskitStatics.VISKIT_MAILING_LIST  + "</b>"
+                    + "<br/><br/><p>Click the link to open up an email form, then copy and paste the log's contents. Thanks!</p>";
 
-            String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                    + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
-                    + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
-                    + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
-
-            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
-        }
-    }
-
-    /** Draconian process for restoring from a possibly corrupt, or out if synch
-     * .viskit config directory in the user's profile space
-     */
-    public static void nukeDotViskit() {
-        File dotViskit = ViskitConfig.VISKIT_CONFIG_DIR;
-        if (dotViskit.exists()) {
-
-            // Can't delete .viskit dir unless it's empty
-            File[] files = dotViskit.listFiles();
-            for (File file : files) {
-                file.delete();
-            }
-            if (dotViskit.delete())
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
-
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, message, true);
         }
     }
 
@@ -153,7 +134,7 @@ public class EventGraphAssemblyComboMain {
         if (viskit.ViskitStatics.debug) {
             System.out.println("***Inside EventGraphAssemblyComboMain: " + args.length);
         }
-        setLandFandFonts();
+        setLookAndFeelAndFonts();
 
         // Leave tooltips on the screen until mouse movement causes removal
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
@@ -170,7 +151,7 @@ public class EventGraphAssemblyComboMain {
         viskitMainFrame.setVisible(true);
     }
 
-    private static void setLandFandFonts() {
+    private static void setLookAndFeelAndFonts() {
         String s = UserPreferencesDialog.getLookAndFeel();
         try {
             if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {

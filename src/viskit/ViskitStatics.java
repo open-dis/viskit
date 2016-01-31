@@ -109,12 +109,12 @@ public class ViskitStatics {
     @SuppressWarnings("unchecked")
     public static void setViskitProjectFile(File projFile) {
         ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+        ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
 
-        XMLConfiguration historyConfig = ViskitConfig.instance().getViskitAppConfig();
-        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJECT_HISTORY_KEY + "[@value]");
+        XMLConfiguration historyConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
+        List<String> valueAr = historyConfig.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
         boolean match = false;
         for (String s : valueAr) {
             if (s.equals(projFile.getPath())) {
@@ -123,7 +123,7 @@ public class ViskitStatics {
             }
         }
         if (!match) {
-            historyConfig.setProperty(ViskitConfig.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
+            historyConfig.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
             historyConfig.getDocument().normalize();
         }
     }
@@ -797,10 +797,10 @@ public class ViskitStatics {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 try {
                     if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-                        Desktop.getDesktop().mail(url.toURI());
-
                         if (showLog)
-                            Desktop.getDesktop().browse(ViskitConfig.V_DEBUG_LOG.toURI());
+                            Desktop.getDesktop().browse(ViskitConfiguration.V_DEBUG_LOG.toURI());
+
+                        Desktop.getDesktop().mail(url.toURI()); // mail on top
                     }
                 } catch (IOException | URISyntaxException ex) {
                     LOG.error(ex);

@@ -1031,7 +1031,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
         return null;
     }
-
     @Override
     public void setSelectedAssemblyName(String selectedAssemblyName) {
         boolean nullString = !(selectedAssemblyName != null && !selectedAssemblyName.isEmpty());
@@ -1042,18 +1041,34 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     @Override
     public void openProject() {
-        AssemblyControllerImpl aController = ((AssemblyControllerImpl) getController());
+        AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
 
-        if (!aController.handleProjectClosing()) {
+        if (!assemblyController.handleProjectClosing()) {
             return;
         }
 
         File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
-            aController.openProject(file);
+            assemblyController.openProject(file);
         }
-
         showProjectName();
+		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
+    }
+
+    @Override
+    public void closeProject()
+	{
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+		{
+			genericReport (JOptionPane.INFORMATION_MESSAGE, "No project is open", "No project needs to be closed");
+		}
+		else
+		{
+			AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
+			assemblyController.handleProjectClosing();
+		}
+		ViskitGlobals.instance().getViskitApplicationFrame().setTitle("Viskit");
+		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
     }
 
     @Override

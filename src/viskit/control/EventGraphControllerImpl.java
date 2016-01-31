@@ -29,7 +29,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
@@ -212,7 +212,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				{
 					_doOpen(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab();
-					// TODO switch pane
 				}
 				else 
 				{
@@ -415,11 +414,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private void recordEgFiles() {
         if (historyConfig == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
-        List<String> valueAr = historyConfig.getList(ViskitConfig.EG_HISTORY_KEY + "[@value]");
+        List<String> valueAr = historyConfig.getList(ViskitConfiguration.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
             if (recentEventGraphFileSet.add(new File(s))) {
-                String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
+                String op = historyConfig.getString(ViskitConfiguration.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openEventGraphs.add(new File(s));
@@ -432,12 +431,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private void saveEventGraphHistoryXML(Set<File> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
         int ix = 0;
 
         // The value's modelPath is already delimited with "/"
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
+            historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
             ix++;
         }
         historyConfig.getDocument().normalize();
@@ -563,7 +562,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         int idx = 0;
         for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(f.getName())) {
-                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -575,7 +574,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         int idx = 0;
         for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(path)) {
-                historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
@@ -971,15 +970,18 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        SimkitXML2Java x2j = null;
+        SimkitXML2Java simkitXML2Java = null;
         try {
-            x2j = new SimkitXML2Java(localLastFile);
-            x2j.unmarshal();
-        } catch (FileNotFoundException fnfe) {
+            simkitXML2Java = new SimkitXML2Java(localLastFile);
+            simkitXML2Java.unmarshal();
+        } catch (FileNotFoundException fnfe)
+		{	
+			String message = localLastFile.getName() + " updated Event Graph Java file not found when unmarshalling";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph Java file not found", message);
             LOG.error(fnfe);
         }
 
-        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
+        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(simkitXML2Java);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetadata().packageName + "." +
@@ -1112,11 +1114,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
     private String imgSaveCount = "";
-    private int imgSaveInt = -1;
+    private int    imgSaveInt = -1;
 
     @Override
     public void windowImageCapture() {
-        String fileName = "ViskitScreenCapture";
+        String fileName = "EventGraphDiagram";
 
         // create and save the image
         EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
@@ -1247,10 +1249,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
     XMLConfiguration historyConfig;
 
-    /** This is the very first caller for getViskitAppConfig() upon Viskit startup */
+    /** This is the very first caller for getViskitApplicationXMLConfiguration() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = ViskitConfig.instance().getViskitAppConfig();
+            historyConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
         } catch (Exception e) {
             LOG.error("Error loading history file: " + e.getMessage());
             LOG.warn("Recent file saving disabled");

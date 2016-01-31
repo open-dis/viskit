@@ -40,7 +40,7 @@ import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
 
 /**
@@ -78,7 +78,7 @@ public class SimulationRunPanel extends JPanel {
     public JLabel npsLabel;
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
-	private JLabel titleLabel = new JLabel();
+	private final JLabel titleLabel = new JLabel();
     private final boolean assemblyRunPanelVisible;
 
     /**
@@ -101,13 +101,12 @@ public class SimulationRunPanel extends JPanel {
         }
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSplit;
-
-        simulationOutputTA = new JTextArea("Simulation output stream:" + lineEnd +
-                                           "-------------------------" + lineEnd);
-        simulationOutputTA.setEditable(true); //false);
+		
+        simulationOutputTA = new JTextArea();
+		initializeSimulationOutput ();
         simulationOutputTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         simulationOutputTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
-        // don't force an initial scroller simulationOutputTA.setRows(100);
+        // don't force an initial scroller such as simulationOutputTA.setRows(100);
         jsp = new JScrollPane(simulationOutputTA);
         bar = jsp.getVerticalScrollBar();
         bar.setUnitIncrement(STEPSIZE);
@@ -122,8 +121,8 @@ public class SimulationRunPanel extends JPanel {
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
         npsLabel.setIconTextGap(50);
 
-        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         leftSplit.setDividerLocation((h/2) - 50); // TODO check with Ben, else -1
@@ -193,7 +192,7 @@ public class SimulationRunPanel extends JPanel {
         flowPanel.add(vcrVerbose);
 
         verboseRepNumberTF = new JTextField(7);
-        verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
+        VerboseReplicationNumberTFListener lis = new VerboseReplicationNumberTFListener();
         verboseRepNumberTF.addActionListener(lis);
         verboseRepNumberTF.addCaretListener(lis);
         ViskitStatics.clampSize(verboseRepNumberTF);
@@ -283,7 +282,7 @@ public class SimulationRunPanel extends JPanel {
         }
     }
 
-    class verboseRepNumberTFListener implements CaretListener, ActionListener {
+    class VerboseReplicationNumberTFListener implements CaretListener, ActionListener {
 
         @Override
         public void caretUpdate(CaretEvent event) {
@@ -299,7 +298,37 @@ public class SimulationRunPanel extends JPanel {
     }
 	public void setTitle (String newTitle)
 	{
-		titleLabel.setText(newTitle + " Assembly Runner");
+		String fullTitle = newTitle.trim();
 		
+		if      ( fullTitle.contains("Assembly") && !fullTitle.contains("Run"))
+		 	 titleLabel.setText(newTitle + " Runner");
+		else if (!fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
+			 titleLabel.setText(newTitle + " Assembly");
+		else if ( fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
+			 titleLabel.setText(newTitle);
+		else titleLabel.setText(newTitle + " Assembly Runner"); // whew
+	}
+	public final void initializeSimulationOutput ()
+	{
+		String initializationMessage;
+		if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels())
+		{
+			initializationMessage = "Simulation output stream:" + lineEnd +
+                                    "-------------------------" + lineEnd;
+			simulationOutputTA.setEditable(true);
+		}
+		else if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
+		{
+			initializationMessage = "Please initialize the selected Assembly before using the Simulation Run panel." + lineEnd +
+                                    "------------------------------------------------------------------------------" + lineEnd;
+			simulationOutputTA.setEditable(true);
+		}
+		else 
+		{
+			initializationMessage = "Please open/create and initialize an Assembly before using the Simulation Run panel." + lineEnd +
+                                    "------------------------------------------------------------------------------------" + lineEnd;
+			simulationOutputTA.setEditable(false);
+		}
+		simulationOutputTA.setText(initializationMessage);
 	}
 }

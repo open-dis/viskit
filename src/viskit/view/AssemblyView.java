@@ -107,6 +107,9 @@ public interface AssemblyView {
     /** Open an already existing Viskit Project */
     void openProject();
 
+    /** Close the current Viskit Project, if open */
+    void closeProject();
+
     /** Update the name of the Assembly in the component title bar
      * @param s the name of the Assembly
      */

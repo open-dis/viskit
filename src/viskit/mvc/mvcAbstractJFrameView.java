@@ -1,7 +1,7 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
 import viskit.util.TitleListener;
 
@@ -51,7 +51,7 @@ public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, m
     public void showProjectName() {
 
         String title = " Viskit: " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
-				// ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
+				// ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
         if (!title.contains("Project"))
 		     title += " Project";
 	    setTitle(title);

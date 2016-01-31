@@ -143,7 +143,7 @@ public class Compiler {
     /**
      * @param baosOut the ByteArrayOutputStream to set
      */
-    public static void setOutPutStream(OutputStream baosOut) {
+    public static void setOutputStream(OutputStream baosOut) {
         Compiler.baosOut = baosOut;
     }
 

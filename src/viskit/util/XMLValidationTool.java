@@ -33,7 +33,7 @@ import org.xml.sax.SAXParseException;
 
 // Local imports
 import edu.nps.util.LogUtils;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 
 /**
  * Utility class to validate XML files against provided Schema and
@@ -121,7 +121,7 @@ public class XMLValidationTool {
             log.info("Validating: " + source.getSystemId());
 
             // Prepare error errorsLog with current DTG
-            File errorsLog = new File(ViskitConfig.VISKIT_CONFIG_DIR + "/validationErrors.log");
+            File errorsLog = new File(ViskitConfiguration.VISKIT_CONFIG_DIR + "/validationErrors.log");
             errorsLog.setWritable(true, false);
 
             // New LogUtils.getLogger() each Viskit startup

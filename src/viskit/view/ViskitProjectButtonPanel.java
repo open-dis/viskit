@@ -74,6 +74,7 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
     /** Creates new form ViskitProjectButtonPanel */
     public ViskitProjectButtonPanel() {
         initComponents();
+//		this.getParent().setTitle ("Viskit Startup"); // TODO fix
     }
 
     /** This method is called from within the constructor to
@@ -83,6 +84,7 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         defaultButt = new javax.swing.JButton();
         existingButt = new javax.swing.JButton();
@@ -96,7 +98,9 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
             }
         });
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Viskit Project"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Viskit Startup", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        setName("viskitProjectButtonPanel"); // NOI18N
+        setLayout(new java.awt.GridBagLayout());
 
         existingButt.setText("Open existing project");
         existingButt.addActionListener(new java.awt.event.ActionListener() {
@@ -104,6 +108,13 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
                 existingButtActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
+        add(existingButt, gridBagConstraints);
 
         createButt.setText("Create new project");
         createButt.addActionListener(new java.awt.event.ActionListener() {
@@ -111,6 +122,14 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
                 createButtActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
+        add(createButt, gridBagConstraints);
 
         exitButt.setText("Exit Viskit");
         exitButt.addActionListener(new java.awt.event.ActionListener() {
@@ -118,30 +137,12 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
                 exitButtActionPerformed(evt);
             }
         });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(existingButt)
-                    .addComponent(createButt)
-                    .addComponent(exitButt))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(existingButt)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(createButt)
-                .addGap(18, 18, 18)
-                .addComponent(exitButt)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
+        add(exitButt, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     static boolean firstTime = true;

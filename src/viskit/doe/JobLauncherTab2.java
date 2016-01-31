@@ -1298,7 +1298,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private void initConfig() {
         try {
-            appConfig = ViskitConfig.instance().getViskitAppConfig();
+            appConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
         } catch (Exception e) {
             System.err.println("Error loading config file: " + e.getMessage());
             appConfig = null;

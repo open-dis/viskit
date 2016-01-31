@@ -577,10 +577,14 @@ public class SimkitAssemblyXML2Java {
 
             if (null != pclMode) // For backwards compatibility
                 switch (pclMode) {
+                    case "replicationStat":
+                    case "replicationStats":
                     case "replicationStatistic":
                     case "replicationStatistics":
                         replicationStatistitcs.put(pcl.getName(), pcl);
                         break;
+                    case "designPointStat":
+                    case "designPointStats":
                     case "designPointStatistic":
                     case "designPointStatistics":
                         designPointStatistics.put(pcl.getName(), pcl);

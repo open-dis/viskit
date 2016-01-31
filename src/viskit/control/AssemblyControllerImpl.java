@@ -44,7 +44,7 @@ import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
@@ -86,7 +86,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
-        initConfig();
+        initializeHistoryXMLConfiguration();
     }
 
     /**
@@ -139,10 +139,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
     public final List<File> getOpenAssemblyFileList(boolean refresh) {
-        if (refresh || openAssemblies == null) {
-            recordAssyFiles();
+        if (refresh || openAssembliesFileList == null) {
+            recordAssemblyFiles();
         }
-        return openAssemblies;
+        return openAssembliesFileList;
     }
 
     private boolean checkSaveIfDirty() {
@@ -247,7 +247,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             vaw.setSelectedAssemblyName(mod.getMetaData().name);
             // TODO: Implement an Assembly description block set here
 
-            adjustRecentAssySet(file);
+            adjustRecentAssemblySet(file);
             markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
@@ -478,7 +478,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
-            adjustRecentAssySet(saveFile);
+            adjustRecentAssemblySet(saveFile);
             markAssemblyFilesOpened();
         }
     }
@@ -504,7 +504,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private static Field adapterCountField;
     private static Field propertyChangeListenerCountField;
 
-    static { // do at class init time
+    static { // do at class initialization time
         try {
                         eventGraphCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
                            adapterCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
@@ -593,7 +593,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 try {
 
                     // First, copy the debug.log to the project dir
-                    Files.copy(ViskitConfig.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -669,7 +669,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void doProjectCleanup() {
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
-        ViskitConfig.instance().clearViskitConfig();
+        ViskitConfiguration.instance().clearViskitConfiguration();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
@@ -689,8 +689,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newAssembly() {
 
-        // Don't allow a new event graph to be created if a current project is
-        // not open
+        // Don't allow a new assembly to be created if a current project is  not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
@@ -827,9 +826,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (f == null) {return;}
 
         int idx = 0;
-        for (File key : recentAssyFileSet) {
+        for (File key : recentAssemblyFileSet) {
             if (key.getPath().contains(f.getName())) {
-                historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -839,10 +838,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void markAssemblyConfigurationOpen(String path) {
 
         int idx = 0;
-        for (File tempPath : recentAssyFileSet) {
+        for (File tempPath : recentAssemblyFileSet) {
 
             if (tempPath.getPath().equals(path)) {
-                historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
@@ -1403,18 +1402,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    private String produceJavaAssemblyClass() {
-
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
+    private String produceJavaAssemblyClass()
+	{
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
+			// TODO error notification needed, or is it already getting handled?
             return null;
         }
-        return buildJavaAssemblySource(vmod.getLastFile());
+		String sourceCode = buildJavaAssemblySource(assemblyModel.getLastFile());
+        return sourceCode;
     }
 
     /**
      * Builds the actual source code from the Assembly XML after a successful
-     * XML validation
+     * XML validation.  These routines to operate on the current assembly.
      *
      * @param f the Assembly file to produce source from
      * @return a string of Assembly source code
@@ -1424,54 +1425,68 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         XMLValidationTool xmlValidationTool = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
         if (!xmlValidationTool.isValidXML()) {
-
+			String message = f.getName() + " is not valid XML";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Invalid Assembly XML", message);
+            LOG.error(message + "\n");
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } else {
-            LOG.info(f + " is valid XML\n");
+            LOG.info(f.getName() + " is valid XML\n");
         }
 
-        SimkitAssemblyXML2Java x2j = null;
+        SimkitAssemblyXML2Java simkitAssemblyXML2Java = null;
         try {
-            x2j = new SimkitAssemblyXML2Java(f);
-            x2j.unmarshal();
+            simkitAssemblyXML2Java = new SimkitAssemblyXML2Java(f);
+            simkitAssemblyXML2Java.unmarshal();
         } catch (FileNotFoundException e) {
+			String message = f.getName() + " updated Assembly XML file not found when unmarshalling";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "XML file not found", message);
             LOG.error(e);
         }
-		if  (x2j != null)
-		  	 return x2j.translate();
-		else return "Error, no Java source produced";
+		if  (simkitAssemblyXML2Java != null)
+		  	 return simkitAssemblyXML2Java.translate();
+		else 
+		{
+			String message = f.getName() + " autogenenerated Java file not found";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "File not found", message);
+			return "Error, no Java source produced";
+		}
     }
-
-    // NOTE: above are routines to operate on current assembly
 
     /**
      * Build the actual source code from the Event Graph XML after a successful
      * XML validation
      *
-     * @param x2j the Event Graph initialized translator to produce source with
+     * @param simkitXML2Java the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitXML2Java x2j) {
-        String eventGraphSource = null;
+    public String buildJavaEventGraphSource(SimkitXML2Java simkitXML2Java) {
+        String eventGraphSource;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xmlValidationTool = new XMLValidationTool(x2j.getEventGraphFile(),
-                new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
+        XMLValidationTool xmlValidationTool = 
+				      new XMLValidationTool(simkitXML2Java.getEventGraphFile(),
+                                            new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
 
-        if (!xmlValidationTool.isValidXML()) {
-
-            // TODO: implement a Dialog pointing to the validationErrors.LOG
+        if (!xmlValidationTool.isValidXML())
+		{
+			String message = simkitXML2Java.getEventGraphFile().getName() + " is not valid XML";
+			messageToUser(JOptionPane.ERROR_MESSAGE, " Invalid Event Graph XML", message);
+			LOG.error(message + "\n");
             return null;
         } else {
-            LOG.info(x2j.getEventGraphFile() + " is valid XML\n");
+            LOG.info(simkitXML2Java.getEventGraphFile() + " is valid XML\n");
         }
 
         try {
-            eventGraphSource = x2j.translate();
-        } catch (Exception e) {
-            LOG.error("Error building Java from " + x2j.getFileBaseName() +
-                    ": " + e.getMessage() + ", erroneous event-graph xml found");
+            eventGraphSource = simkitXML2Java.translate();
+        } 
+		catch (Exception e)
+		{
+			String message = "Error building Java from " + simkitXML2Java.getFileBaseName() +
+                             ":\n" + e.getMessage() + ", erroneous event-graph xml found";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Failed Event Graph conversion to Java", message);
+			LOG.error(message + "\n");
 			eventGraphSource = "Error, no Java source produced";
         }
         return eventGraphSource;
@@ -1479,38 +1494,38 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Create and test compile our EventGraphs and Assemblies from XML
      *
-     * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
+     * @param sourceCode the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to a successfully compiled *.class file or null if
      * a compile failure occurred
      */
-    public static File compileJavaClassFromString(String src) {
+    public static File compileJavaClassFromString(String sourceCode) {
         String baseName;
 
         // Find the package subdirectory
-        Pattern pat = Pattern.compile("package.+;");
-        Matcher mat = pat.matcher(src);
-        boolean fnd = mat.find();
+        Pattern pattern = Pattern.compile("package.+;");
+        Matcher matcher = pattern.matcher(sourceCode);
+        boolean findResult = matcher.find();
 
         String packagePath = "";
-        String pkg = "";
-        if (fnd) {
-            int st = mat.start();
-            int end = mat.end();
-            String s = src.substring(st, end);
-            pkg = src.substring(st, end - 1);
-            pkg = pkg.substring("package".length(), pkg.length()).trim();
+        String packageName = "";
+        if (findResult) {
+            int st = matcher.start();
+            int end = matcher.end();
+            String s = sourceCode.substring(st, end);
+            packageName = sourceCode.substring(st, end - 1);
+            packageName = packageName.substring("package".length(), packageName.length()).trim();
             s = s.replace(';', File.separatorChar);
             String[] sa = s.split("\\s");
             sa[1] = sa[1].replace('.', File.separatorChar);
             packagePath = sa[1].trim();
         }
 
-        pat = Pattern.compile("public\\s+class\\s+");
-        mat = pat.matcher(src);
-        mat.find();
+        pattern = Pattern.compile("public\\s+class\\s+");
+        matcher = pattern.matcher(sourceCode);
+        matcher.find();
 
-        int end = mat.end();
-        String s = src.substring(end, src.length()).trim();
+        int end = matcher.end();
+        String s = sourceCode.substring(end, sourceCode.length()).trim();
         String[] sa = s.split("\\s+");
 
         baseName = sa[0];
@@ -1520,42 +1535,44 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProj.getSrcDirectory(), packagePath);
-            if (!srcPkg.isDirectory()) {
-                srcPkg.mkdirs();
+            File sourcePackage = new File(viskitProject.getSrcDirectory(), packagePath);
+            if (!sourcePackage.isDirectory()) {
+                 sourcePackage.mkdirs();
             }
-            File javaFile = new File(srcPkg, baseName + ".java");
+            File javaFile = new File(sourcePackage, baseName + ".java");
             javaFile.createNewFile();
 
             fw = new FileWriter(javaFile);
-            fw.write(src);
+            fw.write(sourceCode);
 
             // An error stream to write additional error info out to
-            ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-            Compiler.setOutPutStream(baosOut);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Compiler.setOutputStream(byteArrayOutputStream);
 
-            File classesDir = viskitProj.getClassesDirectory();
+            File classesDirectory = viskitProject.getClassesDirectory();
 
             LOG.info("Test compiling " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
-            String diagnostic = Compiler.invoke(pkg, baseName, src);
+            String diagnostic = Compiler.invoke(packageName, baseName, sourceCode);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
-            if (compileSuccess) {
-
+            if (compileSuccess)
+			{
                 LOG.info(diagnostic + "\n");
-                return new File(classesDir, packagePath + baseName + ".class");
-            } else {
-
+                return new File(classesDirectory, packagePath + baseName + ".class");
+            } 
+			else
+			{
+				String message = "Error compiling " + javaFile.getCanonicalPath();
+                LOG.error(message + "\n");
                 LOG.error(diagnostic + "\n");
-                if (!baosOut.toString().isEmpty()) {
-                    LOG.error(baosOut.toString() + "\n");
+                if (!byteArrayOutputStream.toString().isEmpty()) {
+                    LOG.error(byteArrayOutputStream.toString() + "\n");
                 }
             }
-
         } catch (IOException ioe) {
             LOG.error(ioe);
         } finally {
@@ -1569,7 +1586,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /**
      * Known modelPath for EventGraph compilation.  Called whenever an XML file
-     * loads for the first time, or is saved during an edit
+     * loads for the first time, or is saved during an analyst editing session.
      *
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
@@ -1585,16 +1602,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 LOG.debug("Is an Assembly: " + !isEventGraph);
                 return null;
             }
-
-            String src = buildJavaEventGraphSource(x2j);
+            String sourceCode = buildJavaEventGraphSource(x2j);
 
             /* Warn that we may have forgotten a parameter required for a super class */
-            if (src == null) {
-                String msg = xmlFile + " did not compile.\n" +
-                        "Please check that you have provided parameters in \n" +
-                        "identical order declared for any super classes";
-                LOG.error(xmlFile + " " + msg);
-                messageToUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
+            if (sourceCode == null) {
+                String message = xmlFile + " did not compile.\n" +
+                        "Please check that you have provided initialization parameters in the \n" +
+                        "identical order declared by any super classes";
+                LOG.error(xmlFile + " " + message);
+                LOG.error(sourceCode);
+                messageToUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", message);
                 return null;
             }
 
@@ -1609,13 +1626,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 }
             }
 
-            if (src.contains("diskit") && !foundDiskit) {
+            if (sourceCode.contains("diskit") && !foundDiskit) {
                 FileBasedClassManager.instance().addCacheMiss(xmlFile);
 
                 // TODO: Need to announce/recommend to the user to place
                 // diskit.jar in the classpath, then restart Viskit
             } else {
-                paf = compileJavaClassAndSetPackage(src);
+                paf = compileJavaClassAndSetPackage(sourceCode);
             }
         } catch (FileNotFoundException e) {
             LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
@@ -1626,14 +1643,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Path for EventGraph and Assembly compilation
      *
-     * @param source the raw source to write to file
+     * @param sourceCode the raw source to write to file
      * @return a package and file pair
      */
-    private PackageAndFile compileJavaClassAndSetPackage(String source) {
-        String pkg = null;
-        if (source != null && !source.isEmpty()) {
+    private PackageAndFile compileJavaClassAndSetPackage(String sourceCode) {
+        String packageName = new String();
+        if (sourceCode != null && !sourceCode.isEmpty()) {
             Pattern p = Pattern.compile("package.*;");
-            Matcher m = p.matcher(source);
+            Matcher m = p.matcher(sourceCode);
             if (m.find()) {
                 String nuts = m.group();
                 if (nuts.endsWith(";")) {
@@ -1641,11 +1658,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 }
 
                 String[] sa = nuts.split("\\s");
-                pkg = sa[1];
+                packageName = sa[1];
             }
-            File f = compileJavaClassFromString(source);
+            File f = compileJavaClassFromString(sourceCode);
             if (f != null) {
-                return new PackageAndFile(pkg, f);
+                return new PackageAndFile(packageName, f);
             }
         }
         return null;
@@ -1669,24 +1686,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     // Known modelPath for Assembly compilation
     @Override
-    public void initializeAssemblyRun() {
-        String src = produceJavaAssemblyClass(); // asks to save
+    public void initializeAssemblyRun()
+	{
+        String sourceCode = produceJavaAssemblyClass(); // asks to save
 
-        PackageAndFile paf = compileJavaClassAndSetPackage(src);
-        if (paf != null) {
-            File f = paf.file;
+        PackageAndFile packageAndFile = compileJavaClassAndSetPackage(sourceCode);
+        if (packageAndFile != null) {
+            File f = packageAndFile.file;
             String className = f.getName().substring(0, f.getName().indexOf('.'));
-            className = paf.pkg + "." + className;
+            className = packageAndFile.pkg + "." + className;
+			
+            String classPath = ""; // no longer necessary since we don't invoke Runtime.exec to compile anymore
 
-            // no longer necessary since we don't invoke
-            // Runtime.exec to compile anymore
-            String classPath = "";
-
-            executionParameters = buildExecStrings(className, classPath);
+            executionParameters = buildExecutionParameterArray(className, classPath);
         } else {
             executionParameters = null;
         }
     }
+	
+	@Override
+	public boolean isAssemblyReady ()
+	{
+		return (executionParameters != null); // if parameters are ready, then Assembly passed all tests
+	}
 
     @Override
     public void compileAssemblyAndPrepareSimulationRunner() {
@@ -1715,13 +1737,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
 
-        SwingWorker worker = new SwingWorker<Void, Void>() {
-
+        SwingWorker worker = new SwingWorker<Void, Void>()
+		{
             @Override
-            public Void doInBackground() {
-
-                // Compile and prep the execStrings
-                initializeAssemblyRun();
+            public Void doInBackground() // TODO why Void arther than void?  SwingWorker convention of some sort
+			{
+                initializeAssemblyRun(); // generate, compile sourceCode and prepare the executionParameters
 
                 if (executionParameters == null) 
 				{
@@ -1730,48 +1751,46 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "No Assembly file is active",
                             "Please open an Assembly file before running a simulation");
                     } else {
-                        String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
-                        messageToUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
+                        String message = "<html><p>Runtime error: no executionParameters found.</p><br />" + 
+								         "<p>Please locate and correct the source of the error in assembly XML for proper compilation.</p>";
+                        messageToUser(JOptionPane.WARNING_MESSAGE, "Failed Assembly source generation/compilation", message);
                     }
-                } else {
-
+                } 
+				else 
+				{
                     // Ensure a cleared Simulation Run panel upon every Assembly compile
-                    SimulationRunPanel rp2 = ViskitGlobals.instance().getRunPanel();
-                    rp2.simulationOutputTA.setText(null);
-                    rp2.simulationOutputTA.setText("Assembly output stream:" + rp2.lineEnd
-                            + "----------------------" + rp2.lineEnd);
+                    SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
+					simulationRunPanel.initializeSimulationOutput ();
 
-                    // Ensure changes to the Assembly Properties dialog get saved
-                    save();
-
-                    // Initializes a fresh class loader
-                    runner.exec(executionParameters);
-
-                    // reset
-                    executionParameters = null;
+                    save(); // Ensure changes to the Assembly Properties dialog get saved
+					
+                    runner.exec(executionParameters); // Initializes a fresh class loader
+                    
+                    executionParameters = null; // reset
                 }
-
                 return null;
             }
 
             @Override
             protected void done() {
-                try {
-
-                    // Wait for the compile, save and Assy preps to finish
-                    get();
-
-                } catch (InterruptedException | ExecutionException e) {
+                try
+				{
+                   get(); // Wait for the compile, save and Assembly preparations to finish
+                } 
+				catch (InterruptedException | ExecutionException e) 
+				{
                     LOG.error(e);
 //                    e.printStackTrace();
-                } finally {
+                } 
+				finally 
+				{
                     ((AssemblyEditViewFrame) getView()).runButton.setEnabled(true);
-                    mutex--;
-					ViskitGlobals.instance().getViskitApplicationFrame().selectSimulationRunTab();
+                    mutex--; // clear lock
+					ViskitGlobals.instance().getViskitApplicationFrame().selectSimulationRunTab(); // send analyst to Simulation Run tab
                 }
             }
         };
-        worker.execute();
+        worker.execute(); // do it to it
     }
 
     // No longer invoking a Runtime.Exec for compilation
@@ -1787,40 +1806,40 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 //    public static final int EXEC_FIRST_ENTITY_NAME = 9;
 
     /** Prepare for the compilation of the loaded assembly file from java source.
-     * Maintain the above statics to match the order below.
+     * Maintain the above static enumerations to match the order below.
      * @param className the name of the Assembly file to compile
      * @param classPath the current ClassLoader context
-     * @return os exec array
+     * @return operation-system specific array of execution parameters as String array
      */
-    private String[] buildExecStrings(String className, String classPath) {
+    private String[] buildExecutionParameterArray(String className, String classPath)
+	{
         Vector<String> v = new Vector<>();
-        String fsep = ViskitStatics.getFileSeparator();
+        String fileSeparator = ViskitStatics.getFileSeparator();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(System.getProperty("java.home"));
-        sb.append(fsep);
-        sb.append("bin");
-        sb.append(fsep);
-        sb.append("java");
-        v.add(sb.toString());        // 0
-
-        v.add("-Xss2m");             // 1
-        v.add("-Xincgc");            // 2
-        v.add("-Xmx512m");           // 3
-        v.add("-cp");                // 4
-        v.add(classPath);            // 5
-        v.add(className);            // 6
+        StringBuilder invocation = new StringBuilder();
+        invocation.append(System.getProperty("java.home"));
+        invocation.append(fileSeparator);
+        invocation.append("bin");
+        invocation.append(fileSeparator);
+        invocation.append("java");
+        v.add(invocation.toString());// 0
+		// execution parameters, TODO consider including these properties as user preferences
+        v.add("-Xss2m");                                                // 1
+        v.add("-Xincgc");                                               // 2
+        v.add("-Xmx512m");                                              // 3
+        v.add("-cp");                                                   // 4
+        v.add(classPath);                                               // 5
+        v.add(className);                                               // 6
 
         v.add("" + ((AssemblyModel) getModel()).getMetaData().verbose); // 7
         v.add(((AssemblyModel) getModel()).getMetaData().stopTime);     // 8
 
-        Vector<String> vec = ((AssemblyModel) getModel()).getDetailedOutputEntityNames();
-        for (String s : vec) {
-            v.add(s);                                                   // 9+
+        Vector<String> detailedOutputEntityNames = ((AssemblyModel) getModel()).getDetailedOutputEntityNames();
+        for (String entityName : detailedOutputEntityNames) {
+            v.add(entityName);                                          // 9+
         }
-
-        String[] ra = new String[v.size()];
-        return v.toArray(ra);
+        String[] returnStringArray = new String[v.size()];
+        return v.toArray(returnStringArray);
     }
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
@@ -1829,19 +1848,19 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void windowImageCapture() {
 
         AssemblyModel vmod = (AssemblyModel) getModel();
-        String fileName = "AssemblyScreenCapture";
+        String fileName = "AssemblyDiagram";
         if (vmod.getLastFile() != null) {
             fileName = vmod.getLastFile().getName();
         }
 
-        File fil = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true, "Save Assembly Diagram Image");
-        if (fil == null) {
+        File imageFile = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true, "Save Assembly Diagram Image");
+        if (imageFile == null) {
             return;
         }
 
-        final Timer tim = new Timer(100, new timerCallback(fil, true));
-        tim.setRepeats(false);
-        tim.start();
+        final Timer timer = new Timer(100, new timerCallback(imageFile, true));
+        timer.setRepeats(false);
+        timer.start();
 
         imgSaveCount = "" + (++imgSaveInt);
     }
@@ -1854,9 +1873,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void captureAssemblyImage(File assemblyImage) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer tim = new Timer(100, new timerCallback(assemblyImage, false));
-        tim.setRepeats(false);
-        tim.start();
+        final Timer timer = new Timer(100, new timerCallback(assemblyImage, false));
+        timer.setRepeats(false);
+        timer.start();
     }
 
     public boolean isCloseAll() {
@@ -1883,25 +1902,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
-
+        public void actionPerformed(ActionEvent ev)
+		{
             // create and save the image
-            AssemblyEditViewFrame avf = (AssemblyEditViewFrame) getView();
+            AssemblyEditViewFrame assemblyEditViewFrame = (AssemblyEditViewFrame) getView();
 
             // Get only the jgraph part
-            Component component = avf.getCurrentJgraphComponent();
+            Component component = assemblyEditViewFrame.getCurrentJgraphComponent();
             if (component == null) {return;}
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
             }
-            Rectangle rec = component.getBounds();
-            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_3BYTE_BGR);
+            Rectangle rectangle = component.getBounds();
+            Image image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_3BYTE_BGR);
 
             // Tell the jgraph component to draw into memory
             component.paint(image.getGraphics());
 
             try {
-                ImageIO.write((RenderedImage)image, "png", fil);
+                ImageIO.write((RenderedImage)image, "png", fil); // write to file
             } catch (IOException e) {
                 LOG.error(e);
             }
@@ -1909,8 +1928,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // display a scaled version
             if (display) {
                 final JFrame frame = new JFrame("Saved as " + fil.getName());
-                Icon ii = new ImageIcon(image);
-                JLabel lab = new JLabel(ii);
+                Icon imageIcon = new ImageIcon(image);
+                JLabel lab = new JLabel(imageIcon);
                 frame.getContentPane().setLayout(new BorderLayout());
                 frame.getContentPane().add(lab, BorderLayout.CENTER);
                 frame.pack();
@@ -1942,9 +1961,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void openEventGraphs(File f) {
         File tempFile = null;
         try {
-            List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
-            for (File file : eGFiles) {
-
+            List<File> eventGraphFilesList = EventGraphCache.instance().getEventGraphFilesList();
+            for (File file : eventGraphFilesList)
+			{
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened
@@ -1964,16 +1983,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private final Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
-    private final Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentAssemblyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentProjectFileSet  = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an assembly file to add to the list
      */
-    private void adjustRecentAssySet(File file) {
-        for (Iterator<File> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
+    private void adjustRecentAssemblySet(File file) {
+        for (Iterator<File> itr = recentAssemblyFileSet.iterator(); itr.hasNext();) {
 
             File f = itr.next();
             if (file.getPath().equals(f.getPath())) {
@@ -1982,8 +2001,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
 
-        recentAssyFileSet.add(file); // to the top
-        saveAssemblyHistoryXML(recentAssyFileSet);
+        recentAssemblyFileSet.add(file); // to the top
+        saveAssemblyHistoryXML(recentAssemblyFileSet);
         notifyRecentAssemblyFileListeners();
     }
 
@@ -1993,7 +2012,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param file a project file to add to the list
      */
     public void adjustRecentProjectSet(File file) {
-        for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
+        for (Iterator<File> itr = recentProjectFileSet.iterator(); itr.hasNext();) {
 
             File f = itr.next();
             if (file.getPath().equals(f.getPath())) {
@@ -2001,39 +2020,37 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 break;
             }
         }
-
-        recentProjFileSet.add(file); // to the top
-        saveProjectHistoryXML(recentProjFileSet);
+        recentProjectFileSet.add(file); // to the top
+        saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjFileListeners();
     }
 
-    private List<File> openAssemblies;
+    private List<File> openAssembliesFileList;
 
     @SuppressWarnings("unchecked")
-    private void recordAssyFiles() {
-        if (historyConfig == null) {initConfig();}
-        openAssemblies = new ArrayList<>(4);
-        List<String> valueAr = historyConfig.getList(ViskitConfig.ASSEMBLY_HISTORY_KEY + "[@value]");
-        LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
-        int idx = 0;
-        for (String s : valueAr) {
-            if (recentAssyFileSet.add(new File(s))) {
-                String op = historyConfig.getString(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
+    private void recordAssemblyFiles() {
+        if (historyXMLConfiguration == null) {initializeHistoryXMLConfiguration();}
+        openAssembliesFileList = new ArrayList<>(4);
+        List<String> valueList = historyXMLConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
+        LOG.debug("recordAssemblyFiles() valueList size is: " + valueList.size());
+        int index = 0;
+        for (String s : valueList) {
+            if (recentAssemblyFileSet.add(new File(s))) {
+                String open = historyXMLConfiguration.getString(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]");
 
-                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openAssemblies.add(new File(s));
+                if (open != null && (open.toLowerCase().equals("true") || open.toLowerCase().equals("yes"))) {
+                    openAssembliesFileList.add(new File(s));
                 }
-
                 notifyRecentAssemblyFileListeners();
             }
-            idx++;
+            index++;
         }
     }
 
     @SuppressWarnings("unchecked")
     private void recordProjectFiles() {
-        if (historyConfig == null) {initConfig();}
-        List<String> valueAr = historyConfig.getList(ViskitConfig.PROJECT_HISTORY_KEY + "[@value]");
+        if (historyXMLConfiguration == null) {initializeHistoryXMLConfiguration();}
+        List<String> valueAr = historyXMLConfiguration.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
         for (String value : valueAr) {
             adjustRecentProjectSet(new File(value));
@@ -2041,15 +2058,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private void saveAssemblyHistoryXML(Set<File> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.RECENT_ASSEMBLY_CLEAR_KEY);
+        historyXMLConfiguration.clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
         int idx = 0;
 
         // The value's modelPath is already delimited with "/"
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
+            historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
             idx++;
         }
-        historyConfig.getDocument().normalize();
+        historyXMLConfiguration.getDocument().normalize();
     }
 
     /** Always keep our project Hx until a user clears it manually
@@ -2059,16 +2076,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void saveProjectHistoryXML(Set<File> recentFiles) {
         int ix = 0;
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.PROJECT_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
+            historyXMLConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
             ix++;
         }
-        historyConfig.getDocument().normalize();
+        historyXMLConfiguration.getDocument().normalize();
     }
 
     @Override
     public void clearRecentAssemblyFileList() {
-        recentAssyFileSet.clear();
-        saveAssemblyHistoryXML(recentAssyFileSet);
+        recentAssemblyFileSet.clear();
+        saveAssemblyHistoryXML(recentAssemblyFileSet);
         notifyRecentAssemblyFileListeners();
     }
 
@@ -2078,16 +2095,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private Set<File> getRecentAssyFileSet(boolean refresh) {
-        if (refresh || recentAssyFileSet == null) {
-            recordAssyFiles();
+        if (refresh || recentAssemblyFileSet == null) {
+            recordAssemblyFiles();
         }
-        return recentAssyFileSet;
+        return recentAssemblyFileSet;
     }
 
     @Override
     public void clearRecentProjectFileSet() {
-        recentProjFileSet.clear();
-        saveProjectHistoryXML(recentProjFileSet);
+        recentProjectFileSet.clear();
+        saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjFileListeners();
     }
 
@@ -2097,21 +2114,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private Set<File> getRecentProjFileSet(boolean refresh) {
-        if (refresh || recentProjFileSet == null) {
+        if (refresh || recentProjectFileSet == null) {
             recordProjectFiles();
         }
-        return recentProjFileSet;
+        return recentProjectFileSet;
     }
 
-    XMLConfiguration historyConfig;
+    XMLConfiguration historyXMLConfiguration;
 
-    private void initConfig() {
+    private void initializeHistoryXMLConfiguration() {
         try {
-            historyConfig = ViskitConfig.instance().getViskitAppConfig();
+            historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
         } catch (Exception e) {
-            LOG.error("Error loading history file: " + e.getMessage());
-            LOG.warn("Recent file saving disabled");
-            historyConfig = null;
+            LOG.error("Error loading recent history file: " + e.getMessage());
+            LOG.warn ("Error, recent history file disabled");
+            historyXMLConfiguration = null;
         }
     }
 }

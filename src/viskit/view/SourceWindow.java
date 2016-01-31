@@ -157,7 +157,7 @@ public class SourceWindow extends JFrame {
 
                 // An error stream to write additional error info out to
                 ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-                Compiler.setOutPutStream(baosOut);
+                Compiler.setOutputStream(baosOut);
 
                 try {
                     String diagnostic = Compiler.invoke("", className, src);

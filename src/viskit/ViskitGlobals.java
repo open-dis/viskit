@@ -65,6 +65,7 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.control.AnalystReportController;
+import viskit.control.AssemblyController;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
@@ -132,7 +133,7 @@ public class ViskitGlobals {
 
     /* routines to manage the singleton-aspect of the views. */
     mvcAbstractJFrameView assemblyEditViewFrame;
-    mvcController assemblyControllerImpl;
+    AssemblyControllerImpl assemblyControllerImpl;
     boolean assyFirstRun = false;
 
     /**
@@ -154,7 +155,7 @@ public class ViskitGlobals {
         return assemblyEditViewFrame;
     }
 
-    /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
+    /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assembly Editor */
     public void rebuildLEGOTreePanels() {
         ((AssemblyEditViewFrame)assemblyEditViewFrame).rebuildLEGOTreePanels();
     }
@@ -163,11 +164,11 @@ public class ViskitGlobals {
         return (AssemblyModel) assemblyControllerImpl.getModel();
     }
 
-    public mvcController getAssemblyController() {
+    public AssemblyControllerImpl getAssemblyController() {
         return assemblyControllerImpl;
     }
 
-    ActionListener defaultAssyQuitHandler = new ActionListener() {
+    ActionListener defaultAssembyQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -176,7 +177,7 @@ public class ViskitGlobals {
             }
         }
     };
-    ActionListener assemblyQuitHandler = defaultAssyQuitHandler;
+    ActionListener assemblyQuitHandler = defaultAssembyQuitHandler;
 
     public void quitAssemblyEditor() {
         if (assemblyQuitHandler != null) {
@@ -194,7 +195,7 @@ public class ViskitGlobals {
     EventGraphControllerImpl eventGraphController;
 
     public EventGraphViewFrame getEventGraphEditor() {
-        return (EventGraphViewFrame) eventGraphViewFrame;
+        return eventGraphViewFrame;
     }
 
     /** This method starts the chain of various Viskit startup steps.  By
@@ -508,8 +509,8 @@ public class ViskitGlobals {
      */
     public final void initializeProjectHomeDirectory() {
 
-        ViskitConfig vConfig = ViskitConfig.instance();
-        String projectHomeDirectory = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
+        String projectHomeDirectory = vConfig.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
         LOG.debug(projectHomeDirectory);
         if (projectHomeDirectory.isEmpty() || !(new File(projectHomeDirectory).exists())) {
             ViskitProjectButtonPanel.showDialog();
@@ -762,7 +763,7 @@ public class ViskitGlobals {
     JComboBox<String> pendingComboBox;
     Object lastSelected = "void";
 
-    public SimulationRunPanel getRunPanel() {
+    public SimulationRunPanel getSimulationRunPanel() {
         return runPanel;
     }
 
@@ -787,12 +788,12 @@ public class ViskitGlobals {
      * for the an open project's working directory (build/classes)
      */
     public final void createWorkDirectory() {
-        ViskitConfig vConfig = ViskitConfig.instance();
-        if (vConfig.getViskitAppConfig() == null) {
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
+        if (vConfig.getViskitApplicationXMLConfiguration() == null) {
             return;
         }
 
-        String projectName = vConfig.getVal(ViskitConfig.PROJECT_NAME_KEY);
+        String projectName = vConfig.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }

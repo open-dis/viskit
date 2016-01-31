@@ -129,7 +129,7 @@ public class ViskitProject {
     public boolean initializeProject() {
 
         if (!projectRoot.exists()) {
-            projectRoot.mkdir();
+             projectRoot.mkdir();
         }
 
         setAnalystReportsDirectory(new File(projectRoot, ANALYST_REPORTS_DIRECTORY_NAME));
@@ -214,7 +214,7 @@ public class ViskitProject {
         } else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        ViskitConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getAbsolutePath());
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }
@@ -324,7 +324,7 @@ public class ViskitProject {
             log.debug(getEventGraphsDirectory().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
-            String[] classPaths = ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY);
+            String[] classPaths = ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.X_CLASS_PATHS_KEY);
             for (String classPath : classPaths) {
                 cp.add(classPath.replaceAll("\\\\", "/"));
             }
@@ -380,10 +380,10 @@ public class ViskitProject {
     }
 
     public void closeProject() {
-        ViskitConfig vConfig = ViskitConfig.instance();
-        vConfig.getViskitGuiConfig().setProperty(ViskitConfig.PROJECT_TITLE_NAME, "");
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
+        vConfig.getViskitGuiXMLConfiguration().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
         vConfig.cleanup();
-        vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
+        vConfig.removeProjectXMLConfiguration(vConfig.getProjectXMLConfiguration());
         setProjectOpen(false);
     }
 
@@ -397,8 +397,8 @@ public class ViskitProject {
 		try
 		{
 			this.projectRoot = projectRoot.getCanonicalFile();
-			XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
-			guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
+			XMLConfiguration guiConfig = ViskitConfiguration.instance().getViskitGuiXMLConfiguration();
+			guiConfig.setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, getProjectRoot().getName());
 		}
 		catch (Exception e)
 		{

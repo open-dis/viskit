@@ -22,16 +22,16 @@ import java.lang.reflect.Method;
  *
  * Based on code posted by Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
  */
-public class Splash2 extends JFrame {
+public class SplashScreenFrame2 extends JFrame {
 
     Robot robot;
-    BufferedImage screenImg;
-    Rectangle screenRect;
+    BufferedImage screenImage;
+    Rectangle screenRectangle;
     MyPanel contentPanel = new MyPanel();
     private static JProgressBar progressBar;
     boolean userActivate = false;
 
-    public Splash2() {
+    public SplashScreenFrame2() {
         super();
         setUndecorated(true);
 
@@ -55,13 +55,13 @@ public class Splash2 extends JFrame {
 
             @Override
             public void componentMoved(ComponentEvent e) {
-                resetUnderImg();
+                resetUnderImage();
                 repaint();
             }
 
             @Override
             public void componentResized(ComponentEvent e) {
-                resetUnderImg();
+                resetUnderImage();
                 repaint();
             }
         });
@@ -72,10 +72,10 @@ public class Splash2 extends JFrame {
             public void windowActivated(WindowEvent e) {
                 if (userActivate) {
                     userActivate = false;
-                    Splash2.this.setVisible(false);
+                    SplashScreenFrame2.this.setVisible(false);
                     createScreenImage();
-                    resetUnderImg();
-                    Splash2.this.setVisible(true);
+                    resetUnderImage();
+                    SplashScreenFrame2.this.setVisible(true);
                 } else {
                     userActivate = true;
                 }
@@ -93,12 +93,13 @@ public class Splash2 extends JFrame {
         }
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        screenRect = new Rectangle(0, 0, screenSize.width, screenSize.height);
-        screenImg = robot.createScreenCapture(screenRect);
+        screenRectangle      = new Rectangle(0, 0, screenSize.width, screenSize.height);
+        screenImage          = robot.createScreenCapture(screenRectangle);
     }
 
-    public void resetUnderImg() {
-        if (robot != null && screenImg != null) {
+    public void resetUnderImage ()
+	{
+        if (robot != null && screenImage != null) {
             Rectangle frameRect = getBounds();
             int x = frameRect.x; // + 4;
             contentPanel.paintX = 0;
@@ -113,33 +114,33 @@ public class Splash2 extends JFrame {
                 y = 0;
             }
             int w = frameRect.width; // - 10;
-            if (x + w > screenImg.getWidth()) {
-                w = screenImg.getWidth() - x;
+            if (x + w > screenImage.getWidth()) {
+                w = screenImage.getWidth() - x;
             }
             int h = frameRect.height; // - 23 - 5;
-            if (y + h > screenImg.getHeight()) {
-                h = screenImg.getHeight() - y;
+            if (y + h > screenImage.getHeight()) {
+                h = screenImage.getHeight() - y;
             }
 
-            contentPanel.underFrameImg = screenImg.getSubimage(x, y, w, h);
+            contentPanel.underFrameImg = screenImage.getSubimage(x, y, w, h);
         }
     }
 
-    public static void main(String[] args) {
-
+    public static void main (String[] args)
+	{
         if (viskit.ViskitStatics.debug) {
             System.out.println(System.getProperty("java.class.path"));
         }
 
-        final Splash2 spl = new Splash2();
+        final SplashScreenFrame2 splashScreen = new SplashScreenFrame2();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        spl.setLocation((d.width - spl.getWidth()) / 2, (d.height - spl.getHeight()) / 2);
+        splashScreen.setLocation((d.width - splashScreen.getWidth()) / 2, (d.height - splashScreen.getHeight()) / 2);
 
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                spl.setVisible(true);
+                splashScreen.setVisible(true);
             }
         });
 
@@ -173,7 +174,7 @@ public class Splash2 extends JFrame {
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            LogUtils.getLogger(Splash2.class).error(ex);
+            LogUtils.getLogger(SplashScreenFrame2.class).error(ex);
         }
         progressBar.setString("Complete");
 
@@ -181,7 +182,7 @@ public class Splash2 extends JFrame {
 
             @Override
             public void run() {
-                spl.dispose();
+                splashScreen.dispose();
             }
         });
     }
@@ -189,7 +190,7 @@ public class Splash2 extends JFrame {
     static public class DefaultEntry {
 
         public static void main(String[] args) {
-            Splash2.main(new String[] {"viskit.EventGraphAssemblyComboMain"});
+            SplashScreenFrame2.main(new String[] {"viskit.EventGraphAssemblyComboMain"});
         }
     }
 
