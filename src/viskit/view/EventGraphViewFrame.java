@@ -675,11 +675,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Set up Projects menu
         projectsMenu.removeAll(); // reset
 
-        projectsMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
-        projectsMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutKeyMask)));
+        projectsMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK), true));
+        projectsMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutKeyMask), true));
         projectsMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 		openRecentProjectMenu.setMnemonic(KeyEvent.VK_R);
-        projectsMenu.add(buildMenuItem(eventGraphController, "zipAndMailProject", "Zip and Mail Project File", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK)));
+        projectsMenu.add(buildMenuItem(eventGraphController, "zipAndMailProject", "Zip and Mail Project File", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK), true));
 		
 		// TODO Rename Project
 		// TODO Close Project
@@ -687,11 +687,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Set up file menu
         fileMenu.removeAll(); // reset
 		
-        fileMenu.add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask)));
-        fileMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
-        fileMenu.add(openRecentEventGraphMI = buildMenu("Open Recent Event Graph"));
+        fileMenu.add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), true));
+        fileMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
+        openRecentEventGraphMI = buildMenu("Open Recent Event Graph");
 		openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
 		openRecentEventGraphMI.setEnabled(eventGraphController.getRecentEventGraphFileSet().size() > 0);
+		fileMenu.add(openRecentEventGraphMI);
         fileMenu.addSeparator();
 
         // The recently opened project file listener will be set with the
@@ -700,34 +701,33 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		boolean showingEventGraph = false;
 		if                 (null != ViskitGlobals.instance().getViskitApplicationFrame())
 			    showingEventGraph = ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected () && hasOpenModels();
-        JMenuItem saveEventGraphMI = buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask));
-		saveEventGraphMI.setEnabled(showingEventGraph);
+		
+        JMenuItem saveEventGraphMI = buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask), showingEventGraph);
         fileMenu.add(saveEventGraphMI);
-        JMenuItem saveAsEventGraphMI = buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null);
-		saveAsEventGraphMI.setEnabled(showingEventGraph);
+        JMenuItem saveAsEventGraphMI = buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null, showingEventGraph);
         fileMenu.add(saveAsEventGraphMI);
-		JMenuItem closeEventGraphMI = buildMenuItem(eventGraphController, "close", "Close Event Graph", null, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask));
-		closeEventGraphMI.setEnabled(showingEventGraph);
+        JMenuItem saveEventGraphDiagramMI = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutKeyMask), showingEventGraph);
+		fileMenu.add(saveEventGraphDiagramMI);
+		JMenuItem closeEventGraphMI = buildMenuItem(eventGraphController, "close", "Close Event Graph", null, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask), showingEventGraph);
         fileMenu.add(closeEventGraphMI);
-		JMenuItem closeAllEventGraphsMI = buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null);
-		closeAllEventGraphsMI.setEnabled(showingEventGraph);
+		JMenuItem closeAllEventGraphsMI = buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null, showingEventGraph);
         fileMenu.add(closeAllEventGraphsMI);
 
         // Set up edit menu
         editMenu.removeAll(); // reset
 		
-          editMenu.add(buildMenuItem(eventGraphController, "undo", "Undo Edit", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask)));
-          editMenu.add(buildMenuItem(eventGraphController, "redo", "Redo Edit", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask)));
+          editMenu.add(buildMenuItem(eventGraphController, "undo", "Undo Edit", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask), showingEventGraph));
+          editMenu.add(buildMenuItem(eventGraphController, "redo", "Redo Edit", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask), showingEventGraph));
         ActionIntrospector.getAction(eventGraphController, "undo").setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, "redo").setEnabled(false);
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut",            KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut",            KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask), showingEventGraph));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy",          KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy",          KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask), showingEventGraph));
 
         // These start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "cut").setEnabled(false);
@@ -736,23 +736,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         ActionIntrospector.getAction(eventGraphController, "paste").setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "newNode",          "Add Event Node",              KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK)));
-        editMenu.add(buildMenuItem(eventGraphController, "newSimParameter",  "Add Simulation Parameter...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK)));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...",       KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK)));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", null, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newNode",          "Add Event Node",              KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "newSimParameter",  "Add Simulation Parameter...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...",       KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null, showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge",  "Add Self-Refenential Canceling Edge...",  null, null, showingEventGraph));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, "newSelfRefCancelingEdge").setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "showXML", "View Saved XML",                           KeyEvent.VK_X, null));
-        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(eventGraphController, "showXML", "View Saved XML",                           KeyEvent.VK_X, null, showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutKeyMask), showingEventGraph));
+        JMenuItem saveEventGraphDiagramMI2 = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, null, showingEventGraph);
+		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingEventGraph));
 
         // Create a new menu bar and add the created menus
 		if (myMenuBar == null)
@@ -761,12 +762,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			help.mainFrameLocated(this.getBounds());
 			ViskitGlobals.instance().setHelp(help);
 
-			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-			helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
+			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
+			helpMenu.add(buildMenuItem(help, "doSearch",   "Search",   KeyEvent.VK_S, null, true));
 			helpMenu.addSeparator();
 
-			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-			helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
+			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
+			helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
 		
 			myMenuBar = new JMenuBar();
 			myMenuBar.add(fileMenu);
@@ -776,8 +777,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
-        Action a = ActionIntrospector.getAction(source, method);
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled) {
+        Action action = ActionIntrospector.getAction(source, method);
         Map<String, Object> map = new HashMap<>();
         if (mn != null) {
             map.put(Action.MNEMONIC_KEY, mn);
@@ -789,9 +790,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             map.put(Action.NAME, name);
         }
         if (!map.isEmpty()) {
-            ActionUtilities.decorateAction(a, map);
+            ActionUtilities.decorateAction(action, map);
         }
-        return ActionUtilities.createMenuItem(a);
+		JMenuItem menuItem = ActionUtilities.createMenuItem(action);
+		menuItem.setEnabled (enabled);
+        return menuItem;
     }
 
     private JMenu buildMenu(String name) {
@@ -1202,7 +1205,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public File[] openFilesAsk() {
         jfc = buildOpenSaveChooser();
-        jfc.setDialogTitle("Open Event Graph Files");
+        jfc.setDialogTitle("Open Event Graph File(s)");
 
         // Bug fix: 1246
         jfc.addChoosableFileFilter(new EventGraphFileFilter(

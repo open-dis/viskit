@@ -336,9 +336,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Set up file menu
         fileMenu.removeAll(); // reset
 		
-        fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), true));
 
-        fileMenu.add(buildMenuItem(assemblyController, "open",        "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "open",        "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
         fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
 		openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
@@ -349,32 +349,38 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         fileMenu.addSeparator();
 
+		boolean showingAssembly = false;
+		if                 (null != ViskitGlobals.instance().getViskitApplicationFrame())
+			    showingAssembly = ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected () && hasOpenModels();
+
 		// be careful when changing controller method names!!  refactoring won't catch these
-        fileMenu.add(buildMenuItem(assemblyController, "save",     "Save Assembly",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask)));
-        fileMenu.add(buildMenuItem(assemblyController, "saveAs",   "Save Assembly As...", KeyEvent.VK_A, null));
-        fileMenu.add(buildMenuItem(assemblyController, "close",    "Close Assembly",      KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
-        fileMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies",KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "save",     "Save Assembly",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask), showingAssembly));
+        fileMenu.add(buildMenuItem(assemblyController, "saveAs",   "Save Assembly As...", KeyEvent.VK_A, null, showingAssembly));
+		JMenuItem saveAssemblyDiagramMI = buildMenuItem(assemblyController, "windowImageCapture", "Save Assembly Diagram", KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask), showingAssembly);
+        fileMenu.add(saveAssemblyDiagramMI);
+        fileMenu.add(buildMenuItem(assemblyController, "close",    "Close Assembly",      KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask), showingAssembly));
+        fileMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies",KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask), showingAssembly));
 
         // TODO: Unknown as to what this does exactly
-          fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null));
+          fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null, false));
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
 
         // Set up edit menu
         editMenu.removeAll(); // reset
         editMenu.setMnemonic(KeyEvent.VK_A);
-        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask), showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask), showingAssembly));
 
         ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
         ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(assemblyController, "cut",    "Cut",          KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "cut",    "Cut",          KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask), showingAssembly));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(assemblyController, "copy",   "Copy",         KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "paste",  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete",  KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "copy",   "Copy",         KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask), showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "paste",  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask), showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete",  KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask), showingAssembly));
 
         // These start off being disabled, until something is selected
         ActionIntrospector.getAction(assemblyController, "cut"   ).setEnabled(false);
@@ -383,22 +389,19 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         ActionIntrospector.getAction(assemblyController, "paste" ).setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode",         "Add Event Graph...", KeyEvent.VK_V, null));
-        editMenu.add(buildMenuItem(assemblyController, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
+        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode",         "Add Event Graph...", KeyEvent.VK_V, null, showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null, showingAssembly));
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        editMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J,
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "windowImageCapture", "Save Assembly Diagram",
-                KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "showXML", "View Saved XML", KeyEvent.VK_X, null, showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutKeyMask), showingAssembly));
+		JMenuItem saveAssemblyDiagramMI2 = buildMenuItem(assemblyController, "windowImageCapture", "Save Assembly Diagram", KeyEvent.VK_D, null, showingAssembly);
+        editMenu.add(saveAssemblyDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingAssembly));
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepareSimulationRunner", "Initialize Assembly",
-                KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
+        editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepareSimulationRunner", "Initialize Assembly", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), showingAssembly));
 
         // Create a new menu bar and add the created menus
 		if (myMenuBar == null)
@@ -406,12 +409,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			Help help = ViskitGlobals.instance().getHelp();
 			helpMenu.setMnemonic(KeyEvent.VK_H);
 
-			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-			helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
+			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
+			helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null, true));
 			helpMenu.addSeparator();
 
-			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-			helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null));
+			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
+			helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null, true));
 		
 			myMenuBar = new JMenuBar();
 			myMenuBar.add(fileMenu);
@@ -425,8 +428,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
-        Action a = ActionIntrospector.getAction(source, method);
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled) {
+        Action action = ActionIntrospector.getAction(source, method);
 
         Map<String, Object> map = new HashMap<>();
         if (mn != null) {
@@ -439,10 +442,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             map.put(Action.NAME, name);
         }
         if (!map.isEmpty()) {
-            ActionUtilities.decorateAction(a, map);
+            ActionUtilities.decorateAction(action, map);
         }
-
-        return ActionUtilities.createMenuItem(a);
+		JMenuItem menuItem = ActionUtilities.createMenuItem(action);
+		menuItem.setEnabled (enabled);
+        return menuItem;
     }
 
     /**
@@ -1001,7 +1005,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public File[] openFilesAsk() {
         assemblyFileChooser = buildOpenSaveChooser();
-        assemblyFileChooser.setDialogTitle("Open Assembly File");
+        assemblyFileChooser.setDialogTitle("Open Assembly File(s)");
 
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");

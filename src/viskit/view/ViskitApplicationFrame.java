@@ -436,10 +436,12 @@ public class ViskitApplicationFrame extends JFrame {
                 mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
 				eventGraphEditMenu.setEnabled(true);
 			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
-                return;
+                return; // TODO review
             }
             
 			int i = mainTabbedPane.getSelectedIndex();
+			ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // refresh to keep current
+			ViskitGlobals.instance().getAssemblyEditor().buildMenus();
 			
 			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
