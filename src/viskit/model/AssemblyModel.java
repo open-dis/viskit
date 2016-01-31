@@ -86,9 +86,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      *
      * @return the meta data for this Assembly
      */
-    GraphMetaData getMetaData();
+    GraphMetadata getMetaData();
 
-    void changeMetaData(GraphMetaData gmd);
+    void changeMetaData(GraphMetadata gmd);
 
     SimkitAssembly getJaxbRoot();
 

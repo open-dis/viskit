@@ -55,14 +55,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     private final String privateIndexVariablePrefix = "_idxvar_";
     private final String privateLocationVariablePrefix = "locvar_";
     private final String stateVariablePrefix = "state_";
-    private GraphMetaData metaData;
+    private GraphMetadata metaData;
     private final EventGraphControllerImpl eventGraphController;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
     public ModelImpl(mvcController controller) {
         this.eventGraphController = (EventGraphControllerImpl) controller;
-        metaData = new GraphMetaData(this);
+        metaData = new GraphMetadata(this);
     }
 
     @Override
@@ -91,12 +91,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public GraphMetaData getMetaData() {
+    public GraphMetadata getMetadata() {
         return metaData;
     }
 
     @Override
-    public void changeMetaData(GraphMetaData gmd) {
+    public void changeMetaData(GraphMetadata gmd) {
         metaData = gmd;
         setDirty(true);
         notifyChanged(new ModelEvent(gmd, ModelEvent.METADATA_CHANGED, "Metadata changed"));
@@ -117,21 +117,21 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(f);
 
-                GraphMetaData mymetaData = new GraphMetaData(this);
-                mymetaData.author = jaxbRoot.getAuthor();
-                mymetaData.version = jaxbRoot.getVersion();
-                mymetaData.name = jaxbRoot.getName();
-                mymetaData.packageName = jaxbRoot.getPackage();
-                mymetaData.extendsPackageName = jaxbRoot.getExtend();
-                mymetaData.implementsPackageName = jaxbRoot.getImplement();
+                GraphMetadata myMetadata = new GraphMetadata(this);
+                myMetadata.author = jaxbRoot.getAuthor();
+                myMetadata.version = jaxbRoot.getVersion();
+                myMetadata.name = jaxbRoot.getName();
+                myMetadata.packageName = jaxbRoot.getPackage();
+                myMetadata.extendsPackageName = jaxbRoot.getExtend();
+                myMetadata.implementsPackageName = jaxbRoot.getImplement();
                 List<String> lis = jaxbRoot.getComment();
                 StringBuilder sb = new StringBuilder("");
                 for (String comment : lis) {
                     sb.append(comment);
                     sb.append(" ");
                 }
-                mymetaData.description = sb.toString().trim();
-                changeMetaData(mymetaData);
+                myMetadata.description = sb.toString().trim();
+                changeMetaData(myMetadata);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
                 buildParametersFromJaxb(jaxbRoot.getParameter());
@@ -140,8 +140,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             } catch (JAXBException ee) {
                 // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
                 try {
-                    JAXBContext assyCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-                    Unmarshaller um = assyCtx.createUnmarshaller();
+                    JAXBContext assembblyContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+                    Unmarshaller um = assembblyContext.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,

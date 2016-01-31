@@ -57,7 +57,7 @@ import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetaDataDialog;
-import viskit.view.RunnerPanel2;
+import viskit.view.SimulationRunPanel;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.AssemblyView;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
@@ -112,7 +112,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         File f = new File(assyPath);
         initialFile = assyPath;
         _doOpen(f);
-        compileAssemblyAndPrepSimRunner();
+        compileAssemblyAndPrepareSimulationRunner();
     }
 
     @Override
@@ -196,7 +196,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
 				{
 					_doOpen(file);
-					ViskitGlobals.instance().getMainAppWindow().selectAssemblyEditorTab();
+					ViskitGlobals.instance().getViskitApplicationFrame().selectAssemblyEditorTab();
 				}
 				else 
 				{
@@ -208,10 +208,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 							"<p>&nbsp</p>" +
 							"<p>Please choose another assembly or else open a different project.</p>");
 					// TODO offer to copy?
-					return;
+					break;
 				}
 			}
         }
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
     private void _doOpen(File file) {
@@ -248,7 +249,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssySet(file);
-            markAssyFilesOpened();
+            markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
             initOpenAssemblyWatch(file, mod.getJaxbRoot());
@@ -273,15 +274,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
-    /** Mark every Assy file opened as "open" in the app config file */
-    private void markAssyFilesOpened() {
+    /** Mark every Assembly file opened as "open" in the app config file */
+    private void markAssemblyFilesOpened() {
 
         // Mark every vAMod opened as "open"
         AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vAMod : openAlready) {
             if (vAMod.getLastFile() != null) {
                 String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                markAssyConfigOpen(modelPath);
+                markAssemblyConfigurationOpen(modelPath);
             }
         }
     }
@@ -289,6 +290,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void openRecentAssembly(File path) {
         _doOpen(path);
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
     /** Tell the Assembly File listener our new name
@@ -460,7 +462,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void saveAs() {
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView view = (AssemblyView) getView();
-        GraphMetaData gmd = model.getMetaData();
+        GraphMetadata gmd = model.getMetaData();
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
@@ -478,7 +480,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
             adjustRecentAssySet(saveFile);
-            markAssyFilesOpened();
+            markAssemblyFilesOpened();
         }
     }
 
@@ -486,7 +488,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void editGraphMetaData() {
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod == null) {return;}
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetaData();
         boolean modified =
                 AssemblyMetaDataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
@@ -563,6 +565,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
     @Override
@@ -678,7 +682,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ViskitGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
     }
 
     @Override
@@ -694,7 +700,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			return;
 		}
 
-        GraphMetaData oldGmd = null;
+        GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
         if (viskitAssemblyModel != null) {
             oldGmd = viskitAssemblyModel.getMetaData();
@@ -708,7 +714,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // when TabbedPane changelistener detects a tab change.
         ((AssemblyView) getView()).addTab(mod);
 
-        GraphMetaData gmd = new GraphMetaData(mod);   // build a new one, specific to Assy
+        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assy
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
@@ -726,6 +732,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } else {
             ((AssemblyView) getView()).deleteTab(mod);
         }
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
     /**
@@ -784,6 +791,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             setCloseAll(true);
             close();
         }
+		// included in close(): ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
         setCloseAll(false);
     }
 
@@ -792,6 +800,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (preClose()) {
             postClose();
         }
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     @Override
@@ -828,7 +837,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
-    private void markAssyConfigOpen(String path) {
+    private void markAssemblyConfigurationOpen(String path) {
 
         int idx = 0;
         for (File tempPath : recentAssyFileSet) {
@@ -1681,7 +1690,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void compileAssemblyAndPrepSimRunner() {
+    public void compileAssemblyAndPrepareSimulationRunner() {
 
         // Prevent multiple pushes of the initialize sim run button
         mutex++;
@@ -1728,7 +1737,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 } else {
 
                     // Ensure a cleared Simulation Run panel upon every Assembly compile
-                    RunnerPanel2 rp2 = ViskitGlobals.instance().getRunPanel();
+                    SimulationRunPanel rp2 = ViskitGlobals.instance().getRunPanel();
                     rp2.simulationOutputTA.setText(null);
                     rp2.simulationOutputTA.setText("Assembly output stream:" + rp2.lineEnd
                             + "----------------------" + rp2.lineEnd);
@@ -1941,6 +1950,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 // _doOpen checks if a tab is already opened
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
             }
+			ViskitGlobals.instance().getViskitApplicationFrame().selectAnalystReportTab(); // ensure correct context when building menus
+			ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -1981,7 +1992,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
-    public void adjustRecentProjSet(File file) {
+    public void adjustRecentProjectSet(File file) {
         for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
 
             File f = itr.next();
@@ -2025,7 +2036,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         List<String> valueAr = historyConfig.getList(ViskitConfig.PROJECT_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
         for (String value : valueAr) {
-            adjustRecentProjSet(new File(value));
+            adjustRecentProjectSet(new File(value));
         }
     }
 

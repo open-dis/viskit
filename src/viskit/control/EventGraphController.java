@@ -68,7 +68,7 @@ public interface EventGraphController {
      */
     void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages);
 
-    void editGraphMetaData();
+    void editGraphMetadata();
 
     /**
      * Creates a new blank EventGraph model

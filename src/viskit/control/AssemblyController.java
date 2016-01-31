@@ -226,7 +226,7 @@ public interface AssemblyController {
      * run.  This is called from the AssemblyView via reflection when the
      * Initialize assembly run button is selected from the Assembly Editor panel.
      */
-    void compileAssemblyAndPrepSimRunner();
+    void compileAssemblyAndPrepareSimulationRunner();
 
     /** Generating java source and compilation are taken care of here */
     void initializeAssemblyRun();

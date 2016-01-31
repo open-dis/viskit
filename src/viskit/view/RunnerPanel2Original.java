@@ -532,9 +532,9 @@ public class RunnerPanel2Original extends JPanel {
 
     public class Searcher implements ActionListener {
 
-        RunnerPanel2 runner;
+        SimulationRunPanel runner;
 
-        public Searcher(RunnerPanel2 runner) {
+        public Searcher(SimulationRunPanel runner) {
             this.runner = runner;
         }
 

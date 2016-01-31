@@ -36,7 +36,7 @@ package viskit;
 import viskit.control.EventGraphControllerImpl;
 import viskit.control.AssemblyControllerImpl;
 import viskit.view.ViskitProjectButtonPanel;
-import viskit.view.RunnerPanel2;
+import viskit.view.SimulationRunPanel;
 import viskit.view.dialog.UserPreferencesDialog;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.EventGraphViewFrame;
@@ -74,7 +74,7 @@ import viskit.model.Model;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.view.AnalystReportFrame;
-import viskit.view.ViskitMainFrame;
+import viskit.view.ViskitApplicationFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -95,12 +95,12 @@ public class ViskitGlobals {
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popup;
     private final myTypeListener myListener;
-    private ViskitMainFrame mainApplicationWindow;
+    private ViskitApplicationFrame mainApplicationWindow;
 
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox */
-    private RunnerPanel2 runPanel;
+    private SimulationRunPanel runPanel;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -190,11 +190,11 @@ public class ViskitGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    mvcAbstractJFrameView egvf;
-    mvcController eContl;
+    EventGraphViewFrame      eventGraphViewFrame;
+    EventGraphControllerImpl eventGraphController;
 
     public EventGraphViewFrame getEventGraphEditor() {
-        return (EventGraphViewFrame) egvf;
+        return (EventGraphViewFrame) eventGraphViewFrame;
     }
 
     /** This method starts the chain of various Viskit startup steps.  By
@@ -208,26 +208,26 @@ public class ViskitGlobals {
      * @return an instance of the EventGraphViewFrame
      */
     public mvcAbstractJFrameView buildEventGraphViewFrame() {
-        eContl = new EventGraphControllerImpl();
-        egvf = new EventGraphViewFrame(eContl);
-        eContl.setView(egvf);
-        return egvf;
+        eventGraphController   = new EventGraphControllerImpl();
+        eventGraphViewFrame    = new EventGraphViewFrame(eventGraphController);
+        eventGraphController.setView(eventGraphViewFrame);
+        return eventGraphViewFrame;
     }
 
     public mvcController getEventGraphController() {
-        return eContl;
+        return eventGraphController;
     }
 
     public Model getActiveEventGraphModel() {
-        return (Model) eContl.getModel();
+        return (Model) eventGraphController.getModel();
     }
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (egvf != null) {
-                egvf.setVisible(false);
+            if (eventGraphViewFrame != null) {
+                eventGraphViewFrame.setVisible(false);
             }
         }
     };
@@ -762,11 +762,11 @@ public class ViskitGlobals {
     JComboBox<String> pendingComboBox;
     Object lastSelected = "void";
 
-    public RunnerPanel2 getRunPanel() {
+    public SimulationRunPanel getRunPanel() {
         return runPanel;
     }
 
-    public void setRunPanel(RunnerPanel2 runPanel) {
+    public void setRunPanel(SimulationRunPanel runPanel) {
         this.runPanel = runPanel;
     }
 
@@ -951,11 +951,11 @@ public class ViskitGlobals {
         }
     }
 
-    public ViskitMainFrame getMainAppWindow() {
+    public ViskitApplicationFrame getViskitApplicationFrame() {
         return mainApplicationWindow;
     }
 
-    public void setMainAppWindow(ViskitMainFrame mainAppWindow) {
+    public void setMainAppWindow(ViskitApplicationFrame mainAppWindow) {
         this.mainApplicationWindow = mainAppWindow;
     }
 

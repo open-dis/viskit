@@ -74,7 +74,7 @@ import viskit.view.dialog.UserPreferencesDialog;
  * @since 3:25:11 PM
  * @version $Id$
  */
-public class ViskitMainFrame extends JFrame {
+public class ViskitApplicationFrame extends JFrame {
 
     private JTabbedPane    mainTabbedPane;
     private JTabbedPane runTabbedPane;
@@ -108,7 +108,7 @@ public class ViskitMainFrame extends JFrame {
 	private JMenuBar mainMenuBar;
 	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
-    public ViskitMainFrame(String initialFile)
+    public ViskitApplicationFrame(String initialFile)
 	{
         super("Viskit"); // title
 
@@ -308,11 +308,11 @@ public class ViskitMainFrame extends JFrame {
 		
 		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", null, null); // do not change "quit", no hotkey for reliability
         fileMenu.add(quitMenuItem); // TODO omit hotkey
-        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // necessary
+//        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // necessary
 
         // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
         RecentProjectFileSetListener listener = assemblyEditViewFrame.getRecentProjectFileSetListener();
-        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjMenu());
+        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectMenu());
 
         // Now setup the assembly and event graph file change listener(s)
           assemblyController.addAssemblyFileListener  (assemblyController.getAssemblyChangeListener());
@@ -439,9 +439,10 @@ public class ViskitMainFrame extends JFrame {
 			
 			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
-				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
-				boolean hasEventGraph = eventGraphViewFrame.hasOpenModels(); // TODO fix
-				eventGraphEditMenu.setEnabled(true); // hasEventGraph);
+				boolean showingEventGraph = ViskitGlobals.instance().getEventGraphEditor().hasOpenModels();
+			
+//				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
+				eventGraphEditMenu.setEnabled(showingEventGraph);
 			   	  assemblyEditMenu.setEnabled(false);
             }
             // If we compiled and prepped an Assembly to run, but want to go
@@ -449,7 +450,7 @@ public class ViskitMainFrame extends JFrame {
 			else if (i == tabIndices[TAB_SIMULATION_RUN])
 			{
                 i = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
-                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "Run simulation defined by Assembly");
+                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "Simulation Run is defined by active Assembly");
 				eventGraphEditMenu.setEnabled(false);
 			   	  assemblyEditMenu.setEnabled(false);
 
@@ -463,12 +464,13 @@ public class ViskitMainFrame extends JFrame {
             }
 			else // Assembly Edit
 			{
-				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
-				boolean hasAssembly = assemblyEditViewFrame.hasOpenModels();
-                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First initialize assembly runner from Assembly tab");
+				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditor().hasOpenModels();
+			
+//				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
+                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First initialize assembly runner from Assembly tab"); // TODO fix
 //                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
 				eventGraphEditMenu.setEnabled(false);
-			   	  assemblyEditMenu.setEnabled(true); // hasAssembly); // TODO enable/disable menu
+			   	  assemblyEditMenu.setEnabled(showingAssembly);
             }
 
 //            getJMenuBar().remove(hmen);
@@ -525,30 +527,30 @@ public class ViskitMainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            UserPreferencesDialog.showDialog(ViskitMainFrame.this);
+            UserPreferencesDialog.showDialog(ViskitApplicationFrame.this);
         }
     };
 
-    private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {
-        if (mi == null) {
-            JMenu m = mb.getMenu(0); // first menu
-            if (m == null) {
-                m = new JMenu("File");
-                mb.add(m);
-            }
-            m.addSeparator();
-            mi = new JMenuItem("Exit");
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-            m.add(mi);
-        }
-
-        ActionListener[] al = mi.getActionListeners();
-        for (ActionListener al1 : al) {
-            mi.removeActionListener(al1);
-        }
-
-        mi.setAction(qa);
-    }
+//    private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {
+//        if (mi == null) {
+//            JMenu m = mb.getMenu(0); // first menu
+//            if (m == null) {
+//                m = new JMenu("File");
+//                mb.add(m);
+//            }
+//            m.addSeparator();
+//            mi = new JMenuItem("Exit");
+//            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+//            m.add(mi);
+//        }
+//
+//        ActionListener[] al = mi.getActionListeners();
+//        for (ActionListener al1 : al) {
+//            mi.removeActionListener(al1);
+//        }
+//
+//        mi.setAction(qa);
+//    }
 
     class ExitAction extends AbstractAction {
 
@@ -679,7 +681,7 @@ public class ViskitMainFrame extends JFrame {
 				System.out.println ("Blank title set of tab " + key);
 			}
 			else if (tabIndex == key) {
-                ViskitMainFrame.this.setTitle(title);
+                ViskitApplicationFrame.this.setTitle(title);
             }
         }
     }
@@ -708,20 +710,48 @@ public class ViskitMainFrame extends JFrame {
         return quitMenuItem;
     }
 	
+	public boolean isEventGraphEditorTabSelected ()
+	{
+		return (mainTabbedPane.getSelectedIndex() == TAB_EVENTGRAPH_EDITOR);
+    }
+	
+	public boolean isAssemblyEditorTabSelected ()
+	{
+		return (mainTabbedPane.getSelectedIndex() == TAB_ASSEMBLY_EDITOR);
+    }
+	
+	public boolean iSimulationRunTabSelected ()
+	{
+		return (mainTabbedPane.getSelectedIndex() == TAB_SIMULATION_RUN);
+    }
+	
+	public boolean isAnalystReportTabSelected ()
+	{
+		return (mainTabbedPane.getSelectedIndex() == TAB_ANALYST_REPORT);
+    }
+	
 	public void selectEventGraphEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_EVENTGRAPH_EDITOR);
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
 	}
 	public void selectSimulationRunTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
 	}
 	public void selectAssemblyEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ASSEMBLY_EDITOR);
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
 	}
 	public void selectAnalystReportTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ANALYST_REPORT);
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
 	}
 }

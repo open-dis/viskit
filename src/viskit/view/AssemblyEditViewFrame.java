@@ -118,7 +118,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
     private JToggleButton selectMode;
-    private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
+    private JToggleButton adapterMode,  simEventListenerMode,  propertyChangeListenerMode;
     private LegoTree legoTree,  propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -126,8 +126,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     private int untitledCount = 0;
 	
-    private final JMenu fileMenu = new JMenu("Assemblies");
-    private final JMenu editMenu = new JMenu("Assembly Editor");
+    private JMenu fileMenu, editMenu, helpMenu;
+	
+	private AssemblyController assemblyController;
+    private int accelMod;
 
     public AssemblyEditViewFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
@@ -158,13 +160,22 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     /**
      * Initialize the user interface
      */
-    private void initializeUserInterface() {
+    private void initializeUserInterface()
+	{
+        if (assemblyController == null)
+		{
+			assemblyController = (AssemblyController) getController();
+			assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
+			accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(); // TODO name??
+		}
+		fileMenu = new JMenu("Assemblies");
+		editMenu = new JMenu(FRAME_DEFAULT_TITLE);
+		helpMenu = new JMenu("Help");
 
         buildMenus();
         buildToolbar();
-
-        // Build here to prevent NPE from EGContrlr
-        buildTreePanels();
+       
+        buildTreePanels();  // Build here to prevent NPE from eventGraphController
 
         // Set up a assemblyEditorContent level pane that will be the content pane. This
         // has a border layout, and contains the toolbar on the assemblyEditorContent and
@@ -254,7 +265,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetaData gmd = mod.getMetaData();
+            GraphMetadata gmd = mod.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
             } else if (viskit.ViskitStatics.debug) {
@@ -313,33 +324,31 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 assemblyController.clearRecentAssemblyFileList();
             } else {
                 assemblyController.openRecentAssembly(fullPath);
-				ViskitGlobals.instance().getMainAppWindow().selectAssemblyEditorTab();
+				ViskitGlobals.instance().getViskitApplicationFrame().selectAssemblyEditorTab();
             }
+			buildMenus (); // reset
         }
     }
 
-    private void buildMenus() {
-        AssemblyController assemblyController = (AssemblyController) getController();
-
-        assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
-
-        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
+    public void buildMenus() 
+	{
         // Set up file menu
+        fileMenu.removeAll(); // reset
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		
         fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
+		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
 
-        // The EGViewFrame will get this listener for it's menu item of the same
+        // The EGViewFrame will get this listener for it's menu item of the same name TODO confirm
         recentProjectFileSetListener = new RecentProjectFileSetListener();
         getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
+        fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
@@ -353,6 +362,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
 
         // Set up edit menu
+        fileMenu.removeAll(); // reset
         editMenu.setMnemonic(KeyEvent.VK_A);
         editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
@@ -395,26 +405,27 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepSimRunner", "Initialize Assembly",
+        editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepareSimulationRunner", "Initialize Assembly",
                 KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK)));
 
-        // Create a new menu bar and add the menus we created above to it
-        myMenuBar = new JMenuBar();
-        myMenuBar.add(fileMenu);
-        myMenuBar.add(editMenu);
+        // Create a new menu bar and add the created menus
+		if (myMenuBar == null)
+		{
+			Help help = ViskitGlobals.instance().getHelp();
+			helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        Help help = ViskitGlobals.instance().getHelp();
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
+			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
+			helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
+			helpMenu.addSeparator();
 
-        helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-        helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
-        helpMenu.addSeparator();
-
-        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null));
-
-        myMenuBar.add(helpMenu);
+			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
+			helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null));
+		
+			myMenuBar = new JMenuBar();
+			myMenuBar.add(fileMenu);
+			myMenuBar.add(editMenu);
+			myMenuBar.add(helpMenu);
+		}
     }
 
     private JMenu buildMenu(String name) {
@@ -458,7 +469,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         if (simEventListenerMode.isSelected()) {
             return SIMEVLIS_MODE;
         }
-        if (propChangeListenerMode.isSelected()) {
+        if (propertyChangeListenerMode.isSelected()) {
             return PCL_MODE;
         }
         LogUtils.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
@@ -486,10 +497,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         border = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
+        propertyChangeListenerMode = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity");
-        border = propChangeListenerMode.getBorder();
-        propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        border = propertyChangeListenerMode.getBorder();
+        propertyChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
@@ -503,16 +514,17 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
         runButton = makeButton(runAction, "viskit/images/Play24.gif",
-                "Compile, initialize the assembly and prepare the Simulation Runner");
+                "Compile and initialize the Assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
         modeButtonGroup.add(simEventListenerMode);
-        modeButtonGroup.add(propChangeListenerMode);
+        modeButtonGroup.add(propertyChangeListenerMode);
 
         // Make selection mode the default mode
         selectMode.setSelected(true);
 
         getToolBar().add(new JLabel("Mode"));
+        getToolBar().addSeparator(new Dimension(5, 24));
 
         getToolBar().add(selectMode);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -520,10 +532,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(simEventListenerMode);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(propChangeListenerMode);
+        getToolBar().add(propertyChangeListenerMode);
 
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("Zoom"));
+        getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomIn);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
@@ -600,7 +613,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         selectMode.addActionListener(portsOff);
         adapterMode.addActionListener(portsOn);
         simEventListenerMode.addActionListener(portsOn);
-        propChangeListenerMode.addActionListener(portsOn);
+        propertyChangeListenerMode.addActionListener(portsOn);
     }
 
     private JToggleButton makeToolbarButton(Action a, String icPath, String tt) {

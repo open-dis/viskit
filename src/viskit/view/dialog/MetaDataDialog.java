@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.GraphMetaData;
+import viskit.model.GraphMetadata;
 
 import edu.nps.util.SpringUtilities;
 import javax.swing.*;
@@ -26,19 +26,19 @@ abstract public class MetaDataDialog extends JDialog {
     protected JComponent runtimePanel;
     private JButton cancelButton;
     private JButton okButton;
-    GraphMetaData graphMetaData;
+    GraphMetadata graphMetadata;
     JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
     JCheckBox verboseCb;
     JTextArea descriptionTextArea;
 
-    public MetaDataDialog(JFrame f, GraphMetaData gmd) {
+    public MetaDataDialog(JFrame f, GraphMetadata gmd) {
         this(f, gmd, "Event Graph Properties");
     }
 
-    public MetaDataDialog(JFrame f, GraphMetaData gmd, String title) {
+    public MetaDataDialog(JFrame f, GraphMetadata gmd, String title) {
         super(f, title, true);
-        this.graphMetaData = gmd;
+        this.graphMetadata = gmd;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -156,9 +156,9 @@ abstract public class MetaDataDialog extends JDialog {
         setGraphMetaData(f, gmd);
     }
 
-    public final void setGraphMetaData(Component c, GraphMetaData gmd) 
+    public final void setGraphMetaData(Component c, GraphMetadata gmd) 
 	{
-        graphMetaData = gmd;
+        graphMetadata = gmd;
 
         fillWidgets();
 
@@ -169,43 +169,43 @@ abstract public class MetaDataDialog extends JDialog {
 
     private void fillWidgets() 
 	{
-        if (graphMetaData == null) {
-            graphMetaData = new GraphMetaData();
+        if (graphMetadata == null) {
+            graphMetadata = new GraphMetadata();
         }
-                     nameTf.setText(graphMetaData.name);
-                  packageTf.setText(graphMetaData.packageName);
-                   authorTf.setText(graphMetaData.author);
-                  versionTf.setText(graphMetaData.version);
-        descriptionTextArea.setText(graphMetaData.description);
-                  extendsTf.setText(graphMetaData.extendsPackageName);
-               implementsTf.setText(graphMetaData.implementsPackageName);
-                 stopTimeTf.setText(graphMetaData.stopTime);
-                  verboseCb.setSelected(graphMetaData.verbose);
+                     nameTf.setText(graphMetadata.name);
+                  packageTf.setText(graphMetadata.packageName);
+                   authorTf.setText(graphMetadata.author);
+                  versionTf.setText(graphMetadata.version);
+        descriptionTextArea.setText(graphMetadata.description);
+                  extendsTf.setText(graphMetadata.extendsPackageName);
+               implementsTf.setText(graphMetadata.implementsPackageName);
+                 stopTimeTf.setText(graphMetadata.stopTime);
+                  verboseCb.setSelected(graphMetadata.verbose);
                      nameTf.selectAll();
     }
 
     private void unloadWidgets() {
-        graphMetaData.author = authorTf.getText().trim();
-        graphMetaData.description = descriptionTextArea.getText().trim();
+        graphMetadata.author = authorTf.getText().trim();
+        graphMetadata.description = descriptionTextArea.getText().trim();
 
         if (this instanceof AssemblyMetaDataDialog) {
 
             // The default names are AssemblyName, or EventGraphName
-            if (!graphMetaData.name.contains("Assembly") || graphMetaData.name.equals("AssemblyName"))
+            if (!graphMetadata.name.contains("Assembly") || graphMetadata.name.equals("AssemblyName"))
 
                 // Note: we need to force "Assembly" in the file name for special recognition
-                graphMetaData.name = nameTf.getText().trim() + "Assembly";
+                graphMetadata.name = nameTf.getText().trim() + "Assembly";
             else
-                graphMetaData.name = nameTf.getText().trim();
+                graphMetadata.name = nameTf.getText().trim();
         } else {
-            graphMetaData.name = nameTf.getText().trim();
+            graphMetadata.name = nameTf.getText().trim();
         }
-        graphMetaData.packageName = packageTf.getText().trim();
-        graphMetaData.version = versionTf.getText().trim();
-        graphMetaData.extendsPackageName = extendsTf.getText().trim();
-        graphMetaData.implementsPackageName = implementsTf.getText().trim();
-        graphMetaData.stopTime = stopTimeTf.getText().trim();
-        graphMetaData.verbose = verboseCb.isSelected();
+        graphMetadata.packageName = packageTf.getText().trim();
+        graphMetadata.version = versionTf.getText().trim();
+        graphMetadata.extendsPackageName = extendsTf.getText().trim();
+        graphMetadata.implementsPackageName = implementsTf.getText().trim();
+        graphMetadata.stopTime = stopTimeTf.getText().trim();
+        graphMetadata.verbose = verboseCb.isSelected();
     }
 
     class cancelButtonListener implements ActionListener {

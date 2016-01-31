@@ -36,10 +36,10 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
-import viskit.view.dialog.EventGraphMetaDataDialog;
 import viskit.view.AssemblyView;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.EventGraphView;
+import viskit.view.dialog.EventGraphMetaDataDialog;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**
@@ -97,6 +97,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void newProject() {
         ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
     @Override
@@ -116,38 +118,38 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			return;
 		}
 
-        GraphMetaData oldGmd = null;
+        GraphMetadata priorEventGraphMetadata = null;
         Model viskitModel = (Model) getModel();
         if (viskitModel != null) {
-            oldGmd = viskitModel.getMetaData();
+            priorEventGraphMetadata = viskitModel.getMetadata();
         }
 
-        ModelImpl mod = new ModelImpl(this);
-        mod.init();
-        mod.newModel(null);
+        ModelImpl eventGraphModel = new ModelImpl(this);
+        eventGraphModel.init();
+        eventGraphModel.newModel(null);
 
         // No model set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((EventGraphView) getView()).addTab(mod);
+        ((EventGraphView) getView()).addTab(eventGraphModel);
 
-        // If we have models already opened, then use their package names for
-        // this new EventGraph
-        GraphMetaData gmd = mod.getMetaData();
-        if (oldGmd != null) {
-            gmd.packageName = oldGmd.packageName;
+        // If we have models already opened, then use their package names for his new EventGraph
+        GraphMetadata newEventGraphMetadata = eventGraphModel.getMetadata();
+        if (priorEventGraphMetadata != null) {
+            newEventGraphMetadata.packageName = priorEventGraphMetadata.packageName;
         }
 
-        boolean modified = EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
+        boolean modified = EventGraphMetaDataDialog.showDialog((JFrame) getView(), newEventGraphMetadata);
 		
         if (modified) {
 
             // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
+            ((EventGraphView) getView()).setSelectedEventGraphName(newEventGraphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(newEventGraphMetadata.description);
 
             // Bugfix 1398
             String msg =
-                    "<html><body><p align='center'>Do you want Event Graphi execution to start with a <b>\"Run\"</b> Event?</p></body></html>";
+                    "<html><body><p align='center'>Do you want " + newEventGraphMetadata.packageName + 
+					" Event Graph execution to start with a <b>\"Run\"</b> Event?</p></body></html>";
             String title = "Confirm Run Event";
 
             int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
@@ -158,8 +160,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
             ((Model) getModel()).setDirty(dirty);
         } else {
-           ((EventGraphView) getView()).deleteTab(mod);
+           ((EventGraphView) getView()).deleteTab(eventGraphModel);
         }
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     /**
@@ -208,7 +211,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
 				{
 					_doOpen(file);
-					ViskitGlobals.instance().getMainAppWindow().selectEventGraphEditorTab();
+					ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab();
 					// TODO switch pane
 				}
 				else 
@@ -221,10 +224,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 							"<p>&nbsp</p>" +
 							"<p>Please choose another event graph or else open a different project.</p>");
 					// TODO offer to copy?
-					return;
+					break;
 				}
 			}
         }
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     @Override
@@ -261,9 +265,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 mod.setNumericPriority(false);
             }
 
-            viskitView.setSelectedEventGraphName(mod.getMetaData().name);
-            viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
-            adjustRecentEGFileSet(file);
+            viskitView.setSelectedEventGraphName(mod.getMetadata().name);
+            viskitView.setSelectedEventGraphDescription(mod.getMetadata().description);
+            adjustRecentEventGraphFileSet(file);
             markEgFilesAsOpened();
 
             // Check for good compilation
@@ -278,10 +282,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
     private void resetRedoUndoStatus() {
 
-        EventGraphViewFrame view = (EventGraphViewFrame) getView();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
-        if (view.getCurrentVgcw() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        if (eventGraphViewFrame.getCurrentVgcw() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) eventGraphViewFrame.getCurrentVgcw().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -383,15 +387,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private static final int RECENTLISTSIZE = 15;
-    private Set<File> recentEGFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
+    private Set<File> recentEventGraphFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an event graph file to add to the list
      */
-    private void adjustRecentEGFileSet(File file) {
-        for (Iterator<File> itr = recentEGFileSet.iterator(); itr.hasNext();) {
+    private void adjustRecentEventGraphFileSet(File file) {
+        for (Iterator<File> itr = recentEventGraphFileSet.iterator(); itr.hasNext();) {
 
             File f = itr.next();
             if (file.getPath().equals(f.getPath())) {
@@ -400,8 +404,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
         }
 
-        recentEGFileSet.add(file); // to the top
-        saveEgHistoryXML(recentEGFileSet);
+        recentEventGraphFileSet.add(file); // to the top
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
     }
 
@@ -414,7 +418,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         List<String> valueAr = historyConfig.getList(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
-            if (recentEGFileSet.add(new File(s))) {
+            if (recentEventGraphFileSet.add(new File(s))) {
                 String op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
@@ -427,7 +431,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    private void saveEgHistoryXML(Set<File> recentFiles) {
+    private void saveEventGraphHistoryXML(Set<File> recentFiles) {
         historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         int ix = 0;
 
@@ -441,8 +445,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void clearRecentEventGraphFileSet() {
-        recentEGFileSet.clear();
-        saveEgHistoryXML(recentEGFileSet);
+        recentEventGraphFileSet.clear();
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
     }
 
@@ -452,10 +456,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private Set<File> getRecentEGFileSet(boolean refresh) {
-        if (refresh || recentEGFileSet == null) {
+        if (refresh || recentEventGraphFileSet == null) {
             recordEgFiles();
         }
-        return recentEGFileSet;
+        return recentEventGraphFileSet;
     }
 
     private List<File> getOpenFileSet(boolean refresh) {
@@ -514,6 +518,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             setModel((mvcModel) mod);
             close();
         }
+		// included in close(): ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     @Override
@@ -521,6 +526,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (preClose()) {
             postClose();
         }
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     @Override
@@ -555,7 +561,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (f == null) {return;}
 
         int idx = 0;
-        for (File key : recentEGFileSet) {
+        for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(f.getName())) {
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
@@ -567,7 +573,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     // time a file is opened
     private void markConfigOpen(String path) {
         int idx = 0;
-        for (File key : recentEGFileSet) {
+        for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(path)) {
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
@@ -590,7 +596,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void saveAs() {
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetadata();
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
@@ -611,7 +617,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             mod.changeMetaData(gmd); // might have renamed
 
             handleCompileAndSave(mod, saveFile);
-            adjustRecentEGFileSet(saveFile);
+            adjustRecentEventGraphFileSet(saveFile);
             markEgFilesAsOpened();
         }
     }
@@ -976,8 +982,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
-            String className = mod.getMetaData().packageName + "." +
-                    mod.getMetaData().name;
+            String className = mod.getMetadata().packageName + "." +
+                    mod.getMetadata().name;
             ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
@@ -1060,10 +1066,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void editGraphMetaData() {
+    public void editGraphMetadata() {
         Model mod = (Model) getModel();
         if (mod == null) {return;}
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetadata();
         boolean modified =
                 EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {

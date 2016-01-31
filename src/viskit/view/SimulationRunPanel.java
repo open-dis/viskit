@@ -54,7 +54,7 @@ import viskit.ViskitStatics;
  * @since Jul 17, 2006
  * @since 3:17:07 PM
  */
-public class RunnerPanel2 extends JPanel {
+public class SimulationRunPanel extends JPanel {
 
     public boolean dump = true;
     public boolean search;
@@ -82,14 +82,14 @@ public class RunnerPanel2 extends JPanel {
     private final boolean assemblyRunPanelVisible;
 
     /**
-     * Create an Assembly Runner panel
+     * Create an Simulation Run panel
      * @param title the title of this panel
-     * @param skipCloseButt if ture, don't supply rewind or pause buttons on VCR,
+     * @param skipCloseButton if ture, don't supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A false will enable all VCR buttons.
      * Currently, only start and stop work
      * @param assemblyRunPanelPanelVisible if true, will enable the analyst report check box
      */
-    public RunnerPanel2(String title, boolean skipCloseButt, boolean assemblyRunPanelPanelVisible) {
+    public SimulationRunPanel(String title, boolean skipCloseButton, boolean assemblyRunPanelPanelVisible) {
         this.assemblyRunPanelVisible = assemblyRunPanelPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -112,7 +112,7 @@ public class RunnerPanel2 extends JPanel {
         bar = jsp.getVerticalScrollBar();
         bar.setUnitIncrement(STEPSIZE);
 
-        JComponent vcrPanel = makeVCRPanel(skipCloseButt);
+        JComponent vcrPanel = makeVCRPanel(skipCloseButton);
 
         Icon npsIcon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
         String npsString = "";
@@ -135,7 +135,7 @@ public class RunnerPanel2 extends JPanel {
         add(leftRightSplit, BorderLayout.CENTER);
 
         // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setRunPanel(RunnerPanel2.this);
+        ViskitGlobals.instance().setRunPanel(SimulationRunPanel.this);
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButt) {

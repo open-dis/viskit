@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.GraphMetaData;
+import viskit.model.GraphMetadata;
 
 import javax.swing.JFrame;
 
@@ -18,7 +18,7 @@ public class EventGraphMetaDataDialog extends MetaDataDialog {
 
     private static MetaDataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetaData gmd) {
+    public static boolean showDialog(JFrame f, GraphMetadata gmd) {
         if (dialog == null) {
             dialog = new EventGraphMetaDataDialog(f, gmd);
         } else {
@@ -29,7 +29,7 @@ public class EventGraphMetaDataDialog extends MetaDataDialog {
         return modified;
     }
 
-    EventGraphMetaDataDialog(JFrame f, GraphMetaData gmd) {
+    EventGraphMetaDataDialog(JFrame f, GraphMetadata gmd) {
         super(f, gmd, "Event Graph Properties");
         remove(this.runtimePanel);  // only for assembly
         pack();

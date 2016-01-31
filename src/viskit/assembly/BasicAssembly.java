@@ -325,7 +325,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         Schedule.startSimulation();
     }
 
-    /** this is getting called by the Assembly Runner stop
+    /** this is getting called by the Simulation Run stop
      * button, which may get called on startup.
      */
     public void stop() {
@@ -585,7 +585,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         PrintStream out = new PrintStream(os);
         this.printWriter = new PrintWriter(os);
 
-        // This OutputStream gets ported to the JScrollPane of the Assy Runner
+        // This OutputStream gets ported to the JScrollPane of the Simulation Run
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
