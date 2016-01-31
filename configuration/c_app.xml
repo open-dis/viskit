@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- values in this file are retrieved by keys such as 'app.beanshell.warning' -->
-<!-- the root element name is ignored when assembling keys -->
+<!-- Viskit application configuration file c_app.xml -->
+
+<!-- Programming note: values in this file are retrieved by keys such as 'app.beanshell.warning' -->
+<!-- Programming note: the root element name is ignored when assembling keys -->
 <ViskitConfig>
     <app>
         <beanshell>
@@ -10,8 +12,8 @@
           <size h="680" w="930"/>
         </mainframe>
         <projecthome>
-            <!-- These two attributes MUST always be at least zero length Strings -->
-            <!-- DefaultProject coded here for convenience -->
+            <!-- These two attributes MUST always be at least zero-length Strings -->
+            <!-- DefaultProject is included in this template for convenience -->
             <path dir="./MyViskitProjects"/>
             <name value="DefaultProject"/>
         </projecthome>
