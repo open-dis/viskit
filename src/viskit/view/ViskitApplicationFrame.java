@@ -201,7 +201,7 @@ public class ViskitApplicationFrame extends JFrame {
             mainTabbedPane.add(assemblyEditViewFrame.getContent());
             int idx = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
             mainTabbedPane.setTitleAt(idx, "Assembly Editor");
-            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
+            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for simulation program defined by Assembly");
 			
 			assemblyFileMenu = assemblyEditViewFrame.getFileMenu();
             fileMenu.add(assemblyFileMenu);    // submenu
@@ -272,7 +272,8 @@ public class ViskitApplicationFrame extends JFrame {
 
 		// =============================================================================================
         // Analyst report
-        if (analystReportPanelVisible) {
+        if (analystReportPanelVisible)
+		{
             analystReportFrame = ViskitGlobals.instance().buildAnalystReportFrame();
             mainTabbedPane.add(analystReportFrame.getContentPane());
             int idx = mainTabbedPane.indexOfComponent(analystReportFrame.getContentPane());

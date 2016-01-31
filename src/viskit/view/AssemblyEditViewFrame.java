@@ -336,9 +336,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Set up file menu
         fileMenu.removeAll(); // reset
 		
-        fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask)));
 
-        fileMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "open",        "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
         fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
 		openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
@@ -349,48 +349,41 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask)));
-        fileMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
-        fileMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", null,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask)));
-        fileMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies", null, null));
+		// be careful when changing controller method names!!  refactoring won't catch these
+        fileMenu.add(buildMenuItem(assemblyController, "save",     "Save Assembly",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "saveAs",   "Save Assembly As...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(assemblyController, "close",    "Close Assembly",      KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
+        fileMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies",KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask)));
 
         // TODO: Unknown as to what this does exactly
-        fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
+          fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null));
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
 
         // Set up edit menu
-        fileMenu.removeAll(); // reset
+        editMenu.removeAll(); // reset
         editMenu.setMnemonic(KeyEvent.VK_A);
-        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutKeyMask)));
 
         ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
         ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "cut",    "Cut",          KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask)));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask)));
-        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "copy",   "Copy",         KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "paste",  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutKeyMask)));
+        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete",  KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutKeyMask)));
 
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(assemblyController, "cut").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "cut"   ).setEnabled(false);
         ActionIntrospector.getAction(assemblyController, "remove").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "copy").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "copy"  ).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "paste" ).setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
+        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode",         "Add Event Graph...", KeyEvent.VK_V, null));
         editMenu.add(buildMenuItem(assemblyController, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
 
         editMenu.addSeparator();

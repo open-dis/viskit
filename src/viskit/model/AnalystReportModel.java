@@ -482,52 +482,52 @@ public final class AnalystReportModel extends mvcAbstractModel {
     // TODO: Fix generics: version of JDOM does not support generics
     @SuppressWarnings("unchecked")
     List unMakeBehaviorList(Element localRoot) {
-        Vector v = new Vector();
+        Vector resultVector = new Vector();
 
         Element listEl = localRoot.getChild("BehaviorList");
         if (listEl != null) {
-            List<Element> behElms = listEl.getChildren("Behavior");
-            for (Element behavior : behElms) {
+            List<Element> behaviorElements = listEl.getChildren("Behavior");
+            for (Element behavior : behaviorElements) {
 
-                Vector<Object> b = new Vector<>();
-                String nm = behavior.getAttributeValue("name");
-                b.add(nm);
+                Vector<Object> behaviorVector = new Vector<>();
+                String behaviorName = behavior.getAttributeValue("name");
+                behaviorVector.add(behaviorName);
 
-                Element desc = behavior.getChild("description");
-                String desctxt = desc.getAttributeValue("text");
-                b.add(desctxt);
+                Element descriptionAttribute = behavior.getChild("description");
+                String description = descriptionAttribute.getAttributeValue("text");
+                behaviorVector.add(description);
 
-                List<Element> parms = behavior.getChildren("parameter");
+                List<Element> parameterList = behavior.getChildren("parameter");
 
-                Vector<String[]> p = new Vector<>();
-                for (Element param : parms) {
-                    String pnm = param.getAttributeValue("name");
-                    String pty = param.getAttributeValue("type");
-                    String pdsc = param.getAttributeValue("description");
-                    String[] pa = new String[]{pnm, pty, pdsc};
-                    p.add(pa);
+                Vector<String[]> parameterVector = new Vector<>();
+                for (Element parameter : parameterList) {
+                    String   parameterName        = parameter.getAttributeValue("name");
+                    String   parameterType        = parameter.getAttributeValue("type");
+                    String   parameterDescription = parameter.getAttributeValue("description");
+                    String[] sa = new String[]{parameterName, parameterType, parameterDescription};
+                    parameterVector.add(sa);
                 }
-                b.add(p);
+                behaviorVector.add(parameterVector);
 
-                List<Element> stvars = behavior.getChildren("stateVariable");
+                List<Element> stateVariableList = behavior.getChildren("stateVariable");
 
-                Vector<String[]> s = new Vector<>();
-                for (Element svar : stvars) {
-                    String snm = svar.getAttributeValue("name");
-                    String sty = svar.getAttributeValue("type");
-                    String sdsc = svar.getAttributeValue("description");
-                    String[]sa = new String[]{snm, sty, sdsc};
-                    s.add(sa);
+                Vector<String[]> stateVariableVector = new Vector<>();
+                for (Element stateVariable : stateVariableList) {
+                    String stateVariableName        = stateVariable.getAttributeValue("name");
+                    String stateVariableType        = stateVariable.getAttributeValue("type");
+                    String stateVariableDescription = stateVariable.getAttributeValue("description");
+                    String[]sa = new String[]{stateVariableName, stateVariableType, stateVariableDescription};
+                    stateVariableVector.add(sa);
                 }
-                b.add(s);
+                behaviorVector.add(stateVariableVector);
 
-                Element evtGrImg = behavior.getChild("EventGraphImage");
-                b.add(evtGrImg.getAttributeValue("dir"));
+                Element eventGraphImage = behavior.getChild("EventGraphImage");
+                behaviorVector.add(eventGraphImage.getAttributeValue("dir"));
 
-                v.add(b);
+                resultVector.add(behaviorVector);
             }
         }
-        return v;
+        return resultVector;
     }
 
     // TODO: Fix generics: version of JDOM does not support generics
@@ -1029,18 +1029,18 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
-        String assyFile = assemblyFile.getPath();
-        assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
-        File assyImage = new File(
+        String assemblyFilePath = assemblyFile.getPath();
+        assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf("Assemblies"), assemblyFilePath.length());
+        File assemblyImage = new File(
                 ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDirectory(),
-                assyFile + ".png");
+                assemblyFilePath + ".png");
 
-        if (!assyImage.getParentFile().exists())
-            assyImage.mkdirs();
+        if (!assemblyImage.getParentFile().exists())
+            assemblyImage.mkdirs();
 
-        setAssemblyImageLocation(assyImage.getPath());
+        setAssemblyImageLocation(assemblyImage.getPath());
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
-                assyImage);
+                assemblyImage);
     }
 
     private void announceAnalystReportReadyToView() {

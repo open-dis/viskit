@@ -262,15 +262,15 @@ public class ViskitGlobals {
     /* AnalystReport model / view / controller */
 
     /* routines to manage the singleton-aspect of the view */
-    mvcAbstractJFrameView aRf;
-    mvcController aRcont;
+    mvcAbstractJFrameView AnalystReportFrame;
+    mvcController analystReportController;
 
     /**
      * Get a reference to the analyst report view.
      * @return a reference to the analyst report view or null if yet unbuilt.
      */
     public AnalystReportFrame getAnalystReportEditor() {
-        return (AnalystReportFrame) aRf;
+        return (AnalystReportFrame) AnalystReportFrame;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
@@ -278,20 +278,20 @@ public class ViskitGlobals {
      * @return the component AnalystReportFrame
      */
     public mvcAbstractJFrameView buildAnalystReportFrame() {
-        aRcont = new AnalystReportController();
-        aRf = new AnalystReportFrame(aRcont);
-        aRcont.setView(aRf);
-        return aRf;
+        analystReportController = new AnalystReportController();
+        AnalystReportFrame      = new AnalystReportFrame(analystReportController);
+        analystReportController.setView(AnalystReportFrame);
+        return AnalystReportFrame;
     }
 
     /** @return the analyst report builder (model) */
     public AnalystReportModel getAnalystReportModel() {
-        return (AnalystReportModel) aRcont.getModel();
+        return (AnalystReportModel) analystReportController.getModel();
     }
 
     /** @return the analyst report controller */
     public mvcController getAnalystReportController() {
-        return aRcont;
+        return analystReportController;
     }
 
     /******
