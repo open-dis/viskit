@@ -49,22 +49,22 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     }
     private boolean isSampleStatistics = false;
 
-    public boolean isSampleStats() {
+    public boolean isSampleStatistics() {
         return isSampleStatistics;
     }
 
-    public void setIsSampleStats(boolean b) {
+    public void setIsSampleStatistics(boolean b) {
         isSampleStatistics = b;
     }
 
-    private boolean clearStatsAfterEachRun = true; // bug 706
+    private boolean clearStatisticsAfterEachRun = true; // bug 706
 
-    public boolean isClearStatsAfterEachRun() {
-        return clearStatsAfterEachRun;
+    public boolean isClearStatisticsAfterEachRun() {
+        return clearStatisticsAfterEachRun;
     }
 
-    public void setClearStatsAfterEachRun(boolean b) {
-        clearStatsAfterEachRun = b;
+    public void setClearStatisticsAfterEachRun(boolean b) {
+        clearStatisticsAfterEachRun = b;
     }
 
     public boolean isGetMean() {

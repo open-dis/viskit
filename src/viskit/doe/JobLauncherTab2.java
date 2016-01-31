@@ -80,8 +80,8 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssemblyChangeListener {
 
     DoeRunDriver doe;
-    Map statsGraphs;
-    BlockingQueue<DesignPointStatsWrapper> bQ;
+    Map statisticsGraphs;
+    BlockingQueue<DesignPointStatisticsWrapper> bQ;
     String inputFileString;
     File inputFile;
     File filteredFile;
@@ -122,7 +122,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JCheckBox doLocalRun;
     private GraphUpdater graphUpdater;
     private QstatConsole qstatConsole;
-    private StatsGraph statsGraph;
+    private StatisticsGraph statisticsGraph;
     private Thread thread;
     private boolean outputDirty = false;
     private String title;
@@ -384,8 +384,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         serrTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
 
-        statsGraph = new StatsGraph();
-        JScrollPane stgSp = new JScrollPane(statsGraph);
+        statisticsGraph = new StatisticsGraph();
+        JScrollPane stgSp = new JScrollPane(statisticsGraph);
         rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, stgSp);
         leftRightSplit.setLeftComponent(leftSplit);
         leftRightSplit.setRightComponent(rightSplit);
@@ -495,7 +495,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
     }
 
     @Override
@@ -804,8 +804,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             System.gc();
             qstatConsole.setDoe(doe);
 
-            statsGraph = new StatsGraph();
-            rightSplit.setBottomComponent(new JScrollPane(statsGraph));
+            statisticsGraph = new StatisticsGraph();
+            rightSplit.setBottomComponent(new JScrollPane(statisticsGraph));
             rightSplit.setDividerLocation(180);
 
             //boolean doClustStat = this.doClusterStat.isSelected();
@@ -860,11 +860,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 //showClusterStatus(clusterWebStatus);
                 //if(doGraphOut)
                 //chartter = new JobResults(null, title);
-                statsGraphSet = false;
+                statisticsGraphSet = false;
                 writeStatus("Getting results:");
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 //processResults();
-                ProcessResults processResults = new ProcessResults(doe, jaxbRoot, statsGraph);
+                ProcessResults processResults = new ProcessResults(doe, jaxbRoot, statisticsGraph);
                 processResults.execute();
 
             }
@@ -874,18 +874,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             writeStatus(de.toString());
         }
     }
-    private boolean statsGraphSet = false;
+    private boolean statisticsGraphSet = false;
 
     class ProcessResults extends SwingWorker<Void, Void> {
 
         SimkitAssembly jaxbRoot;
         DoeRunDriver doe;
-        StatsGraph statsGraph;
+        StatisticsGraph statisticsGraph;
 
-        public ProcessResults(DoeRunDriver doe, SimkitAssembly jaxbRoot, StatsGraph statsGraph) {
+        public ProcessResults(DoeRunDriver doe, SimkitAssembly jaxbRoot, StatisticsGraph statisticsGraph) {
             this.doe = doe;
             this.jaxbRoot = jaxbRoot;
-            this.statsGraph = statsGraph;
+            this.statisticsGraph = statisticsGraph;
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         }
 
@@ -913,7 +913,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 writeStatus("Total tasks: " + totalTasks);
                 //writeStatus("Started tasks: " + totalTasks - tasksRemaining);
                 bQ = new ArrayBlockingQueue<>(totalTasks);
-                graphUpdater = new GraphUpdater(bQ, statsGraph);
+                graphUpdater = new GraphUpdater(bQ, statisticsGraph);
                 doe.run();
                 graphUpdater.execute();
                 while (tasksRemaining > 0) {
@@ -944,20 +944,20 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                     //writeStatus(ret.toString());
                                     }
 
-                                    ret = doe.getDesignPointStats(sampleIndex, designPtIndex);
+                                    ret = doe.getDesignPointStatistics(sampleIndex, designPtIndex);
 
-                                    if (statsGraphSet == false) {
+                                    if (statisticsGraphSet == false) {
                                         String[] properties = toArray(ret.keySet(), new String[0]);
-                                        statsGraph.setProperties(properties, designPoints, samples);
-                                        statsGraphSet = true;
+                                        statisticsGraph.setProperties(properties, designPoints, samples);
+                                        statisticsGraphSet = true;
                                     }
-                                    addDesignPointStatsToGraphs(ret, designPtIndex, sampleIndex);
-                                    writeStatus("DesignPointStats from task " + (i + 1) + " at sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
+                                    addDesignPointStatisticsToGraphs(ret, designPtIndex, sampleIndex);
+                                    writeStatus("DesignPointStatistics from task " + (i + 1) + " at sampleIndex " + sampleIndex + " at designPtIndex " + designPtIndex);
 
                                     writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
                                     for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
-                                        writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
-//                                        ret = doe.getReplicationStats(sampleIndex, designPtIndex, j);
+                                        writeStatus("ReplicationStatistics from task " + (i + 1) + " replication " + j);
+//                                        ret = doe.getReplicationStatistics(sampleIndex, designPtIndex, j);
                                     }
                                     --tasksRemaining;
                                     lastQueue.set(i, state);
@@ -1350,26 +1350,26 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         clusNameReadOnlyTF.setText(serverCfg);
     }
 
-    private void addDesignPointStatsToGraphs(Map ret, int d, int s) {
+    private void addDesignPointStatisticsToGraphs(Map ret, int d, int s) {
 
         // for the SwingWorker to publish a single object
-        bQ.add(new DesignPointStatsWrapper(ret, d, s));
+        bQ.add(new DesignPointStatisticsWrapper(ret, d, s));
 
     }
 
-    class GraphUpdater extends SwingWorker<Void, DesignPointStatsWrapper> {
+    class GraphUpdater extends SwingWorker<Void, DesignPointStatisticsWrapper> {
 
-        BlockingQueue<DesignPointStatsWrapper> bQ;
-        StatsGraph statsGraph;
+        BlockingQueue<DesignPointStatisticsWrapper> bQ;
+        StatisticsGraph statisticsGraph;
 
-        GraphUpdater(BlockingQueue<DesignPointStatsWrapper> bQ, StatsGraph statsGraph) {
+        GraphUpdater(BlockingQueue<DesignPointStatisticsWrapper> bQ, StatisticsGraph statisticsGraph) {
             this.bQ = bQ; // bbq
-            this.statsGraph = statsGraph;
+            this.statisticsGraph = statisticsGraph;
         }
 
         @Override
         public Void doInBackground() {
-            DesignPointStatsWrapper dp;
+            DesignPointStatisticsWrapper dp;
 
             try {
                 while ((dp = bQ.take()) != null) {
@@ -1383,11 +1383,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
 
         @Override
-        protected void process(List<DesignPointStatsWrapper> chunks) {
-            for (DesignPointStatsWrapper dp : chunks) {
-                java.util.Enumeration stats = ((Dictionary) dp.statsReturned).elements();
-                while (stats.hasMoreElements()) {
-                    String data = (String) stats.nextElement();
+        protected void process(List<DesignPointStatisticsWrapper> chunks) {
+            for (DesignPointStatisticsWrapper dp : chunks) {
+                java.util.Enumeration statistics = ((Dictionary) dp.statisticsReturned).elements();
+                while (statistics.hasMoreElements()) {
+                    String data = (String) statistics.nextElement();
                     try {
                         // creating an unmarshaller each time here is supposed to be more thread safe
                         // if slower, however, this only gets hit by the swing thread
@@ -1397,7 +1397,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         }
                         SampleStatistics sst = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
 
-                        statsGraph.addSampleStatistic(sst, dp.designPtIndex, dp.sampleIndex);
+                        statisticsGraph.addSampleStatistic(sst, dp.designPtIndex, dp.sampleIndex);
                     } catch (JAXBException ex) {
                         LogUtils.getLogger(GraphUpdater.class).error(ex);
                     }
@@ -1406,14 +1406,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
     }
 
-    class DesignPointStatsWrapper {
+    class DesignPointStatisticsWrapper {
 
-        public Map statsReturned;
+        public Map statisticsReturned;
         public int designPtIndex;
         public int sampleIndex;
 
-        DesignPointStatsWrapper(Map statsReturned, int designPtIndex, int sampleIndex) {
-            this.statsReturned = statsReturned;
+        DesignPointStatisticsWrapper(Map statisticsReturned, int designPtIndex, int sampleIndex) {
+            this.statisticsReturned = statisticsReturned;
             this.designPtIndex = designPtIndex;
             this.sampleIndex = sampleIndex;
         }

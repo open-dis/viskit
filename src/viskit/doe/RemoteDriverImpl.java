@@ -179,17 +179,17 @@ public class RemoteDriverImpl implements DoeDriver {
     }
 
     @Override
-    public synchronized Map getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
+    public synchronized Map getDesignPointStatistics(int sampleIndex, int designPtIndex) throws DoeException {
         Map ret = new Hashtable();
 
         try {
-            ret = (Hashtable) rpc.execute("gridkit.getDesignPointStats", makeArgs(usid,sampleIndex,designPtIndex) );
+            ret = (Hashtable) rpc.execute("gridkit.getDesignPointStatistics", makeArgs(usid,sampleIndex,designPtIndex) );
         } catch (XmlRpcException xre) {
-            throw new DoeException("getDesignPointStats failed: "+xre.getMessage());
+            throw new DoeException("getDesignPointStatistics failed: "+xre.getMessage());
         } catch (IOException ioe) {
-            throw new DoeException("getDesignPointStats failed: "+ioe.getMessage());
+            throw new DoeException("getDesignPointStatistics failed: "+ioe.getMessage());
         }
-        if (ret.isEmpty()) throw new DoeException("getDesignPointStats failed: not logged in, set up or running, or ready with stats yet?");
+        if (ret.isEmpty()) throw new DoeException("getDesignPointStatistics failed: not logged in, set up or running, or ready with statistics yet?");
         return ret;
     }
 
@@ -210,17 +210,17 @@ public class RemoteDriverImpl implements DoeDriver {
     }
 
     @Override
-    public synchronized Map getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
+    public synchronized Map getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
          Map ret = new Hashtable();
 
         try {
-            ret = (Hashtable) rpc.execute("gridkit.getReplicationStats", makeArgs(usid,sampleIndex,designPtIndex,replicationIndex) );
+            ret = (Hashtable) rpc.execute("gridkit.getReplicationStatistics", makeArgs(usid,sampleIndex,designPtIndex,replicationIndex) );
         } catch (XmlRpcException xre) {
-            throw new DoeException("getReplicationStats failed: "+xre.getMessage());
+            throw new DoeException("getReplicationStatistics failed: "+xre.getMessage());
         } catch (IOException ioe) {
-            throw new DoeException("getReplicationStats failed: "+ioe.getMessage());
+            throw new DoeException("getReplicationStatistics failed: "+ioe.getMessage());
         }
-        if (ret.isEmpty()) throw new DoeException("getReplicationStats failed: not logged in, set up or running, or ready with stats yet?");
+        if (ret.isEmpty()) throw new DoeException("getReplicationStatistics failed: not logged in, set up or running, or ready with statistics yet?");
         return ret;
     }
 

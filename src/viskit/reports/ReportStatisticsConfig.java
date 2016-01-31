@@ -34,7 +34,7 @@ import viskit.ViskitProject;
  * (replicationStatistics). After construction this object is passed to the BasicAssembly.java
  * object. The BasicAssembly strips the keyValues from the passed object and provides those
  * values to this class.  Using an underscore '_' as a deliberate separator this class extracts
- * the name of each SimEntity for each PropChangeListener.  These names are used to index output
+ * the name of each SimEntity for each PropertyChangeListener.  These names are used to index output
  * from the simulation.
  *
  * TODO: Remove the naming convention requirement and index the statistics object in either the
@@ -67,7 +67,7 @@ public class ReportStatisticsConfig {
      * The DOM object this class uses to create an XML record of the simulation
      * statistics
      */
-    private ReportStatisticsDOM reportStats;
+    private ReportStatisticsDOM reportStatistics;
 
     /**
      * Report author (system username)
@@ -87,11 +87,11 @@ public class ReportStatisticsConfig {
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setInfinity("inf");  // xml chokes on default
         form = new DecimalFormat("0.000", dfs);
-        reportStats = new ReportStatisticsDOM();
+        reportStatistics = new ReportStatisticsDOM();
     }
 
     public void reset() {
-        reportStats = new ReportStatisticsDOM();
+        reportStatistics = new ReportStatisticsDOM();
     }
 
     /**
@@ -123,7 +123,7 @@ public class ReportStatisticsConfig {
                 idx++;
             }
         }
-        reportStats.initializeEntities(entityIndex, propertyIndex);
+        reportStatistics.initializeEntities(entityIndex, propertyIndex);
     }
 
     /**
@@ -148,29 +148,29 @@ public class ReportStatisticsConfig {
     /**
      * Creates a replication record for each SampleStatistics object after each
      * run.
-     * @param repNumber replication number
-     * @param repStats  replication statistics
+     * @param replicaNumber replication number
+     * @param replicationStatistics  replication statistics
      */
-    public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
+    public void processReplicationReport(int replicaNumber, PropertyChangeListener[] replicationStatistics) {
         LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
-        Element[] replicationUpdate = new Element[repStats.length];
+        Element[] replicationUpdate = new Element[replicationStatistics.length];
 
-        for (int i = 0; i < repStats.length; i++) {
+        for (int i = 0; i < replicationStatistics.length; i++) {
 
             Element replication = new Element("Replication");
 
-            replication.setAttribute("number", Integer.toString(repNumber));
-            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) repStats[i]).getCount()));
-            replication.setAttribute("minObs", form.format(((SampleStatistics) repStats[i]).getMinObs()));
-            replication.setAttribute("maxObs", form.format(((SampleStatistics) repStats[i]).getMaxObs()));
-            replication.setAttribute("mean", form.format(((SampleStatistics) repStats[i]).getMean()));
-            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
-            replication.setAttribute("variance", form.format(((SampleStatistics) repStats[i]).getVariance()));
+            replication.setAttribute("number", Integer.toString(replicaNumber));
+            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) replicationStatistics[i]).getCount()));
+            replication.setAttribute("minObs", form.format(((SampleStatistics) replicationStatistics[i]).getMinObs()));
+            replication.setAttribute("maxObs", form.format(((SampleStatistics) replicationStatistics[i]).getMaxObs()));
+            replication.setAttribute("mean", form.format(((SampleStatistics) replicationStatistics[i]).getMean()));
+            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) replicationStatistics[i]).getStandardDeviation()));
+            replication.setAttribute("variance", form.format(((SampleStatistics) replicationStatistics[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }
-        reportStats.storeReplicationData(replicationUpdate);
+        reportStatistics.storeReplicationData(replicationUpdate);
     }
 
     /**
@@ -198,14 +198,14 @@ public class ReportStatisticsConfig {
 
             summaryUpdate[i] = summary;
         }
-        reportStats.storeSummaryData(summaryUpdate);
+        reportStatistics.storeSummaryData(summaryUpdate);
     }
 
     /**
-     * @return a stats report in jdom.Document format; Naw...filename
+     * @return a statistics report in jdom.Document format; Naw...filename
      */
     public String getReport() {
-        Document report = reportStats.getReport();
+        Document report = reportStatistics.getReport();
         return saveData(report);
     }
 

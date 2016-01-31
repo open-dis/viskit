@@ -78,7 +78,7 @@ public class SimulationRunPanel extends JPanel {
     public JLabel npsLabel;
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
-    private JLabel titl;
+	private JLabel titleLabel = new JLabel();
     private final boolean assemblyRunPanelVisible;
 
     /**
@@ -93,11 +93,11 @@ public class SimulationRunPanel extends JPanel {
         this.assemblyRunPanelVisible = assemblyRunPanelPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        add(titleLabel, BorderLayout.NORTH);
         if (title != null)
 		{
-            titl = new JLabel(title);
-            titl.setHorizontalAlignment(JLabel.CENTER);
-            add(titl, BorderLayout.NORTH);
+			setTitle (title);
         }
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSplit;
@@ -138,7 +138,7 @@ public class SimulationRunPanel extends JPanel {
         ViskitGlobals.instance().setRunPanel(SimulationRunPanel.this);
     }
 
-    private JPanel makeVCRPanel(boolean skipCloseButt) {
+    private JPanel makeVCRPanel(boolean skipCloseButton) {
         JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         JLabel vcrSimulationStartTimeLabel = new JLabel("Simulation start time: ");
@@ -202,7 +202,7 @@ public class SimulationRunPanel extends JPanel {
 
         closeButt = new JButton("Close");
         closeButt.setToolTipText("Close this window");
-        if (!skipCloseButt) {
+        if (!skipCloseButton) {
             flowPanel.add(closeButt);
         }
 
@@ -243,13 +243,13 @@ public class SimulationRunPanel extends JPanel {
         vcrRewind.setEnabled(false);
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
         vcrRewind.setText(null);
-        if (!skipCloseButt) {
+        if (!skipCloseButton) {
             buttonPanel.add(vcrRewind);
         }
 
         vcrPlay = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
         vcrPlay.setToolTipText("Begin or resume the simulation run");
-        if (skipCloseButt) {
+        if (skipCloseButton) {
             vcrPlay.setToolTipText("Begin the simulation run");
         }
         vcrPlay.setBorder(BorderFactory.createEtchedBorder());
@@ -260,12 +260,12 @@ public class SimulationRunPanel extends JPanel {
         vcrStep.setToolTipText("Step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);
-        if (!skipCloseButt) {
+        if (!skipCloseButton) {
             buttonPanel.add(vcrStep);
         }
 
         buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        flowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+          flowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
         flowPanel.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
 
@@ -297,4 +297,9 @@ public class SimulationRunPanel extends JPanel {
             caretUpdate(null);
         }
     }
+	public void setTitle (String newTitle)
+	{
+		titleLabel.setText(newTitle + " Assembly Runner");
+		
+	}
 }

@@ -41,15 +41,15 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
-    void newPropChangeListener(String widgetName, String className, Point2D p);
+    void newPropertyChangeListener(String widgetName, String className, Point2D p);
 
     /**
      * Supports redo of a PropertyChangeListenerNode
      * @param node the node to redo
      */
-    void redoPropChangeListener(PropertyChangeListenerNode node);
+    void redoPropertyChangeListener(PropertyChangeListenerNode node);
 
-    void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
+    void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
     /**
      * Boolean to signify whether the model has been changed since last disk
@@ -110,7 +110,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     void deleteEvGraphNode(EventGraphNode eventNode);
 
-    void deletePropChangeListener(PropertyChangeListenerNode pclNode);
+    void deletePropertyChangeListener(PropertyChangeListenerNode pclNode);
 
     void deleteAdapterEdge(AdapterEdge ae);
 

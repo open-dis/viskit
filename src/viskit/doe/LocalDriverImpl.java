@@ -96,14 +96,14 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
 
     @Override
-    public synchronized Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
+    public synchronized Hashtable getDesignPointStatistics(int sampleIndex, int designPointIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getDesignPointStats").invoke(runner,sampleIndex,designPtIndex);
+            return (Hashtable) methods.get("getDesignPointStatistics").invoke(runner,sampleIndex,designPointIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
-        //return runner.getDesignPointStats(sampleIndex,designPtIndex);
+        //return runner.getDesignPointStatistics(sampleIndex,designPtIndex);
     }
 
     @Override
@@ -119,14 +119,14 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
 
     @Override
-    public synchronized Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
+    public synchronized Hashtable getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getReplicationStats").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
+            return (Hashtable) methods.get("getReplicationStatistics").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
-        //return runner.getReplicationStats(sampleIndex,designPtIndex,replicationIndex);
+        //return runner.getReplicationStatistics(sampleIndex,designPtIndex,replicationIndex);
 
     }
 

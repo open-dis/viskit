@@ -80,7 +80,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     ActionListener closer, saveListener;
     JMenuBar myMenuBar;
     BufferedReader backChan;
-    Thread simRunner;
+    Thread simulationRunThread;
     SimulationRunThreadMonitor swingThreadMonitor;
     PipedOutputStream pos;
     PipedInputStream pis;
@@ -107,6 +107,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private final String namePrefix = "Viskit Assembly Runner";
     private String currentTitle = namePrefix;
 
+    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
+
     /**
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
@@ -114,11 +116,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public InternalAssemblyRunner(boolean analystReportPanelVisible) {
 
         saveListener = new SaveListener();
+		String assemblyName = "";
+		if (ViskitGlobals.instance().getActiveAssemblyModel() != null)
+			   assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetaData().name;
 
-        // NOTE:
+        // TODO NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons.  Currently, only start and stop work
-        runPanel = new SimulationRunPanel("Assembly Runner", true, analystReportPanelVisible);
+        runPanel = new SimulationRunPanel(assemblyName, true, analystReportPanelVisible);
         buildMenus();
         runPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
         runPanel.vcrPlay.addActionListener(new StartResumeListener());
@@ -165,7 +170,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         double defaultStopTime =  Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
-            fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
+            fillSimulationRunPanelWidgetsFromPreRunAssembly(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
             ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
@@ -178,7 +183,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(REWIND);
     }
 
-    private void fillRepWidgetsFromPreRunAssy(boolean verbose, double stopTime) throws Throwable {
+    private void fillSimulationRunPanelWidgetsFromPreRunAssembly(boolean verbose, double stopTime) throws Throwable {
 
         assemblyClass = ViskitStatics.classForName(assemblyClassName);
         if (assemblyClass == null) {
@@ -193,14 +198,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
          */
         assembly = (BasicAssembly) assemblyInstance;
 
-        Method getNumberReplications = assemblyClass.getMethod("getNumberReplications");
-        Method isSaveReplicationData = assemblyClass.getMethod("isSaveReplicationData");
+        Method getNumberReplications     = assemblyClass.getMethod("getNumberReplications");
+        Method isSaveReplicationData     = assemblyClass.getMethod("isSaveReplicationData");
         Method isPrintReplicationReports = assemblyClass.getMethod("isPrintReplicationReports");
-        Method isPrintSummaryReport = assemblyClass.getMethod("isPrintSummaryReport");
-        Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
-        Method isVerbose = assemblyClass.getMethod("isVerbose");
-        Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
-        Method getStopTime = assemblyClass.getMethod("getStopTime");
+        Method isPrintSummaryReport      = assemblyClass.getMethod("isPrintSummaryReport");
+        Method setVerbose                = assemblyClass.getMethod("setVerbose", boolean.class);
+        Method isVerbose                 = assemblyClass.getMethod("isVerbose");
+        Method setStopTime               = assemblyClass.getMethod("setStopTime", double.class);
+        Method getStopTime               = assemblyClass.getMethod("getStopTime");
 
         runPanel.numberOfReplicationsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
         runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
@@ -243,17 +248,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
             assemblyInstance = assemblyClass.newInstance();
 
-            Method setOutputStream = assemblyClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplications = assemblyClass.getMethod("setNumberReplications", int.class);
-            Method setSaveReplicationData = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
+            Method setOutputStream            = assemblyClass.getMethod("setOutputStream", OutputStream.class);
+            Method setNumberReplications      = assemblyClass.getMethod("setNumberReplications", int.class);
+            Method setSaveReplicationData     = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
             Method setPrintReplicationReports = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
-            Method setPrintSummaryReport = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
-            Method setEnableAnalystReports = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
-            Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
-            Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplication = assemblyClass.getMethod("setVerboseReplication", int.class);
-            Method setPclNodeCache = assemblyClass.getMethod("setPclNodeCache", Map.class);
-            Method addPropertyChangeListener = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setPrintSummaryReport      = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
+            Method setEnableAnalystReports    = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
+            Method setVerbose                 = assemblyClass.getMethod("setVerbose", boolean.class);
+            Method setStopTime                = assemblyClass.getMethod("setStopTime", double.class);
+            Method setVerboseReplication      = assemblyClass.getMethod("setVerboseReplication", int.class);
+            Method setPclNodeCache            = assemblyClass.getMethod("setPclNodeCache", Map.class);
+            Method addPropertyChangeListener  = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // As of discussion held 09 APR 2015, resetting the RNG seed state
             // is not necessary for basic Viskit operation.  Pseudo random
@@ -303,8 +308,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             assemblyRunnable = (Runnable) assemblyInstance;
 
             // Start the simulation run(s)
-            simRunner = new Thread(assemblyRunnable);
-            new SimulationRunThreadMonitor(simRunner).start();
+            simulationRunThread = new Thread(assemblyRunnable);
+            new SimulationRunThreadMonitor(simulationRunThread).start();
 
             // Restore Viskit's working ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
@@ -702,25 +707,23 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    private void doTitle(String nm) {
-        if (nm != null && nm.length() > 0) {
-            currentTitle = namePrefix + ": " + nm;
+    private TitleListener titleListener;
+    private int titlekey;
+	
+    private void doTitle(String name) {
+        if (name != null && name.length() > 0) {
+            currentTitle = namePrefix + ": " + name;
         }
 
-        if (titlList != null) {
-            titlList.setTitle(currentTitle, titlkey);
+        if (titleListener != null) {
+            titleListener.setTitle(currentTitle, titlekey);
         }
     }
-    private TitleListener titlList;
-    private int titlkey;
-
-    public void setTitleListener(TitleListener lis, int key) {
-        titlList = lis;
-        titlkey = key;
+    public void setTitleListener(TitleListener listener, int key) {
+        titleListener = listener;
+        titlekey = key;
 //        doTitle(null); // don't blow away title while setting up listener, let it be set elsewhere
     }
-
-    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

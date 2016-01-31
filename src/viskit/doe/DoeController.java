@@ -352,7 +352,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
                 break;

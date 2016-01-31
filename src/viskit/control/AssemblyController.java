@@ -28,7 +28,7 @@ public interface AssemblyController {
     /** User has clicked a menu item */
     void newEventGraphNode();
 
-    void newPropChangeListenerNode();
+    void newPropertyChangeListenerNode();
 
     /** User has established some parameter, model can create object
      * @param name the name of the node
@@ -38,9 +38,9 @@ public interface AssemblyController {
 
     void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
 
-    void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
+    void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
 
-    void newPropChangeListenerNode(String name, Point p);
+    void newPropertyChangeListenerNode(String name, Point p);
 
     /**
      * Edit the properties (metadata) of the Assembly
@@ -87,21 +87,21 @@ public interface AssemblyController {
 
     void newSimEvListArc(Object[] nodes);
 
-    void newPropChangeListArc(Object[] nodes);
+    void newPropertyChangeListArc(Object[] nodes);
 
-    void pcListenerEdit(PropertyChangeListenerNode pclNode);
+    void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode);
 
     /** Handles editing of Event Graph nodes
      *
      * @param eventNode the node to edit
      */
-    void evGraphEdit(EventGraphNode eventNode);
+    void eventGraphEdit(EventGraphNode eventNode);
 
     /** Edits the PropertyChangeListner edge
      *
      * @param pclEdge the PCL edite to edit
      */
-    void pcListenerEdgeEdit(PropertyChangeListenerEdge pclEdge);
+    void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge);
 
     /** Edits the Adapter edge
      *
@@ -113,7 +113,7 @@ public interface AssemblyController {
      *
      * @param seEdge the SimEvent edge to edit
      */
-    void simEvListenerEdgeEdit(SimEvListenerEdge seEdge);
+    void simEventListenerEdgeEdit(SimEvListenerEdge seEdge);
 
     /** CMD-Z or CNTL-Z */
     void undo();

@@ -105,8 +105,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     int replicationsPerDesignPoint;
     // total sample sets
     int totalSamples;
-    // numberOfStats used to synchronize access to getDesignPointStats
-    int numberOfStats = Integer.MAX_VALUE;
+    // numberOfStatistics used to synchronize access to getDesignPointStatistics
+    int numberOfStatistics = Integer.MAX_VALUE;
     // timeout in ms for any synchronized requests
     long timeout;
     // list of Booleans in order
@@ -119,8 +119,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     boolean queueClean = false; // dirty means unclaimed info
     // locking semaphores between set and get threads
     // for designPts, results
-    List<Boolean> designPointStatsNotifiers;
-    List<Boolean> replicationStatsNotifiers;
+    List<Boolean> designPointStatisticsNotifiers;
+    List<Boolean> replicationStatisticsNotifiers;
     List<Boolean> resultsNotifiers;
     List<String> status;
 
@@ -195,15 +195,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         String to = root.getExperiment().getTimeout();
         this.timeout = parseLong(to==null?"0":to);
         this.queue = new ArrayList<>();
-        this.designPointStatsNotifiers = new ArrayList<>();
-        this.replicationStatsNotifiers = new ArrayList<>();
+        this.designPointStatisticsNotifiers = new ArrayList<>();
+        this.replicationStatisticsNotifiers = new ArrayList<>();
         this.resultsNotifiers = new ArrayList<>();
         this.status = new ArrayList<>();
         for ( int i = 0; i < totalSamples * designPointCount; i ++) {
             queue.add(Boolean.TRUE);
-            designPointStatsNotifiers.add(false);
+            designPointStatisticsNotifiers.add(false);
             for (int j = 0; j < this.replicationsPerDesignPoint; j++) {
-                replicationStatsNotifiers.add(false);
+                replicationStatisticsNotifiers.add(false);
             }
             resultsNotifiers.add(false);
             status.add("Pending");
@@ -297,7 +297,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             int designPt = parseInt(r.getDesignPoint());
             // note replication is not indexed, yet.
             // after sim has finished run(), then is queried
-            // directly for replicationStats and designPointStats
+            // directly for replicationStatistics and designPointStatistics
             // which is the real "result" and is handled
             // differently. this result is mainly to dump
             // a lot of logs.
@@ -392,24 +392,24 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
 
     // Hashtable returned is name keyed to String of xml
-    public synchronized Hashtable<String, String> getDesignPointStats(int sampleIndex, int designPtIndex) {
+    public synchronized Hashtable<String, String> getDesignPointStatistics(int sampleIndex, int designPtIndex) {
         Sample s = root.getExperiment().getSample().get(sampleIndex);
         DesignPoint dp = s.getDesignPoint().get(designPtIndex);
         Hashtable<String, String> ret = new Hashtable<>();
-        List<JAXBElement<?>> stats = dp.getStatistics();
+        List<JAXBElement<?>> statistics = dp.getStatistics();
         int index = sampleIndex*designPointCount + designPtIndex;
-        Boolean notifier = designPointStatsNotifiers.get(index);
+        Boolean notifier = designPointStatisticsNotifiers.get(index);
         if(!notifier) {
-            int sz = stats.size();
-            while ( sz < numberOfStats ) { // tbd use boolean in notifier
+            int sz = statistics.size();
+            while ( sz < numberOfStatistics ) { // tbd use boolean in notifier
                 try {
                     notifier.wait();
                 } catch (InterruptedException ie) {
-                    //System.out.println("getDesignPointStats has size  "+stats.size());
+                    //System.out.println("getDesignPointStatistics has size  "+statistics.size());
                 }
             }
         }
-        Iterator<JAXBElement<?>> it = stats.iterator();
+        Iterator<JAXBElement<?>> it = statistics.iterator();
         while (it.hasNext()) {
             String name = null;
             String xml = null;
@@ -430,14 +430,14 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
 
     // Hashtable returned is name keyed to String of xml
-    public synchronized Hashtable<String, String> getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) {
+    public synchronized Hashtable<String, String> getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) {
         Sample s = root.getExperiment().getSample().get(sampleIndex);
         DesignPoint dp = s.getDesignPoint().get(designPtIndex);
         Replication rp = dp.getReplication().get(replicationIndex);
         Hashtable<String, String> ret = new Hashtable<>();
-        List<JAXBElement<?>> stats = rp.getStatistics();
+        List<JAXBElement<?>> statistics = rp.getStatistics();
         int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
-        Boolean notifier = replicationStatsNotifiers.get(index);
+        Boolean notifier = replicationStatisticsNotifiers.get(index);
 
         if ( !notifier ) {
             try {
@@ -447,7 +447,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
         }
 
-        Iterator<JAXBElement<?>> it = stats.iterator();
+        Iterator<JAXBElement<?>> it = statistics.iterator();
         while (it.hasNext()) {
             String name = null;
             String xml = null;
@@ -467,23 +467,23 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         return ret;
     }
 
-    public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
+    public Boolean addDesignPointStatistics(int sampleIndex, int designPtIndex, int numberOfStatistics, String stat) {
         try {
-            this.numberOfStats = numberOfStats; // this really only needs to be set the first time
+            this.numberOfStatistics = numberOfStatistics; // this really only needs to be set the first time
             JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
-            JAXBElement<?> stats = (JAXBElement<?>) u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
+            JAXBElement<?> statistics = (JAXBElement<?>) u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
             int index = (sampleIndex*designPointCount) + designPtIndex;
-            Boolean notifier = designPointStatsNotifiers.get(index);
+            Boolean notifier = designPointStatisticsNotifiers.get(index);
 
             synchronized(notifier) {
-                designPoint.getStatistics().add(stats);
-                designPointStatsNotifiers.set(index,true);
+                designPoint.getStatistics().add(statistics);
+                designPointStatisticsNotifiers.set(index,true);
                 notifier.notify();
 
-                //System.out.println("addDesignPointStat "+stat);
+                //System.out.println("addDesignPointStatistics "+stat);
             }
 
         } catch (JAXBException e) {
@@ -494,23 +494,23 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         return Boolean.TRUE;
     }
 
-    public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
+    public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String statistic) {
         try {
             JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             Unmarshaller u = jc.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
             Replication rep = designPoint.getReplication().get(replicationIndex);
-            JAXBElement<?> stats = (JAXBElement<?>) u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
+            JAXBElement<?> statistics = (JAXBElement<?>) u.unmarshal(new ByteArrayInputStream(statistic.getBytes()));
             int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
-            Boolean notifier = replicationStatsNotifiers.get(index);
+            Boolean notifier = replicationStatisticsNotifiers.get(index);
 
             synchronized(notifier) {
-                rep.getStatistics().add(stats);
-                replicationStatsNotifiers.set(index,true);
+                rep.getStatistics().add(statistics);
+                replicationStatisticsNotifiers.set(index,true);
                 notifier.notify();
 
-                System.out.println("addReplicationStat "+stat);
+                System.out.println("addReplicationStatistic "+statistic);
             }
         } catch (JAXBException e) {
             log.error(e);
@@ -583,12 +583,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     }
 
                 }
-                // if replication stats not ready, wait on replicationStatsNotifier
+                // if replication statistics not ready, wait on replicationStatisticsNotifier
                 // replications are always added in order by one thread,
                 // don't expect any a < b to be locked if b isn't
                 for (int i = 0; i < replicationsPerDesignPoint; i++) {
                     int index = ((taskID-1)*replicationsPerDesignPoint) + i;
-                    notifier = replicationStatsNotifiers.get(index);
+                    notifier = replicationStatisticsNotifiers.get(index);
                     if ( ! notifier ) {
 
                         try {
@@ -599,8 +599,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
                     }
                 }
-                // if designPointStats not ready, wait on designPointStatsNotifier
-                notifier = designPointStatsNotifiers.get(taskID-1);
+                // if designPointStatistics not ready, wait on designPointStatisticsNotifier
+                notifier = designPointStatisticsNotifiers.get(taskID-1);
                 if ( ! notifier ) {
 
                     try {

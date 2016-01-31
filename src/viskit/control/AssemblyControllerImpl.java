@@ -79,7 +79,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
-    private String initialFile;
+    private String initialFilePath;
 
     /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
@@ -90,27 +90,26 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /**
-     * Sets an initial assy file to open upon Viskit startup supplied by the
+     * Sets an initial assembly file to open upon Viskit startup supplied by the
      * command line
-     * @param fil the assy file to initially open upon startup
+     * @param assemblyPath the assembly file to immediately open upon startup
      */
-    public void setInitialFile(String fil) {
+    public void setInitialFile(String assemblyPath) {
         if (viskit.ViskitStatics.debug) {
-            System.out.println("Initial file set: " + fil);
+            System.out.println("Initial file set: " + assemblyPath);
         }
-        initialFile = fil;
+        initialFilePath = assemblyPath;
     }
 
     /** This method is for introducing Assemblies to compile from outside of
-     * Viskit.  This method is not used from Viskit and must is required for
-     * third party access.
+     * Viskit.  This method is not used from Viskit and is required for third-party access.
      *
-     * @param assyPath an assembly file to compile
+     * @param assemblyPath an assembly file to compile
      */
-    public void compileAssembly(String assyPath) {
-        LOG.debug("Compiling assembly: " + assyPath);
-        File f = new File(assyPath);
-        initialFile = assyPath;
+    public void compileAssembly(String assemblyPath) {
+        LOG.debug("Compiling assembly: " + assemblyPath);
+        File f = new File(assemblyPath);
+        initialFilePath = assemblyPath;
         _doOpen(f);
         compileAssemblyAndPrepareSimulationRunner();
     }
@@ -118,11 +117,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void begin() {
 
-        // The initialFile is set if we have stated a file "arg" upon startup
+        // The initialFilePath is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialFile != null) {
-            LOG.debug("Loading initial file: " + initialFile);
-            compileAssembly(initialFile);
+        if (initialFilePath != null) {
+            LOG.debug("Loading initial file: " + initialFilePath);
+            compileAssembly(initialFilePath);
         } else {
             List<File> lis = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: " + lis.size());
@@ -305,14 +304,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** @return the listener for this AssemblyControllerImpl */
     @Override
     public OpenAssembly.AssemblyChangeListener getAssemblyChangeListener() {
-        return assyChgListener;
+        return assemblyChangeListener;
     }
     private boolean localDirty = false;
     private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssemblyChangeListener assyChgListener = new OpenAssembly.AssemblyChangeListener() {
+    OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -365,7 +364,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     break;
 
                 default:
-                    LOG.warn("Program error AssemblyController.assyChanged");
+                    LOG.warn("Program error AssemblyControllerImpl.assemblyChanged");
             }
         }
 
@@ -377,12 +376,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public String getHandle() {
-        return assyChgListener.getHandle();
+        return assemblyChangeListener.getHandle();
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
-        assyChgListener.assyChanged(action, source, param);
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        assemblyChangeListener.assemblyChanged(action, source, param);
     }
 
     @Override
@@ -887,16 +886,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newPropChangeListenerNode() // menu click
+    public void newPropertyChangeListenerNode() // menu click
     {
         Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
 
         if (o != null) {
             if (o instanceof Class<?>) {
-                newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
+                newPropertyChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
             } else if (o instanceof FileBasedAssemblyNode) {
-                newFileBasedPropChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
+                newFileBasedPropertyChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -905,15 +904,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newPropChangeListenerNode(String name, Point p) {
+    public void newPropertyChangeListenerNode(String name, Point p) {
         String shName = shortPropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
+        ((AssemblyModel) getModel()).newPropertyChangeListener(shName, name, p);
     }
 
     @Override
-    public void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
+    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortPropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
+        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shName, xnode, p);
     }
 
     /**
@@ -982,7 +981,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newPropChangeListArc(Object[] nodes) {
+    public void newPropertyChangeListArc(Object[] nodes) {
         // One and only one has to be a prop change listener
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
@@ -993,7 +992,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        pcListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
     AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
@@ -1067,7 +1066,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param pclNode Property Change Listener Node
      */
     @Override
-    public void pcListenerEdit(PropertyChangeListenerNode pclNode) {
+    public void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode) {
         boolean done;
         do {
             done = true;
@@ -1079,7 +1078,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void evGraphEdit(EventGraphNode eventNode) {
+    public void eventGraphEdit(EventGraphNode eventNode) {
         boolean done;
         do {
             done = true;
@@ -1091,7 +1090,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void pcListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
+    public void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
         boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
@@ -1107,7 +1106,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void simEvListenerEdgeEdit(SimEvListenerEdge seEdge) {
+    public void simEventListenerEdgeEdit(SimEvListenerEdge seEdge) {
         boolean modified = ((AssemblyView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
@@ -1222,7 +1221,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             } else if (o instanceof PropertyChangeListenerNode) {
                 String nm = ((ViskitElement) o).getName();
                 String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
+                ((AssemblyModel) getModel()).newPropertyChangeListener(nm + "-copy" + copyCount, typ, p);
             }
             copyCount++;
         }
@@ -1246,7 +1245,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePropChangeListener(en);
+                ((AssemblyModel) getModel()).deletePropertyChangeListener(en);
             }
         }
 
@@ -1337,7 +1336,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
                 PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropChangeListener(node);
+                ((AssemblyModel) getModel()).redoPropertyChangeListener(node);
             } else {
                 EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoEventGraph(node);
@@ -1575,8 +1574,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    public PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
-        PkgAndFile paf = null;
+    public PackageAndFile createTemporaryEventGraphClass(File xmlFile) {
+        PackageAndFile paf = null;
         try {
             SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
             x2j.unmarshal();
@@ -1589,7 +1588,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             String src = buildJavaEventGraphSource(x2j);
 
-            /* We may have forgotten a parameter required for a super class */
+            /* Warn that we may have forgotten a parameter required for a super class */
             if (src == null) {
                 String msg = xmlFile + " did not compile.\n" +
                         "Please check that you have provided parameters in \n" +
@@ -1625,12 +1624,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return paf;
     }
 
-    /** Path for EG and Assy compilation
+    /** Path for EventGraph and Assembly compilation
      *
      * @param source the raw source to write to file
      * @return a package and file pair
      */
-    private PkgAndFile compileJavaClassAndSetPackage(String source) {
+    private PackageAndFile compileJavaClassAndSetPackage(String source) {
         String pkg = null;
         if (source != null && !source.isEmpty()) {
             Pattern p = Pattern.compile("package.*;");
@@ -1646,7 +1645,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
             File f = compileJavaClassFromString(source);
             if (f != null) {
-                return new PkgAndFile(pkg, f);
+                return new PackageAndFile(pkg, f);
             }
         }
         return null;
@@ -1666,33 +1665,33 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         model.saveModel(tFile);
     //todo switch to DOE
     }
-    private String[] execStrings;
+    private String[] executionParameters;
 
-    // Known modelPath for Assy compilation
+    // Known modelPath for Assembly compilation
     @Override
     public void initializeAssemblyRun() {
         String src = produceJavaAssemblyClass(); // asks to save
 
-        PkgAndFile paf = compileJavaClassAndSetPackage(src);
+        PackageAndFile paf = compileJavaClassAndSetPackage(src);
         if (paf != null) {
-            File f = paf.f;
-            String clNam = f.getName().substring(0, f.getName().indexOf('.'));
-            clNam = paf.pkg + "." + clNam;
+            File f = paf.file;
+            String className = f.getName().substring(0, f.getName().indexOf('.'));
+            className = paf.pkg + "." + className;
 
             // no longer necessary since we don't invoke
             // Runtime.exec to compile anymore
             String classPath = "";
 
-            execStrings = buildExecStrings(clNam, classPath);
+            executionParameters = buildExecStrings(className, classPath);
         } else {
-            execStrings = null;
+            executionParameters = null;
         }
     }
 
     @Override
     public void compileAssemblyAndPrepareSimulationRunner() {
 
-        // Prevent multiple pushes of the initialize sim run button
+        // Prevent multiple pushes of the initialize Simulation Run button
         mutex++;
         if (mutex > 1) {
             return;
@@ -1724,12 +1723,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 // Compile and prep the execStrings
                 initializeAssemblyRun();
 
-                if (execStrings == null) {
-
+                if (executionParameters == null) 
+				{
                     if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
                         messageToUser(JOptionPane.WARNING_MESSAGE,
-                            "Assembly File Not Opened",
-                            "Please open an Assembly file");
+                            "No Assembly file is active",
+                            "Please open an Assembly file before running a simulation");
                     } else {
                         String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
                         messageToUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
@@ -1746,10 +1745,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     save();
 
                     // Initializes a fresh class loader
-                    runner.exec(execStrings);
+                    runner.exec(executionParameters);
 
                     // reset
-                    execStrings = null;
+                    executionParameters = null;
                 }
 
                 return null;
@@ -1768,6 +1767,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 } finally {
                     ((AssemblyEditViewFrame) getView()).runButton.setEnabled(true);
                     mutex--;
+					ViskitGlobals.instance().getViskitApplicationFrame().selectSimulationRunTab();
                 }
             }
         };
@@ -1849,12 +1849,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
      *
-     * @param assyImage an image file to write the .png
+     * @param assemblyImage an image file to write the .png
      */
-    public void captureAssemblyImage(File assyImage) {
+    public void captureAssemblyImage(File assemblyImage) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer tim = new Timer(100, new timerCallback(assyImage, false));
+        final Timer tim = new Timer(100, new timerCallback(assemblyImage, false));
         tim.setRepeats(false);
         tim.start();
     }

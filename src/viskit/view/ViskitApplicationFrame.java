@@ -455,8 +455,8 @@ public class ViskitApplicationFrame extends JFrame {
             // back and change something, then handle that here
 			else if (i == tabIndices[TAB_SIMULATION_RUN])
 			{
-                i = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
-                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "Simulation Run is defined by active Assembly");
+                i = mainTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex(); // TODO subtabs
+                mainTabbedPane.setToolTipTextAt(TAB_SIMULATION_RUN, "Simulation Run is defined by active Assembly"); // tabIndices[TAB_SIMULATION_RUN]
 				eventGraphEditMenu.setEnabled(false);
 			   	  assemblyEditMenu.setEnabled(false);
 
@@ -488,7 +488,6 @@ public class ViskitApplicationFrame extends JFrame {
 				System.out.println ("No title for tab " + i); // TODO fix improper setup
 			}
 			else myTitleListener.setTitle(titles[i], i);
-
         }
     }
 
@@ -751,6 +750,11 @@ public class ViskitApplicationFrame extends JFrame {
 		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
 		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		
+		String  assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetaData().name;
+		int selectedRunIndex = getRunTabbedPane().getSelectedIndex();
+		ViskitGlobals.instance().getRunPanel().setTitle(assemblyName);
+		getRunTabbedPane().setTitleAt(selectedRunIndex, assemblyName);
 	}
 	public void selectAssemblyEditorTab ()
 	{
@@ -763,5 +767,17 @@ public class ViskitApplicationFrame extends JFrame {
 		mainTabbedPane.setSelectedIndex(TAB_ANALYST_REPORT);
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus();
 		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+	}
+	public JTabbedPane getRunTabbedPane ()
+	{
+		return runTabbedPane;
+	}
+	public JPanel getSelectedSimulationRunTab ()
+	{
+		return (JPanel) runTabbedPane.getSelectedComponent();
+	}
+	public int getSelectedSimulationRunIndex ()
+	{
+		return runTabbedPane.getSelectedIndex();
 	}
 }

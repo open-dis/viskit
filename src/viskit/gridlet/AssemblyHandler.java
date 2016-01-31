@@ -148,28 +148,28 @@ public class AssemblyHandler implements XmlRpcHandler {
                         ret = gridRunner.getResultByTaskID(taskID);
                         break;
                     }
-                case "gridkit.getDesignPointStats":
+                case "gridkit.getDesignPointStatistics":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
-                        ret = gridRunner.getDesignPointStats(sample, designPt);
+                        ret = gridRunner.getDesignPointStatistics(sample, designPt);
                         break;
                     }
-                case "gridkit.getReplicationStats":
+                case "gridkit.getReplicationStatistics":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
                         Integer replication = (Integer) arguments.elementAt(3);
-                        ret = gridRunner.getReplicationStats(sample, designPt, replication);
+                        ret = gridRunner.getReplicationStatistics(sample, designPt, replication);
                         break;
                     }
                 case "gridkit.addDesignPointStat":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
-                        Integer numberOfStats = (Integer) arguments.elementAt(3);
+                        Integer numberOfStatistics = (Integer) arguments.elementAt(3);
                         String stat = (String) arguments.elementAt(4);
-                        ret = gridRunner.addDesignPointStat(sample, designPt, numberOfStats, stat);
+                        ret = gridRunner.addDesignPointStatistics(sample, designPt, numberOfStatistics, stat);
                         break;
                     }
                 case "gridkit.addReplicationStat":

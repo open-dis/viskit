@@ -361,12 +361,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
-        newPropChangeListener(widgetName, node.loadedClass, p);
+    public void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
+        newPropertyChangeListener(widgetName, node.loadedClass, p);
     }
 
     @Override
-    public void newPropChangeListener(String widgetName, String className, Point2D p) {
+    public void newPropertyChangeListener(String widgetName, String className, Point2D p) {
         PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className);
         if (p == null) {
             pcNode.setPosition(pointLess);
@@ -398,7 +398,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeListener(PropertyChangeListenerNode node) {
+    public void redoPropertyChangeListener(PropertyChangeListenerNode node) {
 
         PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
@@ -414,7 +414,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeListener(PropertyChangeListenerNode pclNode) {
+    public void deletePropertyChangeListener(PropertyChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
         getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
@@ -652,11 +652,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxBPcl.setDescription(pclNode.getDescriptionString());
 
         // Modes should be singular.  All new Assemblies will be with singular mode
-        if (pclNode.isSampleStats()) {
-            if (pclNode.isClearStatsAfterEachRun()) {
-                jaxBPcl.setMode("replicationStat");
+        if (pclNode.isSampleStatistics()) {
+            if (pclNode.isClearStatisticsAfterEachRun()) {
+                jaxBPcl.setMode("replicationStatistic");
             } else {
-                jaxBPcl.setMode("designPointStat");
+                jaxBPcl.setMode("designPointStatistic");
             }
         }
 
@@ -1054,7 +1054,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         pNode = new PropertyChangeListenerNode(pcl.getName(), pcl.getType());
 
         // For backwards compatibility, bug 706
-        pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
+        pNode.setClearStatisticsAfterEachRun(pcl.getMode().contains("replicationStat"));
         pNode.setGetMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
         pNode.setGetCount(Boolean.parseBoolean(pcl.getCountStatistics()));
         pNode.setDescriptionString(pcl.getDescription());

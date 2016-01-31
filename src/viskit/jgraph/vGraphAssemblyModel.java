@@ -207,7 +207,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked")
     public void addPclEdge(AssemblyEdge pce) {
         AssemblyNode egn = (AssemblyNode) pce.getFrom();
-        //PropChangeListenerNode pcln = (PropChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
+        //PropertyChangeListenerNode pcln = (PropertyChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
         AssemblyNode pcln = (AssemblyNode) pce.getTo();
         DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;
         DefaultGraphCell to = (DefaultGraphCell) pcln.opaqueViewObject;

@@ -7,14 +7,14 @@ import java.io.File;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.PkgAndFile">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class PkgAndFile {
+public class PackageAndFile {
 
     public String pkg;
-    public File f;
+    public File file;
 
-    public PkgAndFile(String pkg, File f) {
-        this.pkg = pkg;
-        this.f = f;
+    public PackageAndFile(String packageName, File file) {
+        this.pkg = packageName;
+        this.file = file;
     }
 
-} // end class file PkgAndFile.java
+} // end class file PackageAndFile.java

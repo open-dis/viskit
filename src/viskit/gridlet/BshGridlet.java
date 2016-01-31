@@ -247,7 +247,7 @@ public class BshGridlet extends Thread {
             // finished running, collect some statistics
             // from the beanshell context to java
 
-            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
+            simkit.stat.SampleStatistics[] designPointStatistics = sim.getDesignPointStatistics();
             simkit.stat.SampleStatistics replicationStat;
 
             // go through and copy in the statistics
@@ -256,23 +256,23 @@ public class BshGridlet extends Thread {
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             String statXml;
 
-            // first get designPoint stats
-            if (designPointStats != null ) {
+            // first get designPoint statistics
+            if (designPointStatistics != null ) {
                 try {
 
-                    for (simkit.stat.SampleStatistics designPointStat : designPointStats) {
-                        if (designPointStat instanceof simkit.stat.IndexedSampleStatistics) {
+                    for (simkit.stat.SampleStatistics designPointStatistic : designPointStatistics) {
+                        if (designPointStatistic instanceof simkit.stat.IndexedSampleStatistics) {
                             viskit.xsd.bindings.assembly.IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
-                            iss.setName(designPointStat.getName());
+                            iss.setName(designPointStatistic.getName());
                             List<SampleStatistics> args = iss.getSampleStatistics();
-                            simkit.stat.SampleStatistics[] allStat = ((simkit.stat.IndexedSampleStatistics) designPointStat).getAllSampleStat();
+                            simkit.stat.SampleStatistics[] allStat = ((simkit.stat.IndexedSampleStatistics) designPointStatistic).getAllSampleStat();
                             for (simkit.stat.SampleStatistics allStat1 : allStat) {
                                 // TODO: fix generics
                                 args.add(statForStat(allStat1));
                             }
                             statXml = sax2j.marshalToString(iss);
                         } else {
-                            statXml = sax2j.marshalToString(statForStat(designPointStat));
+                            statXml = sax2j.marshalToString(statForStat(designPointStatistic));
                         }
                         if (debug_io) {
                             System.out.println(statXml);
@@ -281,15 +281,15 @@ public class BshGridlet extends Thread {
                         args.add(usid);
                         args.add(sampleIndex);
                         args.add(designPtIndex);
-                        args.add(designPointStats.length);
+                        args.add(designPointStatistics.length);
                         args.add(statXml);
                         if (debug_io) {
                             System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
                             System.out.println(statXml);
                         }
                         xmlrpc.execute("gridkit.addDesignPointStat", args);
-                        // replication stats similarly
-                        String repName = designPointStat.getName();
+                        // replication statistics similarly
+                        String repName = designPointStatistic.getName();
                         repName = repName.substring(0, repName.length() - 6); // strip off ".count"
                         for (int j = 0; j < replicationsPerDesignPoint; j++) {
                             replicationStat = sim.getReplicationStat(repName, j);
@@ -332,7 +332,7 @@ public class BshGridlet extends Thread {
                 }
             }
             else {
-                System.out.println("No DesignPointStats");
+                System.out.println("No DesignPointStatistics");
                 // reconnect io
             }
 
@@ -344,7 +344,7 @@ public class BshGridlet extends Thread {
             }
 
             // skim through console chatter and organize
-            // into log, error, and if non stats property
+            // into log, error, and if non statistics property
             // change messages which are wrapped in xml,
             // then so sent as a Results tag. Results
             // should probably not be named Results as

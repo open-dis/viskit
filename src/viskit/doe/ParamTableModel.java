@@ -343,7 +343,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     OpenAssembly.AssemblyChangeListener dummyListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         }
 
         @Override

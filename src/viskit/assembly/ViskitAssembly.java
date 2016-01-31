@@ -26,8 +26,8 @@ public class ViskitAssembly extends BasicAssembly {
     protected Map<String, PropertyChangeListener> designPointStatistics;
     protected Map<String, PropertyChangeListener> propertyChangeListeners;
     protected Map<String, List<PropertyConnector>> propertyChangeListenerConnections;
-    protected Map<String, List<PropertyConnector>> designPointStatsListenerConnections;
-    protected Map<String, List<PropertyConnector>> replicationStatsListenerConnections;
+    protected Map<String, List<PropertyConnector>> designPointStatisticsListenerConnections;
+    protected Map<String, List<PropertyConnector>> replicationStatisticsListenerConnections;
     protected Map<String, List<String>> simEventListenerConnections;
     protected Map<String, Adapter> adapters;
     private static boolean debug = false;
@@ -39,8 +39,8 @@ public class ViskitAssembly extends BasicAssembly {
         designPointStatistics = new LinkedHashMap<>();
         propertyChangeListeners = new LinkedHashMap<>();
         propertyChangeListenerConnections = new LinkedHashMap<>();
-        designPointStatsListenerConnections = new LinkedHashMap<>();
-        replicationStatsListenerConnections = new LinkedHashMap<>();
+        designPointStatisticsListenerConnections = new LinkedHashMap<>();
+        replicationStatisticsListenerConnections = new LinkedHashMap<>();
         simEventListenerConnections = new LinkedHashMap<>();
         adapters = new LinkedHashMap<>();
     }
@@ -66,22 +66,22 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     @Override
-    protected void createReplicationStats() {
-        replicationStats = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener sampleStats : replicationStats) {
-            LOG.debug(((Named) sampleStats).getName() + " replicationStat created");
+    protected void createReplicationStatistics() {
+        super.replicationStatistics = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener sampleStatistics : super.replicationStatistics) {
+            LOG.debug(((Named) sampleStatistics).getName() + " replicationStat created");
         }
     }
 
     @Override
-    protected void createDesignPointStats() {
+    protected void createDesignPointStatistics() {
 
-        super.createDesignPointStats();
+        super.createDesignPointStatistics();
 
         // the super.
-        for (SampleStatistics sampleStats : designPointStats) {
-//            LOG.debug(sampleStats.getName() + " designPointStat created");
-            designPointStatistics.put(sampleStats.getName(), sampleStats);
+        for (SampleStatistics sampleStatistics : super.designPointStatistics) {
+//            LOG.debug(sampleStatistics.getName() + " designPointStat created");
+            designPointStatistics.put(sampleStatistics.getName(), sampleStatistics);
         }
     }
 
@@ -114,12 +114,12 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     public void hookupReplicationListeners() {
-        String[] listeners = GenericConversion.toArray(replicationStatsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(replicationStatisticsListenerConnections.keySet(), new String[0]);
         for (String listener : listeners) {
-            List<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
-            if (repStatsConnects != null) {
-                for (PropertyConnector pc : repStatsConnects) {
-                    connectReplicationStats(listener, pc);
+            List<PropertyConnector> replicationStatisticsConnects = replicationStatisticsListenerConnections.get(listener);
+            if (replicationStatisticsConnects != null) {
+                for (PropertyConnector pc : replicationStatisticsConnects) {
+                    connectReplicationStatistics(listener, pc);
                 }
             } else if (debug) {
                 LOG.info("No replicationListeners");
@@ -130,15 +130,15 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();
-        String[] listeners = GenericConversion.toArray(designPointStatsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(designPointStatisticsListenerConnections.keySet(), new String[0]);
         // if not the default case, need to really do this with
-        // a Class to create instances selected by each ReplicationStats listener.
+        // a Class to create instances selected by each ReplicationStatistics listener.
         if (listeners.length > 0) {
             for (String listener : listeners) {
-                List<PropertyConnector> designPointConnects = designPointStatsListenerConnections.get(listener);
+                List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnections.get(listener);
                 if ( designPointConnects != null ) {
                     for (PropertyConnector pc : designPointConnects) {
-                        connectDesignPointStats(listener, pc);
+                        connectDesignPointStatistics(listener, pc);
                     }
                 }
             }
@@ -180,7 +180,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
     }
 
-    void connectReplicationStats(String listener, PropertyConnector pc) {
+    void connectReplicationStatistics(String listener, PropertyConnector pc) {
         if ( "null".equals(pc.property) ) {
             pc.property = "";
         }
@@ -189,7 +189,7 @@ public class ViskitAssembly extends BasicAssembly {
         }
 
         if (pc.property.isEmpty()) {
-            pc.property = getReplicationStatsByName(listener).getName().trim();
+            pc.property = getReplicationStatisticsByName(listener).getName().trim();
             if (debug) {
                 LOG.info("Property unspecified, attempting with lookup " + pc.property);
             }
@@ -197,29 +197,29 @@ public class ViskitAssembly extends BasicAssembly {
 
         if (pc.property.isEmpty()) {
             if (debug) {
-                LOG.info("Null property, replicationStats connecting "+pc.source+" to "+listener);
+                LOG.info("Null property, replicationStatistics connecting "+pc.source+" to "+listener);
             }
-            getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatsByName(listener));
+            getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatisticsByName(listener));
         } else {
             if (debug) {
-                LOG.info("Connecting replicationStats from "+pc.source+" to "+listener);
+                LOG.info("Connecting replicationStatistics from "+pc.source+" to "+listener);
             }
-            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatsByName(listener));
+            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatisticsByName(listener));
         }
     }
 
-    void connectDesignPointStats(String listener, PropertyConnector pc) {
+    void connectDesignPointStatistics(String listener, PropertyConnector pc) {
         if ( pc.property.equals("null") ) {
             pc.property = "";
         }
         if ( "".equals(pc.property) ) {
-            pc.property = getDesignPointStatsByName(listener).getName();
+            pc.property = getDesignPointStatisticsByName(listener).getName();
         }
 
         if ( "".equals(pc.property) ) {
-            getSimEntityByName(pc.source).addPropertyChangeListener(getDesignPointStatsByName(listener));
+            getSimEntityByName(pc.source).addPropertyChangeListener(getDesignPointStatisticsByName(listener));
         } else {
-            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatsByName(listener));
+            getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatisticsByName(listener));
         }
     }
 
@@ -231,7 +231,7 @@ public class ViskitAssembly extends BasicAssembly {
 //        LOG.debug("entity is: " + entity);
     }
 
-    public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
+    public void addDesignPointStatistics(String listenerName, PropertyChangeListener pcl) {
         designPointStatistics.put(listenerName,pcl);
     }
 
@@ -239,7 +239,7 @@ public class ViskitAssembly extends BasicAssembly {
      * @param listenerName the given name of the PropertyChangeListener
      * @param pcl type of PropertyChangeListener
      */
-    public void addReplicationStats(String listenerName, PropertyChangeListener pcl) {
+    public void addReplicationStatistics(String listenerName, PropertyChangeListener pcl) {
         LOG.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
         replicationStatistics.put(listenerName, pcl);
     }
@@ -258,22 +258,22 @@ public class ViskitAssembly extends BasicAssembly {
         propertyConnects.add(new PropertyConnector(property, source));
     }
 
-    public void addDesignPointStatsListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> designPointConnects = designPointStatsListenerConnections.get(listener);
+    public void addDesignPointStatisticsListenerConnection(String listener, String property, String source) {
+        List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnections.get(listener);
         if ( designPointConnects == null ) {
             designPointConnects = new LinkedList<>();
-            designPointStatsListenerConnections.put(listener, designPointConnects);
+            designPointStatisticsListenerConnections.put(listener, designPointConnects);
         }
         designPointConnects.add(new PropertyConnector(property,source));
     }
 
-    public void addReplicationStatsListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
-        if ( repStatsConnects == null ) {
-            repStatsConnects = new LinkedList<>();
-            replicationStatsListenerConnections.put(listener, repStatsConnects);
+    public void addReplicationStatisticsListenerConnection(String listener, String property, String source) {
+        List<PropertyConnector> repStatisticsConnects = replicationStatisticsListenerConnections.get(listener);
+        if ( repStatisticsConnects == null ) {
+            repStatisticsConnects = new LinkedList<>();
+            replicationStatisticsListenerConnections.put(listener, repStatisticsConnects);
         }
-        repStatsConnects.add(new PropertyConnector(property,source));
+        repStatisticsConnects.add(new PropertyConnector(property,source));
     }
 
     public void addSimEventListenerConnection(String listener, String source) {
@@ -299,11 +299,11 @@ public class ViskitAssembly extends BasicAssembly {
         return propertyChangeListeners.get(name);
     }
 
-    public SampleStatistics getDesignPointStatsByName(String name) {
+    public SampleStatistics getDesignPointStatisticsByName(String name) {
         return (SampleStatistics) designPointStatistics.get(name);
     }
 
-    public SampleStatistics getReplicationStatsByName(String name) {
+    public SampleStatistics getReplicationStatisticsByName(String name) {
         return (SampleStatistics) replicationStatistics.get(name);
     }
 

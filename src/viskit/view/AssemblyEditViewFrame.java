@@ -390,7 +390,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode",         "Add Event Graph...", KeyEvent.VK_V, null, showingAssembly));
-        editMenu.add(buildMenuItem(assemblyController, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null, showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null, showingAssembly));
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(assemblyController, "showXML", "View Saved XML", KeyEvent.VK_X, null, showingAssembly));
@@ -508,8 +508,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 "Save and compile assembly (Ctrl-S)");
 		saveButton.setSize(new Dimension (24, 24));
 
-        Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
-        runButton = makeButton(runAction, "viskit/images/Play24.gif",
+        // reflection method, take care since refactoring won't find this!!
+        Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepareSimulationRunner");
+		runButton = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile and initialize the Assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -802,16 +803,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         LegosPanel lPan = new LegosPanel(legoTree);
-        PropChangeListenersPanel pclPan = new PropChangeListenersPanel(propertyChangeListenerTree);
+        PropertyChangeListenerPanel propertyChangeListenerPanel = new PropertyChangeListenerPanel(propertyChangeListenerTree);
 
         legoTree.setBackground(background);
         propertyChangeListenerTree.setBackground(background);
 
-        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
+        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, propertyChangeListenerPanel);
         treePanels.setBorder(null);
         treePanels.setOneTouchExpandable(true);
 
-        pclPan.setMinimumSize(new Dimension(20, 80));
+        propertyChangeListenerPanel.setMinimumSize(new Dimension(20, 80));
         lPan.setMinimumSize(new Dimension(20, 80));
         lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
@@ -861,7 +862,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                                 ((AssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
                                 break;
                         }
                     } else {
@@ -871,7 +872,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                                 ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
+                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p);
                                 break;
                         }
                     }

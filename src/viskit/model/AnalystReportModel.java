@@ -76,8 +76,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private File assemblyFile;
 
     /** The viskit.reports.ReportStatisticsDOM object for this report */
-    private Document statsReport;
-    private String   statsReportPath;
+    private Document statisticsReport;
+    private String   statisticsReportPath;
 
     /** The jdom.Document object that is used to build the report */
     private Document reportJdomDocument;
@@ -110,8 +110,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
 
         try {
             Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
-            setStatsReportPath(statisticsReportPath);
-            setStatsReport(doc);
+            setStatisticsReportPath(statisticsReportPath);
+            setStatisticsReport(doc);
         } catch (Exception e) {
             LOG.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
@@ -312,22 +312,22 @@ public final class AnalystReportModel extends mvcAbstractModel {
         rootElement.addContent(statisticalResults);
 
         statisticalResults.setAttribute("comments", "true");
-        statisticalResults.setAttribute("replicationStats", "true");
-        statisticalResults.setAttribute("summaryStats", "true");
+        statisticalResults.setAttribute("replicationStatistics", "true");
+        statisticalResults.setAttribute("summaryStatistics", "true");
         makeComments(statisticalResults,"SR", "");
         makeConclusions(statisticalResults,"SR", "");
 
-        if (statsReportPath != null && statsReportPath.length() > 0) {
-            statisticalResults.setAttribute("file", statsReportPath);
+        if (statisticsReportPath != null && statisticsReportPath.length() > 0) {
+            statisticalResults.setAttribute("file", statisticsReportPath);
 
             Element sumReport = new Element("SummaryReport");
-            List<Element> itr = statsReport.getRootElement().getChildren("SimEntity");
+            List<Element> itr = statisticsReport.getRootElement().getChildren("SimEntity");
             for (Element entity : itr) {
                 Element temp = (Element) entity.clone();
                 temp.removeChildren("SummaryReport");
 
-                Element summStats = entity.getChild("SummaryReport");
-                List<Element> summItr = summStats.getChildren("Summary");
+                Element summaryStaisticts = entity.getChild("SummaryReport");
+                List<Element> summItr = summaryStaisticts.getChildren("Summary");
                 for (Element temp2 : summItr) {
                     Element summaryRecord = new Element("SummaryRecord");
                     summaryRecord.setAttribute("entity", entity.getAttributeValue("name"));
@@ -381,7 +381,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
 
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public List<String[]> unMakeStatsSummList(Element statisticalResults) {
+    public List<String[]> unMakeStatisticsSummaryList(Element statisticalResults) {
         Vector<String[]> v = new Vector<>();
 
         Element sumReports = statisticalResults.getChild("SummaryReport");
@@ -677,7 +677,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     @SuppressWarnings("unchecked")
     private Element makeReplicationReport() {
         Element repReports = new Element("ReplicationReports");
-        List<Element> simEntities = statsReport.getRootElement().getChildren("SimEntity");
+        List<Element> simEntities = statisticsReport.getRootElement().getChildren("SimEntity");
 
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
@@ -693,7 +693,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
                     LOG.debug("entry is: " + entry);
                     Object obj;
-                    if (entry.toString().contains("PropChangeListenerNode")) {
+                    if (entry.toString().contains("PropertyChangeListenerNode")) {
 
                         obj = getPclNodeCache().get(entry.getKey());
                         try {
@@ -943,11 +943,11 @@ public final class AnalystReportModel extends mvcAbstractModel {
         setBehaviorConclusions("***ENTER ENTITY BEHAVIOR CONCLUSIONS HERE***");
 
         //StatisticalResults values
-        setPrintStatsComments(true);
-        setPrintReplicationStats(true);
-        setPrintSummaryStats(true);
-        setStatsDescription("***ENTER STATISTICAL RESULTS DESCRIPTION HERE***");
-        setStatsConclusions("***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***");
+        setPrintStatisticsComments(true);
+        setPrintReplicationStatistics(true);
+        setPrintSummaryStatistics(true);
+        setStatisticsDescription("***ENTER STATISTICAL RESULTS DESCRIPTION HERE***");
+        setStatisticsConclusions("***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***");
 
         //Recommendations/Conclusions
         setPrintRecommendationsConclusions(true);
@@ -958,7 +958,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     public boolean isDebug()                     { return debug; }
 
     public Document   getReportJdomDocument()    { return reportJdomDocument; }
-    public Document   getStatsReport()           { return statsReport; }
+    public Document   getStatisticsReport()      { return statisticsReport; }
     public Element    getRootElement()           { return rootElement; }
     public String     getFileName()              { return fileName; }
     public String     getAuthor()                { return rootElement.getAttributeValue("author"); }
@@ -1072,8 +1072,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     public void setFileName          (String fileName)           { this.fileName = fileName; }
-    public void setStatsReport       (Document statsReport)      { this.statsReport = statsReport; }
-    public void setStatsReportPath   (String filename)           { this.statsReportPath = filename; }
+    public void setStatisticsReport       (Document statisticsReport)      { this.statisticsReport = statisticsReport; }
+    public void setStatisticsReportPath   (String filename)           { this.statisticsReportPath = filename; }
     public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
     public void setClassification           (String s) { rootElement.setAttribute("classification", s);}
     public void setDateOfReport             (String s) { rootElement.setAttribute("date", s);}
@@ -1164,26 +1164,26 @@ public final class AnalystReportModel extends mvcAbstractModel {
     public void    setSimConfigationProductionNotes(String s) {makeProductionNotes(simConfig, "SC", s);}
     public void    setAssemblyImageLocation        (String s) {replaceChild(simConfig, makeImage("Assembly", s));}
 
-    // stat results:
+    // statistics results:
     // good
-    public boolean isPrintReplicationStats() { return stringToBoolean(statisticalResults.getAttributeValue("replicationStats")); }
-    public boolean isPrintStatsComments()    { return stringToBoolean(statisticalResults.getAttributeValue("comments")); }
-    public boolean isPrintSummaryStats()     { return stringToBoolean(statisticalResults.getAttributeValue("summaryStats")); }
-    public boolean isPrintStatsCharts()      { return stringToBoolean(statisticalResults.getAttributeValue("charts")); }
-    //todo later public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
-    public void setPrintReplicationStats   (boolean bool) { statisticalResults.setAttribute("replicationStats", booleanToString(bool)); }
-    public void setPrintStatsComments      (boolean bool) { statisticalResults.setAttribute("comments", booleanToString(bool)); }
-    public void setPrintSummaryStats       (boolean bool) { statisticalResults.setAttribute("summaryStats", booleanToString(bool)); }
-    public void setPrintStatsCharts        (boolean bool) { statisticalResults.setAttribute("charts", booleanToString(bool)); }
-    //todo later public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
+    public boolean isPrintReplicationStatistics() { return stringToBoolean(statisticalResults.getAttributeValue("replicationStatistics")); }
+    public boolean isPrintStatisticsComments()    { return stringToBoolean(statisticalResults.getAttributeValue("comments")); }
+    public boolean isPrintSummaryStatistics()     { return stringToBoolean(statisticalResults.getAttributeValue("summaryStatistics")); }
+    public boolean isPrintStatisticsCharts()      { return stringToBoolean(statisticalResults.getAttributeValue("charts")); }
+    //todo later public boolean isOverlayStatisticsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
+    public void setPrintReplicationStatistics   (boolean bool) { statisticalResults.setAttribute("replicationStatistics", booleanToString(bool)); }
+    public void setPrintStatisticsComments      (boolean bool) { statisticalResults.setAttribute("comments", booleanToString(bool)); }
+    public void setPrintSummaryStatistics       (boolean bool) { statisticalResults.setAttribute("summaryStatistics", booleanToString(bool)); }
+    public void setPrintStatsetPrintReplicationStatisticsCharts        (boolean bool) { statisticalResults.setAttribute("charts", booleanToString(bool)); }
+    //todo later public void setOverlayStatisticsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
 
-    public String  getStatsComments()        { return unMakeComments(statisticalResults);}
-    public String  getStatsConclusions()     { return unMakeConclusions(statisticalResults);}
-    public void setStatsDescription          (String s) { makeComments(statisticalResults,"SR", s); }
-    public void setStatsConclusions          (String s) { makeConclusions(statisticalResults,"SR", s); }
-    public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
-    public List<Object> getStatsReplicationsList() {return unMakeReplicationList(statisticalResults);}
-    public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults);}
+    public String  getStatisticsComments()        { return unMakeComments(statisticalResults);}
+    public String  getStatisticsConclusions()     { return unMakeConclusions(statisticalResults);}
+    public void setStatisticsDescription          (String s) { makeComments(statisticalResults,"SR", s); }
+    public void setStatisticsConclusions          (String s) { makeConclusions(statisticalResults,"SR", s); }
+    public String getStatisticsFilePath()         { return statisticalResults.getAttributeValue("file"); }
+    public List<Object> getStatisticsReplicationsList() {return unMakeReplicationList(statisticalResults);}
+    public List<String[]> getStastSummaryList() {return unMakeStatisticsSummaryList(statisticalResults);}
 
     public Map<String, AssemblyNode> getPclNodeCache() {
         return pclNodeCache;

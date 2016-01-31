@@ -103,11 +103,11 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
         getMeanStatisticsCB = new JCheckBox("Obtain mean statistics only");
         getMeanStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getMeanStatisticsCB.addActionListener(new getMeanStatsCBListener());
+        getMeanStatisticsCB.addActionListener(new GetMeanStatisticsCBListener());
 
         getCountStatisticsCB = new JCheckBox("Obtain raw count statistics only");
         getCountStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatisticsCB.addActionListener(new getCountStatsCBListener());
+        getCountStatisticsCB.addActionListener(new GetCountStaisticsCBListener());
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -176,8 +176,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
             /* Put up a "clear statistics after each replication" checkbox if
              * type is descendent of one of these:
              */
-            if (pclNode.isSampleStats()) {
-                clearStatisticsCB.setSelected(pclNode.isClearStatsAfterEachRun());
+            if (pclNode.isSampleStatistics()) {
+                clearStatisticsCB.setSelected(pclNode.isClearStatisticsAfterEachRun());
                 content.add(clearStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
             }
@@ -209,8 +209,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
             pclNode.setName(nm);
             pclNode.setDescriptionString(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
-            if (pclNode.isSampleStats()) {
-                pclNode.setClearStatsAfterEachRun(clearStatisticsCB.isSelected());
+            if (pclNode.isSampleStatistics()) {
+                pclNode.setClearStatisticsAfterEachRun(clearStatisticsCB.isSelected());
             }
 
             pclNode.setGetCount(getCountStatisticsCB.isSelected());
@@ -226,7 +226,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         ip.setData(pclNode.getInstantiator());
     }
 
-    class getMeanStatsCBListener implements CaretListener, ActionListener {
+    class GetMeanStatisticsCBListener implements CaretListener, ActionListener {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
@@ -241,7 +241,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class getCountStatsCBListener implements CaretListener, ActionListener {
+    class GetCountStaisticsCBListener implements CaretListener, ActionListener {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;

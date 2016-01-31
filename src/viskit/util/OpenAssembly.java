@@ -129,7 +129,7 @@ public class OpenAssembly {
     private void fireAction(int action, AssemblyChangeListener source, Object param) {
         for (AssemblyChangeListener lis : listeners) {
             if (lis != source) {
-                lis.assyChanged(action, source, param);
+                lis.assemblyChanged(action, source, param);
             }
         }
     }
@@ -148,7 +148,7 @@ public class OpenAssembly {
          * @param source the AssemblyChangeListener
          * @param param the object that changes
          */
-        void assyChanged(int action, AssemblyChangeListener source, Object param);
+        void assemblyChanged(int action, AssemblyChangeListener source, Object param);
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();

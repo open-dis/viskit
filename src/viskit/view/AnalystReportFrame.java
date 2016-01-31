@@ -119,7 +119,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * @param param the object to act upon
      */
     @Override
-    public void assyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;
@@ -178,7 +178,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         fillSimulationConfiguration();
         fillEntityParams();
         fillBehaviors();
-        fillStatsPan();
+        fillStatisticsPanel();
         fillConclusionsRecommendationsPanel();
     }
 
@@ -189,7 +189,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         unFillSimulationConfiguration();
         unFillEntityParams();
         unFillBehaviors();
-        unFillStatsPan();
+        unFillStatisticsPanel();
         unFillConRecPan();
     }
 
@@ -691,12 +691,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         }
     }
     JCheckBox wantStatisticsDescriptionAnalysis;
-    JCheckBox wantStatsReplications;
+    JCheckBox wantStatisticsReplications;
     JCheckBox wantStatisticsSummary;
-    JTextArea statsComments;
-    JTextArea statsConclusions;
-    JPanel statsSummaryPanel;
-    JPanel statsRepPanel;
+    JTextArea statisticsComments;
+    JTextArea statisticsConclusions;
+    JPanel statisticsSummaryPanel;
+    JPanel statisticsRepPanel;
     JScrollPane repsJsp;
     JScrollPane summJsp;
 
@@ -708,25 +708,25 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsDescriptionAnalysis);
 
-        JScrollPane jsp = new JScrollPane(statsComments = new WrappingTextArea());
+        JScrollPane jsp = new JScrollPane(statisticsComments = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Description of Expected Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        jsp = new JScrollPane(statsConclusions = new WrappingTextArea());
+        jsp = new JScrollPane(statisticsConclusions = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        wantStatsReplications = new JCheckBox("Include replication statistics", true);
-        wantStatsReplications.setToolTipText("Include entries in output report");
-        wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantStatsReplications);
+        wantStatisticsReplications = new JCheckBox("Include replication statistics", true);
+        wantStatisticsReplications.setToolTipText("Include entries in output report");
+        wantStatisticsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatisticsReplications);
 
-        repsJsp = new JScrollPane(statsRepPanel = new JPanel());
+        repsJsp = new JScrollPane(statisticsRepPanel = new JPanel());
         repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsRepPanel.setLayout(new BoxLayout(statsRepPanel, BoxLayout.Y_AXIS));
+        statisticsRepPanel.setLayout(new BoxLayout(statisticsRepPanel, BoxLayout.Y_AXIS));
         p.add(repsJsp);
 
         wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
@@ -734,46 +734,46 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsSummary);
 
-        summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
+        summJsp = new JScrollPane(statisticsSummaryPanel = new JPanel());
         summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel, BoxLayout.Y_AXIS));
+        statisticsSummaryPanel.setLayout(new BoxLayout(statisticsSummaryPanel, BoxLayout.Y_AXIS));
         p.add(summJsp);
 
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         return p;
     }
 
-    private void fillStatsPan() {
-        boolean bool = arb.isPrintStatsComments();
+    private void fillStatisticsPanel() {
+        boolean bool = arb.isPrintStatisticsComments();
         wantStatisticsDescriptionAnalysis.setSelected(bool);
-        statsComments.setText(arb.getStatsComments());
-        statsConclusions.setText(arb.getStatsConclusions());
-        statsComments.setEnabled(bool);
-        statsConclusions.setEnabled(bool);
+        statisticsComments.setText(arb.getStatisticsComments());
+        statisticsConclusions.setText(arb.getStatisticsConclusions());
+        statisticsComments.setEnabled(bool);
+        statisticsConclusions.setEnabled(bool);
 
-        bool = arb.isPrintReplicationStats();
-        wantStatsReplications.setSelected(bool);
-        bool = arb.isPrintSummaryStats();
+        bool = arb.isPrintReplicationStatistics();
+        wantStatisticsReplications.setSelected(bool);
+        bool = arb.isPrintSummaryStatistics();
         wantStatisticsSummary.setSelected(bool);
 
-        List reps = arb.getStatsReplicationsList();
-        statsRepPanel.removeAll();
+        List reps = arb.getStatisticsReplicationsList();
+        statisticsRepPanel.removeAll();
         JLabel lab;
         JScrollPane jsp;
         JTable tab;
 
-        statsRepPanel.add(lab = new JLabel("Replication Reports"));
+        statisticsRepPanel.add(lab = new JLabel("Replication Reports"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsRepPanel.add(Box.createVerticalStrut(10));
+        statisticsRepPanel.add(Box.createVerticalStrut(10));
         String[] colNames = new String[] {"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
 
         for (Iterator repItr = reps.iterator(); repItr.hasNext();) {
             List r = (List) repItr.next();
             String nm = (String) r.get(0);
             String prop = (String) r.get(1);
-            statsRepPanel.add(lab = new JLabel("Entity: " + nm));
+            statisticsRepPanel.add(lab = new JLabel("Entity: " + nm));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            statsRepPanel.add(lab = new JLabel("Property: " + prop));
+            statisticsRepPanel.add(lab = new JLabel("Property: " + prop));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
             List vals = (List) r.get(2);
@@ -782,12 +782,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             for (Iterator r2 = vals.iterator(); r2.hasNext();) {
                 saa[i++] = (String[]) r2.next();
             }
-            statsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+            statisticsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
             tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
             jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-            statsRepPanel.add(Box.createVerticalStrut(20));
+            statisticsRepPanel.add(Box.createVerticalStrut(20));
         }
         List summs = arb.getStastSummaryList();
 
@@ -798,12 +798,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             saa[i++] = (String[]) sumItr.next();
         }
 
-        statsSummaryPanel.removeAll();
-        statsSummaryPanel.add(lab = new JLabel("Summary Report"));
+        statisticsSummaryPanel.removeAll();
+        statisticsSummaryPanel.add(lab = new JLabel("Summary Report"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsSummaryPanel.add(Box.createVerticalStrut(10));
+        statisticsSummaryPanel.add(Box.createVerticalStrut(10));
 
-        statsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+        statisticsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
         tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -812,12 +812,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
     }
 
-    private void unFillStatsPan() {
-        arb.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
-        arb.setStatsDescription(statsComments.getText());
-        arb.setStatsConclusions(statsConclusions.getText());
-        arb.setPrintReplicationStats(wantStatsReplications.isSelected());
-        arb.setPrintSummaryStats(wantStatisticsSummary.isSelected());
+    private void unFillStatisticsPanel() {
+        arb.setPrintStatisticsComments(wantStatisticsDescriptionAnalysis.isSelected());
+        arb.setStatisticsDescription(statisticsComments.getText());
+        arb.setStatisticsConclusions(statisticsConclusions.getText());
+        arb.setPrintReplicationStatistics(wantStatisticsReplications.isSelected());
+        arb.setPrintSummaryStatistics(wantStatisticsSummary.isSelected());
     }
     JCheckBox wantConclusionsRecommendations;
     JTextArea conRecConclusionsTA;

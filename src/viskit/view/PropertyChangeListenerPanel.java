@@ -9,8 +9,8 @@ package viskit.view;
  * Date: May 14, 2004
  * Time: 10:10:13 AM
  */
-public class PropChangeListenersPanel extends ClassPanel {
-  public PropChangeListenersPanel(LegoTree ltree) {
+public class PropertyChangeListenerPanel extends ClassPanel {
+  public PropertyChangeListenerPanel(LegoTree ltree) {
     super(ltree,"Property Change Listeners", "Add a property change listener class to this list",
                                              "Remove a property change listener class from this list");
   }

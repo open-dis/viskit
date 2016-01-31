@@ -12,8 +12,8 @@ import org.jdom.Element;
 
 /**
  *
- * This class is used by viskit.reports.ReportStatsConfig to construct an XML
- * document out of the replication and summary stats objects that are passed to it.
+ * This class is used by viskit.reports.ReportStatisticsConfig to construct an XML
+ * document out of the replication and summary statistics objects that are passed to it.
  *
  * @author Patrick Sullivan
  * @version $Id$

@@ -161,7 +161,7 @@ public class RunnerPanel2Original extends JPanel {
         // todo uncommment.......ViskitGlobals.instance().setRunPanel((this);
     }
 
-    private JPanel makeVCRPanel(boolean skipCloseButt) {
+    private JPanel makeVCRPanel(boolean skipCloseButton) {
         JPanel flowPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         JLabel vcrSimTimeLab = new JLabel("Sim start time:");
@@ -220,7 +220,7 @@ public class RunnerPanel2Original extends JPanel {
 
         closeButt = new JButton("Close");
         closeButt.setToolTipText("Close this window");
-        if (!skipCloseButt) {
+        if (!skipCloseButton) {
             flowPan.add(closeButt);
         }
 
@@ -244,8 +244,8 @@ public class RunnerPanel2Original extends JPanel {
         flowPan.add(searchB);
         //todo uncomment...... searchB.addActionListener(new Searcher(this));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         vcrStop = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStop.setToolTipText("Stop the simulation run");
@@ -253,40 +253,40 @@ public class RunnerPanel2Original extends JPanel {
         vcrStop.setBorder(BorderFactory.createEtchedBorder());
         vcrStop.setText(null);
         //vcrStop.addActionListener(new FileChaserStopper());
-        buttPan.add(vcrStop);
+        buttonPanel.add(vcrStop);
 
         vcrRewind = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Rewind24.gif")));
         vcrRewind.setToolTipText("Reset the simulation run");
         vcrRewind.setEnabled(false);
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
         vcrRewind.setText(null);
-        if (!skipCloseButt) {
-            buttPan.add(vcrRewind);
+        if (!skipCloseButton) {
+            buttonPanel.add(vcrRewind);
         }
 
         vcrPlay = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/Play24.gif")));
-        vcrPlay.setToolTipText("Begin or resume the simulation run");
-        if (skipCloseButt) {
-            vcrPlay.setToolTipText("Begin the simulation run");
+        vcrPlay.setToolTipText("Begin or resume the Simulation Run");
+        if (skipCloseButton) {
+            vcrPlay.setToolTipText("Begin the Simulation Run");
         }
         vcrPlay.setBorder(BorderFactory.createEtchedBorder());
         vcrPlay.setText(null);
-        buttPan.add(vcrPlay);
+        buttonPanel.add(vcrPlay);
 
         vcrStep = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/StepForward24.gif")));
-        vcrStep.setToolTipText("Step the simulation");
+        vcrStep.setToolTipText("Single-step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);
-        if (!skipCloseButt) {
-            buttPan.add(vcrStep);
+        if (!skipCloseButton) {
+            buttonPanel.add(vcrStep);
         }
 
-        buttPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         flowPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
         flowPan.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
 
-        flowPan.add(buttPan);
+        flowPan.add(buttonPanel);
         return flowPan;
     }
 

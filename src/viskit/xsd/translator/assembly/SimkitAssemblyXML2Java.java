@@ -566,8 +566,8 @@ public class SimkitAssemblyXML2Java {
     void buildListeners(StringWriter listeners) {
 
         PrintWriter pw = new PrintWriter(listeners);
-        Map<String, PropertyChangeListener> replicationStats = new LinkedHashMap<>();
-        Map<String, PropertyChangeListener> designPointStats = new LinkedHashMap<>();
+        Map<String, PropertyChangeListener> replicationStatistitcs = new LinkedHashMap<>();
+        Map<String, PropertyChangeListener> designPointStatistics = new LinkedHashMap<>();
         Map<String, PropertyChangeListener> propertyChangeListeners = new LinkedHashMap<>();
         Map<String, List<PropertyChangeListenerConnection>> propertyChangeListenerConnections =
                 new LinkedHashMap<>();
@@ -577,13 +577,13 @@ public class SimkitAssemblyXML2Java {
 
             if (null != pclMode) // For backwards compatibility
                 switch (pclMode) {
-                    case "replicationStat":
-                    case "replicationStats":
-                        replicationStats.put(pcl.getName(), pcl);
+                    case "replicationStatistic":
+                    case "replicationStatistics":
+                        replicationStatistitcs.put(pcl.getName(), pcl);
                         break;
-                    case "designPointStat":
-                    case "designPointStats":
-                        designPointStats.put(pcl.getName(), pcl);
+                    case "designPointStatistic":
+                    case "designPointStatistics":
+                        designPointStatistics.put(pcl.getName(), pcl);
                         break;
                     default:
                         propertyChangeListeners.put(pcl.getName(), pcl);
@@ -621,9 +621,9 @@ public class SimkitAssemblyXML2Java {
             pw.println(sp8 + rp + sc);
         }
 
-        for (String propChangeListener : propertyChangeListenerConnections.keySet()) {
-            for (PropertyChangeListenerConnection pclc : propertyChangeListenerConnections.get(propChangeListener)) {
-                pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
+        for (String propertyChangeListener : propertyChangeListenerConnections.keySet()) {
+            for (PropertyChangeListenerConnection pclc : propertyChangeListenerConnections.get(propertyChangeListener)) {
+                pw.print(sp8 + "addPropertyChangeListenerConnection" + lp + qu + propertyChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
                 pw.println(qu + pclc.getSource() + qu + rp + sc);
                 pw.println();
             }
@@ -633,13 +633,13 @@ public class SimkitAssemblyXML2Java {
         pw.println();
 
         pw.println(sp4 + "@Override");
-        pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
+        pw.println(sp4 + "public void createReplicationStatistics" + lp + rp + sp + ob);
 
-        String[] pcls = replicationStats.keySet().toArray(new String[0]);
-        for (String propChangeListener : pcls) {
-            PropertyChangeListener pcl = replicationStats.get(propChangeListener);
+        String[] pcls = replicationStatistitcs.keySet().toArray(new String[0]);
+        for (String propertyChangeListener : pcls) {
+            PropertyChangeListener pcl = replicationStatistitcs.get(propertyChangeListener);
             List<Object> pl = pcl.getParameters();
-            pw.println(sp8 + "addReplicationStats" + lp + qu + propChangeListener + qu + cm);
+            pw.println(sp8 + "addReplicationStatistics" + lp + qu + propertyChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
             if (!pl.isEmpty()) {
@@ -655,28 +655,28 @@ public class SimkitAssemblyXML2Java {
             pw.println(sp8 + rp + sc);
             pw.println();
             List<PropertyChangeListenerConnection> myConnections =
-                    propertyChangeListenerConnections.get(propChangeListener);
+                    propertyChangeListenerConnections.get(propertyChangeListener);
             if (myConnections != null) {
                 for (PropertyChangeListenerConnection pclc : myConnections) {
-                    pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + propChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
+                    pw.print(sp8 + "addReplicationStatisticsListenerConnection" + lp + qu + propertyChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
                     pw.println(qu + pclc.getSource() + qu + rp + sc);
                     pw.println();
                 }
             }
         }
-        pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
+        pw.println(sp8 + "super" + pd + "createReplicationStatistics" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
 
         pw.println(sp4 + "@Override");
-        pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
+        pw.println(sp4 + "public void createDesignPointStatistics" + lp + rp + sp + ob);
 
-        pcls = designPointStats.keySet().toArray(new String[0]);
+        pcls = designPointStatistics.keySet().toArray(new String[0]);
 
-        for (String propChangeListener : pcls) {
-            PropertyChangeListener pcl = designPointStats.get(propChangeListener);
+        for (String propertyChangeListener : pcls) {
+            PropertyChangeListener pcl = designPointStatistics.get(propertyChangeListener);
             List<Object> pl = pcl.getParameters();
-            pw.println(sp8 + "addDesignPointStats" + lp + qu + propChangeListener + qu + cm);
+            pw.println(sp8 + "addDesignPointStatistics" + lp + qu + propertyChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
             if (pl.size() > 0) {
@@ -690,7 +690,7 @@ public class SimkitAssemblyXML2Java {
             }
          }
 
-        pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
+        pw.println(sp8 + "super" + pd + "createDesignPointStatistics" + lp + rp + sc);
 
         pw.println(sp4 + cb);
         pw.println();

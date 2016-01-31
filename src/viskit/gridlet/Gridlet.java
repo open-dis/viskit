@@ -421,7 +421,7 @@ public class Gridlet extends Thread {
 
             // finished running, collect some statistics
 
-            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
+            simkit.stat.SampleStatistics[] designPointStatistics = sim.getDesignPointStatistics();
             simkit.stat.SampleStatistics replicationStat;
 
             // go through and copy in the statistics
@@ -429,10 +429,10 @@ public class Gridlet extends Thread {
             ObjectFactory of = new ObjectFactory();
             String statXml;
 
-            // first get designPoint stats
-            if (designPointStats != null ) {
+            // first get designPoint statistics
+            if (designPointStatistics != null ) {
                 try {
-                    for (simkit.stat.SampleStatistics designPointStat : designPointStats) {
+                    for (simkit.stat.SampleStatistics designPointStat : designPointStatistics) {
                         if (designPointStat instanceof simkit.stat.IndexedSampleStatistics) {
                             // tbd handle this for local case too
                             IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
@@ -453,14 +453,14 @@ public class Gridlet extends Thread {
                             // local gridRunner
                             Class<?> gridRunnerz = gridRunner.getClass();
                             Method mthd = gridRunnerz.getMethod("addDesignPointStat", int.class, int.class, int.class, String.class);
-                            mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStats.length, statXml);
+                            mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStatistics.length, statXml);
                         } else {
 
                             Vector<Object> args = new Vector<>();
                             args.add(usid);
                             args.add(sampleIndex);
                             args.add(designPtIndex);
-                            args.add(designPointStats.length);
+                            args.add(designPointStatistics.length);
                             args.add(statXml);
                             if (debug_io) {
                                 System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
@@ -468,7 +468,7 @@ public class Gridlet extends Thread {
                             }
                             xmlrpc.execute("gridkit.addDesignPointStat", args);
                         }
-                        // replication stats similarly
+                        // replication statistics similarly
                         String repName = designPointStat.getName();
                         repName = repName.substring(0, repName.length() - 6); // strip off ".count"
                         for (int j = 0; j < replicationsPerDesignPoint; j++) {
@@ -522,7 +522,7 @@ public class Gridlet extends Thread {
                 }
             }
             else {
-                System.out.println("No DesignPointStats");
+                System.out.println("No DesignPointStatistics");
 
 
                 // reconnect io
@@ -537,7 +537,7 @@ public class Gridlet extends Thread {
             }
 
             // skim through console chatter and organize
-            // into log, error, and if non stats property
+            // into log, error, and if non statistics property
             // change messages which are wrapped in xml,
             // then so sent as a Results tag. Results
             // should probably not be named Results as
