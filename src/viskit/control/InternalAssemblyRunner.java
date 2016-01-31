@@ -41,6 +41,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -76,11 +77,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     /** The name of the assembly to run */
     String assemblyClassName;
     SimulationRunPanel runPanel;
-    ActionListener closer, saver;
+    ActionListener closer, saveListener;
     JMenuBar myMenuBar;
     BufferedReader backChan;
     Thread simRunner;
-    SimThreadMonitor swingThreadMonitor;
+    SimulationRunThreadMonitor swingThreadMonitor;
     PipedOutputStream pos;
     PipedInputStream pis;
     BasicAssembly assembly;
@@ -101,7 +102,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     /** Captures the original RNG seed state */
     private long[] seeds;
-    private stopListener assemblyRunStopListener;
+    private StopListener assemblyRunStopListener;
+
+    private final String namePrefix = "Viskit Assembly Runner";
+    private String currentTitle = namePrefix;
 
     /**
      * The internal logic for the Assembly Runner panel
@@ -109,18 +113,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      */
     public InternalAssemblyRunner(boolean analystReportPanelVisible) {
 
-        saver = new saveListener();
+        saveListener = new SaveListener();
 
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons.  Currently, only start and stop work
         runPanel = new SimulationRunPanel("Assembly Runner", true, analystReportPanelVisible);
-        doMenus();
-        runPanel.vcrStop.addActionListener(assemblyRunStopListener = new stopListener());
-        runPanel.vcrPlay.addActionListener(new startResumeListener());
-        runPanel.vcrRewind.addActionListener(new rewindListener());
-        runPanel.vcrStep.addActionListener(new stepListener());
-        runPanel.vcrVerbose.addActionListener(new verboseListener());
+        buildMenus();
+        runPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
+        runPanel.vcrPlay.addActionListener(new StartResumeListener());
+        runPanel.vcrRewind.addActionListener(new RewindListener());
+        runPanel.vcrStep.addActionListener(new StepListener());
+        runPanel.vcrVerbose.addActionListener(new VerboseListener());
         runPanel.vcrStop.setEnabled(false);
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
@@ -184,7 +188,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         /* in order to resolve the assy as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
-         * it.  Used in the verboseListener within the working Viskit
+         * it.  Used in the VerboseListener within the working Viskit
          * ClassLoader
          */
         assembly = (BasicAssembly) assemblyInstance;
@@ -300,7 +304,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             // Start the simulation run(s)
             simRunner = new Thread(assemblyRunnable);
-            new SimThreadMonitor(simRunner).start();
+            new SimulationRunThreadMonitor(simRunner).start();
 
             // Restore Viskit's working ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
@@ -311,18 +315,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
 	/**
-	 * @return the runMenu
+	 * @return the simulationRunMenu
 	 */
-	public JMenu getRunMenu() {
-		return runMenu;
+	public JMenu getSimulationRunMenu() {
+		return simulationRunMenu;
 	}
 
     /** Class to perform end of simulation run cleanup items */
-    public class SimThreadMonitor extends Thread {
+    public class SimulationRunThreadMonitor extends Thread {
 
         Thread waitOn;
 
-        public SimThreadMonitor(Thread toWaitOn) {
+        public SimulationRunThreadMonitor(Thread toWaitOn) {
             waitOn = toWaitOn;
         }
 
@@ -378,7 +382,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
     PrintWriter pWriter;
 
-    class startResumeListener implements ActionListener {
+    class StartResumeListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -388,7 +392,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class stepListener implements ActionListener {
+    class StepListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -399,7 +403,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     /** Restores the Viskit default ClassLoader after an Assembly compile and
      * run.  Performs a Schedule.coldReset() to clear Simkit for the next run.
      */
-    public class stopListener implements ActionListener {
+    public class StopListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -439,7 +443,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class rewindListener implements ActionListener {
+    class RewindListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -448,7 +452,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     /** Allow for overriding XML set value via the Run panel setting */
-    class verboseListener implements ActionListener {
+    class VerboseListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -459,7 +463,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private JFileChooser saveChooser;
 
-    class saveListener implements ActionListener {
+    class SaveListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -498,7 +502,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private void signalAnalystReportReady() {
         if (analystReportTempFile == null) {
-            // No report to print
+            // No report to print, not yet ready
             return;
         }
 
@@ -585,37 +589,51 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 	
-    private JMenu  runMenu = new JMenu("Simulation Run");
+    private JMenu  simulationRunMenu;
+	
+    private void buildMenus() 
+	{
+        simulationRunMenu = new JMenu("Simulation Run");
+		simulationRunMenu.setMnemonic(KeyEvent.VK_S);
+        JMenuItem saveOutputMI = new JMenuItem("Save simulation output to text file");
+        JMenuItem viewOutputMI = new JMenuItem("View simulation output in text editor");
+		
+        JMenu         editMenu = new JMenu("Edit");
+        JMenuItem       copyMI = new JMenuItem("Copy");
+        JMenuItem  selectAllMI = new JMenuItem("Select all");
+        JMenuItem   clearAllMI = new JMenuItem("Clear all");
 
-    private void doMenus() {
-             myMenuBar = new JMenuBar();
-        JMenuItem save = new JMenuItem("Save simulation output streams");
-        JMenu editMenu = new JMenu("Edit");
-        JMenuItem copy = new JMenuItem("Copy");
-        JMenuItem  selectAll = new JMenuItem("Select all");
-        JMenuItem   clearAll = new JMenuItem("Clear all");
-        JMenuItem viewOutput = new JMenuItem("View output in text editor");
-
-              save.addActionListener(saver);
-              copy.addActionListener(new copyListener());
-         selectAll.addActionListener(new selectAllListener());
-          clearAll.addActionListener(new clearListener());
-        viewOutput.addActionListener(new viewListener());
-
-        runMenu.add(save);
-        runMenu.add(viewOutput);
+              saveOutputMI.addActionListener(saveListener);
+        viewOutputMI.addActionListener(new ViewOutputListener());
+              copyMI.addActionListener(new CopyListener());
+         selectAllMI.addActionListener(new SelectAllListener());
+          clearAllMI.addActionListener(new ClearListener());
+		
+   simulationRunMenu.setMnemonic(KeyEvent.VK_S);
+	    saveOutputMI.setMnemonic(KeyEvent.VK_S); // submenu
+		viewOutputMI.setMnemonic(KeyEvent.VK_V); // submenu
+		
+		    editMenu.setMnemonic(KeyEvent.VK_E);
+		      copyMI.setMnemonic(KeyEvent.VK_C); // submenu
+		 selectAllMI.setMnemonic(KeyEvent.VK_A); // submenu
+		  clearAllMI.setMnemonic(KeyEvent.VK_L); // submenu
 
 //        fileMenu.addSeparator();
 //        fileMenu.add(new JMenuItem("Settings"));
 
-         editMenu.add(copy);
-         editMenu.add(selectAll);
-         editMenu.add(clearAll);
-        myMenuBar.add(runMenu);
+        simulationRunMenu.add(saveOutputMI);
+        simulationRunMenu.add(viewOutputMI);
+
+         editMenu.add(copyMI);
+         editMenu.add(selectAllMI);
+         editMenu.add(clearAllMI);
+		 
+        myMenuBar = new JMenuBar();
+        myMenuBar.add(simulationRunMenu);
         myMenuBar.add(editMenu);
     }
 
-    class copyListener implements ActionListener {
+    class CopyListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -626,7 +644,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class selectAllListener implements ActionListener {
+    class SelectAllListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -635,7 +653,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class clearListener implements ActionListener {
+    class ClearListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -643,7 +661,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class viewListener implements ActionListener
+    class ViewOutputListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
@@ -683,9 +701,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
         }
     }
-
-    private String namePrefix = "Viskit Assembly Runner";
-    private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {
         if (nm != null && nm.length() > 0) {

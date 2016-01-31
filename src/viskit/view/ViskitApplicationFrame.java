@@ -106,6 +106,8 @@ public class ViskitApplicationFrame extends JFrame {
     private final int TAB1_CLUSTERUN_IDX = 2;
 	
 	private JMenuBar mainMenuBar;
+    private int menuShortcutKeyMask;
+	
 	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
     public ViskitApplicationFrame(String initialFile)
@@ -113,7 +115,8 @@ public class ViskitApplicationFrame extends JFrame {
         super("Viskit"); // title
 
         this.initialFile = initialFile;
-
+		
+		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
         initializeUserInterface();
 
         int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
@@ -183,7 +186,7 @@ public class ViskitApplicationFrame extends JFrame {
 //            eventGraphMenuBar = eventGraphViewFrame.getMenus();
 //            menus.add(eventGraphMenuBar);
 //            doCommonHelp(mainMenuBar);
-//            jamSettingsHandler(mainMenuBar);
+//            jamSettingsHandler(mainMenuBar); // TODO investigate, apparently necessary for exit
             eventGraphViewFrame.setTitleListener(myTitleListener, idx);
 //            setJMenuBar(mainMenuBar);
             tabIndices[TAB_EVENTGRAPH_EDITOR] = idx;
@@ -250,7 +253,7 @@ public class ViskitApplicationFrame extends JFrame {
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
 		
-		assemblyRunMenu = assemblyRunComponent.getRunMenu();
+		assemblyRunMenu = assemblyRunComponent.getSimulationRunMenu();
 		assemblyRunMenu.setEnabled(true); // activated when corresponding tabbed pane selected
         fileMenu.add(assemblyRunMenu);
 		
@@ -266,8 +269,6 @@ public class ViskitApplicationFrame extends JFrame {
 
         final EventGraphController eventGraphController = (EventGraphController)   eventGraphViewFrame.getController();
         final   AssemblyController   assemblyController =   (AssemblyController) assemblyEditViewFrame.getController();
-
-        int accelKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(); // copied from EventGraphViewFrame
 
 		// =============================================================================================
         // Analyst report
@@ -301,19 +302,21 @@ public class ViskitApplicationFrame extends JFrame {
         // File menu continued
 
         fileMenu.addSeparator();
-		JMenuItem settingsMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
-        fileMenu.add(settingsMenuItem);
-        settingsMenuItem.addActionListener(myUserPreferencesHandler);
-//        jamSettingsHandler(fileMenu); // TODO investigate
+		JMenuItem userPreferencesMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
+		userPreferencesMenuItem.setMnemonic(KeyEvent.VK_U);
+        fileMenu.add(userPreferencesMenuItem);
+        userPreferencesMenuItem.addActionListener(myUserPreferencesHandler);
+//        jamSettingsHandler(fileMenu);
 		
-		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", null, null); // do not change "quit", no hotkey for reliability
+		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcutKeyMask)); // do not change "quit"
         fileMenu.add(quitMenuItem); // TODO omit hotkey
-//        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // necessary
+        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
 
         // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
         RecentProjectFileSetListener listener = assemblyEditViewFrame.getRecentProjectFileSetListener();
         listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectMenu());
 
+		
         // Now setup the assembly and event graph file change listener(s)
           assemblyController.addAssemblyFileListener  (assemblyController.getAssemblyChangeListener());
         eventGraphController.addEventGraphFileListener(assemblyController.getOpenEventGraphListener());
@@ -531,26 +534,26 @@ public class ViskitApplicationFrame extends JFrame {
         }
     };
 
-//    private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {
-//        if (mi == null) {
-//            JMenu m = mb.getMenu(0); // first menu
-//            if (m == null) {
-//                m = new JMenu("File");
-//                mb.add(m);
-//            }
-//            m.addSeparator();
-//            mi = new JMenuItem("Exit");
-//            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-//            m.add(mi);
-//        }
-//
-//        ActionListener[] al = mi.getActionListeners();
-//        for (ActionListener al1 : al) {
-//            mi.removeActionListener(al1);
-//        }
-//
-//        mi.setAction(qa);
-//    }
+    private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {
+        if (mi == null) {
+            JMenu m = mb.getMenu(0); // first menu
+            if (m == null) {
+                m = new JMenu("File");
+                mb.add(m);
+            }
+            m.addSeparator();
+            mi = new JMenuItem("Exit");
+            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+            m.add(mi);
+        }
+
+        ActionListener[] al = mi.getActionListeners();
+        for (ActionListener al1 : al) {
+            mi.removeActionListener(al1);
+        }
+
+        mi.setAction(qa);
+    }
 
     class ExitAction extends AbstractAction {
 
@@ -702,8 +705,12 @@ public class ViskitApplicationFrame extends JFrame {
         if (!map.isEmpty()) {
             ActionUtilities.decorateAction(a, map);
         }
+		JMenuItem menuItem = ActionUtilities.createMenuItem(a);
+		// TODO get accelerator key to show :(
+		// menuItem.setAccelerator(KeyStroke.getKeyStroke(mn, accel));
+		
 
-        return ActionUtilities.createMenuItem(a);
+        return menuItem;
     }
 
     public JMenuItem getQuitMenuItem() {

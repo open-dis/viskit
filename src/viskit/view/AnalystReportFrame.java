@@ -861,34 +861,34 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
     private void buildMenus() {
 
-        AnalystReportController controller = (AnalystReportController) getController();
+        AnalystReportController analystReportController = (AnalystReportController) getController();
 
-        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 
         // Setup the File Menu
         myMenuBar = new JMenuBar();
         analystReportMenu.setMnemonic(KeyEvent.VK_N);
 
-        analystReportMenu.add(buildMenuItem(controller,
+        analystReportMenu.add(buildMenuItem(analystReportController,
                 "openAnalystReport",
                 "Open Previous Analyst Report",
                 KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
 
-        JMenuItem saveMI = buildMenuItem(controller,
+        JMenuItem saveMI = buildMenuItem(analystReportController,
                 "saveAnalystReport",
                 "Save Analyst Report",
                 KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod));
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask));
         saveMI.setToolTipText("Save Analyst Report as XML file");
         analystReportMenu.add(saveMI);
 
 		
-        JMenuItem generateMI = buildMenuItem(controller,
+        JMenuItem generateMI = buildMenuItem(analystReportController,
                 "generateHtmlReport",
                 "Display Analyst Report",
                 KeyEvent.VK_D,
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod));
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask));
         saveMI.setToolTipText("Save Analyst Report as HTML page");
         analystReportMenu.add(generateMI);
 
