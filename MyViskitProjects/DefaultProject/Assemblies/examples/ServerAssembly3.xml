@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerAssembly3" version="1.0" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ServerAssembly3" version="1.0" package="examples" description="Demonstration of a simple Arrival process getting handled by a Server" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <TerminalParameter name="interarrivalTime_2_1_1" link="interarrivalTime_2_1_1" value="1.7" type="double">
         <DoubleRange lowValue="1.0" highValue="2.0"/>
     </TerminalParameter>
