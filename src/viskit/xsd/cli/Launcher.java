@@ -20,7 +20,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 public class Launcher extends Thread implements Runnable {
 
-    static ClassLoader cloader;
+    static ClassLoader classLoader;
     static Logger log = LogUtils.getLogger(Launcher.class);
     String assembly = null;
     String assemblyName;
@@ -71,8 +71,8 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
 
-            cloader = ViskitGlobals.instance().getWorkClassLoader();
-            InputStream configIn = cloader.getResourceAsStream("config.properties");
+            classLoader = ViskitGlobals.instance().getWorkClassLoader();
+            InputStream configIn = classLoader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);
 
@@ -83,8 +83,8 @@ public class Launcher extends Thread implements Runnable {
                 String eventGraphDir = p.getProperty("EventGraphDir");
                 eventGraphDir = (eventGraphDir == null) ? "?" : eventGraphDir;
                 log.info("eventGraphDir is " + eventGraphDir);
-                if (cloader instanceof Boot) {
-                    Boot b = (Boot) cloader;
+                if (classLoader instanceof Boot) {
+                    Boot b = (Boot) classLoader;
                     u = b.baseJarURL;
                     URLConnection urlc = u.openConnection();
                     JarInputStream jis = new JarInputStream(urlc.getInputStream());
@@ -148,14 +148,14 @@ public class Launcher extends Thread implements Runnable {
                     launchGridkit(p.getProperty("Port"));
                 } else if (p.getProperty("Assembly") != null) {
                     log.debug("Running Assembly " + p.getProperty("Assembly"));
-                    u = cloader.getResource(p.getProperty("Assembly"));
+                    u = classLoader.getResource(p.getProperty("Assembly"));
                     log.debug("From URL: " + u);
                     setAssembly(u);
                     // EventGraphs can also be dropped onto the top-level dir
                     // as long as they are enumerated
                     StringTokenizer st = new StringTokenizer(p.getProperty("EventGraphs"));
                     while (st.hasMoreTokens()) {
-                        u = cloader.getResource(st.nextToken());
+                        u = classLoader.getResource(st.nextToken());
                         addEventGraph(u);
                     }
                 } else if (p.getProperty("Viskit") != null) {
@@ -188,31 +188,31 @@ public class Launcher extends Thread implements Runnable {
         log.debug("Assembly XML" + xml.toString());
 
         // get the class name as defined in the XML
-        log.debug("Trying ClassLoader " + cloader);
+        log.debug("Trying ClassLoader " + classLoader);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
 
-        if (cloader instanceof java.net.URLClassLoader) {
-            URL[] usz = ((java.net.URLClassLoader) cloader).getURLs();
+        if (classLoader instanceof java.net.URLClassLoader) {
+            URL[] usz = ((java.net.URLClassLoader) classLoader).getURLs();
             for (URL usz1 : usz) {
                 log.debug("URL " + usz1.toString());
             }
         }
 
         // create a jaxb context to obtain the name field from the assembly
-        Class<?> jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
+        Class<?> jclz = classLoader.loadClass("javax.xml.bind.JAXBContext");
         Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-        Object jco = m.invoke(null, new Object[]{SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS, cloader});
+        Object jco = m.invoke(null, new Object[]{SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS, classLoader});
         m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
         Object umo = m.invoke(jco, new Object[]{});
 
         // unmarshal the xml to java bindings
-        jclz = cloader.loadClass("javax.xml.bind.Unmarshaller");
+        jclz = classLoader.loadClass("javax.xml.bind.Unmarshaller");
         m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
         Object assemblyJaxb = m.invoke(umo, new Object[]{bais});
 
         // get the root node of the assembly and obtain name of assembly
-        jclz = cloader.loadClass("viskit.xsd.bindings.assembly.SimkitAssembly");
+        jclz = classLoader.loadClass("viskit.xsd.bindings.assembly.SimkitAssembly");
         m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
         assemblyName = (String) m.invoke(assemblyJaxb, new Object[]{});
         m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
@@ -239,17 +239,17 @@ public class Launcher extends Thread implements Runnable {
         try {
             // get the class name as defined in the XML
             ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
-            Class<?> jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
+            Class<?> jclz = classLoader.loadClass("javax.xml.bind.JAXBContext");
             Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-            Object jco = m.invoke(null, new Object[]{SimkitXML2Java.EVENT_GRAPH_BINDINGS, cloader});
+            Object jco = m.invoke(null, new Object[]{SimkitXML2Java.EVENT_GRAPH_BINDINGS, classLoader});
             m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
             Object umo = m.invoke(jco, new Object[]{});
 
-            jclz = cloader.loadClass("javax.xml.bind.Unmarshaller");
+            jclz = classLoader.loadClass("javax.xml.bind.Unmarshaller");
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
             Object eventgraph = m.invoke(umo, new Object[]{bais});
 
-            jclz = cloader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
+            jclz = classLoader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
             String eventGraphName = (String) m.invoke(eventgraph, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
@@ -302,7 +302,7 @@ public class Launcher extends Thread implements Runnable {
             compile();
             if (assemblyName != null) {
                 // run it
-                Class<?> asmz = cloader.loadClass(assemblyName);
+                Class<?> asmz = classLoader.loadClass(assemblyName);
                 Constructor<?> c = asmz.getConstructor(new Class<?>[]{});
                 Object out = c.newInstance(new Object[]{});
                 Thread t = new Thread((Runnable) out);
@@ -328,10 +328,10 @@ public class Launcher extends Thread implements Runnable {
         String assemblyJava;
         File tempDir;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
-        axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
-        assyContlr = cloader.loadClass("viskit.control.AssemblyController");
-        tempDirz = cloader.loadClass("viskit.VGlobals");
+        xml2jz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+        axml2jz = classLoader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
+        assyContlr = classLoader.loadClass("viskit.control.AssemblyController");
+        tempDirz = classLoader.loadClass("viskit.VGlobals");
 
         try {
 
@@ -421,7 +421,7 @@ public class Launcher extends Thread implements Runnable {
             URL url = new URL("file:" + File.separator + File.separator + jarFromDir.getCanonicalPath() + File.separator);
             // if these path-jammers don't work, then will need to define classes directly in the classloader
             // via bytes. url here is the file:\/\/+ canonical path from above to tempDir
-            ((Boot) cloader).addURL(url);
+            ((Boot) classLoader).addURL(url);
             // jam the classpath with the new directory
             System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator + jarFromDir.getCanonicalPath());
             log.debug(System.getProperty("java.class.path"));
@@ -444,10 +444,10 @@ public class Launcher extends Thread implements Runnable {
         ByteArrayInputStream bais;
         String assemblyJava;
 
-        xml2jz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
-        axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
-        bshz = cloader.loadClass("bsh.Interpreter");
-        bshcmz = cloader.loadClass("bsh.BshClassManager");
+        xml2jz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+        axml2jz = classLoader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
+        bshz = classLoader.loadClass("bsh.Interpreter");
+        bshcmz = classLoader.loadClass("bsh.BshClassManager");
 
         c = bshz.getConstructor(new Class<?>[]{});
         bsh = c.newInstance(new Object[]{});
@@ -552,7 +552,7 @@ public class Launcher extends Thread implements Runnable {
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     //xml2j = new SimkitXML2Java(bais);
     xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
@@ -571,7 +571,7 @@ public class Launcher extends Thread implements Runnable {
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
-    Class clz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
+    Class clz = classLoader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();
@@ -606,7 +606,7 @@ public class Launcher extends Thread implements Runnable {
 
     void launchGUI() {
         try {
-            Class<?> viskitz = cloader.loadClass("viskit.Splash2");
+            Class<?> viskitz = classLoader.loadClass("viskit.SplashScreenFrame2");
             Method m = viskitz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"viskit.EventGraphAssemblyComboMain"}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -634,7 +634,7 @@ public class Launcher extends Thread implements Runnable {
     // Gridlets also do their own to get PORT and other env
     void launchGridlet() {
         try {
-            Class<?> gridletz = cloader.loadClass("viskit.gridlet.Gridlet");
+            Class<?> gridletz = classLoader.loadClass("viskit.gridlet.Gridlet");
             Method m = gridletz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -645,7 +645,7 @@ public class Launcher extends Thread implements Runnable {
 
     void launchAssemblyServer(int port) {
         try {
-            Class<?> serverz = cloader.loadClass("viskit.gridlet.AssemblyServer");
+            Class<?> serverz = classLoader.loadClass("viskit.gridlet.AssemblyServer");
             Method m = serverz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"-p", "" + port}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
