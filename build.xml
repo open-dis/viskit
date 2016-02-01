@@ -421,7 +421,7 @@ their descpritions.
                            value="${Savage.url}"/>
 
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2" />
+                <attribute name="Main-Class" value="viskit.SplashScreenFrame2" />
                 <attribute name="Class-Path" value="${launcher.classpath}" />
 
                 <section name="edu.nps.util"/>
@@ -616,7 +616,7 @@ their descpritions.
             description="Run Viskit, don't check dependencies, don't rebuild"/>
 
     <target name="quick.run.not.mac" unless="isMac">
-        <java classname="viskit.Splash2"
+        <java classname="viskit.SplashScreenFrame2"
               classpathref="runtime.classpath"
               fork="true">
 
@@ -626,7 +626,7 @@ their descpritions.
     </target>
 
     <target name="quick.run.mac" if="isMac">
-        <java classname="viskit.Splash2"
+        <java classname="viskit.SplashScreenFrame2"
               classpathref="runtime.classpath"
               fork="true">
 
