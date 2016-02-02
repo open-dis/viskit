@@ -1,7 +1,6 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
-import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
 import viskit.util.TitleListener;
 
@@ -20,8 +19,6 @@ import viskit.util.TitleListener;
  */
 public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener {
 
-    protected TitleListener titleListener;
-    protected int titleKey;
     private mvcModel model;
     private mvcController controller;
 
@@ -31,33 +28,6 @@ public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, m
 
     public void registerWithModel() {
         ((mvcAbstractModel) model).addModelListener(this);
-    }
-
-    /** Sets the frame title listener and key for this frame
-     *
-     * @param listener the title listener to set
-     * @param key the key for this frame's title
-     */
-    public void setTitleListener(TitleListener listener, int key) {
-        titleListener = listener;
-        titleKey = key;
-
-        showProjectName();
-    }
-
-    /**
-     * Shows the project name in the frame title bar
-     */
-    public void showProjectName() {
-
-        String title = " Viskit: " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
-				// ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
-        if (!title.contains("Project"))
-		     title += " Project";
-	    setTitle(title);
-        if (this.titleListener != null) {
-            titleListener.setTitle(title, titleKey);
-        }
     }
 
     @Override

@@ -71,7 +71,7 @@ import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
-import viskit.model.Model;
+import viskit.model.EventGraphModel;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.view.AnalystReportFrame;
@@ -219,8 +219,8 @@ public class ViskitGlobals {
         return eventGraphController;
     }
 
-    public Model getActiveEventGraphModel() {
-        return (Model) eventGraphController.getModel();
+    public EventGraphModel getActiveEventGraphModel() {
+        return (EventGraphModel) eventGraphController.getModel();
     }
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {

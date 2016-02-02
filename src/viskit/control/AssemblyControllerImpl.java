@@ -56,7 +56,7 @@ import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
-import viskit.view.dialog.AssemblyMetaDataDialog;
+import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.SimulationRunPanel;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.AssemblyView;
@@ -223,6 +223,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
         mod.init();
         vaw.addTab(mod);
+        ViskitGlobals.instance().getAssemblyEditor().getSelectedPane().setToolTipText(mod.getMetadata().description);
 
         // these may init to null on startup, check
         // before doing any openAlready lookups
@@ -244,7 +245,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (mod.newModel(file) && !isOpenAlready) {
 
-            vaw.setSelectedAssemblyName(mod.getMetaData().name);
+            vaw.setSelectedAssemblyName(mod.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblySet(file);
@@ -259,6 +260,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         resetRedoUndoStatus();
+        ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // refresh
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
@@ -461,7 +463,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void saveAs() {
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView view = (AssemblyView) getView();
-        GraphMetadata gmd = model.getMetaData();
+        GraphMetadata gmd = model.getMetadata();
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
@@ -474,7 +476,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 n = n.substring(0, n.length() - 4);
             }
             gmd.name = n;
-            model.changeMetaData(gmd); // might have renamed
+            model.changeMetadata(gmd); // might have renamed
 
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
@@ -484,14 +486,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void editGraphMetaData() {
+    public void editGraphMetadata() {
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod == null) {return;}
-        GraphMetadata gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetadata();
         boolean modified =
-                AssemblyMetaDataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
-            ((AssemblyModel) getModel()).changeMetaData(gmd);
+            ((AssemblyModel) getModel()).changeMetadata(gmd);
 
             // update title bar
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
@@ -701,7 +703,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
         if (viskitAssemblyModel != null) {
-            oldGmd = viskitAssemblyModel.getMetaData();
+            oldGmd = viskitAssemblyModel.getMetadata();
         }
 
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
@@ -718,9 +720,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         boolean modified =
-                AssemblyMetaDataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
-            ((AssemblyModel) getModel()).changeMetaData(gmd);
+            ((AssemblyModel) getModel()).changeMetadata(gmd);
 
             // update title bar
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
@@ -1397,7 +1399,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
-            String className = vmod.getMetaData().packageName + "." + vmod.getMetaData().name;
+            String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
             ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
         }
     }
@@ -1831,8 +1833,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         v.add(classPath);                                               // 5
         v.add(className);                                               // 6
 
-        v.add("" + ((AssemblyModel) getModel()).getMetaData().verbose); // 7
-        v.add(((AssemblyModel) getModel()).getMetaData().stopTime);     // 8
+        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 7
+        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 8
 
         Vector<String> detailedOutputEntityNames = ((AssemblyModel) getModel()).getDetailedOutputEntityNames();
         for (String entityName : detailedOutputEntityNames) {

@@ -41,7 +41,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 1:09:38 PM
  * @version $Id$
  */
-public class ModelImpl extends mvcAbstractModel implements Model {
+public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
 
     JAXBContext jc;
     ObjectFactory oFactory;
@@ -96,7 +96,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public void changeMetaData(GraphMetadata gmd) {
+    public void changeMetadata(GraphMetadata gmd) {
         metaData = gmd;
         setDirty(true);
         notifyChanged(new ModelEvent(gmd, ModelEvent.METADATA_CHANGED, "Metadata changed"));
@@ -131,7 +131,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     sb.append(" ");
                 }
                 myMetadata.description = sb.toString().trim();
-                changeMetaData(myMetadata);
+                changeMetadata(myMetadata);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
                 buildParametersFromJaxb(jaxbRoot.getParameter());

@@ -99,7 +99,7 @@ public class AnalystReportController extends mvcAbstractController {
             frame = (AnalystReportFrame) getView();
         }
 
-        frame.showProjectName();
+//        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
         buildAnalystReport(targetFile);
     }
 

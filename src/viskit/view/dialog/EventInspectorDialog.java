@@ -172,11 +172,11 @@ public class EventInspectorDialog extends JDialog {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+            okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
         buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
         twoRowButtonPanel.add(buttonPanel);
 
         panel.add(twoRowButtonPanel);

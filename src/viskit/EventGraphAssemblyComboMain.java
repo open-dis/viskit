@@ -91,17 +91,12 @@ public class EventGraphAssemblyComboMain {
 		{
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
-            if (e instanceof InvocationTargetException) {
-
 			// A corrupted viskitProject can cause an InvocationTargetException. 
 			// The Apache Commons config files have behaved rather well and don't
 			// need to be nuked as of late: 03 DEC 2014.
-//                nukeDotViskit(); moved to user preferences
+            // nukeDotViskit(); moved to user preferences
 
-                // If we encounter this case, then uncomment printStackTrace() to drill down on the cause.
-                // Sometimes easier than setting a breakpoint and debugging!
-                e.printStackTrace();
-            }
+            e.printStackTrace();
 
             URL url = null;
 			String mailtoString = new String();

@@ -62,7 +62,7 @@ import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
-import viskit.model.Model;
+import viskit.model.EventGraphModel;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.view.dialog.UserPreferencesDialog;
@@ -88,6 +88,8 @@ public class ViskitApplicationFrame extends JFrame {
     public Action myExitAction;
     private DoeMain designOfExperimentsMain;
     private JMenuItem quitMenuItem;
+    protected TitleListener titleListener;
+    protected int titleKey;
 
     /** The initial assembly to load. */
     private final String initialFile;
@@ -114,7 +116,7 @@ public class ViskitApplicationFrame extends JFrame {
 
     public ViskitApplicationFrame(String initialFile)
 	{
-        super("Viskit"); // title
+        super("Viskit: Visual Simulation for Simkit"); // title
 
         this.initialFile = initialFile;
 		
@@ -139,6 +141,8 @@ public class ViskitApplicationFrame extends JFrame {
         });
         ImageIcon icon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         this.setIconImage(icon.getImage());
+		
+		showProjectName();
     }
 
     /** @return the quit action class for Viskit */
@@ -148,7 +152,7 @@ public class ViskitApplicationFrame extends JFrame {
 
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
-    private void initializeUserInterface()
+    public void initializeUserInterface()
 	{
         ViskitGlobals.instance().setAssemblyQuitHandler(null);
         ViskitGlobals.instance().setEventGraphQuitHandler(null);
@@ -189,7 +193,7 @@ public class ViskitApplicationFrame extends JFrame {
 //            menus.add(eventGraphMenuBar);
 //            doCommonHelp(mainMenuBar);
 //            jamSettingsHandler(mainMenuBar); // TODO investigate, apparently necessary for exit
-            eventGraphViewFrame.setTitleListener(myTitleListener, idx);
+//            eventGraphViewFrame.setTitleListener(myTitleListener, idx);
 //            setJMenuBar(mainMenuBar);
             tabIndices[TAB_EVENTGRAPH_EDITOR] = idx;
         } else {
@@ -218,7 +222,7 @@ public class ViskitApplicationFrame extends JFrame {
 //            if (getJMenuBar() == null) {
 //                setJMenuBar(mainMenuBar);
 //            }
-            assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
+//            assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myExitAction, mainMenuBar);
             tabIndices[TAB_ASSEMBLY_EDITOR] = idx;
         } else {
@@ -252,8 +256,8 @@ public class ViskitApplicationFrame extends JFrame {
         assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
 		
         runTabbedPane.add(assemblyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
-        runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
-        runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
+        runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Assembly Initialization Needed");
+        runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run simulation replications for current Assembly on local system");
 		
 		assemblyRunMenu = assemblyRunComponent.getSimulationRunMenu();
 		assemblyRunMenu.setEnabled(true); // activated when corresponding tabbed pane selected
@@ -292,7 +296,7 @@ public class ViskitApplicationFrame extends JFrame {
 //            if (getJMenuBar() == null) {
 //                setJMenuBar(mainMenuBar);
 //            }
-            ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
+//            ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(null, myExitAction, mainMenuBar);
             tabIndices[TAB_ANALYST_REPORT] = idx;
             AnalystReportController analystReportController = (AnalystReportController) analystReportFrame.getController();
@@ -372,7 +376,9 @@ public class ViskitApplicationFrame extends JFrame {
         }
 		// =============================================================================================
 //		doCommonHelp(mainMenuBar);
-        mainMenuBar.add(eventGraphViewFrame.getHelpMenu()); // TODO move here
+        mainMenuBar.add(eventGraphViewFrame.getHelpMenu()); // TODO move that method here
+		
+		// do not showProjectName(); yet because hashmap isn't ready and project is not loaded 
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
@@ -419,11 +425,11 @@ public class ViskitApplicationFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            Model[] eventGraphModels = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
-            Model dirtyEventGraphModel = null;
+            EventGraphModel[] eventGraphModels = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
+            EventGraphModel dirtyEventGraphModel = null;
 
             // Make sure we save modified EGs if we wander off to the Assembly tab
-            for (Model eventGraphModel : eventGraphModels) {
+            for (EventGraphModel eventGraphModel : eventGraphModels) {
 
                 if (eventGraphModel.isDirty()) {
                     dirtyEventGraphModel = eventGraphModel;
@@ -755,7 +761,7 @@ public class ViskitApplicationFrame extends JFrame {
 		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
 		buildMenus();
 		
-		String  assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetaData().name;
+		String  assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
 		int selectedRunIndex = getRunTabbedPane().getSelectedIndex();
 		ViskitGlobals.instance().getSimulationRunPanel().setTitle(assemblyName);
 		getRunTabbedPane().setTitleAt(selectedRunIndex, assemblyName);
@@ -800,6 +806,40 @@ public class ViskitApplicationFrame extends JFrame {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
 
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+        }
+    }
+
+    /** Sets the frame title listener and key for this frame
+     *
+     * @param listener the title listener to set
+     * @param key the key for this frame's title
+     */
+    public void setTitleListener(TitleListener listener, int key) {
+        titleListener = listener;
+        titleKey      = key;
+
+        showProjectName();
+    }
+
+    /**
+     * Shows the project name in the frame title bar
+     */
+    public void showProjectName()
+	{
+        String title = " " + ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME + ": ";
+		if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
+			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().isEmpty())
+			 title += ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME;
+		else 
+		{
+			title += ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
+			// ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+			if (!title.contains("Project"))
+				 title += " Project";
+		}
+	    setTitle(title);
+        if (this.titleListener != null) {
+            titleListener.setTitle(title, titleKey);
         }
     }
 }

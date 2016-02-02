@@ -311,22 +311,22 @@ public class SimulationRunPanel extends JPanel {
 	public final void initializeSimulationOutput ()
 	{
 		String initializationMessage;
-		if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels())
-		{
-			initializationMessage = "Simulation output stream:" + lineEnd +
-                                    "-------------------------" + lineEnd;
-			simulationOutputTA.setEditable(true);
-		}
-		else if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
+		if      (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
 		{
 			initializationMessage = "Please initialize the selected Assembly before using the Simulation Run panel." + lineEnd +
                                     "------------------------------------------------------------------------------" + lineEnd;
 			simulationOutputTA.setEditable(true);
 		}
+		else if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels())
+		{
+			initializationMessage = "Simulation output stream:" + lineEnd +
+                                    "-------------------------" + lineEnd;
+			simulationOutputTA.setEditable(true);
+		}
 		else 
 		{
-			initializationMessage = "Please open/create and initialize an Assembly before using the Simulation Run panel." + lineEnd +
-                                    "------------------------------------------------------------------------------------" + lineEnd;
+			initializationMessage = "Please open/create then initialize an Assembly before using the Simulation Run panel." + lineEnd +
+                                    "-------------------------------------------------------------------------------------" + lineEnd;
 			simulationOutputTA.setEditable(false);
 		}
 		simulationOutputTA.setText(initializationMessage);

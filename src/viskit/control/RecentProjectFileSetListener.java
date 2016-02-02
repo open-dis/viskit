@@ -125,8 +125,6 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
             } else {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
-
-                ((AssemblyEditViewFrame) ((AssemblyControllerImpl) acontroller).getView()).showProjectName();
             }
         }
     }

@@ -266,9 +266,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetadata gmd = mod.getMetaData();
+            GraphMetadata gmd = mod.getMetadata();
             if (gmd != null) {
-                setSelectedAssemblyName(gmd.name);
+                setSelectedAssemblyName   (gmd.name);
+				setSelectedAssemblyTooltip(gmd.description);
             } else if (viskit.ViskitStatics.debug) {
                 System.err.println("error: AssemblyViewFrame gmd null..");
             }
@@ -399,7 +400,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.add(saveAssemblyDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingAssembly));
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepareSimulationRunner", "Initialize Assembly", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), showingAssembly));
 
@@ -657,12 +658,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void addTab(AssemblyModel mod) {
+    public void addTab(AssemblyModel assemblyModel) {
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.setjGraph(graphPane);                               // todo fix this
 
-        graphPane.assemblyModel = mod;
+        graphPane.assemblyModel = assemblyModel;
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
@@ -684,6 +685,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         } catch (TooManyListenersException tmle) {
             LogUtils.getLogger(AssemblyEditViewFrame.class).error(tmle);
         }
+        graphPane.setToolTipText(assemblyModel.getMetadata().description);
 
         // the view holds only one assemblyModel, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed assemblyModel
@@ -700,6 +702,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         };
         SwingUtilities.invokeLater(r);
     }
+	
+	public JSplitPane getSelectedPane ()
+	{
+		return ((JSplitPane) tabbedPane.getSelectedComponent());
+	}
 
     @Override
     public void deleteTab(AssemblyModel mod) {
@@ -1038,6 +1045,13 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyName);
         }
     }
+//    @Override // TODO
+    public void setSelectedAssemblyTooltip(String selectedAssemblyDescription) {
+        boolean nullString = !(selectedAssemblyDescription != null && !selectedAssemblyDescription.isEmpty());
+        if (!nullString) {
+            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyDescription);
+        }
+    }
 
     @Override
     public void openProject() {
@@ -1051,8 +1065,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         if (file != null) {
             assemblyController.openProject(file);
         }
-        showProjectName();
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
+        showProjectName();
     }
 
     @Override
@@ -1067,14 +1081,13 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
 			assemblyController.handleProjectClosing();
 		}
-		ViskitGlobals.instance().getViskitApplicationFrame().setTitle("Viskit");
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
+        showProjectName();
     }
 
-    @Override
-    public void showProjectName() {
-        super.showProjectName();
-        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
+    public void showProjectName()
+	{
+        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
     }
 
     private File getUniqueName(String suggName) {

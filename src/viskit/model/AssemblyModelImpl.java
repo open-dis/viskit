@@ -41,7 +41,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private SimkitAssembly jaxbRoot;
     private File currentFile;
     private boolean modelDirty = false;
-    private GraphMetadata metaData;
+    private GraphMetadata metadata;
 
     /** We require specific order on this Map's contents */
     private final Map<String, AssemblyNode> nodeCache;
@@ -52,7 +52,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
         assemblyController = (AssemblyControllerImpl) cont;
-        metaData = new GraphMetadata(this);
+        metadata = new GraphMetadata(this);
         nodeCache = new LinkedHashMap<>();
     }
 
@@ -86,13 +86,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public GraphMetadata getMetaData() {
-        return metaData;
+    public GraphMetadata getMetadata() {
+        return metadata;
     }
 
     @Override
-    public void changeMetaData(GraphMetadata gmd) {
-        metaData = gmd;
+    public void changeMetadata(GraphMetadata gmd) {
+        metadata = gmd;
         setDirty(true);
     }
 
@@ -121,22 +121,22 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetadata mymetaData = new GraphMetadata(this);
-                mymetaData.version = jaxbRoot.getVersion();
-                mymetaData.name = jaxbRoot.getName();
-                mymetaData.packageName = jaxbRoot.getPackage();
-                mymetaData.description = jaxbRoot.getDescription();
+                GraphMetadata myMetadata = new GraphMetadata(this);
+                myMetadata.version = jaxbRoot.getVersion();
+                myMetadata.name = jaxbRoot.getName();
+                myMetadata.packageName = jaxbRoot.getPackage();
+                myMetadata.description = jaxbRoot.getDescription();
 
                 Schedule sch = jaxbRoot.getSchedule();
                 if (sch != null) {
                     String stpTime = sch.getStopTime();
                     if (stpTime != null && stpTime.trim().length() > 0) {
-                        mymetaData.stopTime = stpTime.trim();
+                        myMetadata.stopTime = stpTime.trim();
                     }
-                    mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+                    myMetadata.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
 
-                changeMetaData(mymetaData);
+                changeMetadata(myMetadata);
                 buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
@@ -188,21 +188,21 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nullIfEmpty(metaData.name));
-            jaxbRoot.setVersion(nullIfEmpty(metaData.version));
-            jaxbRoot.setPackage(nullIfEmpty(metaData.packageName));
-            jaxbRoot.setDescription(nullIfEmpty(metaData.description));
+            jaxbRoot.setName(nullIfEmpty(metadata.name));
+            jaxbRoot.setVersion(nullIfEmpty(metadata.version));
+            jaxbRoot.setPackage(nullIfEmpty(metadata.packageName));
+            jaxbRoot.setDescription(nullIfEmpty(metadata.description));
 
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(oFactory.createSchedule());
             }
-            if (!metaData.stopTime.equals("")) {
-                jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+            if (!metadata.stopTime.equals("")) {
+                jaxbRoot.getSchedule().setStopTime(metadata.stopTime);
             } else {
                 jaxbRoot.getSchedule().setStopTime("100.0");
             }
 
-            jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
+            jaxbRoot.getSchedule().setVerbose("" + metadata.verbose);
 
             m.marshal(jaxbRoot, fw);
 

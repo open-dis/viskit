@@ -95,7 +95,7 @@ public class ViskitProject {
 
     static Logger log = LogUtils.getLogger(ViskitProject.class);
 
-	private String projectName;
+	private String projectName = ""; // empty string if no project open
     private File projectRoot;
     private File projectFile;
     private File analystReportsDirectory;
@@ -109,7 +109,7 @@ public class ViskitProject {
     private File buildDirectory;
     private File classesDirectory;
     private File srcDirectory;
-    private File distDir;
+    private File distDirectory;
     private File libDirectory;
     private boolean projectFileExists = false;
     private boolean dirty;
@@ -211,7 +211,9 @@ public class ViskitProject {
             }
             projectDocument = createProjectDocument();
             writeProjectFile();
-        } else {
+        } 
+		else
+		{
             loadProjectFromFile(getProjectFile());
         }
         ViskitConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getAbsolutePath());
@@ -379,12 +381,14 @@ public class ViskitProject {
         deleteDirectoryContents(projectRoot);
     }
 
-    public void closeProject() {
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        vConfig.getViskitGuiXMLConfiguration().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
-        vConfig.cleanup();
-        vConfig.removeProjectXMLConfiguration(vConfig.getProjectXMLConfiguration());
+    public void closeProject()
+	{
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        viskitConfiguration.getViskitGuiXMLConfiguration().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
+        viskitConfiguration.cleanup();
+        viskitConfiguration.removeProjectXMLConfiguration(viskitConfiguration.getProjectXMLConfiguration());
         setProjectOpen(false);
+		projectName = "";
     }
 
     /** @return the root directory of this ViskitProject */

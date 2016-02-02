@@ -26,6 +26,8 @@ import viskit.doe.FileHandler;
  */
 public class ViskitConfiguration {
 
+    public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
+    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
     public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File V_CONFIG_FILE     = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
     public static final File C_APP_FILE        = new File(VISKIT_CONFIG_DIR, "c_app.xml");
@@ -85,7 +87,7 @@ public class ViskitConfiguration {
     private XMLConfiguration              projectXMLConfiguration = null;
 
     static {
-        LOG.info("Welcome to the Visual Discrete Event Simulation (DES) toolkit (Viskit)");
+        LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
         LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " " + VISKIT_CONFIG_DIR.exists() + "\n");
     }
 
@@ -184,7 +186,9 @@ public class ViskitConfiguration {
         if (retS != null && retS.length() > 0) {
             return retS;
         }
-        return combinedConfiguration.getString(key);
+		if (combinedConfiguration == null)
+			 return ""; // safety net
+		else return combinedConfiguration.getString(key);
     }
 
     public String[] getConfigurationValues(String key) {

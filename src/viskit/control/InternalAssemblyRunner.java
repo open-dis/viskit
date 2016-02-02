@@ -118,7 +118,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         saveListener = new SaveListener();
 		String assemblyName = "";
 		if (ViskitGlobals.instance().getActiveAssemblyModel() != null)
-			   assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetaData().name;
+			   assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
 
         // TODO NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.

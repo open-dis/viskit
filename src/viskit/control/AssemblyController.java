@@ -45,7 +45,7 @@ public interface AssemblyController {
     /**
      * Edit the properties (metadata) of the Assembly
      */
-    void editGraphMetaData();
+    void editGraphMetadata();
 
     /**
      * Create a new blank assembly graph model

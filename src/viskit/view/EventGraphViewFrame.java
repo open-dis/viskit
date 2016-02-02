@@ -269,16 +269,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             // wish to have work saved when merely switching between tabs on
             // the EG pallete.  However, when switching to the Assy pallete, we
             // will save all EGs that have been modified
-//            if (((Model)getModel()).isDirty()) {
+//            if (((EventGraphModel)getModel()).isDirty()) {
 //                ((EventGraphController)getController()).save();
 //            }
 
             setModel((ModelImpl) myVgcw.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
-            adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
+            adjustMenus((EventGraphModel) getModel()); // enable/disable menu items based on new EG
 
-            GraphMetadata gmd = ((Model) getModel()).getMetadata();
+            GraphMetadata gmd = ((EventGraphModel) getModel()).getMetadata();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
@@ -337,7 +337,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 		
-		String usageHint = "Use menu item \"Event Graph Editor > Edit Properties...\" 0(Ctrl-E) to modify this field";
+		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Properties...\" (Ctrl-E)";
 		
 //        JLabel implementsLabel = new JLabel("Implements");
 //        implementsLabel.setToolTipText("Event graph superclass (if any)");
@@ -494,11 +494,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     int untitledCount = 0;
 
     @Override
-    public void addTab(Model mod) {
+    public void addTab(EventGraphModel model) { // TODO set type EventGraphModel
         vGraphModel vmod = new vGraphModel();
         VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
         vmod.setjGraph(graphPane);
-        graphPane.model = mod;
+        graphPane.model = model;
 
         buildStateParamSplit(graphPane);
 
@@ -519,6 +519,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         } catch (TooManyListenersException tmle) {
             LogUtils.getLogger(EventGraphViewFrame.class).error(tmle);
         }
+        graphPane.setToolTipText(model.getMetadata().description);
 
         // the view holds only one model, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed model
@@ -538,9 +539,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         };
         SwingUtilities.invokeLater(r);
     }
+	
+	public JSplitPane getSelectedPane ()
+	{
+		return ((JSplitPane) tabbedPane.getSelectedComponent());
+	}
 
     @Override
-    public void deleteTab(Model mod) {
+    public void deleteTab(EventGraphModel mod) {
         for (Component c : tabbedPane.getComponents()) {
             JSplitPane jsplt = (JSplitPane) c;
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
@@ -569,9 +575,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public Model[] getOpenModels() {
+    public EventGraphModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
-        Model[] vm = new Model[ca.length];
+        EventGraphModel[] vm = new EventGraphModel[ca.length];
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
@@ -610,7 +616,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Do menu layout work here
      * @param mod the current model of our EG view
      */
-    private void adjustMenus(Model mod) {
+    private void adjustMenus(EventGraphModel mod) {
         //todo
     }
 
@@ -1016,7 +1022,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             // current model
             tabbedPane.setSelectedComponent(c);
 
-            if (((Model) getModel()).isDirty()) {
+            if (((EventGraphModel) getModel()).isDirty()) {
 
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 

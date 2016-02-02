@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.jgraph;
 
 import javax.swing.JSplitPane;
-import viskit.model.Model;
+import viskit.model.EventGraphModel;
 import viskit.view.CodeBlockPanel;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.ParametersPanel;
@@ -54,7 +54,7 @@ import viskit.view.StateVariablesPanel;
  */
 public class VgraphComponentWrapper extends vGraphComponent {
 
-    public Model model;
+    public EventGraphModel model;
     public JSplitPane drawingSplitPane;
     public JSplitPane stateParamSplitPane;
     public ParametersPanel paramPan;

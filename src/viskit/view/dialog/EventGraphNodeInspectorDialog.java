@@ -100,12 +100,12 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+            okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
         okButton.setEnabled(false);
         buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
 
         placeWidgets();
 

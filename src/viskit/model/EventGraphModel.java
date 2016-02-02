@@ -14,7 +14,7 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id$
  */
-public interface Model {
+public interface EventGraphModel {
 
     /**
      * Separate initialization from object construction.
@@ -22,8 +22,8 @@ public interface Model {
     void init();
 
     /**
-     * Messaged by controller when a new Model should be created, or an existing
-     * model is loading at startup.
+     * Messaged by controller when a new EventGraphModel should be created, or an existing
+ model is loading at startup.
      * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
      * @return for good open
      */
@@ -127,7 +127,7 @@ public interface Model {
      *
      * @param gmd the meta data that contains changes to record
      */
-    void changeMetaData(GraphMetadata gmd);
+    void changeMetadata(GraphMetadata gmd);
 
     /**
      * Notify of a change to an Event Node

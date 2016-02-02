@@ -194,10 +194,12 @@ public class UserPreferencesDialog extends JDialog {
 		
         designOfExperimentsPreferenceCB = new JCheckBox("Design Of Experiments (DOE)");
 		designOfExperimentsPreferenceCB.setEnabled(false); // TODO implement
+		designOfExperimentsPreferenceCB.setToolTipText("Future restoration planned"); // TODO implement
         innerCheckBoxPanel.add(designOfExperimentsPreferenceCB);
 		
-        clusterRunPreferenceCB = new JCheckBox("Cluster Run");
+        clusterRunPreferenceCB = new JCheckBox("Cluster Computation");
 		clusterRunPreferenceCB.setEnabled(false); // TODO implement
+		clusterRunPreferenceCB.setToolTipText("Future restoration planned"); // TODO implement
         innerCheckBoxPanel.add(clusterRunPreferenceCB);
 		
         verboseDebugMessagesPreferenceCB = new JCheckBox("Verbose debug messages");
@@ -304,16 +306,19 @@ public class UserPreferencesDialog extends JDialog {
         JButton clearRecentEventGraphsButton = new JButton("Clear List: Recent Event Graphs");
         clearRecentEventGraphsButton.addActionListener(new ClearRecentEventGraphsHandler());
         clearRecentEventGraphsButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+		clearRecentEventGraphsButton.setToolTipText("Clears user list of recently opened Event Graphs");
 		
         JButton clearRecentAssembliesButton = new JButton("Clear List:  Recent Assemblies");
         clearRecentAssembliesButton.addActionListener(new ClearRecentAssembliesHandler());
         clearRecentAssembliesButton.setAlignmentX(Box.CENTER_ALIGNMENT);
 		clearRecentAssembliesButton.setSize(clearRecentEventGraphsButton.getSize());
+		clearRecentAssembliesButton.setToolTipText("Clears user list of recently opened Assemblies");
 		
         JButton clearDotViskitConfigurationThenExitButton = new JButton("Clear All Preferences and Exit");
         clearDotViskitConfigurationThenExitButton.addActionListener(new ClearDotViskitConfigurationThenExitHandler());
         clearDotViskitConfigurationThenExitButton.setAlignmentX(Box.CENTER_ALIGNMENT);
 		clearDotViskitConfigurationThenExitButton.setSize(clearRecentEventGraphsButton.getSize());
+		clearDotViskitConfigurationThenExitButton.setToolTipText("Cleans user .viskit directory");
 		
         recentP.add(Box.createVerticalGlue());
         recentP.add(clearRecentEventGraphsButton);

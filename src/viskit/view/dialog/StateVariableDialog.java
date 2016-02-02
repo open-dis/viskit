@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.Model;
+import viskit.model.EventGraphModel;
 import viskit.model.vStateVariable;
 
 import javax.swing.*;
@@ -93,11 +93,11 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+            okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
         buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
         con.add(buttonPanel);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
@@ -175,7 +175,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
             commentField.setText(stVar.getComment());
             isArray = ViskitGlobals.instance().isArray(stVar.getType());
         } else {
-            stateVariableNameField.setText(((Model) ViskitGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
+            stateVariableNameField.setText(((EventGraphModel) ViskitGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             ty = (String) stateVariableTypeCombo.getSelectedItem();
             isArray = ViskitGlobals.instance().isArray(ty);
             commentField.setText("");

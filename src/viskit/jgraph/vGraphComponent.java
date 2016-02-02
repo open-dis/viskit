@@ -211,7 +211,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (r != null) {
                         EventNode en = (EventNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                         ((Model) parent.getModel()).changeEvent(en);
+                         ((EventGraphModel) parent.getModel()).changeEvent(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 }
@@ -317,9 +317,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     if (se.conditional != null) {
                         String cond = se.conditional.trim();
                         if (cond.length() > 0) {
-                            sb.append("<u>condition</u><br>&nbsp;if( ");
+                            sb.append("<u>condition</u><br>&nbsp;if (");
                             sb.append(escapeLTGT(cond));
-                            sb.append(" )<br>");
+                            sb.append(")<br>");
                         }
                     }
 

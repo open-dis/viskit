@@ -158,7 +158,7 @@ public class Launcher extends Thread implements Runnable {
                         u = classLoader.getResource(st.nextToken());
                         addEventGraph(u);
                     }
-                } else if (p.getProperty("Viskit") != null) {
+                } else if (p.getProperty("Viskit") != null) { // TODO!! check string property correct
                     launchGUI();
                 }
             } catch (Exception e) {

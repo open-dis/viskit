@@ -672,7 +672,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // all agree to be dependent on, i.e. viskit.simulation.Interface
         SimEntity scenarioManager;
 
-        runEntities = Schedule.getReruns();
+        runEntities = Schedule.getReruns(); // TODO Schedule<SimEntity> generics not yet supported by simkit
 
         // Convenience for Diskit if on the classpath
         for (SimEntity entity : runEntities) {
