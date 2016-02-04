@@ -337,7 +337,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 		
-		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Properties...\" (Ctrl-E)";
+		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Ctrl-E)";
 		
 //        JLabel implementsLabel = new JLabel("Implements");
 //        implementsLabel.setToolTipText("Event graph superclass (if any)");
@@ -770,7 +770,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Event Graph Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), showingEventGraph));
 
 		// ===================================================
         // Create a new menu bar and add the created menus

@@ -62,7 +62,7 @@ public class JTextAreaOutputStream extends ByteArrayOutputStream implements Acti
   final public static int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
 
   private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
-                                    "----------------------------------------------\n";
+                                    "-----------------------------------------------------------------\n";
   public JTextAreaOutputStream(JTextArea ta, int buffSize)
   {
     super(buffSize);

@@ -129,7 +129,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrPlay.addActionListener(new StartResumeListener());
         runPanel.vcrRewind.addActionListener(new RewindListener());
         runPanel.vcrStep.addActionListener(new StepListener());
-        runPanel.vcrVerbose.addActionListener(new VerboseListener());
+        runPanel.vcrVerboseCB.addActionListener(new VerboseListener());
         runPanel.vcrStop.setEnabled(false);
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
@@ -208,13 +208,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method getStopTime               = assemblyClass.getMethod("getStopTime");
 
         runPanel.numberOfReplicationsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
-        runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
-        runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
-        runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
+        runPanel.saveReplicationDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
+        runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
+        runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
 
         // Set the run panel according to what the assy XML value is
         setVerbose.invoke(assemblyInstance, verbose);
-        runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
+        runPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
         runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(assemblyInstance));
     }
@@ -290,9 +290,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numberOfReplicationsTF.getText().trim()));
-            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
-            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
-            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
+            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveReplicationDataCB.isSelected());
+            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printReplicationReportsCB.isSelected());
+            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummaryReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
             setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
@@ -360,7 +360,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         /** Perform simulation stop and reset calls */
         public void end() {
             System.out.println("Simulation ended");
-            System.out.println("----------------");
+            System.out.println("================================================================================================");
+            System.out.println("================================================================================================");
             runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
         }
@@ -379,7 +380,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public int getVerboseReplicationNumber() {
         int ret = -1;
         try {
-            ret = Integer.parseInt(runPanel.verboseRepNumberTF.getText().trim());
+            ret = Integer.parseInt(runPanel.verboseReplicationNumberTF.getText().trim());
         } catch (NumberFormatException ex) {
           //  ;
         }
@@ -543,7 +544,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      * @return overridden XML set value via the Run panel setting
      */
     boolean getVerbose() {
-        return runPanel.vcrVerbose.isSelected();
+        return runPanel.vcrVerboseCB.isSelected();
     }
     public static final int START = 0;
     public static final int STOP = 1;

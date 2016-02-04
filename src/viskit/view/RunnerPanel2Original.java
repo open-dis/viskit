@@ -232,7 +232,7 @@ public class RunnerPanel2Original extends JPanel {
         flowPan.add(printSummReportsCB);
 
         /* DIFF between OA3302 branch and trunk */
-        analystReportCB = new JCheckBox("Enable Analyst Reports");
+        analystReportCB = new JCheckBox("Enable analyst report");
         flowPan.add(analystReportCB);
 
 //        resetSeedStateCB = new JCheckBox("Reset seed each rerun");

@@ -124,7 +124,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JMenuItem quitMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
 
-    private int untitledCount = 0;
+    private int nextTabIndex = 0;
 	
     private JMenu fileMenu, editMenu, helpMenu;
 	
@@ -400,7 +400,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.add(saveAssemblyDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingAssembly));
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), showingAssembly));
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(assemblyController, "compileAssemblyAndPrepareSimulationRunner", "Initialize Assembly", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), showingAssembly));
 
@@ -690,7 +690,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // the view holds only one assemblyModel, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed assemblyModel
         // by virtue of calling stateChanged()
-        tabbedPane.add("untitled" + untitledCount++, graphPane.drawingSplitPane);
+        tabbedPane.add("AssemblyTab" + nextTabIndex, graphPane.drawingSplitPane);
+        tabbedPane.setToolTipTextAt(nextTabIndex, assemblyModel.getMetadata().description);
+		nextTabIndex++; // increment in preparation for next tab
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
 
         // Now expose the Assembly toolbar
@@ -733,6 +735,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 return;
             }
         }
+		nextTabIndex--; // decrement in preparation for next tab
+		if (nextTabIndex < 0)
+			nextTabIndex = 0;
+
     }
 
     public boolean hasOpenModels() {

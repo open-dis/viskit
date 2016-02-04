@@ -100,7 +100,7 @@ public class ViskitGlobals {
 
     private ViskitProject currentViskitProject;
 
-    /** Need hold of the Enable Analyst Reports checkbox */
+    /** Need hold of the Enable analyst report checkbox */
     private SimulationRunPanel runPanel;
 
     /** Flag to denote called systemExit only once */

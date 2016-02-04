@@ -221,7 +221,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
 							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath() + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p>Please choose another event graph or else open a different project.</p>");
+							"<p>Please choose an event graph in current project, or else open a different project.</p>");
 					// TODO offer to copy?
 					break;
 				}

@@ -729,6 +729,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     System.out.println("Already running.");
                 }
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
+                System.out.println("------------------------------------------------------------------------------\n");
                 System.out.println("Starting Replication #" + (replication + 1) + " with RNG seed state of: " + seed);
                 try {
                     Schedule.reset();
