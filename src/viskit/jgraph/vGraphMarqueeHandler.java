@@ -208,8 +208,8 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
             // Else Repaint the Graph
         } else {
             GraphModel mod = graph.getModel();
-            if (mod instanceof vGraphModel) {
-                ((vGraphModel)mod).reDrawNodes();
+            if (mod instanceof JGraphVisualModel) {
+                ((JGraphVisualModel)mod).reDrawNodes();
             } else {
                 ((vGraphAssemblyModel)mod).reDrawNodes();
             }

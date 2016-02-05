@@ -107,62 +107,67 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void newEventGraph() {
-
+    public void newEventGraph()
+	{
         // Don't allow a new event graph to be created if a current project is not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
 					"<html><p>New event graphs are only created within an open project.</p>" +
-					"<p>Please open or create a project first.</p>");
+					"<p>Open or create a project first.</p>");
 			return;
 		}
 
         GraphMetadata priorEventGraphMetadata = null;
-        ModelImpl viskitModel = (ModelImpl) getModel();
-        if (viskitModel != null) {
-            priorEventGraphMetadata = viskitModel.getMetadata();
+        EventGraphModelImpl priorEventGraphModel = (EventGraphModelImpl) getModel();
+        if (priorEventGraphModel != null) {
+            priorEventGraphMetadata = priorEventGraphModel.getMetadata();
         }
 
-        EventGraphModel eventGraphModel = new ModelImpl(this);
-        eventGraphModel.init();
-        eventGraphModel.newModel(null);
+        EventGraphModel eventGraphModel = new EventGraphModelImpl(this);
+        eventGraphModel.initialize();
+        eventGraphModel.newModel(null); // no file
 
-        // No model set in controller yet...it gets set
+        // No model set in controller yet... it gets set
         // when TabbedPane changelistener detects a tab change.
         ((EventGraphView) getView()).addTab(eventGraphModel);
 
-        // If we have models already opened, then use their package names for his new EventGraph
+        // If we have models already opened, then use most recent package name as default for this new EventGraph
         GraphMetadata newEventGraphMetadata = eventGraphModel.getMetadata();
         if (priorEventGraphMetadata != null) {
             newEventGraphMetadata.packageName = priorEventGraphMetadata.packageName;
         }
+		newEventGraphMetadata.description = "TODO: enter a description for this new event graph";
 
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), newEventGraphMetadata);
 		
-        if (modified) {
-
+        if (modified)
+		{
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(newEventGraphMetadata.name);
+			
             ((EventGraphView) getView()).setSelectedEventGraphDescription(newEventGraphMetadata.description);
 
             // Bugfix 1398
-            String msg =
+            String message =
                     "<html><body><p align='center'>Do you want " + newEventGraphMetadata.name + 
 					" Event Graph execution to start with a <b>\"Run\"</b> Event?</p></body></html>";
             String title = "Confirm Run Event";
 
-            int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
+            int ret = ((EventGraphView) getView()).genericAskYN(title, message);
             boolean dirty = false;
             if (ret == JOptionPane.YES_OPTION) {
                 buildNewNode(new Point(30, 60), "Run");
                 dirty = true;
             }
             ((EventGraphModel) getModel()).setDirty(dirty);
-        } else {
+        } 
+		else
+		{
            ((EventGraphView) getView()).deleteTab(eventGraphModel);
         }
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab(); // prerequisite to buildMenus
+		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
     }
 
     /**
@@ -239,8 +244,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     void _doOpen(File file) {
 
         EventGraphView eventGraphView = (EventGraphView) getView();
-        ModelImpl model = new ModelImpl(this);
-        model.init();
+        EventGraphModelImpl model = new EventGraphModelImpl(this);
+        model.initialize();
         eventGraphView.addTab(model);
         ViskitGlobals.instance().getEventGraphEditor().getSelectedPane().setToolTipText(model.getMetadata().description);
 
@@ -532,7 +537,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public boolean preClose() {
-        ModelImpl mod = (ModelImpl) getModel();
+        EventGraphModelImpl mod = (EventGraphModelImpl) getModel();
         if (mod == null) {
             return false;
         }
@@ -547,7 +552,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void postClose() {
 
-        ModelImpl mod = (ModelImpl) getModel();
+        EventGraphModelImpl mod = (EventGraphModelImpl) getModel();
         if (mod.getLastFile() != null) {
             fileWatchClose(mod.getLastFile());
             markConfigClosed(mod.getLastFile());

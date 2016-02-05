@@ -19,7 +19,7 @@ public interface EventGraphModel {
     /**
      * Separate initialization from object construction.
      */
-    void init();
+    void initialize();
 
     /**
      * Messaged by controller when a new EventGraphModel should be created, or an existing

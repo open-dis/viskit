@@ -26,8 +26,8 @@ import viskit.ViskitProject;
 import viskit.images.CancellationArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedulingArcIcon;
-import viskit.jgraph.VgraphComponentWrapper;
-import viskit.jgraph.vGraphModel;
+import viskit.jgraph.EventGraphComponentWrapper;
+import viskit.jgraph.JGraphVisualModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
@@ -47,15 +47,15 @@ import viskit.view.dialog.UserPreferencesDialog;
  events like the dragging and dropping of a node on the screen are first
  recognized in this class, but the GUI is not yet changed. Instead, this class
  (the View) messages the controller class (EventGraphControllerImpl -- by
- means of the EventGraphController i/f). The controller then informs the model
- (ModelImpl), which then updates itself and "broadcasts" that fact. This class
- is a model listener, so it gets the report, then updates the GUI. A round
+ means of the EventGraphController i/f). The controller then informs the eventGraphModel
+ (EventGraphModelImpl), which then updates itself and "broadcasts" that fact. This class
+ is a eventGraphModel listener, so it gets the report, then updates the GUI. A round
  trip.
 
  20 SEP 2005: Updated to show multiple open event graphs. The controller is
  largely unchanged. To understand the flow, understand that 1) The tab
  "ChangeListener" plays a key role; 2) When the ChangeListener is hit, the
- controller.setModel() method installs the appropriate model for the
+ controller.setModel() method installs the appropriate eventGraphModel for the
  newly-selectedTab event graph.
 
  OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
@@ -93,7 +93,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JMenu openRecentEventGraphMI, openRecentProjectMenu;
 	
 	private JMenu projectsMenu = new JMenu("Projects");
-	private JMenu fileMenu     = new JMenu("Event Graphs");
+	private JMenu eventGraphsMenu     = new JMenu("Event Graphs");
 	private JMenu editMenu     = new JMenu(FRAME_DEFAULT_TITLE);
     private JMenu helpMenu     = new JMenu("Help");
 
@@ -164,12 +164,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			menuShortcutCtrlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		}
 		projectsMenu = new JMenu("Projects");
-		fileMenu     = new JMenu("Event Graphs");
+		eventGraphsMenu     = new JMenu("Event Graphs");
 		editMenu     = new JMenu(FRAME_DEFAULT_TITLE);
 		helpMenu     = new JMenu("Help");
 		
         projectsMenu.setMnemonic(KeyEvent.VK_P);
-            fileMenu.setMnemonic(KeyEvent.VK_E);
+            eventGraphsMenu.setMnemonic(KeyEvent.VK_E);
             editMenu.setMnemonic(KeyEvent.VK_E); // submenu
 		    helpMenu.setMnemonic(KeyEvent.VK_H);
 
@@ -193,18 +193,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphComponentWrapper getCurrentVgcw() {
+    public EventGraphComponentWrapper getCurrentVgcw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
         }
 
         JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-        return (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+        return (EventGraphComponentWrapper) jsp.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphComponentWrapper vcw = getCurrentVgcw();
+        EventGraphComponentWrapper vcw = getCurrentVgcw();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getLeftComponent();
     }
@@ -225,10 +225,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
 	/**
-	 * @return the fileMenu
+	 * @return the eventGraphsMenu
 	 */
 	public JMenu getFileMenu() {
-		return fileMenu;
+		return eventGraphsMenu;
 	}
 
 	/**
@@ -258,7 +258,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            VgraphComponentWrapper myVgcw = getCurrentVgcw();
+            EventGraphComponentWrapper myVgcw = getCurrentVgcw();
 
             if (myVgcw == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
@@ -273,7 +273,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 //                ((EventGraphController)getController()).save();
 //            }
 
-            setModel((ModelImpl) myVgcw.model);    // hold on locally
+            setModel((EventGraphModelImpl) myVgcw.eventGraphModel);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
             adjustMenus((EventGraphModel) getModel()); // enable/disable menu items based on new EG
@@ -288,8 +288,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
-
+    private void buildStateParameterSplit(EventGraphComponentWrapper vgcw)
+	{
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
         stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel, BoxLayout.Y_AXIS));
@@ -424,10 +424,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         spltPn.setResizeWeight(0.75);
         spltPn.setMinimumSize(new Dimension(20, 20));
 
-        vgcw.stateParamSplitPane = spltPn;
-        vgcw.paramPan = pp;
-        vgcw.varPan = vp;
-        vgcw.codeBlockPan = codeblockPan;
+        vgcw.stateParameterSplitPane = spltPn;
+        vgcw.parametersPanel = pp;
+        vgcw.stateVariablesPanel = vp;
+        vgcw.codeBlockPanel = codeblockPan;
     }
 
     private CodeBlockPanel buildCodeBlockPanel() {
@@ -480,7 +480,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void setSelectedEventGraphDescription(String description) {
-        JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
+        JSplitPane jsp = getCurrentVgcw().stateParameterSplitPane;
         JPanel jp = (JPanel) jsp.getTopComponent();
         Component[] components = jp.getComponents();
         for (Component c : components) {
@@ -491,27 +491,28 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    int untitledCount = 0;
+    int nextTabIndex = 0;
 
     @Override
-    public void addTab(EventGraphModel model) { // TODO set type EventGraphModel
-        vGraphModel vmod = new vGraphModel();
-        VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
-        vmod.setjGraph(graphPane);
-        graphPane.model = model;
+    public void addTab(EventGraphModel eventGraphModel) // TODO set type EventGraphModel
+	{
+        JGraphVisualModel jGraphVisualModel = new JGraphVisualModel();
+        EventGraphComponentWrapper graphPane = new EventGraphComponentWrapper(jGraphVisualModel, this);
+        jGraphVisualModel.setjGraph(graphPane);
+        graphPane.eventGraphModel = eventGraphModel;
 
-        buildStateParamSplit(graphPane);
+        buildStateParameterSplit(graphPane);
 
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
         JScrollPane jsp = new JScrollPane(graphPane);
 
-        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParamSplitPane);
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParameterSplitPane);
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the left component (JGraph side) most of the usable
         // extra space in this SplitPlane -> 75%
         graphPane.drawingSplitPane.setResizeWeight(0.75);
-        graphPane.drawingSplitPane.setOneTouchExpandable(true);
+        graphPane.drawingSplitPane.setOneTouchExpandable(true); 
 
         graphPane.addMouseListener(new vCursorHandler());
         try {
@@ -519,16 +520,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         } catch (TooManyListenersException tmle) {
             LogUtils.getLogger(EventGraphViewFrame.class).error(tmle);
         }
-        graphPane.setToolTipText(model.getMetadata().description);
+        graphPane.setToolTipText(eventGraphModel.getMetadata().description);
 
-        // the view holds only one model, so it gets overwritten with each tab
-        // but this call serves also to register the view with the passed model
+        // the view holds only one eventGraphModel, so it gets overwritten with each tab
+        // but this call serves also to register the view with the passed eventGraphModel
         // by virtue of calling stateChanged()
-        tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);
+        tabbedPane.add("EventGraph" + nextTabIndex, graphPane.drawingSplitPane);
+        tabbedPane.setToolTipTextAt(nextTabIndex, eventGraphModel.getMetadata().description);
 
         // Bring the JGraph component to front. Also, allows models their own
         // canvas to draw to prevent a NPE
-        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane);
+        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
+		nextTabIndex++;
 
         // Now expose the EventGraph toolbar
         Runnable r = new Runnable() {
@@ -546,12 +549,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	}
 
     @Override
-    public void deleteTab(EventGraphModel mod) {
+    public void deleteTab(EventGraphModel mod)
+	{
         for (Component c : tabbedPane.getComponents()) {
             JSplitPane jsplt = (JSplitPane) c;
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
-            if (vgcw.model == mod) {
+            EventGraphComponentWrapper vgcw = (EventGraphComponentWrapper) jsp.getViewport().getComponent(0);
+            if (vgcw.eventGraphModel == mod) {
                 tabbedPane.remove(c);
                 vgcw.isActive = false;
 
@@ -568,10 +572,29 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 return;
             }
         }
+		nextTabIndex--; // decrement in preparation for next tab
+		if (nextTabIndex < 0)
+			nextTabIndex = 0;
     }
 
-    public boolean hasOpenModels() {
-		return (tabbedPane.getComponentCount() > 0);
+    public boolean hasOpenEventGraphs() {
+		return (tabbedPane != null) && (tabbedPane.getComponentCount() > 0) && (nextTabIndex > 0);
+    }
+
+    public boolean hasActiveEventGraph() {
+		return (ViskitGlobals.instance() != null) &&
+			   (ViskitGlobals.instance().getActiveEventGraphModel()!= null);
+    }
+
+    public boolean hasOpenAssemblies() {
+		return (ViskitGlobals.instance() != null) &&
+			   (ViskitGlobals.instance().getAssemblyEditor() != null) &&
+			   (ViskitGlobals.instance().getAssemblyEditor().hasOpenAssemblies());
+    }
+
+    public boolean hasActiveAssembly() {
+		return (ViskitGlobals.instance() != null) &&
+			   (ViskitGlobals.instance().getActiveEventGraphModel()!= null);
     }
 
     @Override
@@ -581,8 +604,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
-            vm[i] = vgcw.model;
+            EventGraphComponentWrapper vgcw = (EventGraphComponentWrapper) jsp.getViewport().getComponent(0);
+            vm[i] = vgcw.eventGraphModel;
         }
         return vm;
     }
@@ -614,7 +637,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     /**
      * Do menu layout work here
-     * @param mod the current model of our EG view
+     * @param mod the current eventGraphModel of our EG view
      */
     private void adjustMenus(EventGraphModel mod) {
         //todo
@@ -687,8 +710,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         projectsMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
         projectsMenu.add(openRecentProjectMenu = buildMenu ("Open Recent Project"));
 		openRecentProjectMenu.setMnemonic(KeyEvent.VK_R);
+
+		boolean eventGraphVisible = hasOpenEventGraphs() && ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected();
+		boolean   assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
+
+		 // ensures selected before allowing deletion
+        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (eventGraphVisible && hasActiveEventGraph()));
+		deleteEventGraphFromProjectMI.setEnabled (false); // TODO
+		projectsMenu.add(deleteEventGraphFromProjectMI);
+
+		 // ensures selected before allowing deletion
+        JMenuItem deleteAssemblyFromProjectMI = buildMenuItem(this, "deleteAssemblyFromProject", "Delete Assembly from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (assemblyVisible && hasActiveAssembly()));
+		deleteAssemblyFromProjectMI.setEnabled (false); // TODO
+		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
 		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
+        JMenuItem renameProjectMI = buildMenuItem(this, "renameProject", "Rename Project",      KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK), projectOpen);
+		renameProjectMI.setEnabled (false); // TODO
+		projectsMenu.add(renameProjectMI);
 
         JMenuItem projectSettingsMI = buildMenuItem(this, "projectSettings", "Project Settings",      KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_MASK), projectOpen);
 		projectSettingsMI.setEnabled (false); // TODO
@@ -701,50 +740,49 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
 		// ===================================================
 		// Set up file menu
-        fileMenu.removeAll(); // reset
+		eventGraphsMenu.setEnabled(true); // always on
+        eventGraphsMenu.removeAll();      // reset
 		
-        fileMenu.add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
-        fileMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
+        eventGraphsMenu.add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
+        eventGraphsMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
         openRecentEventGraphMI = buildMenu("Open Recent Event Graph");
 		openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
 		openRecentEventGraphMI.setEnabled(eventGraphController.getRecentEventGraphFileSet().size() > 0);
-		fileMenu.add(openRecentEventGraphMI);
-        fileMenu.addSeparator();
+		eventGraphsMenu.add(openRecentEventGraphMI);
+        eventGraphsMenu.addSeparator();
 
         // The recently opened project file listener will be set with the
         // openRecentProjectMenu in the MainFrame after the AssemblyView is instantiated
-
-		boolean showingEventGraph = false;
-		if                 (null != ViskitGlobals.instance().getViskitApplicationFrame())
-			    showingEventGraph = ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected () && hasOpenModels();
 		
-        JMenuItem saveEventGraphMI = buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), showingEventGraph);
-        fileMenu.add(saveEventGraphMI);
-        JMenuItem saveAsEventGraphMI = buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null, showingEventGraph);
-        fileMenu.add(saveAsEventGraphMI);
-        JMenuItem saveEventGraphDiagramMI = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutCtrlKeyMask), showingEventGraph);
-		fileMenu.add(saveEventGraphDiagramMI);
-		JMenuItem closeEventGraphMI = buildMenuItem(eventGraphController, "close", "Close Event Graph", null, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutCtrlKeyMask), showingEventGraph);
-        fileMenu.add(closeEventGraphMI);
-		JMenuItem closeAllEventGraphsMI = buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null, showingEventGraph);
-        fileMenu.add(closeAllEventGraphsMI);
+        JMenuItem saveEventGraphMI = buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), eventGraphVisible);
+        eventGraphsMenu.add(saveEventGraphMI);
+        JMenuItem saveAsEventGraphMI = buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null, eventGraphVisible);
+        eventGraphsMenu.add(saveAsEventGraphMI);
+        JMenuItem saveEventGraphDiagramMI = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutCtrlKeyMask), eventGraphVisible);
+		eventGraphsMenu.add(saveEventGraphDiagramMI);
+		JMenuItem closeEventGraphMI = buildMenuItem(eventGraphController, "close", "Close Event Graph", null, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutCtrlKeyMask), eventGraphVisible);
+        eventGraphsMenu.add(closeEventGraphMI);
+		JMenuItem closeAllEventGraphsMI = buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null, eventGraphVisible);
+        eventGraphsMenu.add(closeAllEventGraphsMI);
 
 		// ===================================================
         // Set up edit menu
+		// only turn top edit menu on if Event Graphs are present and Event Graph Editor tab is selected
+		editMenu.setEnabled(eventGraphVisible && ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected());
         editMenu.removeAll(); // reset
 		
-          editMenu.add(buildMenuItem(eventGraphController, "undo", "Undo Edit", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutCtrlKeyMask), showingEventGraph));
-          editMenu.add(buildMenuItem(eventGraphController, "redo", "Redo Edit", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutCtrlKeyMask), showingEventGraph));
+          editMenu.add(buildMenuItem(eventGraphController, "undo", "Undo Edit", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcutCtrlKeyMask), eventGraphVisible));
+          editMenu.add(buildMenuItem(eventGraphController, "redo", "Redo Edit", KeyEvent.VK_Y, KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcutCtrlKeyMask), eventGraphVisible));
         ActionIntrospector.getAction(eventGraphController, "undo").setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, "redo").setEnabled(false);
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut",            KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutCtrlKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut",            KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutCtrlKeyMask), eventGraphVisible));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy",          KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutCtrlKeyMask), showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutCtrlKeyMask), showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutCtrlKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy",          KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutCtrlKeyMask), eventGraphVisible));
 
         // These start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "cut").setEnabled(false);
@@ -753,24 +791,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         ActionIntrospector.getAction(eventGraphController, "paste").setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "newNode",          "Add Event Node",              KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "newSimParameter",  "Add Simulation Parameter...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK), showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...",       KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK), showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null, showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge",  "Add Self-Refenential Canceling Edge...",  null, null, showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "newNode",          "Add Event Node",              KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "newSimParameter",  "Add Simulation Parameter...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_MASK), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...",       KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_MASK), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null, eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge",  "Add Self-Referential Canceling Edge...",  null, null, eventGraphVisible));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, "newSelfRefCancelingEdge").setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "showXML", "View Saved XML",                           KeyEvent.VK_X, null, showingEventGraph));
-        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutCtrlKeyMask), showingEventGraph));
-        JMenuItem saveEventGraphDiagramMI2 = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, null, showingEventGraph);
+        editMenu.add(buildMenuItem(eventGraphController, "showXML", "View Saved XML",                           KeyEvent.VK_X, null, eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutCtrlKeyMask), eventGraphVisible));
+        JMenuItem saveEventGraphDiagramMI2 = buildMenuItem(eventGraphController, "windowImageCapture", "Save Event Graph Diagram",      KeyEvent.VK_I, null, eventGraphVisible);
 		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Event Graph Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), showingEventGraph));
+        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Event Graph Properties...",             KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), eventGraphVisible));
 
 		// ===================================================
         // Create a new menu bar and add the created menus
@@ -788,7 +826,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
 		
 			myMenuBar = new JMenuBar();
-			myMenuBar.add(fileMenu);
+			myMenuBar.add(eventGraphsMenu);
 			myMenuBar.add(editMenu);
 			myMenuBar.add(helpMenu);
 		}
@@ -867,26 +905,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         addEvent.setIcon(new EventNodeIcon());
 
         addSelfReferential = makeJLabel("viskit/images/selfReferentialArc.png",
-                "Drag onto an existing event node to add a self-referential scheduling edge");
+                "Drag onto an existing SimEntity node to add a self-referential scheduling edge");
         addSelfReferential.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
         addSelfCancelRef = makeJLabel("viskit/images/selfCancelArc.png",
-                "Drag onto an existing event node to add a self-referential canceling edge");
+                "Drag onto an existing SimEntity node to add a self-referential canceling edge");
         addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
         selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
-                "Select items on the graph");
+                "Select a SimEntity node or scheduling/cancelling arc on the graph");
 
         arcMode = makeJToggleButton(null, "viskit/images/schedulingArc.png",
-                "Connect SimEntity  nodes with a scheduling edge");
+                "Scheduling edge connection between SimEntity nodes (click center box on source node, drag arrow to target node)");
         arcMode.setIcon(new SchedulingArcIcon());
 
         cancelArcMode = makeJToggleButton(null, "viskit/images/cancellationArc.png",
-                "Connect SimEntity nodes with a cancelling edge");
+                "Cancelling edge connection between SimEntity nodes (click center box on source node, drag arrow to target node)");
         cancelArcMode.setIcon(new CancellationArcIcon());
 
         modeButtonGroup.add(selectMode);
@@ -1006,8 +1044,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     }
 
-    /** Changes the background color of EG tabs depending on model.isDirty()
-     * status to give the user an indication of a good/bad save &amp; compile
+    /** Changes the background color of EG tabs depending on eventGraphModel.isDirty()
+ status to give the user an indication of a good/bad save &amp; compile
      * operation.  Of note is that the default L&amp;F on must be selected for
      * Windoze machines, else no color will be visible.  On Macs, the platform
      * L&amp;F works best.
@@ -1019,7 +1057,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         for (Component c : tabbedPane.getComponents()) {
 
             // This will fire a call to stateChanged() which also sets the
-            // current model
+            // current eventGraphModel
             tabbedPane.setSelectedComponent(c);
 
             if (((EventGraphModel) getModel()).isDirty()) {
@@ -1037,7 +1075,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
 
-        // Restore active tab and model by virtue of firing a call to stateChanged()
+        // Restore active tab and eventGraphModel by virtue of firing a call to stateChanged()
         tabbedPane.setSelectedIndex(selectedTab);
     }
 
@@ -1258,6 +1296,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		// TODO
     }
 	
+    /** Remove an Event Graph from current Project.
+     */
+    public void deleteEventGraphFromProject ()
+	{
+		// TODO
+    }
+	
+    /** Remove an Assembly from current Project.
+     */
+    public void deleteAssemblyFromProject ()
+	{
+		// TODO
+    }
+	
+    /** Rename the current Project.
+     */
+    public void renameProject ()
+	{
+		// TODO
+    }
+	
     /**
      * Ensures a unique file name by appending a count integer to the filename
      * until the system can detect that it is indeed unique
@@ -1386,9 +1445,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void modelChanged(mvcModelEvent event) {
-        VgraphComponentWrapper vgcw = getCurrentVgcw();
-        ParametersPanel pp = vgcw.paramPan;
-        StateVariablesPanel vp = vgcw.varPan;
+        EventGraphComponentWrapper vgcw = getCurrentVgcw();
+        ParametersPanel pp = vgcw.parametersPanel;
+        StateVariablesPanel vp = vgcw.stateVariablesPanel;
         switch (event.getID()) {
             // Changes the two side panels need to know about
             case ModelEvent.SIMPARAMETERADDED:
@@ -1410,7 +1469,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 vp.updateRow((ViskitElement) event.getSource());
                 break;
             case ModelEvent.CODEBLOCKCHANGED:
-                vgcw.codeBlockPan.setData((String) event.getSource());
+                vgcw.codeBlockPanel.setData((String) event.getSource());
                 break;
             case ModelEvent.NEWMODEL:
                 vp.setData(null);
@@ -1424,7 +1483,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 break;
         }
 
-        // Let model.isDirty() determine status color
+        // Let eventGraphModel.isDirty() determine status color
         toggleEgStatusIndicators();
     }
 

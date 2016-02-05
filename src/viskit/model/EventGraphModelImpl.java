@@ -41,7 +41,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 1:09:38 PM
  * @version $Id$
  */
-public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
+public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphModel {
 
     JAXBContext jc;
     ObjectFactory oFactory;
@@ -60,13 +60,13 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public ModelImpl(mvcController controller) {
+    public EventGraphModelImpl(mvcController controller) {
         this.eventGraphController = (EventGraphControllerImpl) controller;
         metaData = new GraphMetadata(this);
     }
 
     @Override
-    public void init() {
+    public void initialize() {
         try {
             jc = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             oFactory = new ObjectFactory();
@@ -103,19 +103,19 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
     }
 
     @Override
-    public boolean newModel(File f) {
+    public boolean newModel(File file) {
         stateVariables.removeAllElements();
         simulationParameters.removeAllElements();
         eventNodeCache.clear();
         edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
 
-        if (f == null) {
+        if (file == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
-                jaxbRoot = (SimEntity) u.unmarshal(f);
+                jaxbRoot = (SimEntity) u.unmarshal(file);
 
                 GraphMetadata myMetadata = new GraphMetadata(this);
                 myMetadata.author = jaxbRoot.getAuthor();
@@ -142,7 +142,7 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
                 try {
                     JAXBContext assembblyContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
                     Unmarshaller um = assembblyContext.createUnmarshaller();
-                    um.unmarshal(f);
+                    um.unmarshal(file);
                     // If we get here, they've tried to load an assembly.
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                             "Wrong File Type", // TODO confirm
@@ -153,7 +153,7 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                             "XML Input/Output Error",
                             "Exception on JAXB unmarshalling of" +
-                            "\n" + f.getName() +
+                            "\n" + file.getName() +
                             "\nError is: " + e.getMessage() +
                             "\nin Model.newModel(File)"
                             );
@@ -161,7 +161,7 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
                 return false;    // from either error case
             }
         }
-        currentFile = f;
+        currentFile = file;
 
         // required for initial file loading
         setDirty(false);
@@ -169,10 +169,10 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
     }
 
     @Override
-    public boolean saveModel(File f) {
+    public boolean saveModel(File file) {
         boolean retVal;
-        if (f == null) {
-            f = currentFile;
+        if (file == null) {
+            file = currentFile;
         }
 
         // Do the marshalling into a temporary file, so as to avoid possible
@@ -213,23 +213,23 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
             m.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tmpF.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             setDirty(false);
-            currentFile = f;
+            currentFile = file;
             retVal = true;
         } catch (JAXBException e) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "XML Input/Output Error",
                     "Exception on JAXB marshalling" +
-                    "\n" + f.getName() +
+                    "\n" + file.getName() +
                     "\n" + e.getMessage()
                     );
             retVal = false;
         } catch (IOException ex) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "File Input/Output Error",
-                    "Exception on writing " + f.getName() +
+                    "Exception on writing " + file.getName() +
                     "\n" + ex.getMessage()
                     );
             retVal = false;
@@ -311,7 +311,7 @@ public class ModelImpl extends mvcAbstractModel implements EventGraphModel {
 
     private void mangleName(ViskitElement node) {
         do {
-            node.setName(ModelImpl.this.mangleName(node.getName()));
+            node.setName(EventGraphModelImpl.this.mangleName(node.getName()));
         } while (!nameCheck());
     }
 

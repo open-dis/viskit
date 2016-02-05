@@ -33,7 +33,7 @@ import viskit.model.Edge;
  */
 public class vGraphComponent extends JGraph implements GraphModelListener {
 
-    vGraphModel vGModel;
+    JGraphVisualModel vGModel;
     EventGraphViewFrame parent;
     private UndoManager undoManager;
 
@@ -42,7 +42,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
      * @param model a model of the node with its specific edges
      * @param frame the main view frame canvas to render to
      */
-    public vGraphComponent(vGraphModel model, EventGraphViewFrame frame) {
+    public vGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame) {
         super(model);
         parent = frame;
 
@@ -513,7 +513,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     final static double DEFAULT_CELL_SIZE = 54.0d;
 
     /** Create the cell's final attributes before rendering on the graph.  The
-     * edge attributes are set in the vGraphModel
+ edge attributes are set in the JGraphVisualModel
      *
      * @param node the named EventNode to create attributes for
      * @return the cells attributes before rendering on the graph

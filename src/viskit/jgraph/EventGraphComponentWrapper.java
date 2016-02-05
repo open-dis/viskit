@@ -52,17 +52,17 @@ import viskit.view.StateVariablesPanel;
  * @since 11:13:40 AM
  * @version $Id$
  */
-public class VgraphComponentWrapper extends vGraphComponent {
+public class EventGraphComponentWrapper extends vGraphComponent {
 
-    public EventGraphModel model;
-    public JSplitPane drawingSplitPane;
-    public JSplitPane stateParamSplitPane;
-    public ParametersPanel paramPan;
-    public StateVariablesPanel varPan;
-    public CodeBlockPanel codeBlockPan;
-    public boolean isActive = true;
+    public EventGraphModel     eventGraphModel;
+    public JSplitPane          drawingSplitPane;
+    public JSplitPane          stateParameterSplitPane;
+    public ParametersPanel     parametersPanel;
+    public StateVariablesPanel stateVariablesPanel;
+    public CodeBlockPanel      codeBlockPanel;
+    public boolean             isActive = true;
 
-    public VgraphComponentWrapper(vGraphModel model, EventGraphViewFrame frame) {
-        super(model, frame);
+    public EventGraphComponentWrapper(JGraphVisualModel jGraphVisualModel, EventGraphViewFrame frame) {
+        super(jGraphVisualModel, frame);
     }
 }

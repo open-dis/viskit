@@ -557,6 +557,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             statisticsConfig.processSummaryReport(getDesignPointStatistics());
         }
 
+		System.out.println("------------------------------------------------------------------------------\n");
         StringBuilder buf = new StringBuilder("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());

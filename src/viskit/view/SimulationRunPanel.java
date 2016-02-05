@@ -331,13 +331,14 @@ public class SimulationRunPanel extends JPanel {
 	public final void initializeSimulationOutput ()
 	{
 		String initializationMessage;
-		if      (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
+		if      (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
 		{
-			initializationMessage = "Please initialize the selected Assembly before using the Simulation Run panel." + lineEnd +
-                                    "------------------------------------------------------------------------------" + lineEnd;
+			initializationMessage = "**********************************************************************************" + lineEnd +
+                                    "* Not ready! Initialize the selected Assembly before using Simulation Run panel. *" + lineEnd +
+                                    "**********************************************************************************" + lineEnd;
 			simulationOutputTA.setEditable(true);
 		}
-		else if (ViskitGlobals.instance().getAssemblyEditor().hasOpenModels())
+		else if (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly())
 		{
 			initializationMessage = "Simulation output stream:" + lineEnd +
                                     "-------------------------" + lineEnd;
@@ -345,8 +346,9 @@ public class SimulationRunPanel extends JPanel {
 		}
 		else 
 		{
-			initializationMessage = "Please open/create then initialize an Assembly before using the Simulation Run panel." + lineEnd +
-                                    "-------------------------------------------------------------------------------------" + lineEnd;
+			initializationMessage = "*****************************************************************************************" + lineEnd +
+                                    "* Not ready! Open/create then initialize an Assembly before using Simulation Run panel. *" + lineEnd +
+                                    "*****************************************************************************************" + lineEnd;
 			simulationOutputTA.setEditable(false);
 		}
 		simulationOutputTA.setText(initializationMessage);

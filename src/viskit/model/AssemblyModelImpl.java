@@ -56,7 +56,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         nodeCache = new LinkedHashMap<>();
     }
 
-    public void init() {
+    public void initialize() {
         try {
             jc = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             oFactory = new ObjectFactory();

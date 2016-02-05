@@ -35,29 +35,31 @@ public class GraphMetadata {
         packageName = "test";
         
         if (caller instanceof AssemblyModelImpl) {
-            name = "AssemblyName";
+            name = "SimulationName";
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tmp = of.createSimkitAssembly();
             extendsPackageName = tmp.getExtend();
             implementsPackageName = tmp.getImplement();
 
-        } else {
+        } 
+		else
+		{
             name = "EventGraphName";
-            viskit.xsd.bindings.eventgraph.ObjectFactory of =
+            viskit.xsd.bindings.eventgraph.ObjectFactory objectFactory =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
-            SimEntity tmp = of.createSimEntity();
-            extendsPackageName = tmp.getExtend();
-            implementsPackageName = tmp.getImplement();
+            SimEntity tempSimEntity = objectFactory.createSimEntity();
+               extendsPackageName = tempSimEntity.getExtend();
+            implementsPackageName = tempSimEntity.getImplement();
         }
     }
 
     public GraphMetadata(String n, String p, String a, String v, String e, String i) {
-        name = n;
-        packageName = p;
-        author = a;
-        version = v;
-        extendsPackageName = e;
+        name                  = n;
+        packageName           = p;
+        author                = a;
+        version               = v;
+        extendsPackageName    = e;
         implementsPackageName = i;
     }
 }

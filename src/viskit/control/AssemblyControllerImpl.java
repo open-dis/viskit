@@ -221,11 +221,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         AssemblyView vaw = (AssemblyView) getView();
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
-        mod.init();
+        mod.initialize();
         vaw.addTab(mod);
         ViskitGlobals.instance().getAssemblyEditor().getSelectedPane().setToolTipText(mod.getMetadata().description);
 
-        // these may init to null on startup, check
+        // these may initialize to null on startup, check
         // before doing any openAlready lookups
         AssemblyModel[] openAlready = null;
         if (vaw != null) {
@@ -696,43 +696,47 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
 					"<html><p>New assemblies are only created within an open project.</p>" +
-					"<p>Please open or create a project first.</p>");
+					"<p>Open or create a project first.</p>");
 			return;
 		}
 
-        GraphMetadata oldGmd = null;
-        AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
-        if (viskitAssemblyModel != null) {
-            oldGmd = viskitAssemblyModel.getMetadata();
+        GraphMetadata priorAssemblyMetadata = null;
+        AssemblyModelImpl priorAssemblyModel = (AssemblyModelImpl) getModel();
+        if (priorAssemblyModel != null) {
+            priorAssemblyMetadata = priorAssemblyModel.getMetadata();
         }
 
-        AssemblyModelImpl mod = new AssemblyModelImpl(this);
-        mod.init();
-        mod.newModel(null);
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel.initialize();
+        assemblyModel.newModel(null); // no file
 
         // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((AssemblyView) getView()).addTab(mod);
+        ((AssemblyView) getView()).addTab(assemblyModel);
 
-        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assy
-        if (oldGmd != null) {
-            gmd.packageName = oldGmd.packageName;
+        GraphMetadata newAssemblyMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assy
+        if (priorAssemblyMetadata != null) {
+            newAssemblyMetadata.packageName = priorAssemblyMetadata.packageName;
         }
+		newAssemblyMetadata.description = "TODO: enter a description for this new assembly";
 
-        boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
-        if (modified) {
-            ((AssemblyModel) getModel()).changeMetadata(gmd);
+        boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
+        if (modified)
+		{
+            ((AssemblyModel) getModel()).changeMetadata(newAssemblyMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
 
             // TODO: Implement this
 //            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
-        } else {
-            ((AssemblyView) getView()).deleteTab(mod);
+        } 
+		else 
+		{
+            ((AssemblyView) getView()).deleteTab(assemblyModel);
         }
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getViskitApplicationFrame().selectAssemblyEditorTab(); // prerequisite to buildMenus
+		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
     }
 
     /**

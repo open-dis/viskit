@@ -90,8 +90,7 @@ public class ViskitApplicationFrame extends JFrame {
     private JMenuItem quitMenuItem;
     protected TitleListener titleListener;
     protected int titleKey;
-
-    /** The initial assembly to load. */
+	
     private final String initialFile;
     private final int TAB_EVENTGRAPH_EDITOR     = 0;
     private final int TAB_ASSEMBLY_EDITOR       = 1;
@@ -116,7 +115,7 @@ public class ViskitApplicationFrame extends JFrame {
 
     public ViskitApplicationFrame(String initialFile)
 	{
-        super("Viskit: Visual Simulation for Simkit"); // title
+        super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME); // default title
 
         this.initialFile = initialFile;
 		
@@ -152,7 +151,7 @@ public class ViskitApplicationFrame extends JFrame {
 
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
-    public void initializeUserInterface()
+    public final void initializeUserInterface()
 	{
         ViskitGlobals.instance().setAssemblyQuitHandler(null);
         ViskitGlobals.instance().setEventGraphQuitHandler(null);
@@ -444,7 +443,6 @@ public class ViskitApplicationFrame extends JFrame {
                 mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
 				eventGraphEditMenu.setEnabled(true);
 			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
-                return; // TODO review
             }
             
 			int i = mainTabbedPane.getSelectedIndex();
@@ -452,7 +450,7 @@ public class ViskitApplicationFrame extends JFrame {
 			
 			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
-				boolean showingEventGraph = ViskitGlobals.instance().getEventGraphEditor().hasOpenModels();
+				boolean showingEventGraph = ViskitGlobals.instance().getEventGraphEditor().hasActiveEventGraph();
 			
 //				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
 				eventGraphEditMenu.setEnabled(showingEventGraph);
@@ -477,7 +475,7 @@ public class ViskitApplicationFrame extends JFrame {
             }
 			else // Assembly Edit
 			{
-				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditor().hasOpenModels();
+				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly();
 			
 //				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
                 mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First initialize assembly runner from Assembly tab"); // TODO fix
@@ -824,7 +822,7 @@ public class ViskitApplicationFrame extends JFrame {
     /**
      * Shows the project name in the frame title bar
      */
-    public void showProjectName()
+    public final void showProjectName()
 	{
         String title = " " + ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME + ": ";
 		if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||

@@ -18,18 +18,18 @@ import viskit.model.SchedulingEdge;
  * @since 1:21:52 PM
  * @version $Id$
  */
-public class vGraphModel extends DefaultGraphModel {
+public class JGraphVisualModel extends DefaultGraphModel {
 
     Map viskitEdgeStyle, viskitCancelEdgeStyle;
     Map viskitSelfRefEdge, viskitSelfRefCancel;
     private JGraph jGraph;
 
-    public vGraphModel() {
-        initViskitStyle();
+    public JGraphVisualModel() {
+        initializeViskitStyle();
     }
 
     @SuppressWarnings("unchecked") // JGraph not genericized
-    private void initViskitStyle() {
+    private void initializeViskitStyle() {
 
         viskitEdgeStyle = new AttributeMap();
 
