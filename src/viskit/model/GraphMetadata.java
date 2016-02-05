@@ -35,7 +35,7 @@ public class GraphMetadata {
         packageName = "test";
         
         if (caller instanceof AssemblyModelImpl) {
-            name = "SimulationName";
+            name = "NewSimulation";
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tmp = of.createSimkitAssembly();
@@ -45,7 +45,7 @@ public class GraphMetadata {
         } 
 		else
 		{
-            name = "EventGraphName";
+            name = "NewEventGraph";
             viskit.xsd.bindings.eventgraph.ObjectFactory objectFactory =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tempSimEntity = objectFactory.createSimEntity();
