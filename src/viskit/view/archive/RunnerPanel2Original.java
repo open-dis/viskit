@@ -31,7 +31,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-package viskit.view;
+package viskit.view.archive;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,6 +51,7 @@ import java.awt.*;
 import java.io.*;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.view.SimulationRunPanel;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea

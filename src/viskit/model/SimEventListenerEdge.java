@@ -13,7 +13,7 @@ import java.util.List;
  * @since 2:57:37 PM
  * @version $Id$
  */
-public class SimEvListenerEdge extends AssemblyEdge {
+public class SimEventListenerEdge extends AssemblyEdge {
 
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
@@ -22,7 +22,7 @@ public class SimEvListenerEdge extends AssemblyEdge {
     private String value;
     private String comment;
 
-    SimEvListenerEdge() // package-limited
+    SimEventListenerEdge() // package-limited
     {
     }
 

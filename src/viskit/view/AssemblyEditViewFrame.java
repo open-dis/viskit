@@ -944,7 +944,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public boolean doEditSimEventListEdge(SimEvListenerEdge seEdge) {
+    public boolean doEditSimEventListEdge(SimEventListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
     }
 

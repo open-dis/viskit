@@ -94,7 +94,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (o instanceof AdapterEdge) {
                         view = new vAssyAdapterEdgeView(e);
                     }
-                    if (o instanceof SimEvListenerEdge) {
+                    if (o instanceof SimEventListenerEdge) {
                         view = new vAssySelEdgeView(e);
                     }
                 } else {
@@ -280,7 +280,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append(to);
                         sb.append(".");
                         sb.append(toEv);
-                    } else if (se instanceof SimEvListenerEdge) {
+                    } else if (se instanceof SimEventListenerEdge) {
                         sb.append("<center>SimEvent Listener<br><u>");
                         sb.append(to);
                         sb.append("</u> listening to <u>");

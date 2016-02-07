@@ -113,7 +113,7 @@ public interface AssemblyController {
      *
      * @param seEdge the SimEvent edge to edit
      */
-    void simEventListenerEdgeEdit(SimEvListenerEdge seEdge);
+    void simEventListenerEdgeEdit(SimEventListenerEdge seEdge);
 
     /** CMD-Z or CNTL-Z */
     void undo();

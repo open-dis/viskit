@@ -1111,7 +1111,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void simEventListenerEdgeEdit(SimEvListenerEdge seEdge) {
+    public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
         boolean modified = ((AssemblyView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
@@ -1264,8 +1264,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
         } else if (e instanceof PropertyChangeListenerEdge) {
             ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
-        } else if (e instanceof SimEvListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
+        } else if (e instanceof SimEventListenerEdge) {
+            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEventListenerEdge) e);
         }
     }
 
@@ -1334,7 +1334,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
-                SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
+                SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
             }
         } else {

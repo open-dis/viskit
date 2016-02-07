@@ -13,7 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitStatics;
 import viskit.model.EventGraphNode;
-import viskit.model.SimEvListenerEdge;
+import viskit.model.SimEventListenerEdge;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -32,7 +32,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
   private static SimEventListenerConnectionInspectorDialog dialog;
   private static boolean modified = false;
-  private SimEvListenerEdge simEvEdge;
+  private SimEventListenerEdge simEvEdge;
   private final JButton  okButton, cancelButton;
 
   private final JPanel  buttonPanel;
@@ -40,7 +40,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   public static String xnewProperty;
   public static String newTarget,newTargetEvent,newSource,newSourceEvent;
 
-  public static boolean showDialog(JFrame f, SimEvListenerEdge parm)
+  public static boolean showDialog(JFrame f, SimEventListenerEdge parm)
   {
     if (dialog == null)
       dialog = new SimEventListenerConnectionInspectorDialog(f, parm);
@@ -52,7 +52,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     return modified;
   }
 
-  private SimEventListenerConnectionInspectorDialog(JFrame parent, SimEvListenerEdge ed)
+  private SimEventListenerConnectionInspectorDialog(JFrame parent, SimEventListenerEdge ed)
   {
     super(parent, "SimEvent Listener Connection", true);
     simEvEdge = ed;
@@ -105,7 +105,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     }
   }
 
-  public final void setParams(Component c, SimEvListenerEdge ae)
+  public final void setParams(Component c, SimEventListenerEdge ae)
   {
     simEvEdge = ae;
 

@@ -516,7 +516,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) {
-        SimEvListenerEdge sele = new SimEvListenerEdge();
+        SimEventListenerEdge sele = new SimEventListenerEdge();
         sele.setFrom(src);
         sele.setTo(target);
 
@@ -537,7 +537,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoSimEvLisEdge(SimEvListenerEdge sele) {
+    public void redoSimEvLisEdge(SimEventListenerEdge sele) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) sele.getFrom();
@@ -569,7 +569,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteSimEvLisEdge(SimEvListenerEdge sele) {
+    public void deleteSimEvLisEdge(SimEventListenerEdge sele) {
         SimEventListenerConnection sel_c = (SimEventListenerConnection) sele.opaqueModelObject;
 
         jaxbRoot.getSimEventListenerConnection().remove(sel_c);
@@ -626,7 +626,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changeSimEvEdge(SimEvListenerEdge seEdge) {
+    public void changeSimEvEdge(SimEventListenerEdge seEdge) {
         EventGraphNode src = (EventGraphNode) seEdge.getFrom();
         EventGraphNode targ = (EventGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
@@ -972,7 +972,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private void buildSimEvConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
         for (SimEventListenerConnection selc : simevconnsList) {
-            SimEvListenerEdge sele = new SimEvListenerEdge();
+            SimEventListenerEdge sele = new SimEventListenerEdge();
             AssemblyNode toNode = getNodeCache().get(selc.getListener());
             AssemblyNode frNode = getNodeCache().get(selc.getSource());
             sele.setTo(toNode);

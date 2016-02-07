@@ -29,7 +29,7 @@ public interface AssemblyView {
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
-    boolean doEditSimEventListEdge(SimEvListenerEdge seEdge);
+    boolean doEditSimEventListEdge(SimEventListenerEdge seEdge);
 
     Object getSelectedPropertyChangeListener();
 
