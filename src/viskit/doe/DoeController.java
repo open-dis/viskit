@@ -92,7 +92,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case OPEN_FILE:
                 // Todo remove menu
                 checkDirty();
-                olddoOpen(new File(((String) e.getSource())));
+                old_doOpen(new File(((String) e.getSource())));
                 break;
 
             case OPEN_FILE_CHOOSE:
@@ -104,7 +104,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 }
 
                 File f = openSaveFileChooser.getSelectedFile();
-                olddoOpen(f);
+                old_doOpen(f);
                 break;
 
             case SAVE_FILE:
@@ -154,34 +154,38 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     private int checkDirty() {
         DoeFileModel dfm = doeFrame.getModel();
-        int reti = JOptionPane.YES_OPTION;
+        int response = JOptionPane.YES_OPTION;
         if (dfm != null) {
             if (((ParamTableModel) dfm.paramTable.getModel()).dirty) {
-                reti = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
-                if (reti == JOptionPane.YES_OPTION) {
+                response = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
+                if (response == JOptionPane.YES_OPTION) {
                     doSave(dfm);
                 }
             }
         }
-        return reti;
+        return response;
     }
 
-    private void clearDirty() {
-        DoeFileModel dfm = doeFrame.getModel();
-        if (dfm != null) {
-            ((ParamTableModel) dfm.paramTable.getModel()).dirty = false;
+    private void clearDirty()
+	
+	{
+        DoeFileModel doeFileModel = doeFrame.getModel();
+        if (doeFileModel != null) {
+            ((ParamTableModel) doeFileModel.paramTable.getModel()).dirty = false;
         }
     }
 
-    private void doSaveAs(DoeFileModel dfm) {
-        String nm = dfm.userFile.getName();
-        if (!nm.endsWith(".grd")) {
-            int idx = nm.lastIndexOf('.');
-            nm = nm.substring(0, idx);
-            nm = nm + ".grd";
+    private void doSaveAs(DoeFileModel doeFileModel)
+	{
+        String fileName = doeFileModel.userFile.getName();
+        if (!fileName.endsWith(".grd")) // TODO likely switch to Grid.xml or somesuch
+		{
+            int idx = fileName.lastIndexOf('.');
+            fileName = fileName.substring(0, idx);
+            fileName = fileName + ".grd";
         }
 
-        openSaveFileChooser.setSelectedFile(new File(nm));
+        openSaveFileChooser.setSelectedFile(new File(fileName));
         int ret = openSaveFileChooser.showSaveDialog(doeFrame);
         if (ret != JFileChooser.APPROVE_OPTION) {
             return;
@@ -189,23 +193,24 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
         File f = openSaveFileChooser.getSelectedFile();
         try {
-            dfm.marshallJaxb(f);
+            doeFileModel.marshallJaxb(f);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(doeFrame, "Error on file save-as: " + e.getMessage(), "File save error", JOptionPane.OK_OPTION);
         }
-        dfm.userFile = f;
-        doeFrame.setTitle(doeFrame.titleString + " -- " + dfm.userFile.getName());
+        doeFileModel.userFile = f;
+        doeFrame.setTitle(doeFrame.titleString + " -- " + doeFileModel.userFile.getName());
     }
 
-    private void doSave(DoeFileModel dfm) {
+    private void doSave(DoeFileModel doeFileModel) {
         try {
-            dfm.marshallJaxb(dfm.userFile);
+            doeFileModel.marshallJaxb(doeFileModel.userFile);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(doeFrame, "Error on file save: " + e.getMessage(), "File save error", JOptionPane.OK_OPTION);
         }
     }
 
-    private void olddoOpen(File f) // todo remove
+	@Deprecated
+    private void old_doOpen(File f) // todo remove
     {
         try {
             DoeFileModel dfm = FileHandler.openFile(f);
@@ -217,30 +222,30 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         }
     }
 
-    private void doOpen(SimkitAssembly jaxbRoot, File f) {
-        DoeFileModel dfm = FileHandler._openFileJaxb(jaxbRoot, f);
-        doeFrame.setModel(dfm);
+    private void doOpen(SimkitAssembly jaxbSimkitAssembly, File f) {
+        DoeFileModel doeFileModel = FileHandler._openFileJaxb(jaxbSimkitAssembly, f);
+        doeFrame.setModel(doeFileModel);
         doeFrame.installContent();
-        doeFrame.setTitle(doeFrame.titleString + " -- " + dfm.userFile.getName());
+        doeFrame.setTitle(doeFrame.titleString + " -- " + doeFileModel.userFile.getName());
     }
     private JobLauncherTab2 jobLauncher;
 
-    public void setJobLauncher(JobLauncherTab2 jobL) {
-        jobLauncher = jobL;
+    public void setJobLauncher(JobLauncherTab2 jobLauncher) {
+        this.jobLauncher = jobLauncher;
     }
-    Vector<TerminalParameter> savedDesignParms;
+    Vector<TerminalParameter> savedDesignParameters;
     Vector<EventGraph> savedEvGraphs;
 
     public boolean prepRun() {
-        DoeFileModel dfm = doeFrame.getModel();
+        DoeFileModel doeFileModel = doeFrame.getModel();
 
         // check for anything checked
         check:
         {
-            int n = dfm.paramTable.getModel().getRowCount();
+            int n = doeFileModel.paramTable.getModel().getRowCount();
 
             for (int r = 0; r < n; r++) {
-                if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
+                if (((Boolean) doeFileModel.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
                     break check;
                 }
             }
@@ -252,8 +257,8 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // clone the jaxbroot (we want to use currently checked widgets, but don't want to force save
     // No clone method, but save the params
 
-        savedDesignParms = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
-        saveDoeParmsNoNotify();
+        savedDesignParameters = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
+        saveDoeParametersNoNotify();
 
         // put Event graphs in place (CDATA stuff)
 
@@ -262,15 +267,15 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         return true;
     }
 
-    public Collection getLoadedEventGraphs() {
+    public Collection<File> getLoadedEventGraphs() {
         return new Vector<>(loadedEventGraphs);
     }
 
     public void restorePrepRun() {
         SimkitAssembly sa = OpenAssembly.inst().jaxbRoot;
         sa.getDesignParameters().clear();
-        sa.getDesignParameters().addAll(savedDesignParms);
-        savedDesignParms = null;
+        sa.getDesignParameters().addAll(savedDesignParameters);
+        savedDesignParameters = null;
         sa.getEventGraph().clear();
         sa.getEventGraph().addAll(savedEvGraphs);
         savedEvGraphs = null;
@@ -334,11 +339,11 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
      * the jaxb SimkitAssembly object, ready to be marshalled with the next Assembly save;
      */
     public void saveDoeParams() {
-        saveDoeParmsNoNotify();
+        saveDoeParametersNoNotify();
         OpenAssembly.inst().doSendAssyJaxbChanged(this);
     }
 
-    private void saveDoeParmsNoNotify() {
+    private void saveDoeParametersNoNotify() {
         doeFrame.getModel().saveTableEditsToJaxb();
     }
 

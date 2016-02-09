@@ -348,11 +348,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     AssemblyView view = (AssemblyView) getView();
                     view.deleteTab(vAMod);
 
-                    // NOTE: This doesn't work quite right.  If no Assy is open,
+                    // NOTE: This doesn't work quite right.  If no Assembly is open,
                     // then any non-associated EGs that were also open will
                     // annoyingly close from the closeAll call above.  We are
                     // using an open EG cache system that relies on parsing an
-                    // Assy file to find its associated EGs to open
+                    // Assembly file to find its associated EGs to open
                     if (!isCloseAll()) {
 
                         AssemblyModel[] modAr = view.getOpenModels();
@@ -476,7 +476,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 n = n.substring(0, n.length() - 4);
             }
             gmd.name = n;
-            model.changeMetadata(gmd); // might have renamed
+            model.setMetadata(gmd); // might have renamed
 
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
@@ -493,7 +493,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean modified =
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
-            ((AssemblyModel) getModel()).changeMetadata(gmd);
+            ((AssemblyModel) getModel()).setMetadata(gmd);
 
             // update title bar
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
@@ -699,6 +699,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"<p>Open or create a project first.</p>");
 			return;
 		}
+		ViskitGlobals.instance().getViskitApplicationFrame().selectAssemblyEditorTab(); // prerequisite to possible menu
 
         GraphMetadata priorAssemblyMetadata = null;
         AssemblyModelImpl priorAssemblyModel = (AssemblyModelImpl) getModel();
@@ -710,11 +711,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         assemblyModel.initialize();
         assemblyModel.newModel(null); // no file
 
-        // No vAMod set in controller yet...it gets set
+        // No vAssemblyModel set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
         ((AssemblyView) getView()).addTab(assemblyModel);
 
-        GraphMetadata newAssemblyMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assy
+        GraphMetadata newAssemblyMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assembly
         if (priorAssemblyMetadata != null) {
             newAssemblyMetadata.packageName = priorAssemblyMetadata.packageName;
         }
@@ -723,7 +724,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
         if (modified)
 		{
-            ((AssemblyModel) getModel()).changeMetadata(newAssemblyMetadata);
+            ((AssemblyModel) getModel()).setMetadata(newAssemblyMetadata);
 
             // update title bar
             ((AssemblyView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
@@ -1983,6 +1984,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
                     );
+			ex.printStackTrace();
             closeAll();
         }
     }

@@ -13,13 +13,14 @@ import viskit.ViskitGlobals;
  */
 public class EventStateTransition extends ViskitElement {
 
-    private List<String> descriptionArray = new ArrayList<>();
-    private String operationOrAssignment = EMPTY;
+    private String  operationOrAssignment = EMPTY;
+    private String  indexingExpression = EMPTY;
     private boolean isOperation = false;
-    private List<String> comments = new ArrayList<>();
-    private String indexingExpression = EMPTY;
-    private String value;
-    private String comment;
+    private String  value;
+    private ArrayList<String> commentsArrayList = new ArrayList<>();
+    private String  comment;
+    private String  description = EMPTY;  // instance information
+	
     private String localVariableAssignment;
     private String localVariableInvocation;
 
@@ -65,14 +66,6 @@ public class EventStateTransition extends ViskitElement {
         }
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
     @Override
     public boolean isOperation() {
         return isOperation;
@@ -101,23 +94,8 @@ public class EventStateTransition extends ViskitElement {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
     }
     /**
      * @return the localVariableAssignment
@@ -145,5 +123,45 @@ public class EventStateTransition extends ViskitElement {
      */
     public void setLocalVariableInvocation(String localVariableInvocation) {
         this.localVariableInvocation = localVariableInvocation;
+    }
+
+	@Override
+    public String getDescription() 
+	{		
+		moveLegacyCommentsToDescription ();
+        return description;
+    }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if (!commentsArrayList.isEmpty())
+		{
+			String result = new String();
+			for (String comment : commentsArrayList)
+			{
+				result += " " + comment;
+			}
+			description = (description + " " + result).trim();
+			commentsArrayList.clear();
+		}
+	}
+
+    @Override
+	@Deprecated
+    public String getComment() 
+	{
+		moveLegacyCommentsToDescription ();
+        return description;
     }
 }

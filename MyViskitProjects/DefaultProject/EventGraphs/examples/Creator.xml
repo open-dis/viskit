@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="Creator" package="examples" version="1.0" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="Creator" package="examples" version="1.0" author="ahbuss" extend="SimEntityBase" description="" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <StateVariable name="nextID" type="int">
         <Comment></Comment>
     </StateVariable>
-    <Event name="Arrival">
+    <Event name="Arrival" description="">
         <Comment></Comment>
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
         </StateTransition>
-        <Schedule delay="0.0" event="CustomerArrival" condition="true" priority="DEFAULT">
+        <Schedule delay="0.0" event="Customer_Arrival" condition="true" priority="DEFAULT">
             <Comment></Comment>
             <EdgeParameter value="new Integer(nextID)"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="120.0"/>
     </Event>
-    <Event name="CustomerArrival">
+    <Event name="Customer_Arrival" description="">
         <Comment></Comment>
         <Argument name="customer" type="Integer"/>
         <Code></Code>
         <Coordinate x="190.0" y="120.0"/>
     </Event>
-    <Event name="Run">
+    <Event name="Run" description="">
         <Comment></Comment>
         <StateTransition state="nextID">
             <Assignment value="0"/>

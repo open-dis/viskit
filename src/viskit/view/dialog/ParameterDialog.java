@@ -28,13 +28,13 @@ public class ParameterDialog extends JDialog {
 
     private static ParameterDialog dialog;
     private static boolean modified = false;
-    public static String newName,  newType,  newComment;
+    public static String newName,  newType,  newDescription;
     private static int count = 0;
 
-    private final JTextField parameterNameField;    // Text field that holds the parameter name
-    private final JTextField expressionField;       // Text field that holds the expression
-    private final JTextField commentField;          // Text field that holds the comment
-    private final JComboBox<String> parameterTypeCombo;    // Editable combo box that lets us select a type
+    private final JTextField parameterNameField;        // Text field that holds the parameter name
+    private final JTextField expressionField;           // Text field that holds the expression
+    private final JTextField descriptionField;          // Text field that holds the description
+    private final JComboBox<String> parameterTypeCombo; // Editable combo box that lets us select a type
     private vParameter parameter;
     private final JButton okButton, cancelButton;
 
@@ -78,15 +78,15 @@ public class ParameterDialog extends JDialog {
         setMaxHeight(parameterNameField);
         expressionField = new JTextField(25);
         setMaxHeight(expressionField);
-        commentField = new JTextField(25);
-        setMaxHeight(commentField);
+        descriptionField = new JTextField(25);
+        setMaxHeight(descriptionField);
 
         parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
         fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
@@ -107,7 +107,7 @@ public class ParameterDialog extends JDialog {
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         parameterNameField.addCaretListener(lis);
-        commentField.addCaretListener(lis);
+        descriptionField.addCaretListener(lis);
         expressionField.addCaretListener(lis);
         parameterTypeCombo.addActionListener(lis);
 
@@ -136,30 +136,30 @@ public class ParameterDialog extends JDialog {
         if (parameter != null) {
             parameterNameField.setText(parameter.getName());
             parameterTypeCombo.setSelectedItem(parameter.getType());
-            commentField.setText(parameter.getComment());
+            descriptionField.setText(parameter.getDescription());
         } else {
             parameterNameField.setText("param_" + count++);
-            commentField.setText("");
+            descriptionField.setText("");
         }
     }
 
     private void unloadWidgets() {
-        String ty = (String) parameterTypeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
-        String nm = parameterNameField.getText();
-        nm = nm.replaceAll("\\s", "");
+        String type = (String) parameterTypeCombo.getSelectedItem();
+        type = ViskitGlobals.instance().typeChosen(type);
+        String name = parameterNameField.getText();
+        name = name.replaceAll("\\s", "");
         if (parameter != null) {
-            parameter.setName(nm);
+            parameter.setName(name);
             //
-            if (ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
-                ty = "java.lang." + ty;
+            if (type.equals("String") || type.equals("Double") || type.equals("Integer")) {
+                type = "java.lang." + type;
             }
-            parameter.setType(ty);
-            parameter.setComment(commentField.getText());
+            parameter.setType(type);
+            parameter.setDescription(descriptionField.getText());
         } else {
-            newName = nm;
-            newType = ty;
-            newComment = commentField.getText().trim();
+            newName = name;
+            newType = type;
+            newDescription = descriptionField.getText().trim();
         }
     }
 

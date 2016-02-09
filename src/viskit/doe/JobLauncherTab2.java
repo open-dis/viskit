@@ -140,6 +140,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             unmarshaller = jaxbCtx.createUnmarshaller();
         } catch (JAXBException je) {
             LogUtils.getLogger(JobLauncherTab2.class).error(je);
+            je.printStackTrace();
         }
         this.title = title;
         cntlr = controller;
@@ -1400,6 +1401,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         statisticsGraph.addSampleStatistic(sst, dp.designPtIndex, dp.sampleIndex);
                     } catch (JAXBException ex) {
                         LogUtils.getLogger(GraphUpdater.class).error(ex);
+						ex.printStackTrace();
                     }
                 }
             }

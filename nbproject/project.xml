@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.ant.freeform</type>
     <configuration>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
-            <name>Viskit</name>
+            <name>Visual Simkit (Viskit)</name>
         </general-data>
         <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
             <!-- Do not use Project Properties customizer when editing this file manually. -->
-            <name>Viskit</name>
+            <name>Visual Simkit (Viskit)</name>
             <properties>
                 <property name="ant.script">build.xml</property>
             </properties>
@@ -168,5 +168,37 @@
                 <source-level>1.7</source-level>
             </compilation-unit>
         </java-data>
+        <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>Anaviza</word>
+            <word>ArrivalProcess</word>
+            <word>autogenerate</word>
+            <word>Beanshell</word>
+            <word>brutzman</word>
+            <word>cancelling</word>
+            <word>checkbox</word>
+            <word>classpaths</word>
+            <word>DefaultProject</word>
+            <word>DES</word>
+            <word>FreeBSD</word>
+            <word>HTML</word>
+            <word>Hueneme</word>
+            <word>iconized</word>
+            <word>interarrival</word>
+            <word>javahelp</word>
+            <word>LGPL</word>
+            <word>metadata</word>
+            <word>Norbraten</word>
+            <word>NPS</word>
+            <word>popup</word>
+            <word>Simkit</word>
+            <word>SimpleArrivalProcess</word>
+            <word>TODO</word>
+            <word>Toolbar</word>
+            <word>url</word>
+            <word>Viskit</word>
+            <word>Viskit's</word>
+            <word>XML</word>
+            <word>Yumetech</word>
+        </spellchecker-wordlist>
     </configuration>
 </project>

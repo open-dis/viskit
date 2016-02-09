@@ -62,7 +62,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;
     }
 

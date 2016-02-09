@@ -251,10 +251,8 @@ public abstract class ViskitTablePanel extends JPanel {
      * Get all the current table data in the form of an array of row objects.
      * @return ArrayList copy of row objects
      */
-    // We know this to be an ArrayList<ViskitElement> clone
-    @SuppressWarnings("unchecked")
-    public List<ViskitElement> getData() {
-        return (List<ViskitElement>) shadow.clone();
+    public ArrayList<ViskitElement> getData() {
+        return (ArrayList<ViskitElement>) shadow.clone(); // TODO figure out correct generics cast
     }
 
     public boolean isEmpty() {
@@ -309,7 +307,7 @@ public abstract class ViskitTablePanel extends JPanel {
      * Specify how many rows the table should display at a minimum
      * @return number of rows
      */
-    abstract public int getNumVisibleRows();
+    abstract public int getNumberVisibleRows();
 
     // private methods
     /**

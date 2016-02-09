@@ -38,7 +38,7 @@ public interface EventGraphModel {
     boolean saveModel(File f);
 
     /** @return a File object representing the last one passed to the two methods above */
-    File getLastFile();
+    File getCurrentFile();
 
     /**
      * Reports saved state of model.  Becomes "clean" after a save.
@@ -49,7 +49,7 @@ public interface EventGraphModel {
     /**
      * This is messaged by the controller, typically after a newModel(f) message.
      * It is used to inst a vector of all the nodes in the graph.  Since the
-     * EventNode object has src and target members, it also serves to inst all
+     * EventNode object has src and target members, it also serves to instantiate all
      * the edges.
      *
      * @return Vector of EventNodes.
@@ -64,7 +64,7 @@ public interface EventGraphModel {
     Vector<ViskitElement> getStateVariables();
 
     /**
-     * Messaged by controller to inst all defined simulation parameters
+     * Messaged by controller to inst?? all defined simulation parameters
      *
      * @return Vector of vParameter objects.
      */
@@ -79,17 +79,17 @@ public interface EventGraphModel {
 
     /** Models a scheduling edge between two nodes
      *
-     * @param src the source node
-     * @param target the target node
+     * @param sourceNode the source node
+     * @param targetNode the target node
      */
-    void newSchedulingEdge(EventNode src, EventNode target);
+    void newSchedulingEdge(EventNode sourceNode, EventNode targetNode);
 
-    /** Models a canceling edge between two nodes
+    /** Models a cancelling edge between two nodes
      *
-     * @param src the source node
-     * @param target the target node
+     * @param sourceNode the source node
+     * @param targetNode the target node
      */
-    void newCancelingEdge(EventNode src, EventNode target);
+    void newCancellingEdge(EventNode sourceNode, EventNode targetNode);
 
     /**
      * Delete the referenced event, also deleting attached edges.  Also handles
@@ -103,52 +103,52 @@ public interface EventGraphModel {
      *
      * @param edge the edge to delete or undo
      */
-    void deleteSchedulingEdge(Edge edge);
+    void deleteSchedulingEdge(SchedulingEdge edge);
 
     /** Deletes the given edge from the canvas.  Also handles and undo
      *
      * @param edge the edge to delete or undo
      */
-    void deleteCancelingEdge(Edge edge);
+    void deleteCancellingEdge(CancellingEdge edge);
 
     /** Changes the given edge on the canvas
      *
-     * @param e the edge to delete
+     * @param edge the edge to delete
      */
-    void changeSchedulingEdge(Edge e);
+    void changeSchedulingEdge(SchedulingEdge edge);
 
     /** Changes the given edge on the canvas
      *
-     * @param e the edge to delete
+     * @param edge the edge to change
      */
-    void changeCancelingEdge(Edge e);
+    void changeCancellingEdge(CancellingEdge edge);
 
-    /** Modifies the properties of this EG model
+    /** Modifies the properties of this Event Graph model
      *
-     * @param gmd the meta data that contains changes to record
+     * @param graphMetadata the meta data that contains changes to record
      */
-    void changeMetadata(GraphMetadata gmd);
+    void setMetadata(GraphMetadata graphMetadata);
 
     /**
      * Notify of a change to an Event Node
-     * @param en the event node that changed
+     * @param eventNode the event node that changed
      * @return true if a change occurred
      */
-    boolean changeEvent(EventNode en);
+    boolean changeEvent(EventNode eventNode);
 
-    void newStateVariable(String name, String type, String initVal, String comment);
+    void newStateVariable(String name, String type, String initialValue, String description);
 
-    void newSimParameter(String name, String type, String initVal, String comment);
+    void newSimParameter(String name, String type, String initialValue, String description);
 
-    boolean changeStateVariable(vStateVariable st);
+    boolean changeStateVariable(vStateVariable stateParameter);
 
-    boolean changeSimParameter(vParameter p);
+    boolean changeSimParameter(vParameter simParameter);
 
-    void changeCodeBlock(String s);
+    void changeCodeBlock(String newCodeBlock);
 
-    void deleteStateVariable(vStateVariable sv);
+    void deleteStateVariable(vStateVariable stateVariable);
 
-    void deleteSimParameter(vParameter p);
+    void deleteSimParameter(vParameter simParameter);
 
     GraphMetadata getMetadata();
 
@@ -162,26 +162,26 @@ public interface EventGraphModel {
 
     String generateIndexVariableName();
 
-    void resetLVNameGenerator();
+    void resetLocalVariableNameGenerator();
 
-    void resetIdxNameGenerator();
+    void resetIndexVariableNameGenerator();
 
     String generateStateVariableName();
 
-    /** Supports redo of a canceling edge
-     * @param ed the CancelingEdge to reinsert into the model
+    /** Supports redo of a cancelling edge
+     * @param edge the CancellingEdge to reinsert into the model
      */
-    void redoCancelingEdge(Edge ed);
+    void redoCancellingEdge(CancellingEdge edge);
 
     /**
      * Supports redo of a scheduling edge
      * @param ed the SchedulingEdge to reinsert into the model
      */
-    void redoSchedulingEdge(Edge ed);
+    void redoSchedulingEdge(SchedulingEdge ed);
 
     /**
      * Supports redo of an event node
-     * @param node the event to reinsert into the model
+     * @param eventNode the EventNode to reinsert into the model
      */
-    void redoEvent(EventNode node);
+    void redoEvent(EventNode eventNode);
 }

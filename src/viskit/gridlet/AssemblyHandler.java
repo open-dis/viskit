@@ -48,7 +48,7 @@ public class AssemblyHandler implements XmlRpcHandler {
     // during an addReport(), likewise enabling the appropriate
     // getReport() monitor.
     int port;
-    JAXBContext jaxbCtx;
+    JAXBContext jaxbContext;
     InputStream inputStream;
 
     public AssemblyHandler(int port) {
@@ -60,9 +60,10 @@ public class AssemblyHandler implements XmlRpcHandler {
         this.sessionManager = sessionManager;
         gridRuns = new Hashtable<>();
         try {
-            jaxbCtx = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error("Classpath error loading jaxb bindings?", e);
+            e.printStackTrace();
         }
     }
 

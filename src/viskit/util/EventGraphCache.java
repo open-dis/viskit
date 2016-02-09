@@ -132,7 +132,7 @@ public class EventGraphCache {
     }
 
     /**
-     * Converts a loaded assy file into a Document
+     * Converts a loaded Assembly file into a Document
      *
      * @param assyFile the assembly file loaded
      */
@@ -142,7 +142,7 @@ public class EventGraphCache {
 
     /**
      * Creates the entity table for an analyst report xml object.  Also aids in
-     * opening EG files that are a SimEntity node of an Assy file
+     * opening EG files that are a SimEntity node of an Assembly file
      *
      * @param assyFile the assembly file loaded
      */

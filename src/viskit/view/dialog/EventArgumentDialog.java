@@ -24,20 +24,21 @@ import viskit.ViskitGlobals;
  */
 public class EventArgumentDialog extends JDialog {
 
-    private final JTextField nameField;    // Text field that holds the parameter name
-    private final JTextField descriptionField;          // Text field that holds the description
+    private final JTextField                 nameField;    // Text field that holds the parameter name
+    private final JTextField          descriptionField;    // Text field that holds the description
     private final JComboBox<String> parameterTypeCombo;    // Editable combo box that lets us select a type
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
-    private EventArgument myEA;
+    private EventArgument eventArgument;
     private final JButton okButton,  cancelButton;
     public static String newName,  newType,  newDescription;
 
-    public static boolean showDialog(JFrame f, EventArgument parm) {
+    public static boolean showDialog(JFrame f, EventArgument eventArg)
+	{
         if (dialog == null) {
-            dialog = new EventArgumentDialog(f, parm);
+            dialog = new EventArgumentDialog(f, eventArg);
         } else {
-            dialog.setParams(f, parm);
+            dialog.setParameters(f, eventArg);
         }
 
         dialog.setVisible(true);
@@ -45,14 +46,15 @@ public class EventArgumentDialog extends JDialog {
         return modified;
     }
 
-    private EventArgumentDialog(JFrame parent, EventArgument param) {
+    private EventArgumentDialog(JFrame parent, EventArgument eventArgument)
+	{
         super(parent, "Event Argument", true);
-        this.myEA = param;
+        this.eventArgument = eventArgument;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        Container cont = getContentPane();
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -62,11 +64,11 @@ public class EventArgumentDialog extends JDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("name");
-        JLabel initLab = new JLabel("initial value");
-        JLabel typeLab = new JLabel("type");
-        JLabel descriptionLabel = new JLabel("description");
-        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
+        JLabel nameLabel         = new JLabel("name");
+        JLabel initialValueLabel = new JLabel("initial value");
+        JLabel typeLabel         = new JLabel("type");
+        JLabel descriptionLabel  = new JLabel("description");
+        int width = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
@@ -75,9 +77,9 @@ public class EventArgumentDialog extends JDialog {
         parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
-        fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
-        fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
+        fieldsPanel.add(new OneLinePanel(nameLabel, width, nameField));
+        fieldsPanel.add(new OneLinePanel(typeLabel, width, parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, width, descriptionField));
         panel.add(fieldsPanel);
         panel.add(Box.createVerticalStrut(5));
 
@@ -90,7 +92,7 @@ public class EventArgumentDialog extends JDialog {
         buttonPanel.add(cancelButton);
         panel.add(buttonPanel);
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        cont.add(panel);
+        contentPane.add(panel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
@@ -101,7 +103,7 @@ public class EventArgumentDialog extends JDialog {
         this.descriptionField.addCaretListener(listener);
         this.parameterTypeCombo.addActionListener(listener);
 
-        setParams(parent, param);
+        setParameters(parent, eventArgument);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -110,8 +112,8 @@ public class EventArgumentDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, EventArgument p) {
-        myEA = p;
+    public final void setParameters(Component c, EventArgument p) {
+        eventArgument = p;
 
         fillWidgets();
 
@@ -123,38 +125,37 @@ public class EventArgumentDialog extends JDialog {
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() {
-        if (myEA != null) {
-            nameField.setText(myEA.getName());
-            parameterTypeCombo.setSelectedItem(myEA.getType());
-            if (myEA.getDescription().size() > 0) {
-                descriptionField.setText(myEA.getDescription().get(0));
-            } else {
-                descriptionField.setText("");
-            }
-        } else {
+    private void fillWidgets()
+	{
+        if (eventArgument != null) {
+            nameField.setText(eventArgument.getName());
+            parameterTypeCombo.setSelectedItem(eventArgument.getType());
+            descriptionField.setText(eventArgument.getDescription());
+        } 
+		else
+		{
             nameField.setText("");
+            parameterTypeCombo.setSelectedIndex(-1);
             descriptionField.setText("");
         }
     }
 
     private void unloadWidgets() {
-        String ty = (String) parameterTypeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
-        String nm = nameField.getText();
-        nm = nm.replaceAll("\\s", "");
+        String type = (String) parameterTypeCombo.getSelectedItem();
+        type = ViskitGlobals.instance().typeChosen(type);
+        String name = nameField.getText();
+        name = name.replaceAll("\\s", "");
 
-        if (myEA != null) {
-            myEA.setName(nm);
-            myEA.setType(ty);
-            myEA.getDescription().clear();
-            String cs = descriptionField.getText().trim();
-            if (cs.length() > 0) {
-                myEA.getDescription().add(0, cs);
-            }
-        } else {
-            newName = nm;
-            newType = ty;
+        if (eventArgument != null)
+		{
+            eventArgument.setName(name);
+            eventArgument.setType(type);
+            eventArgument.setDescription(descriptionField.getText().trim());
+        } 
+		else 
+		{
+            newName = name;
+            newType = type;
             newDescription = descriptionField.getText().trim();
         }
     }

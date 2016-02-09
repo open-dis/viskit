@@ -346,9 +346,9 @@ public class SimulationRunPanel extends JPanel {
 		}
 		else 
 		{
-			initializationMessage = "*****************************************************************************************" + lineEnd +
-                                    "* Not ready! Open/create then initialize an Assembly before using Simulation Run panel. *" + lineEnd +
-                                    "*****************************************************************************************" + lineEnd;
+			initializationMessage = "************************************************************************************" + lineEnd +
+                                    "* Not ready! Open/create/initialize an Assembly before using Simulation Run panel. *" + lineEnd +
+                                    "************************************************************************************" + lineEnd;
 			simulationOutputTA.setEditable(false);
 		}
 		simulationOutputTA.setText(initializationMessage);

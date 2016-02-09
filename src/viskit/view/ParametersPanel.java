@@ -38,7 +38,7 @@ public class ParametersPanel extends ViskitTablePanel {
         String[] sa = new String[3];
         sa[0] = e.getName();
         sa[1] = e.getType();
-        sa[2] = e.getComment();
+        sa[2] = e.getDescription();
         return sa;
     }
 
@@ -49,7 +49,7 @@ public class ParametersPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;
     }
 

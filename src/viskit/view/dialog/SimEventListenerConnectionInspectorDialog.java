@@ -126,7 +126,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
       EventGraphNode egnT = (EventGraphNode)simEvEdge.getTo();
       sourceTF.setText(egnS.getName() + " (" + egnS.getType()+")");
       targetTF.setText(egnT.getName() + " (" + egnT.getType()+")");
-      descriptionTF  .setText(simEvEdge.getDescriptionString());
+      descriptionTF  .setText(simEvEdge.getDescription());
     }
     else {
       sourceTF.setText("");
@@ -151,7 +151,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void unloadWidgets()
   {
     if(simEvEdge != null)
-      simEvEdge.setDescriptionString(descriptionTF.getText().trim());
+      simEvEdge.setDescription(descriptionTF.getText().trim());
   }
 
   class cancelButtonListener implements ActionListener

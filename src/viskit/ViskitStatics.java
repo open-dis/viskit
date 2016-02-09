@@ -571,7 +571,7 @@ public class ViskitStatics {
             Constructor<?>[] constr = type.getConstructors();
             Annotation[] paramAnnots;
             List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
-            ObjectFactory of = new ObjectFactory();
+            ObjectFactory objectFactory = new ObjectFactory();
             Field f = null;
 
             try {
@@ -608,7 +608,7 @@ public class ViskitStatics {
                             throw new RuntimeException("ParameterMap names and types length mismatch");
                         }
                         for (int k = 0; k < names.length; k++) {
-                            Parameter pt = of.createParameter();
+                            Parameter pt = objectFactory.createParameter();
                             pt.setName(names[k]);
                             pt.setType(types[k]);
 
@@ -636,7 +636,7 @@ public class ViskitStatics {
                                 plist[n] = new ArrayList<>();
                                 for (int k = 0; k < params.length; k += 2) {
                                     try {
-                                        Parameter p = of.createParameter();
+                                        Parameter p = objectFactory.createParameter();
                                         String ptype = params[k];
                                         String pname = params[k + 1];
 
@@ -663,7 +663,7 @@ public class ViskitStatics {
                     int k = 0;
                     for (Class<?> ptype : ptypes) {
                         try {
-                            Parameter p = of.createParameter();
+                            Parameter p = objectFactory.createParameter();
                             String ptType = ViskitStatics.convertClassName(ptype.getName());
                             if (ptType.indexOf(".class") > 0) { //??
                                 ptType = ptType.split("\\.")[0];

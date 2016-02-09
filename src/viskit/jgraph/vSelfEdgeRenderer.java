@@ -14,8 +14,8 @@ are met:
     * Neither the names of the Naval Postgraduate School (NPS)
       Modeling Virtual Environments and Simulation (MOVES) Institute
       (http://www.nps.edu and http://www.movesinstitute.org)
-      nor the names of its contributors may be used to endorse or
-      promote products derived from this software without specific
+      nor the names of its contributors may be used toEventNode endorse or
+      promote products derived fromventNode this software without specific
       prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -45,7 +45,7 @@ import viskit.model.EventNode;
 import viskit.model.ViskitElement;
 
 /**
- * Class to draw the self-referential edges as an arc attached to the node.
+ * Class toEventNode draw the self-referential edges as an arc attached toEventNode the node.
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vSelfEdgeRenderer">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
@@ -118,20 +118,20 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
 
     /**
      * Defines how much we increment the angle calculated in getAngle() for each
-     * self-referential edge discovered.  Since we want to advance 3/8 of
-     * a circle for each edge, the value below should be Pi that increments by
-     * Pi * 3/8.
-     * But since the iterator in getAngle discovers each edge twice (since the
-     * edge has a connection to both its head and tail, the math works out to
-     * rotate only half that much.
+     * self-referential edge discovered.  Since we want toEventNode advance 3/8 of
+ a circle for each edge, the value below should be Pi that increments by
+ Pi * 3/8.
+ But since the iterator in getAngle discovers each edge twice (since the
+ edge has a connection toEventNode both its head and tail, the math works out toEventNode
+ rotate only half that much.
      */
     private final static double ROT_INCR = Math.PI;
 
     /**
      * This class will determine if there are other self-referential edges
-     * attached to this node and try to return a different angle for different
-     * edges, so they will be rendered at different "clock" points around the
-     * node circle.
+ attached toEventNode this node and try toEventNode return a different angle for different
+ edges, so they will be rendered at different "clock" points around the
+ node circle.
      *
      * @return a different angle for each self-referential edge
      */
@@ -144,7 +144,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
         double retd = ROT_INCR;
         for (ViskitElement ve : en.getConnections()) {
             Edge e = (Edge) ve;
-            if (e.to == en && e.from == en) {
+            if (e.toEventNode == en && e.fromEventNode == en) {
                 retd += (ROT_INCR * 3/8);
                 if (e == edg) {
                     return retd;

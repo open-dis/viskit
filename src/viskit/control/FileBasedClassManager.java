@@ -23,7 +23,7 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /** A custom class manager to support finding EGs and PCLs in *.class form vice
- * XML.  Used to populate the LEGOs tree on the Assy Editor.
+ * XML.  Used to populate the LEGOs tree on the Assembly Editor.
  *
  * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -191,6 +191,7 @@ public class FileBasedClassManager {
 
         } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
             LOG.error(e);
+            e.printStackTrace();
         }
     }
 

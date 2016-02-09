@@ -77,7 +77,7 @@ public class OpenAssembly {
     /** Singleton class */
     private OpenAssembly() {}
 
-    /** @param f the Assembly XML file to announce to all the Assy Listeners
+    /** @param f the Assembly XML file to announce to all the Assembly Listeners
      * @param jaxb the JAXB root of this XML file
      */
     public void setFile(File f, SimkitAssembly jaxb) {
@@ -87,7 +87,7 @@ public class OpenAssembly {
             jaxbFactory = new ObjectFactory();
 
             // This is crucial for Viskit being able to open associated EGs for
-            // this Assy
+            // this Assembly
             EventGraphCache.instance().makeEntityTable(file);
             doSendNewAssy(file);
         }

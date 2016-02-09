@@ -20,10 +20,10 @@ public interface EventGraphView {
     /**
      * Permits user to edit existing edges
      *
-     * @param edge the canceling edge to edit
+     * @param edge the cancelling edge to edit
      * @return successful or not
      */
-    boolean doEditCancelEdge(Edge edge);
+    boolean doEditCancellingEdge(Edge edge);
 
     /**
      * Permits user to edit existing edges

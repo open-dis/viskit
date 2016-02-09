@@ -18,25 +18,16 @@ import java.util.Vector;
 public abstract class AssemblyNode extends ViskitElement {
 
     private Vector<AssemblyEdge> connections = new Vector<>();
-    private List<String> comments = new ArrayList<>();
-    private Point2D position = new Point2D.Double(0d, 0d);
+    private Point2D       position = new Point2D.Double(0d, 0d);
     private VInstantiator instantiator;
-    private String descriptionString = EMPTY;  // instance information
+    private List<String>  commentsArrayList = new ArrayList<>();
+    private String        description = EMPTY;  // instance information
 
     AssemblyNode(String name, String type) // package access on constructor
     {
         this.name = name;
         this.type = type;
     }
-
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
     public Vector<AssemblyEdge> getConnections() {
         return connections;
     }
@@ -61,11 +52,43 @@ public abstract class AssemblyNode extends ViskitElement {
         this.instantiator = instantiator;
     }
 
-    public String getDescriptionString() {
-        return descriptionString;
+	@Override
+    public String getDescription() 
+	{		
+		moveLegacyCommentsToDescription ();
+        return description;
     }
 
-    public void setDescriptionString(String description) {
-        this.descriptionString = description;
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if (!commentsArrayList.isEmpty())
+		{
+			String result = new String();
+			for (String comment : commentsArrayList)
+			{
+				result += " " + comment;
+			}
+			description = (description + " " + result).trim();
+			commentsArrayList.clear();
+		}
+	}
+
+    @Override
+	@Deprecated
+    public String getComment() 
+	{
+		moveLegacyCommentsToDescription ();
+        return description;
     }
 }

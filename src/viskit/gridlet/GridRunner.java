@@ -178,6 +178,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
             log.error(e);
+            e.printStackTrace();
             return Boolean.FALSE;
         }
 
@@ -321,6 +322,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (NumberFormatException | JAXBException e) {
             error = true;
             log.error(e);
+            e.printStackTrace();
         }
 
         return error;
@@ -488,6 +490,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         } catch (JAXBException e) {
             log.error(e);
+            e.printStackTrace();
             return Boolean.FALSE;
         }
 
@@ -514,6 +517,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
         } catch (JAXBException e) {
             log.error(e);
+            e.printStackTrace();
             return Boolean.FALSE;
         }
 

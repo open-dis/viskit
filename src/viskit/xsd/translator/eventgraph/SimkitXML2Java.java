@@ -8,6 +8,8 @@ import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
@@ -53,7 +55,7 @@ public class SimkitXML2Java {
     private SimEntity root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbCtx;
+    JAXBContext jaxbContext;
     private Unmarshaller unMarshaller;
     private Object unMarshalledObject;
 
@@ -69,10 +71,11 @@ public class SimkitXML2Java {
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
         try {
-            jaxbCtx = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
+            jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
             log.error(ex);
             error(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -107,13 +110,25 @@ public class SimkitXML2Java {
 
     public void unmarshal() {
         try {
-            setUnMarshaller(jaxbCtx.createUnmarshaller());
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            setUnMarshaller(jaxbUnmarshaller);
+			
+			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+			jaxbUnmarshaller.setEventHandler(new ValidationEventHandler() {
+				@Override
+				public boolean handleEvent(ValidationEvent validationEvent) {
+					System.out.println("Unmarshaller event handler says: " + validationEvent.getMessage() + 
+									   " (Exception: " + validationEvent.getLinkedException() + ")");
+					return false;
+				}
+			});
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
             root = (SimEntity) getUnMarshalledObject();
         } catch (JAXBException ex) {
 
             // Silence attempting to unmarshal an Assembly here
             log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
+            ex.printStackTrace();
         }
     }
 
@@ -240,7 +255,7 @@ public class SimkitXML2Java {
         for (Parameter p : liParams) {
 
             if (!superParams.contains(p)) {
-                if (!p.getComment().isEmpty()) {
+                if (!p.getComment().isEmpty()) { // TODO fix description
                     pw.print(SP_4 + JDO + SP);
                     for (String comment : p.getComment()) {
                         pw.print(comment);
@@ -280,7 +295,7 @@ public class SimkitXML2Java {
 
             // Non array type generics
             if (isGeneric(s.getType())) {
-                if (!s.getComment().isEmpty()) {
+                if (!s.getComment().isEmpty()) { // TODO fix description
                     pw.print(SP_4 + JDO + SP);
                     for (String comment : s.getComment()) {
                         pw.print(comment);
@@ -298,7 +313,7 @@ public class SimkitXML2Java {
                 // Non-super type, primitive, primitive[] or another type array
                 if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
 
-                    if (!s.getComment().isEmpty()) {
+                    if (!s.getComment().isEmpty()) { // TODO fix description
                         pw.print(SP_4 + JDO + SP);
                         for (String comment : s.getComment()) {
                             pw.print(comment);
@@ -310,7 +325,7 @@ public class SimkitXML2Java {
 
                 } else if (!isArray(s.getType())) {
 
-                    if (!s.getComment().isEmpty()) {
+                    if (!s.getComment().isEmpty()) { // TODO fix description
                         pw.print(SP_4 + JDO + SP);
                         for (String comment : s.getComment()) {
                             pw.print(comment);

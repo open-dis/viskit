@@ -1012,7 +1012,7 @@ public class ViskitGlobals {
         public void actionPerformed(ActionEvent e) {
             Object o = e.getSource();
             if (o instanceof JComboBox) {
-                final JComboBox<String> comboBox = (JComboBox) o;
+                final JComboBox<String> comboBox = (JComboBox) o; // TODO figure out correct generics cast
                 pendingComboBox = comboBox;
                 if (comboBox.getSelectedItem().toString().equals(moreTypesString)) {
 

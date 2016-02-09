@@ -128,7 +128,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         Object toO = ae.getTo();
         DefaultGraphCell from, to;
         from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
-        to = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
+        to   = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
 
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
         ae.opaqueViewObject = edge;

@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.List;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -16,26 +14,28 @@ import java.util.List;
  */
 abstract public class ViskitElement implements Comparable<ViskitElement> {
 
-    public Object opaqueViewObject;       // for private use of V
-    public Object opaqueModelObject;      // for private use of M
+    public Object opaqueViewObject;       // for private use of View
+    public Object opaqueModelObject;      // for private use of Model
 
     /** NOT USED */
-    public Object opaqueControllerObject; // for private use of C
+    public Object opaqueControllerObject; // for private use of Controller
 
     protected static final String EMPTY = "";
-    protected String type = EMPTY;
-    protected String name = EMPTY;
+    protected String type       = EMPTY;
+    protected String name       = EMPTY;
 
     /** every node or edge has a unique key */
     private static int seqID = 0;
     private Object modelKey = EMPTY + (seqID++);
 
-    protected ViskitElement shallowCopy(ViskitElement newVe) {
-        newVe.opaqueControllerObject = this.opaqueControllerObject;
-        newVe.opaqueViewObject = this.opaqueViewObject;
-        newVe.opaqueModelObject = this.opaqueModelObject;
-        newVe.modelKey = this.modelKey;
-        return newVe;
+    protected ViskitElement shallowCopy(ViskitElement newViskitElement)
+	{
+        newViskitElement.opaqueControllerObject = this.opaqueControllerObject;
+        newViskitElement.opaqueViewObject       = this.opaqueViewObject;
+        newViskitElement.opaqueModelObject      = this.opaqueModelObject;
+        newViskitElement.modelKey               = this.modelKey;
+		
+        return newViskitElement;
     }
 
     public Object getModelKey() {
@@ -91,11 +91,12 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
 
     public abstract String getValue();
 
+	@Deprecated
     public abstract String getComment();
 
-    public abstract List<String> getDescriptionArray();
+    public abstract String getDescription();
 
-    public abstract void setDescriptionArray(List<String> descriptionArray);
+    public abstract void setDescription(String description);
 
     public abstract String getOperationOrAssignment();
 

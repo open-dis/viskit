@@ -20,19 +20,20 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class EventNode extends ViskitElement {
 
-    private Vector<ViskitElement> connections = new Vector<>();
-    private List<ViskitElement> localVariables = new ArrayList<>();
-    private List<String> comments = new ArrayList<>();
-    private List<ViskitElement> transitions = new ArrayList<>();
-    private List<ViskitElement> arguments = new ArrayList<>();
-    private List<String> descriptionArray = new ArrayList<>();
+    private ArrayList<ViskitElement>   argumentsArrayList      = new ArrayList<>();
+    private Vector<ViskitElement>      connectionsVector       = new Vector<>();
+    private ArrayList<ViskitElement>   localVariablesArrayList = new ArrayList<>();
+    private ArrayList<ViskitElement>   transitionsArrayList    = new ArrayList<>();
+	
     private Point2D position = new Point2D.Double(0.d, 0.d);
-    private String codeblock = EMPTY;
+    private String  codeblock = EMPTY;
     private boolean operation;
-    private String operationOrAssignment;
-    private String indexingExpression;
-    private String value;
-    private String comment;
+    private String  operationOrAssignment;
+    private String  indexingExpression;
+    private String  value;
+    private ArrayList<String>          commentsArrayList       = new ArrayList<>(); // usage is deprecated, move information to description field
+    private String  comment;
+    private String                     description             = new String();
 
     EventNode(String name) // package access on constructor
     {
@@ -44,39 +45,43 @@ public class EventNode extends ViskitElement {
         return name;
     }
 
-    public EventNode shallowCopy() {
-        EventNode en = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
-        en.connections = connections;
-        en.comments = comments;
-        en.transitions = transitions;
-        en.localVariables = localVariables;
-        en.arguments = arguments;
-        en.codeblock = codeblock;
-        return en;
+    public EventNode shallowCopy()
+	{
+        EventNode eventNode = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
+        eventNode.argumentsArrayList      = argumentsArrayList;
+        eventNode.codeblock               = codeblock;
+        eventNode.connectionsVector       = connectionsVector;
+        eventNode.localVariablesArrayList = localVariablesArrayList;
+        eventNode.transitionsArrayList    = transitionsArrayList;
+        eventNode.commentsArrayList       = commentsArrayList;
+        eventNode.description             = description;
+		
+		if (!eventNode.commentsArrayList.isEmpty())
+		{
+			for (String comment : eventNode.commentsArrayList)
+			{
+				eventNode.description  += " " + comment;
+			}
+			eventNode.description = eventNode.description.trim();
+			eventNode.commentsArrayList.clear();
+		}
+        return eventNode;
     }
 
     @Override
-    public void setName(String s) {
+    public void setName(String newName) {
         if (this.opaqueModelObject != null) {
-            ((Event) opaqueModelObject).setName(s);
+            ((Event) opaqueModelObject).setName(newName);
         }
-        this.name = s;
+        this.name = newName;
     }
 
     public List<ViskitElement> getArguments() {
-        return arguments;
+        return argumentsArrayList;
     }
 
-    public void setArguments(List<ViskitElement> arguments) {
-        this.arguments = arguments;
-    }
-
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
+    public void setArguments(ArrayList<ViskitElement> arguments) {
+        this.argumentsArrayList = arguments;
     }
 
     public void setCodeBLock(String s) {
@@ -88,27 +93,27 @@ public class EventNode extends ViskitElement {
     }
 
     public Vector<ViskitElement> getConnections() {
-        return connections;
+        return connectionsVector;
     }
 
     public void setConnections(Vector<ViskitElement> connections) {
-        this.connections = connections;
+        this.connectionsVector = connections;
     }
 
     public List<ViskitElement> getLocalVariables() {
-        return localVariables;
+        return localVariablesArrayList;
     }
 
-    public void setLocalVariables(List<ViskitElement> localVariables) {
-        this.localVariables = localVariables;
+    public void setLocalVariables(ArrayList<ViskitElement> localVariables) {
+        this.localVariablesArrayList = localVariables;
     }
 
-    public List<ViskitElement> getTransitions() {
-        return transitions;
+    public ArrayList<ViskitElement> getTransitions() {
+        return transitionsArrayList;
     }
 
-    public void setTransitions(List<ViskitElement> transitions) {
-        this.transitions = transitions;
+    public void setTransitions(ArrayList<ViskitElement> transitions) {
+        this.transitionsArrayList = transitions;
     }
 
     public Point2D getPosition() {
@@ -117,16 +122,6 @@ public class EventNode extends ViskitElement {
 
     public void setPosition(Point2D position) {
         this.position = position;
-    }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
     }
 
     @Override
@@ -140,11 +135,6 @@ public class EventNode extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
-    }
-
-    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -152,5 +142,57 @@ public class EventNode extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+	/**
+	 * @return the description
+	 */
+	@Override
+	public String getDescription()
+	{
+		moveLegacyCommentsToDescription ();
+		return description;
+	}
+
+	/**
+	 * @param newDescription the description to set
+	 */
+	@Override
+	public void setDescription(String newDescription) 
+	{
+		this.description = newDescription;
+	}
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if ((comment != null) && !comment.isEmpty())
+		{
+			description = comment.trim();
+			comment     = "";
+		}
+		if ((commentsArrayList != null) && !commentsArrayList.isEmpty())
+		{
+			String result = new String();
+			for (String comment : commentsArrayList)
+			{
+				result += " " + comment;
+			}
+			description = (description + " " + result).trim();
+			commentsArrayList.clear();
+		}
+	}
+
+    @Deprecated
+    @Override
+    public String getComment()
+	{
+		moveLegacyCommentsToDescription ();
+		return description;
     }
 }

@@ -1,12 +1,10 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.ViskitGlobals;
 
 /**
  * Represents the information about one state variable. This
- * includes its name, type, initial value, and current value.
+ * includes its name, type, initial value, current value and description.
  *
  * @author DMcG
  * @version $Id$
@@ -17,13 +15,13 @@ public class vStateVariable extends ViskitElement {
     private String[] arraySize;
 
     /** Object that represents its current value */
-    private Object currentValue;
-    private String comment = EMPTY;
-    private List<String> descriptionArray = new ArrayList<>();
+    private Object  currentValue;
+    private String  indexingExpression;
     private boolean operation;
-    private String operationOrAssignment;
-    private String indexingExpression;
-    private String value;
+    private String  operationOrAssignment;
+    private String  value;
+    private String  comment = EMPTY;
+    private String  description = new String();
 
     /**
      * Constructor
@@ -36,9 +34,9 @@ public class vStateVariable extends ViskitElement {
         currentValue = null;
     }
 
-    public vStateVariable(String nm, String typ, String comment) {
-        this(nm, typ);
-        this.comment = comment;
+    public vStateVariable(String name, String type, String description) {
+        this(name, type);
+        this.description = description;
     }
 
     @Override
@@ -73,25 +71,6 @@ public class vStateVariable extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -109,5 +88,40 @@ public class vStateVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+	@Override
+    public String getDescription() 
+	{		
+		moveLegacyCommentsToDescription ();
+        return description;
+    }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if ((comment != null) && !comment.isEmpty())
+		{
+			description = comment.trim();
+			comment     = "";
+		}
+	}
+
+    @Deprecated
+    @Override
+    public String getComment()
+	{
+		moveLegacyCommentsToDescription ();
+        return description;
     }
 }

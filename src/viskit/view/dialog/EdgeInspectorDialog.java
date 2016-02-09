@@ -66,14 +66,14 @@ public class EdgeInspectorDialog extends JDialog {
 
     /**
      * Set up and show the dialog.  The first Component argument
-     * determines which frame the dialog depends on; it should be
-     * a component in the dialog's controlling frame. The second
-     * Component argument should be null if you want the dialog
-     * to come up with its left corner in the center of the screen;
-     * otherwise, it should be the component on top of which the
-     * dialog should appear.
-     * @param f the frame to orient this dialog
-     * @param edge the Edge node to edit
+ determines which frame the dialog depends on; it should be
+ a component in the dialog's controlling frame. The second
+ Component argument should be null if you want the dialog
+ toEventNode come up with its left corner in the center of the screen;
+ otherwise, it should be the component on top of which the
+ dialog should appear.
+     * @param f the frame toEventNode orient this dialog
+     * @param edge the Edge node toEventNode edit
      * @return an indication of success
      */
     public static boolean showDialog(JFrame f, Edge edge) {
@@ -114,7 +114,7 @@ public class EdgeInspectorDialog extends JDialog {
         typePanel.add(Box.createHorizontalStrut(15));
         schedulingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Scheduling" + OneLinePanel.CLOSE_LABEL_BOLD);
         BoxLayoutUtils.clampWidth(schedulingLabel);
-        cancellingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Canceling" + OneLinePanel.CLOSE_LABEL_BOLD);
+        cancellingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Cancelling" + OneLinePanel.CLOSE_LABEL_BOLD);
         BoxLayoutUtils.clampWidth(cancellingLabel);
         typePanel.add(schedulingLabel);
         typePanel.add(cancellingLabel);
@@ -212,7 +212,7 @@ public class EdgeInspectorDialog extends JDialog {
                 Color.gray);
         timeDelayMethodsCB = buildTimeDelayMethodsCB();
 
-        // Can happen of an unqualified name was used to create a parameter
+        // Can happen of an unqualified name was used toEventNode create a parameter
         if (timeDelayMethodsCB != null) {
             timeDelayMethodsCB.setToolTipText("Select an invocable method, or type "
                     + "in floating point delay value");
@@ -244,7 +244,7 @@ public class EdgeInspectorDialog extends JDialog {
         addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
         addButtonPanel.setBorder(new TitledBorder("add"));
         addDescriptionButton = new JButton("description"); //add description");
-        addConditionalButton = new JButton("conditional"); //add conditional");
+        addConditionalButton = new JButton("conditional"); //add condition");
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
@@ -345,30 +345,30 @@ public class EdgeInspectorDialog extends JDialog {
                     } // save the default one
                 }
             }
-            jcb.setEditable(true); // this allows anything to be entered
+            jcb.setEditable(true); // this allows anything toEventNode be entered
         } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
         }
         return jcb;
     }
 
-    /** Populates the time delay combo box with parameters, local vars and event
-     * node arguments from the node that is the source of the current edge
+    /** Populates the time delay combo box with parametersList, local vars and event
+ node arguments fromventNode the node that is the source of the current edge
      *
-     * @return a time delay combo box populated with parameters, local vars
-     * and event node arguments
+     * @return a time delay combo box populated with parametersList, local vars
+ and event node arguments
      */
     private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
         JComboBox<ViskitElement> cb = new JComboBox<>();
 
         ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsCBModel();
 
-        // First item should be empty to allow for default zero delay
+        // First item should be empty toEventNode allow for default zero delay
         ((DefaultComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
         cb.setModel(m);
 
-        java.util.List<ViskitElement> vars = new ArrayList<>(edge.from.getLocalVariables());
-        vars.addAll(edge.from.getArguments());
+        java.util.List<ViskitElement> vars = new ArrayList<>(edge.fromEventNode.getLocalVariables());
+        vars.addAll(edge.fromEventNode.getArguments());
 
         for (ViskitElement e : vars) {
             ((DefaultComboBoxModel<ViskitElement>)m).addElement(e);
@@ -383,8 +383,8 @@ public class EdgeInspectorDialog extends JDialog {
         String typ;
         Vector<String> methodNames = new Vector<>();
 
-        java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
-        types.addAll(edge.from.getArguments());
+        java.util.List<ViskitElement> types = new ArrayList<>(edge.fromEventNode.getLocalVariables());
+        types.addAll(edge.fromEventNode.getArguments());
         types.addAll(ViskitGlobals.instance().getSimParametersList());
 
         String className;
@@ -410,7 +410,7 @@ public class EdgeInspectorDialog extends JDialog {
             methods = type.getMethods();
 
             // Filter out methods of Object and any
-            // methods requiring parameters
+            // methods requiring parametersList
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
                 if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
@@ -425,7 +425,7 @@ public class EdgeInspectorDialog extends JDialog {
         ComboBoxModel<String> m = new DefaultComboBoxModel<>(methodNames);
         JComboBox<String> cb = new JComboBox<>();
 
-        // Allow user to edit the selection
+        // Allow user toEventNode edit the selection
         cb.setEditable(true);
 
         // First item should be empty
@@ -450,7 +450,7 @@ public class EdgeInspectorDialog extends JDialog {
             // Must have been an odd one, but we know it's a good double
             priorityCB.setSelectedItem(pr);
         } else {
-            // First try to find it in the list
+            // First try toEventNode find it in the list
             int i = 0;
             for (String s : priorityNames) {
                 if (s.equalsIgnoreCase(pr)) {
@@ -488,7 +488,7 @@ public class EdgeInspectorDialog extends JDialog {
         // Default
         timeDelayMethodsCB.setSelectedItem(value);
 
-        // Set the ComboBox width to accomodate the string length
+        // Set the ComboBox width toEventNode accomodate the string length
         timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
 
         for (int i = 0; i < timeDelayMethodsCB.getItemCount(); i++) {
@@ -496,7 +496,7 @@ public class EdgeInspectorDialog extends JDialog {
             if (value.equals(s)) {
                 timeDelayMethodsCB.setSelectedIndex(i);
 
-                // Set the ComboBox width to accomodate the string length
+                // Set the ComboBox width toEventNode accomodate the string length
                 timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
                 return;
             }
@@ -505,12 +505,12 @@ public class EdgeInspectorDialog extends JDialog {
 
     private void fillWidgets() {
 
-        sourceEvent.setText(edge.from.getName());
-        targetEvent.setText(edge.to.getName());
+        sourceEvent.setText(edge.fromEventNode.getName());
+        targetEvent.setText(edge.toEventNode.getName());
 
-        if (edge.to.getArguments() != null || !edge.to.getArguments().isEmpty()) {
-            parameters.setArgumentList(edge.to.getArguments());
-            parameters.setData(edge.parameters);
+        if (edge.toEventNode.getArguments() != null || !edge.toEventNode.getArguments().isEmpty()) {
+            parameters.setArgumentList(edge.toEventNode.getArguments());
+            parameters.setData(edge.parametersList);
             myParametersPanel.setBorder(new CompoundBorder(
                     new EmptyBorder(0, 0, 5, 0),
                     BorderFactory.createTitledBorder("Edge Parameters passed to " + targetEvent.getText())));
@@ -526,7 +526,7 @@ public class EdgeInspectorDialog extends JDialog {
             // A zero delay will be the default
             setTimeDelayMethodsCBValue("0.0");
 
-            // We always want this enabled to be able to enter manual delay
+            // We always want this enabled toEventNode be able toEventNode enter manual delay
             // values
             if (timeDelayMethodsCB != null)
                 timeDelayMethodsCB.setEnabled(true);
@@ -567,19 +567,19 @@ public class EdgeInspectorDialog extends JDialog {
             timeDelayPanel.setBorder(delayPanelDisabledBorder);
         }
 
-        if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
+        if (edge.condition == null || edge.condition.trim().isEmpty()) {
             conditionalExpressionPanel.setText("");
             hideShowConditionals(false);
         } else {
-            conditionalExpressionPanel.setText(edge.conditional);
+            conditionalExpressionPanel.setText(edge.condition);
             hideShowConditionals(true);
         }
 
-        if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
+        if (edge.conditionDescription == null || edge.conditionDescription.isEmpty()) {
             setDescription("");
             hideShowDescription(false);
         } else {
-            setDescription(edge.conditionalDescription);
+            setDescription(edge.conditionDescription);
             hideShowDescription(true);
         }
 
@@ -632,26 +632,26 @@ public class EdgeInspectorDialog extends JDialog {
         edge.delay = delaySt;
 
         String condSt = conditionalExpressionPanel.getText();
-        edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText();
+        edge.condition = (condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText();
 
-        edge.conditionalDescription = getDescription();
-        if (!edge.parameters.isEmpty()) {
-            edge.parameters.clear();
+        edge.conditionDescription = getDescription();
+        if (!edge.parametersList.isEmpty()) {
+            edge.parametersList.clear();
         }
 
         // Key on the EdgeNode's list of potential arguments
-        // TODO: How do we do this automatically from the EventInspectorDialog
+        // TODO: How do we do this automatically fromventNode the EventInspectorDialog
         // when we remove an argument?
-        if (!edge.to.getArguments().isEmpty()) {
+        if (!edge.toEventNode.getArguments().isEmpty()) {
 
-            // Bug 1373: This is how applying changes to a scheduling edge
+            // Bug 1373: This is how applying changes toEventNode a scheduling edge
             // causes the correct EG XML representation when removing event
-            // parameters from a proceeding node.  This loop adds vEdgeParameters
+            // parametersList fromventNode a proceeding node.  This loop adds vEdgeParameters
             for (ViskitElement o : parameters.getData()) {
-                edge.parameters.add(o);
+                edge.parametersList.add(o);
             }
         } else {
-            parameters.setData(edge.parameters);
+            parameters.setData(edge.parametersList);
         }
     }
 
@@ -723,7 +723,7 @@ public class EdgeInspectorDialog extends JDialog {
             getRootPane().setDefaultButton(okButton);
             dotLabel.setVisible(!((ViskitElement) timeDelayVariablesCB.getSelectedItem()).getName().isEmpty());
 
-            // Set the ComboBox width to accomodate the string length
+            // Set the ComboBox width toEventNode accomodate the string length
             if (timeDelayMethodsCB != null)
                 timeDelayMethodsCB.setPrototypeDisplayValue((String) timeDelayMethodsCB.getSelectedItem());
             else

@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
@@ -20,12 +18,12 @@ public class EventGraphNode extends AssemblyNode {
 
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
-    private List<String> descriptionArray = new ArrayList<>();
-    private boolean operation;
-    private String operationOrAssignment;
-    private String indexingExpression;
-    private String value;
-    private String comment;
+    private   boolean operation;
+    private   String operationOrAssignment;
+    private   String indexingExpression;
+    private   String value;
+    private   String comment;
+    private   String description = new String();
 
     EventGraphNode(String name, String type) // package access on constructor
     {
@@ -68,16 +66,6 @@ public class EventGraphNode extends AssemblyNode {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -88,11 +76,6 @@ public class EventGraphNode extends AssemblyNode {
     }
 
     @Override
-    public String getComment() {
-        return comment;
-    }
-
-    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -100,5 +83,47 @@ public class EventGraphNode extends AssemblyNode {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+	/**
+	 * @return the description
+	 */
+	@Override
+	public String getDescription()
+	{
+		moveLegacyCommentsToDescription ();
+		return description;
+	}
+
+	/**
+	 * @param newDescription the description to set
+	 */
+	@Override
+	public void setDescription(String newDescription) 
+	{
+		this.description = newDescription;
+	}
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if ((comment != null) && !comment.isEmpty())
+		{
+			description = comment.trim();
+			comment     = "";
+		}
+	}
+
+    @Deprecated
+    @Override
+    public String getComment()
+	{
+		moveLegacyCommentsToDescription ();
+		return description;
     }
 }

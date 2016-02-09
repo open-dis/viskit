@@ -672,9 +672,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         graphPane.trees.setDividerLocation(250);
 
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
-        JScrollPane jscrp = new JScrollPane(graphPane);
+        JScrollPane scrollPane = new JScrollPane(graphPane);
 
-        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, jscrp);
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, scrollPane);
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the right component (JGraph side) most of the usable
@@ -693,9 +693,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // but this call serves also to register the view with the passed assemblyModel
         // by virtue of calling stateChanged()
         tabbedPane.add("AssemblyTab" + nextTabIndex, graphPane.drawingSplitPane);
-        tabbedPane.setToolTipTextAt(nextTabIndex, assemblyModel.getMetadata().description);
-		nextTabIndex++; // increment in preparation for next tab
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, assemblyModel.getMetadata().description);
         tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
+		nextTabIndex++; // increment in preparation for next tab
 
         // Now expose the Assembly toolbar
         Runnable r = new Runnable() {

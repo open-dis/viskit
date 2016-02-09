@@ -18,7 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
- * XML.  Used to populate the LEGOs tree on the Assy Editor.
+ * XML.  Used to populate the LEGOs tree on the Assembly Editor.
  *
  * @version $Id$
  * @author  ahbuss

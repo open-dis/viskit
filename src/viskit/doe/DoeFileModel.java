@@ -59,7 +59,7 @@ public class DoeFileModel {
 
     public File userFile;
     public ParamTable paramTable;
-    public List<TerminalParameter> designParms;
+    public List<TerminalParameter> designParmeters;
     public Document jdomDocument;
     public boolean dirty = false;
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
@@ -78,8 +78,8 @@ public class DoeFileModel {
     }
 
     public void saveEventGraphsToJaxb(Collection<File> evGraphs) {
-        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
-        List<EventGraph> lis = assy.getEventGraph();
+        SimkitAssembly assembly = OpenAssembly.inst().jaxbRoot;
+        List<EventGraph> lis = assembly.getEventGraph();
         lis.clear();
 
         for (File f : evGraphs) {
@@ -112,13 +112,13 @@ public class DoeFileModel {
     }
 
     public void saveTableEditsToJaxb() {
-        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
-        ObjectFactory factory = OpenAssembly.inst().jaxbFactory;
+        SimkitAssembly jaxbSimkitAssembly = OpenAssembly.inst().jaxbRoot;
+        ObjectFactory objectFactory = OpenAssembly.inst().jaxbFactory;
 
-        List<TerminalParameter> designParameters = assy.getDesignParameters();
+        List<TerminalParameter> jaxbDesignParameters = jaxbSimkitAssembly.getDesignParameters();
 
         // Throw away existing design points
-        designParameters.clear();
+        jaxbDesignParameters.clear();
 
         // Go down rows, update the nameRef and value fields (type, content aren't changed)
         // For each row that's a factor (design point) add a design point TP at top
@@ -159,7 +159,7 @@ public class DoeFileModel {
                 //tp.setLinkRef(name+"_"+cnt.toString()+"_DP");
                 tp.setName(name + "_" + cnt);
                 // Create a designpoint TP with a name
-                TerminalParameter newTP = factory.createTerminalParameter();
+                TerminalParameter newTP = objectFactory.createTerminalParameter();
 
                 newTP.setName(name + "_" + cnt.toString());
                 newTP.setLink(name + "_" + cnt.toString());
@@ -180,13 +180,13 @@ public class DoeFileModel {
                 }
 
                 ValueRange dr = new ValueRange();
-                JAXBElement<ValueRange> jevr = factory.createDoubleRange(dr);
+                JAXBElement<ValueRange> jevr = objectFactory.createDoubleRange(dr);
 
                 dr.setLowValue(lowRange);
                 dr.setHighValue(highRange);
                 newTP.setValueRange(jevr);
 
-                designParameters.add(dpCount++, newTP);
+                jaxbDesignParameters.add(dpCount++, newTP);
 
                 tp.setLinkRef(newTP);
             }

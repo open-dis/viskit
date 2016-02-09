@@ -207,7 +207,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
             targetEVG = (EventGraphNode) adapterEdge.getTo();
             targetTF.setText(targetEVG.getName() + " (" + targetEVG.getType() + ")");
             targetEventTF.setText(adapterEdge.getTargetEvent());
-            descriptionTF.setText(adapterEdge.getDescriptionString());
+            descriptionTF.setText(adapterEdge.getDescription());
         } else {
             sourceTF.setText("");
             sourceEventTF.setText("");
@@ -246,7 +246,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
             adapterEdge.setName(nameTF.getText().trim());
             adapterEdge.setSourceEvent(sourceEventTF.getText().trim());
             adapterEdge.setTargetEvent(targetEventTF.getText().trim());
-            adapterEdge.setDescriptionString(descriptionTF.getText().trim());
+            adapterEdge.setDescription(descriptionTF.getText().trim());
         }
     //todo implement
     //newTarget,newTargetEvent,newSource,newSourceEvent;

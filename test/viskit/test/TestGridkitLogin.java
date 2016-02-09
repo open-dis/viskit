@@ -15,7 +15,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 /**
  *
@@ -142,7 +142,7 @@ public class TestGridkitLogin extends Thread {
 
             // now send a jar to newbies new session
 
-            URL u = VGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
+            URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
             LOG.info("Opening " + u);
             u = new URL((u.getFile().split("!"))[0].trim());
             File jar = new File(u.getFile());

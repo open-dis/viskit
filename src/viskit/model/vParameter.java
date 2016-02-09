@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.ViskitGlobals;
 
 /**
@@ -14,13 +12,13 @@ import viskit.ViskitGlobals;
  */
 public class vParameter extends ViskitElement {
 
-    private String value = EMPTY;
-    private String comment = EMPTY;
     private String[] arraySize;
-    private List<String> descriptionArray = new ArrayList<>();
-    private boolean operation;
-    private String operationOrAssignment;
-    private String indexingExpression;
+    private String   indexingExpression;
+    private boolean  operation;
+    private String   operationOrAssignment;
+    private String   value       = EMPTY;
+    private String   comment     = EMPTY;
+    private String   description = new String();
 
     vParameter(String pName, String pType) //package-accessible
     {
@@ -28,10 +26,10 @@ public class vParameter extends ViskitElement {
         setType(pType);
     }
 
-    public vParameter(String pName, String pType, String comment) //todo make package-accessible
+    public vParameter(String pName, String pType, String description) //todo make package-accessible
     {
         this(pName, pType);
-        this.comment = comment;
+        this.description = description;
     }
 
     @Override
@@ -49,15 +47,6 @@ public class vParameter extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String cmt) {
-        this.comment = cmt;
-    }
-
-    @Override
     public final void setType(String pType) {
         this.type = pType;
         arraySize = ViskitGlobals.instance().getArraySize(pType);
@@ -65,16 +54,6 @@ public class vParameter extends ViskitElement {
 
     public String[] getArraySize() {
         return arraySize;
-    }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
     }
 
     @Override
@@ -90,5 +69,40 @@ public class vParameter extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+	@Override
+    public String getDescription() 
+	{		
+		moveLegacyCommentsToDescription ();
+        return description;
+    }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if ((comment != null) && !comment.isEmpty())
+		{
+			description = comment.trim();
+			comment     = "";
+		}
+	}
+
+    @Deprecated
+    @Override
+    public String getComment()
+	{
+		moveLegacyCommentsToDescription ();
+        return description;
     }
 }

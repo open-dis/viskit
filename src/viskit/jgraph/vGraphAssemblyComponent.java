@@ -135,57 +135,57 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 // Ensure we start fresh
                 vGAModel.deleteAll();
                 break;
-            case ModelEvent.EVENTGRAPHADDED:
+            case ModelEvent.EVENTGRAPH_ADDED:
 
                 // Reclaimed from the vGAModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTGRAPHCHANGED:
+            case ModelEvent.EVENTGRAPH_CHANGED:
                 vGAModel.changeEGNode((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTGRAPHDELETED:
+            case ModelEvent.EVENTGRAPH_DELETED:
                 vGAModel.deleteEGNode((AssemblyNode) ev.getSource());
                 break;
 
-            case ModelEvent.PCLADDED:
+            case ModelEvent.PCL_ADDED:
 
                 // Reclaimed from the vGAModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.PCLCHANGED:
+            case ModelEvent.PCL_CHANGED:
                 vGAModel.changePCLNode((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.PCLDELETED:
+            case ModelEvent.PCL_DELETED:
                 vGAModel.deletePCLNode((AssemblyNode) ev.getSource());
                 break;
 
-            case ModelEvent.ADAPTEREDGEADDED:
+            case ModelEvent.ADAPTEREDGE_ADDED:
                 vGAModel.addAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGECHANGED:
+            case ModelEvent.ADAPTEREDGE_CHANGED:
                 vGAModel.changeAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGEDELETED:
+            case ModelEvent.ADAPTEREDGE_DELETED:
                 vGAModel.deleteAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
 
-            case ModelEvent.SIMEVLISTEDGEADDED:
+            case ModelEvent.SIMEVENTLISTEDGE_ADDED:
                 vGAModel.addSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.SIMEVLISTEDGECHANGED:
+            case ModelEvent.SIMEVENTLISTEDGE_CHANGED:
                 vGAModel.changeSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.SIMEVLISTEDGEDELETED:
+            case ModelEvent.SIMEVENTLISTEDGE_DELETED:
                 vGAModel.deleteSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
 
-            case ModelEvent.PCLEDGEADDED:
+            case ModelEvent.PCLEDGE_ADDED:
                 vGAModel.addPclEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.PCLEDGEDELETED:
+            case ModelEvent.PCLEDGE_DELETED:
                 vGAModel.deletePclEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.PCLEDGECHANGED:
+            case ModelEvent.PCLEDGE_CHANGED:
                 vGAModel.changePclEdge((AssemblyEdge) ev.getSource());
                 break;
 
@@ -194,11 +194,11 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             case ModelEvent.UNDO_EVENT_GRAPH:
             case ModelEvent.REDO_EVENT_GRAPH:
             case ModelEvent.UNDO_PCL:
-            case ModelEvent.REDO_PCL:;
+            case ModelEvent.REDO_PCL:
             case ModelEvent.UNDO_ADAPTER_EDGE:
             case ModelEvent.REDO_ADAPTER_EDGE:
-            case ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE:
-            case ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE:
+            case ModelEvent.UNDO_SIMEVENT_LISTENER_EDGE:
+            case ModelEvent.REDO_SIMEVENT_LISTENER_EDGE:
             case ModelEvent.UNDO_PCL_EDGE:
             case ModelEvent.REDO_PCL_EDGE:
                 vGAModel.reDrawNodes();
@@ -265,76 +265,76 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 StringBuilder sb = new StringBuilder("<html>");
                 if (c instanceof vAssemblyEdgeCell) {
                     vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
-                    AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
-                    Object to = se.getTo();
-                    Object from = se.getFrom();
+                    AssemblyEdge assemblyEdge = (AssemblyEdge) vc.getUserObject();
+                    Object to = assemblyEdge.getTo();
+                    Object from = assemblyEdge.getFrom();
 
-                    if (se instanceof AdapterEdge) {
-                        Object toEv = ((AdapterEdge) se).getTargetEvent();
-                        Object frEv = ((AdapterEdge) se).getSourceEvent();
+                    if (assemblyEdge instanceof AdapterEdge) {
+                        Object   toEvent = ((AdapterEdge) assemblyEdge).getTargetEvent();
+                        Object fromEvent = ((AdapterEdge) assemblyEdge).getSourceEvent();
                         sb.append("<center>Adapter<br><u>");// +
                         sb.append(from);
                         sb.append(".");
-                        sb.append(frEv);
+                        sb.append(fromEvent);
                         sb.append("</u> connected to <u>");
                         sb.append(to);
                         sb.append(".");
-                        sb.append(toEv);
-                    } else if (se instanceof SimEventListenerEdge) {
+                        sb.append(toEvent);
+                    } else if (assemblyEdge instanceof SimEventListenerEdge) {
                         sb.append("<center>SimEvent Listener<br><u>");
                         sb.append(to);
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                     } else {
-                        String prop = ((PropertyChangeListenerEdge) se).getProperty();
-                        prop = (prop != null && prop.length() > 0) ? prop : "*all*";
+                        String property = ((PropertyChangeListenerEdge) assemblyEdge).getProperty();
+                        property = (property != null && property.length() > 0) ? property : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
                         sb.append(to);
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                         sb.append(".");
-                        sb.append(prop);
+                        sb.append(property);
                     }
-                    String desc = se.getDescriptionString();
-                    if (desc != null) {
-                        desc = desc.trim();
-                        if (desc.length() > 0) {
+                    String description = assemblyEdge.getDescription();
+                    if (description != null) {
+                        description = description.trim();
+                        if (description.length() > 0) {
                             sb.append("<br>");
                             sb.append("<u> description: </u>");
-                            sb.append(wrapAtPos(escapeLTGT(desc), 60));
+                            sb.append(wrapAtPosition(description, 60));
                         }
                     }
                     sb.append("</center>");
                     sb.append("</html>");
                     return sb.toString();
                 } else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropListCell) {
-                    String typ;
+                    String type;
                     String name;
-                    String desc;
+                    String description;
                     if (c instanceof AssemblyCircleCell) {
                         AssemblyCircleCell cc = (AssemblyCircleCell) c;
                         EventGraphNode en = (EventGraphNode) cc.getUserObject();
-                        typ = en.getType();
+                        type = en.getType();
                         name = en.getName();
-                        desc = en.getDescriptionString();
+                        description = en.getDescription();
                     } else /*if (c instanceof AssemblyPropListCell)*/ {
                         AssemblyPropListCell cc = (AssemblyPropListCell) c;
                         PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
-                        typ = pcln.getType();
+                        type = pcln.getType();
                         name = pcln.getName();
-                        desc = pcln.getDescriptionString();
+                        description = pcln.getDescription();
                     }
 
                     sb.append("<center><u>");
-                    sb.append(typ);
+                    sb.append(type);
                     sb.append("</u><br>");
                     sb.append(name);
-                    if (desc != null) {
-                        desc = desc.trim();
-                        if (desc.length() > 0) {
+                    if (description != null) {
+                        description = description.trim();
+                        if (description.length() > 0) {
                             sb.append("<br>");
                             sb.append("<u> description: </u>");
-                            sb.append(wrapAtPos(escapeLTGT(desc), 60));
+                            sb.append(wrapAtPosition(escapeLTGT(description), 60));
                         }
                     }
                     sb.append("</center>");
@@ -346,7 +346,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         return null;
     }
 
-    private String wrapAtPos(String s, int len) {
+    private String wrapAtPosition(String s, int len) {
         String[] sa = s.split(" ");
         StringBuilder sb = new StringBuilder();
         int idx = 0;

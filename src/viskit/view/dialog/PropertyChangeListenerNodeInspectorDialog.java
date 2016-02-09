@@ -27,17 +27,17 @@ import viskit.view.InstantiationPanel;
  */
 public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
-    private final JLabel nameLabel;
-    private final JLabel typeLabel;
-    private final JTextField nameField;    // Text field that holds the parameter name
-    private final JTextField typeField;
-    private InstantiationPanel ip;
+    private final JLabel     nameLabel;
+    private final JLabel     typeLabel;
+    private final JTextField nameTF;    // Text field that holds the parameter name
+    private final JTextField typeTF;
+    private InstantiationPanel instantiationPanel;
     private Class<?> myClass;
     private static PropertyChangeListenerNodeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropertyChangeListenerNode pclNode;
+    private PropertyChangeListenerNode propertyChangeListenerNode;
     private final JButton okButton, cancelButton;
-    private final enableApplyButtonListener lis;
+    private final EnableApplyButtonListener lis;
     JPanel buttonPanel;
     private final JCheckBox clearStatisticsCB, getMeanStatisticsCB, getCountStatisticsCB;
     private final JTextField descriptionTF;
@@ -63,13 +63,14 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PropertyChangeListenerNodeInspectorDialog(JFrame parent, PropertyChangeListenerNode lv) throws ClassNotFoundException {
+    private PropertyChangeListenerNodeInspectorDialog(JFrame parent, PropertyChangeListenerNode propertyChangeListenerNode) throws ClassNotFoundException
+	{
         super(parent, "Property Change Listener (PCL) Inspector", true);
-        this.pclNode = lv;
+        this.propertyChangeListenerNode = propertyChangeListenerNode;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        this.addWindowListener(new MyCloseListener());
 
-        lis = new enableApplyButtonListener();
+        lis = new EnableApplyButtonListener();
 
         JPanel content = new JPanel();
         setContentPane(content);
@@ -78,11 +79,11 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
                 BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 BorderFactory.createLineBorder(Color.green, 2)));
 
-        nameField = new JTextField();
-        ViskitStatics.clampHeight(nameField);
-        nameField.addCaretListener(lis);
+        nameTF = new JTextField();
+        ViskitStatics.clampHeight(nameTF);
+        nameTF.addCaretListener(lis);
         nameLabel = new JLabel("name", JLabel.TRAILING);
-        nameLabel.setLabelFor(nameField);
+        nameLabel.setLabelFor(nameTF);
 
         descriptionTF = new JTextField();
         ViskitStatics.clampHeight(descriptionTF);
@@ -91,10 +92,10 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         descriptionLabel.setLabelFor(descriptionTF);
 
         typeLabel = new JLabel("type", JLabel.TRAILING);
-        typeField = new JTextField();
-        ViskitStatics.clampHeight(typeField);
-        typeField.setEditable(false);
-        typeLabel.setLabelFor(typeField);
+        typeTF = new JTextField();
+        ViskitStatics.clampHeight(typeTF);
+        typeTF.setEditable(false);
+        typeLabel.setLabelFor(typeTF);
 
         clearStatisticsCB = new JCheckBox("Clear statistics after each replication");
         clearStatisticsCB.setSelected(true); // bug 706
@@ -107,7 +108,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
         getCountStatisticsCB = new JCheckBox("Obtain raw count statistics only");
         getCountStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatisticsCB.addActionListener(new GetCountStaisticsCBListener());
+        getCountStatisticsCB.addActionListener(new GetCountStatisticsCBListener());
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -118,14 +119,14 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         buttonPanel.add(cancelButton);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new CancelButtonListener());
+        okButton.addActionListener(new ApplyButtonListener());
 
-        setParams(parent, lv);
+        setParams(parent, propertyChangeListenerNode);
     }
 
     public final void setParams(Component c, PropertyChangeListenerNode p) throws ClassNotFoundException {
-        pclNode = p;
+        propertyChangeListenerNode = p;
 
         fillWidgets();
 
@@ -137,21 +138,23 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() throws ClassNotFoundException {
-        if (pclNode != null) {
-            myClass = ViskitStatics.classForName(pclNode.getType());
+    private void fillWidgets() throws ClassNotFoundException
+	{
+        if (propertyChangeListenerNode != null)
+		{
+            myClass = ViskitStatics.classForName(propertyChangeListenerNode.getType());
             if (myClass == null) {
-                JOptionPane.showMessageDialog(this, "Class " + pclNode.getType() + " not found.");
+                JOptionPane.showMessageDialog(this, "Class " + propertyChangeListenerNode.getType() + " not found.");
                 return;
             }
 
-            nameField.setText(pclNode.getName());
-            typeField.setText(pclNode.getType());
-            descriptionTF.setText(pclNode.getDescriptionString());
+                nameTF.setText(propertyChangeListenerNode.getName());
+                typeTF.setText(propertyChangeListenerNode.getType());
+            descriptionTF.setText(propertyChangeListenerNode.getDescription());
 
-            ip = new InstantiationPanel(this, lis, true);
-            setupIP();
-            ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+            instantiationPanel = new InstantiationPanel(this, lis, true);
+            setupInstantiationPanel();
+            instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
             JPanel content = new JPanel();
@@ -162,13 +165,13 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
             JPanel cont = new JPanel(new SpringLayout());
             cont.add(nameLabel);
-            cont.add(nameField);
+            cont.add(nameTF);
 
             cont.add(descriptionLabel);
             cont.add(descriptionTF);
 
             cont.add(typeLabel);
-            cont.add(typeField);
+            cont.add(typeTF);
             SpringUtilities.makeCompactGrid(cont, 3, 2, 10, 10, 5, 5);
 
             content.add(cont);
@@ -176,45 +179,46 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
             /* Put up a "clear statistics after each replication" checkbox if
              * type is descendent of one of these:
              */
-            if (pclNode.isSampleStatistics()) {
-                clearStatisticsCB.setSelected(pclNode.isClearStatisticsAfterEachRun());
+            if (propertyChangeListenerNode.isSampleStatistics()) {
+                clearStatisticsCB.setSelected(propertyChangeListenerNode.isClearStatisticsAfterEachRun());
                 content.add(clearStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
             }
 
             // No need to display mean and count CBs for a SPD PCL
-            if (!pclNode.getType().contains("SimplePropertyDumper")) {
-                getMeanStatisticsCB.setSelected(pclNode.isGetMean());
+            if (!propertyChangeListenerNode.getType().contains("SimplePropertyDumper")) {
+                getMeanStatisticsCB.setSelected(propertyChangeListenerNode.isGetMean());
                 content.add(getMeanStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
 
-                getCountStatisticsCB.setSelected(pclNode.isGetCount());
+                getCountStatisticsCB.setSelected(propertyChangeListenerNode.isGetCount());
                 content.add(getCountStatisticsCB);
                 content.add(Box.createVerticalStrut(3));
             }
 
-            content.add(ip);
+            content.add(instantiationPanel);
             content.add(Box.createVerticalStrut(5));
             content.add(buttonPanel);
             setContentPane(content);
         } else {
-            nameField.setText("pclNode name");
+            nameTF.setText("pclNode name");
         }
     }
 
     private void unloadWidgets() {
-        String nm = nameField.getText();
-        nm = nm.replaceAll("\\s", "");
-        if (pclNode != null) {
-            pclNode.setName(nm);
-            pclNode.setDescriptionString(descriptionTF.getText().trim());
-            pclNode.setInstantiator(ip.getData());
-            if (pclNode.isSampleStatistics()) {
-                pclNode.setClearStatisticsAfterEachRun(clearStatisticsCB.isSelected());
+        String name = nameTF.getText();
+        name = name.replaceAll("\\s", "");
+        if (propertyChangeListenerNode != null)
+		{
+            propertyChangeListenerNode.setName(name);
+            propertyChangeListenerNode.setDescription(descriptionTF.getText().trim());
+            propertyChangeListenerNode.setInstantiator(instantiationPanel.getData());
+            if (propertyChangeListenerNode.isSampleStatistics())
+			{
+                propertyChangeListenerNode.setClearStatisticsAfterEachRun(clearStatisticsCB.isSelected());
             }
-
-            pclNode.setGetCount(getCountStatisticsCB.isSelected());
-            pclNode.setGetMean(getMeanStatisticsCB.isSelected());
+            propertyChangeListenerNode.setGetCount(getCountStatisticsCB.isSelected());
+            propertyChangeListenerNode.setGetMean (getMeanStatisticsCB.isSelected());
         }
     }
 
@@ -222,8 +226,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
      * Initialize the InstantiationsPanel with the data from the pclnode
      * @throws java.lang.ClassNotFoundException
      */
-    private void setupIP() throws ClassNotFoundException {
-        ip.setData(pclNode.getInstantiator());
+    private void setupInstantiationPanel() throws ClassNotFoundException {
+        instantiationPanel.setData(propertyChangeListenerNode.getInstantiator());
     }
 
     class GetMeanStatisticsCBListener implements CaretListener, ActionListener {
@@ -241,7 +245,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class GetCountStaisticsCBListener implements CaretListener, ActionListener {
+    class GetCountStatisticsCBListener implements CaretListener, ActionListener {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
@@ -256,7 +260,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -265,7 +269,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -276,7 +280,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener implements CaretListener, ActionListener {
+    class EnableApplyButtonListener implements CaretListener, ActionListener {
 
         @Override
         public void caretUpdate(CaretEvent event) {
@@ -291,7 +295,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    class myCloseListener extends WindowAdapter {
+    class MyCloseListener extends WindowAdapter {
 
         @Override
         public void windowClosing(WindowEvent e) {

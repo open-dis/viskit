@@ -109,7 +109,7 @@ public class ViskitApplicationFrame extends JFrame {
     private final int TAB1_CLUSTERUN_IDX = 2;
 	
 	private JMenuBar mainMenuBar;
-    private int menuShortcutKeyMask;
+    private final int menuShortcutKeyMask;
 	
 	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
@@ -358,7 +358,8 @@ public class ViskitApplicationFrame extends JFrame {
         // Grid run panel
         if (UserPreferencesDialog.isClusterRunVisible()) {
             runGridComponent = new JobLauncherTab2(designOfExperimentsMain.getController(), null, null, this);
-			designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
+			if ((designOfExperimentsFrame != null) && (designOfExperimentsFrame.getController() != null))
+			     designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
             runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
             runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
@@ -580,7 +581,7 @@ public class ViskitApplicationFrame extends JFrame {
 
             // Tell Visit to not recompile open Event Graphss from any remaining open Assemblies
 			// when we perform a Viskit exit
-            ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
+            ViskitGlobals.instance().getAssemblyController().setCloseAll(true);
 
             outer:
             {
@@ -739,7 +740,7 @@ public class ViskitApplicationFrame extends JFrame {
 		return (mainTabbedPane.getSelectedIndex() == TAB_ASSEMBLY_EDITOR);
     }
 	
-	public boolean iSimulationRunTabSelected ()
+	public boolean isSimulationRunTabSelected ()
 	{
 		return (mainTabbedPane.getSelectedIndex() == TAB_SIMULATION_RUN);
     }

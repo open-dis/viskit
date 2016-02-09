@@ -793,7 +793,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     /**
-     * Creates a standard 'Comments' element used by all sections of the report
+     * Creates a standard 'Comments' element used by all sections of the report // TODO fix
      * to add comments
      *
      * @param parent
@@ -1045,7 +1045,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
 
     private void announceAnalystReportReadyToView() {
 
-        // NOTE: This method may be called with the classloader set during Assy
+        // NOTE: This method may be called with the classloader set during Assembly
         // Run initialization, so, we can't center this dialog via reference to
         // the main app frame.
         JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +

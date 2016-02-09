@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ServerWithReneges" package="examples" version="0.1.5" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ServerWithReneges" package="examples" version="0.1.5" extend="SimEntityBase" description="Simple Server process where Arrival entities can decide to renege and leave the Server queue before being serviced" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="numberServers" type="int"/>
     <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
     <Parameter name="renegeTime" type="simkit.random.RandomVariate"/>
@@ -10,7 +10,7 @@
         <Comment>this state variable stores the number of reneges</Comment>
         <Comment>as a Java int.</Comment>
     </StateVariable>
-    <Event name="Run">
+    <Event name="Run" description="">
         <Comment></Comment>
         <StateTransition state="numberAvailableServers">
             <Assignment value="getNumberServers()"/>
@@ -27,7 +27,7 @@
         <Code></Code>
         <Coordinate x="70.0" y="70.0"/>
     </Event>
-    <Event name="Arrival">
+    <Event name="Arrival" description="">
         <Comment></Comment>
         <Argument name="customer" type="java.lang.Integer"/>
         <StateTransition state="queue">
@@ -40,10 +40,8 @@
         <Code></Code>
         <Coordinate x="70.0" y="160.0"/>
     </Event>
-    <Event name="StartService">
-        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()">
-            <Comment></Comment>
-        </LocalVariable>
+    <Event name="StartService" description="">
+        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" description=""/>
         <StateTransition state="queue">
             <Operation method="removeFirst()"/>
         </StateTransition>
@@ -58,7 +56,7 @@
         </Schedule>
         <Coordinate x="210.0" y="160.0"/>
     </Event>
-    <Event name="EndService">
+    <Event name="EndService" description="">
         <Argument name="customer1" type="java.lang.Integer"/>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers+1"/>
@@ -69,7 +67,7 @@
         <Schedule event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
         <Coordinate x="340.0" y="160.0"/>
     </Event>
-    <Event name="Renege">
+    <Event name="Renege" description="">
         <Argument name="customer2" type="java.lang.Integer"/>
         <StateTransition state="queue">
             <Operation method="remove(customer2)"/>

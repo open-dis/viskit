@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.ViskitStatics;
 
 /**
@@ -18,13 +16,14 @@ import viskit.ViskitStatics;
  */
 public class PropertyChangeListenerNode extends AssemblyNode {
 
-    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
-    private String operationOrAssignment;
-    private String indexingExpression;
-    private String value;
-    private String comment;
-    private boolean getMean = false;
+    private String  operationOrAssignment;
+    private String  indexingExpression;
+    private String  value;
+    private String  comment;
+    private String  description = new String();
+	
+    private boolean getMean  = false;
     private boolean getCount = false;
 
     PropertyChangeListenerNode(String name, String type) // package access on constructor
@@ -84,16 +83,6 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -101,11 +90,6 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getComment() {
-        return comment;
     }
 
     @Override
@@ -117,4 +101,40 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     public boolean isOperation() {
         return operation;
     }
+
+	@Override
+    public String getDescription() 
+	{		
+		moveLegacyCommentsToDescription ();
+        return description;
+    }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+	
+	/**
+	 * "Comment" elements are earlier viskit constructs.
+	 * If found from an earlier model, append them as part of description and then delete.
+	 */
+	private void moveLegacyCommentsToDescription ()
+	{
+		if (description == null)
+			description = new String();
+		if ((comment != null) && !comment.isEmpty())
+		{
+			description = comment.trim();
+			comment     = "";
+		}
+	}
+
+    @Override
+	@Deprecated
+    public String getComment() 
+	{
+		moveLegacyCommentsToDescription ();
+        return description;
+    }
+
 }

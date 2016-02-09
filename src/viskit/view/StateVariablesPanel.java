@@ -15,9 +15,9 @@ import viskit.model.vStateVariable;
  */
 public class StateVariablesPanel extends ViskitTablePanel {
 
-    private String[] mytitles = {"name", "type", "description"};
-    private String plusToolTip = "Add a state variable";
-    private String minusToolTip = "Removed the selected state variable";
+    private final String[] columnTitles = {"name", "type", "description"};
+    private final String  plusToolTip = "Add a state variable";
+    private final String minusToolTip = "Removed the selected state variable";
 
     StateVariablesPanel(int wid, int height) {
         super(wid, height);            // separate constructor from initialization
@@ -26,7 +26,7 @@ public class StateVariablesPanel extends ViskitTablePanel {
 
     @Override
     public String[] getColumnTitles() {
-        return mytitles;
+        return columnTitles;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class StateVariablesPanel extends ViskitTablePanel {
         String[] sa = new String[3];
         sa[0] = e.getName();
         sa[1] = e.getType();
-        sa[2] = e.getComment();
+        sa[2] = e.getDescription();
         return sa;
     }
 
@@ -45,7 +45,7 @@ public class StateVariablesPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;  // not used if we init super with a height
     }
 

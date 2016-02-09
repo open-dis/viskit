@@ -635,7 +635,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
 
             // Comment in to see what the matter is
-//            t.printStackTrace();
+            t.printStackTrace();
             return;
         }
 

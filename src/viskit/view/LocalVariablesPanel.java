@@ -36,13 +36,13 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public String[] getFields(ViskitElement e, int rowNum)
+  public String[] getFields(ViskitElement viskitElement, int rowNum)
   {
     String[] sa = new String[4];
-    sa[0] = e.getName();
-    sa[1] = e.getType();
-    sa[2] = e.getValue();
-    sa[3] = e.getComment();
+    sa[0] = viskitElement.getName();
+    sa[1] = viskitElement.getType();
+    sa[2] = viskitElement.getValue();
+    sa[3] = viskitElement.getDescription();
     return sa;
   }
 
@@ -57,7 +57,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public int getNumVisibleRows()
+  public int getNumberVisibleRows()
   {
     return 3;
   }

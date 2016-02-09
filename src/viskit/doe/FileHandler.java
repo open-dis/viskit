@@ -40,6 +40,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -64,7 +66,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class FileHandler {
 
-    private static String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private static String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
 
     public static DoeFileModel openFile(File f) throws Exception {
         SAXBuilder builder;
@@ -85,27 +87,27 @@ public class FileHandler {
             throw new Exception("Root element must be named \"SimkitAssembly\".");
         }
 
-        DoeFileModel dfm = new DoeFileModel();
-        dfm.userFile = f;
+        DoeFileModel doeFileModel = new DoeFileModel();
+        doeFileModel.userFile = f;
 
-        dfm.jdomDocument = doc;
-        dfm.designParms = getDesignParams(doc);
-        dfm.setSimEntities(getSimEntities(doc));
-        dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
+        doeFileModel.jdomDocument = doc;
+        doeFileModel.designParmeters = getDesignParameters(doc);
+        doeFileModel.setSimEntities(getSimEntities(doc));
+        doeFileModel.paramTable = new ParamTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
 
-        return dfm;
+        return doeFileModel;
     }
 
     // todo replace above
-    public static DoeFileModel _openFileJaxb(SimkitAssembly assy, File f) {
-        DoeFileModel dfm = new DoeFileModel();
-        dfm.userFile = f;
-        // todo dfm.jaxbRoot = assy;
-        dfm.designParms = assy.getDesignParameters();
-        dfm.setSimEntities(assy.getSimEntity());
-        dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
+    public static DoeFileModel _openFileJaxb(SimkitAssembly assembly, File f) {
+        DoeFileModel doeFileModel = new DoeFileModel();
+        doeFileModel.userFile = f;
+        // todo dfm.jaxbRoot = assembly;
+        doeFileModel.designParmeters = assembly.getDesignParameters();
+        doeFileModel.setSimEntities(assembly.getSimEntity());
+        doeFileModel.paramTable = new ParamTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
 
-        return dfm;
+        return doeFileModel;
     }
 
     public static Document unmarshallJdom(File f) throws Exception {
@@ -123,15 +125,25 @@ public class FileHandler {
         xmlOut.output(doc, fow);
     }
 
-    public static void marshallJaxb(File of) throws Exception {
-        JAXBContext jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+    public static void marshallJaxb(File of) throws Exception
+	{
         FileOutputStream fos = new FileOutputStream(of);
-        Marshaller m = jaxbCtx.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+        JAXBContext jaxbContext    = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+        Marshaller  jaxbMarshaller = jaxbContext.createMarshaller();
+		// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+		jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+			@Override
+			public boolean handleEvent(ValidationEvent validationEvent) {
+				System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+						           " (Exception: " + validationEvent.getLinkedException() + ")");
+				return false;
+			}
+		});
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
         //fillRoot();
-        m.marshal(OpenAssembly.inst().jaxbRoot, fos);
+        jaxbMarshaller.marshal(OpenAssembly.inst().jaxbRoot, fos);
     }
 
     public static void runFile(File fil, String title, JFrame mainFrame) {
@@ -148,7 +160,7 @@ public class FileHandler {
 
     // TODO: JDOM v1.1 does not yet support generics
     @SuppressWarnings("unchecked")
-    private static List<TerminalParameter> getDesignParams(Document doc) throws Exception {
+    private static List<TerminalParameter> getDesignParameters(Document doc) throws Exception {
         Element elm = doc.getRootElement();
         return elm.getChildren("TerminalParameter");
     }

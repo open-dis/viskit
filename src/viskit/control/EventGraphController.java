@@ -41,9 +41,9 @@ public interface EventGraphController {
 
     void buildNewNode(Point p, String name);
 
-    void buildNewSimParameter(String name, String type, String initVal, String comment);
+    void buildNewSimParameter(String name, String type, String initialValue, String description);
 
-    void buildNewStateVariable(String name, String type, String initVal, String comment);
+    void buildNewStateVariable(String name, String type, String initialValue, String description);
 
     /** Connect a scheduling edge between two nodes
      *
@@ -51,11 +51,11 @@ public interface EventGraphController {
      */
     void buildNewSchedulingArc(Object[] nodes);
 
-    /** Connect a canceling edge between two nodes
+    /** Connect a cancelling edge between two nodes
      *
      * @param nodes an array of source and target nodes
      */
-    void buildNewCancelingArc(Object[] nodes);
+    void buildNewCancellingArc(Object[] nodes);
 
     /**
      * Provides an automatic capture of all Event Graphs images used in an
@@ -105,22 +105,22 @@ public interface EventGraphController {
     /**
      * Edit a scheduling edge
      *
-     * @param ed the edge to edit
+     * @param edge the edge to edit
      */
-    void schedulingArcEdit(Edge ed);
+    void schedulingArcEdit(SchedulingEdge edge);
 
     /**
-     * Edit a canceling edge
+     * Edit a cancelling edge
      *
-     * @param ed the edge to edit
+     * @param edge the edge to edit
      */
-    void cancellingArcEdit(Edge ed);
+    void cancellingArcEdit(CancellingEdge edge);
 
-    void simParameterEdit(vParameter param);
+    void simParameterEdit(vParameter parameter);
 
-    void stateVariableEdit(vStateVariable var);
+    void stateVariableEdit(vStateVariable stateVariable);
 
-    void codeBlockEdit(String s);
+    void codeBlockEdit(String codeBlockSource);
 
     /**
      * Opens selected files from a FileChooser

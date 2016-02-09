@@ -108,7 +108,7 @@ public class TransitionsPanel extends JPanel {
                         if (idx == -1) {
                             return;
                         }
-                        ViskitElement est = arLis.get(idx);
+                        ViskitElement est = arrayList.get(idx);
                         event.setSource(est);
                         myMouseLis.mouseClicked(event);
                     }
@@ -118,7 +118,7 @@ public class TransitionsPanel extends JPanel {
     }
 
     // TODO: combine with list model.  List has no clone method implemented
-    ArrayList<ViskitElement> arLis = new ArrayList<>();
+    ArrayList<ViskitElement> arrayList = new ArrayList<>();
 
     public void setTransitions(List<? extends ViskitElement> tLis) {
         clearTransitions();
@@ -129,13 +129,13 @@ public class TransitionsPanel extends JPanel {
 
     // We know this to be an ArrayList<ViskitElement> clone
     @SuppressWarnings("unchecked")
-    public List<ViskitElement> getTransitions() {
-        return (List<ViskitElement>) arLis.clone();
+    public ArrayList<ViskitElement> getTransitions() {
+        return (ArrayList<ViskitElement>) arrayList.clone();
     }
 
     private void addTransition(ViskitElement est) {
         model.addElement(transitionString(est));
-        arLis.add(est);
+        arrayList.add(est);
     }
 
     private String transitionString(ViskitElement est) {
@@ -144,7 +144,7 @@ public class TransitionsPanel extends JPanel {
 
     public void clearTransitions() {
         model.removeAllElements();
-        arLis.clear();
+        arrayList.clear();
     }
 
     /** Used to determine whether to show or hide StateTransitions
@@ -181,7 +181,7 @@ public class TransitionsPanel extends JPanel {
     private MouseListener myMouseLis;
 
     public void updateTransition(EventStateTransition est) {
-        int idx = arLis.indexOf(est);
+        int idx = arrayList.indexOf(est);
         model.setElementAt(transitionString(est), idx);
     }
 
@@ -195,7 +195,8 @@ public class TransitionsPanel extends JPanel {
     class plusButtonListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event)
+		{
             if (ViskitGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
                 ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
@@ -211,7 +212,7 @@ public class TransitionsPanel extends JPanel {
             TransitionsPanel.this.invalidate();
             minusButt.setEnabled(true);
             EventStateTransition est = new EventStateTransition();
-            arLis.add(est);
+            arrayList.add(est);
             if (myPlusListener != null) {
                 myPlusListener.actionPerformed(event);
             }
@@ -249,7 +250,7 @@ public class TransitionsPanel extends JPanel {
             if (sel.length != 0) {
                 for (int i = 0; i < sel.length; i++) {
                     model.remove(sel[i] - i);
-                    arLis.remove(sel[i] - i);
+                    arrayList.remove(sel[i] - i);
                 }
             }
             if (lis.getModel().getSize() <= 0) {

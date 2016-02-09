@@ -372,7 +372,7 @@ public class UserPreferencesDialog extends JDialog {
                 appConfig.setProperty(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY, assemblyEditorPreferenceCB.isSelected());
             } else if (src == runAssemblyPreferenceCB) {
                 if (runAssemblyPreferenceCB.isSelected()) {
-                    // if we turn on the assembly runner, we also need the assy editor
+                    // if we turn on the assembly runner, we also need the Assembly editor
                     if (!assemblyEditorPreferenceCB.isSelected()) {
                         assemblyEditorPreferenceCB.doClick();
                     } // reenter here
@@ -738,16 +738,16 @@ public class UserPreferencesDialog extends JDialog {
     }
 
     /**
-     * Return if the Assy Editor is to be visible
-     * @return if the Assy Editor is to be visible
+     * Return if the Assembly Editor is to be visible
+     * @return if the Assembly Editor is to be visible
      */
     public static boolean isAssemblyEditorVisible() {
         return getVisibilitySense(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY);
     }
 
     /**
-     * Return if the Assy Runner is to be visible
-     * @return if the Assy Runner is to be visible
+     * Return if the Assembly Runner is to be visible
+     * @return if the Assembly Runner is to be visible
      */
     public static boolean isAssemblyRunVisible() {
         return getVisibilitySense(ViskitConfiguration.ASSY_RUN_VISIBLE_KEY);

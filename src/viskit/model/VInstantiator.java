@@ -212,7 +212,7 @@ public abstract class VInstantiator {
                                 LOG.info("setting name " + ((Parameter)eparams[indx].get(j)).getName());
                             }
                             ((VInstantiator) args.get(j)).setName(((Parameter)eparams[indx].get(j)).getName());
-                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eparams[indx].get(j)).getComment()));
+                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eparams[indx].get(j)).getComment())); // TODO fix
                         }
                     }
                 }

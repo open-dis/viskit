@@ -15,6 +15,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
 import viskit.ViskitGlobals;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.mvcAbstractModel;
@@ -26,11 +28,11 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**
  * <p>
- * This is the "master" model of an event graph.  It should control the node and
- * edge XML (JAXB) information.  What hasn't been done is to put in accessor
- * methods for the view to read pieces that it needs, say after it receives a
- * "new model" event.
- * </p>
+ This is the "master" model of an event graph.  It should control the node and
+ edge XML (JAXB) information.  What hasn't been done is toEventNode put in accessor
+ methods for the view toEventNode read pieces that it needs, say after it receives a
+ "new model" event.
+ </p>
  *
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -43,40 +45,41 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphModel {
 
-    JAXBContext jc;
-    ObjectFactory oFactory;
-    SimEntity jaxbRoot;
+    JAXBContext   jaxbContext;
+    ObjectFactory jaxbObjectFactory;
+    SimEntity     jaxbSimEntity;
     File currentFile;
-    Map<Event, EventNode> eventNodeCache = new HashMap<>();
-    Map<Object, Edge>     edgeCache = new HashMap<>();
-    Vector<ViskitElement> stateVariables = new Vector<>();
+    Map<Event, EventNode> eventNodeCache       = new HashMap<>();
+    Map<Object, Edge>     edgeCache            = new HashMap<>();
+    Vector<ViskitElement> stateVariables       = new Vector<>();
     Vector<ViskitElement> simulationParameters = new Vector<>();
-    private final String schemaLocation = XMLValidationTool.EVENT_GRAPH_SCHEMA;
-    private final String privateIndexVariablePrefix = "_idxvar_";
-    private final String privateLocationVariablePrefix = "locvar_";
-    private final String stateVariablePrefix = "state_";
-    private GraphMetadata metaData;
+    private final String schemaLocation        = XMLValidationTool.EVENT_GRAPH_SCHEMA;
+    private final String indexVariablePrefix   = "_idxvar_";
+    private final String localVariablePrefix= "locvar_";
+    private final String stateVariablePrefix   = "state_";
+    private GraphMetadata graphMetadata;
     private final EventGraphControllerImpl eventGraphController;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
     public EventGraphModelImpl(mvcController controller) {
         this.eventGraphController = (EventGraphControllerImpl) controller;
-        metaData = new GraphMetadata(this);
+        graphMetadata = new GraphMetadata(this);
     }
 
     @Override
     public void initialize() {
         try {
-            jc = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
-            oFactory = new ObjectFactory();
-            jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
+            jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+            jaxbObjectFactory = new ObjectFactory();
+            jaxbSimEntity = jaxbObjectFactory.createSimEntity(); // toEventNode start with empty graph
         } catch (JAXBException e) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
                     );
+            e.printStackTrace();
         }
     }
 
@@ -92,62 +95,80 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
     @Override
     public GraphMetadata getMetadata() {
-        return metaData;
+        return graphMetadata;
     }
 
     @Override
-    public void changeMetadata(GraphMetadata gmd) {
-        metaData = gmd;
+    public void setMetadata(GraphMetadata graphMetadata)
+	{
+        this.graphMetadata = graphMetadata;
         setDirty(true);
-        notifyChanged(new ModelEvent(gmd, ModelEvent.METADATA_CHANGED, "Metadata changed"));
+        notifyChanged(new ModelEvent(graphMetadata, ModelEvent.METADATA_CHANGED, "Metadata changed"));
     }
 
     @Override
-    public boolean newModel(File file) {
-        stateVariables.removeAllElements();
+    public boolean newModel(File file)
+	{
+              stateVariables.removeAllElements();
         simulationParameters.removeAllElements();
-        eventNodeCache.clear();
-        edgeCache.clear();
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
+              eventNodeCache.clear();
+                   edgeCache.clear();
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New event graph model"));
 
-        if (file == null) {
-            jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
-        } else {
+        if (file == null)
+		{
+            jaxbSimEntity = jaxbObjectFactory.createSimEntity(); // toEventNode start with empty event graph
+        } 
+		else
+		{
             try {
-                Unmarshaller u = jc.createUnmarshaller();
-                jaxbRoot = (SimEntity) u.unmarshal(file);
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                jaxbSimEntity = (SimEntity) unmarshaller.unmarshal(file);
 
-                GraphMetadata myMetadata = new GraphMetadata(this);
-                myMetadata.author = jaxbRoot.getAuthor();
-                myMetadata.version = jaxbRoot.getVersion();
-                myMetadata.name = jaxbRoot.getName();
-                myMetadata.packageName = jaxbRoot.getPackage();
-                myMetadata.extendsPackageName = jaxbRoot.getExtend();
-                myMetadata.implementsPackageName = jaxbRoot.getImplement();
-                List<String> lis = jaxbRoot.getComment();
-                StringBuilder sb = new StringBuilder("");
-                for (String comment : lis) {
-                    sb.append(comment);
+                GraphMetadata newMetadata = new GraphMetadata(this);
+                newMetadata.author                = jaxbSimEntity.getAuthor();
+                newMetadata.version               = jaxbSimEntity.getVersion();
+                newMetadata.name                  = jaxbSimEntity.getName();
+                newMetadata.packageName           = jaxbSimEntity.getPackage();
+                newMetadata.extendsPackageName    = jaxbSimEntity.getExtend();
+                newMetadata.implementsPackageName = jaxbSimEntity.getImplement();
+				
+                // move <Comment> elements to EventNode description attribute
+				List<String> commentList = jaxbSimEntity.getComment();
+                StringBuilder sb = new StringBuilder();
+                for (String comment : commentList) {
                     sb.append(" ");
+                    sb.append(comment);
                 }
-                myMetadata.description = sb.toString().trim();
-                changeMetadata(myMetadata);
+				if (sb.toString().length() > 0)
+				{
+					newMetadata.description = (sb.toString()).trim(); // copy over then delete
+					jaxbSimEntity.getComment().clear();
+				}
+				else 
+				{
+					String newDescription = new String();
+					if (jaxbSimEntity.getDescription() != null) // empty XML attribute is null
+						newDescription = jaxbSimEntity.getDescription();
+					newMetadata.description = newDescription.trim();
+				}
+                setMetadata(newMetadata);
 
-                buildEventsFromJaxb(jaxbRoot.getEvent());
-                buildParametersFromJaxb(jaxbRoot.getParameter());
-                buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
-                buildCodeBlockFromJaxb(jaxbRoot.getCode());
+                        buildEventsFromJaxb(jaxbSimEntity.getEvent());
+                    buildParametersFromJaxb(jaxbSimEntity.getParameter());
+                buildStateVariablesFromJaxb(jaxbSimEntity.getStateVariable());
+                     buildCodeBlockFromJaxb(jaxbSimEntity.getCode());
             } catch (JAXBException ee) {
-                // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
+                // want a clear way toEventNode know if they're trying toEventNode load an assembly vs. some unspecified XML.
                 try {
-                    JAXBContext assembblyContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-                    Unmarshaller um = assembblyContext.createUnmarshaller();
-                    um.unmarshal(file);
-                    // If we get here, they've tried to load an assembly.
+                    JAXBContext assemblyJaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+                    Unmarshaller unmarshaller = assemblyJaxbContext.createUnmarshaller();
+                    unmarshaller.unmarshal(file);
+                    // If we get here, they've tried toEventNode load an assembly.
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                             "Wrong File Type", // TODO confirm
-                            "Use the assembly editor to" +
-                            "\n" + "work with this file."
+                            "File is not an Event Graph." + "\n" + 
+                            "Use the assembly editor to work with this file."
                             );
                 } catch (JAXBException e) {
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
@@ -155,128 +176,145 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                             "Exception on JAXB unmarshalling of" +
                             "\n" + file.getName() +
                             "\nError is: " + e.getMessage() +
-                            "\nin Model.newModel(File)"
+                            "\nin EventGraphModelImpl.newModel(File)"
                             );
+					e.printStackTrace();
                 }
-                return false;    // from either error case
+				ee.printStackTrace();
+                return false;    // fromEventNode either error case
             }
         }
         currentFile = file;
 
-        // required for initial file loading
-        setDirty(false);
+        setDirty(false); // required for initial file loading
         return true;
     }
 
     @Override
-    public boolean saveModel(File file) {
-        boolean retVal;
+    public boolean saveModel(File file)
+	{
+        boolean returnValue;
         if (file == null) {
             file = currentFile;
         }
-
-        // Do the marshalling into a temporary file, so as to avoid possible
+		else
+		{
+			// TODO any handling needed?
+		}
+		
+        // Do the marshalling into a temporary file, so as toEventNode avoid possible
         // deletion of existing file on a marshal error.
 
-        File tmpF;
-        FileWriter fw = null;
+        File tempFile;
+        FileWriter fileWriter = null;
         try {
-            tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
-        } catch (IOException e) {
+            tempFile = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
+        } 
+		catch (IOException e) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                    "I/O Error",
-                    "Exception creating temporary file, Model.saveModel():" +
+                    "Input/Output (I/O) Error",
+                    "Exception creating temporary file, EventGraphModelImpl.saveModel():" +
                     "\n" + e.getMessage()
                     );
             return false;
         }
 
         try {
-            fw = new FileWriter(tmpF);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
+            fileWriter = new FileWriter(tempFile);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+				@Override
+				public boolean handleEvent(ValidationEvent validationEvent) {
+					System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+									   " (Exception: " + validationEvent.getLinkedException() + ")");
+					return false;
+				}
+			});
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nIe(metaData.name));
-            jaxbRoot.setVersion(nIe(metaData.version));
-            jaxbRoot.setAuthor(nIe(metaData.author));
-            jaxbRoot.setPackage(nIe(metaData.packageName));
-            jaxbRoot.setExtend(nIe(metaData.extendsPackageName));
-            jaxbRoot.setImplement(nIe(metaData.implementsPackageName));
-            List<String> clis = jaxbRoot.getComment();
-            clis.clear();
-            String cmt = nIe(metaData.description);
-            if (cmt != null) {
-                clis.add(cmt.trim());
-            }
+            jaxbSimEntity.setName(nullIfEmpty(graphMetadata.name));
+            jaxbSimEntity.setVersion(nullIfEmpty(graphMetadata.version));
+            jaxbSimEntity.setAuthor(nullIfEmpty(graphMetadata.author));
+            jaxbSimEntity.setPackage(nullIfEmpty(graphMetadata.packageName));
+            jaxbSimEntity.setExtend(nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbSimEntity.setImplement(nullIfEmpty(graphMetadata.implementsPackageName));
+			jaxbSimEntity.setDescription(graphMetadata.description);
 
-            m.marshal(jaxbRoot, fw);
+            jaxbMarshaller.marshal(jaxbSimEntity, fileWriter);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tmpF.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             setDirty(false);
             currentFile = file;
-            retVal = true;
-        } catch (JAXBException e) {
+            returnValue = true;
+        } 
+		catch (JAXBException e) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "XML Input/Output Error",
                     "Exception on JAXB marshalling" +
                     "\n" + file.getName() +
                     "\n" + e.getMessage()
                     );
-            retVal = false;
-        } catch (IOException ex) {
+            returnValue = false;
+            e.printStackTrace();
+        } 
+		catch (IOException ex) {
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "File Input/Output Error",
                     "Exception on writing " + file.getName() +
                     "\n" + ex.getMessage()
                     );
-            retVal = false;
-        } finally {
+            returnValue = false;
+            ex.printStackTrace();
+        } 
+		finally {
             try {
-                if (fw != null)
-                    fw.close();
+                if (fileWriter != null)
+                    fileWriter.close();
             } catch (IOException ioe) {}
         }
-        return retVal;
+        return returnValue;
     }
 
     @Override
-    public File getLastFile() {
+    public File getCurrentFile() {
         return currentFile;
     }
 
-    private void buildEventsFromJaxb(List<Event> lis) {
-        for (Event ev : lis) {
-            EventNode en = buildNodeFromJaxbEvent(ev);
-            buildEdgesFromJaxb(en, ev.getScheduleOrCancel());
+    private void buildEventsFromJaxb(List<Event> eventList) {
+        for (Event event : eventList) {
+            EventNode eventNode = buildNodeFromJaxbEvent(event);
+            buildEdgesFromJaxb(eventNode, event.getScheduleOrCancel());
         }
     }
 
-    private EventNode buildNodeFromJaxbEvent(Event ev) {
-        EventNode en = eventNodeCache.get(ev);
-        if (en != null) {
-            return en;
+    private EventNode buildNodeFromJaxbEvent(Event event)
+	{
+        EventNode eventNode = eventNodeCache.get(event);
+        if (eventNode != null) {
+            return eventNode;
         }
-        en = new EventNode(ev.getName());
-        jaxbEventToNode(ev, en);
-        en.opaqueModelObject = ev;
+        eventNode = new EventNode(event.getName());
+        jaxbEventToNode(event, eventNode);
+        eventNode.opaqueModelObject = event;
 
-        eventNodeCache.put(ev, en);   // key = ev
+        eventNodeCache.put(event, eventNode);   // key = event
 
         // Ensure a unique Event name for XML IDREFs
         if (!nameCheck()) {
-            mangleName(en);
+            mangleName(eventNode);
         }
-        notifyChanged(new ModelEvent(en, ModelEvent.EVENTADDED, "Event added"));
+        notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_ADDED, "Event added: " + eventNode.name));
 
-        return en;
+        return eventNode;
     }
 
-    private String concatStrings(List<String> lis) {
+    private String concatStrings(List<String> stringList) {
         StringBuilder sb = new StringBuilder();
-        for (String s : lis) {
+        for (String s : stringList) {
             sb.append(s);
             if (sb.length() > 0 && sb.charAt(sb.length() - 1) != ' ') {
                 sb.append(' ');
@@ -284,14 +322,14 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
         return sb.toString().trim();
     }
-    private final char[] hdigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     private String _fourHexDigits(int i) {
         char[] ca = new char[4];
         for (int j = 3; j >= 0; j--) {
             int idx = i & 0xF;
             i >>= 4;
-            ca[j] = hdigits[idx];
+            ca[j] = hexDigits[idx];
         }
         return new String(ca);
     }
@@ -310,18 +348,22 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     private void mangleName(ViskitElement node) {
-        do {
+        do
+		{
             node.setName(EventGraphModelImpl.this.mangleName(node.getName()));
-        } while (!nameCheck());
+        }
+		while (!nameCheck());
     }
 
     private boolean nameCheck() {
-        Set<String> hs = new HashSet<>(10);
-        for (EventNode en : eventNodeCache.values()) {
-            if (!hs.add(en.getName())) {
+        Set<String> stringHashSet = new HashSet<>(10);
+        for (EventNode eventNode : eventNodeCache.values())
+		{
+            if (!stringHashSet.add(eventNode.getName()))
+			{
                 eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE,
                         "Duplicate Event Name",
-                        "Duplicate event name detected: " + en.getName() +
+                        "Duplicate event name detected: " + eventNode.getName() +
                         "\nUnique name will be substituted.");
                 return false;
             }
@@ -329,7 +371,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return true;
     }
 
-    /** @return true if a simkit.Priority was found to have a numeric value */
+    /** @return true if a simkit.Priority was found toEventNode have a numeric value */
     public boolean isNumericPriority() {
         return numericPriority;
     }
@@ -338,99 +380,97 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         numericPriority = b;
     }
 
-    private boolean stateVariableParamNameCheck() {
-        Set<String> hs = new HashSet<>(10);
-        for (ViskitElement sv : stateVariables) {
-            if (!hs.add(sv.getName())) {
+    private boolean stateVariableParameterNameCheck()
+	{
+        Set<String> stringHashSet = new HashSet<>(10);
+        for (ViskitElement stateVariable : stateVariables)
+		{
+            if (!stringHashSet.add(stateVariable.getName())) {
                 return false;
             }
         }
-        for (ViskitElement sp : simulationParameters) {
-            if (!hs.add(sp.getName())) {
+        for (ViskitElement simulationParameter : simulationParameters)
+		{
+            if (!stringHashSet.add(simulationParameter.getName())) {
                 return false;
             }
         }
         return true;
     }
 
-    private void jaxbEventToNode(Event event, EventNode node) {
-        node.setName(event.getName());
+    private void jaxbEventToNode(Event jaxbEvent, EventNode eventNode)
+	{
+        eventNode.setName       (jaxbEvent.getName());
+        eventNode.setDescription(jaxbEvent.getDescription());
 
-        node.getComments().clear();
-        node.getComments().addAll(event.getComment());
+        eventNode.getArguments().clear();
+        for (Argument jaxbArgument : jaxbEvent.getArgument())
+		{
+            EventArgument eventArgument = new EventArgument();
+            eventArgument.setName(jaxbArgument.getName());
+            eventArgument.setType(jaxbArgument.getType());
 
-        node.getArguments().clear();
-        for (Argument arg : event.getArgument()) {
-            EventArgument ea = new EventArgument();
-            ea.setName(arg.getName());
-            ea.setType(arg.getType());
-
-            List<String> com = new ArrayList<>();
-            com.addAll(arg.getComment());
-            ea.setComments(com);
-            ea.opaqueModelObject = arg;
-            node.getArguments().add(ea);
+            eventArgument.setDescription(jaxbArgument.getDescription());
+            eventArgument.opaqueModelObject = jaxbArgument;
+            eventNode.getArguments().add(eventArgument);
         }
 
-        node.getLocalVariables().clear();
-        for (LocalVariable lv : event.getLocalVariable()) {
-            if (!lv.getName().startsWith(privateIndexVariablePrefix)) {    // only if it's a "public" one
-                EventLocalVariable elv = new EventLocalVariable(
-                        lv.getName(), lv.getType(), lv.getValue());
-                elv.setComment(concatStrings(lv.getComment()));
-                elv.opaqueModelObject = lv;
+        eventNode.getLocalVariables().clear();
+        for (LocalVariable localVariable : jaxbEvent.getLocalVariable()) {
+            if (!localVariable.getName().startsWith(indexVariablePrefix)) {    // only if it's a "public" one
+                EventLocalVariable eventLocalVariable = new EventLocalVariable(
+                        localVariable.getName(), localVariable.getType(), localVariable.getValue());
+                eventLocalVariable.setDescription(localVariable.getDescription());
+                eventLocalVariable.opaqueModelObject = localVariable;
 
-                node.getLocalVariables().add(elv);
+                eventNode.getLocalVariables().add(eventLocalVariable);
             }
         }
 
-        node.setCodeBLock(event.getCode());
+        eventNode.setCodeBLock(jaxbEvent.getCode());
 
-        node.getTransitions().clear();
-        for (StateTransition st : event.getStateTransition()) {
+        eventNode.getTransitions().clear();
+        for (StateTransition stateTransition : jaxbEvent.getStateTransition()) {
 
-            EventStateTransition est = new EventStateTransition();
+            EventStateTransition eventStateTransition = new EventStateTransition();
 
-            LocalVariableAssignment l = st.getLocalVariableAssignment();
+            LocalVariableAssignment l = stateTransition.getLocalVariableAssignment();
             if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
-                est.setLocalVariableAssignment(l.getValue());
+                eventStateTransition.setLocalVariableAssignment(l.getValue());
             }
 
-            StateVariable sv = (StateVariable) st.getState();
-            est.setName(sv.getName());
-            est.setType(sv.getType());
+            StateVariable stateVariable = (StateVariable) stateTransition.getState();
+            eventStateTransition.setName(stateVariable.getName());
+            eventStateTransition.setType(stateVariable.getType());
+            eventStateTransition.setDescription(stateVariable.getDescription());
 
             // bug fix 1183
-            if (ViskitGlobals.instance().isArray(sv.getType())) {
-                String idx = st.getIndex();
-                est.setIndexingExpression(idx);
+            if (ViskitGlobals.instance().isArray(stateVariable.getType())) {
+                String idx = stateTransition.getIndex();
+                eventStateTransition.setIndexingExpression(idx);
             }
 
-            est.setOperation(st.getOperation() != null);
-            if (est.isOperation()) {
-                est.setOperationOrAssignment(st.getOperation().getMethod());
+            eventStateTransition.setOperation(stateTransition.getOperation() != null);
+            if (eventStateTransition.isOperation()) {
+                eventStateTransition.setOperationOrAssignment(stateTransition.getOperation().getMethod());
             } else {
-                est.setOperationOrAssignment(st.getAssignment().getValue());
+                eventStateTransition.setOperationOrAssignment(stateTransition.getAssignment().getValue());
             }
 
-            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
-            if (lvi != null && lvi.getMethod() != null && !lvi.getMethod().isEmpty())
-                est.setLocalVariableInvocation(st.getLocalVariableInvocation().getMethod());
+            LocalVariableInvocation localVariableInvocatio = stateTransition.getLocalVariableInvocation();
+            if (localVariableInvocatio != null && localVariableInvocatio.getMethod() != null && !localVariableInvocatio.getMethod().isEmpty())
+                eventStateTransition.setLocalVariableInvocation(stateTransition.getLocalVariableInvocation().getMethod());
 
-            List<String> cmt = new ArrayList<>();
-            cmt.addAll(sv.getComment());
-            est.setComments(cmt);
-
-            est.opaqueModelObject = st;
-            node.getTransitions().add(est);
+            eventStateTransition.opaqueModelObject = stateTransition;
+            eventNode.getTransitions().add(eventStateTransition);
         }
 
-        Coordinate coor = event.getCoordinate();
-        if (coor != null) //todo lose this after all xmls updated
+        Coordinate coord = jaxbEvent.getCoordinate();
+        if (coord != null) //todo lose this after all xmls updated
         {
-            node.setPosition(new Point2D.Double(
-                    Double.parseDouble(coor.getX()),
-                    Double.parseDouble(coor.getY())));
+            eventNode.setPosition(new Point2D.Double(
+                    Double.parseDouble(coord.getX()),
+                    Double.parseDouble(coord.getY())));
         }
 
     }
@@ -445,22 +485,24 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
     }
 
-    private void buildScheduleEdgeFromJaxb(EventNode src, Schedule ed) {
-        SchedulingEdge se = new SchedulingEdge();
+    private void buildScheduleEdgeFromJaxb(EventNode src, Schedule jaxbSchedule)
+	{
+        SchedulingEdge schedulingEdge = new SchedulingEdge();
         String s;
-        se.opaqueModelObject = ed;
+        schedulingEdge.opaqueModelObject = jaxbSchedule;
 
-        se.from = src;
-        EventNode target = buildNodeFromJaxbEvent((Event) ed.getEvent());
-        se.to = target;
+        schedulingEdge.fromEventNode = src;
+        EventNode target = buildNodeFromJaxbEvent((Event) jaxbSchedule.getEvent());
+        schedulingEdge.toEventNode = target;
 
-        src.getConnections().add(se);
-        target.getConnections().add(se);
-        se.conditional = ed.getCondition();
+        src.getConnections().add(schedulingEdge);
+        target.getConnections().add(schedulingEdge);
+        schedulingEdge.condition = jaxbSchedule.getCondition();
 
-        // Attempt to avoid NumberFormatException thrown on Double.parseDouble(String s)
-        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ed.getPriority())) {
-            s = ed.getPriority();
+        // Attempt toEventNode avoid NumberFormatException thrown on Double.parseDouble(String s)
+        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, jaxbSchedule.getPriority()))
+		{
+            s = jaxbSchedule.getPriority();
 
             setNumericPriority(true);
 
@@ -484,62 +526,55 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         } else {
 
             // We have an enumeration String
-            s = ed.getPriority();
+            s = jaxbSchedule.getPriority();
         }
 
-        se.priority = s;
+        schedulingEdge.priority = s;
 
-        // Now set the JAXB Schedule to record the Priority enumeration to overwrite
+        // Now set the JAXB Schedule toEventNode record the Priority enumeration toEventNode overwrite
         // numeric Priority values
-        ed.setPriority(se.priority);
+        jaxbSchedule.setPriority(schedulingEdge.priority);
 
-        List<String> cmt = ed.getComment();
-        if (!cmt.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (String comment : cmt) {
-                sb.append(comment);
-                sb.append("  ");
-            }
-            se.conditionalDescription = sb.toString().trim();
-        }
-        se.delay = ed.getDelay();
-        se.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
+        schedulingEdge.conditionDescription = jaxbSchedule.getDescription();
 
-        edgeCache.put(ed, se);
+        schedulingEdge.delay = jaxbSchedule.getDelay();
+        schedulingEdge.parametersList = buildEdgeParmsFromJaxb(jaxbSchedule.getEdgeParameter());
+
+        edgeCache.put(jaxbSchedule, schedulingEdge);
 
         setDirty(true);
 
-        this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
+        this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Schedule Edge added: " + schedulingEdge.name));
     }
 
-    private void buildCancelEdgeFromJaxb(EventNode src, Cancel ed) {
-        CancelingEdge ce = new CancelingEdge();
-        ce.opaqueModelObject = ed;
-        ce.conditional = ed.getCondition();
+    private void buildCancelEdgeFromJaxb(EventNode jaxbSourceNode, Cancel jaxbCancel) {
+        CancellingEdge cancellingEdge       = new CancellingEdge();
+        cancellingEdge.opaqueModelObject    = jaxbCancel;
+        cancellingEdge.condition            = jaxbCancel.getCondition();
 
-        List<String> cmt = ed.getComment();
-        if (!cmt.isEmpty()) {
+        List<String> commentList = jaxbCancel.getComment();
+        if (!commentList.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (String comment : cmt) {
+            for (String comment : commentList) {
                 sb.append(comment);
-                sb.append("  ");
+                sb.append(" ");
             }
-            ce.conditionalDescription = sb.toString().trim();
+            cancellingEdge.conditionDescription = (jaxbCancel.getDescription() + sb.toString()).trim();
         }
 
-        ce.parameters = buildEdgeParmsFromJaxb(ed.getEdgeParameter());
+        cancellingEdge.parametersList = buildEdgeParmsFromJaxb(jaxbCancel.getEdgeParameter());
 
-        ce.from = src;
-        EventNode target = buildNodeFromJaxbEvent((Event) ed.getEvent());
-        ce.to = target;
+        cancellingEdge.fromEventNode = jaxbSourceNode;
+        EventNode target = buildNodeFromJaxbEvent((Event) jaxbCancel.getEvent());
+        cancellingEdge.toEventNode = target;
 
-        src.getConnections().add(ce);
-        target.getConnections().add(ce);
+        jaxbSourceNode.getConnections().add(cancellingEdge);
+        target.getConnections().add(cancellingEdge);
 
-        edgeCache.put(ed, ce);
+        edgeCache.put(jaxbCancel, cancellingEdge);
         setDirty(true);
 
-        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling edge added"));
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_ADDED, "Cancelling edge added: " + cancellingEdge.name));
     }
 
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
@@ -551,50 +586,61 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return alis;
     }
 
-    private void buildCodeBlockFromJaxb(String code) {
-        code = (code == null) ? "" : code;
+    private void buildCodeBlockFromJaxb(String code)
+	{
+        code = (code == null) ? "" : code; // ensure non-null
 
-        notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCKCHANGED, "Code block changed"));
+        notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCK_CHANGED, "Code block changed"));
     }
 
-    private void buildStateVariablesFromJaxb(List<StateVariable> lis) {
-        for (StateVariable var : lis) {
-            List<String> varCom = var.getComment();
-            String c = " ";
-            for (String comment : varCom) {
-                c += comment;
-                c += " ";
+    private void buildStateVariablesFromJaxb(List<StateVariable> jaxbStateVariableList)
+	{
+        for (StateVariable jaxbStateVariable : jaxbStateVariableList)
+		{
+            List<String> stateVariableCommentsList = jaxbStateVariable.getComment();
+            String comments = " ";
+            for (String comment : stateVariableCommentsList) {
+                comments += comment;
+                comments += " ";
             }
-            vStateVariable v = new vStateVariable(var.getName(), var.getType(), c.trim());
-            v.opaqueModelObject = var;
+			String description = (jaxbStateVariable.getDescription() + comments).trim();
+			
+            vStateVariable stateVariable = new vStateVariable(jaxbStateVariable.getName(), jaxbStateVariable.getType(), description);
+            stateVariable.opaqueModelObject = jaxbStateVariable;
 
-            stateVariables.add(v);
-
-            if (!stateVariableParamNameCheck()) {
-                mangleName(v);
+            if (!stateVariableParameterNameCheck()) {
+                mangleName(stateVariable);
             }
+            stateVariables.add(stateVariable);
 
-            notifyChanged(new ModelEvent(v, ModelEvent.STATEVARIABLEADDED, "New state variable"));
+            notifyChanged(new ModelEvent(stateVariable, ModelEvent.STATEVARIABLE_ADDED, "New state variable: " + stateVariable.name));
         }
     }
 
-    private void buildParametersFromJaxb(List<Parameter> lis) {
-        for (Parameter p : lis) {
-            List<String> pCom = p.getComment();
-            String c = " ";
-            for (String comment : pCom) {
-                c += comment;
-                c += " ";
+    private void buildParametersFromJaxb(List<Parameter> jaxbParametersList)
+	{
+        for (Parameter jaxbParameter : jaxbParametersList)
+		{
+            List<String> jaxbParameterCommentsList = jaxbParameter.getComment();
+            String comments = " ";
+            for (String comment : jaxbParameterCommentsList) {
+                comments += comment;
+                comments += " ";
             }
-            vParameter vp = new vParameter(p.getName(), p.getType(), c.trim());
-            vp.opaqueModelObject = p;
+			String description = (jaxbParameter.getDescription() + comments).trim();
+			jaxbParameter.getComment().clear();
+			
+            vParameter vp = new vParameter(jaxbParameter.getName(), jaxbParameter.getType(), description);
+			jaxbParameter.getComment().clear();
+			
+            vp.opaqueModelObject = jaxbParameter;
 
-            simulationParameters.add(vp);
-
-            if (!stateVariableParamNameCheck()) {
+            if (!stateVariableParameterNameCheck()) {
                 mangleName(vp);
             }
-            notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
+            simulationParameters.add(vp);
+
+            notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETER_ADDED, "New vParameter added"));
         }
     }
 
@@ -603,14 +649,14 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return new Vector<ViskitElement>(eventNodeCache.values());
     }
 
-    // TODO: Known unchecked cast to ViskitElement
+    // TODO: Known unchecked cast toEventNode ViskitElement
     @SuppressWarnings("unchecked")
     @Override
     public Vector<ViskitElement> getStateVariables() {
         return (Vector<ViskitElement>) stateVariables.clone();
     }
 
-    // TODO: Known unchecked cast to ViskitElement
+    // TODO: Known unchecked cast toEventNode ViskitElement
     @SuppressWarnings("unchecked")
     @Override
     public Vector<ViskitElement> getSimParameters() {
@@ -620,34 +666,33 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     // parameter mods
     // --------------
     @Override
-    public void newSimParameter(String nm, String typ, String xinitVal, String comment) {
+    public void newSimParameter(String name, String type, String initialValue, String description)
+	{
         setDirty(true);
 
-        vParameter vp = new vParameter(nm, typ, comment);
+        vParameter vp = new vParameter(name, type, description);
         simulationParameters.add(vp);
 
-        if (!stateVariableParamNameCheck()) {
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vp);
         }
 
-        //p.setValue(initVal);
-        Parameter p = this.oFactory.createParameter();
-        p.setName(nIe(nm));
-        //p.setShortName(nm);
-        p.setType(nIe(typ));
-        p.getComment().add(comment);
+        Parameter jaxbParameter = jaxbObjectFactory.createParameter();
+        jaxbParameter.setName(nullIfEmpty(name));
+        jaxbParameter.setType(nullIfEmpty(type));
+        jaxbParameter.setDescription(nullIfEmpty(description));
 
-        vp.opaqueModelObject = p;
+        vp.opaqueModelObject = jaxbParameter;
 
-        jaxbRoot.getParameter().add(p);
+        jaxbSimEntity.getParameter().add(jaxbParameter);
 
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "new sim parameter"));
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETER_ADDED, "new Sim Parameter: " + name));
     }
 
     @Override
     public void deleteSimParameter(vParameter vp) {
         // remove jaxb variable
-        Iterator<Parameter> spItr = jaxbRoot.getParameter().iterator();
+        Iterator<Parameter> spItr = jaxbSimEntity.getParameter().iterator();
         while (spItr.hasNext()) {
             if (spItr.next() == (Parameter) vp.opaqueModelObject) {
                 spItr.remove();
@@ -656,62 +701,62 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
         setDirty(true);
         simulationParameters.remove(vp);
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETER_DELETED, "vParameter deleted: " + vp.name));
     }
 
     @Override
     public void changeCodeBlock(String s) {
-        jaxbRoot.setCode(s);
+        jaxbSimEntity.setCode(s);
         setDirty(true);
     }
 
     @Override
     public boolean changeSimParameter(vParameter vp) {
-        boolean retcode = true;
-        if (!stateVariableParamNameCheck()) {
+        boolean success = true;
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vp);
-            retcode = false;
+            success = false;
         }
         // fill out jaxb variable
-        Parameter p = (Parameter) vp.opaqueModelObject;
-        p.setName(nIe(vp.getName()));
+        Parameter parameter = (Parameter) vp.opaqueModelObject;
+        parameter.setName(nullIfEmpty(vp.getName()));
         //p.setShortName(vp.getName());
-        p.setType(nIe(vp.getType()));
-        p.getComment().clear();
-        p.getComment().add(vp.getComment());
+        parameter.setType(nullIfEmpty(vp.getType()));
+        parameter.setDescription(vp.getDescription());
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERCHANGED, "vParameter changed"));
-        return retcode;
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETER_CHANGED, "simParameter changed: " + vp.getName()));
+        return success;
     }
 
     // State variable mods
     // -------------------
     @Override
-    public void newStateVariable(String name, String type, String xinitVal, String comment) {
+    public void newStateVariable(String name, String type, String initialValue, String description)
+	{
         setDirty(true);
 
         // get the new one here and show it around
-        vStateVariable vsv = new vStateVariable(name, type, comment);
+        vStateVariable vsv = new vStateVariable(name, type, description);
         stateVariables.add(vsv);
-        if (!stateVariableParamNameCheck()) {
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vsv);
         }
-        StateVariable s = this.oFactory.createStateVariable();
-        s.setName(nIe(name));
-        //s.setShortName(nIe(name));
-        s.setType(nIe(type));
-        s.getComment().add(comment);
+        StateVariable stateVariable = jaxbObjectFactory.createStateVariable();
+        stateVariable.setName(nullIfEmpty(name));
+        stateVariable.setType(nullIfEmpty(type));
+        stateVariable.setDescription(description);
 
-        vsv.opaqueModelObject = s;
-        jaxbRoot.getStateVariable().add(s);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
+        vsv.opaqueModelObject = stateVariable;
+        jaxbSimEntity.getStateVariable().add(stateVariable);
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_ADDED, "State variable added: " + stateVariable.getName()));
     }
 
     @Override
-    public void deleteStateVariable(vStateVariable vsv) {
+    public void deleteStateVariable(vStateVariable vsv)
+	{
         // remove jaxb variable
-        Iterator<StateVariable> svItr = jaxbRoot.getStateVariable().iterator();
+        Iterator<StateVariable> svItr = jaxbSimEntity.getStateVariable().iterator();
         while (svItr.hasNext()) {
             if (svItr.next() == (StateVariable) vsv.opaqueModelObject) {
                 svItr.remove();
@@ -720,137 +765,142 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
         stateVariables.remove(vsv);
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_DELETED, "State variable deleted: " + vsv.getName()));
     }
 
     @Override
-    public boolean changeStateVariable(vStateVariable vsv) {
-        boolean retcode = true;
-        if (!stateVariableParamNameCheck()) {
+    public boolean changeStateVariable(vStateVariable vsv)
+	{
+        boolean success = true;
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vsv);
-            retcode = false;
+            success = false;
         }
         // fill out jaxb variable
-        StateVariable sv = (StateVariable) vsv.opaqueModelObject;
-        sv.setName(nIe(vsv.getName()));
-        //sv.setShortName(nIe(vsv.getName()));
-        sv.setType(nIe(vsv.getType()));
-        sv.getComment().clear();
-        sv.getComment().add(vsv.getComment());
+        StateVariable jaxbStateVariable = (StateVariable) vsv.opaqueModelObject;
+        jaxbStateVariable.setName(nullIfEmpty(vsv.getName()));
+        jaxbStateVariable.setType(nullIfEmpty(vsv.getType()));
+        jaxbStateVariable.setDescription(nullIfEmpty(vsv.getDescription()));
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLECHANGED, "State variable changed"));
-        return retcode;
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_CHANGED, "State variable changed: " + vsv.getName()));
+        return success;
     }
 
     // Event (node) mods
     // -----------------
 
     @Override
-    public void newEvent(String nodeName, Point2D p) {
-        EventNode node = new EventNode(nodeName);
-        if (p == null) {
-            p = new Point2D.Double(30, 60);
+    public void newEvent(String nodeName, Point2D point)
+	{
+        EventNode eventNode = new EventNode(nodeName);
+        if (point == null) {
+            point = new Point2D.Double(30, 60);
         }
-        node.setPosition(p);
-        Event jaxbEv = oFactory.createEvent();
+        eventNode.setPosition(point);
+        Event jaxbEvent = jaxbObjectFactory.createEvent();
 
-        eventNodeCache.put(jaxbEv, node);   // key = ev
+        eventNodeCache.put(jaxbEvent, eventNode);   // key = ev
 
         // Ensure a unique Event name
         if (!nameCheck()) {
-            mangleName(node);
+            mangleName(eventNode);
         }
 
-        jaxbEv.setName(nIe(nodeName));
+        jaxbEvent.setName(nullIfEmpty(eventNode.name));
 
-        if ("Run".equals(nIe(nodeName))) {
-            jaxbEv.setDescription("This event is fired first to facilitate "
-                    + "initialization of all simulation state variables");
+        if ("Run".equals(nullIfEmpty(nodeName))) {
+            jaxbEvent.setDescription("The Run event is fired first to support initialization of all simulation state variables");
         }
-        node.opaqueModelObject = jaxbEv;
-        jaxbRoot.getEvent().add(jaxbEv);
+        eventNode.opaqueModelObject = jaxbEvent;
+        jaxbSimEntity.getEvent().add(jaxbEvent);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.EVENTADDED, "Event added"));
+        notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_ADDED, "Event added: " + eventNode.name));
     }
 
     @Override
     public void redoEvent(EventNode node) {
-        Event jaxbEv = oFactory.createEvent();
-        eventNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
-        jaxbEv.setName(node.getName());
-        node.opaqueModelObject = jaxbEv;
-        jaxbRoot.getEvent().add(jaxbEv);
+        Event jaxbEvent = jaxbObjectFactory.createEvent();
+        eventNodeCache.put(jaxbEvent, node);   // key = evnode.opaqueModelObject = jaxbEv;
+        jaxbEvent.setName(node.getName());
+        node.opaqueModelObject = jaxbEvent;
+        jaxbSimEntity.getEvent().add(jaxbEvent);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone"));
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone: " + node.getName()));
     }
 
     @Override
     public void deleteEvent(EventNode node) {
-        Event jaxbEv = (Event) node.opaqueModelObject;
-        eventNodeCache.remove(jaxbEv);
-        jaxbRoot.getEvent().remove(jaxbEv);
+        Event jaxbEvent = (Event) node.opaqueModelObject;
+        eventNodeCache.remove(jaxbEvent);
+        jaxbSimEntity.getEvent().remove(jaxbEvent);
 
         setDirty(true);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
+            notifyChanged(new ModelEvent(node, ModelEvent.EVENT_DELETED,   "Event deleted: " + node.getName()));
         else
-            notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone"));
+            notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone: " + node.getName()));
     }
 
-    private StateVariable findStateVariable(String nm) {
-        List<StateVariable> lis = jaxbRoot.getStateVariable();
-        for (StateVariable sv : lis) {
-            if (sv.getName().equals(nm)) {
-                return sv;
+    private StateVariable findStateVariable(String name)
+	{
+        List<StateVariable> jaxbStateVariableList = jaxbSimEntity.getStateVariable();
+        for (StateVariable jaxbStateVariable : jaxbStateVariableList) {
+            if (jaxbStateVariable.getName().equals(name)) {
+                return jaxbStateVariable;
             }
         }
-        return null;
+        return null; // jaxbStateVariable not found
     }
-    private int locVarNameSequence = 0;
+    private int localVariableNameSequence = 0;
 
     @Override
-    public String generateLocalVariableName() {
-        String nm = null;
+    public String generateLocalVariableName()
+	{
+        String name = null;
         do {
-            nm = privateLocationVariablePrefix + locVarNameSequence++;
-        } while (!isUniqueLVorIdxVname(nm));
-        return nm;
+            name = localVariablePrefix + localVariableNameSequence++;
+        } 
+		while (!isUniqueLocalVariableOrIndexVname(name));
+        return name;
     }
 
     @Override
-    public void resetLVNameGenerator() {
-        locVarNameSequence = 0;
+    public void resetLocalVariableNameGenerator() {
+        localVariableNameSequence = 0;
     }
-    private int idxVarNameSequence = 0;
+    private int indexVariableNameSequence = 0;
 
     @Override
     public String generateIndexVariableName() {
-        String nm = null;
+        String name = null;
         do {
-            nm = privateIndexVariablePrefix + idxVarNameSequence++;
-        } while (!isUniqueLVorIdxVname(nm));
-        return nm;
+            name = indexVariablePrefix + indexVariableNameSequence++;
+        } 
+		while (!isUniqueLocalVariableOrIndexVname(name));
+        return name;
     }
 
     @Override
-    public void resetIdxNameGenerator() {
-        idxVarNameSequence = 0;
+    public void resetIndexVariableNameGenerator() {
+        indexVariableNameSequence = 0;
     }
 
-    private boolean isUniqueLVorIdxVname(String nm) {
-        for (EventNode event : eventNodeCache.values()) {
-            for (ViskitElement lv : event.getLocalVariables()) {
-                if (lv.getName().equals(nm)) {
+    private boolean isUniqueLocalVariableOrIndexVname(String name)
+	{
+        for (EventNode event : eventNodeCache.values())
+		{
+            for (ViskitElement localVariable : event.getLocalVariables()) {
+                if (localVariable.getName().equals(name)) {
                     return false;
                 }
             }
             for (ViskitElement transition : event.getTransitions()) {
-                String ie = transition.getIndexingExpression();
-                if (ie != null && ie.equals(nm)) {
+                String indexingExpression = transition.getIndexingExpression();
+                if (indexingExpression != null && indexingExpression.equals(name)) {
                     return false;
                 }
             }
@@ -858,9 +908,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return true;
     }
 
-    private boolean isUniqueSVname(String nm) {
-        for (ViskitElement sv : stateVariables) {
-            if (sv.getName().equals(nm)) {
+    private boolean isUniqueStateVariableName(String name) {
+        for (ViskitElement stateVariable : stateVariables) {
+            if (stateVariable.getName().equals(name)) {
                 return false;
             }
         }
@@ -869,323 +919,342 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
     @Override
     public String generateStateVariableName() {
-        String nm = null;
-        int startnum = 0;
+        String name = null;
+        int startNumber = 0;
         do {
-            nm = stateVariablePrefix + startnum++;
-        } while (!isUniqueSVname(nm));
-        return nm;
+            name = stateVariablePrefix + startNumber++;
+        }
+		while (!isUniqueStateVariableName(name));
+        return name;
     }
 
     /**
      * Here we convert local state transition expressions into JAXB bindings
      *
-     * @param targ List of StateTransitions to populate
-     * @param local List of StateTransitions to transfer to the target
+     * @param jaxbTargetList List of StateTransitions toEventNode populate
+     * @param local List of StateTransitions toEventNode transfer toEventNode the target
      */
-    private void cloneTransitions(List<StateTransition> targ, List<ViskitElement> local) {
-        targ.clear();
-        for (ViskitElement transition : local) {
-            StateTransition st = oFactory.createStateTransition();
+    private void cloneTransitions(List<StateTransition> jaxbTargetList, List<ViskitElement> local)
+	{
+        jaxbTargetList.clear();
+        for (ViskitElement transition : local)
+		{
+            StateTransition stateTransition = jaxbObjectFactory.createStateTransition();
 
             // Various locally declared variable ops
-            String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
-            if (localV != null && !localV.isEmpty()) {
+            String localVariableAssignment = ((EventStateTransition)transition).getLocalVariableAssignment();
+            if (localVariableAssignment != null && !localVariableAssignment.isEmpty()) {
 
-                String assign = ((EventStateTransition)transition).getLocalVariableAssignment();
-                if (assign != null && !assign.isEmpty()) {
-                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
-                    l.setValue(assign);
-                    st.setLocalVariableAssignment(l);
+                String localVariableAssignmentValue = ((EventStateTransition)transition).getLocalVariableAssignment();
+                if (localVariableAssignmentValue != null && !localVariableAssignmentValue.isEmpty()) {
+                    LocalVariableAssignment jaxbLocalVariableAssignment = jaxbObjectFactory.createLocalVariableAssignment();
+                    jaxbLocalVariableAssignment.setValue(localVariableAssignmentValue);
+                    stateTransition.setLocalVariableAssignment(jaxbLocalVariableAssignment);
                 }
             }
+            StateVariable stateVariable = findStateVariable(transition.getName());
 
-            StateVariable sv = findStateVariable(transition.getName());
+            if (stateVariable == null)
+			{
+				continue; // looping
+			}
 
-            if (sv == null) {continue;}
+            stateTransition.setState(stateVariable);
 
-            st.setState(sv);
+            if (stateVariable.getType() != null && ViskitGlobals.instance().isArray(stateVariable.getType())) {
 
-            if (sv.getType() != null && ViskitGlobals.instance().isArray(sv.getType())) {
-
-                // Match the state transition's index to the given index
-                st.setIndex(transition.getIndexingExpression());
+                // Match the state transition's index toEventNode the given index
+                stateTransition.setIndex(transition.getIndexingExpression());
             }
 
             if (transition.isOperation()) {
-                Operation o = oFactory.createOperation();
-                o.setMethod(transition.getOperationOrAssignment());
-                st.setOperation(o);
+                Operation jaxbOperation = jaxbObjectFactory.createOperation();
+                jaxbOperation.setMethod(transition.getOperationOrAssignment());
+                stateTransition.setOperation(jaxbOperation);
             } else {
-                Assignment a = oFactory.createAssignment();
+                Assignment a = jaxbObjectFactory.createAssignment();
                 a.setValue(transition.getOperationOrAssignment());
-                st.setAssignment(a);
+                stateTransition.setAssignment(a);
             }
 
-            // If we have any void return type, zero parameter methods to
+            // If we have any void return type, zero parameter methods toEventNode
             // call on local vars, or args, do it now
-            String localI = ((EventStateTransition)transition).getLocalVariableInvocation();
-            if (localI != null && !localI.isEmpty()) {
+            String localVariableInvocation = ((EventStateTransition)transition).getLocalVariableInvocation();
+            if (localVariableInvocation != null && !localVariableInvocation.isEmpty()) {
 
                 String invoke = ((EventStateTransition) transition).getLocalVariableInvocation();
                 if (invoke != null && !invoke.isEmpty()) {
-                    LocalVariableInvocation lvi = oFactory.createLocalVariableInvocation();
-                    lvi.setMethod(invoke);
-                    st.setLocalVariableInvocation(lvi);
+                    LocalVariableInvocation jaxbLocalVariableInvocation = jaxbObjectFactory.createLocalVariableInvocation();
+                    jaxbLocalVariableInvocation.setMethod(invoke);
+                    stateTransition.setLocalVariableInvocation(jaxbLocalVariableInvocation);
                 }
             }
-
-            transition.opaqueModelObject = st; //replace
-            targ.add(st);
+            transition.opaqueModelObject = stateTransition; //replace
+            jaxbTargetList.add(stateTransition);
         }
     }
-
-    private void cloneComments(List<String> targ, List<String> local) {
+	
+	@Deprecated
+    private void cloneComments (List<String> targ, List<String> local) {
         targ.clear();
         targ.addAll(local);
     }
 
-    private void cloneArguments(List<Argument> targ, List<ViskitElement> local) {
-        targ.clear();
-        for (ViskitElement eventArguments : local) {
-            Argument arg = oFactory.createArgument();
-            arg.setName(nIe(eventArguments.getName()));
-            arg.setType(nIe(eventArguments.getType()));
-            arg.getComment().clear();
-            arg.getComment().addAll(eventArguments.getDescriptionArray());
-            eventArguments.opaqueModelObject = arg; // replace
-            targ.add(arg);
+    private void cloneArguments(List<Argument> jaxbArgumentList, List<ViskitElement> local) {
+        jaxbArgumentList.clear();
+        for (ViskitElement eventArguments : local)
+		{
+            Argument jaxbArgument = jaxbObjectFactory.createArgument();
+            jaxbArgument.setName(nullIfEmpty(eventArguments.getName()));
+            jaxbArgument.setType(nullIfEmpty(eventArguments.getType()));
+            jaxbArgument.setDescription(nullIfEmpty(eventArguments.getDescription()));
+            eventArguments.opaqueModelObject = jaxbArgument; // replace
+            jaxbArgumentList.add(jaxbArgument);
         }
     }
 
-    private void cloneLocalVariables(List<LocalVariable> targ, List<ViskitElement> local) {
-        targ.clear();
+    private void cloneLocalVariables(List<LocalVariable> jaxbLocalVariableList, List<ViskitElement> local) {
+        jaxbLocalVariableList.clear();
         for (ViskitElement eventLocalVariables : local) {
-            LocalVariable lvar = oFactory.createLocalVariable();
-            lvar.setName(nIe(eventLocalVariables.getName()));
-            lvar.setType(nIe(eventLocalVariables.getType()));
-            lvar.setValue(nIe(eventLocalVariables.getValue()));
-            lvar.getComment().clear();
-            lvar.getComment().add(eventLocalVariables.getComment());
-            eventLocalVariables.opaqueModelObject = lvar; //replace
-            targ.add(lvar);
+            LocalVariable jaxbLocalVariable = jaxbObjectFactory.createLocalVariable();
+            jaxbLocalVariable.setName(nullIfEmpty(eventLocalVariables.getName()));
+            jaxbLocalVariable.setType(nullIfEmpty(eventLocalVariables.getType()));
+            jaxbLocalVariable.setValue(nullIfEmpty(eventLocalVariables.getValue()));
+            jaxbLocalVariable.setDescription(eventLocalVariables.getDescription());
+            eventLocalVariables.opaqueModelObject = jaxbLocalVariable; //replace
+            jaxbLocalVariableList.add(jaxbLocalVariable);
         }
     }
 
     @Override
     public boolean changeEvent(EventNode node) {
-        boolean retcode = true;
+        boolean success = true;
 
         // Ensure a unique Event name
         if (!nameCheck()) {
             mangleName(node);
-            retcode = false;
+            success = false;
         }
-        Event jaxbEv = (Event) node.opaqueModelObject;
+        Event jaxbEvent = (Event) node.opaqueModelObject;
 
-        jaxbEv.setName(node.getName());
+        jaxbEvent.setName(node.getName());
 
         double x = node.getPosition().getX();
         double y = node.getPosition().getY();
-        Coordinate coor = oFactory.createCoordinate();
-        coor.setX("" + x);
-        coor.setY("" + y);
+        Coordinate coord = jaxbObjectFactory.createCoordinate();
+        coord.setX("" + x);
+        coord.setY("" + y);
         node.getPosition().setLocation(x, y);
-        jaxbEv.setCoordinate(coor);
+        jaxbEvent.setCoordinate(coord);
 
-        cloneComments(jaxbEv.getComment(), node.getComments());
-        cloneArguments(jaxbEv.getArgument(), node.getArguments());
-        cloneLocalVariables(jaxbEv.getLocalVariable(), node.getLocalVariables());
+		String descriptionCopy = "";
+		if ((node.getDescription() != null))
+		       descriptionCopy = node.getDescription().trim(); // copy, not reference
+		jaxbEvent.setDescription(descriptionCopy);
+        cloneArguments(jaxbEvent.getArgument(), node.getArguments());
+        cloneLocalVariables(jaxbEvent.getLocalVariable(), node.getLocalVariables());
         // following must follow above
-        cloneTransitions(jaxbEv.getStateTransition(), node.getTransitions());
+        cloneTransitions(jaxbEvent.getStateTransition(), node.getTransitions());
 
-        jaxbEv.setCode(node.getCodeBlock());
+        jaxbEvent.setCode(node.getCodeBlock());
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));
-        return retcode;
+        notifyChanged(new ModelEvent(node, ModelEvent.EVENT_CHANGED, "Event changed: " + node.getName()));
+        return success;
     }
 
     // Edge mods
     // ---------
 
     @Override
-    public void newSchedulingEdge(EventNode src, EventNode target) {
-        SchedulingEdge se = new SchedulingEdge();
-        se.from = src;
-        se.to = target;
-        src.getConnections().add(se);
-        target.getConnections().add(se);
+    public void newSchedulingEdge(EventNode sourceNode, EventNode targetNode)
+	{
+        SchedulingEdge schedulingEdge = new SchedulingEdge();
+        schedulingEdge.fromEventNode = sourceNode;
+        schedulingEdge.toEventNode = targetNode;
+        sourceNode.getConnections().add(schedulingEdge);
+        targetNode.getConnections().add(schedulingEdge);
 
-        Schedule sch = oFactory.createSchedule();
+        Schedule jaxbSchedule = jaxbObjectFactory.createSchedule();
 
-        se.opaqueModelObject = sch;
-        Event targEv = (Event) target.opaqueModelObject;
-        sch.setEvent(targEv);
-        Event srcEv = (Event) src.opaqueModelObject;
-        srcEv.getScheduleOrCancel().add(sch);
+        schedulingEdge.opaqueModelObject = jaxbSchedule;
+        Event targetEvent = (Event) targetNode.opaqueModelObject;
+        jaxbSchedule.setEvent(targetEvent);
+        Event sourceEvent = (Event) sourceNode.opaqueModelObject;
+        sourceEvent.getScheduleOrCancel().add(jaxbSchedule);
 
-        // Put in dummy edge parameters to match the target arguments
-        List<ViskitElement> args = target.getArguments();
+        // Put in dummy edge parametersList toEventNode match the target arguments
+        List<ViskitElement> args = targetNode.getArguments();
         if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
-            se.parameters = edgeParameters;
+            schedulingEdge.parametersList = edgeParameters;
         }
 
-        se.priority = "DEFAULT";  // set default
+        schedulingEdge.priority = "DEFAULT";  // set default
 
-        edgeCache.put(sch, se);
+        edgeCache.put(jaxbSchedule, schedulingEdge);
         setDirty(true);
-        notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Scheduling Edge added"));
+        notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Scheduling Edge added: " +
+		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
     @Override
-    public void redoSchedulingEdge(Edge ed) {
-        EventNode src, target;
-        src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
-        target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
-        Schedule sched = oFactory.createSchedule();
-        ed.opaqueModelObject = sched;
-        Event targEv = (Event) target.opaqueModelObject;
-        sched.setEvent(targEv);
-        Event srcEv = (Event) src.opaqueModelObject;
-        srcEv.getScheduleOrCancel().add(sched);
-        edgeCache.put(sched, ed);
+    public void redoSchedulingEdge(SchedulingEdge jaxbEdge)
+	{
+        EventNode sourceNode, targetNode;
+        sourceNode = (EventNode) ((DefaultMutableTreeNode) jaxbEdge.fromEventNode.opaqueViewObject).getUserObject();
+        targetNode = (EventNode) ((DefaultMutableTreeNode) jaxbEdge.toEventNode.opaqueViewObject).getUserObject();
+        Schedule jaxbSchedule = jaxbObjectFactory.createSchedule();
+        jaxbEdge.opaqueModelObject = jaxbSchedule;
+        Event jaxbEvent = (Event) targetNode.opaqueModelObject;
+        jaxbSchedule.setEvent(jaxbEvent);
+        Event sourceEvent = (Event) sourceNode.opaqueModelObject;
+        sourceEvent.getScheduleOrCancel().add(jaxbSchedule);
+        edgeCache.put(jaxbSchedule, jaxbEdge);
         setDirty(true);
-        notifyChanged(new ModelEvent(ed, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
+        notifyChanged(new ModelEvent(jaxbEdge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone: " + 
+		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
     @Override
-    public void newCancelingEdge(EventNode src, EventNode target) {
-        CancelingEdge ce = new CancelingEdge();
-        ce.from = src;
-        ce.to = target;
-        src.getConnections().add(ce);
-        target.getConnections().add(ce);
+    public void newCancellingEdge(EventNode sourceNode, EventNode targetNode)
+	{
+        CancellingEdge cancellingEdge = new CancellingEdge();
+        cancellingEdge.fromEventNode = sourceNode;
+        cancellingEdge.toEventNode   = targetNode;
+        sourceNode.getConnections().add(cancellingEdge);
+        targetNode.getConnections().add(cancellingEdge);
 
-        Cancel can = oFactory.createCancel();
+        Cancel cancel = jaxbObjectFactory.createCancel();
 
-        ce.opaqueModelObject = can;
-        Event targEv = (Event) target.opaqueModelObject;
-        can.setEvent(targEv);
-        Event srcEv = (Event) src.opaqueModelObject;
-        srcEv.getScheduleOrCancel().add(can);
+        cancellingEdge.opaqueModelObject = cancel;
+        Event targetEvent = (Event) targetNode.opaqueModelObject;
+        cancel.setEvent(targetEvent);
+        Event sourceEvent = (Event) sourceNode.opaqueModelObject;
+        sourceEvent.getScheduleOrCancel().add(cancel);
 
-        // Put in dummy edge parameters to match the target arguments
-        List<ViskitElement> args = target.getArguments();
+        // Put in dummy edge parametersList toEventNode match the target arguments
+        List<ViskitElement> args = targetNode.getArguments();
         if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
-            ce.parameters = edgeParameters;
+            cancellingEdge.parametersList = edgeParameters;
         }
 
-        edgeCache.put(can, ce);
+        edgeCache.put(cancel, cancellingEdge);
         setDirty(true);
-        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling Edge added"));
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_ADDED, "Cancelling Edge added: " + 
+		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
     @Override
-    public void redoCancelingEdge(Edge ed) {
-        EventNode src, target;
-        src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
-        target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
-        Cancel can = oFactory.createCancel();
-        ed.opaqueModelObject = can;
-        Event targEv = (Event) target.opaqueModelObject;
-        can.setEvent(targEv);
-        Event srcEv = (Event) src.opaqueModelObject;
-        srcEv.getScheduleOrCancel().add(can);
-        edgeCache.put(can, ed);
+    public void redoCancellingEdge(CancellingEdge edge)
+	{
+        EventNode sourceNode, targetNode;
+        sourceNode = (EventNode) ((DefaultMutableTreeNode) edge.fromEventNode.opaqueViewObject).getUserObject();
+        targetNode = (EventNode) ((DefaultMutableTreeNode) edge.toEventNode.opaqueViewObject).getUserObject();
+        Cancel cancel = jaxbObjectFactory.createCancel();
+        edge.opaqueModelObject = cancel;
+        Event targetEvent = (Event) targetNode.opaqueModelObject;
+        cancel.setEvent(targetEvent);
+        Event sourceEvent = (Event) sourceNode.opaqueModelObject;
+        sourceEvent.getScheduleOrCancel().add(cancel);
+        edgeCache.put(cancel, edge);
         setDirty(true);
-        notifyChanged(new ModelEvent(ed, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
+        notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELLING_EDGE, "Cancelling Edge redone: " +
+		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
     @Override
-    public void deleteSchedulingEdge(Edge edge) {
+    public void deleteSchedulingEdge(SchedulingEdge edge)
+	{
         _commonEdgeDelete(edge);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.EDGE_DELETED, "Scheduling Edge deleted: " + edge.getName()));
         else
-            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Edge undone"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Scheduling Edge undone: " + edge.getName()));
     }
 
     @Override
-    public void deleteCancelingEdge(Edge edge) {
+    public void deleteCancellingEdge(CancellingEdge edge)
+	{
         _commonEdgeDelete(edge);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGE_DELETED, "Cancelling edge deleted: " + edge.getName()));
         else
-            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELING_EDGE, "Canceling edge undone"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELLING_EDGE, "Cancelling edge undone: " + edge.getName()));
     }
 
-    private void _commonEdgeDelete(Edge edg) {
-        Object jaxbEdge = edg.opaqueModelObject;
+    private void _commonEdgeDelete(Edge edge)
+	{
+        Object jaxbEdge = edge.opaqueModelObject;
 
-        List<Event> nodes = jaxbRoot.getEvent();
-        for (Event ev : nodes) {
-            List<Object> edges = ev.getScheduleOrCancel();
+        List<Event> jaxbEvents = jaxbSimEntity.getEvent();
+        for (Event jaxbEvent : jaxbEvents) {
+            List<Object> edges = jaxbEvent.getScheduleOrCancel();
             edges.remove(jaxbEdge);
         }
 
-        edgeCache.remove(edg);
+        edgeCache.remove(edge);
         setDirty(true);
     }
 
     @Override
-    public void changeSchedulingEdge(Edge e) {
-        Schedule sch = (Schedule) e.opaqueModelObject;
-        sch.setCondition(e.conditional);
-        sch.getComment().clear();
-        sch.getComment().add(e.conditionalDescription);
-        sch.setDelay("" + e.delay);
+    public void changeSchedulingEdge(SchedulingEdge schedulingEdge)
+	{
+        Schedule jaxbSchedule = (Schedule) schedulingEdge.opaqueModelObject;
+        jaxbSchedule.setCondition(schedulingEdge.condition);
+        jaxbSchedule.setDescription(schedulingEdge.conditionDescription);
+        jaxbSchedule.setDelay("" + schedulingEdge.delay);
 
-        sch.setEvent(e.to.opaqueModelObject);
-        sch.setPriority(((SchedulingEdge)e).priority);
-        sch.getEdgeParameter().clear();
+        jaxbSchedule.setEvent(schedulingEdge.toEventNode.opaqueModelObject);
+        jaxbSchedule.setPriority((schedulingEdge).priority);
+        jaxbSchedule.getEdgeParameter().clear();
 
-        // Bug 1373: This is where an edge parameter gets written out to XML
-        for (ViskitElement edgeParameter : e.parameters) {
-            EdgeParameter p = oFactory.createEdgeParameter();
-            p.setValue(nIe(edgeParameter.getValue()));
-            sch.getEdgeParameter().add(p);
+        // Bug 1373: This is where an edge parameter gets written out toEventNode XML
+        for (ViskitElement edgeParameter : schedulingEdge.parametersList)
+		{
+            EdgeParameter jaxbEdgeParameter = jaxbObjectFactory.createEdgeParameter();
+            jaxbEdgeParameter.setValue(nullIfEmpty(edgeParameter.getValue()));
+            jaxbSchedule.getEdgeParameter().add(jaxbEdgeParameter);
         }
 
         setDirty(true);
-        notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
+        notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_CHANGED, "Edge changed: " + schedulingEdge.name));
     }
 
     @Override
-    public void changeCancelingEdge(Edge e) {
-        Cancel can = (Cancel) e.opaqueModelObject;
-        can.setCondition(e.conditional);
-        can.setEvent(e.to.opaqueModelObject);
-        can.getComment().clear();
-        can.getComment().add(e.conditionalDescription);
+    public void changeCancellingEdge(CancellingEdge cancellingEdge)
+	{
+        Cancel jaxbCancel = (Cancel) cancellingEdge.opaqueModelObject;
+        jaxbCancel.setCondition(cancellingEdge.condition);
+        jaxbCancel.setEvent(cancellingEdge.toEventNode.opaqueModelObject);
+        jaxbCancel.setDescription(cancellingEdge.conditionDescription);
 
-        can.getEdgeParameter().clear();
-        for (ViskitElement edgeParameter : e.parameters) {
-            EdgeParameter p = oFactory.createEdgeParameter();
-            p.setValue(nIe(edgeParameter.getValue()));
-            can.getEdgeParameter().add(p);
+        jaxbCancel.getEdgeParameter().clear();
+        for (ViskitElement edgeParameter : cancellingEdge.parametersList)
+		{
+            EdgeParameter jaxbEdgeParameter = jaxbObjectFactory.createEdgeParameter();
+            jaxbEdgeParameter.setValue(nullIfEmpty(edgeParameter.getValue()));
+            jaxbCancel.getEdgeParameter().add(jaxbEdgeParameter);
         }
-
         setDirty(true);
-        notifyChanged(new ModelEvent(e, ModelEvent.CANCELINGEDGECHANGED, "Canceling edge changed"));
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_CHANGED, "Cancelling edge changed: " + cancellingEdge.name));
     }
 
     /**
      * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s the string to evaluate for nullity
+     * @param s the string toEventNode evaluate for nullity
      * @return the passed string if non-zero length, else null
      */
-    private String nIe(String s) {
+    private String nullIfEmpty(String s) {
         if (s != null) {
             if (s.isEmpty()) {
                 s = null;

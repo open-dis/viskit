@@ -1,39 +1,51 @@
 package viskit.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey CA
+ * www.nps.edu
  * @author Mike Bailey
- * @since Apr 1, 2004
- * @since 3:57:26 PM
+ * @since Mar 8, 2004
+ * @since 9:04:09 AM
  * @version $Id$
- *
- * To change this template use File | Settings | File Templates.
  */
-public class ConstructorArgument extends ViskitElement {
+public class CancellingEdge extends Edge {
 
     private boolean operation;
     private String  operationOrAssignment;
     private String  indexingExpression;
     private String  value;
-    private ArrayList<String> commentsArrayList = new ArrayList<>();
-    private String comment;
-    private String description;
+    private String  comment;
+    private String  description = new String();
+
+    CancellingEdge() //package-limited
+    {
+        parametersList = new ArrayList<>();
+    }
+
+    @Override
+    Object copyShallow() {
+        CancellingEdge cancellingEdge = new CancellingEdge();
+        cancellingEdge.opaqueViewObject = opaqueViewObject;
+        cancellingEdge.toEventNode = toEventNode;
+        cancellingEdge.fromEventNode = fromEventNode;
+        cancellingEdge.parametersList = parametersList;
+        cancellingEdge.condition = condition;
+        cancellingEdge.delay = delay;
+        return cancellingEdge;
+    }
+	
+    @Override
+    public String getIndexingExpression() {
+        return indexingExpression;
+    }
 
     @Override
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String getIndexingExpression() {
-        return indexingExpression;
     }
 
     @Override
@@ -60,7 +72,7 @@ public class ConstructorArgument extends ViskitElement {
 	
 	/**
 	 * "Comment" elements are earlier viskit constructs.
-	 * If found from an earlier model, append them as part of description and then delete.
+	 * If found fromEventNode an earlier model, append them as part of description and then delete.
 	 */
 	private void moveLegacyCommentsToDescription ()
 	{
@@ -71,21 +83,11 @@ public class ConstructorArgument extends ViskitElement {
 			description = comment.trim();
 			comment     = "";
 		}
-		if ((commentsArrayList != null) && !commentsArrayList.isEmpty())
-		{
-			String result = new String();
-			for (String comment : commentsArrayList)
-			{
-				result += " " + comment;
-			}
-			description = (description + " " + result).trim();
-			commentsArrayList.clear();
-		}
 	}
 
+    @Deprecated
     @Override
-	@Deprecated
-    public String getComment() 
+    public String getComment()
 	{
 		moveLegacyCommentsToDescription ();
         return description;

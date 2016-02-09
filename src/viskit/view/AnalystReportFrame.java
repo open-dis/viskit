@@ -91,10 +91,18 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     private JMenuBar myMenuBar;
     private JMenu    analystReportMenu = new JMenu("Analyst Report");
     private JFileChooser locationImageFileChooser;
+	
+    JTextField                titleTF = new JTextField();
+    JTextField          analystNameTF = new JTextField();
+    JComboBox<String> accessControlTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+	DateFormat             dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+    JTextField               dateTF = new JTextField(dateFormat.format(new Date()));
+    File currentAssemblyFile;
 
-    public AnalystReportFrame(mvcController controller) {
+    public AnalystReportFrame(mvcController controller)
+	{
         super(FRAME_DEFAULT_TITLE);
-        initMVC(controller);
+        initializeMVC(controller);
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
         buildMenus();
@@ -102,15 +110,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         locationImageFileChooser = new JFileChooser("./images/");
 		locationImageFileChooser.setDialogTitle("Open Image");
     }
-    JTextField titleTF = new JTextField();
-    JTextField analystNameTF = new JTextField();
-    JComboBox<String> classifiedTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
-	DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
-    JTextField dateTF = new JTextField(dateFormat.format(new Date()));
-    File currentAssyFile;
 
-    private void initMVC(mvcController cntlr) {
-        setController(cntlr);
+    private void initializeMVC(mvcController controller) {
+        setController(controller);
     }
 
     /** Captures the name of the assembly file
@@ -122,9 +124,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
-                currentAssyFile = (File) param;
+                currentAssemblyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssyFile(currentAssyFile);
+                cntlr.setCurrentAssyFile(currentAssemblyFile);
                 break;
 
             case CLOSE_ASSY:
@@ -133,7 +135,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assyChanged");
+                LOG.error("Program error AnalystReportFrame.assemblyChanged");
         }
     }
 
@@ -202,14 +204,14 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         } else {
             dateTF.setText(DateFormat.getDateInstance().format(new Date()));
         } //now
-        classifiedTF.setSelectedItem(arb.getClassification());
+        accessControlTF.setSelectedItem(arb.getClassification());
     }
 
     private void unFillHeader() {
         arb.setReportName(titleTF.getText());
         arb.setAuthor(analystNameTF.getText());
         arb.setDateOfReport(dateTF.getText());
-        arb.setClassification((String) classifiedTF.getSelectedItem());
+        arb.setClassification((String) accessControlTF.getSelectedItem());
     }
 
     private void setLayout() {
@@ -246,12 +248,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         headerPanel.add(new JLabel("Analysis Date"));
         headerPanel.add(dateTF);
         headerPanel.add(new JLabel("Report Classification"));
-        headerPanel.add(classifiedTF);
+        headerPanel.add(accessControlTF);
         Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
         titleTF.setMaximumSize(new Dimension(d));
         analystNameTF.setMaximumSize(new Dimension(d));
         dateTF.setMaximumSize(new Dimension(d));
-        classifiedTF.setMaximumSize(new Dimension(d));
+        accessControlTF.setMaximumSize(new Dimension(d));
         SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
 
         headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));

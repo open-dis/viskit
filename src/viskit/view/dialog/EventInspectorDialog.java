@@ -37,32 +37,32 @@ public class EventInspectorDialog extends JDialog {
     private static boolean modified = false;
     private JTextField name;
     private JTextField description;
-    private JPanel descriptionPanel;
-    private TransitionsPanel transitions;
-    private ArgumentsPanel arguments;
-    private LocalVariablesPanel localVariables;
-    private CodeBlockPanel codeBlock;
+    private JPanel              descriptionPanel;
+    private TransitionsPanel    transitionsPanel;
+    private ArgumentsPanel      argumentsPanel;
+    private LocalVariablesPanel localVariablesPanel;
+    private CodeBlockPanel      codeBlockPanel;
     private JButton cancelButton, okButton;
     private JButton addDescriptionButton, addArgumentsButton, addLocalsButton, addCodeBlockButton, addStateTransitionsButton;
 
     /**
      * Set up and show the dialog.  The first Component argument
-     * determines which frame the dialog depends on; it should be
-     * a component in the dialog's controlling frame. The second
-     * Component argument should be null if you want the dialog
-     * to come up with its left corner in the center of the screen;
-     * otherwise, it should be the component on top of which the
-     * dialog should appear.
+ determines which frame the dialog depends on; it should be
+ a component in the dialog's controlling frame. The second
+ Component argument should be null if you want the dialog
+ toEventNode come up with its left corner in the center of the screen;
+ otherwise, it should be the component on top of which the
+ dialog should appear.
      *
      * @param f parent frame
-     * @param node EventNode to edit
+     * @param node EventNode toEventNode edit
      * @return whether data was modified, or not
      */
     public static boolean showDialog(JFrame f, EventNode node) {
         if (dialog == null) {
             dialog = new EventInspectorDialog(f, node);
         } else {
-            dialog.setParams(f, node);
+            dialog.setParameters(f, node);
         }
 
         dialog.setVisible(true);
@@ -70,7 +70,8 @@ public class EventInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventInspectorDialog(final JFrame frame, EventNode node) {
+    private EventInspectorDialog(final JFrame frame, EventNode node)
+	{
         super(frame, "Event Inspector: " + node.getName(), true);
         this.node = node;
 
@@ -83,19 +84,19 @@ public class EventInspectorDialog extends JDialog {
         panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
 
         // name
-        JPanel namePan = new JPanel();
-        namePan.setLayout(new BoxLayout(namePan, BoxLayout.X_AXIS));
-        namePan.setOpaque(false);
-        namePan.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event name")));
+        JPanel namePanel = new JPanel();
+        namePanel.setLayout(new BoxLayout(namePanel, BoxLayout.X_AXIS));
+        namePanel.setOpaque(false);
+        namePanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event name")));
         name = new JTextField(30); // This sets the "preferred width" when this dialog is packed
         name.setOpaque(true);
         name.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        namePan.add(name);
+        namePanel.add(name);
         // make the field expand only horiz.
-        Dimension d = namePan.getPreferredSize();
+        Dimension d = namePanel.getPreferredSize();
         d.width = Integer.MAX_VALUE;
-        namePan.setMaximumSize(new Dimension(d));
-        panel.add(namePan);
+        namePanel.setMaximumSize(new Dimension(d));
+        panel.add(namePanel);
 
         descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
@@ -119,24 +120,24 @@ public class EventInspectorDialog extends JDialog {
         panel.add(descriptionPanel);
 
         // Event arguments
-        arguments = new ArgumentsPanel(300, 2);
-        arguments.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event arguments")));
-        panel.add(arguments);
+        argumentsPanel = new ArgumentsPanel(300, 2);
+        argumentsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event arguments")));
+        panel.add(argumentsPanel);
 
         // local vars
-        localVariables = new LocalVariablesPanel(300, 2);
-        localVariables.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
-        panel.add(localVariables);
+        localVariablesPanel = new LocalVariablesPanel(300, 2);
+        localVariablesPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
+        panel.add(localVariablesPanel);
 
         // code block
-        codeBlock = new CodeBlockPanel(this, true, "Event Code Block");
-        codeBlock.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
-        panel.add(codeBlock);
+        codeBlockPanel = new CodeBlockPanel(this, true, "Event Code Block");
+        codeBlockPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
+        panel.add(codeBlockPanel);
 
         // state transitions
-        transitions = new TransitionsPanel();
-        transitions.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
-        panel.add(transitions);
+        transitionsPanel = new TransitionsPanel();
+        transitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
+        panel.add(transitionsPanel);
 
         // buttons
         JPanel twoRowButtonPanel = new JPanel();
@@ -185,7 +186,7 @@ public class EventInspectorDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        addHideButtListener hideList = new addHideButtListener();
+        AddShowButtonListener hideList = new AddShowButtonListener();
         addDescriptionButton.addActionListener(hideList);
         addArgumentsButton.addActionListener(hideList);
         addLocalsButton.addActionListener(hideList);
@@ -199,9 +200,9 @@ public class EventInspectorDialog extends JDialog {
         description.addKeyListener(klis);
         editDescriptionButton.addActionListener(new commentListener());
 
-        arguments.addPlusListener(myChangeListener);
-        arguments.addMinusListener(myChangeListener);
-        arguments.addDoubleClickedListener(new ActionListener() {
+        argumentsPanel.addPlusListener(myChangeListener);
+        argumentsPanel.addMinusListener(myChangeListener);
+        argumentsPanel.addDoubleClickedListener(new ActionListener() {
 
             // EventArgumentDialog: Event arguments
             @Override
@@ -209,32 +210,32 @@ public class EventInspectorDialog extends JDialog {
                 EventArgument ea = (EventArgument) e.getSource();
                 boolean modified = EventArgumentDialog.showDialog(frame, ea);
                 if (modified) {
-                    arguments.updateRow(ea);
+                    argumentsPanel.updateRow(ea);
                     setModified(modified);
                 }
             }
         });
 
-        codeBlock.addUpdateListener(myChangeListener);
+        codeBlockPanel.addUpdateListener(myChangeListener);
 
-        localVariables.addPlusListener(myChangeListener);
-        localVariables.addMinusListener(myChangeListener);
-        localVariables.addDoubleClickedListener(new ActionListener() {
+        localVariablesPanel.addPlusListener(myChangeListener);
+        localVariablesPanel.addMinusListener(myChangeListener);
+        localVariablesPanel.addDoubleClickedListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 EventLocalVariable elv = (EventLocalVariable) e.getSource();
                 boolean modified = LocalVariableDialog.showDialog(frame, elv);
                 if (modified) {
-                    localVariables.updateRow(elv);
+                    localVariablesPanel.updateRow(elv);
                     setModified(modified);
                 }
             }
         });
 
-        transitions.addPlusListener(myChangeListener);
-        transitions.addMinusListener(myChangeListener);
-        transitions.addDoubleClickedListener(new MouseAdapter() {
+        transitionsPanel.addPlusListener(myChangeListener);
+        transitionsPanel.addMinusListener(myChangeListener);
+        transitionsPanel.addDoubleClickedListener(new MouseAdapter() {
 
             // EventStateTransitionDialog: State transition
             // bug fix 1183
@@ -247,16 +248,16 @@ public class EventInspectorDialog extends JDialog {
                 boolean modified = EventStateTransitionDialog.showDialog(
                         frame,
                         est,
-                        arguments,
-                        localVariables);
+                        argumentsPanel,
+                        localVariablesPanel);
                 if (modified) {
-                    transitions.updateTransition(est);
+                    transitionsPanel.updateTransition(est);
                     setModified(modified);
                 }
             }
         });
 
-        setParams(frame, node);
+        setParameters(frame, node);
     }
 
     private void setModified(boolean f) {
@@ -265,9 +266,9 @@ public class EventInspectorDialog extends JDialog {
     }
 
     private void sizeAndPosition(Component c) {
-        pack();     // do this prior to next
+        pack();     // do this prior toEventNode next
 
-        // little check to add some extra space to always include the node name
+        // little check toEventNode add some extra space toEventNode always include the node name
         // in title bar w/out dotdotdots
         if (getWidth() < 350) {
             setSize(350, getHeight());
@@ -275,7 +276,7 @@ public class EventInspectorDialog extends JDialog {
         setLocationRelativeTo(c);
     }
 
-    public final void setParams(Component c, EventNode en) {
+    public final void setParameters(Component c, EventNode en) {
         node = en;
 
         fillWidgets();
@@ -289,81 +290,79 @@ public class EventInspectorDialog extends JDialog {
         name.setText(nmSt);
 
         Dimension d = description.getPreferredSize();
-        String s = fillString(node.getComments());
-        description.setText(s);
+        description.setText(node.getDescription());
         description.setCaretPosition(0);
         description.setPreferredSize(d);
 
-        hideShowDescription(s != null && !s.isEmpty());
+        showDescription(true); // always show descriptions by default, they are important for model definition
 
-        s = node.getCodeBlock();
-        codeBlock.setData(s);
-        codeBlock.setVisibleLines(1);
-        hideShowCodeBlock(s != null && !s.isEmpty());
+        String s = node.getCodeBlock();
+        codeBlockPanel.setData(s);
+        codeBlockPanel.setVisibleLines(1);
+        showCodeBlock(s != null && !s.isEmpty());
 
-        transitions.setTransitions(node.getTransitions());
-        s = transitions.getString();
-        hideShowStateTransitions(s != null && !s.isEmpty());
+        transitionsPanel.setTransitions(node.getTransitions());
+        s = transitionsPanel.getString();
+        showStateTransitions(s != null && !s.isEmpty());
 
-        arguments.setData(node.getArguments());
-        hideShowArguments(!arguments.isEmpty());
+        argumentsPanel.setData(node.getArguments());
+        showArguments(!argumentsPanel.isEmpty());
 
-        localVariables.setData(node.getLocalVariables());
-        hideShowLocals(!localVariables.isEmpty());
+        localVariablesPanel.setData(node.getLocalVariables());
+        showLocals(!localVariablesPanel.isEmpty());
 
         setModified(false);
         getRootPane().setDefaultButton(cancelButton);
     }
 
-    private void unloadWidgets(EventNode en) {
+    private void unloadWidgets(EventNode eventNode) {
         if (modified) {
-            en.setName(name.getText().trim().replace(' ', '_'));
+            eventNode.setName(name.getText().trim().replace(' ', '_'));
 
-            en.setTransitions(transitions.getTransitions());
+            eventNode.setTransitions(transitionsPanel.getTransitions());
 
             // Bug 1373: This is how an EventNode will have knowledge
             // of edge parameter additions, or removals
-            en.setArguments(arguments.getData());
+            eventNode.setArguments(argumentsPanel.getData());
 
             // Bug 1373: This is how we will now sync up any SchedulingEdge
-            // parameters with corresponding EventNode parameters
+            // parametersList with corresponding EventNode parametersList
 
             // TODO: Recheck bug and verify this isn't don't elsewhere.  W/O
             // the continue statement, it nukes edge values that were already
             // there if we modify a node
-            for (ViskitElement ve : en.getConnections()) {
+            for (ViskitElement viskitElement : eventNode.getConnections()) {
 
                 // Okay, it's a SchedulingEdge
-                if (ve instanceof SchedulingEdge) {
+                if (viskitElement instanceof SchedulingEdge) {
 
-                    // and, this SchedulingEdge is going to this node
-                    if (((SchedulingEdge) ve).to.getName().equals(en.getName())) {
+                    // and, this SchedulingEdge is going toEventNode this node
+                    if (((SchedulingEdge) viskitElement).toEventNode.getName().equals(eventNode.getName())) {
                         LogUtils.getLogger(EventInspectorDialog.class).debug("Found the SE's 'to' Node that matches this EventNode");
 
-                        // The lower key values signal when it was connected to
-                        // to this event node.  We're interested in the first
-                        // SchedulingEdge to this EventNode
-                        LogUtils.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) ve).getModelKey());
+                        // The lower key values signal when it was connected toEventNode
+                        // toEventNode this event node.  We're interested in the first
+                        // SchedulingEdge toEventNode this EventNode
+                        LogUtils.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) viskitElement).getModelKey());
 
                         // If this isn't the first time, then skip over this edge
-                        if (!((SchedulingEdge) ve).parameters.isEmpty()) {continue;}
+                        if (!((SchedulingEdge) viskitElement).parametersList.isEmpty()) {continue;}
 
-                        // We match EventArgument count to EdgeParameter count
+                        // We match EventArgument count toEventNode EdgeParameter count
                         // here.
-                        for (ViskitElement v : en.getArguments()) {
+                        for (ViskitElement v : eventNode.getArguments()) {
 
-                            // The user will be able to change any values from
+                            // The user will be able toEventNode change any values fromventNode
                             // the EdgeInspectorDialog.  Right now, values are
-                            // defaulted to zeros.
-                            ((SchedulingEdge) ve).parameters.add(new vEdgeParameter(v.getValue()));
+                            // defaulted toEventNode zeros.
+                            ((SchedulingEdge) viskitElement).parametersList.add(new vEdgeParameter(v.getValue()));
                         }
                     }
                 }
             }
-            en.setLocalVariables(localVariables.getData());
-            en.getComments().clear();
-            en.getComments().add(description.getText().trim());
-            en.setCodeBLock(codeBlock.getData());
+            eventNode.setLocalVariables(localVariablesPanel.getData());
+            eventNode.setDescription(description.getText().trim());
+            eventNode.setCodeBLock(codeBlockPanel.getData());
         }
     }
 
@@ -386,7 +385,7 @@ public class EventInspectorDialog extends JDialog {
             setModified(false);
 
             // To start numbering over next time
-            ViskitGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
+            ViskitGlobals.instance().getActiveEventGraphModel().resetLocalVariableNameGenerator();
             dispose();
         }
     }
@@ -403,7 +402,7 @@ public class EventInspectorDialog extends JDialog {
                   // now
 
 //                // Our node object hasn't been updated yet (see unloadWidgets) and won't if
-//                // we cancel out below.  But to do the beanshell parse test, a node needs to be supplied
+//                // we cancel out below.  But toEventNode do the beanshell parse test, a node needs toEventNode be supplied
 //                // so the context can be set up properly.
 //                // Build a temp one;
 //                EventNode evn = node.shallowCopy();   // temp copy
@@ -445,50 +444,50 @@ public class EventInspectorDialog extends JDialog {
     }
 
     // begin show/hide support for unused fields
-    private void hideShowDescription(boolean show) {
+    private void showDescription(boolean show) {
         descriptionPanel.setVisible(show);
         addDescriptionButton.setVisible(!show);
         pack();
     }
 
-    private void hideShowArguments(boolean show) {
-        arguments.setVisible(show);
+    private void showArguments(boolean show) {
+        argumentsPanel.setVisible(show);
         addArgumentsButton.setVisible(!show);
         pack();
     }
 
-    private void hideShowLocals(boolean show) {
-        localVariables.setVisible(show);
+    private void showLocals(boolean show) {
+        localVariablesPanel.setVisible(show);
         addLocalsButton.setVisible(!show);
         pack();
     }
 
-    private void hideShowCodeBlock(boolean show) {
-        codeBlock.setVisible(show);
+    private void showCodeBlock(boolean show) {
+        codeBlockPanel.setVisible(show);
         addCodeBlockButton.setVisible(!show);
         pack();
     }
 
-    private void hideShowStateTransitions(boolean show) {
-        transitions.setVisible(show);
+    private void showStateTransitions(boolean show) {
+        transitionsPanel.setVisible(show);
         addStateTransitionsButton.setVisible(!show);
         pack();
     }
 
-    class addHideButtListener implements ActionListener {
+    class AddShowButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource().equals(addDescriptionButton)) {
-                hideShowDescription(true);
+                showDescription(true);
             } else if (e.getSource().equals(addArgumentsButton)) {
-                hideShowArguments(true);
+                showArguments(true);
             } else if (e.getSource().equals(addLocalsButton)) {
-                hideShowLocals(true);
+                showLocals(true);
             } else if (e.getSource().equals(addCodeBlockButton)) {
-                hideShowCodeBlock(true);
+                showCodeBlock(true);
             } else if (e.getSource().equals(addStateTransitionsButton)) {
-                hideShowStateTransitions(true);
+                showStateTransitions(true);
             }
         }
     }

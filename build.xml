@@ -224,7 +224,7 @@ their descpritions.
         <trang failonerror="true" input="${cli.dtd}" output="${cli.xsd}" schemaIn="dtd" schemaOut="xsd"/>
     </target>
 
-    <target name="bindings.simkit"
+    <target name="bindings.simkit.jaxb"
             depends="init"
             description="Create bindings to Simkit XML Schemas" >
 
@@ -261,7 +261,7 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit,javahelp">
+    <target name="compile" depends="bindings.simkit.jaxb,javahelp">
 
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"

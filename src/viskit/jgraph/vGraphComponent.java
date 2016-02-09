@@ -37,10 +37,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     EventGraphViewFrame parent;
     private UndoManager undoManager;
 
-    /** Sets up JGraph to render nodes and edges for DES
+    /** Sets up JGraph toEventNode render nodes and edges for DES
      *
      * @param model a model of the node with its specific edges
-     * @param frame the main view frame canvas to render to
+     * @param frame the main view frame canvas toEventNode render toEventNode
      */
     public vGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame) {
         super(model);
@@ -60,10 +60,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
 
-        // Set the Tolerance to 2 Pixel
+        // Set the Tolerance toEventNode 2 Pixel
         setTolerance(2);
 
-        // Jump to default port on connect
+        // Jump toEventNode default port on connect
         setJumpToDefaultPort(true);
 
         // Set up the cut/remove/paste/copy/undo/redo actions
@@ -76,7 +76,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // accomplished via this convention
         getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
 
-            // To use circles, from the tutorial
+            // To use circles, fromventNode the tutorial
             @Override
             protected VertexView createVertexView(Object v) {
                 VertexView view;
@@ -133,51 +133,51 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     }
     private ModelEvent currentModelEvent = null;
 
-    public void viskitModelChanged(ModelEvent ev) {
-        currentModelEvent = ev;
+    public void viskitModelChanged(ModelEvent modelEvent) {
+        currentModelEvent = modelEvent;
 
-        switch (ev.getID()) {
+        switch (modelEvent.getID()) {
             case ModelEvent.NEWMODEL:
 
                 // Ensure we start fresh
                 vGModel.deleteAll();
                 break;
-            case ModelEvent.EVENTADDED:
+            case ModelEvent.EVENT_ADDED:
 
-                // Reclaimed from the vGModel to here
-                insert((EventNode) ev.getSource());
+                // Reclaimed from eventNode the vGModel toEventNode here
+                insert                 ((EventNode) modelEvent.getSource());
                 break;
-            case ModelEvent.EVENTCHANGED:
-                vGModel.changeEvent((EventNode) ev.getSource());
+            case ModelEvent.EVENT_CHANGED:
+                vGModel.changeEvent    ((EventNode) modelEvent.getSource());
                 break;
-            case ModelEvent.EVENTDELETED:
-                vGModel.deleteEventNode((EventNode) ev.getSource());
+            case ModelEvent.EVENT_DELETED:
+                vGModel.deleteEventNode((EventNode) modelEvent.getSource());
                 break;
-            case ModelEvent.EDGEADDED:
-                vGModel.addEdge((Edge) ev.getSource());
+            case ModelEvent.EDGE_ADDED:
+                vGModel.addEdge        ((Edge) modelEvent.getSource());
                 break;
-            case ModelEvent.EDGECHANGED:
-                vGModel.changeEdge((Edge) ev.getSource());
+            case ModelEvent.EDGE_CHANGED:
+                vGModel.changeEdge     ((Edge) modelEvent.getSource());
                 break;
-            case ModelEvent.EDGEDELETED:
-                vGModel.deleteEdge((Edge) ev.getSource());
+            case ModelEvent.EDGE_DELETED:
+                vGModel.deleteEdge     ((Edge) modelEvent.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGEADDED:
-                vGModel.addCancelEdge((Edge) ev.getSource());
+            case ModelEvent.CANCELLINGEDGE_ADDED:
+                vGModel.addCancelEdge  ((Edge) modelEvent.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGECHANGED:
-                vGModel.changeCancelingEdge((Edge) ev.getSource());
+            case ModelEvent.CANCELLINGEDGE_CHANGED:
+                vGModel.changeCancellingEdge((Edge) modelEvent.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGEDELETED:
-                vGModel.deleteCancelingEdge((Edge) ev.getSource());
+            case ModelEvent.CANCELLINGEDGE_DELETED:
+                vGModel.deleteCancellingEdge((Edge) modelEvent.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
             // keeps track
-            case ModelEvent.REDO_CANCELING_EDGE:
+            case ModelEvent.REDO_CANCELLING_EDGE:
             case ModelEvent.REDO_SCHEDULING_EDGE:
             case ModelEvent.REDO_EVENT_NODE:
-            case ModelEvent.UNDO_CANCELING_EDGE:
+            case ModelEvent.UNDO_CANCELLING_EDGE:
             case ModelEvent.UNDO_SCHEDULING_EDGE:
             case ModelEvent.UNDO_EVENT_NODE:
                 vGModel.reDrawNodes();
@@ -194,9 +194,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     public void graphChanged(GraphModelEvent e) {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {
             return;
-        } // this came in from outside, we don't have to inform anybody..prevent reentry
+        } // this came in fromventNode outside, we don't have toEventNode inform anybody..prevent reentry
 
-        // TODO: confirm any other events that should cause us to bail here
+        // TODO: confirm any other events that should cause us toEventNode bail here
         GraphModelEvent.GraphModelChange c = e.getChange();
         Object[] ch = c.getChanged();
 
@@ -276,10 +276,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
 
                         int idx = 1;
-                        if (!se.parameters.isEmpty()) {
+                        if (!se.parametersList.isEmpty()) {
 
                             sb.append("<u>edge parameters</u><br>");
-                            for (ViskitElement e : se.parameters) {
+                            for (ViskitElement e : se.parametersList) {
                                 vEdgeParameter ep = (vEdgeParameter) e;
                                 sb.append("&nbsp;");
                                 sb.append(idx++);
@@ -299,14 +299,14 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     } else {
 
                         if (vc instanceof vSelfEdgeCell)
-                            sb.append("<center>Self Canceling Edge</center>");
+                            sb.append("<center>Self Cancelling Edge</center>");
                         else
-                            sb.append("<center>Canceling Edge</center>");
+                            sb.append("<center>Cancelling Edge</center>");
 
                     }
 
-                    if (se.conditionalDescription != null) {
-                        String cmt = se.conditionalDescription.trim();
+                    if (se.conditionDescription != null) {
+                        String cmt = se.conditionDescription.trim();
                         if (cmt.length() > 0) {
                             sb.append("<br><u>description</u><br>");
                             sb.append(wrapAtPos(escapeLTGT(cmt), 60));
@@ -314,8 +314,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    if (se.conditional != null) {
-                        String cond = se.conditional.trim();
+                    if (se.condition != null) {
+                        String cond = se.condition.trim();
                         if (cond.length() > 0) {
                             sb.append("<u>condition</u><br>&nbsp;if (");
                             sb.append(escapeLTGT(cond));
@@ -331,12 +331,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     return sb.toString();
 
                 } else if (c instanceof CircleCell) {
-                    CircleCell cc = (CircleCell) c;
-                    EventNode en = (EventNode) cc.getUserObject();
+                    CircleCell circleCell = (CircleCell) c;
+                    EventNode eventNode = (EventNode) circleCell.getUserObject();
                     sb.append("<center>");
 
-                    // Show event node names w/ corresponding parameters if any
-                    String nodeName = en.getName();
+                    // Show event node names w/ corresponding parametersList if any
+                    String nodeName = eventNode.getName();
                     String[] arr = nodeName.split("_");
 
                     if (arr.length > 1) {
@@ -351,16 +351,17 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     }
                     sb.append("</center>");
 
-                    if (!en.getComments().isEmpty()) {
-                        String stripBrackets = en.getComments().get(0).trim();
-                        if (stripBrackets.length() > 0) {
+                    if (!eventNode.getDescription().isEmpty()) {
+                        String description = eventNode.getDescription();
+                        if (description.length() > 0) {
                             sb.append("<u>description</u><br>");
-                            sb.append(wrapAtPos(escapeLTGT(stripBrackets), 60));
+//                          sb.append(wrapAtPos(escapeLTGT(stripBrackets), 60));
+                            sb.append(wrapAtPos(description, 60));
                             sb.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> argLis = en.getArguments();
+                    List<ViskitElement> argLis = eventNode.getArguments();
                     if (!argLis.isEmpty()) {
 
                         sb.append("<u>arguments</u><br>");
@@ -376,7 +377,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    List<ViskitElement> locVarLis = en.getLocalVariables();
+                    List<ViskitElement> locVarLis = eventNode.getLocalVariables();
                     if (!locVarLis.isEmpty()) {
 
                         sb.append("<u>local variables</u><br>");
@@ -393,7 +394,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    String codeBlock = en.getCodeBlock();
+                    String codeBlock = eventNode.getCodeBlock();
                     if (codeBlock != null && !codeBlock.isEmpty()) {
                         sb.append("<u>code block</u><br>");
 
@@ -405,7 +406,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    List<ViskitElement> st = en.getTransitions();
+                    List<ViskitElement> st = eventNode.getTransitions();
                     if (!st.isEmpty()) {
 
                         sb.append("<u>state transitions</u><br>");
@@ -472,12 +473,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             Object e = cc.getUserObject();
             if (e instanceof SchedulingEdge) {
                 SchedulingEdge se = (SchedulingEdge) e;
-                if (se.conditional == null || se.conditional.isEmpty()) // put S only for conditional edges
+                if (se.condition == null || se.condition.isEmpty()) // put S only for condition edges
                 {
                     return null;
                 }
                 return null;  // bug 675 "S";
-            } else if (e instanceof CancelingEdge) // should always be one of these 2 except for proto examples
+            } else if (e instanceof CancellingEdge) // should always be one of these 2 except for proto examples
             {
                 return null;
             }
@@ -494,8 +495,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
     /** Inserts a new Edge between source and target nodes
      *
-     * @param source the source node to connect
-     * @param target the target node to connect
+     * @param source the source node toEventNode connect
+     * @param target the target node toEventNode connect
      */
     public void connect(Port source, Port target) {
 
@@ -504,7 +505,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         Object[] oa = new Object[]{src, tar};
         EventGraphController controller = (EventGraphController) parent.getController();
         if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
-            controller.buildNewCancelingArc(oa);
+            controller.buildNewCancellingArc(oa);
         } else {
             controller.buildNewSchedulingArc(oa);
         }
@@ -515,22 +516,22 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     /** Create the cell's final attributes before rendering on the graph.  The
  edge attributes are set in the JGraphVisualModel
      *
-     * @param node the named EventNode to create attributes for
+     * @param node the named EventNode toEventNode create attributes for
      * @return the cells attributes before rendering on the graph
      */
     public Map createCellAttributes(EventNode node) {
         Map map = new Hashtable();
         Point2D point = node.getPosition();
 
-        // Snap the Point to the Grid
+        // Snap the Point toEventNode the Grid
         if (this != null) {
             point = snap((Point2D) point.clone());
         } else {
             point = (Point2D) point.clone();
         }
 
-        // Add a Bounds Attribute to the Map.  NOTE: using the length of the
-        // node name to help size the cell does not bode well with the
+        // Add a Bounds Attribute toEventNode the Map.  NOTE: using the length of the
+        // node name toEventNode help size the cell does not bode well with the
         // customized edge router, so, leave it at DEFAULT_CELL_SIZE
         GraphConstants.setBounds(map, new Rectangle2D.Double(
                 point.getX(),
@@ -549,7 +550,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
         // Add a nice looking gradient background
 //        GraphConstants.setGradientColor(map, Color.blue);
-        // Add a Border Color Attribute to the Map
+        // Add a Border Color Attribute toEventNode the Map
 //        GraphConstants.setBorderColor(map, Color.black);
         // Add a White Background
 //        GraphConstants.setBackground(map, Color.white);
@@ -575,7 +576,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     }
 
     /** Insert a new Vertex at point
-     * @param node the EventNode to insert
+     * @param node the EventNode toEventNode insert
      */
     public void insert(EventNode node) {
         DefaultGraphCell vertex = createDefaultGraphCell(node);
@@ -645,7 +646,7 @@ class vPortView extends PortView {
 }
 
 /**
- * Sub class EdgeView to install our own localRenderer.
+ * Sub class EdgeView toEventNode install our own localRenderer.
  */
 class vEdgeView extends EdgeView {
 
@@ -662,7 +663,7 @@ class vEdgeView extends EdgeView {
 }
 
 /**
- * Sub class EdgeView to support self-referring edges
+ * Sub class EdgeView toEventNode support self-referring edges
  */
 class vSelfEdgeView extends vEdgeView {
 
@@ -693,7 +694,7 @@ class CircleCell extends DefaultGraphCell {
 }
 
 /**
- * Sub class VertexView to install our own localRenderer.
+ * Sub class VertexView toEventNode install our own localRenderer.
  */
 class CircleView extends VertexView {
 

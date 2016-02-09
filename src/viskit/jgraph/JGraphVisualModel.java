@@ -33,14 +33,14 @@ public class JGraphVisualModel extends DefaultGraphModel {
 
         viskitEdgeStyle = new AttributeMap();
 
-        // common to 4 types
+        // common toEventNode 4 types
         GraphConstants.setDisconnectable(viskitEdgeStyle, false);
         GraphConstants.setLineEnd(viskitEdgeStyle, GraphConstants.ARROW_TECHNICAL);
         GraphConstants.setEndFill(viskitEdgeStyle, true);
         GraphConstants.setEndSize(viskitEdgeStyle, 10);
         GraphConstants.setFont(viskitEdgeStyle, GraphConstants.DEFAULTFONT.deriveFont(10));
 
-        // This setting critical to getting the start and end points offset from
+        // This setting critical toEventNode getting the start and end points offset fromventNode
         // the center of the node
         GraphConstants.setLineStyle(viskitEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
         GraphConstants.setLineWidth(viskitEdgeStyle, 1);
@@ -86,13 +86,13 @@ public class JGraphVisualModel extends DefaultGraphModel {
         changeEitherEdge(ed);
     }
 
-    public void changeCancelingEdge(Edge ed) {
+    public void changeCancellingEdge(Edge ed) {
         changeEitherEdge(ed);
     }
 
     // I don't think this is required anymore.  We don't change src/targets...we rebuild the edge
     private void changeEitherEdge(Edge ed) {
-        CircleCell newFromCC = (CircleCell) ed.from.opaqueViewObject;
+        CircleCell newFromCC = (CircleCell) ed.fromEventNode.opaqueViewObject;
         vEdgeCell edgeC = (vEdgeCell) ed.opaqueViewObject;
 
         DefaultPort dpFrom = (DefaultPort) edgeC.getSource();
@@ -138,7 +138,7 @@ public class JGraphVisualModel extends DefaultGraphModel {
         reDrawNodes();
     }
 
-    public void deleteCancelingEdge(Edge edge) {
+    public void deleteCancellingEdge(Edge edge) {
         deleteEdge(edge);
     }
 
@@ -154,8 +154,8 @@ public class JGraphVisualModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked")
     private void _addEdgeCommon(Edge ed, Map edgeStyle) {
 
-        EventNode enfrom = ed.from;
-        EventNode ento = ed.to;
+        EventNode enfrom = ed.fromEventNode;
+        EventNode ento = ed.toEventNode;
         DefaultGraphCell source = (DefaultGraphCell) enfrom.opaqueViewObject;
         DefaultGraphCell target = (DefaultGraphCell) ento.opaqueViewObject;
 
@@ -190,7 +190,7 @@ public class JGraphVisualModel extends DefaultGraphModel {
     }
 
     /**
-     * @param jGraph the jGraph to set
+     * @param jGraph the jGraph toEventNode set
      */
     public void setjGraph(JGraph jGraph) {
         this.jGraph = jGraph;

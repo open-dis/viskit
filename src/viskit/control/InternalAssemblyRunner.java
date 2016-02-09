@@ -191,7 +191,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
         assemblyInstance = assemblyClass.newInstance();
 
-        /* in order to resolve the assy as a BasicAssembly, it must be
+        /* in order to resolve the Assembly as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
          * it.  Used in the VerboseListener within the working Viskit
          * ClassLoader
@@ -212,7 +212,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
 
-        // Set the run panel according to what the assy XML value is
+        // Set the run panel according to what the Assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
         runPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
@@ -243,7 +243,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            }
 //            LOG.info("\n");
 
-            // Now we are in the pure classloader realm where each assy run can
+            // Now we are in the pure classloader realm where each Assembly run can
             // be independent of any other
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
             assemblyInstance = assemblyClass.newInstance();
@@ -437,9 +437,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
-                // the initialize Assy run button and tabs back and forth
-                // between the Assy editor and the Assy runner panel, but it
-                // won't impede a correct Assy run.  Catch the
+                // the initialize Assembly run button and tabs back and forth
+                // between the Assembly editor and the Assembly runner panel, but it
+                // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
 //                LOG.error(ex);
 //                ex.printStackTrace();
@@ -499,7 +499,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     bw.write(runPanel.simulationOutputTA.getText());
                 }
             } catch (IOException e1) {
-                JOptionPane.showMessageDialog(null, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, e1.getMessage(), "Input/Output (I/O) Error,", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

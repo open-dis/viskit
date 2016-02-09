@@ -14,6 +14,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.ValidationEvent;
+import javax.xml.bind.ValidationEventHandler;
 import org.apache.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
@@ -53,15 +55,16 @@ public class SimkitAssemblyXML2Java {
     private SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbCtx;
+    JAXBContext jaxbContext;
 
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
         try {
-            this.jaxbCtx = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
+            this.jaxbContext = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
             log.error(ex);
             error(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -93,7 +96,7 @@ public class SimkitAssemblyXML2Java {
 
     public void unmarshal() {
         try {
-            Unmarshaller u = jaxbCtx.createUnmarshaller();
+            Unmarshaller u = jaxbContext.createUnmarshaller();
 
             this.root = (SimkitAssembly) u.unmarshal(fileInputStream);
 
@@ -103,7 +106,7 @@ public class SimkitAssemblyXML2Java {
             }
         } catch (JAXBException ex) {
             log.error(ex);
-//            ex.printStackTrace();
+            ex.printStackTrace();
         }
     }
 
@@ -116,31 +119,42 @@ public class SimkitAssemblyXML2Java {
     }
 
     public javax.xml.bind.Element unmarshalAny(String bindings) {
-        JAXBContext oldCtx = jaxbCtx;
+        JAXBContext priorJaxbContext = jaxbContext;
         Unmarshaller u;
         try {
-            jaxbCtx = JAXBContext.newInstance(bindings);
-            u = jaxbCtx.createUnmarshaller();
-            jaxbCtx = oldCtx;
+            jaxbContext = JAXBContext.newInstance(bindings);
+            u = jaxbContext.createUnmarshaller();
+            jaxbContext = priorJaxbContext;
             return (javax.xml.bind.Element) u.unmarshal(fileInputStream);
         } catch (JAXBException e) {
-            jaxbCtx = oldCtx;
+            jaxbContext = priorJaxbContext;
+            e.printStackTrace();
             return (javax.xml.bind.Element) null;
         }
     }
 
     public void marshalRoot() {
         try {
-            Marshaller m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(this.root, System.out);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+				@Override
+				public boolean handleEvent(ValidationEvent validationEvent) {
+					System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+									   " (Exception: " + validationEvent.getLinkedException() + ")");
+					return false;
+				}
+			});
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.marshal(this.root, System.out);
         } catch (JAXBException ex) {
             log.error(ex);
+            ex.printStackTrace();
         }
     }
 
     public String marshalToString(Object jaxb) {
-        Marshaller m;
+        Marshaller jaxbMarshaller;
         String s;
         if ( jaxb == null ) {
             return "<Empty/>";
@@ -151,16 +165,25 @@ public class SimkitAssemblyXML2Java {
             s = "<Errors/>";
         }
         try {
-            m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            jaxbMarshaller = jaxbContext.createMarshaller();
+			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+				@Override
+				public boolean handleEvent(ValidationEvent validationEvent) {
+					System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+									   " (Exception: " + validationEvent.getLinkedException() + ")");
+					return false;
+				}
+			});
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
-            m.marshal(jaxb,pw);
+            jaxbMarshaller.marshal(jaxb,pw);
             s = sw.toString();
         } catch (JAXBException e) {
             log.error(e);
-//            e.printStackTrace();
+            e.printStackTrace();
         }
         return s;
     }
@@ -176,19 +199,28 @@ public class SimkitAssemblyXML2Java {
             marshal(root, fos);
         } catch (FileNotFoundException e) {
             log.error(e);
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
     public void marshal(Object node, OutputStream o) {
-        Marshaller m;
+        Marshaller jaxbMarshaller;
         try {
-            m = jaxbCtx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.marshal(node,o);
+            jaxbMarshaller = jaxbContext.createMarshaller();
+			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
+			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+				@Override
+				public boolean handleEvent(ValidationEvent validationEvent) {
+					System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+									   " (Exception: " + validationEvent.getLinkedException() + ")");
+					return false;
+				}
+			});
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.marshal(node,o);
         } catch (JAXBException e) {
             log.error(e);
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
