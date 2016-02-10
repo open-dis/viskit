@@ -117,8 +117,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
-    private JToggleButton selectMode;
-    private JToggleButton adapterMode,  simEventListenerMode,  propertyChangeListenerMode;
+    private JToggleButton selectModeButton;
+    private JToggleButton adapterModeButton,  simEventListenerModeButton,  propertyChangeListenerModeButton;
     private LegoTree legoTree,  propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -459,16 +459,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Use the button's selected status to figure out what mode
         // we are in.
 
-        if (selectMode.isSelected()) {
+        if (selectModeButton.isSelected()) {
             return SELECT_MODE;
         }
-        if (adapterMode.isSelected()) {
+        if (adapterModeButton.isSelected()) {
             return ADAPTER_MODE;
         }
-        if (simEventListenerMode.isSelected()) {
+        if (simEventListenerModeButton.isSelected()) {
             return SIMEVLIS_MODE;
         }
-        if (propertyChangeListenerMode.isSelected()) {
+        if (propertyChangeListenerModeButton.isSelected()) {
             return PCL_MODE;
         }
         LogUtils.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
@@ -481,30 +481,30 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         // Buttons for what mode we are in
 
-        selectMode = makeToolbarButton(null, "viskit/images/selectNode.png",
-                "Select items on the graph");
-        Border border = selectMode.getBorder();
-        selectMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(Color.lightGray, 2)));
+        selectModeButton = makeToolbarButton(null, "viskit/images/selectNode.png",
+                "Select (double-click inspection) and move (drag) SimEntity items on the event graph");
+        Border border = selectModeButton.getBorder();
+        selectModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        adapterMode = makeToolbarButton(null, new AdapterIcon(24, 24),
-                "Connect assembly nodes (event graph instances) with adapter pattern");
-        border = adapterMode.getBorder();
-        adapterMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        propertyChangeListenerModeButton = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
+                "Property change listener: monitor events from a single SimEntity to collect statistics"); // TODO improve
+        border = propertyChangeListenerModeButton.getBorder();
+        propertyChangeListenerModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
-        simEventListenerMode = makeToolbarButton(null, new SimEventListenerIcon(24, 24),
-                "Connect assembly nodes (event graph instances) with a SimEvent listener pattern");
-        border = simEventListenerMode.getBorder();
-        simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        simEventListenerModeButton = makeToolbarButton(null, new SimEventListenerIcon(24, 24),
+                "Listener: connect two assembly nodes (event graph instances) with a SimEvent listener pattern"); // TODO improve
+        border = simEventListenerModeButton.getBorder();
+        simEventListenerModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propertyChangeListenerMode = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
-                "Connect a property change listener to a SimEntity");
-        border = propertyChangeListenerMode.getBorder();
-        propertyChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        adapterModeButton = makeToolbarButton(null, new AdapterIcon(24, 24),
+                "Adapter: connect two assembly nodes (event graph instances) with an event adapter pattern"); // TODO improve
+        border = adapterModeButton.getBorder();
+        adapterModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
+        JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
 
-        JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
+        JButton zoomOutButton = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
 
         JButton saveButton = makeButton(null, "viskit/images/save.png",
@@ -515,31 +515,31 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         Action compileInitializeAssemblyAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepareSimulationRunner");
 		compileInitializeAssemblyButton = makeButton(compileInitializeAssemblyAction, "viskit/images/Play24.gif",
                 "Compile and initialize the Assembly, prepare for Simulation Run");
-        modeButtonGroup.add(selectMode);
-        modeButtonGroup.add(adapterMode);
-        modeButtonGroup.add(simEventListenerMode);
-        modeButtonGroup.add(propertyChangeListenerMode);
+        modeButtonGroup.add(selectModeButton);
+        modeButtonGroup.add(propertyChangeListenerModeButton);
+        modeButtonGroup.add(simEventListenerModeButton);
+        modeButtonGroup.add(adapterModeButton);
 
         // Make selection mode the default mode
-        selectMode.setSelected(true);
-
-        getToolBar().add(new JLabel("Mode"));
+        selectModeButton.setSelected(true);
+		JLabel modeLabel = new JLabel("Mode");
+		modeLabel.setToolTipText("Hover mouse over any node or arc to see a summary of settings");
+        getToolBar().add(modeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
-
-        getToolBar().add(selectMode);
+        getToolBar().add(selectModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(adapterMode);
+        getToolBar().add(propertyChangeListenerModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(simEventListenerMode);
+        getToolBar().add(simEventListenerModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(propertyChangeListenerMode);
-
+        getToolBar().add(adapterModeButton);
         getToolBar().addSeparator(new Dimension(24, 24));
+
         getToolBar().add(new JLabel("Zoom"));
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(zoomIn);
+        getToolBar().add(zoomInButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(zoomOut);
+        getToolBar().add(zoomOutButton);
         getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
@@ -567,14 +567,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
 
-        zoomIn.addActionListener(new ActionListener() {
+        zoomInButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 getCurrentVgraphAssemblyComponentWrapper().setScale(getCurrentVgraphAssemblyComponentWrapper().getScale() + 0.1d);
             }
         });
-        zoomOut.addActionListener(new ActionListener() {
+        zoomOutButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -610,10 +610,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         PortsVisibleListener portsOn = new PortsVisibleListener(true);
         PortsVisibleListener portsOff = new PortsVisibleListener(false);
-        selectMode.addActionListener(portsOff);
-        adapterMode.addActionListener(portsOn);
-        simEventListenerMode.addActionListener(portsOn);
-        propertyChangeListenerMode.addActionListener(portsOn);
+        selectModeButton.addActionListener(portsOff);
+        adapterModeButton.addActionListener(portsOn);
+        simEventListenerModeButton.addActionListener(portsOn);
+        propertyChangeListenerModeButton.addActionListener(portsOn);
     }
 
     private JToggleButton makeToolbarButton(Action a, String icPath, String tt) {
