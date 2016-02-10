@@ -474,10 +474,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     private JFileChooser saveChooser;
 
-    class SaveListener implements ActionListener {
-
+    class SaveListener implements ActionListener
+	{
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+		{
+			ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab();
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
                 saveChooser.setDialogTitle("Save Assembly Output");
@@ -652,8 +654,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         myMenuBar.add(editMenu);
     }
 
-    class CopyListener implements ActionListener {
-
+    class CopyListener implements ActionListener
+	{
         @Override
         public void actionPerformed(ActionEvent e) {
             String s = simulationRunPanel.simulationOutputTA.getSelectedText();
@@ -663,8 +665,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class SelectAllListener implements ActionListener {
-
+    class SelectAllListener implements ActionListener
+	{
         @Override
         public void actionPerformed(ActionEvent e) {
             simulationRunPanel.simulationOutputTA.requestFocus();
@@ -672,11 +674,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    class ClearListener implements ActionListener {
-
+    class ClearListener implements ActionListener
+	{
         @Override
-        public void actionPerformed(ActionEvent e) {
-			// TODO a
+        public void actionPerformed(ActionEvent e)
+		{
+			ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab();
             int returnValue = ViskitGlobals.instance().getAssemblyEditor().genericAskYN("Are you sure?", "Do you really want to clear the Simulation Run output?");
             if (returnValue == JOptionPane.OK_OPTION)
 			{
@@ -690,6 +693,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e)
         {
+			ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab();
             File f; // = tmpFile;
             String osName = ViskitStatics.OPERATING_SYSTEM;
             String filePath = "";
