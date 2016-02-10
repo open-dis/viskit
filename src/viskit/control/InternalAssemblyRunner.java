@@ -614,7 +614,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 		simulationRunMenu.setMnemonic(KeyEvent.VK_S);
         JMenuItem  saveOutputMI = new JMenuItem("Save simulation output to text file");
         JMenuItem  viewOutputMI = new JMenuItem("View simulation output in text editor");
-        JMenuItem clearOutputMI = new JMenuItem("Clear simulation output"); // TODO
+        JMenuItem clearOutputMI = new JMenuItem("Clear simulation output");
 		
         JMenu         editMenu = new JMenu("Edit");
         JMenuItem       copyMI = new JMenuItem("Copy");
