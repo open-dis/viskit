@@ -46,7 +46,7 @@ public class ArrayInspector extends JDialog {
         ViskitStatics.clampHeight(typeTF);
         typeLabel.setLabelFor(typeTF);
         JLabel countLab = new JLabel("Array length", JLabel.TRAILING);
-        sizeTF = new JTextField();
+        sizeTF = new JTextField(50); // columns to initially grow the display
         ViskitStatics.clampHeight(sizeTF);
         countLab.setLabelFor(sizeTF);
 
