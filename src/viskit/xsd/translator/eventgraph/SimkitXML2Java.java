@@ -27,24 +27,43 @@ public class SimkitXML2Java {
     static Logger log = LogUtils.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
+	/** space character */
     public final static String SP = " ";
+	/** 4 space characters */
     public final static String SP_4 = SP + SP + SP + SP;
+	/** 8 space characters */
     public final static String SP_8 = SP_4 + SP_4;
+	/** 12 space characters */
     public final static String SP_12 = SP_8 + SP_4;
+	/** open squiggly bracket */
     public final static String OB = "{";
+	/** close squiggly bracket */
     public final static String CB = "}";
+	/** semicolon */
     public final static String SC = ";";
+	/** comma */
     public final static String CM = ",";
+	/** left parenthesis */
     public final static String LP = "(";
+	/** right parenthesis */
     public final static String RP = ")";
+	/** equals sign */
     public final static String EQ = "=";
+	/** period (decimal point, dot) */
     public final static String PD = ".";
+	/** quote mark */
     public final static String QU = "\"";
+	/** left square bracket */
     public final static String LB = "[";
+	/** right square bracket */
     public final static String RB = "]";
+	/** right angle bracket (greater-than sign) */
     public final static String RA = ">";
+	/**left angle bracket (less-than sign) */
     public final static String LA = "<";
+	/** javadoc open */
     public final static String JDO = "/**";
+	/** javadoc close */
     public final static String JDC = "*/";
     public final static String PUBLIC = "public";
     public final static String PROTECTED = "protected";

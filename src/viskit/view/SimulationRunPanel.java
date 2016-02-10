@@ -42,6 +42,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
+import viskit.control.InternalAssemblyRunner;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -64,7 +65,7 @@ public class SimulationRunPanel extends JPanel {
     public JSplitPane xsplPn;
     public JButton vcrStop,  vcrPlay,  vcrRewind,  vcrStep,  closeButton;
     public JCheckBox vcrVerboseCB;
-    public JTextField vcrSimulationTime,  vcrStopTime;
+    public JTextField vcrSimulationStartTimeTF,  vcrSimulationStopTimeTF;
     public JCheckBox saveReplicationDataCB;
     public JCheckBox printReplicationReportsCB;
     public JCheckBox searchCB;
@@ -80,6 +81,8 @@ public class SimulationRunPanel extends JPanel {
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
 	private final JLabel titleLabel = new JLabel();
     private final boolean assemblyRunPanelVisible;
+	private int numberOfReplications = 1;
+	private String fullTitle = new String();
 
     /**
      * Create an Simulation Run panel
@@ -103,7 +106,6 @@ public class SimulationRunPanel extends JPanel {
         JSplitPane leftSplit;
 		
         simulationOutputTA = new JTextArea();
-		initializeSimulationOutput ();
         simulationOutputTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         simulationOutputTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller such as simulationOutputTA.setRows(100);
@@ -111,7 +113,7 @@ public class SimulationRunPanel extends JPanel {
         bar = jsp.getVerticalScrollBar();
         bar.setUnitIncrement(STEPSIZE);
 
-        JComponent vcrPanel = makeSimulationRunControlPanel(skipCloseButton);
+        JComponent vcrPanel = buildSimulationRunControlPanel(skipCloseButton);
 
         Icon npsIcon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
         String npsString = "";
@@ -132,12 +134,14 @@ public class SimulationRunPanel extends JPanel {
         leftRightSplit.setDividerLocation(275); // (w/2) - (w/4));
 
         add(leftRightSplit, BorderLayout.CENTER);
+		
+		initializeRunWidgetsSimulationOutputTA ();
 
-        // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setRunPanel(SimulationRunPanel.this);
+        // Provide access to Enable Analyst Report checkbox etc.
+        ViskitGlobals.instance().setSimulationRunPanel(SimulationRunPanel.this);
     }
 
-    private JPanel makeSimulationRunControlPanel(boolean skipCloseButton)
+    private JPanel buildSimulationRunControlPanel(boolean skipCloseButton)
 	{
         JPanel simulationRunControlPanel = new JPanel();
 		simulationRunControlPanel.setLayout(new BoxLayout(simulationRunControlPanel, BoxLayout.Y_AXIS));
@@ -153,25 +157,25 @@ public class SimulationRunPanel extends JPanel {
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
-        vcrSimulationTime = new JTextField(10);
-        vcrSimulationTime.setEditable(false);
-        ViskitStatics.clampSize(vcrSimulationTime);
+        vcrSimulationStartTimeTF = new JTextField(10);
+        vcrSimulationStartTimeTF.setEditable(false);
+        ViskitStatics.clampSize(vcrSimulationStartTimeTF);
         vcrPanel.add(vcrSimulationStartTimeLabel);
         vcrPanel.add(Box.createHorizontalStrut(5));
-        vcrPanel.add(vcrSimulationTime);
+        vcrPanel.add(vcrSimulationStartTimeTF);
         simulationRunControlPanel.add(vcrPanel);
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
 
         JLabel vcrSimulationStopTimeLabel = new JLabel("Simulation stop time: ");
         vcrSimulationStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
-        vcrStopTime = new JTextField(10);
-        ViskitStatics.clampSize(vcrStopTime);
+        vcrSimulationStopTimeTF = new JTextField(10);
+        ViskitStatics.clampSize(vcrSimulationStopTimeTF);
         vcrPanel = new JPanel(); // reset
 		vcrPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         vcrPanel.setLayout(new BoxLayout(vcrPanel, BoxLayout.X_AXIS));
         vcrPanel.add(vcrSimulationStopTimeLabel);
         vcrPanel.add(Box.createHorizontalStrut(5));
-        vcrPanel.add(vcrStopTime);
+        vcrPanel.add(vcrSimulationStopTimeTF);
         simulationRunControlPanel.add(vcrPanel); // updated
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
 
@@ -180,8 +184,10 @@ public class SimulationRunPanel extends JPanel {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int numReps = Integer.parseInt(numberOfReplicationsTF.getText().trim());
-                    if (numReps < 1) {
+                    setNumberOfReplications(Integer.parseInt(numberOfReplicationsTF.getText().trim()));
+                    if (getNumberOfReplications() < 1)
+					{
+						setNumberOfReplications(1);
                         numberOfReplicationsTF.setText("1");
                     }
                 }
@@ -198,7 +204,7 @@ public class SimulationRunPanel extends JPanel {
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
 		
         vcrVerboseCB = new JCheckBox("Verbose output", false);
-        vcrVerboseCB.addActionListener(new vcrVerboseCBListener());
+        vcrVerboseCB.addActionListener(new VcrVerboseCBListener());
         vcrVerboseCB.setToolTipText("Enables verbose output for all runs");
         simulationRunControlPanel.add(vcrVerboseCB); // updated
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
@@ -292,12 +298,32 @@ public class SimulationRunPanel extends JPanel {
         return simulationRunControlPanel;
     }
 
-    class vcrVerboseCBListener implements ActionListener {
+	/**
+	 * @return the numberOfReplications
+	 */
+	public int getNumberOfReplications()
+	{
+		numberOfReplications = Integer.parseInt(numberOfReplicationsTF.getText().trim()); // ensure value is captured from TextField
+		return numberOfReplications;
+	}
+
+	/**
+	 * @param numberOfReplications the numberOfReplications to set
+	 */
+	public void setNumberOfReplications(int numberOfReplications) 
+	{
+		numberOfReplicationsTF.setText(Integer.toString(numberOfReplications));
+		this.numberOfReplications = numberOfReplications;
+	}
+
+    class VcrVerboseCBListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (vcrVerboseCB.isSelected()) {
-                verboseReplicationNumberTF.setText("");
+            if (vcrVerboseCB.isSelected())
+			{
+				// verbose and single-verbose-replication are mutually exclusive
+                verboseReplicationNumberTF.setText(""); //TODO consider layout refactor, radio buttons
             }
         }
     }
@@ -316,41 +342,56 @@ public class SimulationRunPanel extends JPanel {
             caretUpdate(null);
         }
     }
-	public void setTitle (String newTitle)
+	public final void setTitle (String newTitle)
 	{
-		String fullTitle = newTitle.trim();
-		
+		fullTitle = newTitle.trim();
+		// adjust title for readability
 		if      ( fullTitle.contains("Assembly") && !fullTitle.contains("Run"))
-		 	 titleLabel.setText(newTitle + " Runner");
+		 	 fullTitle += " Runner";
 		else if (!fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
-			 titleLabel.setText(newTitle + " Assembly");
+			 fullTitle += " Assembly";
 		else if ( fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
-			 titleLabel.setText(newTitle);
-		else titleLabel.setText(newTitle + " Assembly Runner"); // whew
+		{
+			// OK as is
+		}
+		else fullTitle += " Assembly Runner"; // whew
+		
+		titleLabel.setText(fullTitle);
 	}
-	public final void initializeSimulationOutput ()
+	public final void initializeRunWidgetsSimulationOutputTA ()
 	{
+		boolean ready = false;
 		String initializationMessage;
 		if      (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
 		{
 			initializationMessage = "**********************************************************************************" + lineEnd +
                                     "* Not ready! Initialize the selected Assembly before using Simulation Run panel. *" + lineEnd +
                                     "**********************************************************************************" + lineEnd;
-			simulationOutputTA.setEditable(true);
 		}
 		else if (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly())
 		{
-			initializationMessage = "Simulation output stream:" + lineEnd +
-                                    "-------------------------" + lineEnd;
-			simulationOutputTA.setEditable(true);
+			initializationMessage = "Simulation output stream";
+			if ((fullTitle != null) && !fullTitle.isEmpty())
+			{
+				initializationMessage += " for " + fullTitle; // TODO fix initialization sequence
+			}
+			initializationMessage += lineEnd +
+                                     InternalAssemblyRunner.dividerLine + lineEnd +
+                                     InternalAssemblyRunner.dividerLine + lineEnd;
+			ready = true;
 		}
 		else 
 		{
 			initializationMessage = "************************************************************************************" + lineEnd +
                                     "* Not ready! Open/create/initialize an Assembly before using Simulation Run panel. *" + lineEnd +
                                     "************************************************************************************" + lineEnd;
-			simulationOutputTA.setEditable(false);
 		}
-		simulationOutputTA.setText(initializationMessage);
+		// adjust panel widgets
+				simulationOutputTA.setText(initializationMessage);
+				simulationOutputTA.setEditable(ready);
+			numberOfReplicationsTF.setEnabled(ready);
+		verboseReplicationNumberTF.setEnabled(ready);
+		  vcrSimulationStartTimeTF.setEnabled(ready);
+	       vcrSimulationStopTimeTF.setEnabled(ready);
 	}
 }

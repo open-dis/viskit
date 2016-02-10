@@ -104,7 +104,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public static final int PCL_MODE = 3;
 
     // The view needs access to this
-    public JButton runButton;
+    public JButton compileInitializeAssemblyButton;
 
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
@@ -326,7 +326,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 assemblyController.clearRecentAssemblyFileList();
             } else {
                 assemblyController.openRecentAssembly(fullPath);
-				ViskitGlobals.instance().getViskitApplicationFrame().selectAssemblyEditorTab();
+				ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab();
             }
 			buildMenus (); // reset
         }
@@ -512,8 +512,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		saveButton.setSize(new Dimension (24, 24));
 
         // reflection method, take care since refactoring won't find this!!
-        Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepareSimulationRunner");
-		runButton = makeButton(runAction, "viskit/images/Play24.gif",
+        Action compileInitializeAssemblyAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepareSimulationRunner");
+		compileInitializeAssemblyButton = makeButton(compileInitializeAssemblyAction, "viskit/images/Play24.gif",
                 "Compile and initialize the Assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -546,11 +546,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize Assembly<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
         initializeLabel.setToolTipText("Prepare selected Assembly for Simulation Run");
-              runButton.setToolTipText("Prepare selected Assembly for Simulation Run");
+        compileInitializeAssemblyButton.setToolTipText("Prepare selected Assembly for Simulation Run");
         getToolBar().add(initializeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
-		runButton.setHorizontalAlignment(JButton.RIGHT);
-        getToolBar().add(runButton);
+		compileInitializeAssemblyButton.setHorizontalAlignment(JButton.RIGHT);
+        getToolBar().add(compileInitializeAssemblyButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         
 		JLabel saveLabel = new JLabel(EventGraphViewFrame.saveCompileLabelText);

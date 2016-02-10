@@ -34,6 +34,8 @@ abstract public class AssemblyEdge extends ViskitElement {
 
 	@Override
     public String getDescription() {
+		if (description == null)
+			description = "";
         return description;
     }
 

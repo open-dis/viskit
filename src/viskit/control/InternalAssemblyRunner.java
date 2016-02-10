@@ -74,27 +74,27 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
 
-    /** The name of the assembly to run */
-    String assemblyClassName;
-    SimulationRunPanel runPanel;
-    ActionListener closer, saveListener;
-    JMenuBar myMenuBar;
-    BufferedReader backChan;
-    Thread simulationRunThread;
-    SimulationRunThreadMonitor swingThreadMonitor;
+    /** The name of the basicAssembly to run */
+    String             assemblyClassName;
+    SimulationRunPanel simulationRunPanel;
+    ActionListener     closeListener, saveListener;
+    JMenuBar           myMenuBar;
+    BufferedReader     backChannelBufferedReader;
+    BasicAssembly      basicAssembly;
+    Thread                     simulationRunThread;
+    SimulationRunThreadMonitor simulationRunThreadMonitor;
     PipedOutputStream pos;
-    PipedInputStream pis;
-    BasicAssembly assembly;
+    PipedInputStream  pis;
 
     /** external runner saves a file */
-    private String analystReportTempFile = null;
+    private String   analystReportTempFile = null;
     FileOutputStream fos;
-    FileInputStream fis;
+    FileInputStream  fis;
 
-    /** The assembly to be run from java source */
+    /** The basicAssembly to be run from java source */
     Class<?> assemblyClass;
 
-    /** Instance of the assembly to run from java source */
+    /** Instance of the basicAssembly to run from java source */
     Object assemblyInstance;
     private static int mutex = 0;
     private ClassLoader lastLoaderNoReset;
@@ -108,6 +108,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private String currentTitle = namePrefix;
 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
+	public final static String dividerLine = "================================================================================================";
 
     /**
      * The internal logic for the Assembly Runner panel
@@ -123,24 +124,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // TODO NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons.  Currently, only start and stop work
-        runPanel = new SimulationRunPanel(assemblyName, true, analystReportPanelVisible);
+        simulationRunPanel = new SimulationRunPanel(assemblyName, true, analystReportPanelVisible);
         buildMenus();
-        runPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
-        runPanel.vcrPlay.addActionListener(new StartResumeListener());
-        runPanel.vcrRewind.addActionListener(new RewindListener());
-        runPanel.vcrStep.addActionListener(new StepListener());
-        runPanel.vcrVerboseCB.addActionListener(new VerboseListener());
-        runPanel.vcrStop.setEnabled(false);
-        runPanel.vcrPlay.setEnabled(false);
-        runPanel.vcrRewind.setEnabled(false);
-        runPanel.vcrStep.setEnabled(false);
+        simulationRunPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
+        simulationRunPanel.vcrPlay.addActionListener(new StartResumeListener());
+        simulationRunPanel.vcrRewind.addActionListener(new RewindListener());
+        simulationRunPanel.vcrStep.addActionListener(new StepListener());
+        simulationRunPanel.vcrVerboseCB.addActionListener(new VerboseListener());
+        simulationRunPanel.vcrStop.setEnabled(false);
+        simulationRunPanel.vcrPlay.setEnabled(false);
+        simulationRunPanel.vcrRewind.setEnabled(false);
+        simulationRunPanel.vcrStep.setEnabled(false);
         twiddleButtons(OFF);
 
         // Viskit's current working ClassLoader
         lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
     }
 
-    public JComponent getRunnerPanel() {return runPanel;}
+    public JComponent getRunnerPanel() {return simulationRunPanel;}
 
     public JMenuBar getMenus() {
         return myMenuBar;
@@ -154,7 +155,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      * Pre-initialization this runner for a simulation run
      * @param params arguments to initialize the Simulation runner
      */
-    public void preInitRun(String[] params) {
+    public void preInitializeRun(String[] params) {
 
 //        for (String s : params) {
 //            LOG.info("VM argument is: " + s);
@@ -163,7 +164,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(assemblyClassName);
 
-        runPanel.vcrSimulationTime.setText("0.0");
+        simulationRunPanel.vcrSimulationStartTimeTF.setText("0.0");
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
@@ -177,7 +178,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage());
             twiddleButtons(OFF);
-//            throwable.printStackTrace();
+            throwable.printStackTrace();
             return;
         }
         twiddleButtons(REWIND);
@@ -196,9 +197,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
          * it.  Used in the VerboseListener within the working Viskit
          * ClassLoader
          */
-        assembly = (BasicAssembly) assemblyInstance;
+        basicAssembly = (BasicAssembly) assemblyInstance;
 
-        Method getNumberReplications     = assemblyClass.getMethod("getNumberReplications");
+		// TODO avoid string references so that method names can be refactored
+        Method getNumberOfReplications   = assemblyClass.getMethod("getNumberOfReplications");
         Method isSaveReplicationData     = assemblyClass.getMethod("isSaveReplicationData");
         Method isPrintReplicationReports = assemblyClass.getMethod("isPrintReplicationReports");
         Method isPrintSummaryReport      = assemblyClass.getMethod("isPrintSummaryReport");
@@ -207,25 +209,27 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method setStopTime               = assemblyClass.getMethod("setStopTime", double.class);
         Method getStopTime               = assemblyClass.getMethod("getStopTime");
 
-        runPanel.numberOfReplicationsTF.setText("" + (Integer) getNumberReplications.invoke(assemblyInstance));
-        runPanel.saveReplicationDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
-        runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
-        runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
+//        simulationRunPanel.numberOfReplicationsTF.setText("" + (Integer) getNumberOfReplications.invoke(assemblyInstance));
+        simulationRunPanel.setNumberOfReplications((Integer) getNumberOfReplications.invoke(assemblyInstance)); // TODO refactor further
+		
+        simulationRunPanel.saveReplicationDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
+        simulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
+        simulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
 
         // Set the run panel according to what the Assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
-        runPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
+        simulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
-        runPanel.vcrStopTime.setText("" + (Double) getStopTime.invoke(assemblyInstance));
+        simulationRunPanel.vcrSimulationStopTimeTF.setText("" + (Double) getStopTime.invoke(assemblyInstance));
     }
 
     File tmpFile;
     RandomAccessFile rTmpFile;
     JTextAreaOutputStream textAreaOutputStream;
 
-    protected void initRun() {
+    protected void initializeRun() {
 
-        // Prevent multiple pushes of the sim run button
+        // ignore multiple pushes of the simulation run button
         mutex++;
         if (mutex > 1) {
             return;
@@ -249,7 +253,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             assemblyInstance = assemblyClass.newInstance();
 
             Method setOutputStream            = assemblyClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplications      = assemblyClass.getMethod("setNumberReplications", int.class);
+            Method setNumberOfReplications    = assemblyClass.getMethod("setNumberOfReplications", int.class);
             Method setSaveReplicationData     = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
             Method setPrintReplicationReports = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
             Method setPrintSummaryReport      = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
@@ -268,7 +272,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // *** Resetting the RNG seed state ***
             // NOTE: This is currently disabled as the resetSeedStateCB is not
             // enabled nor visible
-            if (runPanel.resetSeedStateCB.isSelected()) {
+            if (simulationRunPanel.resetSeedStateCB.isSelected()) {
 
                 Class<?> rVFactClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
@@ -286,16 +290,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
             // *** End RNG seed state reset ***
 
-            textAreaOutputStream = new JTextAreaOutputStream(runPanel.simulationOutputTA, 16*1024);
+            textAreaOutputStream = new JTextAreaOutputStream(simulationRunPanel.simulationOutputTA, 16*1024);
 
-            setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyInstance, Integer.parseInt(runPanel.numberOfReplicationsTF.getText().trim()));
-            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveReplicationDataCB.isSelected());
-            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printReplicationReportsCB.isSelected());
-            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummaryReportsCB.isSelected());
+			// TODO fix all indirection that thwarts direct tracing and code refactoring
+            setOutputStream.invoke(           assemblyInstance, textAreaOutputStream);
+            setNumberOfReplications.invoke(   assemblyInstance, simulationRunPanel.getNumberOfReplications());
+            setSaveReplicationData.invoke(    assemblyInstance, simulationRunPanel.saveReplicationDataCB.isSelected());
+            setPrintReplicationReports.invoke(assemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
+            setPrintSummaryReport.invoke(     assemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
-            setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
+            setEnableAnalystReports.invoke(assemblyInstance, simulationRunPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
             // Allow panel values to override XML set values
@@ -342,7 +347,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 waitOn.join();
             } catch (InterruptedException ex) {
                 LOG.error(ex);
-//                ex.printStackTrace();
+                ex.printStackTrace();
             }
 
             end();
@@ -360,9 +365,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         /** Perform simulation stop and reset calls */
         public void end() {
             System.out.println("Simulation ended");
-            System.out.println("================================================================================================");
-            System.out.println("================================================================================================");
-            runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
+            System.out.println(dividerLine);
+            System.out.println(dividerLine);
+            simulationRunPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
         }
     }
@@ -380,7 +385,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public int getVerboseReplicationNumber() {
         int ret = -1;
         try {
-            ret = Integer.parseInt(runPanel.verboseReplicationNumberTF.getText().trim());
+            ret = Integer.parseInt(simulationRunPanel.verboseReplicationNumberTF.getText().trim());
         } catch (NumberFormatException ex) {
           //  ;
         }
@@ -392,9 +397,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.vcrSimulationTime.setText("0.0");    // because no pausing
+            simulationRunPanel.vcrSimulationStartTimeTF.setText("0.0");    // because no pausing
             twiddleButtons(START);
-            initRun();
+            initializeRun();
         }
     }
 
@@ -441,8 +446,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 // between the Assembly editor and the Assembly runner panel, but it
                 // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
-//                LOG.error(ex);
-//                ex.printStackTrace();
+                LOG.error(ex);
+                ex.printStackTrace();
             }
 
             twiddleButtons(STOP);
@@ -462,8 +467,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (assembly == null) {return;}
-            assembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
+            if (basicAssembly == null) {return;}
+            basicAssembly.setVerbose(((JCheckBox) e.getSource()).isSelected());
         }
     }
 
@@ -496,7 +501,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             try {
                 try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
-                    bw.write(runPanel.simulationOutputTA.getText());
+                    bw.write(simulationRunPanel.simulationOutputTA.getText());
                 }
             } catch (IOException e1) {
                 JOptionPane.showMessageDialog(null, e1.getMessage(), "Input/Output (I/O) Error,", JOptionPane.ERROR_MESSAGE);
@@ -516,14 +521,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
 
-            // Switch over to the analyst report tab if we have a report ready
-            // for editing
+            // TODO reconcile showing new report with editing previous report
             AnalystReportModel analystReportModel = (AnalystReportModel) analystReportController.getModel();
-            if (analystReportModel != null && analystReportModel.isReportReady()) {
-                analystReportController.mainTabbedPane.setSelectedIndex(analystReportController.mainTabbedPaneIdx);
+            if (analystReportModel != null && analystReportModel.isReportReady())
+			{
                 analystReportModel.setReportReady(false);
+				// Don't automatically shift to Analyst Report tab, since user often wants to repeat replications and debug
+//              analystReportController.mainTabbedPane.setSelectedIndex(analystReportController.mainTabbedPaneIdx); // original
+//				ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab();                     // improved
             }
-        } else {
+        } 
+		else
+		{
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +
                     "view on next Viskit opening, select File -> Settings -> " +
@@ -537,14 +546,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      * @return overridden XML set value via the Run panel setting
      */
     double getStopTime() {
-        return Double.parseDouble(runPanel.vcrStopTime.getText());
+        return Double.parseDouble(simulationRunPanel.vcrSimulationStopTimeTF.getText());
     }
 
     /** Allow for overriding XML set value via the Run panel setting
      * @return overridden XML set value via the Run panel setting
      */
     boolean getVerbose() {
-        return runPanel.vcrVerboseCB.isSelected();
+        return simulationRunPanel.vcrVerboseCB.isSelected();
     }
     public static final int START = 0;
     public static final int STOP = 1;
@@ -556,38 +565,38 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         switch (evnt) {
             case START:
                 //System.out.println("twbutt start");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(true);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                simulationRunPanel.vcrPlay.setEnabled(false);
+                simulationRunPanel.vcrStop.setEnabled(true);
+                simulationRunPanel.vcrStep.setEnabled(false);
+                simulationRunPanel.vcrRewind.setEnabled(false);
                 break;
             case STOP:
                 //System.out.println("twbutt stop");
-                runPanel.vcrPlay.setEnabled(true);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(true);
-                runPanel.vcrRewind.setEnabled(true);
+                simulationRunPanel.vcrPlay.setEnabled(true);
+                simulationRunPanel.vcrStop.setEnabled(false);
+                simulationRunPanel.vcrStep.setEnabled(true);
+                simulationRunPanel.vcrRewind.setEnabled(true);
                 break;
             case STEP:
                 //System.out.println("twbutt step");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(true);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                simulationRunPanel.vcrPlay.setEnabled(false);
+                simulationRunPanel.vcrStop.setEnabled(true);
+                simulationRunPanel.vcrStep.setEnabled(false);
+                simulationRunPanel.vcrRewind.setEnabled(false);
                 break;
             case REWIND:
                 //System.out.println("twbutt rewind");
-                runPanel.vcrPlay.setEnabled(true);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(true);
-                runPanel.vcrRewind.setEnabled(false);
+                simulationRunPanel.vcrPlay.setEnabled(true);
+                simulationRunPanel.vcrStop.setEnabled(false);
+                simulationRunPanel.vcrStep.setEnabled(true);
+                simulationRunPanel.vcrRewind.setEnabled(false);
                 break;
             case OFF:
                 //System.out.println("twbutt off");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                simulationRunPanel.vcrPlay.setEnabled(false);
+                simulationRunPanel.vcrStop.setEnabled(false);
+                simulationRunPanel.vcrStep.setEnabled(false);
+                simulationRunPanel.vcrRewind.setEnabled(false);
                 break;
             default:
                 System.err.println("Bad event in InternalAssemblyRunner");
@@ -601,23 +610,26 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 	{
         simulationRunMenu = new JMenu("Simulation Run");
 		simulationRunMenu.setMnemonic(KeyEvent.VK_S);
-        JMenuItem saveOutputMI = new JMenuItem("Save simulation output to text file");
-        JMenuItem viewOutputMI = new JMenuItem("View simulation output in text editor");
+        JMenuItem  saveOutputMI = new JMenuItem("Save simulation output to text file");
+        JMenuItem  viewOutputMI = new JMenuItem("View simulation output in text editor");
+        JMenuItem clearOutputMI = new JMenuItem("Clear simulation output"); // TODO
 		
         JMenu         editMenu = new JMenu("Edit");
         JMenuItem       copyMI = new JMenuItem("Copy");
         JMenuItem  selectAllMI = new JMenuItem("Select all");
         JMenuItem   clearAllMI = new JMenuItem("Clear all");
 
-              saveOutputMI.addActionListener(saveListener);
+        saveOutputMI.addActionListener(saveListener);
         viewOutputMI.addActionListener(new ViewOutputListener());
+       clearOutputMI.addActionListener(new ClearListener());
               copyMI.addActionListener(new CopyListener());
          selectAllMI.addActionListener(new SelectAllListener());
           clearAllMI.addActionListener(new ClearListener());
 		
    simulationRunMenu.setMnemonic(KeyEvent.VK_S);
-	    saveOutputMI.setMnemonic(KeyEvent.VK_S); // submenu
-		viewOutputMI.setMnemonic(KeyEvent.VK_V); // submenu
+	    saveOutputMI.setMnemonic(KeyEvent.VK_S); // submenu item
+		viewOutputMI.setMnemonic(KeyEvent.VK_V); // submenu item
+	   clearOutputMI.setMnemonic(KeyEvent.VK_C); // submenu item
 		
 		    editMenu.setMnemonic(KeyEvent.VK_E);
 		      copyMI.setMnemonic(KeyEvent.VK_C); // submenu
@@ -629,6 +641,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         simulationRunMenu.add(saveOutputMI);
         simulationRunMenu.add(viewOutputMI);
+        simulationRunMenu.add(clearOutputMI);
 
          editMenu.add(copyMI);
          editMenu.add(selectAllMI);
@@ -643,7 +656,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String s = runPanel.simulationOutputTA.getSelectedText();
+            String s = simulationRunPanel.simulationOutputTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbd.setContents(ss, ss);
@@ -654,8 +667,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.simulationOutputTA.requestFocus();
-            runPanel.simulationOutputTA.selectAll();
+            simulationRunPanel.simulationOutputTA.requestFocus();
+            simulationRunPanel.simulationOutputTA.selectAll();
         }
     }
 
@@ -663,7 +676,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.simulationOutputTA.setText(null);
+			// TODO a
+            int returnValue = ViskitGlobals.instance().getAssemblyEditor().genericAskYN("Are you sure?", "Do you really want to clear the Simulation Run output?");
+            if (returnValue == JOptionPane.OK_OPTION)
+			{
+				simulationRunPanel.simulationOutputTA.setText("");
+			}
         }
     }
 
@@ -684,7 +702,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 tool = "gedit"; // assuming Linux here
             }
 
-            String s = runPanel.simulationOutputTA.getText().trim();
+            String s = simulationRunPanel.simulationOutputTA.getText().trim();
             try {
                 f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
@@ -702,7 +720,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
               }
               catch (IOException ex1) {
                   LOG.error(ex1);
-//                  ex1.printStackTrace();
+                  ex1.printStackTrace();
               }
             }
         }
@@ -734,10 +752,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue());
             npsString.append(" of ");
-            npsString.append(Integer.parseInt(runPanel.numberOfReplicationsTF.getText()));
+            npsString.append(simulationRunPanel.getNumberOfReplications());
             npsString.append("</b>\n");
             npsString.append("</font></p></body></html>\n");
-            runPanel.npsLabel.setText(npsString.toString());
+            simulationRunPanel.npsLabel.setText(npsString.toString());
 
             // reset for the next replication output
             npsString.delete(beginLength, npsString.length());

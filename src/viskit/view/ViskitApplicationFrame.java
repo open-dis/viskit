@@ -96,7 +96,8 @@ public class ViskitApplicationFrame extends JFrame {
     private final int TAB_ASSEMBLY_EDITOR       = 1;
     private final int TAB_SIMULATION_RUN        = 2;
     private final int TAB_ANALYST_REPORT        = 3;
-//  private final int TAB_DESIGN_OF_EXPERIMENTS = 4;
+    private final int TAB_DESIGN_OF_EXPERIMENTS = 4;
+    private final int TAB_GRID_CLUSTER_JOBS     = 5; // TODO naming
     private final int[] tabIndices = {
         TAB_EVENTGRAPH_EDITOR, 
         TAB_ASSEMBLY_EDITOR,
@@ -674,7 +675,7 @@ public class ViskitApplicationFrame extends JFrame {
 
 
                 // initializes a fresh class loader
-                assemblyRunComponent.preInitRun(execStrings);
+                assemblyRunComponent.preInitializeRun(execStrings);
             }
         }
     }
@@ -750,12 +751,12 @@ public class ViskitApplicationFrame extends JFrame {
 		return (mainTabbedPane.getSelectedIndex() == TAB_ANALYST_REPORT);
     }
 	
-	public void selectEventGraphEditorTab ()
+	public void displayEventGraphEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_EVENTGRAPH_EDITOR);
 		buildMenus();
 	}
-	public void selectSimulationRunTab ()
+	public void displaySimulationRunTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_SIMULATION_RUN);
 		buildMenus();
@@ -765,14 +766,24 @@ public class ViskitApplicationFrame extends JFrame {
 		ViskitGlobals.instance().getSimulationRunPanel().setTitle(assemblyName);
 		getRunTabbedPane().setTitleAt(selectedRunIndex, assemblyName);
 	}
-	public void selectAssemblyEditorTab ()
+	public void displayAssemblyEditorTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ASSEMBLY_EDITOR);
 		buildMenus();
 	}
-	public void selectAnalystReportTab ()
+	public void displayAnalystReportTab ()
 	{
 		mainTabbedPane.setSelectedIndex(TAB_ANALYST_REPORT);
+		buildMenus();
+	}
+	public void displayDesignOfExperimentsTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_DESIGN_OF_EXPERIMENTS);
+		buildMenus();
+	}
+	public void displayGridClusterJobTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_GRID_CLUSTER_JOBS);
 		buildMenus();
 	}
 	public JTabbedPane getRunTabbedPane ()

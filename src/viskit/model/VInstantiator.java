@@ -55,6 +55,8 @@ public abstract class VInstantiator {
     }
 
     public String getDescription() {
+		if (description == null)
+			description = "";
         return description;
     }
 

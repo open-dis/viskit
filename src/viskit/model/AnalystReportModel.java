@@ -992,7 +992,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     /** Post Analyst Report processing steps to take */
-    private void postProcessing() {
+    private void postProcessing()
+	{
         jpb.setIndeterminate(true);
         jpb.setString("Analyst Report now generating...");
         jpb.setStringPainted(true);
@@ -1049,7 +1050,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         // Run initialization, so, we can't center this dialog via reference to
         // the main app frame.
         JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
-                "Analyst Report is loaded and is now ready for further editing.</p></body></html>",
+                "Analyst Report is loaded and is ready for further editing.</p></body></html>",
                 "Analyst Report Ready", JOptionPane.INFORMATION_MESSAGE);
         // TODO consider inserting loaded filename into message above as a user confirmation
     }

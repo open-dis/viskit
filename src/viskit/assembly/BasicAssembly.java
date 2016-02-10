@@ -78,13 +78,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected PropertyChangeListener[] propertyChangeListener;
     protected boolean hookupsCalled;
     protected boolean stopRun;
-    protected int startRepNumber = 0;
+    protected int startReplicationNumber = 0;
     protected Set<SimEntity> runEntities;
     protected long seed;
 
     private double stopTime;
     private boolean singleStep;
-    private int numberReplications;
+    private int numberOfReplications;
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
@@ -100,8 +100,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     private ReportStatisticsConfig statisticsConfig;
     private int designPointID;
-    private DecimalFormat format = new DecimalFormat("0.0000");
-    private List<String> entitiesWithStatistics;
+    private DecimalFormat decimalFormat = new DecimalFormat("0.0000");
+    private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
 
@@ -109,11 +109,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Default constructor sets parameters of BasicAssembly to their
      * default values.  These are:
      * <pre>
-     * printReplicationReports = false
-     * printSummaryReport = true
-     * saveReplicationData = false
-     * numberReplications = 1
-     * </pre>
+ printReplicationReports = false
+ printSummaryReport = true
+ saveReplicationData = false
+ numberOfReplications = 1
+ </pre>
      */
     public BasicAssembly() {
         setPrintReplicationReports(false);
@@ -123,7 +123,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         replicationStatistics = new PropertyChangeListener[0];
         designPointStatistics = new SampleStatistics[0];
         propertyChangeListener = new PropertyChangeListener[0];
-        setNumberReplications(1);
+        setNumberOfReplications(1);
         hookupsCalled = false;
 
         // Creates a report statistics config object and names it based on the name
@@ -141,7 +141,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         for (PropertyChangeListener sampleStatistics : replicationStatistics) {
             ((SampleStatistics) sampleStatistics).reset();
         }
-        startRepNumber = 0;
+        startReplicationNumber = 0;
     }
 
     // mask the Thread run()
@@ -177,7 +177,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Receives the replicationStatistics LinkedHashMap from ViskitAssembly. This
+     * Receives the replicationStatistics LinkedHashMap from BasicAssembly. This
      * method extracts the key values and passes them to ReportStatisticsConfig. The
      * key set is in the order of the replication statistics object in this class.
      * The goal of this and related methods is to aid ReportStatisticsConfig in
@@ -190,15 +190,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * <p/>
      * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
-     * @param repStatistics a map containing collected statistics on a SimEntity's state variables
+     * @param replicationStatistics a map containing collected statistics on a SimEntity's state variables
      */
-    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> repStatistics) {
-        Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
-        entitiesWithStatistics = new LinkedList<>();
+    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatistics) {
+        Set<Map.Entry<String, PropertyChangeListener>> entrySet = replicationStatistics.entrySet();
+        entitiesWithStatisticsList = new LinkedList<>();
         for (Map.Entry<String, PropertyChangeListener> entry : entrySet) {
-            String ent = entry.getKey();
-            LOG.debug("Entry is: " + entry);
-            entitiesWithStatistics.add(ent);
+            String entryKey = entry.getKey();
+            LOG.debug("Entry key is: " + entry);
+            entitiesWithStatisticsList.add(entryKey);
         }
     }
 
@@ -337,15 +337,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
 
-    public final void setNumberReplications(int num) {
-        if (num < 1) {
-            throw new IllegalArgumentException("Number replications must be > 0: " + num);
+    public final void setNumberOfReplications(int numberOfReplications) {
+        if (numberOfReplications < 1) {
+            throw new IllegalArgumentException("Number of replications must be > 0: " + numberOfReplications);
         }
-        numberReplications = num;
+        this.numberOfReplications = numberOfReplications;
     }
 
-    public int getNumberReplications() {
-        return numberReplications;
+    public int getNumberOfReplications() {
+        return numberOfReplications;
     }
 
     public final void setPrintReplicationReports(boolean b) {
@@ -444,19 +444,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-    private void saveState(int lastRepNum) {
-        boolean midRun = !Schedule.getDefaultEventList().isFinished();
-        boolean midReps = lastRepNum < getNumberReplications();
+    private void saveState(int lastReplicationNumber) // TODO why not used?
+	{
+        boolean middleOfRun          = !Schedule.getDefaultEventList().isFinished();
+        boolean middleOfReplications = lastReplicationNumber < getNumberOfReplications();
 
-        if (midReps) {
-            // middle of some rep, fell out because of GUI stop
-            startRepNumber = lastRepNum;
-        } else if (!midReps && !midRun) {
-            // done with all reps
-            startRepNumber = 0;
-        } else if (!midReps && midRun) {
-            // n/a can't be out of reps but in a run
-            throw new RuntimeException("Bad state in ViskitAssembly");
+        if (middleOfReplications) {
+            // middle of some replication, fell out because of GUI stop
+            startReplicationNumber = lastReplicationNumber;
+        } else if (!middleOfReplications && !middleOfRun) {
+            // done with all repeplications
+            startReplicationNumber = 0;
+        } else if (!middleOfReplications && middleOfRun) {
+            // n/a can't be out of replications but within a run
+            throw new RuntimeException("Bad state in BasicAssembly");
         }
     }
 
@@ -529,15 +530,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             buf.append('\t');
             buf.append(stat.getCount());
             buf.append('\t');
-            buf.append(format.format(stat.getMinObs()));
+            buf.append(decimalFormat.format(stat.getMinObs()));
             buf.append('\t');
-            buf.append(format.format(stat.getMaxObs()));
+            buf.append(decimalFormat.format(stat.getMaxObs()));
             buf.append('\t');
-            buf.append(format.format(stat.getMean()));
+            buf.append(decimalFormat.format(stat.getMean()));
             buf.append('\t');
-            buf.append(format.format(stat.getStandardDeviation()));
+            buf.append(decimalFormat.format(stat.getStandardDeviation()));
             buf.append('\t');
-            buf.append(format.format(stat.getVariance()));
+            buf.append(decimalFormat.format(stat.getVariance()));
 
             ((SampleStatistics) replicationStatistics[i++]).reset();
         }
@@ -645,7 +646,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // existing parameters.
         // might have run before
         statisticsConfig.reset();
-        statisticsConfig.setEntityIndex(entitiesWithStatistics);
+        statisticsConfig.setEntityIndex(entitiesWithStatisticsList);
         if (!hookupsCalled) {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
@@ -684,17 +685,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 scenarioManager = entity;
                 try {
                     Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
-                    setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
+                    setNumberOfReplications.invoke(scenarioManager, getNumberOfReplications());
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error(ex);
                 }
             }
         }
 
-        int runCount = runEntities.size();
+        int runEntitiesCount = runEntities.size(); // number of SimEntity objects with Run methods
 
-        for (int replication = 0; replication < getNumberReplications(); replication++) {
-
+		// Replication loop
+        for (int replication = 0; replication < getNumberOfReplications(); replication++)
+		{
             firePropertyChange("replicationNumber", (replication + 1));
             if ((replication + 1) == getVerboseReplication()) {
                 Schedule.setVerbose(true);
@@ -705,10 +707,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             }
 
             int nextRunCount = Schedule.getReruns().size();
-            if (nextRunCount != runCount) {
-                System.out.println("Reruns changed old: " + runCount + " new: " + nextRunCount);
-                firePropertyChange("rerunCount", runCount, nextRunCount);
-                runCount = nextRunCount;
+            if (nextRunCount != runEntitiesCount) {
+                System.out.println("Reruns changed old: " + runEntitiesCount + " new: " + nextRunCount);
+                firePropertyChange("rerunCount", runEntitiesCount, nextRunCount);
+                runEntitiesCount = nextRunCount;
 
                 // print out new reRuns
                 // Note: too many Sysouts for multiple replications.  Comment
@@ -853,7 +855,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
+     * Method which may be overridden by subclasses (e.g., BasicAssembly) which will be called after
      * createObject() at run time.
      */
     public void printInfo() {}

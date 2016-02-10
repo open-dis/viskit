@@ -251,15 +251,15 @@ public class SimkitAssemblyXML2Java {
     }
 
     void buildHead(StringWriter head) {
-        PrintWriter pw = new PrintWriter(head);
-        String name = this.root.getName();
-        String pkg  = this.root.getPackage();
-        String extendz = this.root.getExtend();
+        PrintWriter printWriter = new PrintWriter(head);
+        String name       = this.root.getName();
+        String pkg        = this.root.getPackage();
+        String extendz    = this.root.getExtend();
         String implementz = this.root.getImplement();
-        Schedule schedule;
+        Schedule jaxbSchedule;
 
-        pw.println("package " + pkg + sc);
-        pw.println();
+        printWriter.println("package " + pkg + sc);
+        printWriter.println();
 
         // Fully qualified names are used, no imports required
 //        printImports(pw);
@@ -276,33 +276,33 @@ public class SimkitAssemblyXML2Java {
             implementz = "";
         }
 
-        pw.println("public class " + name + sp + extendz + implementz + ob);
-        pw.println();
-        pw.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
-        pw.println(sp8 + "super" + lp + rp + sc);
-        if ( (schedule = this.root.getSchedule()) != null ) {
+        printWriter.println("public class " + name + sp + extendz + implementz + ob);
+        printWriter.println();
+        printWriter.println(sp4 + "public" + sp + name + lp + rp + sp + ob);
+        printWriter.println(sp8 + "super" + lp + rp + sc);
+        if ( (jaxbSchedule = this.root.getSchedule()) != null ) {
 
-            pw.print(sp8 + "setStopTime");
-            pw.println(lp + schedule.getStopTime() + rp + sc);
+            printWriter.print(sp8 + "setStopTime");
+            printWriter.println(lp + jaxbSchedule.getStopTime() + rp + sc);
 
-            pw.print(sp8 + "setVerbose");
-            pw.println(lp + schedule.getVerbose() + rp + sc);
+            printWriter.print(sp8 + "setVerbose");
+            printWriter.println(lp + jaxbSchedule.getVerbose() + rp + sc);
 
-            pw.print(sp8 + "setNumberReplications");
-            pw.println(lp + schedule.getNumberReplications() + rp + sc);
+            printWriter.print(sp8 + "setNumberOfReplications");
+            printWriter.println(lp + jaxbSchedule.getNumberReplications() + rp + sc);  // TODO spelling mismatch getNumberOfReplications
 
-            pw.print(sp8 + "setSaveReplicationData");
-            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
+            printWriter.print(sp8 + "setSaveReplicationData");
+            printWriter.println(lp + jaxbSchedule.getSaveReplicationData() + rp + sc);
 
-            pw.print(sp8 + "setPrintReplicationReports");
-            pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
+            printWriter.print(sp8 + "setPrintReplicationReports");
+            printWriter.println(lp + jaxbSchedule.getPrintReplicationReports() + rp + sc);
 
-            pw.print(sp8 + "setPrintSummaryReport");
-            pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
+            printWriter.print(sp8 + "setPrintSummaryReport");
+            printWriter.println(lp + jaxbSchedule.getPrintSummaryReport() + rp + sc);
         }
 
-        pw.println(sp4 + cb);
-        pw.println();
+        printWriter.println(sp4 + cb);
+        printWriter.println();
     }
 
     /** Print out required imports to the Assembly

@@ -94,9 +94,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 	
     JTextField                titleTF = new JTextField();
     JTextField          analystNameTF = new JTextField();
-    JComboBox<String> accessControlTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    JComboBox<String> accessControlTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET"});
 	DateFormat             dateFormat = new SimpleDateFormat("dd MMMM yyyy");
-    JTextField               dateTF = new JTextField(dateFormat.format(new Date()));
+    JTextField                 dateTF = new JTextField(dateFormat.format(new Date()));
     File currentAssemblyFile;
 
     public AnalystReportFrame(mvcController controller)

@@ -114,7 +114,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JTextField clusterTF;
     private JTextField clusNameReadOnlyTF;
     private JTextField portTF;
-    private JTextField numRepsTF;
+    private JTextField numberOfReplicationsTF;
     private JTextField numDPsTF;
     private JTextField tmo;
     private JTextField unameTF;
@@ -296,7 +296,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         JLabel sampLab = new JLabel("Hypercubes");
         numCubesTF = new ttJTextField(20);
 
-        numRepsTF = new JTextField(6);
+        numberOfReplicationsTF = new JTextField(6);
         JLabel repLab = new JLabel("Replications");
         tmo = new JTextField(6);
         JLabel tmoLab = new JLabel("Replication time out (ms)");
@@ -311,7 +311,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         topPan.add(sampLab);
         topPan.add(numCubesTF);
         topPan.add(repLab);
-        topPan.add(numRepsTF);
+        topPan.add(numberOfReplicationsTF);
         topPan.add(tmoLab);
         topPan.add(tmo);
         topPan.add(analystReportLab); // tooltip this with warning
@@ -462,7 +462,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             }
             s = exp.getReplicationsPerDesignPoint();
             if (s != null) {
-                numRepsTF.setText(s);
+                numberOfReplicationsTF.setText(s);
             }
 
             s = exp.getTimeout();
@@ -477,7 +477,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             exp.setTotalSamples("1");
             numCubesTF.setText("1");
             exp.setReplicationsPerDesignPoint("1");
-            numRepsTF.setText("1");
+            numberOfReplicationsTF.setText("1");
             exp.setTimeout("5000");
             tmo.setText("5000");
             int numDesignPts = jaxbRoot.getDesignParameters().size();
@@ -490,7 +490,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
-            saveParamsToJaxbNoNotify();
+            saveDesignParametersToJaxbNoNotify();
             OpenAssembly.inst().doSendAssyJaxbChanged(JobLauncherTab2.this);
         }
     }
@@ -504,29 +504,29 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         return "Launch Cluster Job";
     }
 
-    private void saveParamsToJaxbNoNotify() {
+    private void saveDesignParametersToJaxbNoNotify() {
         // Put the params from the GUI into the jaxbRoot
-        int numDesignPts = jaxbRoot.getDesignParameters().size();
-        numDPsTF.setText("" + numDesignPts);
+        int numberOfDesignPoints = jaxbRoot.getDesignParameters().size();
+        numDPsTF.setText("" + numberOfDesignPoints);
 
-        Experiment exp = jaxbRoot.getExperiment();
-        Schedule sch = jaxbRoot.getSchedule();
-        if (exp == null) {
-            exp = OpenAssembly.inst().jaxbFactory.createExperiment();
+        Experiment jaxbExperiment = jaxbRoot.getExperiment();
+        Schedule   jaxbSchedule   = jaxbRoot.getSchedule();
+        if (jaxbExperiment == null) {
+            jaxbExperiment = OpenAssembly.inst().jaxbFactory.createExperiment();
         }
-        if (sch == null) {
-            sch = OpenAssembly.inst().jaxbFactory.createSchedule();
+        if (jaxbSchedule == null) {
+            jaxbSchedule = OpenAssembly.inst().jaxbFactory.createSchedule();
         }
 
-        String reps = numRepsTF.getText().trim();
+        String numberOfReplications = numberOfReplicationsTF.getText().trim();
         try {
-            Integer.parseInt(reps);
+            Integer.parseInt(numberOfReplications);
         } catch (NumberFormatException e) {
-            reps = "1";
+            numberOfReplications = "1";
             System.err.println("Bad number of replications...use 1");
         }
-        sch.setNumberReplications(reps);                            // rg: 2
-        exp.setReplicationsPerDesignPoint(reps);
+        jaxbSchedule.setNumberReplications(numberOfReplications);   // TODO spelling mismatch // rg: 2
+        jaxbExperiment.setReplicationsPerDesignPoint(numberOfReplications);
 
         String samps = numCubesTF.getText().trim();
         try {
@@ -535,24 +535,24 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             samps = "1";
             System.err.println("Bad number of samples...use 1");
         }
-        exp.setTotalSamples(samps);                                // rg: 5
+        jaxbExperiment.setTotalSamples(samps);                                // rg: 5
 
-        exp.setJitter("true");
-        exp.setType("latin-hypercube");
+        jaxbExperiment.setJitter("true");
+        jaxbExperiment.setType("latin-hypercube");
 
         String stopTime = tmo.getText().trim();
         try {
             Double.parseDouble(stopTime);
         } catch (NumberFormatException e) {
             stopTime = "1000.0";
-            System.err.println("Bad stop time...use 1000");
+            System.err.println("Bad stop time... use 1000");
         }
-        sch.setStopTime(stopTime);
+        jaxbSchedule.setStopTime(stopTime);
 
-        sch.setVerbose("true");
+        jaxbSchedule.setVerbose("true");
 
-        jaxbRoot.setSchedule(sch);
-        jaxbRoot.setExperiment(exp);
+        jaxbRoot.setSchedule(jaxbSchedule);
+        jaxbRoot.setExperiment(jaxbExperiment);
     }
 
     private void doListeners() {
@@ -568,7 +568,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         adminButt.addActionListener(al);
 
         numCubesTF.addKeyListener(myEditListener);
-        numRepsTF.addKeyListener(myEditListener);
+        numberOfReplicationsTF.addKeyListener(myEditListener);
         tmo.addKeyListener(myEditListener);
     }
 
@@ -619,7 +619,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
         // put the local stuff in place
         saveExp(jaxbRoot.getExperiment());
-        saveParamsToJaxbNoNotify();
+        saveDesignParametersToJaxbNoNotify();
 
         filteredFile = cntlr.doTempFileMarshall();
         cntlr.restorePrepRun();

@@ -101,7 +101,7 @@ public class ViskitGlobals {
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable analyst report checkbox */
-    private SimulationRunPanel runPanel;
+    private SimulationRunPanel simulationRunPanel;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -764,11 +764,11 @@ public class ViskitGlobals {
     Object lastSelected = "void";
 
     public SimulationRunPanel getSimulationRunPanel() {
-        return runPanel;
+        return simulationRunPanel;
     }
 
-    public void setRunPanel(SimulationRunPanel runPanel) {
-        this.runPanel = runPanel;
+    public void setSimulationRunPanel(SimulationRunPanel runPanel) {
+        this.simulationRunPanel = runPanel;
     }
 
     public ViskitProject getCurrentViskitProject() {

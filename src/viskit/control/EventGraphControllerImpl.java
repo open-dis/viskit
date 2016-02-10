@@ -118,7 +118,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 					"<p>Open or create a project first.</p>");
 			return;
 		}
-		ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab(); // prerequisite to possible file menu dialog
+		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // prerequisite to possible file menu dialog
 
         GraphMetadata priorEventGraphMetadata = null;
         EventGraphModelImpl priorEventGraphModel = (EventGraphModelImpl) getModel();
@@ -168,7 +168,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		{
            ((EventGraphView) getView()).deleteTab(eventGraphModel);
         }
-		ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab(); // prerequisite to buildMenus
+		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // prerequisite to buildMenus
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
     }
 
@@ -218,7 +218,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
 				{
 					_doOpen(file);
-					ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab();
+					ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
 				}
 				else 
 				{

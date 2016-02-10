@@ -696,7 +696,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 eventGraphController.clearRecentEventGraphFileSet();
             } else {
                 eventGraphController.openRecentEventGraph(fullPath);
-				ViskitGlobals.instance().getViskitApplicationFrame().selectEventGraphEditorTab();
+				ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
             }
 			buildMenus (); // reset
         }

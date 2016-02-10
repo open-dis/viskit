@@ -159,7 +159,7 @@ public class RunnerPanel2Original extends JPanel {
         add(leftRightSplit, BorderLayout.CENTER);
 
         // Provide access to Enable Analyst Report checkbox
-        // todo uncommment.......ViskitGlobals.instance().setRunPanel((this);
+        // todo uncommment.......ViskitGlobals.instance().setSimulationRunPanel((this);
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButton) {
