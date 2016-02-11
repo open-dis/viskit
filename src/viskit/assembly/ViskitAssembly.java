@@ -21,20 +21,24 @@ import simkit.stat.SampleStatistics;
  */
 public class ViskitAssembly extends BasicAssembly {
 
-    protected Map<String, SimEntity> entitiesMap;
-    protected Map<String, PropertyChangeListener> replicationStatisticsMap;
-    protected Map<String, PropertyChangeListener> designPointStatisticsMap;
-    protected Map<String, PropertyChangeListener> propertyChangeListenersMap;
+    protected Map<String, SimEntity>               entitiesMap;
+    protected Map<String, PropertyChangeListener>  propertyChangeListenersMap;
+    protected Map<String, PropertyChangeListener>  designPointStatisticsMap;
+    protected Map<String, PropertyChangeListener>  replicationStatisticsMap;
     protected Map<String, List<PropertyConnector>> propertyChangeListenerConnectionsMap;
     protected Map<String, List<PropertyConnector>> designPointStatisticsListenerConnectionsMap;
     protected Map<String, List<PropertyConnector>> replicationStatisticsListenerConnectionsMap;
-    protected Map<String, List<String>> simEventListenerConnectionsMap;
-    protected Map<String, Adapter> adaptersMap;
+    protected Map<String, List<String>>            simEventListenerConnectionsMap;
+    protected Map<String, Adapter>                 adaptersMap;
     private static boolean debug = false;
 
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly()
 	{
+                                        entitiesMap = new LinkedHashMap<>();
+                         propertyChangeListenersMap = new LinkedHashMap<>();
+                           designPointStatisticsMap = new LinkedHashMap<>();
+                           replicationStatisticsMap = new LinkedHashMap<>();
                propertyChangeListenerConnectionsMap = new LinkedHashMap<>();
         designPointStatisticsListenerConnectionsMap = new LinkedHashMap<>();
         replicationStatisticsListenerConnectionsMap = new LinkedHashMap<>();
