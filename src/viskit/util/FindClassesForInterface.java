@@ -184,7 +184,7 @@ public class FindClassesForInterface {
         if (true) {
             return;
         }
-        List<Class<?>> simEntities = new ArrayList<>();
+        List<Class<?>> simEntities             = new ArrayList<>();
         List<Class<?>> propertyChangeListeners = new ArrayList<>();
         System.out.println(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
@@ -222,7 +222,7 @@ public class FindClassesForInterface {
             System.out.println(propertyChangeListeners.get(i));
         }
 
-        if (true) {
+        if (true) { // TODO skips test code?
             return;
         }
         System.out.println(loader);

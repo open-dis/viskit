@@ -41,21 +41,21 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private JAXBContext    jaxbContext;
     private ObjectFactory  jaxbObjectFactory;
     private SimkitAssembly jaxbSimkitAssembly;
-    private File currentFile;
-    private boolean modelDirty = false;
-    private GraphMetadata metadata;
+    private File           currentFile;
+    private boolean        modelDirty = false;
+    private GraphMetadata  graphMetadata;
 
     /** We require specific order on this Map's contents */
-    private final Map<String, AssemblyNode> nodeCache;
+    private final Map<String, AssemblyNode> nodeCacheMap;
     private final String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl assemblyController;
 
-    public AssemblyModelImpl(mvcController cont) {
+    public AssemblyModelImpl(mvcController assemblyController) {
         pointLess = new Point2D.Double(30, 60);
-        assemblyController = (AssemblyControllerImpl) cont;
-        metadata = new GraphMetadata(this);
-        nodeCache = new LinkedHashMap<>();
+        this.assemblyController = (AssemblyControllerImpl) assemblyController;
+        graphMetadata = new GraphMetadata(this);
+        nodeCacheMap = new LinkedHashMap<>();
     }
 
     public void initialize() {
@@ -79,8 +79,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void setDirty(boolean wh) {
-        modelDirty = wh;
+    public void setDirty(boolean dirtyStatus) {
+        modelDirty = dirtyStatus;
     }
 
     @Override
@@ -90,12 +90,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public GraphMetadata getMetadata() {
-        return metadata;
+        return graphMetadata;
     }
 
     @Override
-    public void setMetadata(GraphMetadata gmd) {
-        metadata = gmd;
+    public void setMetadata(GraphMetadata graphMetadata) {
+        this.graphMetadata = graphMetadata;
         setDirty(true);
     }
 
@@ -203,21 +203,21 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbSimkitAssembly.setName(nullIfEmpty(metadata.name));
-            jaxbSimkitAssembly.setVersion(nullIfEmpty(metadata.version));
-            jaxbSimkitAssembly.setPackage(nullIfEmpty(metadata.packageName));
-            jaxbSimkitAssembly.setDescription(nullIfEmpty(metadata.description));
+            jaxbSimkitAssembly.setName(nullIfEmpty(graphMetadata.name));
+            jaxbSimkitAssembly.setVersion(nullIfEmpty(graphMetadata.version));
+            jaxbSimkitAssembly.setPackage(nullIfEmpty(graphMetadata.packageName));
+            jaxbSimkitAssembly.setDescription(nullIfEmpty(graphMetadata.description));
 
             if (jaxbSimkitAssembly.getSchedule() == null) {
                 jaxbSimkitAssembly.setSchedule(jaxbObjectFactory.createSchedule());
             }
-            if (!metadata.stopTime.equals("")) {
-                jaxbSimkitAssembly.getSchedule().setStopTime(metadata.stopTime);
+            if (!graphMetadata.stopTime.equals("")) {
+                jaxbSimkitAssembly.getSchedule().setStopTime(graphMetadata.stopTime);
             } else {
                 jaxbSimkitAssembly.getSchedule().setStopTime("100.0");
             }
 
-            jaxbSimkitAssembly.getSchedule().setVerbose("" + metadata.verbose);
+            jaxbSimkitAssembly.getSchedule().setVerbose("" + graphMetadata.verbose);
 
             jaxbMarshaller.marshal(jaxbSimkitAssembly, fw);
 
@@ -1159,7 +1159,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     public Map<String, AssemblyNode> getNodeCache() {
-        return nodeCache;
+        return nodeCacheMap;
     }
 
 }

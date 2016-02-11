@@ -20,16 +20,16 @@ public interface AssemblyView {
     boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode pclNode);
 
     /** Permits user to edit existing entities
-     * @param eventNode the event graph node to edit
+     * @param eventGraphNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEventGraphNode(EventGraphNode eventNode);
+    boolean doEditEventGraphNode(EventGraphNode eventGraphNode);
 
     boolean doEditPropertyChangeListenerEdge(PropertyChangeListenerEdge pclEdge);
 
-    boolean doEditAdapterEdge(AdapterEdge aEdge);
+    boolean doEditAdapterEdge(AdapterEdge adapterEdge);
 
-    boolean doEditSimEventListEdge(SimEventListenerEdge seEdge);
+    boolean doEditSimEventListEdge(SimEventListenerEdge simEventListenerEdge);
 
     Object getSelectedPropertyChangeListener();
 
@@ -40,8 +40,7 @@ public interface AssemblyView {
      * compilation of EGs
      *
      * @param f the path to evaluate for SimEntites
-     * @param b flag to indicate recursion checking of the given path if a known
-     * directory
+     * @param b flag to indicate recursion checking of the given path if a known directory
      */
     void addEventGraphsToLegoTree(File f, boolean b);
 
@@ -68,11 +67,11 @@ public interface AssemblyView {
 
     /** A component, e.g., vAMod, wants to say something.
      *
-     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION
+     * @param type the type of message, i.e. WARN, ERROR, INFO, QUESTION
      * @param title the title of the message in the dialog frame
-     * @param msg the message to transmit
+     * @param message the message to transmit
      */
-    void genericReport(int typ, String title, String msg);
+    void genericReport(int type, String title, String message);
 
     String promptForStringOrCancel(String title, String message, String initval);
 
@@ -111,38 +110,38 @@ public interface AssemblyView {
     void closeProject();
 
     /** Update the name of the Assembly in the component title bar
-     * @param s the name of the Assembly
+     * @param newAssemblyName the name of the Assembly
      */
-    void setSelectedAssemblyName(String s);
+    void setSelectedAssemblyName(String newAssemblyName);
 
     /**
      * Called by the controller after source has been generated. Show to the
      * user and provide him with the option to save.
      *
      * @param className the name of the source file to show
-     * @param s Java source
+     * @param sourceText Java source
      * @param filename the source file's name
      */
-    void showAndSaveSource(String className, String s, String filename);
+    void showAndSaveSource(String className, String sourceText, String filename);
 
     /**
      * Shows the XML representation of the given file
-     * @param f the file to display
+     * @param file the file to display
      */
-    void displayXML(File f);
+    void displayXML(File file);
 
     /** Add an Assembly tab to the Assembly View Editor
      *
-     * @param mod the Assembly model to display graphically
+     * @param assemblyModel the Assembly model to display graphically
      */
-    void addTab(AssemblyModel mod);
+    void addTab(AssemblyModel assemblyModel);
 
     /** Remove an Assembly tab from the Assembly View Editor
      *
-     * @param mod the Assembly model to remove from view
+     * @param assemblyModel the Assembly model to remove from view
      */
-    void deleteTab(AssemblyModel mod);
+    void deleteTab(AssemblyModel assemblyModel);
 
     /** @return an array of open ViskitAssemblyModels */
-    AssemblyModel[] getOpenModels();
+    AssemblyModel[] getOpenAssemblyModelArray();
 }

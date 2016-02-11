@@ -72,10 +72,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     static final Logger LOG = LogUtils.getLogger(BasicAssembly.class);
     protected Map<Integer, List<SavedStats>> replicationData;
-    protected PropertyChangeListener[] replicationStatistics;
+    protected PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray;
     protected SampleStatistics[] designPointStatistics;
     protected SimEntity[] simEntity;
-    protected PropertyChangeListener[] propertyChangeListener;
+    protected PropertyChangeListener[] propertyChangeListenerArray;
     protected boolean hookupsCalled;
     protected boolean stopRun;
     protected int startReplicationNumber = 0;
@@ -120,9 +120,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         setPrintSummaryReport(true);
         replicationData = new LinkedHashMap<>();
         simEntity = new SimEntity[0];
-        replicationStatistics = new PropertyChangeListener[0];
+        replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointStatistics = new SampleStatistics[0];
-        propertyChangeListener = new PropertyChangeListener[0];
+        propertyChangeListenerArray = new PropertyChangeListener[0];
         setNumberOfReplications(1);
         hookupsCalled = false;
 
@@ -138,7 +138,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @Override
     public void reset() {
         super.reset();
-        for (PropertyChangeListener sampleStatistics : replicationStatistics) {
+        for (PropertyChangeListener sampleStatistics : replicationStatisticsPropertyChangeListenerArray) {
             ((SampleStatistics) sampleStatistics).reset();
         }
         startReplicationNumber = 0;
@@ -177,7 +177,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Receives the replicationStatistics LinkedHashMap from BasicAssembly. This
+     * Receives the replicationStatisticsPropertyChangeListenerArray LinkedHashMap from BasicAssembly. This
      * method extracts the key values and passes them to ReportStatisticsConfig. The
      * key set is in the order of the replication statistics object in this class.
      * The goal of this and related methods is to aid ReportStatisticsConfig in
@@ -190,10 +190,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * <p/>
      * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
-     * @param replicationStatistics a map containing collected statistics on a SimEntity's state variables
+     * @param replicationStatisticsMap a map containing collected statistics on a SimEntity's state variables
      */
-    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatistics) {
-        Set<Map.Entry<String, PropertyChangeListener>> entrySet = replicationStatistics.entrySet();
+    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatisticsMap) {
+        Set<Map.Entry<String, PropertyChangeListener>> entrySet = replicationStatisticsMap.entrySet();
         entitiesWithStatisticsList = new LinkedList<>();
         for (Map.Entry<String, PropertyChangeListener> entry : entrySet) {
             String entryKey = entry.getKey();
@@ -211,7 +211,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * The default behavior is to create a <code>SimplStatisticsTally</code>
-     * instance for each element in <code>replicationStatistics</code> with the
+     * instance for each element in <code>replicationStatisticsPropertyChangeListenerArray</code> with the
      * corresponding name + ".count," or ".mean"
      */
     protected void createDesignPointStatistics() {
@@ -219,8 +219,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         /* Check for zero length.  SimplePropertyDumper may have been selected
          * as the only PCL
          */
-        if (BasicAssembly.this.getReplicationStatistics().length == 0) {return;}
-        designPointStatistics = new SampleStatistics[BasicAssembly.this.getReplicationStatistics().length];
+        if (BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length == 0) {return;}
+        designPointStatistics = new SampleStatistics[BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length];
         String typeStat, nodeType;
         int ix = 0;
         boolean isCount;
@@ -251,7 +251,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     typeStat = isCount ? ".count" : ".mean";
                     LOG.debug("typeStat is: " + typeStat);
 
-                    SampleStatistics stat = (SampleStatistics) BasicAssembly.this.getReplicationStatistics()[ix];
+                    SampleStatistics stat = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[ix];
                     if (stat.getName().equals("%unnamed%")) {
                         stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
                     }
@@ -275,8 +275,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /** Set up all outer statistics propertyChangeListeners */
     protected void hookupDesignPointListeners() {
-        for (SampleStatistics designPointStat : designPointStatistics) {
-            this.addPropertyChangeListener(designPointStat);
+        for (SampleStatistics designPointStatistic : designPointStatistics) {
+            this.addPropertyChangeListener(designPointStatistic);
         }
     }
 
@@ -406,8 +406,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /** @return an array of ProperChangeListeners for this Assembly  */
-    public PropertyChangeListener[] getReplicationStatistics() {
-        return replicationStatistics.clone();
+    public PropertyChangeListener[] getReplicationStatisticsPropertyChangeListenerArray() {
+        return replicationStatisticsPropertyChangeListenerArray.clone();
     }
 
     /** @param id the ID of this replication statistic
@@ -434,9 +434,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getIDforReplicationStateName(String state) {
         int id = -1;
-        int replicationStatisticsLength = BasicAssembly.this.getReplicationStatistics().length;
+        int replicationStatisticsLength = BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length;
         for (int i = 0; i < replicationStatisticsLength; i++) {
-            if (((SampleStatistics) BasicAssembly.this.getReplicationStatistics()[i]).getName().equals(state)) {
+            if (((SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[i]).getName().equals(state)) {
                 id = i;
                 break;
             }
@@ -490,7 +490,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     protected String getReplicationReport(int rep) {
 
-        PropertyChangeListener[] clonedReplicationStatistics = BasicAssembly.this.getReplicationStatistics();
+        PropertyChangeListener[] clonedReplicationStatistics = BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray();
         int i = 0;
 
         // Outputs raw replication statistics to XML report
@@ -517,30 +517,30 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         buf.append('\t');
         buf.append("var");
 
-        SampleStatistics stat;
+        SampleStatistics sampleStatistic;
 
         // Report data
         for (PropertyChangeListener pcl : clonedReplicationStatistics) {
-            stat = (SampleStatistics) pcl;
+            sampleStatistic = (SampleStatistics) pcl;
             buf.append(System.getProperty("line.separator"));
-            buf.append(stat.getName());
-            if (!(stat.getName().length() > 20)) {
+            buf.append(sampleStatistic.getName());
+            if (!(sampleStatistic.getName().length() > 20)) {
                 buf.append('\t');
             }
             buf.append('\t');
-            buf.append(stat.getCount());
+            buf.append(sampleStatistic.getCount());
             buf.append('\t');
-            buf.append(decimalFormat.format(stat.getMinObs()));
+            buf.append(decimalFormat.format(sampleStatistic.getMinObs()));
             buf.append('\t');
-            buf.append(decimalFormat.format(stat.getMaxObs()));
+            buf.append(decimalFormat.format(sampleStatistic.getMaxObs()));
             buf.append('\t');
-            buf.append(decimalFormat.format(stat.getMean()));
+            buf.append(decimalFormat.format(sampleStatistic.getMean()));
             buf.append('\t');
-            buf.append(decimalFormat.format(stat.getStandardDeviation()));
+            buf.append(decimalFormat.format(sampleStatistic.getStandardDeviation()));
             buf.append('\t');
-            buf.append(decimalFormat.format(stat.getVariance()));
+            buf.append(decimalFormat.format(sampleStatistic.getVariance()));
 
-            ((SampleStatistics) replicationStatistics[i++]).reset();
+           ((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i++]).reset();
         }
         buf.append(System.getProperty("line.separator"));
         return buf.toString();
@@ -662,7 +662,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // This should be unchecked if only listening with a SimplePropertyDumper
         if (isSaveReplicationData()) {
             replicationData.clear();
-            int replicationStatisticsLength = BasicAssembly.this.getReplicationStatistics().length;
+            int replicationStatisticsLength = BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length;
             for (int i = 0; i < replicationStatisticsLength; i++) {
                 replicationData.put(i, new ArrayList<SavedStats>());
             }
@@ -762,7 +762,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
-                    // # of PropertyChangeListenerNodes is == to replicationStatistics.length
+                    // # of PropertyChangeListenerNodes is == to replicationStatisticsPropertyChangeListenerArray.length
                     for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
                         Object obj;
                         if (entry.toString().contains("PropertyChangeListenerNode")) {
@@ -781,7 +781,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 }
                                 isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                                 typeStat = isCount ? ".count" : ".mean";
-                                SampleStatistics ss = (SampleStatistics) BasicAssembly.this.getReplicationStatistics()[ix];
+                                SampleStatistics ss = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[ix];
                                 fireIndexedPropertyChange(ix, ss.getName(), ss);
                                 if (isCount) {
                                     fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());

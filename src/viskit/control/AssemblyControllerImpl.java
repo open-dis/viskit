@@ -229,7 +229,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // before doing any openAlready lookups
         AssemblyModel[] openAlready = null;
         if (vaw != null) {
-            openAlready = vaw.getOpenModels();
+            openAlready = vaw.getOpenAssemblyModelArray();
         }
         boolean isOpenAlready = false;
         if (openAlready != null) {
@@ -279,7 +279,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void markAssemblyFilesOpened() {
 
         // Mark every vAMod opened as "open"
-        AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
+        AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel vAMod : openAlready) {
             if (vAMod.getLastFile() != null) {
                 String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
@@ -355,7 +355,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     // Assembly file to find its associated EGs to open
                     if (!isCloseAll()) {
 
-                        AssemblyModel[] modAr = view.getOpenModels();
+                        AssemblyModel[] modAr = view.getOpenAssemblyModelArray();
                         for (AssemblyModel mod : modAr) {
                             if (!mod.equals(vAMod)) {
                                 openEventGraphs(mod.getLastFile());
@@ -486,46 +486,47 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void editGraphMetadata() {
-        AssemblyModel mod = (AssemblyModel) getModel();
-        if (mod == null) {return;}
-        GraphMetadata gmd = mod.getMetadata();
+    public void editGraphMetadata()
+	{
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null) {return;}
+        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), graphMetadata);
         if (modified) {
-            ((AssemblyModel) getModel()).setMetadata(gmd);
+            ((AssemblyModel) getModel()).setMetadata(graphMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(graphMetadata.name);
         }
     }
-    private int eventGraphNodeCount = 0;
-    private int adapterNodeCount = 0;
+    private int eventGraphNodeCount             = 0;
+    private int adapterNodeCount                = 0;
     private int propertyChangeListenerNodeCount = 0;    // A little experiment in class introspection
-    private static Field eventGraphCountField;
-    private static Field adapterCountField;
-    private static Field propertyChangeListenerCountField;
+    private static Field eventGraphNodeCountField;
+    private static Field adapterNodeCountField;
+    private static Field propertyChangeListenerNodeCountField;
 
     static { // do at class initialization time
         try {
-                        eventGraphCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
-                           adapterCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
-            propertyChangeListenerCountField = AssemblyControllerImpl.class.getDeclaredField("propertyChangeListenerNodeCount");
+                        eventGraphNodeCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
+                           adapterNodeCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
+            propertyChangeListenerNodeCountField = AssemblyControllerImpl.class.getDeclaredField("propertyChangeListenerNodeCount");
         } catch (NoSuchFieldException | SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     private String shortEventGraphName(String typeName) {
-        return shortName(typeName, "evgr_", eventGraphCountField);
+        return shortName(typeName, "evgr_", eventGraphNodeCountField);
     }
 
     private String shortPropertyChangeListenerName(String typeName) {
-        return shortName(typeName, "lstnr_", propertyChangeListenerCountField); // use same counter
+        return shortName(typeName, "lstnr_", propertyChangeListenerNodeCountField); // use same counter
     }
 
     private String shortAdapterName(String typeName) {
-        return shortName(typeName, "adptr_", adapterCountField); // use same counter
+        return shortName(typeName, "adptr_", adapterNodeCountField); // use same counter
     }
 
     private String shortName(String typeName, String prefix, Field intField) {
@@ -555,14 +556,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newProject() {
+    public void newProject()
+	{
         if (handleProjectClosing()) {
             ViskitGlobals.instance().initializeProjectHomeDirectory();
             ViskitGlobals.instance().createWorkDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
-            if (egFiles.length == 0) {
+            File[] eventGraphFileArray = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
+            if (eventGraphFileArray.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
@@ -573,21 +575,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void zipAndMailProject() {
 
-        SwingWorker worker = new SwingWorker<Void, Void>() {
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
-            File projDir;
-            File projZip;
+            File projectDirectory;
+            File projectZip;
             File logFile;
 
             @Override
             public Void doInBackground() {
 
-                projDir = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
-                projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
-                logFile = new File(projDir, "debug.log");
+                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projectZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
+                logFile = new File(projectDirectory, "debug.log");
 
-                if (projZip.exists())
-                    projZip.delete();
+                if (projectZip.exists())
+                    projectZip.delete();
 
                 if (logFile.exists())
                     logFile.delete();
@@ -596,7 +598,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     // First, copy the debug.log to the project dir
                     Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ZipUtils.zipFolder(projDir, projZip);
+                    ZipUtils.zipFolder(projectDirectory, projectZip);
                 } catch (IOException e) {
                     LOG.error(e);
                 }
@@ -616,15 +618,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     try {
                         url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Submission%20for%20"
-                                + projDir.getName() + "&body=see%20attachment");
+                                + projectDirectory.getName() + "&body=see%20attachment");
 						urlString =  url.toString();
                     } catch (MalformedURLException e) {
                         LOG.error(e);
                     }
 
-                    String msg = "Please navigate to<br/>"
-                            + projZip.getParent()
-                            + "<br/>and email the " + projZip.getName()
+                    String message = "Please navigate to<br/>"
+                            + projectZip.getParent()
+                            + "<br/>and email the " + projectZip.getName()
                             + " file to "
                             + "<b><a href=\"" + urlString + "\">"
                             + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
@@ -632,12 +634,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             + "form, then attach the zip file";
 
                     try {
-                        Desktop.getDesktop().open(projZip.getParentFile());
+                        Desktop.getDesktop().open(projectZip.getParentFile());
                     } catch (IOException e) {
                         LOG.error(e);
                     }
 
-                    ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
+                    ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, message, false);
 
                 } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
@@ -652,23 +654,24 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @return indication of continue or cancel
      */
     public boolean handleProjectClosing() {
-        boolean retVal = true;
-        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
-            String msg = "Are you sure you want to close your current Viskit Project?";
-            String title = "Close Current Project";
-
-            int ret = ((AssemblyView) getView()).genericAskYN(title, msg);
-            if (ret == JOptionPane.YES_OPTION) {
+        boolean returnValue = true;
+        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+		{
+            String message = "Are you sure you want to close your current Viskit Project?";
+            String title   = "Close Current Project";
+            int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
+            if (responseValue == JOptionPane.YES_OPTION) {
                 doProjectCleanup();
             } else {
-                retVal = false;
+                returnValue = false;
             }
         }
-        return retVal;
+        return returnValue;
     }
 
     @Override
-    public void doProjectCleanup() {
+    public void doProjectCleanup()
+	{
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfiguration.instance().clearViskitConfiguration();
@@ -678,7 +681,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void openProject(File file) {
+    public void openProject(File file)
+	{
         ViskitStatics.setViskitProjectFile(file);
         ViskitGlobals.instance().createWorkDirectory();
 
@@ -689,8 +693,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newAssembly() {
-
+    public void newAssembly()
+	{
         // Don't allow a new assembly to be created if a current project is  not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
@@ -768,7 +772,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public boolean preQuit() {
 
         // Check for dirty models before exiting
-        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
+        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel vmod : modAr) {
             setModel((mvcModel) vmod);
 
@@ -790,7 +794,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void closeAll() {
 
-        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
+        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel vmod : modAr) {
             setModel((mvcModel) vmod);
             setCloseAll(true);
@@ -960,7 +964,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         AssemblyNode[] oArr;
         try {
-            oArr = checkLegalForSEListenerArc(oA, oB);
+            oArr = checkLegalForSimEventListenerArc(oA, oB);
         } catch (Exception e) {
             messageToUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
@@ -977,10 +981,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
+        AssemblyNode[] oArr = checkLegalForSimEventListenerArc(oA, oB);
 
         if (oArr == null) {
-            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The node connection must be a SimEventListener and SimEventSource combination.");
             return;
         }
         ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
@@ -992,22 +996,22 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
+        AssemblyNode[] oArr = checkLegalForPropertyChangeArc(oA, oB);
 
         if (oArr == null) {
-            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
+            messageToUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The node connection must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
         propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
-    AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForSimEventListenerArc(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderSELSrcAndLis(a, b, ca, cb);
     }
 
-    AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForPropertyChangeArc(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderPCLSrcAndLis(a, b, ca, cb);

@@ -545,8 +545,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		// right aligned
 		JLabel initializeLabel = new JLabel("<html><p align='right'>Initialize Assembly<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
-        initializeLabel.setToolTipText("Prepare selected Assembly for Simulation Run");
-        compileInitializeAssemblyButton.setToolTipText("Prepare selected Assembly for Simulation Run");
+		String initializeHint = "Prepare selected Assembly for Simulation Run";
+                        initializeLabel.setToolTipText(initializeHint);
+        compileInitializeAssemblyButton.setToolTipText(initializeHint);
         getToolBar().add(initializeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
 		compileInitializeAssemblyButton.setHorizontalAlignment(JButton.RIGHT);
@@ -554,7 +555,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(5, 24));
         
 		JLabel saveLabel = new JLabel(EventGraphViewFrame.saveCompileLabelText);
-		saveLabel.setToolTipText(     EventGraphViewFrame.saveCompileLabelTooltip);		
+		 saveLabel.setToolTipText(    EventGraphViewFrame.saveCompileLabelTooltip);		
 		saveButton.setToolTipText(    EventGraphViewFrame.saveCompileLabelTooltip);
 
 		saveLabel.setHorizontalAlignment(JLabel.RIGHT);
@@ -754,7 +755,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public AssemblyModel[] getOpenModels() {
+    public AssemblyModel[] getOpenAssemblyModelArray() {
         Component[] ca = tabbedPane.getComponents();
         AssemblyModel[] vm = new AssemblyModel[ca.length];
         for (int i = 0; i < vm.length; i++) {

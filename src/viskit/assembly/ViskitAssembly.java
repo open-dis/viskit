@@ -21,28 +21,25 @@ import simkit.stat.SampleStatistics;
  */
 public class ViskitAssembly extends BasicAssembly {
 
-    protected Map<String, SimEntity> entities;
-    protected Map<String, PropertyChangeListener> replicationStatistics;
-    protected Map<String, PropertyChangeListener> designPointStatistics;
-    protected Map<String, PropertyChangeListener> propertyChangeListeners;
-    protected Map<String, List<PropertyConnector>> propertyChangeListenerConnections;
-    protected Map<String, List<PropertyConnector>> designPointStatisticsListenerConnections;
-    protected Map<String, List<PropertyConnector>> replicationStatisticsListenerConnections;
-    protected Map<String, List<String>> simEventListenerConnections;
-    protected Map<String, Adapter> adapters;
+    protected Map<String, SimEntity> entitiesMap;
+    protected Map<String, PropertyChangeListener> replicationStatisticsMap;
+    protected Map<String, PropertyChangeListener> designPointStatisticsMap;
+    protected Map<String, PropertyChangeListener> propertyChangeListenersMap;
+    protected Map<String, List<PropertyConnector>> propertyChangeListenerConnectionsMap;
+    protected Map<String, List<PropertyConnector>> designPointStatisticsListenerConnectionsMap;
+    protected Map<String, List<PropertyConnector>> replicationStatisticsListenerConnectionsMap;
+    protected Map<String, List<String>> simEventListenerConnectionsMap;
+    protected Map<String, Adapter> adaptersMap;
     private static boolean debug = false;
 
     /** Creates a new instance of ViskitAssembly */
-    public ViskitAssembly() {
-        entities = new LinkedHashMap<>();
-        replicationStatistics = new LinkedHashMap<>();
-        designPointStatistics = new LinkedHashMap<>();
-        propertyChangeListeners = new LinkedHashMap<>();
-        propertyChangeListenerConnections = new LinkedHashMap<>();
-        designPointStatisticsListenerConnections = new LinkedHashMap<>();
-        replicationStatisticsListenerConnections = new LinkedHashMap<>();
-        simEventListenerConnections = new LinkedHashMap<>();
-        adapters = new LinkedHashMap<>();
+    public ViskitAssembly()
+	{
+               propertyChangeListenerConnectionsMap = new LinkedHashMap<>();
+        designPointStatisticsListenerConnectionsMap = new LinkedHashMap<>();
+        replicationStatisticsListenerConnectionsMap = new LinkedHashMap<>();
+                     simEventListenerConnectionsMap = new LinkedHashMap<>();
+                                        adaptersMap = new LinkedHashMap<>();
     }
 
     @Override
@@ -53,23 +50,23 @@ public class ViskitAssembly extends BasicAssembly {
          * keys can be extracted for data output indexing. This method is used by
          * the ReportStatisticsConfig.
          */
-        setStatisticsKeyValues(replicationStatistics);
+        setStatisticsKeyValues(replicationStatisticsMap);
     }
 
     @Override
     protected void createSimEntities() {
-        if (entities != null) {
-            if (entities.values() != null) {
-                simEntity = GenericConversion.toArray(entities.values(), new SimEntity[0]);
+        if (entitiesMap != null) {
+            if (entitiesMap.values() != null) {
+                simEntity = GenericConversion.toArray(entitiesMap.values(), new SimEntity[0]);
             }
         }
     }
 
     @Override
     protected void createReplicationStatistics() {
-        super.replicationStatistics = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener sampleStatistics : super.replicationStatistics) {
-            LOG.debug(((Named) sampleStatistics).getName() + " replicationStat created");
+        super.replicationStatisticsPropertyChangeListenerArray = GenericConversion.toArray(replicationStatisticsMap.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener sampleStatistics : super.replicationStatisticsPropertyChangeListenerArray) {
+            LOG.debug(((Named) sampleStatistics).getName() + " replicationStatistics created");
         }
     }
 
@@ -81,26 +78,26 @@ public class ViskitAssembly extends BasicAssembly {
         // the super.
         for (SampleStatistics sampleStatistics : super.designPointStatistics) {
 //            LOG.debug(sampleStatistics.getName() + " designPointStat created");
-            designPointStatistics.put(sampleStatistics.getName(), sampleStatistics);
+            designPointStatisticsMap.put(sampleStatistics.getName(), sampleStatistics);
         }
     }
 
     @Override
     protected void createPropertyChangeListeners() {
-        propertyChangeListener = GenericConversion.toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener pcl : propertyChangeListener) {
+        propertyChangeListenerArray = GenericConversion.toArray(propertyChangeListenersMap.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener pcl : propertyChangeListenerArray) {
             LOG.debug(pcl + " propertyChangeListener created");
         }
     }
 
     @Override
     public void hookupSimEventListeners() {
-        String[] listeners = GenericConversion.toArray(simEventListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(simEventListenerConnectionsMap.keySet(), new String[0]);
         if(debug) {
             LOG.info("hookupSimEventListeners called " + listeners.length);
         }
         for (String listener : listeners) {
-            List<String> simEventListenerConnects = simEventListenerConnections.get(listener);
+            List<String> simEventListenerConnects = simEventListenerConnectionsMap.get(listener);
             if (simEventListenerConnects != null) {
                 for(String source : simEventListenerConnects) {
                     connectSimEventListener(listener, source);
@@ -114,9 +111,9 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     public void hookupReplicationListeners() {
-        String[] listeners = GenericConversion.toArray(replicationStatisticsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(replicationStatisticsListenerConnectionsMap.keySet(), new String[0]);
         for (String listener : listeners) {
-            List<PropertyConnector> replicationStatisticsConnects = replicationStatisticsListenerConnections.get(listener);
+            List<PropertyConnector> replicationStatisticsConnects = replicationStatisticsListenerConnectionsMap.get(listener);
             if (replicationStatisticsConnects != null) {
                 for (PropertyConnector pc : replicationStatisticsConnects) {
                     connectReplicationStatistics(listener, pc);
@@ -130,12 +127,12 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     protected void hookupDesignPointListeners() {
         super.hookupDesignPointListeners();
-        String[] listeners = GenericConversion.toArray(designPointStatisticsListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(designPointStatisticsListenerConnectionsMap.keySet(), new String[0]);
         // if not the default case, need to really do this with
         // a Class to create instances selected by each ReplicationStatistics listener.
         if (listeners.length > 0) {
             for (String listener : listeners) {
-                List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnections.get(listener);
+                List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnectionsMap.get(listener);
                 if ( designPointConnects != null ) {
                     for (PropertyConnector pc : designPointConnects) {
                         connectDesignPointStatistics(listener, pc);
@@ -149,9 +146,9 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void hookupPropertyChangeListeners() {
-        String[] listeners = GenericConversion.toArray(propertyChangeListenerConnections.keySet(), new String[0]);
+        String[] listeners = GenericConversion.toArray(propertyChangeListenerConnectionsMap.keySet(), new String[0]);
         for (String listener : listeners) {
-            List<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
+            List<PropertyConnector> propertyConnects = propertyChangeListenerConnectionsMap.get(listener);
             if (propertyConnects != null) {
                 for (PropertyConnector pc : propertyConnects) {
                     connectPropertyChangeListener(listener, pc);
@@ -185,7 +182,7 @@ public class ViskitAssembly extends BasicAssembly {
             pc.property = "";
         }
         if (debug) {
-            LOG.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
+            LOG.info("Connecting entity " + pc.source + " to replicationStatistics " + listener + " property " + pc.property);
         }
 
         if (pc.property.isEmpty()) {
@@ -212,27 +209,28 @@ public class ViskitAssembly extends BasicAssembly {
         if ( pc.property.equals("null") ) {
             pc.property = "";
         }
-        if ( "".equals(pc.property) ) {
+        if ( "".equals(pc.property) ) { // TODO ??
             pc.property = getDesignPointStatisticsByName(listener).getName();
         }
 
-        if ( "".equals(pc.property) ) {
+        if ( "".equals(pc.property) ) { // TODO ??
             getSimEntityByName(pc.source).addPropertyChangeListener(getDesignPointStatisticsByName(listener));
         } else {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getDesignPointStatisticsByName(listener));
         }
     }
 
-    public void addSimEntity(String name, SimEntity entity) {
-        entity.setName(name);
-        entities.put(name, entity);
+    public void addSimEntity(String name, SimEntity simEntity) {
+        simEntity.setName(name);
+        entitiesMap.put(name, simEntity);
 
         // TODO: This will throw an IllegalArgumentException?
 //        LOG.debug("entity is: " + entity);
     }
 
     public void addDesignPointStatistics(String listenerName, PropertyChangeListener pcl) {
-        designPointStatistics.put(listenerName,pcl);
+        LOG.debug("Adding to designPointStatistics " + listenerName + " " + pcl);
+        designPointStatisticsMap.put(listenerName,pcl);
     }
 
     /** Called from the generated Assembly adding PCLs in order of calling
@@ -241,46 +239,47 @@ public class ViskitAssembly extends BasicAssembly {
      */
     public void addReplicationStatistics(String listenerName, PropertyChangeListener pcl) {
         LOG.debug("Adding to replicationStatistics " + listenerName + " " + pcl);
-        replicationStatistics.put(listenerName, pcl);
+        replicationStatisticsMap.put(listenerName, pcl);
     }
 
     @Override
     public void addPropertyChangeListener(String listenerName, PropertyChangeListener pcl) {
-        propertyChangeListeners.put(listenerName, pcl);
+        LOG.debug("Adding to propertyChangeListeners " + listenerName + " " + pcl);
+        propertyChangeListenersMap.put(listenerName, pcl);
     }
 
     public void addPropertyChangeListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
-        if ( propertyConnects == null ) {
+        List<PropertyConnector> propertyConnects = propertyChangeListenerConnectionsMap.get(listener);
+        if (propertyConnects == null ) {
             propertyConnects = new LinkedList<>();
-            propertyChangeListenerConnections.put(listener, propertyConnects);
+            propertyChangeListenerConnectionsMap.put(listener, propertyConnects);
         }
         propertyConnects.add(new PropertyConnector(property, source));
     }
 
     public void addDesignPointStatisticsListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnections.get(listener);
-        if ( designPointConnects == null ) {
+        List<PropertyConnector> designPointConnects = designPointStatisticsListenerConnectionsMap.get(listener);
+        if (designPointConnects == null ) {
             designPointConnects = new LinkedList<>();
-            designPointStatisticsListenerConnections.put(listener, designPointConnects);
+            designPointStatisticsListenerConnectionsMap.put(listener, designPointConnects);
         }
         designPointConnects.add(new PropertyConnector(property,source));
     }
 
     public void addReplicationStatisticsListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> repStatisticsConnects = replicationStatisticsListenerConnections.get(listener);
-        if ( repStatisticsConnects == null ) {
-            repStatisticsConnects = new LinkedList<>();
-            replicationStatisticsListenerConnections.put(listener, repStatisticsConnects);
+        List<PropertyConnector> replicationStatisticsConnects = replicationStatisticsListenerConnectionsMap.get(listener);
+        if (replicationStatisticsConnects == null ) {
+            replicationStatisticsConnects = new LinkedList<>();
+            replicationStatisticsListenerConnectionsMap.put(listener, replicationStatisticsConnects);
         }
-        repStatisticsConnects.add(new PropertyConnector(property,source));
+        replicationStatisticsConnects.add(new PropertyConnector(property,source));
     }
 
     public void addSimEventListenerConnection(String listener, String source) {
-        List<String> simEventListenerConnects = simEventListenerConnections.get(listener);
+        List<String> simEventListenerConnects = simEventListenerConnectionsMap.get(listener);
         if ( simEventListenerConnects == null ) {
             simEventListenerConnects = new LinkedList<>();
-            simEventListenerConnections.put(listener, simEventListenerConnects);
+            simEventListenerConnectionsMap.put(listener, simEventListenerConnects);
         }
         if (debug) {
             LOG.info("addSimEventListenerConnection source " + source + " to listener " + listener );
@@ -289,29 +288,29 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     public void addAdapter(String name, String heard, String sent, String from, String to) {
-        Adapter a = new Adapter(heard,sent);
-        a.connect(getSimEntityByName(from),getSimEntityByName(to));
-        adapters.put(name,a);
-        entities.put(name,a);
+        Adapter adapter = new Adapter(heard,sent);
+        adapter.connect(getSimEntityByName(from),getSimEntityByName(to));
+        adaptersMap.put(name,adapter);
+        entitiesMap.put(name,adapter);
     }
 
     public PropertyChangeListener getPropertyChangeListenerByName(String name) {
-        return propertyChangeListeners.get(name);
+        return propertyChangeListenersMap.get(name);
     }
 
     public SampleStatistics getDesignPointStatisticsByName(String name) {
-        return (SampleStatistics) designPointStatistics.get(name);
+        return (SampleStatistics) designPointStatisticsMap.get(name);
     }
 
     public SampleStatistics getReplicationStatisticsByName(String name) {
-        return (SampleStatistics) replicationStatistics.get(name);
+        return (SampleStatistics) replicationStatisticsMap.get(name);
     }
 
     public SimEntity getSimEntityByName(String name) {
         if (debug) {
-            LOG.info("getSimEntityByName for " + name + " " + entities.get(name));
+            LOG.info("getSimEntityByName for " + name + " " + entitiesMap.get(name));
         }
-        return entities.get(name);
+        return entitiesMap.get(name);
     }
 
     protected class PropertyConnector {

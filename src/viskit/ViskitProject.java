@@ -389,6 +389,7 @@ public class ViskitProject {
         viskitConfiguration.removeProjectXMLConfiguration(viskitConfiguration.getProjectXMLConfiguration());
         setProjectOpen(false);
 		projectName = "";
+		ViskitGlobals.instance().getViskitApplicationFrame().setTitle(projectName);
     }
 
     /** @return the root directory of this ViskitProject */

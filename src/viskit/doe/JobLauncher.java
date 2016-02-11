@@ -576,26 +576,26 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             System.out.println("Error unmarshalling results: " + e.getMessage());
             return null;
         }
-        Element el = document.getRootElement();
-        if (!el.getName().equals("Results")) {
+        Element jdomRootElement = document.getRootElement();
+        if (!jdomRootElement.getName().equals("Results")) {
             System.out.println("Unknown results format, design point = " + dp + ", run = " + nrun);
             return res;
         }
-        String design = attValue(el, "design");
-        String index = attValue(el, "index");
-        String job = attValue(el, "job");
-        String run = attValue(el, "run");
+        String design = attValue(jdomRootElement, "design");
+        String index  = attValue(jdomRootElement, "index");
+        String job    = attValue(jdomRootElement, "job");
+        String run    = attValue(jdomRootElement, "run");
 
-        Element propCh = el.getChild("PropertyChange");
-        if (propCh == null) {
+        Element jdomPropertyChange = jdomRootElement.getChild("PropertyChange");
+        if (jdomPropertyChange == null) {
             if (viskit.ViskitStatics.debug) {
                 System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
             }
             return res;
         }
-        String listenerName = attValue(propCh, "listenerName");
-        String property = attValue(propCh, "property");
-        java.util.List propertyContent = propCh.getContent();
+        String listenerName = attValue(jdomPropertyChange, "listenerName");
+        String property     = attValue(jdomPropertyChange, "property");
+        java.util.List propertyContent = jdomPropertyChange.getContent();
         Text txt = (Text) propertyContent.get(0);
         String cstr = txt.getTextTrim();
         if (viskit.ViskitStatics.debug) {
@@ -678,7 +678,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             editorPane.setEditable(false);
             editorScrollPane = new JScrollPane(editorPane);
             editorScrollPane.setVerticalScrollBarPolicy(
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             editorScrollPane.setPreferredSize(new Dimension(680, 800)); //640,480));
             editorScrollPane.setMinimumSize(new Dimension(10, 10));
 

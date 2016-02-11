@@ -33,14 +33,14 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     }
 
     @Override
-    public final void setType(String typ) {
-        super.setType(typ);
+    public final void setType(String newType) {
+        super.setType(newType);
 
-        Class<?> myClass = ViskitStatics.classForName(typ);
+        Class<?> myClass = ViskitStatics.classForName(newType);
         if (myClass != null) {
-            Class<?> sampstatcls = ViskitStatics.classForName("simkit.stat.SampleStatistics");
-            if (sampstatcls != null) {
-                if (sampstatcls.isAssignableFrom(myClass)) {
+            Class<?> sampleStatisticsClass = ViskitStatics.classForName("simkit.stat.SampleStatistics");
+            if (sampleStatisticsClass != null) {
+                if (sampleStatisticsClass.isAssignableFrom(myClass)) {
                     isSampleStatistics = true;
                 }
             }
@@ -52,8 +52,8 @@ public class PropertyChangeListenerNode extends AssemblyNode {
         return isSampleStatistics;
     }
 
-    public void setIsSampleStatistics(boolean b) {
-        isSampleStatistics = b;
+    public void setIsSampleStatistics(boolean status) {
+        isSampleStatistics = status;
     }
 
     private boolean clearStatisticsAfterEachRun = true; // bug 706

@@ -773,7 +773,7 @@ public class SimkitAssemblyXML2Java {
         List<PropertyChangeListener> pcls = getAssemblyRoot().getPropertyChangeListener();
         for (Output output : lis) {
             Object elem = output.getEntity();
-            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
+            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>"; // TODO
 
             for (SimEntity se : simEntities) {
                 if (se.getName().equals(elem.toString())) {
@@ -789,7 +789,7 @@ public class SimkitAssemblyXML2Java {
                 }
             }
 
-            if (!name.contains("<FIX:")) {
+            if (!name.contains("<FIX:")) { // TODO
                 pw.println(sp8 + "System.out.println" + lp + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
             }
         }
