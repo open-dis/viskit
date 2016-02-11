@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ArrivalProcess" package="examples" version="0.1" extend="SimEntityBase" description="Model of a simple recurring Arrival process" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate"/>
+    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate" description="todo"/>
     <StateVariable name="numberArrivals" type="int"/>
-    <Event name="Run" description="">
+    <Event name="Run">
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>
         </StateTransition>
+        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
         <Coordinate x="50.0" y="70.0"/>
+    </Event>
+    <Event name="Arrival">
+        <StateTransition state="numberArrivals">
+            <Assignment value="numberArrivals + 1"/>
+        </StateTransition>
+        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
+        <Coordinate x="260.0" y="70.0"/>
     </Event>
 </SimEntity>
