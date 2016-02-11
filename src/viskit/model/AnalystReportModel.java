@@ -95,7 +95,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private Element statisticalResults;
     private Element concRec;
 
-    private JProgressBar jpb;
+    private JProgressBar progressBar;
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -109,14 +109,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
     public AnalystReportModel(String statisticsReportPath, Map<String, AssemblyNode> map) {
 
         try {
-            Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
+            Document document = EventGraphCache.instance().loadXML(statisticsReportPath);
             setStatisticsReportPath(statisticsReportPath);
-            setStatisticsReport(doc);
+            setStatisticsReport(document);
         } catch (Exception e) {
             LOG.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
         }
         setPclNodeCache(map);
-        initDocument();
+        initializeDocument();
     }
 
     /**
@@ -124,22 +124,21 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * This done after the statistic report is incorporated into the basic
      * Analyst Report and further annotations are to be written by the analyst
      * to finalize the report.</p>
-     * @param aRPanel a reference to the Analyst Report Frame
-     * @param xmlFile an existing temp Analyst Report
-     * @param assyFile the current assembly file to process a report from
+     * @param analystReporPanel a reference to the Analyst Report Frame
+     * @param xmlFile an existing temp Analyst ReportassemblyFile@param assyFile the current assembly file to process a report from
      * @throws java.lang.Exception general catchall
      */
-    public AnalystReportModel(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
+    public AnalystReportModel(JFrame analystReporPanel, File xmlFile, File assemblyFile) throws Exception {
         this(xmlFile);
 
         // TODO: This doesn't seem to be doing anything correctly
-        jpb = new JProgressBar();
-        aRPanel.add(jpb);
-        aRPanel.validate();
+        progressBar = new JProgressBar();
+        analystReporPanel.add(progressBar);
+        analystReporPanel.validate();
 
         LOG.debug("Successful parseXML");
-        if (assyFile != null) {
-            setAssemblyFile(assyFile);
+        if (assemblyFile != null) {
+            setAssemblyFile(assemblyFile);
             LOG.debug("Successful setting of assembly file");
             postProcessing();
             LOG.debug("Successful post processing of Analyst Report");
@@ -160,7 +159,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
         }
     }
 
-    private void initDocument() {
+    private void initializeDocument() {
         reportJdomDocument = new Document();
         rootElement = new Element("AnalystReport");
         reportJdomDocument.setRootElement(rootElement);
@@ -994,9 +993,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
     /** Post Analyst Report processing steps to take */
     private void postProcessing()
 	{
-        jpb.setIndeterminate(true);
-        jpb.setString("Analyst Report now generating...");
-        jpb.setStringPainted(true);
+        progressBar.setIndeterminate(true);
+        progressBar.setString("Analyst Report now generating...");
+        progressBar.setStringPainted(true);
 
         LOG.debug("JProgressBar set");
 
@@ -1007,8 +1006,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
         captureLocationImage();
         LOG.debug("Location Image captured");
 
-        jpb.setIndeterminate(false);
-        jpb.setStringPainted(false);
+        progressBar.setIndeterminate(false);
+        progressBar.setStringPainted(false);
 
         announceAnalystReportReadyToView();
         reportReady = true;
@@ -1037,11 +1036,10 @@ public final class AnalystReportModel extends mvcAbstractModel {
                 assemblyFilePath + ".png");
 
         if (!assemblyImage.getParentFile().exists())
-            assemblyImage.mkdirs();
+             assemblyImage.mkdirs();
 
         setAssemblyImageLocation(assemblyImage.getPath());
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
-                assemblyImage);
+        ViskitGlobals.instance().getAssemblyController().captureAssemblyImage(assemblyImage);
     }
 
     private void announceAnalystReportReadyToView() {
