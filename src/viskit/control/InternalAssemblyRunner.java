@@ -108,7 +108,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private String currentTitle = namePrefix;
 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
-	public final static String dividerLine = "================================================================================================";
+	public final static String horizontalRuleEqualSigns = "================================================================================================";
+	public final static String horizontalRuleDashes     = "------------------------------------------------------------------------------------------------";
 
     /**
      * The internal logic for the Assembly Runner panel
@@ -365,11 +366,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         /** Perform simulation stop and reset calls */
         public void end()
 		{
-            System.out.println(dividerLine);
-            System.out.println(dividerLine);
-            System.out.println("Simulation replication ");
+            System.out.println(horizontalRuleEqualSigns);
+            System.out.println(horizontalRuleEqualSigns);
+            System.out.print  ("Simulation replication");
 			if (simulationRunPanel.getNumberOfReplications() > 1)
-				System.out.println("s");
+				System.out.print  ("s");
             System.out.println(" ended.");
             simulationRunPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
