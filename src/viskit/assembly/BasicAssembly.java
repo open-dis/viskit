@@ -59,6 +59,7 @@ import simkit.stat.SimpleStatsTally;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitConfiguration;
+import viskit.control.InternalAssemblyRunner;
 import viskit.model.AssemblyNode;
 
 /**
@@ -103,6 +104,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private DecimalFormat decimalFormat = new DecimalFormat("0.0000");
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
+	/** State variable */
     private int verboseReplicationNumber;
 
     /**
@@ -558,7 +560,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             statisticsConfig.processSummaryReport(getDesignPointStatistics());
         }
 
-		System.out.println("------------------------------------------------------------------------------\n");
+		System.out.println(InternalAssemblyRunner.horizontalRuleDashes);
+		System.out.println();
         StringBuilder buf = new StringBuilder("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
         buf.append(super.toString());
@@ -651,7 +654,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             throw new RuntimeException("performHookups() hasn't been called!");
         }
 
-        System.out.println("\nStopping at time: " + getStopTime());
+        System.out.println("\nStopping at time: " + getStopTime() + "\n");
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
 
@@ -676,10 +679,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         runEntities = Schedule.getReruns(); // TODO Schedule<SimEntity> generics not yet supported by simkit
 
-        // Convenience for Diskit if on the classpath
+        // Convenience for Diskit if on the classpath; this is a SavageStudio hack...
         for (SimEntity entity : runEntities) {
 
-            // access the SM's numberOfReplications parameter setter for user
+            // access the ScenarioManager's numberOfReplications parameter setter for user
             // dynamic input to override the XML value
             if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
@@ -698,17 +701,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         for (int replication = 0; replication < getNumberOfReplications(); replication++)
 		{
             firePropertyChange("replicationNumber", (replication + 1));
-            if ((replication + 1) == getVerboseReplication()) {
+            if ((replication + 1) == getVerboseReplication()) // check whether one replication is marked as being verbose
+			{
                 Schedule.setVerbose(true);
                 Schedule.setReallyVerbose(true);
             } else {
                 Schedule.setVerbose(isVerbose());
                 Schedule.setReallyVerbose(isVerbose());
             }
-
+			// Initiate all Run events for existing event graphs
             int nextRunCount = Schedule.getReruns().size();
-            if (nextRunCount != runEntitiesCount) {
-                System.out.println("Reruns changed old: " + runEntitiesCount + " new: " + nextRunCount);
+            if (nextRunCount != runEntitiesCount) { // TODO confirm logic
+                LOG.debug("Reruns changed old: " + runEntitiesCount + " new: " + nextRunCount);
                 firePropertyChange("rerunCount", runEntitiesCount, nextRunCount);
                 runEntitiesCount = nextRunCount;
 
@@ -731,11 +735,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 if (Schedule.isRunning()) {
                     System.out.println("Already running.");
                 }
+				// TODO keep track of seed RNG value for each replication in order to support readability
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
-                System.out.println("------------------------------------------------------------------------------\n");
+				System.out.println(InternalAssemblyRunner.horizontalRuleDashes);
+				System.out.println();
                 System.out.println("Starting Replication #" + (replication + 1) + " with RNG seed state of: " + seed);
                 try {
-                    Schedule.reset();
+                    Schedule.reset(); // master reset: each event graph and event list should be ready to go
                 } catch (java.util.ConcurrentModificationException cme) {
                     JOptionPane.showMessageDialog(null,
                             cme + "\nSimulation will terminate",
@@ -754,7 +760,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     }
                 }
 
-                Schedule.startSimulation();
+                Schedule.startSimulation(); // simulation time set to 0, simulation proceeds
 
                 String typeStat;
                 int ix = 0;
@@ -800,6 +806,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     printWriter.flush();
                 }
             }
+			System.out.println ("Replication " + (replication + 1) + " complete\n");
         }
 
         if (isPrintSummaryReport()) {
