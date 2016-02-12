@@ -251,8 +251,9 @@ public abstract class ViskitTablePanel extends JPanel {
      * Get all the current table data in the form of an array of row objects.
      * @return ArrayList copy of row objects
      */
+	@SuppressWarnings("unchecked") // necessary because clone() returns an object
     public ArrayList<ViskitElement> getData() {
-        return (ArrayList<ViskitElement>) shadow.clone(); // TODO figure out correct generics cast
+        return (ArrayList<ViskitElement>) shadow.clone();
     }
 
     public boolean isEmpty() {
