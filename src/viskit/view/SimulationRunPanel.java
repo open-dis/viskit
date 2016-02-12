@@ -376,8 +376,8 @@ public class SimulationRunPanel extends JPanel {
 				initializationMessage += " for " + fullTitle; // TODO fix initialization sequence
 			}
 			initializationMessage += lineEnd +
-                                     InternalAssemblyRunner.dividerLine + lineEnd +
-                                     InternalAssemblyRunner.dividerLine + lineEnd;
+                                     InternalAssemblyRunner.horizontalRuleEqualSigns + lineEnd +
+                                     InternalAssemblyRunner.horizontalRuleEqualSigns + lineEnd;
 			ready = true;
 		}
 		else 
