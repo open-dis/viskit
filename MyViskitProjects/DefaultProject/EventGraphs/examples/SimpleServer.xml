@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" description="Model of a simple server" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
-    <Parameter name="totalNumberServers" type="int"/>
-    <StateVariable name="numberInQueue" type="int"/>
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate" description=""/>
+    <Parameter name="totalNumberServers" type="int" description=""/>
+    <StateVariable name="numberInQueue" type="int" description="number of arrivals waiting in queue"/>
     <StateVariable name="numberAvailableServers" type="int"/>
     <Event name="Run" description="">
         <StateTransition state="numberInQueue">
@@ -21,7 +21,7 @@
             <Comment></Comment>
             <EdgeParameter value="numberAvailableServers"/>
         </Schedule>
-        <Coordinate x="20.0" y="130.0"/>
+        <Coordinate x="10.0" y="120.0"/>
     </Event>
     <Event name="StartService" description="">
         <Comment></Comment>

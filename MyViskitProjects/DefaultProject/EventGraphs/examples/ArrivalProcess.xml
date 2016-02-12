@@ -2,14 +2,14 @@
 <SimEntity name="ArrivalProcess" package="examples" version="0.1" extend="SimEntityBase" description="Model of a simple recurring Arrival process" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="interarrivalTime" type="simkit.random.RandomVariate" description="todo"/>
     <StateVariable name="numberArrivals" type="int"/>
-    <Event name="Run">
+    <Event name="Run" description="">
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
         <Coordinate x="50.0" y="70.0"/>
     </Event>
-    <Event name="Arrival">
+    <Event name="Arrival" description="">
         <StateTransition state="numberArrivals">
             <Assignment value="numberArrivals + 1"/>
         </StateTransition>
