@@ -26,14 +26,18 @@ public class ClassPanel extends JPanel {
     LegoTree tree;
     JFileChooser jfc;
 
-    public ClassPanel(LegoTree ltree, String title, String plusTT, String minusTT) {
+    public ClassPanel(LegoTree ltree, String title, String hint, String plusButtonTooltip, String minusButtonTooltip) {
         this.tree = ltree;
         jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        JLabel lab = new JLabel(title); //"Event Graphs");
-        lab.setAlignmentX(Box.CENTER_ALIGNMENT);
-        add(lab);
+        JLabel titleLabel = new JLabel(title); // e.g. "Event Graph Selection"
+		titleLabel.setToolTipText(hint);
+        titleLabel.setAlignmentX(Box.CENTER_ALIGNMENT);
+        add(titleLabel);
+//		JLabel hintPane = new JLabel ("<html><p align=\"center\">" + hint + "</p></html>");
+//        hintPane.setAlignmentX(Box.CENTER_ALIGNMENT);
+//        add(hintPane);
         JScrollPane jsp = new JScrollPane(tree);
         jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -44,7 +48,7 @@ public class ClassPanel extends JPanel {
         plus = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
         plus.setBorder(null);
         plus.setText(null);
-        plus.setToolTipText(plusTT); //"Add event graph class file or directory root to this list");
+        plus.setToolTipText(plusButtonTooltip); //"Add event graph class file or directory root to this list");
         Dimension dd = plus.getPreferredSize();
         plus.setMinimumSize(dd);
         plus.setMaximumSize(dd);
@@ -55,7 +59,7 @@ public class ClassPanel extends JPanel {
         minus.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
         minus.setBorder(null);
         minus.setText(null);
-        minus.setToolTipText(minusTT); //"Remove event graph class file or directory from this list");
+        minus.setToolTipText(minusButtonTooltip); //"Remove event graph class file or directory from this list");
         dd = minus.getPreferredSize();
         minus.setMinimumSize(dd);
         minus.setMaximumSize(dd);

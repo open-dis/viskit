@@ -11,7 +11,9 @@ package viskit.view;
  */
 public class LegosPanel extends ClassPanel {
   public LegosPanel(LegoTree ltree) {
-    super(ltree,"Event Graphs","Add event graph class file, XML file or directory root to this list",
-                               "Remove event graph class file, XML file or directory from this list");
+    super(ltree,"Event Graph Selection",
+			"Select and drag an event graph onto the Assembly Editor",              // hint
+			"Add event graph class file, XML file or directory root to this list",  //  plus-sign tooltip
+			"Remove event graph class file, XML file or directory from this list"); // minus-sign tooltip
   }
 }

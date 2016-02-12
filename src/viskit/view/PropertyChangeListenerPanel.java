@@ -11,7 +11,9 @@ package viskit.view;
  */
 public class PropertyChangeListenerPanel extends ClassPanel {
   public PropertyChangeListenerPanel(LegoTree ltree) {
-    super(ltree,"Property Change Listeners", "Add a property change listener class to this list",
-                                             "Remove a property change listener class from this list");
+    super(ltree,"Property Change Listener Selection", 
+			"Select and drag a property change listener (PCL) onto the Assembly Editor", // hint
+			"Add a property change listener class to this list",                         //  plus-button tooltip
+			"Remove a property change listener class from this list");                   // minus-button tooltip
   }
 }
