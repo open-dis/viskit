@@ -363,10 +363,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
 
         /** Perform simulation stop and reset calls */
-        public void end() {
-            System.out.println("Simulation ended");
+        public void end()
+		{
             System.out.println(dividerLine);
             System.out.println(dividerLine);
+            System.out.println("Simulation replication ");
+			if (simulationRunPanel.getNumberOfReplications() > 1)
+				System.out.println("s");
+            System.out.println(" ended.");
             simulationRunPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
         }
@@ -749,12 +753,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        LOG.debug(evt.getPropertyName());
+    public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+        LOG.debug(propertyChangeEvent.getPropertyName() + ": old=" + propertyChangeEvent.getOldValue() + ", new=" + propertyChangeEvent.getNewValue());
 
-        if (evt.getPropertyName().equals("replicationNumber")) {
+        if (propertyChangeEvent.getPropertyName().equals("replicationNumber")) {
             int beginLength = npsString.length();
-            npsString.append(evt.getNewValue());
+            npsString.append(propertyChangeEvent.getNewValue());
             npsString.append(" of ");
             npsString.append(simulationRunPanel.getNumberOfReplications());
             npsString.append("</b>\n");
