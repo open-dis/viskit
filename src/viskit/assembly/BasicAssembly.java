@@ -806,7 +806,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     printWriter.flush();
                 }
             }
-			System.out.println ("Replication " + (replication + 1) + " complete\n");
+			System.out.println ("Replication " + (replication + 1) + " complete.\n");
         }
 
         if (isPrintSummaryReport()) {

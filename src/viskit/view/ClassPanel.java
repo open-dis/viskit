@@ -22,19 +22,56 @@ import viskit.ViskitProject;
  */
 public class ClassPanel extends JPanel {
 
-    JButton plus, minus;
+    JButton plusButton, minusButton;
     LegoTree tree;
     JFileChooser jfc;
 
     public ClassPanel(LegoTree ltree, String title, String hint, String plusButtonTooltip, String minusButtonTooltip) {
         this.tree = ltree;
         jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+		
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+		buttonPanel.setAlignmentX(Box.LEFT_ALIGNMENT);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JLabel titleLabel = new JLabel(title); // e.g. "Event Graph Selection"
 		titleLabel.setToolTipText(hint);
-        titleLabel.setAlignmentX(Box.CENTER_ALIGNMENT);
-        add(titleLabel);
+        titleLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        buttonPanel.add(titleLabel);
+		
+        buttonPanel.add(Box.createHorizontalGlue());
+		
+        JLabel plusMinusButtonLabel = new JLabel("Configuration"); // e.g. "Event Graph Selection"
+		plusMinusButtonLabel.setToolTipText("Add or remove files, jars, directories");
+        plusMinusButtonLabel.setAlignmentX(Box.RIGHT_ALIGNMENT);
+        buttonPanel.add(plusMinusButtonLabel);
+        buttonPanel.add(Box.createHorizontalStrut(4));
+		
+        plusButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
+        plusButton.setBorder(null);
+        plusButton.setText(null);
+        plusButton.setToolTipText(plusButtonTooltip); //"Add event graph class file or directory root to this list");
+        Dimension dd = plusButton.getPreferredSize();
+        plusButton.setMinimumSize(dd);
+        plusButton.setMaximumSize(dd);
+        buttonPanel.add(plusButton);
+        buttonPanel.add(Box.createHorizontalStrut(10));
+
+        minusButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
+        minusButton.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
+        minusButton.setBorder(null);
+        minusButton.setText(null);
+        minusButton.setToolTipText(minusButtonTooltip); //"Remove event graph class file or directory from this list");
+        dd = minusButton.getPreferredSize();
+        minusButton.setMinimumSize(dd);
+        minusButton.setMaximumSize(dd);
+        minusButton.setActionCommand("m");
+        //minus.setEnabled(false);
+        buttonPanel.add(minusButton);
+        buttonPanel.add(Box.createHorizontalGlue());
+        add(buttonPanel);
+		
 //		JLabel hintPane = new JLabel ("<html><p align=\"center\">" + hint + "</p></html>");
 //        hintPane.setAlignmentX(Box.CENTER_ALIGNMENT);
 //        add(hintPane);
@@ -42,33 +79,8 @@ public class ClassPanel extends JPanel {
         jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(jsp);
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.add(Box.createHorizontalGlue());
-        plus = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
-        plus.setBorder(null);
-        plus.setText(null);
-        plus.setToolTipText(plusButtonTooltip); //"Add event graph class file or directory root to this list");
-        Dimension dd = plus.getPreferredSize();
-        plus.setMinimumSize(dd);
-        plus.setMaximumSize(dd);
-        buttonPanel.add(plus);
-        buttonPanel.add(Box.createHorizontalStrut(10));
-
-        minus = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
-        minus.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
-        minus.setBorder(null);
-        minus.setText(null);
-        minus.setToolTipText(minusButtonTooltip); //"Remove event graph class file or directory from this list");
-        dd = minus.getPreferredSize();
-        minus.setMinimumSize(dd);
-        minus.setMaximumSize(dd);
-        minus.setActionCommand("m");
-        //minus.setEnabled(false);
-        buttonPanel.add(minus);
-        buttonPanel.add(Box.createHorizontalGlue());
-        add(buttonPanel);
-        minus.addActionListener(new ActionListener() {
+		
+        minusButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,7 +88,7 @@ public class ClassPanel extends JPanel {
             }
         });
 
-        plus.addActionListener(new ActionListener() {
+        plusButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {

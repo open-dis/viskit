@@ -371,7 +371,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             System.out.print  ("Simulation replication");
 			if (simulationRunPanel.getNumberOfReplications() > 1)
 				System.out.print  ("s");
-            System.out.println(" ended.");
+            System.out.println(" complete.");
             simulationRunPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
         }
