@@ -35,7 +35,7 @@
         <TerminalParameter name="totalNumberServers" value="2" type="int"/>
         <Coordinate x="280.0" y="90.0"/>
     </SimEntity>
-    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
+    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
         <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
         <Coordinate x="350.0" y="230.0"/>
     </PropertyChangeListener>
