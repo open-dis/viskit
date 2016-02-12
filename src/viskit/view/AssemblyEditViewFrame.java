@@ -118,7 +118,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
     private JToggleButton selectModeButton;
-    private JToggleButton adapterModeButton,  simEventListenerModeButton,  propertyChangeListenerModeButton;
+    private JToggleButton adapterModeButton,  simEventListenerModeButton,  propertyChangeConnectorModeButton;
     private LegoTree legoTree,  propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -468,7 +468,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         if (simEventListenerModeButton.isSelected()) {
             return SIMEVLIS_MODE;
         }
-        if (propertyChangeListenerModeButton.isSelected()) {
+        if (propertyChangeConnectorModeButton.isSelected()) {
             return PCL_MODE;
         }
         LogUtils.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
@@ -486,10 +486,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         Border border = selectModeButton.getBorder();
         selectModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        propertyChangeListenerModeButton = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
-                "Property change listener: monitor events from a single SimEntity to collect statistics"); // TODO improve
-        border = propertyChangeListenerModeButton.getBorder();
-        propertyChangeListenerModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        propertyChangeConnectorModeButton = makeToolbarButton(null, new PropertyChangeListenerIcon(24, 24),
+                "Property Change Connector for a Property Change Listener (PCL) to monitor events from a single SimEntity in order to collect statistics"); // TODO improve
+        border = propertyChangeConnectorModeButton.getBorder();
+        propertyChangeConnectorModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         simEventListenerModeButton = makeToolbarButton(null, new SimEventListenerIcon(24, 24),
                 "Listener: connect two assembly nodes (event graph instances) with a SimEvent listener pattern"); // TODO improve
@@ -516,7 +516,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		compileInitializeAssemblyButton = makeButton(compileInitializeAssemblyAction, "viskit/images/Play24.gif",
                 "Compile and initialize the Assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectModeButton);
-        modeButtonGroup.add(propertyChangeListenerModeButton);
+        modeButtonGroup.add(propertyChangeConnectorModeButton);
         modeButtonGroup.add(simEventListenerModeButton);
         modeButtonGroup.add(adapterModeButton);
 
@@ -528,7 +528,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(selectModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(propertyChangeListenerModeButton);
+        getToolBar().add(propertyChangeConnectorModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(simEventListenerModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -614,7 +614,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         selectModeButton.addActionListener(portsOff);
         adapterModeButton.addActionListener(portsOn);
         simEventListenerModeButton.addActionListener(portsOn);
-        propertyChangeListenerModeButton.addActionListener(portsOn);
+        propertyChangeConnectorModeButton.addActionListener(portsOn);
     }
 
     private JToggleButton makeToolbarButton(Action a, String icPath, String tt) {
