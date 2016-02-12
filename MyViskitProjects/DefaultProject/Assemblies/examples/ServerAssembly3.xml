@@ -35,20 +35,20 @@
         <TerminalParameter name="totalNumberServers" value="2" type="int"/>
         <Coordinate x="280.0" y="90.0"/>
     </SimEntity>
-    <PropertyChangeListener name="numInQueueStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="numberInQueue" type="java.lang.String"/>
-        <Coordinate x="210.0" y="230.0"/>
-    </PropertyChangeListener>
-    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
+    <PropertyChangeListener name="numAvailServersStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true">
         <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
         <Coordinate x="350.0" y="230.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="simplePropertyDumper" type="simkit.util.SimplePropertyDumper" meanStatistics="false" countStatistics="true" description="">
-        <Coordinate x="280.0" y="290.0"/>
+    <PropertyChangeListener name="simpleStatsTimeVarying_0" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="false" description="">
+        <TerminalParameter name="p[0] : " value="numberInQueue" type="java.lang.String"/>
+        <Coordinate x="200.0" y="230.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListenerConnection listener="numInQueueStat" source="server"/>
-    <PropertyChangeListenerConnection listener="numAvailServersStat" source="server"/>
-    <PropertyChangeListenerConnection listener="simplePropertyDumper" source="server"/>
+    <PropertyChangeListener name="simplePropertyDumper_0" type="simkit.util.SimplePropertyDumper" meanStatistics="false" countStatistics="false" description="">
+        <Coordinate x="280.0" y="280.0"/>
+    </PropertyChangeListener>
+    <PropertyChangeListenerConnection property="numberAvailableServers" listener="numAvailServersStat" source="server" description=""/>
+    <PropertyChangeListenerConnection property="numberInQueue" listener="simpleStatsTimeVarying_0" source="server" description=""/>
+    <PropertyChangeListenerConnection listener="simplePropertyDumper_0" source="server"/>
     <Adapter name="adptr_3" eventHeard="Arrival" eventSent="Arrival" from="arrival" to="server"/>
     <Output entity="arrival"/>
     <Output entity="server"/>
