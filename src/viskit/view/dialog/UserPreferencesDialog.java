@@ -367,19 +367,19 @@ public class UserPreferencesDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == eventGraphEditorPreferenceCB) {
-                appConfig.setProperty(ViskitConfiguration.EG_EDIT_VISIBLE_KEY, eventGraphEditorPreferenceCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, eventGraphEditorPreferenceCB.isSelected());
             } else if (src == assemblyEditorPreferenceCB) {
-                appConfig.setProperty(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY, assemblyEditorPreferenceCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assemblyEditorPreferenceCB.isSelected());
             } else if (src == runAssemblyPreferenceCB) {
                 if (runAssemblyPreferenceCB.isSelected()) {
-                    // if we turn on the assembly runner, we also need the Assembly editor
+                    // if we turn on the Simulation Run, we also need the Assembly editor
                     if (!assemblyEditorPreferenceCB.isSelected()) {
                         assemblyEditorPreferenceCB.doClick();
                     } // reenter here
                 }
-                appConfig.setProperty(ViskitConfiguration.ASSY_RUN_VISIBLE_KEY, runAssemblyPreferenceCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.SIMULATION_RUN_VISIBLE_KEY, runAssemblyPreferenceCB.isSelected());
             } else if (src == verboseDebugMessagesPreferenceCB) {
-                appConfig.setProperty(ViskitConfiguration.DEBUG_MSGS_KEY, verboseDebugMessagesPreferenceCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, verboseDebugMessagesPreferenceCB.isSelected());
                 ViskitStatics.debug = verboseDebugMessagesPreferenceCB.isSelected();
             } else if (src == analystReportPreferenceCB) {
                 appConfig.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportPreferenceCB.isSelected());
@@ -429,7 +429,7 @@ public class UserPreferencesDialog extends JDialog {
     private static void clearClassPathEntries() {
         // Always reinitialize the config instances.  We may have changed projects
         initConfigs();
-        projectConfig.clearTree(ViskitConfiguration.X_CLASS_PATHS_CLEAR_KEY);
+        projectConfig.clearTree(ViskitConfiguration.EXTRA_CLASSPATHS_CLEAR_KEY);
     }
 
     static JDialog progressDialog;
@@ -446,7 +446,7 @@ public class UserPreferencesDialog extends JDialog {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
                 LogUtils.getLogger(UserPreferencesDialog.class).debug("lis[" + ix + "]: " + s);
-                projectConfig.setProperty(ViskitConfiguration.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
+                projectConfig.setProperty(ViskitConfiguration.EXTRA_CLASSPATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
         }
@@ -509,7 +509,7 @@ public class UserPreferencesDialog extends JDialog {
 
         eventGraphEditorPreferenceCB.setSelected(isEventGraphEditorVisible());
         assemblyEditorPreferenceCB.setSelected(isAssemblyEditorVisible());
-        runAssemblyPreferenceCB.setSelected(isAssemblyRunVisible());
+        runAssemblyPreferenceCB.setSelected(isSimulationRunVisible());
         designOfExperimentsPreferenceCB.setSelected(isDOEVisible());
         clusterRunPreferenceCB.setSelected(isClusterRunVisible());
         analystReportPreferenceCB.setSelected(isAnalystReportVisible());
@@ -682,7 +682,7 @@ public class UserPreferencesDialog extends JDialog {
         if ((appConfig == null) || (projectConfig == null)) {
             initConfigs();
         }
-        return projectConfig.getStringArray(ViskitConfiguration.X_CLASS_PATHS_KEY);
+        return projectConfig.getStringArray(ViskitConfiguration.EXTRA_CLASSPATHS_KEY);
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */
@@ -734,7 +734,7 @@ public class UserPreferencesDialog extends JDialog {
      * @return if the EG Editor is to be visible
      */
     public static boolean isEventGraphEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.EG_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY);
     }
 
     /**
@@ -742,15 +742,15 @@ public class UserPreferencesDialog extends JDialog {
      * @return if the Assembly Editor is to be visible
      */
     public static boolean isAssemblyEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY);
     }
 
     /**
-     * Return if the Assembly Runner is to be visible
-     * @return if the Assembly Runner is to be visible
+     * Return if the Simulation Run is to be visible
+     * @return if the Simulation Run is to be visible
      */
-    public static boolean isAssemblyRunVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSY_RUN_VISIBLE_KEY);
+    public static boolean isSimulationRunVisible() {
+        return getVisibilitySense(ViskitConfiguration.SIMULATION_RUN_VISIBLE_KEY);
     }
 
     /**
@@ -766,7 +766,7 @@ public class UserPreferencesDialog extends JDialog {
      * @return if verbose debug message are to be printed
      */
     public static boolean isVerboseDebug() {
-        return getVisibilitySense(ViskitConfiguration.DEBUG_MSGS_KEY);
+        return getVisibilitySense(ViskitConfiguration.DEBUG_MESSAGES_KEY);
     }
 
     /**

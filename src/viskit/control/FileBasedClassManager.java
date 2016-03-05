@@ -110,7 +110,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ViskitGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
@@ -284,7 +284,7 @@ public class FileBasedClassManager {
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
             LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
-            LOG.debug("chached " + cacheXML.contains(filePath));
+            LOG.debug("cached " + cacheXML.contains(filePath));
             if (cacheXML.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);

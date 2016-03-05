@@ -63,7 +63,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     static final Logger LOG = LogUtils.getLogger(EventGraphControllerImpl.class);
 
     public EventGraphControllerImpl() {
-        initConfig();
+        initializeViskitConfiguration();
         initOpenEventGraphWatch();
     }
 
@@ -107,8 +107,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).zipAndMailProject();
     }
 
+    public final static String NEWEVENTGRAPH_METHOD = "newEventGraph"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraph()
+    public void newEventGraph () // name must match preceding string value
 	{
         // Don't allow a new event graph to be created if a current project is not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
@@ -206,8 +207,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return returnValue;
     }
 
+    public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open() {
+    public void open () // name must match preceding string value
+	{
         // Bug fix: 1249
         File[] files = ((EventGraphView) getView()).openFilesAsk();
         if (files == null) {
@@ -306,7 +309,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         for (EventGraphModel vMod : openAlready) {
             if (vMod.getCurrentFile() != null) {
                 String modelPath = vMod.getCurrentFile().getAbsolutePath().replaceAll("\\\\", "/");
-                markConfigOpen(modelPath);
+                markXMLConfigurationOpen(modelPath);
             }
         }
     }
@@ -364,34 +367,35 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis) {
-        dirWatch.addListener(lis);
+    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener) {
+        dirWatch.addListener(listener);
     }
 
     @Override
-    public void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis) {
-        dirWatch.removeListener(lis);
+    public void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener) {
+        dirWatch.removeListener(listener);
     }
 
     Set<mvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentEventGraphFileListener(mvcRecentFileListener lis)
+    public void addRecentEventGraphFileListener(mvcRecentFileListener listener)
     {
-      recentListeners.add(lis);
+      recentListeners.add(listener);
     }
 
     @Override
-    public void removeRecentEventGraphFileListener(mvcRecentFileListener lis)
+    public void removeRecentEventGraphFileListener(mvcRecentFileListener listener)
     {
-      recentListeners.remove(lis);
+      recentListeners.remove(listener);
     }
 
     private void notifyRecentFileListeners()
     {
-      for(mvcRecentFileListener lis : recentListeners) {
+      for(mvcRecentFileListener lis : recentListeners)
+	  {
             lis.listChanged();
-        }
+      }
     }
 
     private static final int RECENTLISTSIZE = 15;
@@ -420,14 +424,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private List<File> openEventGraphs;
 
     @SuppressWarnings("unchecked")
-    private void recordEgFiles() {
-        if (historyConfig == null) {initConfig();}
+    private void recordEventGraphFiles() {
+        if (historyXMLConfiguration == null) {initializeViskitConfiguration();}
         openEventGraphs = new ArrayList<>(4);
-        List<String> valueAr = historyConfig.getList(ViskitConfiguration.EG_HISTORY_KEY + "[@value]");
+        List<String> valueAr = historyXMLConfiguration.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
         int i = 0;
         for (String s : valueAr) {
             if (recentEventGraphFileSet.add(new File(s))) {
-                String op = historyConfig.getString(ViskitConfiguration.EG_HISTORY_KEY + "(" + i + ")[@open]");
+                String op = historyXMLConfiguration.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + i + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openEventGraphs.add(new File(s));
@@ -440,15 +444,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private void saveEventGraphHistoryXML(Set<File> recentFiles) {
-        historyConfig.clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
+        historyXMLConfiguration.clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
         int ix = 0;
 
         // The value's modelPath is already delimited with "/"
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
+            historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
             ix++;
         }
-        historyConfig.getDocument().normalize();
+        historyXMLConfiguration.getDocument().normalize();
     }
 
     @Override
@@ -460,19 +464,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public Set<File> getRecentEventGraphFileSet() {
-        return getRecentEGFileSet(false);
+        return getRecentEventGraphFileSet(false);
     }
 
-    private Set<File> getRecentEGFileSet(boolean refresh) {
+    private Set<File> getRecentEventGraphFileSet(boolean refresh) {
         if (refresh || recentEventGraphFileSet == null) {
-            recordEgFiles();
+            recordEventGraphFiles();
         }
         return recentEventGraphFileSet;
     }
 
     private List<File> getOpenFileSet(boolean refresh) {
         if (refresh || openEventGraphs == null) {
-            recordEgFiles();
+            recordEventGraphFiles();
         }
         return openEventGraphs;
     }
@@ -518,19 +522,23 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ViskitGlobals.instance().quitEventGraphEditor();
     }
 
+    public final static String CLOSEALL_METHOD = "closeAll"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeAll() {
+    public void closeAll () // name must match preceding string value
+	{
 
-        EventGraphModel[] mods = ((EventGraphView) getView()).getOpenModels();
-        for (EventGraphModel mod : mods) {
-            setModel((mvcModel) mod);
+        EventGraphModel[] openModels = ((EventGraphView) getView()).getOpenModels();
+        for (EventGraphModel eventGraphModel : openModels) {
+            setModel((mvcModel) eventGraphModel);
             close();
         }
 		// included in close(): ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
+    public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void close() {
+    public void close () // name must match preceding string value
+	{
         if (preClose()) {
             postClose();
         }
@@ -539,12 +547,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public boolean preClose() {
-        EventGraphModelImpl mod = (EventGraphModelImpl) getModel();
-        if (mod == null) {
+        EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
+        if (eventGraphModel == null) {
             return false;
         }
 
-        if (mod.isDirty()) {
+        if (eventGraphModel.isDirty()) {
             return askToSaveAndContinue();
         }
 
@@ -554,16 +562,16 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void postClose() {
 
-        EventGraphModelImpl mod = (EventGraphModelImpl) getModel();
-        if (mod.getCurrentFile() != null) {
-            fileWatchClose(mod.getCurrentFile());
-            markConfigClosed(mod.getCurrentFile());
+        EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
+        if (eventGraphModel.getCurrentFile() != null) {
+            fileWatchClose(eventGraphModel.getCurrentFile());
+            markXMLConfigurationClosed(eventGraphModel.getCurrentFile());
         }
 
-        ((EventGraphView) getView()).deleteTab(mod);
+        ((EventGraphView) getView()).deleteTab(eventGraphModel);
     }
 
-    private void markConfigClosed(File f) {
+    private void markXMLConfigurationClosed(File f) {
 
         // Someone may try to close a file that hasn't been saved
         if (f == null) {return;}
@@ -571,7 +579,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         int idx = 0;
         for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(f.getName())) {
-                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
             idx++;
         }
@@ -579,18 +587,20 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     // NOTE: The open attribute is zeroed out for all recent files the first
     // time a file is opened
-    private void markConfigOpen(String path) {
+    private void markXMLConfigurationOpen(String path) {
         int idx = 0;
         for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(path)) {
-                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
             idx++;
         }
     }
 
+    public final static String SAVE_METHOD = "save"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void save() {
+    public void save () // name must match preceding string value
+	{
         EventGraphModel mod = (EventGraphModel) getModel();
         File localLastFile = mod.getCurrentFile();
         if (localLastFile == null) {
@@ -600,8 +610,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String SAVEAS_METHOD = "saveAs"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void saveAs() {
+    public void saveAs () // name must match preceding string value
+	{
         EventGraphModel mod = (EventGraphModel) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetadata gmd = mod.getMetadata();
@@ -652,8 +664,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String NEWSIMPARAMETER_METHOD = "newSimParameter"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newSimParameter() //------------------------
+    public void newSimParameter () // name must match preceding string value
     {
         ((EventGraphView) getView()).addParameterDialog();
     }
@@ -684,8 +697,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String NEWSTATEVARIABLE_METHOD = "newStateVariable"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newStateVariable() {
+    public void newStateVariable() 
+	{
         ((EventGraphView) getView()).addStateVariableDialog();
     }
 
@@ -709,8 +724,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ActionIntrospector.getAction(this, "cut").setEnabled(false);
         ActionIntrospector.getAction(this, "remove").setEnabled(selected);
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(selected);
-        ActionIntrospector.getAction(this, "newSelfRefCancellingEdge").setEnabled(selected);
+        ActionIntrospector.getAction(this, "newSelfSchedulingEdge").setEnabled(selected);
+        ActionIntrospector.getAction(this, "newSelfCancellingEdge").setEnabled(selected);
     }
 
     private boolean nodeCopied() {
@@ -744,8 +759,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private boolean doRemove = false;
 
+    public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove() {
+    public void remove () // name must match preceding string value
+	{
         if (!selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
@@ -770,16 +787,23 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
         }
     }
-
+	
+    public final static String CUT_METHOD = "cut"; // must match following method name.  not possible to accomplish this programmatically.
+	/**
+	 * Not supported
+	 */
     @Override
-    public void cut() //---------------
+    public void cut() // name must match preceding string value
     {
         // Not supported
     }
 
+	
+    public final static String COPY_METHOD = "copy"; // must match following method name.  not possible to accomplish this programmatically.
+	
     @Override
     @SuppressWarnings("unchecked")
-    public void copy() //----------------
+    public void copy() // name must match preceding string value
     {
         if (!nodeSelected()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -799,8 +823,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private int bias = 0;
 
+    public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste() //-----------------
+    public void paste() // name must match preceding string value
     {
         if (copyVector.isEmpty()) {
             return;
@@ -818,10 +843,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    /** Permanently delete, or undo selected nodes and attached edges from the cache */
+    public final static String DELETE_METHOD = "delete"; // must match following method name.  Not possible to accomplish this programmatically.
+    /** 
+	 * Permanently delete, or undo selected nodes and attached edges from the cache
+	 */
     @SuppressWarnings("unchecked")
-    private void delete() {
-
+    private void delete() // name must match preceding string value
+	{
         // Prevent concurrent modification
         Vector<Object> v = (Vector<Object>) selectionVector.clone();
         for (Object elem : v) {
@@ -866,12 +894,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public boolean isUndo() {
         return isUndo;
     }
-
+	
+    public final static String UNDO_METHOD = "undo"; // must match following method name.  Not possible to accomplish this programmatically.
     /**
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() {
+    public void undo() // name must match preceding string value
+	{
 
         isUndo = true;
 
@@ -900,15 +930,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String REDO_METHOD = "redo"; // must match following method name.  Not possible to accomplish this programmatically.
     /**
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo() {
-
-        // Recreate the JAXB (XML) bindings since the paste function only does
-        // nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
+    public void redo() // name must match preceding string value
+	{
+        // Recreate the JAXB (XML) bindings since the paste function only does nodes and not edges
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
 
             // Handles both arcs and self-referential arcs
             if (redoGraphCell.getUserObject() instanceof SchedulingEdge) {
@@ -936,11 +966,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
-        EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }
@@ -956,9 +986,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private boolean checkSave() {
-        EventGraphModel mod = (EventGraphModel) getModel();
-        if (mod == null) {return false;}
-        if (mod.isDirty() || mod.getCurrentFile() == null) {
+        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        if (eventGraphModel == null) {return false;}
+        if (eventGraphModel.isDirty() || eventGraphModel.getCurrentFile() == null) {
             String msg = "The model will be saved.\nContinue?";
             String title = "Confirm";
             int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
@@ -970,11 +1000,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return true;
     }
 
+    public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource() {
-        EventGraphModel mod = (EventGraphModel) getModel();
-        if (mod == null) {return;}
-        File localLastFile = mod.getCurrentFile();
+    public void generateJavaSource () // name must match preceding string value
+	{
+        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        if (eventGraphModel == null) {return;}
+        File localLastFile = eventGraphModel.getCurrentFile();
         if (!checkSave() || localLastFile == null) {
             return;
         }
@@ -990,17 +1022,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOG.error(fnfe);
         }
 
-        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(simkitXML2Java);
+        String source = (ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(simkitXML2Java);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
-            String className = mod.getMetadata().packageName + "." +
-                    mod.getMetadata().name;
+            String className = eventGraphModel.getMetadata().packageName + "." +
+                    eventGraphModel.getMetadata().name;
             ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
+    public final static String SHOWXML_METHOD = "showXML"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void showXML() {
+    public void showXML () // name must match preceding string value
+	{
         if (!checkSave() || ((EventGraphModel) getModel()).getCurrentFile() == null) {
             return;
         }
@@ -1017,10 +1051,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
     private int nodeCount = 0;
 
+    public final static String NEWEVENTNODE_METHOD = "newNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newNode() //-------------------
+    public void newNode () // name must match preceding string value
     {
-        buildNewNode(new Point(100, 100));
+        buildNewNode(new Point(100, 100)); // TODO avoid collision
     }
 
     @Override
@@ -1053,8 +1088,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ((EventGraphModel) getModel()).newCancellingEdge(src, tar);
     }
 
+    public final static String NEWSELFSCHEDULINGEDGE_METHOD = "newSelfSchedulingEdge"; // must match following method name.  not possible to accomplish this programmatically.
     /** Handles the menu selection for a new self-referential scheduling edge */
-    public void newSelfRefSchedulingEdge() //--------------------------
+    public void newSelfSchedulingEdge() // name must match preceding string value
     {
         if (selectionVector != null) {
             for (Object o : selectionVector) {
@@ -1065,8 +1101,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String NEWSELFCANCELLINGEDGE_METHOD = "newSelfCancellingEdge"; // must match following method name.  not possible to accomplish this programmatically.
     /** Handles the menu selection for a new self-referential cancelling edge */
-    public void newSelfRefCancellingEdge() {  //--------------------------
+    public void newSelfCancellingEdge() // name must match preceding string value
+	{
         if (selectionVector != null) {
             for (Object o : selectionVector) {
                 if (o instanceof EventNode) {
@@ -1076,8 +1114,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
+    public final static String EDITGRAPHMETADATA_METHOD = "editGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editGraphMetadata() {
+    public void editGraphMetadata () // name must match preceding string value
+	{
         EventGraphModel mod = (EventGraphModel) getModel();
         if (mod == null) {return;}
         GraphMetadata gmd = mod.getMetadata();
@@ -1125,8 +1165,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private String imgSaveCount = "";
     private int    imgSaveInt = -1;
 
+    public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void windowImageCapture() {
+    public void windowImageCapture () // name must match preceding string value
+	{
         String fileName = "EventGraphDiagram";
 
         // create and save the image
@@ -1256,16 +1298,16 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
         }
     }
-    XMLConfiguration historyConfig;
+    XMLConfiguration historyXMLConfiguration;
 
     /** This is the very first caller for getViskitApplicationXMLConfiguration() upon Viskit startup */
-    private void initConfig() {
+    private void initializeViskitConfiguration() {
         try {
-            historyConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
+            historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
         } catch (Exception e) {
             LOG.error("Error loading history file: " + e.getMessage());
-            LOG.warn("Recent file saving disabled");
-            historyConfig = null;
+            LOG.warn ("Recent file saving disabled");
+            historyXMLConfiguration = null;
         }
     }
 }

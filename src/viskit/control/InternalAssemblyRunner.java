@@ -104,7 +104,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     private long[] seeds;
     private StopListener assemblyRunStopListener;
 
-    private final String namePrefix = "Viskit Assembly Runner";
+    private final String namePrefix = "Simulation Run";
     private String currentTitle = namePrefix;
 
     StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now running Replication ");
@@ -112,7 +112,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 	public final static String horizontalRuleDashes     = "------------------------------------------------------------------------------------------------";
 
     /**
-     * The internal logic for the Assembly Runner panel
+     * The internal logic for the Simulation Run panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
      */
     public InternalAssemblyRunner(boolean analystReportPanelVisible) {
@@ -447,8 +447,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
-                // the initialize Assembly run button and tabs back and forth
-                // between the Assembly editor and the Assembly runner panel, but it
+                // the Assembly Initialization button and tabs back and forth
+                // between the Assembly editor and the Simulation Run panel, but it
                 // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
                 LOG.error(ex);

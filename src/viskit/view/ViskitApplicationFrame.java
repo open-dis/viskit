@@ -237,11 +237,11 @@ public class ViskitApplicationFrame extends JFrame {
         runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
 
         // Always selected as visible
-        if (UserPreferencesDialog.isAssemblyRunVisible()) {
+        if (UserPreferencesDialog.isSimulationRunVisible()) {
             mainTabbedPane.add(runTabbedPanePanel);
             int idx = mainTabbedPane.indexOfComponent(runTabbedPanePanel);
             mainTabbedPane.setTitleAt(idx, "Simulation Run");
-            mainTabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
+            mainTabbedPane.setToolTipTextAt(idx, "First select Assembly Initialization button from Assembly tab");
             menus.add(null); // placeholder TODO?
             tabIndices[TAB_SIMULATION_RUN] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
@@ -480,7 +480,7 @@ public class ViskitApplicationFrame extends JFrame {
 				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly();
 			
 //				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
-                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First initialize assembly runner from Assembly tab"); // TODO fix
+                mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First select Assembly Initialization button from Assembly tab"); // TODO fix
 //                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
 				eventGraphEditMenu.setEnabled(false);
 			   	  assemblyEditMenu.setEnabled(showingAssembly);

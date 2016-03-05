@@ -103,7 +103,7 @@ public class EventGraphAssemblyComboMain {
             try {
                 url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error%20log&body=log%20output:");
-				mailtoString = "<a href=\"" + url.toString()+ "\">" + "email the error log" + "</a>";
+				mailtoString = "<a href=\"" + url.toString()+ "\">" + "view and email the session log" + "</a>";
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }

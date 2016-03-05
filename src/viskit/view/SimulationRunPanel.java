@@ -80,7 +80,7 @@ public class SimulationRunPanel extends JPanel {
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
 	private final JLabel titleLabel = new JLabel();
-    private final boolean assemblyRunPanelVisible;
+    private final boolean simulationRunPanelVisible;
 	private int numberOfReplications = 1;
 	private String fullTitle = new String();
 
@@ -90,10 +90,10 @@ public class SimulationRunPanel extends JPanel {
      * @param skipCloseButton if ture, don't supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A false will enable all VCR buttons.
      * Currently, only start and stop work
-     * @param assemblyRunPanelPanelVisible if true, will enable the analyst report check box
+     * @param simulationRunPanelPanelVisible if true, will enable the analyst report check box
      */
-    public SimulationRunPanel(String title, boolean skipCloseButton, boolean assemblyRunPanelPanelVisible) {
-        this.assemblyRunPanelVisible = assemblyRunPanelPanelVisible;
+    public SimulationRunPanel(String title, boolean skipCloseButton, boolean simulationRunPanelPanelVisible) {
+        this.simulationRunPanelVisible = simulationRunPanelPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -251,7 +251,7 @@ public class SimulationRunPanel extends JPanel {
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable analyst report");
         analystReportCB.setSelected(true);
-        analystReportCB.setEnabled(assemblyRunPanelVisible);
+        analystReportCB.setEnabled(simulationRunPanelVisible);
         simulationRunControlPanel.add(analystReportCB);
         simulationRunControlPanel.add(Box.createVerticalStrut(5));
 		
@@ -346,15 +346,15 @@ public class SimulationRunPanel extends JPanel {
 	{
 		fullTitle = newTitle.trim();
 		// adjust title for readability
-		if      ( fullTitle.contains("Assembly") && !fullTitle.contains("Run"))
+		if      ( fullTitle.contains("Simulation") && !fullTitle.contains("Run"))
 		 	 fullTitle += " Runner";
-		else if (!fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
+		else if (!fullTitle.contains("Simulation") &&  fullTitle.contains("Run"))
 			 fullTitle += " Assembly";
-		else if ( fullTitle.contains("Assembly") &&  fullTitle.contains("Run"))
+		else if ( fullTitle.contains("Simulation") &&  fullTitle.contains("Run"))
 		{
 			// OK as is
 		}
-		else fullTitle += " Assembly Runner"; // whew
+		else fullTitle += " Simulation Run"; // whew
 		
 		titleLabel.setText(fullTitle);
 	}

@@ -183,8 +183,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // placeholder for combo gui
     }
 
+    public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open() {
+    public void open () // name must match preceding string value
+	{
 
         File[] files = ((AssemblyView) getView()).openFilesAsk();
         if (files == null) {
@@ -449,8 +451,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return egListener;
     }
 
+    public final static String SAVE_METHOD = "save"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void save() {
+    public void save () // name must match preceding string value 
+	{
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod.getLastFile() == null) {
             saveAs();
@@ -459,8 +463,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    public final static String SAVEAS_METHOD = "saveAs"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void saveAs() {
+    public void saveAs () // name must match preceding string value
+	{
         AssemblyModel model         = (AssemblyModel) getModel();
         AssemblyView  view          = (AssemblyView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
@@ -485,8 +491,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    public final static String EDITGRAPHMETADATA_METHOD = "editGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editGraphMetadata()
+    public void editGraphMetadata () // name must match preceding string value
 	{
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null) {return;}
@@ -692,8 +699,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
     }
 
+    public final static String NEWASSEMBLY_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newAssembly()
+    public void newAssembly () // name must match preceding string value
 	{
         // Don't allow a new assembly to be created if a current project is  not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
@@ -791,9 +799,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private boolean closeAll = false;
 
+    public final static String CLOSEALL_METHOD = "closeAll"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeAll() {
-
+    public void closeAll () // name must match preceding string value
+	{
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel vmod : modAr) {
             setModel((mvcModel) vmod);
@@ -804,8 +813,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         setCloseAll(false);
     }
 
+    public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void close() {
+    public void close () // name must match preceding string value
+	{
         if (preClose()) {
             postClose();
         }
@@ -865,8 +876,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return nextPoint;
     }
 
+    public final static String NEWEVENTGRAPH_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraphNode() // menu click
+    public void newEventGraphNode() // name must match preceding string value
     {
         Object o = ((AssemblyView) getView()).getSelectedEventGraph();
 
@@ -895,8 +907,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
+
+    public final static String NEWPCLNODE_METHOD = "newPropertyChangeListenerNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newPropertyChangeListenerNode() // menu click
+    public void newPropertyChangeListenerNode () // name must match preceding string value
     {
         Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
 
@@ -1159,8 +1173,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private boolean doRemove = false;
 
+    public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove() {
+    public void remove() // name must match preceding string value
+	{
         if (!selectionVector.isEmpty()) {
             // first ask:
             String msg = "";
@@ -1182,15 +1198,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    public final static String CUT_METHOD = "cut"; // must match following method name.  not possible to accomplish this programmatically.
+	/**
+	 * Not supported
+	 */
     @Override
-    public void cut() //---------------
+    public void cut() // name must match preceding string value
     {
         // Not supported
     }
 
+    public final static String COPY_METHOD = "copy"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
     @SuppressWarnings("unchecked")
-    public void copy() {
+    public void copy() // name must match preceding string value
+	{
         if (selectionVector.isEmpty()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
@@ -1210,8 +1232,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Also acts as a bias for point offset */
     private int copyCount = 0;
 
+    public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste() //-----------------
+    public void paste() // name must match preceding string value
     {
         if (copyVector.isEmpty()) {
             return;
@@ -1288,6 +1311,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return isUndo;
     }
 
+    public final static String UNDO_METHOD = "undo"; // must match following method name.  not possible to accomplish this programmatically.
     /**
      * Removes the last selected node or edge from the JGraph model
      */
@@ -1321,12 +1345,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
     }
 
+    public final static String REDO_METHOD = "redo"; // must match following method name.  Not possible to accomplish this programmatically.
     /**
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo() {
-
+    public void redo () // name must match preceding string value
+	{
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
         if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
@@ -1369,17 +1394,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
         vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }
 
-    /********************************/
-    /* from menu:*/
-
+    public final static String SHOWXML_METHOD = "showXML"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void showXML() {
+    public void showXML () // name must match preceding string value
+	{
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
             return;
@@ -1403,8 +1427,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return true;
     }
 
+    public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource() {
+    public void generateJavaSource() // name must match preceding string value
+	{
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
@@ -1721,8 +1747,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		return (executionParameters != null); // if parameters are ready, then Assembly passed all tests
 	}
 
+    public final static String PREPARESIMULATIONRUN_METHOD = "compileAssemblyAndPrepareSimulationRunner"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void compileAssemblyAndPrepareSimulationRunner() {
+    public void compileAssemblyAndPrepareSimulationRunner () // name must match preceding string value
+	{
 
         // Prevent multiple pushes of the initialize Simulation Run button
         mutex++;
@@ -1856,8 +1884,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private String imgSaveCount = "";
     private int imgSaveInt = -1;
 
+    public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void windowImageCapture() {
+    public void windowImageCapture () // name must match preceding string value
+	{
 
         AssemblyModel vmod = (AssemblyModel) getModel();
         String fileName = "AssemblyDiagram";

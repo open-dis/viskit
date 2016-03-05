@@ -224,7 +224,7 @@ public interface AssemblyController {
 
     /** Compile the Assembly and prepare the Simulation Runner for simulation
      * run.  This is called from the AssemblyView via reflection when the
-     * Initialize assembly run button is selected from the Assembly Editor panel.
+     * Assembly Initialization button is selected from the Assembly Editor panel.
      */
     void compileAssemblyAndPrepareSimulationRunner();
 

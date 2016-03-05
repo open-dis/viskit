@@ -326,7 +326,7 @@ public class ViskitProject {
             log.debug(getEventGraphsDirectory().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
-            String[] classPaths = ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.X_CLASS_PATHS_KEY);
+            String[] classPaths = ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.EXTRA_CLASSPATHS_KEY);
             for (String classPath : classPaths) {
                 cp.add(classPath.replaceAll("\\\\", "/"));
             }
