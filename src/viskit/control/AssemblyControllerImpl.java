@@ -876,7 +876,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return nextPoint;
     }
 
-    public final static String NEWEVENTGRAPH_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
+    public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
     public void newEventGraphNode() // name must match preceding string value
     {
@@ -1997,7 +1997,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         runner = plug;
     }
 
-    /** Opens each EG associated with this Assembly
+    /** Opens each Event Graph associated with this Assembly
      * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
@@ -2071,7 +2071,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private List<File> openAssembliesFileList;
 
     @SuppressWarnings("unchecked")
-    private void recordAssemblyFiles() {
+    private void recordAssemblyFiles()
+	{
         if (historyXMLConfiguration == null) {initializeHistoryXMLConfiguration();}
         openAssembliesFileList = new ArrayList<>(4);
         List<String> valueList = historyXMLConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
