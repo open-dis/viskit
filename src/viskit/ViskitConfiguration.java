@@ -56,8 +56,8 @@ public class ViskitConfiguration {
     public static final String PROJECT_HISTORY_KEY    = RECENT_PROJECT_CLEAR_KEY     + ".Project";
     public static final String EVENTGRAPH_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSEMBLY_EDIT_VISIBLE_KEY   = "app.tabs.AssemblyEditor[@visible]";
-	@Deprecated
-    public static final String ASSEMBLY_RUN_VISIBLE_KEY    = "app.tabs.AssemblyRun[@visible]";
+//	@Deprecated
+//  public static final String ASSEMBLY_RUN_VISIBLE_KEY    = "app.tabs.AssemblyRun[@visible]";
     public static final String SIMULATION_RUN_VISIBLE_KEY  = "app.tabs.SimulationRun[@visible]";
     public static final String DOE_EDIT_VISIBLE_KEY        = "app.tabs.DesignOfExperiments[@visible]";
     public static final String CLUSTER_RUN_VISIBLE_KEY     = "app.tabs.ClusterRun[@visible]";
