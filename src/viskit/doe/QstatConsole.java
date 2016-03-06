@@ -44,7 +44,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     private JPanel content;
     
     public QstatConsole() {
-        super("Viskit Grid Queue Status Console");
+        super("Visual Simkit (Viskit) Grid Queue Status Console");
         
         addWindowListener(this);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

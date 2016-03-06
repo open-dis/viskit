@@ -109,7 +109,7 @@ public class StatisticsGraph extends JPanel {
     }
 
     public final void reset() {
-        setProperties(new String[] {"Viskit DOE Results"}, 0, 0);
+        setProperties(new String[] {"Visual Simkit (Viskit) Design of Experiments (DOE) Results"}, 0, 0);
     }
 
     /** add SampleStatistic to datasets at designPoint d and sample s

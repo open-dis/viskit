@@ -1231,7 +1231,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             }
         }
     }
-    private String namePrefix = "Viskit Cluster Job Controller";
+    private String namePrefix = "Visual Simkit (Viskit) Cluster Job Controller";
     private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {
