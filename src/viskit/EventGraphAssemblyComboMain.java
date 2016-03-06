@@ -107,7 +107,7 @@ public class EventGraphAssemblyComboMain {
             } catch (MalformedURLException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }
-            String message = "Viskit has experienced a startup problem.   "
+            String message = "Visual Simkit (Viskit) has experienced a startup problem.   "
                     + "Details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " <br/> "
                     + "Please " + mailtoString + " to " 
 					+ "<b>" + ViskitStatics.VISKIT_MAILING_LIST  + "</b>"

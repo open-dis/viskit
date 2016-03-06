@@ -288,7 +288,7 @@ public class ViskitProject {
     }
 
     /**
-     * Load a Viskit project file
+     * Load a Visual Simkit (Viskit) project file
      * @param inputProjectFile a Viskit project file
      */
     private void loadProjectFromFile(File inputProjectFile) {
@@ -676,8 +676,8 @@ public class ViskitProject {
             if (!isProjectDirectory) {
                 Object[] options = {"Select project", "Cancel"};
 				String TRY_AGAIN = "Please try another selection...";
-                int retrn = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Viskit project.</p>" + 
-						    "<p>Look for the Viskit icon when choosing the correct directory.)</p>" + "<<p>&nbsp;</p>" +
+                int retrn = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Visual Simkit (Viskit) project.</p>" + 
+						    "<p>Look for the Viskit icon when choosing the correct directory.)</p>" + "<p>&nbsp;</p>" +
 						    "<p>" + TRY_AGAIN + "</p>", TRY_AGAIN,
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 

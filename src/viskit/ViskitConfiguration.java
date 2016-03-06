@@ -15,7 +15,7 @@ import org.jdom.output.XMLOutputter;
 import viskit.doe.FileHandler;
 
 /**
- * <p>Viskit Discrete Event Simulation (DES) Tool
+ * <p>Visual Simkit (Viskit) Discrete Event Simulation (DES) Tool
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  *

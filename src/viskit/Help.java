@@ -25,14 +25,14 @@ public class Help {
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
     public static final String ABOUT_EG_STRING =
-            "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
+            "Event Graph Editor for Visual Simkit (Viskit)" + CR + "   version " + VERSION_STRING + CR
             + VERSION.getLastModified() + CR + CR;
     public static final String ABOUT_ASSEMBLY_STRING =
-            "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
+            "Assembly Editor for Visual Simkit (Viskit)" + CR + "   version " + VERSION_STRING + CR
             + VERSION.getLastModified() + CR + CR;
-    public static final String   SIMKIT_URL = "http://diana.nps.edu/Simkit/";
-    public static final String   VISKIT_URL = "http://diana.nps.edu/Viskit/";
-    public static final String BUGZILLA_URL = "https://diana.nps.edu/bugzilla/";
+    public static final String   SIMKIT_URL = "http://eos.nps.edu/Simkit/";
+    public static final String   VISKIT_URL = "http://eos.nps.edu/Viskit/";
+    public static final String BUGZILLA_URL = "https://eos.nps.edu/bugzilla/";
     public static final String DEVELOPERS =
             "Copyright &copy; 2004-2016 under the Lesser GNU Public License ((LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
@@ -48,7 +48,7 @@ public class Help {
             + "Visit the Simkit home page at" + CR
             + LinkURLString(SIMKIT_URL) + CR;
     public static final String VISKIT_PAGE = CR
-            + "Visit the Viskit home page at" + CR
+            + "Visual Simkit (Viskit) home page: " + CR
             + LinkURLString(VISKIT_URL);
     public static final String VERSIONS =
             "<hr>Simkit Version: "
@@ -56,7 +56,7 @@ public class Help {
             + CR + "Java version: "
             + System.getProperty("java.version");
     public static final String BUGZILLA_PAGE = CR
-            + "Please register for the Viskit Issue tracker:" + CR
+            + "Please register for the Visual Simkit (Viskit) Issue Tracker:" + CR
             + LinkURLString(BUGZILLA_URL);
 
     private HelpBroker hb;
@@ -117,13 +117,13 @@ public class Help {
 
     public void aboutEventGraphEditor() {
         JOptionPane.showMessageDialog(parent, aboutEGEditorPane,
-                "About Viskit Event Graph Editor...",
+                "About Visual Simkit (Viskit) Event Graph Editor...",
                 JOptionPane.OK_OPTION, icon);
     }
 
     public void aboutAssemblyEditor() {
         JOptionPane.showMessageDialog(parent, aboutAssemblyEditorPane,
-                "About Viskit Assembly Editor...",
+                "About Visual Simkit (Viskit) Assembly Editor...",
                 JOptionPane.OK_OPTION, icon);
     }
 
@@ -163,6 +163,6 @@ public class Help {
     }
 
     public static void main(String[] args) {
-        System.out.println("Viskit DES interface: " + VERSION);
+        System.out.println("Visual Simkit (Viskit) Discrete Event Simulation (DES) interface: " + VERSION);
     }
 }
