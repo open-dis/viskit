@@ -89,7 +89,7 @@ public class OpenAssembly {
             // This is crucial for Viskit being able to open associated EGs for
             // this Assembly
             EventGraphCache.instance().makeEntityTable(file);
-            doSendNewAssy(file);
+            doSendNewAssembly(file);
         }
     }
     private Set<AssemblyChangeListener> listeners = new HashSet<>();
@@ -110,26 +110,26 @@ public class OpenAssembly {
         return listeners.remove(listener);
     }
 
-    public void doParamLocallyEditted(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
+    public void doParamLocallyEdited(AssemblyChangeListener source) {
+        fireAction(AssemblyChangeListener.PARAM_LOCALLY_EDITED, source, null);
     }
 
     public void doSendAssyJaxbChanged(AssemblyChangeListener source) {
         fireAction(AssemblyChangeListener.JAXB_CHANGED, source, null);
     }
 
-    public void doSendNewAssy(File f) {
-        fireAction(AssemblyChangeListener.NEW_ASSY, null, f);
+    public void doSendNewAssembly(File f) {
+        fireAction(AssemblyChangeListener.NEW_ASSEMBLY, null, f);
     }
 
-    public void doSendCloseAssy() {
-        fireAction(AssemblyChangeListener.CLOSE_ASSY, null, null);
+    public void doSendCloseAssembly() {
+        fireAction(AssemblyChangeListener.CLOSE_ASSEMBLY, null, null);
     }
 
     private void fireAction(int action, AssemblyChangeListener source, Object param) {
-        for (AssemblyChangeListener lis : listeners) {
-            if (lis != source) {
-                lis.assemblyChanged(action, source, param);
+        for (AssemblyChangeListener listener : listeners) {
+            if (listener != source) {
+                listener.assemblyChanged(action, source, param);
             }
         }
     }
@@ -137,10 +137,10 @@ public class OpenAssembly {
     static public interface AssemblyChangeListener {
 
         // public final static int JDOM_CHANGED = 0;
-        int JAXB_CHANGED = 1;
-        int NEW_ASSY = 2;
-        int CLOSE_ASSY = 3;
-        int PARAM_LOCALLY_EDITTED = 4;
+        final int         JAXB_CHANGED = 1;
+        final int         NEW_ASSEMBLY = 2;
+        final int       CLOSE_ASSEMBLY = 3;
+        final int PARAM_LOCALLY_EDITED = 4;
 
         /**
          * Notify the assembly listeners of a change

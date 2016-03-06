@@ -362,7 +362,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case JAXB_CHANGED:
                 break;
 
-            case NEW_ASSY:
+            case NEW_ASSEMBLY:
                 doOpen(OpenAssembly.inst().jaxbRoot, OpenAssembly.inst().file);
 
                 if (jobLauncher != null) {
@@ -371,9 +371,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 }
                 break;
 
-            case PARAM_LOCALLY_EDITTED:
+            case PARAM_LOCALLY_EDITED:
                 break;
-            case CLOSE_ASSY:
+            case CLOSE_ASSEMBLY:
                 break;
             default:
                 System.err.println("Program error DoeController.assyChanged");

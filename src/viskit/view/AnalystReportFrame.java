@@ -123,14 +123,14 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     @Override
     public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
-            case NEW_ASSY:
+            case NEW_ASSEMBLY:
                 currentAssemblyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
                 cntlr.setCurrentAssyFile(currentAssemblyFile);
                 break;
 
-            case CLOSE_ASSY:
-            case PARAM_LOCALLY_EDITTED:
+            case CLOSE_ASSEMBLY:
+            case PARAM_LOCALLY_EDITED:
             case JAXB_CHANGED:
                 break;
 

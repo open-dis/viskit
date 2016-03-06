@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -23,6 +24,7 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
+import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphControllerImpl;
 import viskit.images.CancellationArcIcon;
 import viskit.images.EventNodeIcon;
@@ -91,7 +93,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
 
-    private JMenu openRecentEventGraphMI, openRecentProjectMenu;
+    private JMenu openRecentEventGraphMenu, openRecentProjectsMenu;
 	
 	private JMenu projectsMenu = new JMenu("Projects");
 	private JMenu eventGraphsMenu     = new JMenu("Event Graphs");
@@ -104,17 +106,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	public static String saveCompileLabelText    = "<html><p align='right'>Save and<br /> Compile </p></html>";
 	public static String saveCompileLabelTooltip = "Save file (Ctrl-S) then generate source code and compile Java (Ctrl-J)";
 	
-    private EventGraphController eventGraphController;
+    private EventGraphControllerImpl eventGraphController;
     private int menuShortcutCtrlKeyMask;
 
     /**
      * Constructor; lays out initial GUI objects
-     * @param ctrl the controller for this frame (MVF)
+     * @param controller the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(mvcController ctrl) {
+    public EventGraphViewFrame(mvcController controller)
+	{
         super(FRAME_DEFAULT_TITLE);
-        initMVC(ctrl);   // set up mvc linkages
-        initializeUserInterface();    // build widgets
+        initializeMVC(controller);       // set up mvc linkages
+        initializeUserInterface(); // build widgets
     }
 
     /** @return the JPanel which is the content of this JFrame */
@@ -149,7 +152,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initializeMVC(mvcController ctrl) {
         setController(ctrl);
     }
 
@@ -160,7 +163,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	{
         if (eventGraphController == null)
 		{
-			eventGraphController = (EventGraphController) getController();
+			eventGraphController = (EventGraphControllerImpl) getController();
 			eventGraphController.addRecentEventGraphFileListener(new RecentEventGraphFileListener());
 			menuShortcutCtrlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		}
@@ -220,10 +223,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     /**
-     * @return the openRecentProjectMenu
+     * @return the openRecentProjectsMenu
      */
-    public JMenu getOpenRecentProjectMenu() {
-        return openRecentProjectMenu;
+    public JMenu getOpenRecentProjectsMenu() {
+        return openRecentProjectsMenu;
     }
 
 	/**
@@ -649,53 +652,66 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     class RecentEventGraphFileListener implements mvcRecentFileListener
 	{
         @Override
-        public void listChanged() {
-            EventGraphController eventGraphController = (EventGraphController) getController();
-            Set<File> fileSet = eventGraphController.getRecentEventGraphFileSet();
-            openRecentEventGraphMI.removeAll();
-            for (File fullPath : fileSet) {
-                if (!fullPath.exists()) {
-                    continue;
+        public void listChanged()
+		{
+            EventGraphControllerImpl eventGraphController = (EventGraphControllerImpl) getController();
+			if ((eventGraphController == null) || (openRecentEventGraphMenu == null))
+				return;
+            List<File>  openEventGraphFileList = eventGraphController.getOpenEventGraphFileList();
+            Set<File>  recentEventGraphFileSet = eventGraphController.getRecentEventGraphFileSet();
+            openRecentEventGraphMenu.removeAll();
+            for (File eventGraphFile : recentEventGraphFileSet)
+			{
+                if (!eventGraphFile.exists() || openEventGraphFileList.contains(eventGraphFile))
+				{
+                    continue; // skip this entry, don't add recent menu item if file is open
                 }
-                String nameOnly = fullPath.getName();
-                Action menuItemAction = new ParameterizedAction(nameOnly);
-                menuItemAction.putValue(FULLPATH, fullPath);
+                String fileNameOnly = eventGraphFile.getName();
+                Action menuItemAction = new ParameterizedEventGraphAction(fileNameOnly);
+                menuItemAction.putValue(FULLPATH, eventGraphFile);
                 JMenuItem menuItem = new JMenuItem(menuItemAction);
-                menuItem.setToolTipText(fullPath.getPath());
-                openRecentEventGraphMI.add(menuItem);
+                menuItem.setToolTipText(eventGraphFile.getPath());
+                openRecentEventGraphMenu.add(menuItem);
             }
-            if (fileSet.size() > 0) {
-                openRecentEventGraphMI.add(new JSeparator());
-                Action menuItemAction = new ParameterizedAction("clear");
-                menuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem menuItem = new JMenuItem(menuItemAction);
+            if (openRecentEventGraphMenu.getItemCount() > 0) // fileSet.size()
+			{
+                openRecentEventGraphMenu.add(new JSeparator());
+                Action clearMenuItemAction = new ParameterizedEventGraphAction("clear"); // TODO
+                clearMenuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+                JMenuItem menuItem = new JMenuItem(clearMenuItemAction);
                 menuItem.setToolTipText("Clear this list");
-                openRecentEventGraphMI.add(menuItem);
+                openRecentEventGraphMenu.add(menuItem);
             }
         }
     }
 
-    class ParameterizedAction extends javax.swing.AbstractAction {
+    class ParameterizedEventGraphAction extends javax.swing.AbstractAction
+	{
+		private String action;
 
-        ParameterizedAction(String s) {
+        ParameterizedEventGraphAction(String s) {
             super(s);
+			action = s;
         }
 
         @Override
         public void actionPerformed(ActionEvent ev) {
             EventGraphController eventGraphController = (EventGraphController) getController();
 
-            File fullPath;
+            File eventGraphFile;
             Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
-                fullPath = new File((String) obj);
+                eventGraphFile = new File((String) obj);
             else
-                fullPath = (File) obj;
+                eventGraphFile = (File) obj;
 
-            if (fullPath.getPath().equals(CLEARPATHFLAG)) {
+            if (eventGraphFile.getPath().equals(CLEARPATHFLAG) || action.equals("clear"))
+			{
                 eventGraphController.clearRecentEventGraphFileSet();
-            } else {
-                eventGraphController.openRecentEventGraph(fullPath);
+            }
+			else 
+			{
+                eventGraphController.openRecentEventGraph(eventGraphFile);
 				ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
             }
 			buildMenus (); // reset
@@ -705,14 +721,36 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public void buildMenus() 
 	{
 		// ===================================================
-        // Set up Projects menu
+        // Initialize
         projectsMenu.removeAll(); // reset
+		if (openRecentEventGraphMenu == null)
+		{
+			openRecentEventGraphMenu = buildMenu("Recent Event Graph"); // don't wipe it out if already there!
+			openRecentEventGraphMenu.setToolTipText("Open Recent Event Graph");
+		}
+		eventGraphController.updateEventGraphFileLists();
+		
+		// ===================================================
+        // Set up Projects menu
+		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
+		if (assemblyController != null)
+			assemblyController.updateProjectFileLists();
 
 		boolean projectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
         projectsMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
         projectsMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
-        projectsMenu.add(openRecentProjectMenu = buildMenu ("Open Recent Project"));
-		openRecentProjectMenu.setMnemonic(KeyEvent.VK_R);
+		if (openRecentProjectsMenu == null)
+		{
+			openRecentProjectsMenu = buildMenu ("Open Recent Project"); // don't wipe it out if already there!
+			openRecentProjectsMenu.setToolTipText("Open Recent Project");
+		}
+		openRecentProjectsMenu.setMnemonic(KeyEvent.VK_R);
+
+        // The recently opened project file listener will be set up with the
+        // openRecentProjectsMenu in the MainFrame after the AssemblyView is instantiated
+		
+		openRecentProjectsMenu.setEnabled(true); // TODO openRecentProjectsMenu.getItemCount() > 0);
+		projectsMenu.add(openRecentProjectsMenu);
 
 		boolean eventGraphVisible = hasOpenEventGraphs() && ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected();
 		boolean   assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
@@ -748,14 +786,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
-        openRecentEventGraphMI = buildMenu("Open Recent Event Graph");
-		openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
-		openRecentEventGraphMI.setEnabled(eventGraphController.getRecentEventGraphFileSet().size() > 0);
-		eventGraphsMenu.add(openRecentEventGraphMI);
+        openRecentEventGraphMenu.setMnemonic(KeyEvent.VK_R);
+		openRecentEventGraphMenu.setEnabled(true); // TODO eventGraphController.getRecentEventGraphFileSet().size() > 0);
+		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
-
-        // The recently opened project file listener will be set with the
-        // openRecentProjectMenu in the MainFrame after the AssemblyView is instantiated
 		
         JMenuItem saveEventGraphMI        = buildMenuItem(eventGraphController, EventGraphControllerImpl.SAVE_METHOD,   "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), eventGraphVisible);
         eventGraphsMenu.add(saveEventGraphMI);
@@ -808,7 +842,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.SHOWXML_METHOD,           "View Saved XML",                KeyEvent.VK_X, null, eventGraphVisible));
         editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.JAVASOURCE_METHOD,        "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutCtrlKeyMask), eventGraphVisible));
         JMenuItem saveEventGraphDiagramMI2 = 
-				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_I, null, eventGraphVisible);
+				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_D, null, eventGraphVisible);
 		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();

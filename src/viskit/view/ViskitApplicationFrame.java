@@ -321,7 +321,7 @@ public class ViskitApplicationFrame extends JFrame {
 
         // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
         RecentProjectFileSetListener listener = assemblyEditViewFrame.getRecentProjectFileSetListener();
-        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectMenu());
+        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectsMenu());
 
 		
         // Now setup the assembly and event graph file change listener(s)

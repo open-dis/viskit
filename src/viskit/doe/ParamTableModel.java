@@ -111,7 +111,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         if (viskit.ViskitStatics.debug) {
             System.out.println("Sending paramlocally editted from ParamTableModel");
         }
-        OpenAssembly.inst().doParamLocallyEditted(dummyListener);
+        OpenAssembly.inst().doParamLocallyEdited(dummyListener);
     }
 
     private void processDesignParam(TerminalParameter tp) {

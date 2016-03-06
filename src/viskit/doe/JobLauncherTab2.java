@@ -446,7 +446,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         public void keyTyped(KeyEvent e) {
             //System.out.println("sending paramlocallyeditted from JobLauncherTab");
-            OpenAssembly.inst().doParamLocallyEditted(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
+            OpenAssembly.inst().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
         }
     };
 

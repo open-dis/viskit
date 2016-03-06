@@ -49,6 +49,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -106,7 +107,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     // The view needs access to this
     public JButton compileInitializeAssemblyButton;
 
-    JMenu openRecentAssemblyMenu, openRecentProjectMenu;
+    JMenu openRecentAssemblyMenu, openRecentProjectsMenu;
 
     private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
 
@@ -128,7 +129,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	
     private JMenu assembliesMenu, editMenu, helpMenu;
 	
-	private AssemblyController assemblyController;
+	private AssemblyControllerImpl assemblyController;
     private int menuShortcutKeyMask;
 
     public AssemblyEditViewFrame(mvcController controller) {
@@ -164,7 +165,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	{
         if (assemblyController == null)
 		{
-			assemblyController = (AssemblyController) getController();
+			assemblyController = (AssemblyControllerImpl) getController();
 			assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
 			menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		}
@@ -279,24 +280,33 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     class RecentAssemblyFileListener implements mvcRecentFileListener {
 
         @Override
-        public void listChanged() {
-            AssemblyController assemblyController = (AssemblyController) getController();
-            Set<File> fileSet = assemblyController.getRecentAssemblyFileSet();
+        public void listChanged()
+		{
+            AssemblyControllerImpl assemblyController = (AssemblyControllerImpl) getController();
+			if ((assemblyController == null) || (openRecentAssemblyMenu == null))
+				return;
+            List<File> openAssemblyFileList = assemblyController.getOpenAssemblyFileList();
+            Set<File> recentAssemblyFileSet = assemblyController.getRecentAssemblyFileSet();
+			assemblyController.updateAssemblyFileLists ();
+			
             openRecentAssemblyMenu.removeAll();
-            for (File fullPath : fileSet) {
-                if (!fullPath.exists()) {
-                    continue;
+            for (File assemblyFile : recentAssemblyFileSet)
+			{
+                if (!assemblyFile.exists() || openAssemblyFileList.contains(assemblyFile))
+				{
+                    continue; // skip this entry, don't add recent menu item if file is open
                 }
-                String nameOnly = fullPath.getName();
-                Action menuItemAction = new ParameterizedAssemblyAction(nameOnly);
-                menuItemAction.putValue(FULLPATH, fullPath);
+                String fileNameOnly = assemblyFile.getName();
+                Action menuItemAction = new ParameterizedAssemblyAction(fileNameOnly);
+                menuItemAction.putValue(FULLPATH, assemblyFile);
                 JMenuItem menuItem = new JMenuItem(menuItemAction);
-                menuItem.setToolTipText(fullPath.getPath());
+                menuItem.setToolTipText(assemblyFile.getPath());
                 openRecentAssemblyMenu.add(menuItem);
             }
-            if (fileSet.size() > 0) {
+            if (openRecentAssemblyMenu.getItemCount() > 0) // fileSet.size()
+			{
                 openRecentAssemblyMenu.add(new JSeparator());
-                Action menuItemAction = new ParameterizedAssemblyAction("clear");
+                Action menuItemAction = new ParameterizedAssemblyAction("clear"); // TODO
                 menuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
                 JMenuItem menuItem = new JMenuItem(menuItemAction);
                 menuItem.setToolTipText("Clear this list");
@@ -306,26 +316,32 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     class ParameterizedAssemblyAction extends javax.swing.AbstractAction {
+		private String action;
 
         ParameterizedAssemblyAction(String s) {
             super(s);
+			action = s;
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(ActionEvent ev)
+		{
             AssemblyController assemblyController = (AssemblyController) getController();
 
-            File fullPath;
+            File assemblyFile;
             Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
-                fullPath = new File((String) obj);
+                assemblyFile = new File((String) obj);
             else
-                fullPath = (File) obj;
+                assemblyFile = (File) obj;
 
-            if (fullPath.getPath().equals(CLEARPATHFLAG)) {
+            if (assemblyFile.getPath().equals(CLEARPATHFLAG) || action.equals("clear"))
+			{
                 assemblyController.clearRecentAssemblyFileList();
-            } else {
-                assemblyController.openRecentAssembly(fullPath);
+            }
+			else 
+			{
+                assemblyController.openRecentAssembly(assemblyFile);
 				ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab();
             }
 			buildMenus (); // reset
@@ -341,15 +357,21 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assembliesMenu.removeAll();      // reset
 		
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.NEWASSEMBLY_METHOD, "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), true));
-
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.OPEN_METHOD,        "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
-        assembliesMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
+        if (openRecentAssemblyMenu == null)
+		{
+			openRecentAssemblyMenu = buildMenu("Recent Assembly"); // don't wipe it out if already there!
+			openRecentAssemblyMenu.setToolTipText("Open Recent Assembly");
+		}
 		openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
-		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
+		openRecentAssemblyMenu.setEnabled(true); // TODO assemblyController.getRecentAssemblyFileSet().size() > 0);
+		assemblyController.updateAssemblyFileLists();
+		assembliesMenu.add(openRecentAssemblyMenu);
 
-        // The EGViewFrame will get this listener for it's menu item of the same name TODO confirm
+		// TODO align multiple methods with EventGraphViewFrame
+        // The EventGraphViewFrame will get this listener for its menu item of the same name
         recentProjectFileSetListener = new RecentProjectFileSetListener();
-        getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
+        getRecentProjectFileSetListener().addMenuItem(openRecentProjectsMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         assembliesMenu.addSeparator();
 
@@ -358,7 +380,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.SAVEAS_METHOD,   "Save Assembly As...", KeyEvent.VK_A, null, assemblyVisible));
 		JMenuItem saveAssemblyDiagramMI = buildMenuItem(assemblyController, AssemblyControllerImpl.IMAGECAPTURE_METHOD, "Save Assembly Diagram", KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask), assemblyVisible);
         assembliesMenu.add(saveAssemblyDiagramMI);
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSE_METHOD,    "Close Assembly",      KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutKeyMask), assemblyVisible));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSE_METHOD,    "Close Assembly",      KeyEvent.VK_W, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask), assemblyVisible));
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSEALL_METHOD, "Close All Assemblies",KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask), assemblyVisible));
 
         // TODO: Unknown as to what this does exactly
@@ -544,7 +566,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
-		JLabel initializeLabel = new JLabel("<html><p align='center'>Assembly Initialization<br /> prepares Simulation Run </p></html>");
+		JLabel initializeLabel = new JLabel("<html><p align='center'>Assembly Initialization<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
 		String initializeHint = "Prepare selected Assembly for Simulation Run";
                         initializeLabel.setToolTipText(initializeHint);
@@ -1098,7 +1120,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			assemblyController.handleProjectClosing();
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
-        showProjectName();
+        showProjectName(); // reset title
     }
 
     public void showProjectName()

@@ -64,12 +64,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public EventGraphControllerImpl() {
         initializeViskitConfiguration();
-        initOpenEventGraphWatch();
+        initializeOpenEventGraphWatch();
     }
 
     @Override
-    public void begin() {
-        List<File> fileList = getOpenFileSet(false);
+    public void begin()
+	{
+        List<File> fileList = EventGraphControllerImpl.this.getOpenEventGraphFileList(false);
 
         if (!fileList.isEmpty()) {
 
@@ -99,7 +100,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 	{
         ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
     }
 
     @Override
@@ -237,6 +238,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				}
 			}
         }
+		updateEventGraphFileLists ();
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
@@ -246,8 +248,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
-    void _doOpen(File file) {
-
+    void _doOpen(File file)
+	{
         EventGraphView eventGraphView = (EventGraphView) getView();
         EventGraphModelImpl model = new EventGraphModelImpl(this);
         model.initialize();
@@ -320,7 +322,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private DirectoryWatch dirWatch;
     private File watchDir;
 
-    private void initOpenEventGraphWatch() {
+    private void initializeOpenEventGraphWatch() {
         try { // TBD this may be obsolete
             watchDir = TempFileManager.createTempFile("egs", "current");   // actually creates
             watchDir = TempFileManager.createTempDir(watchDir);
@@ -392,9 +394,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     private void notifyRecentFileListeners()
     {
-      for(mvcRecentFileListener lis : recentListeners)
+      for (mvcRecentFileListener listener : recentListeners)
 	  {
-            lis.listChanged();
+            listener.listChanged();
       }
     }
 
@@ -406,79 +408,92 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * Trim to RECENTLISTSIZE
      * @param file an event graph file to add to the list
      */
-    private void adjustRecentEventGraphFileSet(File file) {
-        for (Iterator<File> itr = recentEventGraphFileSet.iterator(); itr.hasNext();) {
-
+    private void adjustRecentEventGraphFileSet(File file) 
+	{
+        for (Iterator<File> itr = recentEventGraphFileSet.iterator(); itr.hasNext();)
+		{
             File f = itr.next();
             if (file.getPath().equals(f.getPath())) {
                 itr.remove();
                 break;
             }
         }
-
         recentEventGraphFileSet.add(file); // to the top
-        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
     }
 
-    private List<File> openEventGraphs;
+    private List<File> openEventGraphsFileList = new ArrayList<>(4);
 
     @SuppressWarnings("unchecked")
-    private void recordEventGraphFiles() {
-        if (historyXMLConfiguration == null) {initializeViskitConfiguration();}
-        openEventGraphs = new ArrayList<>(4);
-        List<String> valueAr = historyXMLConfiguration.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
-        int i = 0;
-        for (String s : valueAr) {
-            if (recentEventGraphFileSet.add(new File(s))) {
-                String op = historyXMLConfiguration.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + i + ")[@open]");
+    public void updateEventGraphFileLists ()
+	{
+        if (historyXMLConfiguration == null) 
+		{
+			initializeViskitConfiguration();
+		}
+        List<String> eventGraphFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
+        int index = 0;
+        for (String eventGraphFilePath : eventGraphFilePathList) {
+            if (recentEventGraphFileSet.add(new File(eventGraphFilePath))) // returns true if file added
+			{
+                String openValue = historyXMLConfiguration.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + index + ")[@open]");
 
-                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openEventGraphs.add(new File(s));
+                if (openValue != null && (openValue.toLowerCase().equals("true") || openValue.toLowerCase().equals("yes"))) {
+                    openEventGraphsFileList.add(new File(eventGraphFilePath));
                 }
-
                 notifyRecentFileListeners();
             }
-            i++;
+            index++;
         }
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
     }
 
-    private void saveEventGraphHistoryXML(Set<File> recentFiles) {
+    private void saveEventGraphHistoryXML(Set<File> recentFiles)
+	{
         historyXMLConfiguration.clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
-        int ix = 0;
+        int index = 0;
 
         // The value's modelPath is already delimited with "/"
-        for (File value : recentFiles) {
-            historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
-            ix++;
+        for (File recentFile : recentFiles) {
+            historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + index + ")[@value]", recentFile.getPath());
+            index++;
         }
         historyXMLConfiguration.getDocument().normalize();
     }
 
     @Override
-    public void clearRecentEventGraphFileSet() {
+    public void clearRecentEventGraphFileSet()
+	{
         recentEventGraphFileSet.clear();
-        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
+		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
     @Override
-    public Set<File> getRecentEventGraphFileSet() {
-        return getRecentEventGraphFileSet(false);
+    public Set<File> getRecentEventGraphFileSet()
+	{
+        return getRecentEventGraphFileSet(true); // typically must refresh to see changes
     }
 
     private Set<File> getRecentEventGraphFileSet(boolean refresh) {
         if (refresh || recentEventGraphFileSet == null) {
-            recordEventGraphFiles();
+            updateEventGraphFileLists();
         }
         return recentEventGraphFileSet;
     }
 
-    private List<File> getOpenFileSet(boolean refresh) {
-        if (refresh || openEventGraphs == null) {
-            recordEventGraphFiles();
+    public List<File> getOpenEventGraphFileList()
+	{
+        return getOpenEventGraphFileList(true); // typically must refresh to see changes
+    }
+
+    private List<File> getOpenEventGraphFileList(boolean refresh) {
+        if (refresh || openEventGraphsFileList == null) {
+            updateEventGraphFileLists();
         }
-        return openEventGraphs;
+        return openEventGraphsFileList;
     }
 
     /**
@@ -526,7 +541,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void closeAll () // name must match preceding string value
 	{
-
         EventGraphModel[] openModels = ((EventGraphView) getView()).getOpenModels();
         for (EventGraphModel eventGraphModel : openModels) {
             setModel((mvcModel) eventGraphModel);
@@ -542,6 +556,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (preClose()) {
             postClose();
         }
+		updateEventGraphFileLists ();
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 
@@ -551,11 +566,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (eventGraphModel == null) {
             return false;
         }
-
         if (eventGraphModel.isDirty()) {
             return askToSaveAndContinue();
         }
-
         return true;
     }
 
@@ -563,11 +576,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void postClose() {
 
         EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
-        if (eventGraphModel.getCurrentFile() != null) {
+        if (eventGraphModel.getCurrentFile() != null)
+		{
+			openEventGraphsFileList.remove(eventGraphModel.getCurrentFile());
             fileWatchClose(eventGraphModel.getCurrentFile());
             markXMLConfigurationClosed(eventGraphModel.getCurrentFile());
         }
-
         ((EventGraphView) getView()).deleteTab(eventGraphModel);
     }
 
@@ -576,12 +590,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // Someone may try to close a file that hasn't been saved
         if (f == null) {return;}
 
-        int idx = 0;
+        int index = 0;
         for (File key : recentEventGraphFileSet) {
             if (key.getPath().contains(f.getName())) {
-                historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyXMLConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + index + ")[@open]", "false");
             }
-            idx++;
+            index++;
         }
     }
 
@@ -1162,14 +1176,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             ((viskit.model.EventGraphModel) getModel()).changeCancellingEdge(edge);
         }
     }
-    private String imgSaveCount = "";
-    private int    imgSaveInt = -1;
+    private String imageSaveCount = "";
+    private int    imageSaveInt = -1;
 
     public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
     public void windowImageCapture () // name must match preceding string value
 	{
-        String fileName = "EventGraphDiagram";
+        String fileName = "EventGraphDiagram"; // default, replaced by filename
 
         // create and save the image
         EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
@@ -1180,19 +1194,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         File localLastFile = ((EventGraphModel) getModel()).getCurrentFile();
         if (localLastFile != null) {
             fileName = localLastFile.getName();
+			if (fileName.endsWith(".xml"))
+				fileName = fileName.substring (0, fileName.indexOf(".xml"));
         }
+        File imageFile = ((EventGraphView) getView()).saveFileAsk(fileName + imageSaveCount + ".png", false, "Save Event Graph Diagram Image");
 
-        File fil = ((EventGraphView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false, "Save Event Graph Diagram Image");
-
-        if (fil == null) {
+        if (imageFile == null) {
             return;
         }
+        final Timer timer = new Timer(100, new TimerCallback(imageFile, true, component));
+        timer.setRepeats(false);
+        timer.start();
 
-        final Timer tim = new Timer(100, new TimerCallback(fil, true, component));
-        tim.setRepeats(false);
-        tim.start();
-
-        imgSaveCount = "" + (++imgSaveInt);
+        imageSaveCount = "" + (++imageSaveInt);
     }
 
     @Override
