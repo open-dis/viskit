@@ -27,7 +27,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
     public static void showDialog() {
         ViskitProjectGenerationDialog3 panel = new ViskitProjectGenerationDialog3();
         dialog = new JDialog((Dialog) null, true);  // modal
-        dialog.setTitle("Viskit Project Creation");
+        dialog.setTitle("Create Project for Visual Simkit (Viskit)");
         dialog.setContentPane(panel);
         dialog.pack();
         dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE); //WindowConstants.DO_NOTHING_ON_CLOSE);

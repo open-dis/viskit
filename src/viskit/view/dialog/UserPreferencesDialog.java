@@ -89,7 +89,7 @@ public class UserPreferencesDialog extends JDialog {
     private JRadioButton otherLafRB;
     private JTextField otherTF;
 	
-	public final String PREFERENCE_CHANGE_MESSAGE = "Changes are applied when Viskit launches";
+	public final String PREFERENCE_CHANGE_MESSAGE = "Changes are applied when Visual Simkit (Viskit) launches";
 
     public static boolean showDialog(JFrame mother) {
         if (projectSettingsDialog == null) {
@@ -419,8 +419,8 @@ public class UserPreferencesDialog extends JDialog {
 				{
 					ViskitApplicationFrame.nukeDotViskit(); // clear out .viskit configuration files
 					
-					JOptionPane.showMessageDialog(UserPreferencesDialog.this, "All user preferences cleared, Viskit will now exit.",
-                        "Viskit preferences cleared", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(UserPreferencesDialog.this, "All user preferences cleared, Visual Simkit (Viskit) will now exit.",
+                        "Visual Simkit (Viskit) preferences cleared", JOptionPane.INFORMATION_MESSAGE);
 					System.exit(0);
                 }
         }
