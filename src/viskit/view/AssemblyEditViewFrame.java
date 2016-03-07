@@ -362,17 +362,20 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
 			openRecentAssemblyMenu = buildMenu("Recent Assembly"); // don't wipe it out if already there!
 			openRecentAssemblyMenu.setToolTipText("Open Recent Assembly");
+			openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		}
-		openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		openRecentAssemblyMenu.setEnabled(true); // TODO assemblyController.getRecentAssemblyFileSet().size() > 0);
 		assemblyController.updateAssemblyFileLists();
 		assembliesMenu.add(openRecentAssemblyMenu);
 
 		// TODO align multiple methods with EventGraphViewFrame
         // The EventGraphViewFrame will get this listener for its menu item of the same name
-        recentProjectFileSetListener = new RecentProjectFileSetListener();
-        getRecentProjectFileSetListener().addMenuItem(openRecentProjectsMenu);
-        assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
+		if (recentProjectFileSetListener == null)
+		{
+			recentProjectFileSetListener = new RecentProjectFileSetListener();
+			getRecentProjectFileSetListener().addMenuItem(openRecentProjectsMenu);
+			assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
+		}
         assembliesMenu.addSeparator();
 
 		// be careful when changing controller method names!!  refactoring won't catch these

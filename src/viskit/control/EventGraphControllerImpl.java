@@ -556,7 +556,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (preClose()) {
             postClose();
         }
-		updateEventGraphFileLists ();
+//		updateEventGraphFileLists (); // save for next time
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
     }
 

@@ -33,14 +33,16 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
+import edu.nps.util.LogUtils;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import viskit.SplashScreenFrame2;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
+import viskit.control.AssemblyController;
 import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
@@ -53,6 +55,8 @@ import viskit.view.dialog.ViskitProjectGenerationDialog3;
  * @version $Id$
  */
 public class ViskitProjectButtonPanel extends javax.swing.JPanel {
+	
+    static final Logger LOG = LogUtils.getLogger(ViskitProjectButtonPanel.class);
 
     private static JDialog dialog;
 
@@ -169,23 +173,37 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
      * @param evt the open an existing project event action
      */
 private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtonActionPerformed
-    File file;
-    if (!firstTime) {
-        mvcController vac = ViskitGlobals.instance().getAssemblyController();
-        if (vac != null) {
+    File projectDirectory;
+    if (!firstTime)
+	{
+        mvcController assemblyController = ViskitGlobals.instance().getAssemblyController();
+        if (assemblyController != null)
+		{
+            AssemblyView assemblyView = (AssemblyView) assemblyController.getView();
 
-            AssemblyView vaw = (AssemblyView) vac.getView();
-
-            if (vaw != null) {
-                vaw.openProject();
+            if (assemblyView != null) {
+                assemblyView.openProject();
             }
         }
-    } else {
-        file = ViskitProject.openProjectDirectory(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        ViskitStatics.setViskitProjectFile(file);
-        firstTime = !firstTime;
-
-        // NOTE: We have no way of setting the first opened project here as the
+    }
+	else // firstTime during this execution
+	{
+        projectDirectory = ViskitProject.openProjectDirectory(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+		if ((projectDirectory.exists() && projectDirectory.isDirectory()))  // extra safety check
+		{
+  			ViskitStatics.setViskitProjectDirectory(projectDirectory);
+			ViskitGlobals.instance().initializeProjectHomeDirectory();
+// TODO
+//            AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+//            assemblyController.openProject(projectDirectory);
+			
+			firstTime = !firstTime;
+		}
+		else
+		{
+			LOG.error("ViskitProjectButtonPanel illegal directory selected: " + projectDirectory.getAbsolutePath());
+		}
+        // TODO NOTE: We have no way of setting the first opened project here as the
         // controller hasn't been created yet to store that info when Viskit
         // first starts up
     }
@@ -200,26 +218,31 @@ private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_defaultButtActionPerformed
 
 private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-    File projF;
+    File projectDirectory;
 
     // What we wish to do here is force the user to create a new project space
     // before letting them move on, or, open and existing project, or the only
     // other option is to exit
     do {
         ViskitProjectGenerationDialog3.showDialog();
-        if (ViskitProjectGenerationDialog3.cancelled) {
+        if (ViskitProjectGenerationDialog3.cancelled)
+		{
             return;
         }
-        String projPath = ViskitProjectGenerationDialog3.projectPath;
-        projF = new File(projPath);
-        if (projF.exists() && (projF.isFile() || projF.list().length > 0)) {
+        String projectPath = ViskitProjectGenerationDialog3.projectPath;
+        projectDirectory = new File(projectPath);
+		
+        if (projectDirectory.exists() && (projectDirectory.isFile() || projectDirectory.list().length > 0))
+		{
             JOptionPane.showMessageDialog(this, "Chosen project name exists.");
-        } else {
+        } 
+		else
+		{
             break; // out of do
         }
     } while (true);
 
-    ViskitStatics.setViskitProjectFile(projF);
+    ViskitStatics.setViskitProjectDirectory(projectDirectory);
 
     // NOTE: We have no way of setting the first opened project here as the
     // controller hasn't been created yet to store that info when Viskit first

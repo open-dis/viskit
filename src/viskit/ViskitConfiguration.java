@@ -28,6 +28,7 @@ public class ViskitConfiguration {
 
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
+	
     public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File V_CONFIG_FILE     = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
     public static final File C_APP_FILE        = new File(VISKIT_CONFIG_DIR, "c_app.xml");
@@ -111,6 +112,14 @@ public class ViskitConfiguration {
                  LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
             }
             File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
+			// clear out corrupted files, if found
+			if (V_CONFIG_FILE.length() == 0L)
+				V_CONFIG_FILE.delete();
+			if (C_APP_FILE.length() == 0L)
+				C_APP_FILE.delete();
+			if (C_GUI_FILE.length() == 0L)
+				C_GUI_FILE.delete();
+			// create configuration files, if needed
             if (!V_CONFIG_FILE.exists()) {
                 Files.copy(vconfigSrc.toPath(), V_CONFIG_FILE.toPath());
             }
@@ -132,11 +141,11 @@ public class ViskitConfiguration {
         }
         xmlConfigurations = new HashMap<>();
         sessionHashMap    = new HashMap<>();
-        setDefaultConfig();
+        setDefaultConfiguration();
     }
 
     /** Builds (or rebuilds) a default configuration */
-    private void setDefaultConfig() {
+    private void setDefaultConfiguration() {
         try {
             defaultConfigurationBuilder = new DefaultConfigurationBuilder();
             defaultConfigurationBuilder.setFile(V_CONFIG_FILE);
@@ -146,9 +155,9 @@ public class ViskitConfiguration {
                 LOG.error(e);
             }
 
-            // Save off the indiv XML config for each prefix so we can write back
-            int numConfigs = combinedConfiguration.getNumberOfConfigurations();
-            for (int i = 0; i < numConfigs; i++) {
+            // Save off the individual XML configurations for each prefix so we can write back
+            int numberOfConfigurations = combinedConfiguration.getNumberOfConfigurations();
+            for (int i = 0; i < numberOfConfigurations; i++) {
                 Object obj = combinedConfiguration.getConfiguration(i);
                 if (!(obj instanceof XMLConfiguration)) {
                     continue;
@@ -176,7 +185,12 @@ public class ViskitConfiguration {
     public void setValue(String key, String value) {
         String configurationKey = key.substring(0, key.indexOf('.'));
         XMLConfiguration xmlConfiguration = xmlConfigurations.get(configurationKey);
-        xmlConfiguration.setProperty(key, value);
+		if (xmlConfiguration != null)
+            xmlConfiguration.setProperty(key, value);
+		else
+		{
+            LOG.error("ViskitConfiguration error xmlConfiguration.setProperty(" + key + ", " + value + ");");
+		}
     }
 
     public void setSessionValue(String key, String value) {
@@ -184,9 +198,9 @@ public class ViskitConfiguration {
     }
 
     public String getValue(String key) {
-        String retS = sessionHashMap.get(key);
-        if (retS != null && retS.length() > 0) {
-            return retS;
+        String retrievedValue = sessionHashMap.get(key);
+        if (retrievedValue != null && retrievedValue.length() > 0) {
+            return retrievedValue;
         }
 		if (combinedConfiguration == null)
 			 return ""; // safety net
@@ -197,10 +211,10 @@ public class ViskitConfiguration {
         return combinedConfiguration.getStringArray(key);
     }
 
-    /** @param f a Viskit project file */
-    public void setProjectXMLConfiguration(String f) {
+    /** @param projectConfigurationPath a Viskit project file */
+    public void setProjectXMLConfiguration(String projectConfigurationPath) {
         try {
-            projectXMLConfiguration = new XMLConfiguration(f);
+            projectXMLConfiguration = new XMLConfiguration(projectConfigurationPath);
         } catch (ConfigurationException ce) {
             LOG.error(ce);
         }

@@ -63,6 +63,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import static viskit.ViskitProject.*;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
@@ -104,26 +105,29 @@ public class ViskitStatics {
 
     /** Utility method to configure a Viskit project
      *
-     * @param projFile the base directory of a Viskit project
+     * @param projectDirectory the base directory of a Viskit project
      */
     @SuppressWarnings("unchecked")
-    public static void setViskitProjectFile(File projFile) {
-        ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
+    public static void setViskitProjectDirectory (File projectDirectory)
+	{
+		// must be parent directory!!
+        ViskitProject.MY_VISKIT_PROJECTS_DIR = projectDirectory.getParent().replaceAll("\\\\", "/"); // normalize
+		// ViskitConfiguration.instance() creates configuration (if needed) before saving values
         ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
+        ViskitProject.DEFAULT_PROJECT_NAME = projectDirectory.getName();
         ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
 
         XMLConfiguration historyConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
         List<String> valueAr = historyConfig.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
         boolean match = false;
         for (String s : valueAr) {
-            if (s.equals(projFile.getPath())) {
+            if (s.equals(projectDirectory.getPath())) {
                 match = true;
                 break;
             }
         }
         if (!match) {
-            historyConfig.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
+            historyConfig.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projectDirectory.getPath());
             historyConfig.getDocument().normalize();
         }
     }

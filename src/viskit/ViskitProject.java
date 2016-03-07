@@ -50,6 +50,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import static viskit.ViskitStatics.LOG;
 
 /** The base class for management of all Viskit Projects
  * @version $Id: ViskitProject.java 1916 2008-07-04 09:13:41Z tdnorbra $
@@ -72,26 +73,26 @@ public class ViskitProject {
      */
     public static       String        DEFAULT_PROJECT_NAME = "DefaultProject";
 
-    public static final String            VISKIT_ROOT_NAME = "ViskitProject";     // fixed
-    public static final String           PROJECT_FILE_NAME = "viskitProject.xml"; // fixed
-    public static final String   ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
-    public static final String EVENT_GRAPHS_DIRECTORY_NAME = "EventGraphs";
-
+    public static final String               VISKIT_ROOT_NAME = "ViskitProject";     // fixed
+    public static final String              PROJECT_FILE_NAME = "viskitProject.xml"; // fixed
+    public static final String      ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
+    public static final String     EVENTGRAPHS_DIRECTORY_NAME = "EventGraphs";
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
-    public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
-    public static final String VISKIT_CONFIG_DIR = "configuration";
-    public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIG_DIR + "/" + VISKIT_ICON_FILE_NAME;
-    public static final String ANALYST_REPORT_CHARTS_DIRECTORY_NAME = "charts";
-    public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
-    public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
-    public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
-    public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
     public static final String   BUILD_DIRECTORY_NAME = "build";
     public static final String CLASSES_DIRECTORY_NAME = "classes";
     public static final String  SOURCE_DIRECTORY_NAME = "src";
     public static final String    DIST_DIRECTORY_NAME = "dist";
     public static final String     LIB_DIRECTORY_NAME = "lib";
+
+    public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
+    public static final String VISKIT_CONFIGURATION_SUBDIR = "configuration";
+    public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIGURATION_SUBDIR + "/" + VISKIT_ICON_FILE_NAME;
+    public static final String ANALYST_REPORT_CHARTS_DIRECTORY_NAME = "charts";
+    public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
+    public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
+    public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENTGRAPHS_DIRECTORY_NAME;
+    public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
     static Logger log = LogUtils.getLogger(ViskitProject.class);
 
@@ -169,7 +170,7 @@ public class ViskitProject {
             getAssembliesDirectory().mkdir();
         }
 
-        setEventGraphsDirectory(new File(projectRoot, EVENT_GRAPHS_DIRECTORY_NAME));
+        setEventGraphsDirectory(new File(projectRoot, EVENTGRAPHS_DIRECTORY_NAME));
         if (!eventGraphsDirectory.exists()) {
             getEventGraphsDirectory().mkdir();
         }
@@ -242,7 +243,7 @@ public class ViskitProject {
         root.addContent(element);
 
         element = new Element("EventGraphsDirectory");
-        element.setAttribute("name", EVENT_GRAPHS_DIRECTORY_NAME);
+        element.setAttribute("name", EVENTGRAPHS_DIRECTORY_NAME);
         root.addContent(element);
 
         element = new Element("BuildDirectory");
@@ -659,35 +660,58 @@ public class ViskitProject {
         initializeProjectChooser(startingDirectoryPath);
 
         projectChooser.setDialogTitle("Open Existing Viskit Project");
-        boolean isProjectDirectory;
+        boolean isProjectDirectory, found = false;
 
         do {
-            int ret = projectChooser.showOpenDialog(parentFrame);
+            int returnValue = projectChooser.showOpenDialog(parentFrame);
 
             // User may have exited the chooser
-            if (ret == JFileChooser.CANCEL_OPTION) {
+            if (returnValue == JFileChooser.CANCEL_OPTION) {
                 return null;
             }
-
             projectDirectory = projectChooser.getSelectedFile();
-            isProjectDirectory = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDirectory);
 
+			if (!projectDirectory.isDirectory())
+			{
+				projectDirectory = projectDirectory.getParentFile();
+			}
+			File originalProjectDirectory = projectDirectory;
+
+			if (projectDirectory.getName().equals(ASSEMBLIES_DIRECTORY_NAME)      ||
+				projectDirectory.getName().equals(EVENTGRAPHS_DIRECTORY_NAME)     ||
+				projectDirectory.getName().equals(ANALYST_REPORTS_DIRECTORY_NAME) ||
+				projectDirectory.getName().equals(BUILD_DIRECTORY_NAME)           ||
+				projectDirectory.getName().equals(CLASSES_DIRECTORY_NAME)         ||
+				projectDirectory.getName().equals(SOURCE_DIRECTORY_NAME)          ||
+				projectDirectory.getName().equals(DIST_DIRECTORY_NAME)            ||
+				projectDirectory.getName().equals(LIB_DIRECTORY_NAME))
+			{
+				projectDirectory = projectDirectory.getParentFile(); // gracefully support subdirectory mis-selection
+				LOG.info("changed project directory to parent: " + projectDirectory.getPath());
+			}
+			// check for project configuration file
+			File viskitProjectFile = new File(projectDirectory.getPath() + File.separator + PROJECT_FILE_NAME);
+		
+            isProjectDirectory = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDirectory);
             // Give user a chance to select an iconized project directory
-            if (!isProjectDirectory) {
+            if (!projectDirectory.exists() || !isProjectDirectory || !viskitProjectFile.exists())
+			{
+				LOG.error("Illegal viskit project directory: " + originalProjectDirectory.getPath());
                 Object[] options = {"Select project", "Cancel"};
 				String TRY_AGAIN = "Please try another selection...";
-                int retrn = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Visual Simkit (Viskit) project.</p>" + 
+                returnValue = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Visual Simkit (Viskit) project.</p>" + 
 						    "<p>Look for the Viskit icon when choosing the correct directory.)</p>" + "<p>&nbsp;</p>" +
 						    "<p>" + TRY_AGAIN + "</p>", TRY_AGAIN,
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-                if (retrn != 0) {
+                if (returnValue != 0) {
                     // 0th choice (Select project)
                     return null; // cancelled
                 } // cancelled
             }
-
-        } while (!isProjectDirectory);
+			else  found = true;
+			
+        } while (!found);
 
         return projectDirectory;
     }
@@ -735,7 +759,7 @@ public class ViskitProject {
 
                     // configuration/ contains the template viskitProject.xml file
                     // so, don't show this directory as a potential Viskit project
-                    if (dir.getName().equals(VISKIT_CONFIG_DIR)) {
+                    if (dir.getName().equals(VISKIT_CONFIGURATION_SUBDIR)) {
                         return false;
                     }
 

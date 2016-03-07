@@ -168,7 +168,7 @@ public class ViskitGlobals {
         return assemblyControllerImpl;
     }
 
-    ActionListener defaultAssembyQuitHandler = new ActionListener() {
+    ActionListener defaultAssemblyQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -177,7 +177,7 @@ public class ViskitGlobals {
             }
         }
     };
-    ActionListener assemblyQuitHandler = defaultAssembyQuitHandler;
+    ActionListener assemblyQuitHandler = defaultAssemblyQuitHandler;
 
     public void quitAssemblyEditor() {
         if (assemblyQuitHandler != null) {
@@ -507,10 +507,10 @@ public class ViskitGlobals {
      * recorded project space, or launch a dialog asking the user to either
      * create a new project space, or open another existing one, or exit Viskit
      */
-    public final void initializeProjectHomeDirectory() {
-
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        String projectHomeDirectory = vConfig.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
+    public final void initializeProjectHomeDirectory()
+	{
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        String projectHomeDirectory = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
         LOG.debug(projectHomeDirectory);
         if (projectHomeDirectory.isEmpty() || !(new File(projectHomeDirectory).exists())) {
             ViskitProjectButtonPanel.showDialog();
@@ -787,13 +787,14 @@ public class ViskitGlobals {
      * Not the best Java Bean convention, but performs as a no-argument setter
      * for the an open project's working directory (build/classes)
      */
-    public final void createWorkDirectory() {
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        if (vConfig.getViskitApplicationXMLConfiguration() == null) {
+    public final void createWorkDirectory()
+	{
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        if (viskitConfiguration.getViskitApplicationXMLConfiguration() == null) {
             return;
         }
 
-        String projectName = vConfig.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+        String projectName = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }

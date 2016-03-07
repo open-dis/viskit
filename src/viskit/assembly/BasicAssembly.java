@@ -605,6 +605,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     // TODO: Simkit not generisized yet
 	
     @Override
+	@SuppressWarnings("unchecked") // TODO Schedule<SimEntity> generics not yet supported by simkit
     public void run()
 	{
         stopRun = false;
@@ -623,17 +624,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             LOG.error(t);
 
             URL url = null;
+			String path = "mailto:"; // avoid warning
             try {
                 url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:");
+				path = url.getPath();
             } catch (MalformedURLException ex) {
                 LOG.error(ex);
             }
-
             String msg = "Assembly run aborted.  <br/>Please "
                     + "navigate to " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.getPath() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + path + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
             ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
@@ -677,7 +679,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // all agree to be dependent on, i.e. viskit.simulation.Interface
         SimEntity scenarioManager;
 
-        runEntities = Schedule.getReruns(); // TODO Schedule<SimEntity> generics not yet supported by simkit
+        runEntities = Schedule.getReruns();
 
         // Convenience for Diskit if on the classpath; this is a SavageStudio hack...
         for (SimEntity entity : runEntities) {

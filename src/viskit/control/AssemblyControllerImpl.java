@@ -133,7 +133,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 _doOpen(f);
             }
         }
-        updateProjectFileLists();
+        updateAssemblyFileLists();
     }
 	
     public List<File> getOpenAssemblyFileList()
@@ -670,7 +670,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      *
      * @return indication of continue or cancel
      */
-    public boolean handleProjectClosing() {
+    public boolean handleProjectClosing()
+	{
         boolean returnValue = true;
         if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
@@ -698,13 +699,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void openProject(File file)
+    public void openProject(File projectDirectory)
 	{
-        ViskitStatics.setViskitProjectFile(file);
+        ViskitStatics.setViskitProjectDirectory(projectDirectory);
         ViskitGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjectFileSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        adjustRecentProjectFileSet(projectDirectory);
 		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
 		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
     }
@@ -830,7 +831,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (preClose()) {
             postClose();
         }
-		updateAssemblyFileLists(); // update file lists
+//		updateAssemblyFileLists(); // save for next time
 		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
     }
 
@@ -2074,8 +2075,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         recentProjectFileSet.add(file); // to the top
+//        notifyRecentProjectFileListeners(); infinite loop?
         saveProjectHistoryXML(recentProjectFileSet);
-        notifyRecentProjectFileListeners();
     }
 
     private List<File> openAssembliesFileList = new ArrayList<>(4);

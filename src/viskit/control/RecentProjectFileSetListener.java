@@ -56,45 +56,44 @@ import viskit.view.AssemblyEditViewFrame;
  */
 public class RecentProjectFileSetListener implements mvcRecentFileListener {
 
-    private List<JMenu> openRecentProjMenus;
+    private List<JMenu> recentProjectMenuList;
 
     public RecentProjectFileSetListener() {
-        openRecentProjMenus = new ArrayList<>();
+        recentProjectMenuList = new ArrayList<>(4);
     }
 
     public void addMenuItem(JMenu menuItem) {
-        openRecentProjMenus.add(menuItem);
+        recentProjectMenuList.add(menuItem);
     }
 
     @Override
     public void listChanged() {
-        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-        Set<File> lis = acontroller.getRecentProjectFileSet();
+        AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        Set<File> recentProjectFileSet = assemblyController.getRecentProjectFileSet();
 
-        for (JMenu m : openRecentProjMenus) {
+        for (JMenu m : recentProjectMenuList) {
             m.removeAll();
         }
 
-        for (File fullPath : lis) {
+        for (File fullPath : recentProjectFileSet) {
 
             if (!fullPath.exists()) {
                 continue;
             }
-
-            for (JMenu m : openRecentProjMenus) {
+            for (JMenu m : recentProjectMenuList) {
                 String nameOnly = fullPath.getName();
-                Action act = new ParameterizedProjAction(nameOnly);
-                act.putValue(ViskitStatics.FULL_PATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
+                Action parameterizedProjectAction = new ParameterizedProjectAction(nameOnly);
+                parameterizedProjectAction.putValue(ViskitStatics.FULL_PATH, fullPath);
+                JMenuItem mi = new JMenuItem(parameterizedProjectAction);
                 mi.setToolTipText(fullPath.getPath());
                 m.add(mi);
             }
         }
-        if (!lis.isEmpty()) {
-
-            for (JMenu m : openRecentProjMenus) {
+        if (!recentProjectFileSet.isEmpty())
+		{
+            for (JMenu m : recentProjectMenuList) {
                 m.add(new JSeparator());
-                Action act = new ParameterizedProjAction("clear");
+                Action act = new ParameterizedProjectAction("clear");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
@@ -103,28 +102,28 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
         }
     }
 
-    class ParameterizedProjAction extends AbstractAction {
+    class ParameterizedProjectAction extends AbstractAction {
 
-        ParameterizedProjAction(String s) {
+        ParameterizedProjectAction(String s) {
             super(s);
         }
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+            AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
-            File fullPath;
+            File projectDirectory;
             Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
-                fullPath = new File((String) obj);
+                projectDirectory = new File((String) obj);
             else
-                fullPath = (File) obj;
+                projectDirectory = (File) obj;
 
-            if (fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
-                acontroller.clearRecentProjectFileSet();
+            if (projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
+                assemblyController.clearRecentProjectFileSet();
             } else {
-                acontroller.doProjectCleanup();
-                acontroller.openProject(fullPath);
+                assemblyController.doProjectCleanup();
+                assemblyController.openProject(projectDirectory);
             }
         }
     }

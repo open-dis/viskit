@@ -713,8 +713,31 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			{
                 eventGraphController.openRecentEventGraph(eventGraphFile);
 				ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
+				
+				// now select tab with recent event graph, if appropriate
+				if (action.endsWith(".xml"))
+				{
+					boolean found = false;
+					int selectedTab = tabbedPane.getSelectedIndex(); // save current selection
+		
+					for (Component c : tabbedPane.getComponents())
+					{
+						// This will fire a call to stateChanged() which also sets the current eventGraphModel
+						tabbedPane.setSelectedComponent(c);
+						if (((EventGraphModel) getModel()).getMetadata().name.equals(action.substring(0,action.indexOf(".xml"))))
+						{
+							found = true; // stay on this tab
+							break;
+						}
+					}
+					// TODO check if this tab isn't found even if it was selected via recent list? is this code block all out of order, checking before it gets loaded?
+					// Restore active tab and eventGraphModel by virtue of firing a call to stateChanged()
+					if (!found)
+						tabbedPane.setSelectedIndex(selectedTab);
+					// TODO similar functionality for assembly tabs, once they are working
+				}
             }
-			buildMenus (); // reset
+			buildMenus (); // reset, may have switched panes
         }
     }
 
@@ -727,28 +750,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		{
 			openRecentEventGraphMenu = buildMenu("Recent Event Graph"); // don't wipe it out if already there!
 			openRecentEventGraphMenu.setToolTipText("Open Recent Event Graph");
+			openRecentEventGraphMenu.setMnemonic(KeyEvent.VK_R);
 		}
 		eventGraphController.updateEventGraphFileLists();
 		
 		// ===================================================
         // Set up Projects menu
-		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
-		if (assemblyController != null)
-			assemblyController.updateProjectFileLists();
 
 		boolean projectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
         projectsMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
         projectsMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
 		if (openRecentProjectsMenu == null)
 		{
-			openRecentProjectsMenu = buildMenu ("Open Recent Project"); // don't wipe it out if already there!
+			openRecentProjectsMenu = buildMenu ("Recent Project"); // don't wipe it out if already there!
 			openRecentProjectsMenu.setToolTipText("Open Recent Project");
+			openRecentProjectsMenu.setMnemonic(KeyEvent.VK_R);
 		}
-		openRecentProjectsMenu.setMnemonic(KeyEvent.VK_R);
-
-        // The recently opened project file listener will be set up with the
-        // openRecentProjectsMenu in the MainFrame after the AssemblyView is instantiated
-		
+		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
+		if (assemblyController != null)
+			assemblyController.updateProjectFileLists();
 		openRecentProjectsMenu.setEnabled(true); // TODO openRecentProjectsMenu.getItemCount() > 0);
 		projectsMenu.add(openRecentProjectsMenu);
 
@@ -780,13 +800,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         projectsMenu.add(zipAndMailProjectMI);
 		
 		// ===================================================
-		// Set up file menu
+		// Set up Event Graphs menu
 		eventGraphsMenu.setEnabled(true); // always on
         eventGraphsMenu.removeAll();      // reset
 		
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
-        openRecentEventGraphMenu.setMnemonic(KeyEvent.VK_R);
 		openRecentEventGraphMenu.setEnabled(true); // TODO eventGraphController.getRecentEventGraphFileSet().size() > 0);
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
@@ -1083,36 +1102,35 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     /** Changes the background color of EG tabs depending on eventGraphModel.isDirty()
- status to give the user an indication of a good/bad save &amp; compile
+	 * status to give the user an indication of a good/bad save &amp; compile
      * operation.  Of note is that the default L&amp;F on must be selected for
-     * Windoze machines, else no color will be visible.  On Macs, the platform
+     * Windows machines, else no color will be visible.  On Macs, the platform
      * L&amp;F works best.
      */
-    public void toggleEventGraphStatusIndicators() {
+    public void toggleEventGraphStatusIndicators()
+	{
+        int selectedTab = tabbedPane.getSelectedIndex(); // save current selection
 
-        int selectedTab = tabbedPane.getSelectedIndex();
-
-        for (Component c : tabbedPane.getComponents()) {
-
-            // This will fire a call to stateChanged() which also sets the
-            // current eventGraphModel
+        for (Component c : tabbedPane.getComponents())
+		{
+            // This will fire a call to stateChanged() which also sets the current eventGraphModel
             tabbedPane.setSelectedComponent(c);
 
-            if (((EventGraphModel) getModel()).isDirty()) {
-
+            if (((EventGraphModel) getModel()).isDirty())
+			{
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
-            } else {
-
+            } 
+			else
+			{
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
             }
         }
-
         // Restore active tab and eventGraphModel by virtue of firing a call to stateChanged()
         tabbedPane.setSelectedIndex(selectedTab);
     }
