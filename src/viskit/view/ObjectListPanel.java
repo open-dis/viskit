@@ -40,7 +40,7 @@ import viskit.control.AssemblyController;
  * @since 3:03:09 PM
  * @version $Id$
  */
-public class ObjListPanel extends JPanel implements ActionListener, CaretListener {
+public class ObjectListPanel extends JPanel implements ActionListener, CaretListener {
 
     private JDialog parent;
     private JLabel typeLab[];
@@ -48,7 +48,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     private VInstantiator shadow[];
     private ActionListener changeListener;
 
-    public ObjListPanel(ActionListener changeListener) {
+    public ObjectListPanel(ActionListener changeListener) {
         setLayout(new SpringLayout());
         this.changeListener = changeListener;
     }

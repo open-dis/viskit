@@ -21,7 +21,7 @@ public class ConstructorPanel extends JPanel {
     private JPanel selectButtPan;
     private boolean showButt;
     private ActionListener selectButtListener;
-    private ObjListPanel olp;
+    private ObjectListPanel olp;
     private JDialog parent;
 
     public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButt, ActionListener selectListener, JDialog parent) {
@@ -44,7 +44,7 @@ public class ConstructorPanel extends JPanel {
         this.removeAll();
         add(Box.createVerticalGlue());
 
-        olp = new ObjListPanel(modLis); // may have to intercept
+        olp = new ObjectListPanel(modLis); // may have to intercept
         olp.setDialogInfo(parent);
         olp.setData(args, true);
         if (args.size() > 0) {

@@ -414,7 +414,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private JPanel topP;
 
-        private ObjListPanel olp;
+        private ObjectListPanel olp;
 
         private String typ;
 
@@ -488,7 +488,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
 
         private void addObjListPanel(Vector<Object> params, boolean showLabels) {
-            olp = new ObjListPanel(ip);
+            olp = new ObjectListPanel(ip);
             olp.setBorder(BorderFactory.createTitledBorder(
                     BorderFactory.createLineBorder(Color.black),
                     "Method arguments",
