@@ -308,9 +308,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 openRecentAssemblyMenu.add(new JSeparator());
                 Action menuItemAction = new ParameterizedAssemblyAction("clear"); // TODO
                 menuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem menuItem = new JMenuItem(menuItemAction);
-                menuItem.setToolTipText("Clear this list");
-                openRecentAssemblyMenu.add(menuItem);
+                JMenuItem clearRecentAssemblyMenuItem = new JMenuItem(menuItemAction);
+                clearRecentAssemblyMenuItem.setToolTipText("Clear this list");
+                openRecentAssemblyMenu.add(clearRecentAssemblyMenuItem);
             }
         }
     }
@@ -364,7 +364,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			openRecentAssemblyMenu.setToolTipText("Open Recent Assembly");
 			openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		}
-		openRecentAssemblyMenu.setEnabled(true); // TODO assemblyController.getRecentAssemblyFileSet().size() > 0);
+		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
 		assemblyController.updateAssemblyFileLists();
 		assembliesMenu.add(openRecentAssemblyMenu);
 
@@ -776,7 +776,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     public boolean hasActiveAssembly() {
 		return (ViskitGlobals.instance() != null) &&
-			   (ViskitGlobals.instance().getAssemblyEditor() != null) &&
+			   (ViskitGlobals.instance().getAssemblyEditViewFrame() != null) &&
 			   (ViskitGlobals.instance().getActiveAssemblyModel()!= null);
     }
 
@@ -1061,6 +1061,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assemblyFileChooser.setFileFilter(filter);
 
         assemblyFileChooser.setMultiSelectionEnabled(true);
+		assemblyFileChooser.setFileHidingEnabled(true);
+		assemblyFileChooser.setAcceptAllFileFilterUsed(false);
 
         int returnVal = assemblyFileChooser.showOpenDialog(this);
         return (returnVal == JFileChooser.APPROVE_OPTION) ? assemblyFileChooser.getSelectedFiles() : null;
@@ -1095,32 +1097,42 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void openProject() {
+    public void openProject()
+	{
         AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
 
         if (!assemblyController.handleProjectClosing()) {
             return;
         }
-
         File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
             assemblyController.openProject(file);
         }
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName();
+		
+		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
+		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())
+		{
+			// show relevant pane for new project
+			viskitApplicationFrame.displaySimulationRunTab();
+		}
     }
 
     @Override
     public void closeProject()
 	{
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) // check if already closed
 		{
 			genericReport (JOptionPane.INFORMATION_MESSAGE, "No project is open", "No project needs to be closed");
 		}
 		else
 		{
 			AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
-			assemblyController.handleProjectClosing();
+			if (assemblyController.handleProjectClosing())
+			{		
+				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+			}
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName(); // reset title

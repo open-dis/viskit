@@ -131,12 +131,14 @@ public class EventArgumentDialog extends JDialog {
             nameField.setText(eventArgument.getName());
             parameterTypeCombo.setSelectedItem(eventArgument.getType());
             descriptionField.setText(eventArgument.getDescription());
+            descriptionField.setToolTipText(eventArgument.getDescription());
         } 
 		else
 		{
             nameField.setText("");
             parameterTypeCombo.setSelectedIndex(-1);
             descriptionField.setText("");
+            descriptionField.setToolTipText("");
         }
     }
 

@@ -137,9 +137,11 @@ public class ParameterDialog extends JDialog {
             parameterNameField.setText(parameter.getName());
             parameterTypeCombo.setSelectedItem(parameter.getType());
             descriptionField.setText(parameter.getDescription());
+            descriptionField.setToolTipText(parameter.getDescription());
         } else {
             parameterNameField.setText("param_" + count++);
             descriptionField.setText("");
+            descriptionField.setToolTipText("");
         }
     }
 

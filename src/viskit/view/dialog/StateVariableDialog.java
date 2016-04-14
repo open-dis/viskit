@@ -61,13 +61,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("name");
-        JLabel initLab = new JLabel("initial value");
-        JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
+        JLabel           nameLabel = new JLabel("name");
+        JLabel inititialValueLabel = new JLabel("initial value");
+        JLabel           typeLabel = new JLabel("type");
+        JLabel    descriptionLabel = new JLabel("description");
         arrSizeLab = new JLabel("array size");
 
-        int w = OneLinePanel.maxWidth(new JComponent[] {nameLab, initLab, typeLab, commLab});
+        int w = OneLinePanel.maxWidth(new JComponent[] {nameLabel, inititialValueLabel, typeLabel, descriptionLabel});
 
         stateVariableNameField = new JTextField(15);
         stateVariableNameField.addFocusListener(focusListener);
@@ -84,10 +84,10 @@ public class StateVariableDialog extends ViskitSmallDialog {
         arraySizeField = new JTextField(15);
         arraySizeField.addFocusListener(focusListener);
 
-        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVariableNameField));
-        fieldsPanel.add(new OneLinePanel(typeLab, w, stateVariableTypeCombo));
+        fieldsPanel.add(new OneLinePanel(nameLabel, w, stateVariableNameField));
+        fieldsPanel.add(new OneLinePanel(typeLabel, w, stateVariableTypeCombo));
         fieldsPanel.add(new OneLinePanel(arrSizeLab, w, arraySizeField));
-        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
@@ -174,14 +174,16 @@ public class StateVariableDialog extends ViskitSmallDialog {
             stateVariableTypeCombo.setSelectedItem(stripArraySize(type));
             arraySizeField.setText(getArraySize(type));
             descriptionField.setText(stateVariable.getDescription());
+            descriptionField.setToolTipText(stateVariable.getDescription());
             isArray = ViskitGlobals.instance().isArray(stateVariable.getType());
         } 
 		else 
 		{
-            stateVariableNameField.setText(((EventGraphModel) ViskitGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
+            stateVariableNameField.setText(((EventGraphModel) ViskitGlobals.instance().getEventGraphViewFrame().getModel()).generateStateVariableName()); //"state_"+count++);
             type = (String) stateVariableTypeCombo.getSelectedItem();
             isArray = ViskitGlobals.instance().isArray(type);
             descriptionField.setText("");
+            descriptionField.setToolTipText("");
             arraySizeField.setText("");
         }
         toggleArraySizeFields(isArray);

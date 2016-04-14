@@ -114,6 +114,8 @@ public class ViskitApplicationFrame extends JFrame {
 	
 	private JMenu    fileMenu, projectsMenu, eventGraphFileMenu, eventGraphEditMenu, assemblyFileMenu, assemblyEditMenu, assemblyRunMenu, analystReportMenu, helpMenu;
 
+	private RecentProjectFileSetListener recentProjectFileSetListener;
+	
     public ViskitApplicationFrame(String initialFile)
 	{
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME); // default title
@@ -319,10 +321,12 @@ public class ViskitApplicationFrame extends JFrame {
         fileMenu.add(quitMenuItem); // TODO omit hotkey
         jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
 
-        // Now that we have an assemblyFrame reference, set the recent open project's file listener for the eventGraphFrame
-        RecentProjectFileSetListener listener = assemblyEditViewFrame.getRecentProjectFileSetListener();
-        listener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectsMenu());
-
+        // Now that we have an assemblyEditViewFrame reference, set the recent open project's file listener for the eventGraphFrame
+        if (recentProjectFileSetListener == null) // remember rather than re-instantiate
+		{
+			recentProjectFileSetListener = assemblyEditViewFrame.getRecentProjectFileSetListener();
+			recentProjectFileSetListener.addMenuItem(eventGraphViewFrame.getOpenRecentProjectsMenu());
+		}
 		
         // Now setup the assembly and event graph file change listener(s)
           assemblyController.addAssemblyFileListener  (assemblyController.getAssemblyChangeListener());
@@ -426,7 +430,7 @@ public class ViskitApplicationFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            EventGraphModel[] eventGraphModels = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
+            EventGraphModel[] eventGraphModels = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
             EventGraphModel dirtyEventGraphModel = null;
 
             // Make sure we save modified EGs if we wander off to the Assembly tab
@@ -452,7 +456,7 @@ public class ViskitApplicationFrame extends JFrame {
 			
 			if (i == tabIndices[TAB_EVENTGRAPH_EDITOR])
 			{
-				boolean showingEventGraph = ViskitGlobals.instance().getEventGraphEditor().hasActiveEventGraph();
+				boolean showingEventGraph = ViskitGlobals.instance().getEventGraphViewFrame().hasActiveEventGraph();
 			
 //				eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
 				eventGraphEditMenu.setEnabled(showingEventGraph);
@@ -477,7 +481,7 @@ public class ViskitApplicationFrame extends JFrame {
             }
 			else // Assembly Edit
 			{
-				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly();
+				boolean showingAssembly = ViskitGlobals.instance().getAssemblyEditViewFrame().hasActiveAssembly();
 			
 //				assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
                 mainTabbedPane.setToolTipTextAt(tabIndices[TAB_SIMULATION_RUN], "First select Assembly Initialization button from Assembly tab"); // TODO fix
@@ -499,8 +503,8 @@ public class ViskitApplicationFrame extends JFrame {
     }
 	public void buildMenus ()
 	{
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // refresh to keep current
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // refresh to keep current
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();
 	}
 
     /**
@@ -580,8 +584,7 @@ public class ViskitApplicationFrame extends JFrame {
             SystemExitHandler defaultHandler = ViskitGlobals.instance().getSystemExitHandler();
             ViskitGlobals.instance().setSystemExitHandler(nullSystemExitHandler);
 
-            // Tell Visit to not recompile open Event Graphss from any remaining open Assemblies
-			// when we perform a Viskit exit
+            // Tell Viskit to not recompile open Event Graphs from any remaining open Assemblies when we perform a Viskit exit
             ViskitGlobals.instance().getAssemblyController().setCloseAll(true);
 
             outer:
@@ -838,9 +841,12 @@ public class ViskitApplicationFrame extends JFrame {
 	{
         String title = " " + ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME + ": ";
 		if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
-			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().isEmpty())
-			 title += ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME;
-		else 
+			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() ||
+			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+		{
+			title = ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME; // no project is open
+		}
+		else // project is open
 		{
 			title += ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
 			// ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);

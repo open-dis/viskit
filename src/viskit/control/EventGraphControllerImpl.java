@@ -99,8 +99,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void newProject()
 	{
         ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();   // reset
     }
 
     @Override
@@ -217,9 +217,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (files == null) {
             return;
         }
-        for (File file : files) {
-            if (file != null) {
-				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
+        for (File file : files)
+		{
+            if (file != null)
+			{
+				if (file.getName().startsWith("."))
+				{
+					break; // skip hidden files
+				}
+				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
 				{
 					_doOpen(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
@@ -239,7 +245,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			}
         }
 		updateEventGraphFileLists ();
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -254,7 +260,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         EventGraphModelImpl model = new EventGraphModelImpl(this);
         model.initialize();
         eventGraphView.addTab(model);
-        ViskitGlobals.instance().getEventGraphEditor().getSelectedPane().setToolTipText(model.getMetadata().description);
+        ViskitGlobals.instance().getEventGraphViewFrame().getSelectedPane().setToolTipText(model.getMetadata().description);
 
         EventGraphModel[] openAlready = eventGraphView.getOpenModels();
         boolean isOpenAlready = false;
@@ -289,7 +295,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         resetRedoUndoStatus();
-        ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // refresh
+        ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // refresh
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
@@ -468,7 +474,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         recentEventGraphFileSet.clear();
         notifyRecentFileListeners();
         saveEventGraphHistoryXML(recentEventGraphFileSet);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -546,7 +552,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             setModel((mvcModel) eventGraphModel);
             close();
         }
-		// included in close(): ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		// included in close(): ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
     public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -557,7 +563,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             postClose();
         }
 //		updateEventGraphFileLists (); // save for next time
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -669,7 +675,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated.  model.isDirty will be set from
             // this call.
-            ViskitGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
+            ViskitGlobals.instance().getAssemblyEditViewFrame().addEventGraphsToLegoTree(f, false);
         }
 
         // Don't watch a an XML file whose source couldn't be compiled correctly
@@ -1041,7 +1047,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (source != null && source.length() > 0) {
             String className = eventGraphModel.getMetadata().packageName + "." +
                     eventGraphModel.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyEditViewFrame().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
@@ -1053,7 +1059,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        ViskitGlobals.instance().getAssemblyEditor().displayXML(((EventGraphModel) getModel()).getCurrentFile());
+        ViskitGlobals.instance().getAssemblyEditViewFrame().displayXML(((EventGraphModel) getModel()).getCurrentFile());
     }
 
     @Override

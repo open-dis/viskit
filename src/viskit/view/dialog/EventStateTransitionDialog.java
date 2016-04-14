@@ -217,7 +217,7 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nm = ViskitGlobals.instance().getEventGraphEditor().addStateVariableDialog();
+                String nm = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
                 if (nm != null) {
                     stateVariablesCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
                     for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {

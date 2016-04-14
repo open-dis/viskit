@@ -489,7 +489,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
                 saveChooser.setDialogTitle("Save Assembly Output");
             }
-            File fil = ViskitGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
+            File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
             int retv = saveChooser.showSaveDialog(null);
@@ -685,7 +685,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         public void actionPerformed(ActionEvent e)
 		{
 			ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab();
-            int returnValue = ViskitGlobals.instance().getAssemblyEditor().genericAskYN("Are you sure?", "Do you really want to clear the Simulation Run output?");
+            int returnValue = ViskitGlobals.instance().getAssemblyEditViewFrame().genericAskYN("Are you sure?", "Do you really want to clear the Simulation Run output?");
             if (returnValue == JOptionPane.OK_OPTION)
 			{
 				simulationRunPanel.simulationOutputTA.setText("");

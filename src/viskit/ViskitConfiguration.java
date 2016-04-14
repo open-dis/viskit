@@ -249,8 +249,15 @@ public class ViskitConfiguration {
     /** Used to clear all Viskit Configuration information to create a new
      * Viskit Project
      */
-    public void clearViskitConfiguration() {
-        setValue(ViskitConfiguration.PROJECT_PATH_KEY, "");
+    public void clearViskitConfiguration()
+	{
+		String projectHomeDirectory = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY);
+		if (!projectHomeDirectory.isEmpty())
+		{
+			File parentFile = new File (projectHomeDirectory);
+			setValue(ViskitConfiguration.PROJECT_PATH_KEY,  parentFile.getParent()); // remember something, current parent is good
+		}
+		else setValue(ViskitConfiguration.PROJECT_PATH_KEY, "");
         setValue(ViskitConfiguration.PROJECT_NAME_KEY, "");
         getViskitApplicationXMLConfiguration().clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
         getViskitApplicationXMLConfiguration().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);

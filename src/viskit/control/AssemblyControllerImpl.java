@@ -60,6 +60,7 @@ import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.SimulationRunPanel;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.AssemblyView;
+import viskit.view.ViskitApplicationFrame;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -223,7 +224,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			}
         }
 //		updateAssemblyFileLists(); // update file lists
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     private void _doOpen(File file) {
@@ -235,7 +236,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
         mod.initialize();
         vaw.addTab(mod);
-        ViskitGlobals.instance().getAssemblyEditor().getSelectedPane().setToolTipText(mod.getMetadata().description);
+        ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(mod.getMetadata().description);
 
         // these may initialize to null on startup, check
         // before doing any openAlready lookups
@@ -272,7 +273,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         resetRedoUndoStatus();
-        ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // refresh
+        ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // refresh
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
@@ -303,7 +304,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void openRecentAssembly(File path) {
         _doOpen(path);
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     /** Tell the Assembly File listener our new name
@@ -509,7 +510,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (assemblyModel == null) {return;}
         GraphMetadata graphMetadata = assemblyModel.getMetadata();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), graphMetadata);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditViewFrame(), graphMetadata);
         if (modified) {
             ((AssemblyModel) getModel()).setMetadata(graphMetadata);
 
@@ -585,8 +586,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -677,6 +678,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
             String message = "Are you sure you want to close your current Viskit Project?";
             String title   = "Close Current Project";
+			if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+				title += ": " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
             int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
             if (responseValue == JOptionPane.YES_OPTION) {
                 doProjectCleanup();
@@ -706,8 +709,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectFileSet(projectDirectory);
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus();   // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();   // reset
+		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
+		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())
+			 viskitApplicationFrame.displayAssemblyEditorTab(); // select relevant tab
     }
 
     public final static String NEWASSEMBLY_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -820,7 +826,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			setCloseAll(true);
             close();
         }
-		// included in close(): ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		// included in close(): ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
         setCloseAll(false);
     }
 
@@ -832,7 +838,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             postClose();
         }
 //		updateAssemblyFileLists(); // save for next time
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -2022,7 +2028,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
             }
 			ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab(); // ensure correct context when building menus
-			ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+			ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -2155,7 +2161,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         recentAssemblyFileSet.clear();
         notifyRecentAssemblyFileListeners();
         saveAssemblyHistoryXML(recentAssemblyFileSet);
-		ViskitGlobals.instance().getAssemblyEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     @Override
@@ -2178,7 +2184,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         recentProjectFileSet.clear();
         saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjectFileListeners();
-		ViskitGlobals.instance().getEventGraphEditor().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
     @Override

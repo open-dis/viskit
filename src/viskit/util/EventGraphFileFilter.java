@@ -85,7 +85,8 @@ public final class EventGraphFileFilter extends FileFilter {
     public EventGraphFileFilter(String[] contents) {
         this.contents = contents;
         int ix = 0;
-        for (String s : contents) {
+        for (String s : contents)
+		{
             contents[ix] = s.toLowerCase();
             ix++;
         }
@@ -102,20 +103,30 @@ public final class EventGraphFileFilter extends FileFilter {
      */
     @Override
     public boolean accept(File f) {
-        if (f.isDirectory()) {return true;}
-        boolean retVal = false;
+        if (f.isDirectory()) 
+		{
+			return true;
+		}
+		if (f.getName().startsWith("."))
+		{
+			return false; // no hidden files
+		}
+        boolean returnValue = false;
         String fileName = f.getName();
         for (String s : contents) {
-            retVal = !fileName.toLowerCase().contains(s);
-            if (!retVal) {
+            returnValue = !fileName.toLowerCase().contains(s);
+            if (!returnValue) {
                 break;
             }
         }
-        return retVal;
+        return returnValue;
     }
 
     /** @return a fileview description of the filter */
     @Override
-    public String getDescription() {return "EventGraph XML Files Only";}
+    public String getDescription() 
+	{
+		return "EventGraph XML Files Only";
+	}
 
 } // end class file EventGraphFileFilter.java

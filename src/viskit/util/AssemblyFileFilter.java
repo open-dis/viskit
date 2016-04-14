@@ -94,12 +94,15 @@ public final class AssemblyFileFilter extends FileFilter {
         if (f.isDirectory()) {
             return !f.getName().contains("svn");
         }
+		if (f.getName().startsWith("."))
+			return false; // no hidden files
         return f.getName().toLowerCase().contains(contains);
     }
 
     /** @return a fileview description of the filter */
     @Override
-    public String getDescription() {
+    public String getDescription() 
+	{
         return "Viskit Assembly XML Files Only";
     }
 

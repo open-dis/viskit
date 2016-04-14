@@ -362,13 +362,13 @@ public class SimulationRunPanel extends JPanel {
 	{
 		boolean ready = false;
 		String initializationMessage;
-		if      (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
+		if      (ViskitGlobals.instance().getAssemblyEditViewFrame().hasActiveAssembly() && !ViskitGlobals.instance().getAssemblyController().isAssemblyReady())
 		{
 			initializationMessage = "**********************************************************************************" + lineEnd +
                                     "* Not ready! Initialize the selected Assembly before using Simulation Run panel. *" + lineEnd +
                                     "**********************************************************************************" + lineEnd;
 		}
-		else if (ViskitGlobals.instance().getAssemblyEditor().hasActiveAssembly())
+		else if (ViskitGlobals.instance().getAssemblyEditViewFrame().hasActiveAssembly())
 		{
 			initializationMessage = "Simulation output stream";
 			if ((fullTitle != null) && !fullTitle.isEmpty())

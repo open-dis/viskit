@@ -146,12 +146,14 @@ public class LocalVariableDialog extends JDialog {
                     nameField.setText(eventLocalVariable.getName());
             initialValueField.setText(eventLocalVariable.getValue());
              descriptionField.setText(eventLocalVariable.getDescription());
+             descriptionField.setToolTipText(eventLocalVariable.getDescription());
                  typeComboBox.setSelectedItem(eventLocalVariable.getType());
         } 
 		else
 		{
             nameField.setText("eventLocalVariable name");
             descriptionField.setText("description here");
+            descriptionField.setToolTipText("description here");
         }
     }
 

@@ -192,7 +192,6 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 		if ((projectDirectory.exists() && projectDirectory.isDirectory()))  // extra safety check
 		{
   			ViskitStatics.setViskitProjectDirectory(projectDirectory);
-			ViskitGlobals.instance().initializeProjectHomeDirectory();
 // TODO
 //            AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 //            assemblyController.openProject(projectDirectory);

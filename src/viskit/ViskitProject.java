@@ -63,7 +63,7 @@ public class ViskitProject {
      * home will be the user's working directory where Viskit is installed.
      */
     public static final String DEFAULT_VISKIT_PROJECTS_DIR =
-            System.getProperty("user.home").replaceAll("\\\\", "/") + "/MyViskitProjects";
+            System.getProperty("user.home").replaceAll("\\\\", "/") + "/.viskit/MyViskitProjects";
 
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
@@ -224,7 +224,14 @@ public class ViskitProject {
 	
 	public String getProjectName ()
 	{
-		return projectRoot.getName();
+		return projectName;
+	}
+
+	/**
+	 * @param newProjectName the projectName to set
+	 */
+	public void setProjectName(String newProjectName) {
+		this.projectName = newProjectName;
 	}
 
     private Document createProjectDocument() {
@@ -761,6 +768,9 @@ public class ViskitProject {
                     // so, don't show this directory as a potential Viskit project
                     if (dir.getName().equals(VISKIT_CONFIGURATION_SUBDIR)) {
                         return false;
+                    }
+					if (name.startsWith(".")) {
+                        return false; // no hidden files
                     }
 
                     // Be brutally specific to reduce looking for any *.xml

@@ -140,7 +140,7 @@ public class ViskitGlobals {
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
-    public AssemblyEditViewFrame getAssemblyEditor() {
+    public AssemblyEditViewFrame getAssemblyEditViewFrame() {
         return (AssemblyEditViewFrame) assemblyEditViewFrame;
     }
 
@@ -194,7 +194,7 @@ public class ViskitGlobals {
     EventGraphViewFrame      eventGraphViewFrame;
     EventGraphControllerImpl eventGraphController;
 
-    public EventGraphViewFrame getEventGraphEditor() {
+    public EventGraphViewFrame getEventGraphViewFrame() {
         return eventGraphViewFrame;
     }
 
@@ -512,9 +512,12 @@ public class ViskitGlobals {
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
         String projectHomeDirectory = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
         LOG.debug(projectHomeDirectory);
-        if (projectHomeDirectory.isEmpty() || !(new File(projectHomeDirectory).exists())) {
+        if (projectHomeDirectory.isEmpty() || !(new File(projectHomeDirectory).exists()))
+		{
             ViskitProjectButtonPanel.showDialog();
-        } else {
+        } 
+		else
+		{
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHomeDirectory;
         }
     }

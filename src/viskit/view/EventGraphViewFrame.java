@@ -592,8 +592,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     public boolean hasOpenAssemblies() {
 		return (ViskitGlobals.instance() != null) &&
-			   (ViskitGlobals.instance().getAssemblyEditor() != null) &&
-			   (ViskitGlobals.instance().getAssemblyEditor().hasOpenAssemblies());
+			   (ViskitGlobals.instance().getAssemblyEditViewFrame() != null) &&
+			   (ViskitGlobals.instance().getAssemblyEditViewFrame().hasOpenAssemblies());
     }
 
     public boolean hasActiveAssembly() {
@@ -678,9 +678,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 openRecentEventGraphMenu.add(new JSeparator());
                 Action clearMenuItemAction = new ParameterizedEventGraphAction("clear"); // TODO
                 clearMenuItemAction.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem menuItem = new JMenuItem(clearMenuItemAction);
-                menuItem.setToolTipText("Clear this list");
-                openRecentEventGraphMenu.add(menuItem);
+                JMenuItem clearRecentEventGraphMenuItem = new JMenuItem(clearMenuItemAction);
+                clearRecentEventGraphMenuItem.setToolTipText("Clear this list");
+                openRecentEventGraphMenu.add(clearRecentEventGraphMenuItem);
             }
         }
     }
@@ -769,7 +769,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 		if (assemblyController != null)
 			assemblyController.updateProjectFileLists();
-		openRecentProjectsMenu.setEnabled(true); // TODO openRecentProjectsMenu.getItemCount() > 0);
+		openRecentProjectsMenu.setEnabled(openRecentProjectsMenu.getItemCount() > 0);
 		projectsMenu.add(openRecentProjectsMenu);
 
 		boolean eventGraphVisible = hasOpenEventGraphs() && ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected();
@@ -806,7 +806,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
-		openRecentEventGraphMenu.setEnabled(true); // TODO eventGraphController.getRecentEventGraphFileSet().size() > 0);
+		openRecentEventGraphMenu.setEnabled(eventGraphController.getRecentEventGraphFileSet().size() > 0);
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
 		
@@ -1302,7 +1302,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
     }
-    private JFileChooser jfc;
+    private JFileChooser eventGraphFileChooser;
 
     private JFileChooser buildOpenSaveChooser() {
 
@@ -1315,19 +1315,22 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public File[] openFilesAsk() {
-        jfc = buildOpenSaveChooser();
-        jfc.setDialogTitle("Open Event Graph File(s)");
+    public File[] openFilesAsk()
+	{
+        eventGraphFileChooser = buildOpenSaveChooser();
+        eventGraphFileChooser.setDialogTitle("Open Event Graph File(s)");
 
         // Bug fix: 1246
-        jfc.addChoosableFileFilter(new EventGraphFileFilter(
+        eventGraphFileChooser.addChoosableFileFilter(new EventGraphFileFilter(
                 new String[] {"assembly", "smal", "x3d", "x3dv", "java", "class"}));
 
         // Bug fix: 1249
-        jfc.setMultiSelectionEnabled(true);
+        eventGraphFileChooser.setMultiSelectionEnabled(true);
+		eventGraphFileChooser.setFileHidingEnabled(true);
+		eventGraphFileChooser.setAcceptAllFileFilterUsed(false);
 
-        int retv = jfc.showOpenDialog(this);
-        return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
+        int retv = eventGraphFileChooser.showOpenDialog(this);
+        return (retv == JFileChooser.APPROVE_OPTION) ? eventGraphFileChooser.getSelectedFiles() : null;
     }
 
     /** Open an already existing Viskit Project.  Called via reflection from
@@ -1335,14 +1338,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      */
     public void openProject ()
 	{
-        ViskitGlobals.instance().getAssemblyEditor().openProject();
+        ViskitGlobals.instance().getAssemblyEditViewFrame().openProject();
     }
 
     /** Close the current project.
      */
     public void closeProject ()
 	{
-        ViskitGlobals.instance().getAssemblyEditor().closeProject();
+        ViskitGlobals.instance().getAssemblyEditViewFrame().closeProject();
     }
 	
     /** Edit current project settings.
@@ -1408,10 +1411,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle) {
-        if (jfc == null) {
-            jfc = buildOpenSaveChooser();
+        if (eventGraphFileChooser == null) {
+            eventGraphFileChooser = buildOpenSaveChooser();
         }
-        jfc.setDialogTitle(dialogTitle);
+        eventGraphFileChooser.setDialogTitle(dialogTitle);
 
         File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggestedName);
         if (!file.getParentFile().isDirectory()) {
@@ -1421,20 +1424,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             file = getUniqueName(suggestedName, file.getParentFile());
         }
 
-        jfc.setSelectedFile(file);
-        int retv = jfc.showSaveDialog(this);
+        eventGraphFileChooser.setSelectedFile(file);
+        int retv = eventGraphFileChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
-            if (jfc.getSelectedFile().exists()) {
+            if (eventGraphFileChooser.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
-            return jfc.getSelectedFile();
+            return eventGraphFileChooser.getSelectedFile();
         }
 
         // We canceled
         deleteCanceledSave(file.getParentFile());
-        jfc = null;
+        eventGraphFileChooser = null;
         return null;
     }
 
@@ -1443,12 +1446,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * @param file to candidate EG file
      */
     private void deleteCanceledSave(File file) {
-        ViskitGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
+        ViskitGlobals.instance().getAssemblyEditViewFrame().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        return ViskitGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
+        return ViskitGlobals.instance().getAssemblyEditViewFrame().openRecentFilesAsk(lis);
     }
 
     @Override
@@ -1480,17 +1483,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public int genericAsk(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditViewFrame().genericAsk(title, msg);
     }
 
     @Override
     public int genericAskYN(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditViewFrame().genericAskYN(title, msg);
     }
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        ViskitGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
+        ViskitGlobals.instance().getAssemblyEditViewFrame().genericReport(type, title, msg);
     }
 
     @Override

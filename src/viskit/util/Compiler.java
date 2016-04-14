@@ -119,7 +119,7 @@ public class Compiler {
                                 + "java.exe first in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
-                ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                ViskitGlobals.instance().getAssemblyEditViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                         "Incorrect Path", msg);
 
                 log.error(msg);

@@ -52,8 +52,8 @@ import viskit.ViskitConfiguration;
  */
 public class XMLValidationTool {
 
-    public static final String ASSEMBLY_SCHEMA = "http://diana.nps.edu/Simkit/assembly.xsd";
-    public static final String EVENT_GRAPH_SCHEMA = "http://diana.nps.edu/Simkit/simkit.xsd";
+    public static final String ASSEMBLY_SCHEMA = "http://eos.nps.edu/Simkit/assembly.xsd";
+    public static final String EVENT_GRAPH_SCHEMA = "http://eos.nps.edu/Simkit/simkit.xsd";
 
     /** The locally resolved location for assembly.xsd */
     public static final String LOCAL_ASSEMBLY_SCHEMA =
