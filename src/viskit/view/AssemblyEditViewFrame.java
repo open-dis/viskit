@@ -428,9 +428,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.add(saveAssemblyDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
+		// TODO icon
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PREPARESIMULATIONRUN_METHOD, "Initialization for Simulation Run", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), assemblyVisible));
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.EDITGRAPHMETADATA_METHOD,    "Edit Assembly Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), assemblyVisible));
-        editMenu.addSeparator();
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PREPARESIMULATIONRUN_METHOD, "Initialize Assembly", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), assemblyVisible));
 
         // Create a new menu bar and add the created menus
 		if (myMenuBar == null)
@@ -571,7 +571,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		// right aligned
 		JLabel initializeLabel = new JLabel("<html><p align='center'>Assembly Initialization<br /> for Simulation Run </p></html>");
 		initializeLabel.setHorizontalAlignment(JLabel.RIGHT);
-		String initializeHint = "Prepare selected Assembly for Simulation Run";
+		String initializeHint = "Prepare selected Assembly for Simulation Run (Alt-C)";
                         initializeLabel.setToolTipText(initializeHint);
         compileInitializeAssemblyButton.setToolTipText(initializeHint);
         getToolBar().add(initializeLabel);
