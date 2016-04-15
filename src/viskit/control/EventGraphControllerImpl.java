@@ -634,16 +634,16 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void saveAs () // name must match preceding string value
 	{
-        EventGraphModel mod = (EventGraphModel) getModel();
-        EventGraphView view = (EventGraphView) getView();
-        GraphMetadata gmd = mod.getMetadata();
+        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphView  eventGraphView  = (EventGraphView) getView();
+        GraphMetadata   graphMetadata   =  eventGraphModel.getMetadata();
 
         // Allow the user to type specific package names
-        String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false, "Save Event Graph File As");
+        String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
+        File saveFile = eventGraphView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false, "Save Event Graph File As");
 
         if (saveFile != null) {
-            File localLastFile = mod.getCurrentFile();
+            File localLastFile = eventGraphModel.getCurrentFile();
             if (localLastFile != null) {
                 fileWatchClose(localLastFile);
             }
@@ -652,11 +652,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
-            gmd.name = n;
-            view.setSelectedEventGraphName(gmd.name);
-            mod.setMetadata(gmd); // might have renamed
+            graphMetadata.name = n;
+            eventGraphView.setSelectedEventGraphName(graphMetadata.name);
+            eventGraphModel.setMetadata(graphMetadata); // might have renamed
 
-            handleCompileAndSave(mod, saveFile);
+            handleCompileAndSave(eventGraphModel, saveFile);
             adjustRecentEventGraphFileSet(saveFile);
             markEventGraphFilesAsOpened();
         }
@@ -719,7 +719,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWSTATEVARIABLE_METHOD = "newStateVariable"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newStateVariable() 
+    public void newStateVariable() // name must match preceding string value
 	{
         ((EventGraphView) getView()).addStateVariableDialog();
     }
@@ -1134,21 +1134,20 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    public final static String EDITGRAPHMETADATA_METHOD = "editGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
+    public final static String EDIT_EVENT_GRAPH_METADATA_METHOD = "editEventGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editGraphMetadata () // name must match preceding string value
+    public void editEventGraphMetadata () // name must match preceding string value
 	{
-        EventGraphModel mod = (EventGraphModel) getModel();
-        if (mod == null) {return;}
-        GraphMetadata gmd = mod.getMetadata();
-        boolean modified =
-                EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
+        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        if (eventGraphModel == null) {return;}
+        GraphMetadata graphMetadata = eventGraphModel.getMetadata();
+        boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
-            ((EventGraphModel) getModel()).setMetadata(gmd);
+            ((EventGraphModel) getModel()).setMetadata(graphMetadata);
 
             // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
+            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
         }
     }
 

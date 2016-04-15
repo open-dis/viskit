@@ -267,12 +267,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetadata gmd = mod.getMetadata();
-            if (gmd != null) {
-                setSelectedAssemblyName   (gmd.name);
-				setSelectedAssemblyTooltip(gmd.description);
+            GraphMetadata graphMetadata = mod.getMetadata();
+            if (graphMetadata != null) {
+                setSelectedAssemblyName   (graphMetadata.name);
+				setSelectedAssemblyTooltip(graphMetadata.description);
             } else if (viskit.ViskitStatics.debug) {
-                System.err.println("error: AssemblyViewFrame gmd null..");
+                System.err.println("error: AssemblyViewFrame graphMetadata null..");
             }
         }
     }
@@ -1119,8 +1119,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		}
     }
 
+	public final static String CLOSE_PROJECT_METHOD = "closeProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeProject()
+    public void closeProject() // name must match preceding string value
 	{
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) // check if already closed
 		{

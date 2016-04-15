@@ -234,8 +234,11 @@ public class ViskitProject {
 		this.projectName = newProjectName;
 	}
 
-    private Document createProjectDocument() {
+    private Document createProjectDocument()
+	{
         Document document = new Document();
+		
+		// TODO assign DTD and/or Schema
 
         Element root = new Element(VISKIT_ROOT_NAME);
         root.setAttribute("name", projectRoot.getName());
@@ -276,7 +279,8 @@ public class ViskitProject {
         return document;
     }
 
-    private void writeProjectFile() {
+    private void writeProjectFile()
+	{
         FileOutputStream fileOutputStream = null;
         try {
             XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());

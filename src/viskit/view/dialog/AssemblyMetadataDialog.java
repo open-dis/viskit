@@ -18,11 +18,11 @@ public class AssemblyMetadataDialog extends MetadataDialog {
 
     private static MetadataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata gmd) {
+    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) {
         if (dialog == null) {
-            dialog = new AssemblyMetadataDialog(f, gmd);
+            dialog = new AssemblyMetadataDialog(f, graphMetadata);
         } else {
-            dialog.setGraphMetadata(f, gmd);
+            dialog.setGraphMetadata(f, graphMetadata);
         }
 
         dialog.setVisible(true);
@@ -30,7 +30,7 @@ public class AssemblyMetadataDialog extends MetadataDialog {
         return modified;
     }
 
-    AssemblyMetadataDialog(JFrame f, GraphMetadata gmd) {
-        super(f, gmd, "Assembly Properties");
+    AssemblyMetadataDialog(JFrame f, GraphMetadata graphMetadata) {
+        super(f, graphMetadata, "Assembly Properties");
     }
 }

@@ -573,26 +573,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return retn;
     }
 
+    public final static String NEWPROJECT_METHOD = "newProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newProject()
+    public void newProject() // name must match preceding string value
 	{
-        if (handleProjectClosing()) {
+        if (handleProjectClosing()) // if a project is currently open, first ask and then perform project closing before continuing
+		{
             ViskitGlobals.instance().initializeProjectHomeDirectory();
             ViskitGlobals.instance().createWorkDirectory();
 
-            // For a brand new empty project open a default EG
+            // For a brand new empty project open a default Event Graph
             File[] eventGraphFileArray = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
             if (eventGraphFileArray.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
+    public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void zipAndMailProject() {
-
+    public void zipAndMailProject() // name must match preceding string value
+	{
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
             File projectDirectory;
@@ -667,9 +670,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssyView and this AssyController
+    /** Common method between the AssemblyView and this AssemblyyController
      *
-     * @return indication of continue or cancel
+     * @return indication of continue (true) or cancel (false)
      */
     public boolean handleProjectClosing()
 	{
@@ -759,7 +762,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
 
             // TODO: Implement this
-//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
+//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(graphMetadata.description);
         } 
 		else 
 		{
@@ -1333,8 +1336,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() {
-
+    public void undo() // name must match preceding string value
+	{
         isUndo = true;
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();

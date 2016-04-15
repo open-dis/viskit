@@ -42,7 +42,7 @@ public class GraphMetadata {
                extendsPackageName = tmp.getExtend();
             implementsPackageName = tmp.getImplement();
         } 
-		else
+		else if (caller instanceof EventGraphModelImpl)
 		{
             name = "NewEventGraph";
             viskit.xsd.bindings.eventgraph.ObjectFactory objectFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
@@ -50,19 +50,26 @@ public class GraphMetadata {
                  extendsPackageName = tempSimEntity.getExtend();
               implementsPackageName = tempSimEntity.getImplement();
         }
+		else // project TODO verify OK
+		{
+            name = "NewProject";
+				        packageName = "";
+                 extendsPackageName = "";
+              implementsPackageName = "";
+        }
 		if (description == null) // when not defined in XML
 		{
 			 description = new String(); // keep empty since legacy Comment information may get added
 		}
     }
 
-    public GraphMetadata(String n, String p, String a, String v, String e, String i, String d) {
-        name                  = n;
-        packageName           = p;
-        author                = a;
-        version               = v;
-        extendsPackageName    = e;
-        implementsPackageName = i;
-		description           = d;
+    public GraphMetadata(String name, String packageName, String author, String version, String extendsPackageName, String implementsPackageName, String description) {
+        this.name                  = name;
+        this.packageName           = packageName;
+        this.author                = author;
+        this.version               = version;
+        this.extendsPackageName    = extendsPackageName;
+        this.implementsPackageName = implementsPackageName;
+		this.description           = description;
     }
 }
