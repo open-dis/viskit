@@ -116,8 +116,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void begin() {
-
+    public void begin()
+	{
         // The initialFilePath is set if we have stated a file "arg" upon startup
         // from the command line
         if (initialFilePath != null) {
@@ -127,7 +127,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		else 
 		{
             List<File> openAssemblyFileList = getOpenAssemblyFileList(false);
-            LOG.debug("Inside begin() and openAssemblyFileList.size()=" + openAssemblyFileList.size());
+//            LOG.debug("Inside begin() and openAssemblyFileList.size()=" + openAssemblyFileList.size());
 
             for (File f : openAssemblyFileList)
 			{
@@ -196,7 +196,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open () // name must match preceding string value
+    public void open () // method name must exactly match preceding string value
 	{
         File[] files = ((AssemblyView) getView()).openFilesAsk();
         if (files == null) {
@@ -464,7 +464,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String SAVE_METHOD = "save"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void save () // name must match preceding string value 
+    public void save () // method name must exactly match preceding string value 
 	{
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod.getLastFile() == null) {
@@ -476,7 +476,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String SAVEAS_METHOD = "saveAs"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void saveAs () // name must match preceding string value
+    public void saveAs () // method name must exactly match preceding string value
 	{
         AssemblyModel model         = (AssemblyModel) getModel();
         AssemblyView  view          = (AssemblyView) getView();
@@ -504,7 +504,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String EDITGRAPHMETADATA_METHOD = "editGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editGraphMetadata () // name must match preceding string value
+    public void editGraphMetadata () // method name must exactly match preceding string value
 	{
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null) {return;}
@@ -575,7 +575,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWPROJECT_METHOD = "newProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newProject() // name must match preceding string value
+    public void newProject() // method name must exactly match preceding string value
 	{
         if (handleProjectClosing()) // if a project is currently open, first ask and then perform project closing before continuing
 		{
@@ -594,7 +594,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void zipAndMailProject() // name must match preceding string value
+    public void zipAndMailProject() // method name must exactly match preceding string value
 	{
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
@@ -672,11 +672,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Common method between the AssemblyView and this AssemblyyController
      *
-     * @return indication of continue (true) or cancel (false)
+     * @return indication to continue (true) or cancel (false)
      */
-    public boolean handleProjectClosing()
+    public boolean handleProjectClosing ()
 	{
         boolean returnValue = true;
+		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
+			return true;
         if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
             String message = "Are you sure you want to close your current Viskit Project?";
@@ -721,7 +723,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWASSEMBLY_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newAssembly () // name must match preceding string value
+    public void newAssembly () // method name must exactly match preceding string value
 	{
         // Don't allow a new assembly to be created if a current project is  not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
@@ -821,7 +823,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String CLOSEALL_METHOD = "closeAll"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeAll () // name must match preceding string value
+    public void closeAll () // method name must exactly match preceding string value
 	{
         AssemblyModel[] assemblyModelArray = ((AssemblyView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel assemblyModel : assemblyModelArray) {
@@ -835,7 +837,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void close () // name must match preceding string value
+    public void close () // method name must exactly match preceding string value
 	{
         if (preClose()) {
             postClose();
@@ -898,7 +900,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraphNode() // name must match preceding string value
+    public void newEventGraphNode() // method name must exactly match preceding string value
     {
         Object o = ((AssemblyView) getView()).getSelectedEventGraph();
 
@@ -930,7 +932,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWPCLNODE_METHOD = "newPropertyChangeListenerNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newPropertyChangeListenerNode () // name must match preceding string value
+    public void newPropertyChangeListenerNode () // method name must exactly match preceding string value
     {
         Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
 
@@ -1195,7 +1197,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove() // name must match preceding string value
+    public void remove() // method name must exactly match preceding string value
 	{
         if (!selectionVector.isEmpty()) {
             // first ask:
@@ -1223,7 +1225,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	 * Not supported
 	 */
     @Override
-    public void cut() // name must match preceding string value
+    public void cut() // method name must exactly match preceding string value
     {
         // Not supported
     }
@@ -1231,7 +1233,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public final static String COPY_METHOD = "copy"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
     @SuppressWarnings("unchecked")
-    public void copy() // name must match preceding string value
+    public void copy() // method name must exactly match preceding string value
 	{
         if (selectionVector.isEmpty()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -1254,7 +1256,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste() // name must match preceding string value
+    public void paste() // method name must exactly match preceding string value
     {
         if (copyVector.isEmpty()) {
             return;
@@ -1336,7 +1338,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() // name must match preceding string value
+    public void undo() // method name must exactly match preceding string value
 	{
         isUndo = true;
 
@@ -1370,7 +1372,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo () // name must match preceding string value
+    public void redo () // method name must exactly match preceding string value
 	{
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
@@ -1422,7 +1424,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String SHOWXML_METHOD = "showXML"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void showXML () // name must match preceding string value
+    public void showXML () // method name must exactly match preceding string value
 	{
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
@@ -1449,7 +1451,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource() // name must match preceding string value
+    public void generateJavaSource() // method name must exactly match preceding string value
 	{
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
@@ -1636,7 +1638,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             try {
                 if (fw != null)
                     fw.close();
-            } catch (IOException e) {}
+            } 
+			catch (IOException e) {}
         }
         return null;
     }
@@ -1718,7 +1721,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 packageName = sa[1];
             }
             File f = compileJavaClassFromString(sourceCode);
-            if (f != null) {
+            if (f != null)
+			{
                 return new PackageAndFile(packageName, f);
             }
         }
@@ -1769,7 +1773,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String PREPARESIMULATIONRUN_METHOD = "compileAssemblyAndPrepareSimulationRunner"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void compileAssemblyAndPrepareSimulationRunner () // name must match preceding string value
+    public void compileAssemblyAndPrepareSimulationRunner () // method name must exactly match preceding string value
 	{
 
         // Prevent multiple pushes of the initialize Simulation Run button
@@ -1906,7 +1910,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void windowImageCapture () // name must match preceding string value
+    public void windowImageCapture () // method name must exactly match preceding string value
 	{
         AssemblyModel vmod = (AssemblyModel) getModel();
         String fileName = "AssemblyDiagram"; // default, replaced by filename
@@ -2098,7 +2102,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			initializeHistoryXMLConfiguration();
 		}
         List<String> assemblyFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
-        LOG.debug("recordAssemblyFiles() assemblyFilePathList.size()=" + assemblyFilePathList.size());
+//        LOG.debug("recordAssemblyFiles() assemblyFilePathList.size()=" + assemblyFilePathList.size());
         int index = 0;
         for (String assemblyFilePath : assemblyFilePathList)
 		{

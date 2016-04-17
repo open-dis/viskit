@@ -85,7 +85,7 @@ public class LocalBootLoader extends URLClassLoader {
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
-    URL[] extUrls;
+    URL[] externalClasspathUrls;
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
 
@@ -96,7 +96,7 @@ public class LocalBootLoader extends URLClassLoader {
      */
     public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[] {}, parent);
-        extUrls = classes;
+        externalClasspathUrls = classes;
         this.workDir = workDir;
         LogUtils.getLogger(LocalBootLoader.class).debug(ViskitGlobals.instance().printCallerLog());
     }
@@ -116,55 +116,58 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** @return a custom ClassLoader */
-    public LocalBootLoader init() {
+    public LocalBootLoader init()
+	{
         File jar = null;
 
         // Capture the current runtime classpath
         initStage1();
 
         stage1.allowAssembly = this.allowAssembly;
-
+		
         // Now add any external classpaths
-        for (URL ext : extUrls) {
+        if (externalClasspathUrls != null)
+		{
+			for (URL ext : externalClasspathUrls)
+			{
+				// Can happen if a path is present in the viskitProject.xml, but the
+				// jar was removed from where is was supposed to be
+				if (ext == null) {continue;}
 
-            // Can happen if a path is present in the viskitProject.xml, but the
-            // jar was removed from where is was supposed to be
-            if (ext == null) {continue;}
+				stage1.addURL(ext);
+				String[] tmp = new String[getClassPath().length + 1];
+				System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+				try {
+					tmp[tmp.length - 1] = ext.toURI().getPath();
+					classPath = tmp;
+				} catch (URISyntaxException ex) {
+					LOG.error(ex);
+				}
+			}
 
-            stage1.addURL(ext);
-            String[] tmp = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
-            try {
-                tmp[tmp.length - 1] = ext.toURI().getPath();
-                classPath = tmp;
-            } catch (URISyntaxException ex) {
-                LOG.error(ex);
-            }
-        }
+			// TODO: Clearly, adding build/classes to the classpath violates the
+			// dirty assembly in the classpath issue that we were attempting to
+			// mitigate with the buildCleanWorkJar call below, but something doesn't
+			// go quite right if we are building a project from scratch  where
+			// we have no build/classes compiled, and/or have no cached EGs in the
+			// viskitProject.xml.  So, leaving commeted out for now and will need
+			// to reopen this issue when we need strict design points for DOE.
 
-        // TODO: Clearly, adding build/classes to the classpath violates the
-        // dirty assembly in the classpath issue that we were attempting to
-        // mitigate with the buildCleanWorkJar call below, but something doesn't
-        // go quite right if we are building a project from scratch  where
-        // we have no build/classes compiled, and/or have no cached EGs in the
-        // viskitProject.xml.  So, leaving commeted out for now and will need
-        // to reopen this issue when we need strict design points for DOE.
-
-        // Now add our project's working directory, i.e. build/classes
-        try {
-
-            stage1.addURL(getWorkDir().toURI().toURL());
-            String[] tmp = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
-            try {
-                tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
-                classPath = tmp;
-            } catch (IOException ex) {
-                LOG.error(ex);
-            }
-        } catch (MalformedURLException ex) {
-            LOG.error(ex);
-        }
+			// Now add our project's working directory, i.e. build/classes
+			try {
+				stage1.addURL(getWorkDir().toURI().toURL());
+				String[] tmp = new String[getClassPath().length + 1];
+				System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+				try {
+					tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
+					classPath = tmp;
+				} catch (IOException ex) {
+					LOG.error(ex);
+				}
+			} catch (MalformedURLException ex) {
+				LOG.error(ex);
+			}
+		}
 
 //        jar = buildCleanWorkJar(); // See TODO note above
 
@@ -218,8 +221,8 @@ public class LocalBootLoader extends URLClassLoader {
      * Convenience method for the DOE local driver
      * @return a URL[] of External ClassPath paths
      */
-    public URL[] getExtUrls() {
-        return extUrls;
+    public URL[] getExternalClasspathUrls() {
+        return externalClasspathUrls;
     }
 
     /** @return a custom classpath String [] */

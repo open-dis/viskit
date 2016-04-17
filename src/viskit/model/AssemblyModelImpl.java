@@ -125,7 +125,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 }
 
                 GraphMetadata myMetadata = new GraphMetadata(this);
-                myMetadata.version       = jaxbSimkitAssembly.getVersion();
+                myMetadata.revision       = jaxbSimkitAssembly.getVersion();
                 myMetadata.name          = jaxbSimkitAssembly.getName();
                 myMetadata.packageName   = jaxbSimkitAssembly.getPackage();
                 myMetadata.description   = jaxbSimkitAssembly.getDescription(); // TODO salvage Comment entries in older versions
@@ -204,7 +204,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
             jaxbSimkitAssembly.setName(nullIfEmpty(graphMetadata.name));
-            jaxbSimkitAssembly.setVersion(nullIfEmpty(graphMetadata.version));
+            jaxbSimkitAssembly.setVersion(nullIfEmpty(graphMetadata.revision));
             jaxbSimkitAssembly.setPackage(nullIfEmpty(graphMetadata.packageName));
             jaxbSimkitAssembly.setDescription(nullIfEmpty(graphMetadata.description));
 

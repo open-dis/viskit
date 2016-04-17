@@ -24,19 +24,20 @@ abstract public class MetadataDialog extends JDialog {
 
     protected static boolean modified = false;
     protected JComponent runtimePanel;
-    private JButton cancelButton;
-    private JButton okButton;
-    GraphMetadata graphMetadata;
-    JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
-    JTextField stopTimeTf;
-    JCheckBox verboseCb;
-    JTextArea descriptionTextArea;
+    private   JButton    cancelButton;
+    private   JButton    okButton;
+    private   GraphMetadata graphMetadata;
+    private   JTextField nameTf, packageTf, authorTf, revisionTf, extendsTf, implementsTf;
+    private   JTextField stopTimeTf;
+    private   JCheckBox  verboseCb;
+    private   JTextArea  descriptionTextArea;
 
     public MetadataDialog(JFrame f, GraphMetadata graphMetadata) {
         this(f, graphMetadata, "Event Graph Properties");
     }
 
-    public MetadataDialog(JFrame f, GraphMetadata graphMetadata, String title) {
+    public MetadataDialog(JFrame f, GraphMetadata graphMetadata, String title)
+	{
         super(f, title, true);
         this.graphMetadata = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -51,18 +52,11 @@ abstract public class MetadataDialog extends JDialog {
         JPanel textFieldPanel = new JPanel(new SpringLayout());
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        JLabel nameLabel = new JLabel("name", JLabel.TRAILING);
+        JLabel nameLabel = new JLabel(graphMetadata.getLabel() + " " + "name", JLabel.TRAILING);
         nameTf = new JTextField(20);
         nameLabel.setLabelFor(nameTf);
         textFieldPanel.add(nameLabel);
         textFieldPanel.add(nameTf);
-
-        JLabel packageLabel = new JLabel("package", JLabel.TRAILING);
-        packageTf = new JTextField(20);
-        packageTf.setToolTipText("Use standard Java dot notation for package naming");
-        packageLabel.setLabelFor(packageTf);
-        textFieldPanel.add(packageLabel);
-        textFieldPanel.add(packageTf);
 
         JLabel authorLabel = new JLabel("author", JLabel.TRAILING);
         authorTf = new JTextField(20);
@@ -70,27 +64,49 @@ abstract public class MetadataDialog extends JDialog {
         textFieldPanel.add(authorLabel);
         textFieldPanel.add(authorTf);
 
-        JLabel verssionLabel = new JLabel("version", JLabel.TRAILING);
-        versionTf = new JTextField(20);
-        verssionLabel.setLabelFor(versionTf);
-        textFieldPanel.add(verssionLabel);
-        textFieldPanel.add(versionTf);
+        JLabel versionLabel = new JLabel("revision", JLabel.TRAILING);
+        revisionTf = new JTextField(20);
+        versionLabel.setLabelFor(revisionTf);
+        textFieldPanel.add(versionLabel);
+        textFieldPanel.add(revisionTf);
+		
+		int rowCount = 3;
 
-        JLabel extendsLabel = new JLabel("extends", JLabel.TRAILING);
-        extendsTf = new JTextField(20);
-        extendsLabel.setLabelFor(extendsTf);
-        textFieldPanel.add(extendsLabel);
-        textFieldPanel.add(extendsTf);
+		if (!graphMetadata.isProject())
+		{
+			JLabel packageLabel = new JLabel("package", JLabel.TRAILING);
+			packageTf = new JTextField(20);
+			String packageTooltip = "Use standard Java dot notation for package naming";
+			packageLabel.setToolTipText(packageTooltip);
+			   packageTf.setToolTipText(packageTooltip);
+			packageLabel.setLabelFor(packageTf);
+			textFieldPanel.add(packageLabel);
+			textFieldPanel.add(packageTf);
+		
+			JLabel extendsLabel = new JLabel("extends", JLabel.TRAILING);
+			extendsTf = new JTextField(20);
+			extendsLabel.setLabelFor(extendsTf);
+			String extendsTooltip = "Name of inherited parent Java class";
+			extendsLabel.setToolTipText(extendsTooltip);
+			   extendsTf.setToolTipText(extendsTooltip);
+			textFieldPanel.add(extendsLabel);
+			textFieldPanel.add(extendsTf);
 
-        JLabel implementsLabel = new JLabel("implements", JLabel.TRAILING);
-        implementsTf = new JTextField(20);
-        implementsLabel.setLabelFor(implementsTf);
-        textFieldPanel.add(implementsLabel);
-        textFieldPanel.add(implementsTf);
-
-        // Lay out the panel.
+			JLabel implementsLabel = new JLabel("implements", JLabel.TRAILING);
+			implementsTf = new JTextField(20);
+			String implementsTooltip = "Names of implemented Java interfaces (comma separated)";
+			implementsLabel.setToolTipText(implementsTooltip);
+			   implementsTf.setToolTipText(implementsTooltip);
+			implementsLabel.setLabelFor(implementsTf);
+			textFieldPanel.add(implementsLabel);
+			textFieldPanel.add(implementsTf);
+			
+			rowCount = 6;
+		}
+		
+        // Lay out the panel
         SpringUtilities.makeCompactGrid(textFieldPanel,
-                6, 2,   //rows, cols
+                rowCount, 2,   //rows, cols
                 0, 0,   //initX, initY
                 6, 6);  //xPad, yPad
 
@@ -121,7 +137,7 @@ abstract public class MetadataDialog extends JDialog {
 
         metaDataDialogPanel.add(runtimePanel);
 
-        JLabel descriptionLabel = new JLabel("Description");
+        JLabel descriptionLabel = new JLabel("description");
         descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         metaDataDialogPanel.add(descriptionLabel);
         metaDataDialogPanel.add(Box.createVerticalStrut(5));
@@ -158,8 +174,6 @@ abstract public class MetadataDialog extends JDialog {
 
     public final void setGraphMetadata(Component c, GraphMetadata graphMetadata) 
 	{
-        graphMetadata = graphMetadata;
-
         fillWidgets();
 
         modified = (graphMetadata == null);
@@ -173,18 +187,23 @@ abstract public class MetadataDialog extends JDialog {
             graphMetadata = new GraphMetadata();
         }
                      nameTf.setText(graphMetadata.name);
-                  packageTf.setText(graphMetadata.packageName);
                    authorTf.setText(graphMetadata.author);
-                  versionTf.setText(graphMetadata.version);
+                 revisionTf.setText(graphMetadata.revision);
         descriptionTextArea.setText(graphMetadata.description);
-                  extendsTf.setText(graphMetadata.extendsPackageName);
-               implementsTf.setText(graphMetadata.implementsPackageName);
                  stopTimeTf.setText(graphMetadata.stopTime);
                   verboseCb.setSelected(graphMetadata.verbose);
                      nameTf.selectAll();
+					 
+		if (!graphMetadata.isProject())
+		{
+                  packageTf.setText(graphMetadata.packageName);
+                  extendsTf.setText(graphMetadata.extendsPackageName);
+               implementsTf.setText(graphMetadata.implementsPackageName);
+		}
     }
 
-    private void unloadWidgets() {
+    private void unloadWidgets() 
+	{
         graphMetadata.author = authorTf.getText().trim();
         graphMetadata.description = descriptionTextArea.getText().trim();
 
@@ -197,13 +216,21 @@ abstract public class MetadataDialog extends JDialog {
                 graphMetadata.name = nameTf.getText().trim() + "Assembly";
             else
                 graphMetadata.name = nameTf.getText().trim();
-        } else {
+        } 
+		else
+		{
             graphMetadata.name = nameTf.getText().trim();
         }
-        graphMetadata.packageName = packageTf.getText().trim();
-        graphMetadata.version = versionTf.getText().trim();
-        graphMetadata.extendsPackageName = extendsTf.getText().trim();
-        graphMetadata.implementsPackageName = implementsTf.getText().trim();
+        graphMetadata.author      =            authorTf.getText().trim();
+        graphMetadata.revision    =          revisionTf.getText().trim();
+        graphMetadata.description = descriptionTextArea.getText().trim();
+		
+		if (!graphMetadata.isProject())
+		{
+			graphMetadata.packageName = packageTf.getText().trim();
+			graphMetadata.extendsPackageName = extendsTf.getText().trim();
+			graphMetadata.implementsPackageName = implementsTf.getText().trim();
+		}
         graphMetadata.stopTime = stopTimeTf.getText().trim();
         graphMetadata.verbose = verboseCb.isSelected();
     }

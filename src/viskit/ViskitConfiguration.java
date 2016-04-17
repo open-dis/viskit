@@ -44,8 +44,11 @@ public class ViskitConfiguration {
     public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP  = GUI_BEANSHELL_ERROR_DIALOG + ".preferencestooltip";
     public static final String BEANSHELL_WARNING      = "app.beanshell.warning";
     public static final String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
-    public static final String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
-    public static final String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
+    public static final String PROJECT_PATH_KEY     = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
+    public static final String PROJECT_NAME_KEY     = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
+    public static final String PROJECT_AUTHOR_KEY   = PROJECT_HOME_CLEAR_KEY + ".author[@value]";
+    public static final String PROJECT_REVISION_KEY = PROJECT_HOME_CLEAR_KEY + ".revision[@value]";
+    public static final String PROJECT_DESCRIPTION_KEY = PROJECT_HOME_CLEAR_KEY + ".description[@value]";
     public static final String EXTRA_CLASSPATHS_CLEAR_KEY = "extraClassPaths";
     public static final String EXTRA_CLASSPATHS_PATH_KEY = EXTRA_CLASSPATHS_CLEAR_KEY + ".path";
     public static final String EXTRA_CLASSPATHS_KEY      = EXTRA_CLASSPATHS_PATH_KEY  + "[@value]";
@@ -91,7 +94,7 @@ public class ViskitConfiguration {
 
     static {
         LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
-        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " " + VISKIT_CONFIG_DIR.exists() + "\n");
+        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " (exists=" + VISKIT_CONFIG_DIR.exists() + ")\n");
     }
 
     public static synchronized ViskitConfiguration instance() {
@@ -150,28 +153,30 @@ public class ViskitConfiguration {
             defaultConfigurationBuilder = new DefaultConfigurationBuilder();
             defaultConfigurationBuilder.setFile(V_CONFIG_FILE);
             try {
-                combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true);
-            } catch (ConfigurationException e) {
+                combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true); // TODO silence unhelpful verbose output
+            }
+			catch (ConfigurationException e)
+			{
                 LOG.error(e);
             }
 
             // Save off the individual XML configurations for each prefix so we can write back
             int numberOfConfigurations = combinedConfiguration.getNumberOfConfigurations();
-            for (int i = 0; i < numberOfConfigurations; i++) {
-                Object obj = combinedConfiguration.getConfiguration(i);
-                if (!(obj instanceof XMLConfiguration)) {
+            for (int i = 0; i < numberOfConfigurations; i++)
+			{
+                Configuration configuration = combinedConfiguration.getConfiguration(i);
+                if (!(configuration instanceof XMLConfiguration)) {
                     continue;
                 }
-                XMLConfiguration xc = (XMLConfiguration) obj;
-                xc.setAutoSave(true);
-                HierarchicalConfiguration.Node n = xc.getRoot();
-                for (Object o : n.getChildren()) {
-                    xmlConfigurations.put(((HierarchicalConfiguration.Node) o).getName(), xc);
+                XMLConfiguration xmlConfiguration = (XMLConfiguration) configuration;
+                xmlConfiguration.setAutoSave(true);
+                HierarchicalConfiguration.Node n = xmlConfiguration.getRoot();
+                for (Object childObject : n.getChildren()) {
+                    xmlConfigurations.put(((HierarchicalConfiguration.Node) childObject).getName(), xmlConfiguration);
                 }
             }
         } catch (Exception e) {
             LOG.error(e);
-//            e.printStackTrace();
         }
     }
 
@@ -259,6 +264,9 @@ public class ViskitConfiguration {
 		}
 		else setValue(ViskitConfiguration.PROJECT_PATH_KEY, "");
         setValue(ViskitConfiguration.PROJECT_NAME_KEY, "");
+        setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY, "");
+        setValue(ViskitConfiguration.PROJECT_REVISION_KEY, "");
+        setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "");
         getViskitApplicationXMLConfiguration().clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);
         getViskitApplicationXMLConfiguration().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
 

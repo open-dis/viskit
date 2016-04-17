@@ -38,6 +38,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
@@ -96,7 +98,11 @@ public class ViskitProject {
 
     static Logger log = LogUtils.getLogger(ViskitProject.class);
 
-	private String projectName = ""; // empty string if no project open
+	private String projectName        = ""; // empty string if no project open
+	private String projectAuthor      = "";
+	/** date or version number */
+	private String projectRevision    = "";
+	private String projectDescription = "";
     private File projectRoot;
     private File projectFile;
     private File analystReportsDirectory;
@@ -127,8 +133,8 @@ public class ViskitProject {
         setProjectRoot(projectRoot);
     }
 
-    public boolean initializeProject() {
-
+    public boolean initializeProject ()
+	{
         if (!projectRoot.exists()) {
              projectRoot.mkdir();
         }
@@ -204,16 +210,17 @@ public class ViskitProject {
 
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectRoot, PROJECT_FILE_NAME));
-        if (!projectFile.exists()) {
+        if (!projectFile.exists())
+		{
             try {
                 getProjectFile().createNewFile();
             } catch (IOException e) {
                 log.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
-            writeProjectFile();
+            saveProjectFile();
         } 
-		else
+		else // found file
 		{
             loadProjectFromFile(getProjectFile());
         }
@@ -221,27 +228,20 @@ public class ViskitProject {
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }
-	
-	public String getProjectName ()
-	{
-		return projectName;
-	}
 
-	/**
-	 * @param newProjectName the projectName to set
-	 */
-	public void setProjectName(String newProjectName) {
-		this.projectName = newProjectName;
-	}
-
-    private Document createProjectDocument()
+    private Document createProjectDocument ()
 	{
         Document document = new Document();
 		
 		// TODO assign DTD and/or Schema
 
         Element root = new Element(VISKIT_ROOT_NAME);
-        root.setAttribute("name", projectRoot.getName());
+        root.setAttribute("name",        projectRoot.getName());
+        root.setAttribute("author",      System.getProperty("user.name")); // TODO user preference, default author name
+
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+        root.setAttribute("revision",    simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
+        root.setAttribute("description", "");
         document.setRootElement(root);
 
         Element element = new Element(ANALYST_REPORTS_DIRECTORY_NAME);
@@ -279,7 +279,7 @@ public class ViskitProject {
         return document;
     }
 
-    private void writeProjectFile()
+    public void saveProjectFile ()
 	{
         FileOutputStream fileOutputStream = null;
         try {
@@ -303,26 +303,71 @@ public class ViskitProject {
      * Load a Visual Simkit (Viskit) project file
      * @param inputProjectFile a Viskit project file
      */
-    private void loadProjectFromFile(File inputProjectFile) {
+    private void loadProjectFromFile(File inputProjectFile)
+	{
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
-            projectDocument = saxBuilder.build(inputProjectFile);
-            Element root = projectDocument.getRootElement();
-            if (!root.getName().equals(VISKIT_ROOT_NAME)) {
+			try {
+				projectDocument = saxBuilder.build(inputProjectFile);
+			}
+			catch (JDOMException | IOException e)
+			{
                 projectDocument = null;
-                throw new IllegalArgumentException("Not a Viskit Project File");
+				log.error(e);
+				String errorMessage = inputProjectFile.getAbsolutePath() + " is not a valid Viskit Project File";
+				log.error(errorMessage);
+                throw new IllegalArgumentException(errorMessage);
+			}
+            Element root = projectDocument.getRootElement();
+            if ((root == null) || !root.getName().equals(VISKIT_ROOT_NAME))
+			{
+                projectDocument = null;
+				String errorMessage = inputProjectFile.getAbsolutePath() + " is not a valid Viskit Project File, bad root element";
+				log.error(errorMessage);
+                throw new IllegalArgumentException(errorMessage);
             }
             projectFileExists = true;
-			projectName = root.getAttribute("name").getValue();
-        } catch (JDOMException | IOException ex) {
+			
+			// load and/or set project properties
+			if (root.getAttribute("name") != null)
+				projectName = root.getAttribute("name").getValue();
+			else 
+			{
+				projectName = "";
+				projectDocument.getRootElement().setAttribute("name", projectName);
+			}
+			if (root.getAttribute("author") != null)
+				projectAuthor = root.getAttribute("author").getValue();
+			else 
+			{
+				projectAuthor = "";
+				projectDocument.getRootElement().setAttribute("author", projectAuthor);
+			}
+			if (root.getAttribute("revision") != null)
+				projectRevision = root.getAttribute("revision").getValue();
+			else 
+			{
+				projectRevision = "";
+				projectDocument.getRootElement().setAttribute("revision", projectRevision);
+			}
+			if (root.getAttribute("description") != null)
+				projectDescription = root.getAttribute("description").getValue();
+			else 
+			{
+				projectDescription = "";
+				projectDocument.getRootElement().setAttribute("description", projectDescription);
+			}
+        }
+		catch (Exception ex)
+		{
             log.error(ex);
             throw new RuntimeException(ex);
         }
     }
 
     /** @return an array of a project's external resources */
-    public String[] getProjectContents() {
-
+    public String[] getProjectContents()
+	{
         // Prevent duplicate entries
         Set<String> cp = new HashSet<>();
 
@@ -400,8 +445,11 @@ public class ViskitProject {
         viskitConfiguration.cleanup();
         viskitConfiguration.removeProjectXMLConfiguration(viskitConfiguration.getProjectXMLConfiguration());
         setProjectOpen(false);
-		projectName = "";
-		ViskitGlobals.instance().getViskitApplicationFrame().setTitle(projectName);
+		projectName        = "";
+		projectAuthor      = "";
+		projectRevision    = "";
+		projectDescription = "";
+		ViskitGlobals.instance().getViskitApplicationFrame().setTitle(projectName); // update
     }
 
     /** @return the root directory of this ViskitProject */
@@ -733,6 +781,64 @@ public class ViskitProject {
     public void setAnalystReportStatisticsDir(File analystReportStatisticsDir) {
         this.analystReportStatisticsDir = analystReportStatisticsDir;
     }
+	
+	public String getProjectName ()
+	{
+		return projectName;
+	}
+
+	/**
+	 * @param newProjectName the projectName to set
+	 */
+	public void setProjectName(String newProjectName) { // TODO check impact on file naming
+		this.projectName = newProjectName;
+		projectDocument.getRootElement().setAttribute("name", projectName);
+	}
+
+	/**
+	 * @return the projectAuthor
+	 */
+	public String getProjectAuthor() {
+		return projectAuthor;
+	}
+
+	/**
+	 * @param projectAuthor the projectAuthor to set
+	 */
+	public void setProjectAuthor(String projectAuthor) {
+		this.projectAuthor = projectAuthor;
+		projectDocument.getRootElement().setAttribute("author", projectAuthor);
+	}
+
+	/**
+	 * @return the projectRevision
+	 */
+	public String getProjectRevision() {
+		return projectRevision;
+	}
+
+	/**
+	 * @param projectRevision the projectRevision to set
+	 */
+	public void setProjectRevision(String projectRevision) {
+		this.projectRevision = projectRevision;
+		projectDocument.getRootElement().setAttribute("revision", projectRevision);
+	}
+
+	/**
+	 * @return the projectDescription
+	 */
+	public String getProjectDescription() {
+		return projectDescription;
+	}
+
+	/**
+	 * @param projectDescription the projectDescription to set
+	 */
+	public void setProjectDescription(String projectDescription) {
+		this.projectDescription = projectDescription;
+		projectDocument.getRootElement().setAttribute("description", projectDescription);
+	}
 
     private static class ViskitProjectFileView extends FileView {
 

@@ -79,7 +79,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 _doOpen(f);
             }
 
-        } else
+        } 
+		else if (ViskitGlobals.instance().getCurrentViskitProject() != null) // project might not be open
 		{
             // For a brand new empty project open a default Event Graph
             File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
@@ -99,8 +100,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void newProject()
 	{
         ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();   // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset menus
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset menus
     }
 
     @Override
@@ -110,7 +111,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraph"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraph () // name must match preceding string value
+    public void newEventGraph () // method name must exactly match preceding string value
 	{
         // Don't allow a new event graph to be created if a current project is not open
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
@@ -210,7 +211,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open () // name must match preceding string value
+    public void open () // method name must exactly match preceding string value
 	{
         // Bug fix: 1249
         File[] files = ((EventGraphView) getView()).openFilesAsk();
@@ -545,7 +546,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String CLOSEALL_METHOD = "closeAll"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeAll () // name must match preceding string value
+    public void closeAll () // method name must exactly match preceding string value
 	{
         EventGraphModel[] openModels = ((EventGraphView) getView()).getOpenModels();
         for (EventGraphModel eventGraphModel : openModels) {
@@ -557,7 +558,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void close () // name must match preceding string value
+    public void close () // method name must exactly match preceding string value
 	{
         if (preClose()) {
             postClose();
@@ -619,7 +620,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String SAVE_METHOD = "save"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void save () // name must match preceding string value
+    public void save () // method name must exactly match preceding string value
 	{
         EventGraphModel mod = (EventGraphModel) getModel();
         File localLastFile = mod.getCurrentFile();
@@ -632,7 +633,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String SAVEAS_METHOD = "saveAs"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void saveAs () // name must match preceding string value
+    public void saveAs () // method name must exactly match preceding string value
 	{
         EventGraphModel eventGraphModel = (EventGraphModel) getModel();
         EventGraphView  eventGraphView  = (EventGraphView) getView();
@@ -686,7 +687,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWSIMPARAMETER_METHOD = "newSimParameter"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newSimParameter () // name must match preceding string value
+    public void newSimParameter () // method name must exactly match preceding string value
     {
         ((EventGraphView) getView()).addParameterDialog();
     }
@@ -719,7 +720,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWSTATEVARIABLE_METHOD = "newStateVariable"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newStateVariable() // name must match preceding string value
+    public void newStateVariable() // method name must exactly match preceding string value
 	{
         ((EventGraphView) getView()).addStateVariableDialog();
     }
@@ -781,7 +782,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove () // name must match preceding string value
+    public void remove () // method name must exactly match preceding string value
 	{
         if (!selectionVector.isEmpty()) {
             // first ask:
@@ -813,7 +814,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 	 * Not supported
 	 */
     @Override
-    public void cut() // name must match preceding string value
+    public void cut() // method name must exactly match preceding string value
     {
         // Not supported
     }
@@ -823,7 +824,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 	
     @Override
     @SuppressWarnings("unchecked")
-    public void copy() // name must match preceding string value
+    public void copy() // method name must exactly match preceding string value
     {
         if (!nodeSelected()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -845,7 +846,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste() // name must match preceding string value
+    public void paste() // method name must exactly match preceding string value
     {
         if (copyVector.isEmpty()) {
             return;
@@ -868,7 +869,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 	 * Permanently delete, or undo selected nodes and attached edges from the cache
 	 */
     @SuppressWarnings("unchecked")
-    private void delete() // name must match preceding string value
+    private void delete() // method name must exactly match preceding string value
 	{
         // Prevent concurrent modification
         Vector<Object> v = (Vector<Object>) selectionVector.clone();
@@ -920,7 +921,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() // name must match preceding string value
+    public void undo() // method name must exactly match preceding string value
 	{
 
         isUndo = true;
@@ -955,7 +956,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo() // name must match preceding string value
+    public void redo() // method name must exactly match preceding string value
 	{
         // Recreate the JAXB (XML) bindings since the paste function only does nodes and not edges
         if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
@@ -1022,7 +1023,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource () // name must match preceding string value
+    public void generateJavaSource () // method name must exactly match preceding string value
 	{
         EventGraphModel eventGraphModel = (EventGraphModel) getModel();
         if (eventGraphModel == null) {return;}
@@ -1053,7 +1054,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String SHOWXML_METHOD = "showXML"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void showXML () // name must match preceding string value
+    public void showXML () // method name must exactly match preceding string value
 	{
         if (!checkSave() || ((EventGraphModel) getModel()).getCurrentFile() == null) {
             return;
@@ -1073,7 +1074,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWEVENTNODE_METHOD = "newNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newNode () // name must match preceding string value
+    public void newNode () // method name must exactly match preceding string value
     {
         buildNewNode(new Point(100, 100)); // TODO avoid collision
     }
@@ -1110,7 +1111,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWSELFSCHEDULINGEDGE_METHOD = "newSelfSchedulingEdge"; // must match following method name.  not possible to accomplish this programmatically.
     /** Handles the menu selection for a new self-referential scheduling edge */
-    public void newSelfSchedulingEdge() // name must match preceding string value
+    public void newSelfSchedulingEdge() // method name must exactly match preceding string value
     {
         if (selectionVector != null) {
             for (Object o : selectionVector) {
@@ -1123,7 +1124,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String NEWSELFCANCELLINGEDGE_METHOD = "newSelfCancellingEdge"; // must match following method name.  not possible to accomplish this programmatically.
     /** Handles the menu selection for a new self-referential cancelling edge */
-    public void newSelfCancellingEdge() // name must match preceding string value
+    public void newSelfCancellingEdge() // method name must exactly match preceding string value
 	{
         if (selectionVector != null) {
             for (Object o : selectionVector) {
@@ -1136,7 +1137,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String EDIT_EVENT_GRAPH_METADATA_METHOD = "editEventGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editEventGraphMetadata () // name must match preceding string value
+    public void editEventGraphMetadata () // method name must exactly match preceding string value
 	{
         EventGraphModel eventGraphModel = (EventGraphModel) getModel();
         if (eventGraphModel == null) {return;}
@@ -1186,7 +1187,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void windowImageCapture () // name must match preceding string value
+    public void windowImageCapture () // method name must exactly match preceding string value
 	{
         String fileName = "EventGraphDiagram"; // default, replaced by filename
 

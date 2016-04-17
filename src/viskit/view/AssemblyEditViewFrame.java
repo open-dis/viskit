@@ -128,6 +128,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private int nextTabIndex = 0;
 	
     private JMenu assembliesMenu, editMenu, helpMenu;
+	private Help help;
 	
 	private AssemblyControllerImpl assemblyController;
     private int menuShortcutKeyMask;
@@ -176,8 +177,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         buildMenus();
         buildToolbar();
-       
-        buildTreePanels();  // Build here to prevent NPE from eventGraphController
+		
+		if (ViskitGlobals.instance().getCurrentViskitProject() != null)// viskit might open with no project
+			buildTreePanels();  // Build here to prevent NPE from eventGraphController
 
         // Set up a assemblyEditorContent level pane that will be the content pane. This
         // has a border layout, and contains the toolbar on the assemblyEditorContent and
@@ -350,7 +352,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     public void buildMenus() 
 	{
-		boolean assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
+		boolean assemblyVisible = false;
+		if (ViskitGlobals.instance() != null)// viskit might open with no project
+			assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
 		
         // Set up file menu
 		assembliesMenu.setEnabled(true); // always on
@@ -430,25 +434,32 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         editMenu.addSeparator();
 		// TODO icon
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PREPARESIMULATIONRUN_METHOD, "Initialization for Simulation Run", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), assemblyVisible));
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.EDITGRAPHMETADATA_METHOD,    "Edit Assembly Properties...", KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutKeyMask), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.EDITGRAPHMETADATA_METHOD,    "Edit Assembly Properties...", KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutKeyMask), assemblyVisible));
 
         // Create a new menu bar and add the created menus
 		if (myMenuBar == null)
 		{
-			Help help = ViskitGlobals.instance().getHelp();
-			helpMenu.setMnemonic(KeyEvent.VK_H);
-
-			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
-			helpMenu.add(buildMenuItem(help, "doSearch",   "Search", KeyEvent.VK_S, null, true));
-			helpMenu.addSeparator();
-
-			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
-			helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null, true));
-		
 			myMenuBar = new JMenuBar();
 			myMenuBar.add(assembliesMenu);
 			myMenuBar.add(editMenu);
-			myMenuBar.add(helpMenu);
+			
+			try 
+			{
+				help = ViskitGlobals.instance().getHelp();
+				helpMenu.setMnemonic(KeyEvent.VK_H);
+
+				helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
+				helpMenu.add(buildMenuItem(help, "doSearch",   "Search", KeyEvent.VK_S, null, true));
+				helpMenu.addSeparator();
+
+				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
+				helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null, true));
+				myMenuBar.add(helpMenu);
+			}
+			catch (Exception e)
+			{
+				LogUtils.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu, ignored");
+			}
 		}
     }
 
@@ -457,7 +468,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled)
+	{
         Action action = ActionIntrospector.getAction(source, method);
 
         Map<String, Object> map = new HashMap<>();
@@ -687,11 +699,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void addTab(AssemblyModel assemblyModel) {
+    public void addTab(AssemblyModel assemblyModel)
+	{
         vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
         VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.setjGraph(graphPane);                               // todo fix this
 
+		if (treePanels == null) // viskit opened with no active project
+			buildTreePanels();
         graphPane.assemblyModel = assemblyModel;
         graphPane.trees = treePanels;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -794,7 +809,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
-    public void rebuildLEGOTreePanels() {
+    public void rebuildLEGOTreePanels()
+	{
         legoTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentVgraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
@@ -803,8 +819,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
     private JSplitPane treePanels;
 
-    private JSplitPane buildTreePanels() {
-
+    private JSplitPane buildTreePanels()
+	{
         legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
@@ -820,7 +836,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 if (!file.exists()) {
 
                     // Allow a relative path for Diskit-Test (Diskit)
-                    if (path.contains("..")) {
+                    if (path.contains(".."))
+					{
                         file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
                     }
                 }
@@ -1101,8 +1118,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	{
         AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
 
-        if (!assemblyController.handleProjectClosing()) {
-            return;
+        if (!assemblyController.handleProjectClosing())
+		{
+            return; // decision to continue was false
         }
         File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
@@ -1121,8 +1139,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
 	public final static String CLOSE_PROJECT_METHOD = "closeProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeProject() // name must match preceding string value
+    public void closeProject () // method name must exactly match preceding string value
 	{
+		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
+			return; // no need to close project if none is active
+		
         if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) // check if already closed
 		{
 			genericReport (JOptionPane.INFORMATION_MESSAGE, "No project is open", "No project needs to be closed");

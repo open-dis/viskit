@@ -58,6 +58,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -114,6 +116,8 @@ public class ViskitGlobals {
 
     /** JavaHelp set for the main application */
     private Help help;
+	
+	private static String dateFormat = "dd MMMM yyyy";
 
     public static synchronized ViskitGlobals instance() {
         if (me == null) {
@@ -123,12 +127,14 @@ public class ViskitGlobals {
     }
 	/** Constructor for initialization
 	 */
-    private ViskitGlobals() {
+    private ViskitGlobals()
+	{
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myListener = new myTypeListener();
         buildTypePopup();
-        initializeProjectHomeDirectory();
-        createWorkDirectory();
+		// do not initialize a new project here, viskit might be loading without one
+//        initializeProjectHomeDirectory();
+//        createWorkDirectory();
     }
 
     /* routines to manage the singleton-aspect of the views. */
@@ -208,7 +214,8 @@ public class ViskitGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public mvcAbstractJFrameView buildEventGraphViewFrame() {
+    public mvcAbstractJFrameView buildEventGraphViewFrame()
+	{
         eventGraphController   = new EventGraphControllerImpl();
         eventGraphViewFrame    = new EventGraphViewFrame(eventGraphController);
         eventGraphController.setView(eventGraphViewFrame);
@@ -793,20 +800,25 @@ public class ViskitGlobals {
     public final void createWorkDirectory()
 	{
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
-        if (viskitConfiguration.getViskitApplicationXMLConfiguration() == null) {
+        if (viskitConfiguration.getViskitApplicationXMLConfiguration() == null)
+		{
             return;
         }
 
         String projectName = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
-        if ((projectName != null) && (!projectName.isEmpty())) {
+        if ((projectName != null) && (!projectName.isEmpty()))
+		{
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
         projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
         currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
-        if (currentViskitProject.initializeProject()) {
+        if (currentViskitProject.initializeProject())
+		{
             UserPreferencesDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
-        } else {
+        } 
+		else
+		{
             throw new RuntimeException("Unable to create project directory");
         }
         workDirectory = currentViskitProject.getClassesDirectory();
@@ -983,6 +995,20 @@ public class ViskitGlobals {
     public void setSystemExitCalled(boolean systemExitCalled) {
         this.systemExitCalled = systemExitCalled;
     }
+
+	/**
+	 * @return the dateFormat
+	 */
+	public static String getDateFormat() {
+		return dateFormat;
+	}
+
+	/**
+	 * @param newDateFormat the dateFormat to set
+	 */
+	public static void setDateFormat(String newDateFormat) {
+		dateFormat = newDateFormat;
+	}
 
     /**
      * Small class to hold on to the fully-qualified class name, while displaying only the

@@ -101,6 +101,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	private JMenu eventGraphsMenu     = new JMenu("Event Graphs");
 	private JMenu editMenu     = new JMenu(FRAME_DEFAULT_TITLE);
     private JMenu helpMenu     = new JMenu("Help");
+	private viskit.Help help;
 
     private final String  FULLPATH     = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
@@ -110,7 +111,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	
     private EventGraphControllerImpl eventGraphController;
     private int menuShortcutCtrlKeyMask;
-
+	
     /**
      * Constructor; lays out initial GUI objects
      * @param controller the controller for this frame (MVF)
@@ -759,9 +760,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		// ===================================================
         // Set up Projects menu
 
-		boolean isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
+		boolean isProjectOpen = false;
+		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
+			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
+		
         projectsMenu.add(buildMenuItem(eventGraphController, AssemblyControllerImpl.NEWPROJECT_METHOD, "New Viskit Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
-        projectsMenu.add(buildMenuItem(this, OPENPROJECT_METHOD, "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
+        
+		projectsMenu.add(buildMenuItem(this, OPENPROJECT_METHOD, "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
 		if (openRecentProjectsMenu == null) // don't wipe it out if already there!
 		{
 			openRecentProjectsMenu = buildMenu ("Recent Project");
@@ -780,27 +785,30 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
 		 // ensures selected before allowing deletion
         JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (eventGraphVisible && hasActiveEventGraph()));
-		deleteEventGraphFromProjectMI.setEnabled (false); // TODO
+		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteEventGraphFromProjectMI);
 
 		 // ensures selected before allowing deletion
         JMenuItem deleteAssemblyFromProjectMI = buildMenuItem(this, "deleteAssemblyFromProject", "Delete Assembly from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (assemblyVisible && hasActiveAssembly()));
-		deleteAssemblyFromProjectMI.setEnabled (false); // TODO
+		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
 		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
         JMenuItem renameProjectMI = buildMenuItem(this, "renameProject", "Rename Project",      KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK), isProjectOpen);
-		renameProjectMI.setEnabled (false); // TODO
+		renameProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(renameProjectMI);
 
-        JMenuItem projectSettingsMI = buildMenuItem(this, EDIT_PROJECT_PROPERTIES_METHOD, "Edit Project Properties",      KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), isProjectOpen);
-		projectSettingsMI.setEnabled (true);
+        JMenuItem projectSettingsMI = buildMenuItem(this, EDIT_PROJECT_PROPERTIES_METHOD, "Edit Project Properties",      KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_MASK), isProjectOpen);
+		projectSettingsMI.setEnabled (isProjectOpen);
 		projectsMenu.add(projectSettingsMI);
 		
         projectsMenu.addSeparator();
 		JMenuItem zipAndMailProjectMI = buildMenuItem(eventGraphController, AssemblyControllerImpl.ZIP_AND_MAIL_PROJECT_METHOD, "Zip and Mail Project File", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_MASK), true);
-        projectsMenu.add(zipAndMailProjectMI);
+        zipAndMailProjectMI.setEnabled (isProjectOpen);
+		projectsMenu.add(zipAndMailProjectMI);
+		
 		JMenuItem closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), isProjectOpen);
+		closeProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(closeProjectMI);
 		
 		// ===================================================
@@ -869,27 +877,34 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.EDIT_EVENT_GRAPH_METADATA_METHOD, "Edit Event Graph Properties...",KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.EDIT_EVENT_GRAPH_METADATA_METHOD, "Edit Event Graph Properties...",KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutCtrlKeyMask), eventGraphVisible));
 
 		// ===================================================
         // Create a new menu bar and add the created menus
 		if (myMenuBar == null)
 		{
-			Help help = new Help(this);
-			help.mainFrameLocated(this.getBounds());
-			ViskitGlobals.instance().setHelp(help);
-
-			helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
-			helpMenu.add(buildMenuItem(help, "doSearch",   "Search",   KeyEvent.VK_S, null, true));
-			helpMenu.addSeparator();
-
-			helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
-			helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
-		
 			myMenuBar = new JMenuBar();
 			myMenuBar.add(eventGraphsMenu);
 			myMenuBar.add(editMenu);
-			myMenuBar.add(helpMenu);
+			
+			try 
+			{
+				help = new viskit.Help(this);
+				help.mainFrameLocated(this.getBounds());
+				ViskitGlobals.instance().setHelp(help);
+
+				helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
+				helpMenu.add(buildMenuItem(help, "doSearch",   "Search",   KeyEvent.VK_S, null, true));
+				helpMenu.addSeparator();
+
+				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
+				helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
+				myMenuBar.add(helpMenu);
+			}
+			catch (Exception e)
+			{
+				LogUtils.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored");
+			}
 		}
     }
 
@@ -1341,7 +1356,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     /** Open an already existing Viskit Project.  Called via reflection from
      * the Actions library.
      */
-    public void openProject () // name must match preceding string value
+    public void openProject () // method name must exactly match preceding string value
 	{
         ViskitGlobals.instance().getAssemblyEditViewFrame().openProject();
     }
@@ -1356,26 +1371,34 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public final static String EDIT_PROJECT_PROPERTIES_METHOD = "editProjectProperties"; // must match following method name.  Not possible to accomplish this programmatically.
     /** Edit current project settings.
      */
-    public void editProjectProperties () // name must match preceding string value
+    public void editProjectProperties () // method name must exactly match preceding string value
 	{
-		System.out.println ("editProjectProperties");
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
 		
-        GraphMetadata graphMetadata = new GraphMetadata (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY), // name
-		                                                 "", // packageName
-		                                                 "", // author
-		                                                 "", // version
-		                                                 "", // extendsPackageName 
-		                                                 "", // implementsPackageName
-		                                                 viskitConfiguration.getValue(ViskitConfiguration.PROJECT_TITLE_NAME)); // description
+        GraphMetadata graphMetadata = new GraphMetadata (
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY), // name
+				"", // packageName
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY), // author
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY), // revision
+				"", // extendsPackageName 
+				"", // implementsPackageName
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY), // description
+				true); // isProject
 		
         boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata);
         if (modified)
 		{
-            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY, graphMetadata.name);
-//            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY, graphMetadata.author);
-//            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_VERSION_KEY, graphMetadata.version);
-            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_TITLE_NAME, graphMetadata.description);
+            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        graphMetadata.name);
+            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
+            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
+            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, graphMetadata.description);
+			
+			ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
+			viskitProject.setProjectName       (graphMetadata.name);
+			viskitProject.setProjectAuthor     (graphMetadata.author);
+			viskitProject.setProjectRevision   (graphMetadata.revision);
+			viskitProject.setProjectDescription(graphMetadata.description);
+			viskitProject.saveProjectFile (); // save immediately
         }
     }
 	

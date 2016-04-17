@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -905,7 +906,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
         setReportName("***ENTER REPORT TITLE HERE***");
         setClassification("***ENTER CLASSIFICATION HERE***");
         setAuthor("***ENTER THE NAME OF THE AUTHOR HERE***");
-        setDateOfReport(DateFormat.getInstance().format(new Date()));
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+        setDateOfReport(simpleDateFormat.format(new Date()));
 
         //Executive Summary values
         setExecutiveSummaryComments(true);

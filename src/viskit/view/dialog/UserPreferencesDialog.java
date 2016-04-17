@@ -107,7 +107,7 @@ public class UserPreferencesDialog extends JDialog {
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
-        initConfigs();
+        initializeConfigurations();
 
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -355,7 +355,8 @@ public class UserPreferencesDialog extends JDialog {
     private static XMLConfiguration     projectConfiguration;
     private static XMLConfiguration         guiConfiguration;
 
-    private static void initConfigs() {
+    private static void initializeConfigurations()
+	{
       applicationConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
           projectConfiguration = ViskitConfiguration.instance().getProjectXMLConfiguration();
               guiConfiguration = ViskitConfiguration.instance().getViskitGuiXMLConfiguration();
@@ -428,7 +429,7 @@ public class UserPreferencesDialog extends JDialog {
 
     private static void clearClassPathEntries() {
         // Always reinitialize the config instances.  We may have changed projects
-        initConfigs();
+        initializeConfigurations();
         projectConfiguration.clearTree(ViskitConfiguration.EXTRA_CLASSPATHS_CLEAR_KEY);
     }
 
@@ -678,11 +679,15 @@ public class UserPreferencesDialog extends JDialog {
     }
 
     /** @return a String array containing the extra classpaths to consider */
-    public static String[] getExtraClassPath() {
-        if ((applicationConfiguration == null) || (projectConfiguration == null)) {
-            initConfigs();
+    public static String[] getExtraClassPath()
+	{
+        if ((applicationConfiguration == null) || (projectConfiguration == null) || (guiConfiguration == null))
+		{
+            initializeConfigurations();
         }
-        return projectConfiguration.getStringArray(ViskitConfiguration.EXTRA_CLASSPATHS_KEY);
+		if (projectConfiguration == null) // no project during startup
+			 return null;
+		else return projectConfiguration.getStringArray(ViskitConfiguration.EXTRA_CLASSPATHS_KEY);
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */

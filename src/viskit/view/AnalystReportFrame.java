@@ -61,6 +61,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.apache.log4j.Logger;
+import viskit.ViskitGlobals;
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -95,8 +96,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     JTextField                titleTF = new JTextField();
     JTextField          analystNameTF = new JTextField();
     JComboBox<String> accessControlTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET"});
-	DateFormat             dateFormat = new SimpleDateFormat("dd MMMM yyyy");
-    JTextField                 dateTF = new JTextField(dateFormat.format(new Date()));
+    JTextField                 dateTF = new JTextField();
     File currentAssemblyFile;
 
     public AnalystReportFrame(mvcController controller)
@@ -106,6 +106,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
         buildMenus();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+		dateTF.setText(simpleDateFormat.format(new Date()));
 
         locationImageFileChooser = new JFileChooser("./images/");
 		locationImageFileChooser.setDialogTitle("Open Image");

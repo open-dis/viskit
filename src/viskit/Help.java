@@ -73,7 +73,8 @@ public class Help {
     /** Creates a new instance of Help
      * @param parent main frame to center on
      */
-    public Help(Component parent) {
+    public Help(Component parent)
+	{
         this.parent = parent;
 
         ClassLoader cl = viskit.Help.class.getClassLoader();

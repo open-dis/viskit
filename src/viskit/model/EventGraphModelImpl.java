@@ -127,7 +127,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
                 GraphMetadata newMetadata = new GraphMetadata(this);
                 newMetadata.author                = jaxbSimEntity.getAuthor();
-                newMetadata.version               = jaxbSimEntity.getVersion();
+                newMetadata.revision               = jaxbSimEntity.getVersion();
                 newMetadata.name                  = jaxbSimEntity.getName();
                 newMetadata.packageName           = jaxbSimEntity.getPackage();
                 newMetadata.extendsPackageName    = jaxbSimEntity.getExtend();
@@ -235,7 +235,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
             jaxbSimEntity.setName(nullIfEmpty(graphMetadata.name));
-            jaxbSimEntity.setVersion(nullIfEmpty(graphMetadata.version));
+            jaxbSimEntity.setVersion(nullIfEmpty(graphMetadata.revision));
             jaxbSimEntity.setAuthor(nullIfEmpty(graphMetadata.author));
             jaxbSimEntity.setPackage(nullIfEmpty(graphMetadata.packageName));
             jaxbSimEntity.setExtend(nullIfEmpty(graphMetadata.extendsPackageName));
