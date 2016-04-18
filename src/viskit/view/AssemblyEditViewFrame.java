@@ -838,7 +838,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                     // Allow a relative path for Diskit-Test (Diskit)
                     if (path.contains(".."))
 					{
-                        file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+                        file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getParent() + "/" + path.replaceFirst("../", ""));
                     }
                 }
 
@@ -1024,8 +1024,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void removeEventGraphFromLEGOTree(File f) {
-        legoTree.removeContentRoot(f);
+    public void removeEventGraphFromLEGOTree(File f)
+	{
+		if (legoTree != null)
+			legoTree.removeContentRoot(f);
     }
 
     // Not used
@@ -1118,9 +1120,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	{
         AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
 
-        if (!assemblyController.handleProjectClosing())
+        if (!assemblyController.confirmProjectClosing())
 		{
-            return; // decision to continue was false
+            return; // decision to continue was false, so do not open a new project
         }
         File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null) {
@@ -1151,7 +1153,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		else
 		{
 			AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) getController());
-			if (assemblyController.handleProjectClosing())
+			
+			if (assemblyController.confirmProjectClosing()) // user confirmation
 			{		
 				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
 			}

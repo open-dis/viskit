@@ -100,7 +100,7 @@ public class ViskitGlobals {
     private final myTypeListener myListener;
     private ViskitApplicationFrame mainApplicationWindow;
 
-    private ViskitProject currentViskitProject;
+    private static ViskitProject currentViskitProject;
 
     /** Need hold of the Enable analyst report checkbox */
     private SimulationRunPanel simulationRunPanel;
@@ -112,13 +112,14 @@ public class ViskitGlobals {
     private File workDirectory;
 
     /** The current project base directory */
-    private File projectsBaseDir;
+    private File projectsBaseDirectory;
 
     /** JavaHelp set for the main application */
     private Help help;
 	
 	private static String dateFormat = "dd MMMM yyyy";
 
+	/** Singleton pattern */
     public static synchronized ViskitGlobals instance() {
         if (me == null) {
             me = new ViskitGlobals();
@@ -526,7 +527,7 @@ public class ViskitGlobals {
 		else
 		{
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHomeDirectory;
-        }
+        }	
     }
 
     private Object instantiateType(String type) throws Exception {
@@ -810,12 +811,12 @@ public class ViskitGlobals {
 		{
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
-        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
+        projectsBaseDirectory = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        currentViskitProject  = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (currentViskitProject.initializeProject())
 		{
-            UserPreferencesDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
+            UserPreferencesDialog.saveExtraClassPathEntries(currentViskitProject.getProjectClasspathArray());
         } 
 		else
 		{
@@ -1008,6 +1009,13 @@ public class ViskitGlobals {
 	 */
 	public static void setDateFormat(String newDateFormat) {
 		dateFormat = newDateFormat;
+	}
+
+	/**
+	 * @param currentViskitProject the currentViskitProject to set
+	 */
+	public static void setCurrentViskitProject(ViskitProject newViskitProject) {
+		currentViskitProject = newViskitProject;
 	}
 
     /**

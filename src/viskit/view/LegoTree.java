@@ -129,7 +129,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
 
-        projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+        projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
     }
 
     // beginning of hack to hide the tree rootNode

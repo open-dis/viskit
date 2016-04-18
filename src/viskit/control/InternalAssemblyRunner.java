@@ -486,7 +486,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 		{
 			ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab();
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+                saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
                 saveChooser.setDialogTitle("Save Assembly Output");
             }
             File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());

@@ -154,18 +154,21 @@ public class LocalBootLoader extends URLClassLoader {
 			// to reopen this issue when we need strict design points for DOE.
 
 			// Now add our project's working directory, i.e. build/classes
-			try {
-				stage1.addURL(getWorkDir().toURI().toURL());
-				String[] tmp = new String[getClassPath().length + 1];
-				System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+			if (getWorkDir() != null)
+			{
 				try {
-					tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
-					classPath = tmp;
-				} catch (IOException ex) {
+					stage1.addURL(getWorkDir().toURI().toURL());
+					String[] tmp = new String[getClassPath().length + 1];
+					System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+					try {
+						tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
+						classPath = tmp;
+					} catch (IOException ex) {
+						LOG.error(ex);
+					}
+				} catch (MalformedURLException ex) {
 					LOG.error(ex);
 				}
-			} catch (MalformedURLException ex) {
-				LOG.error(ex);
 			}
 		}
 

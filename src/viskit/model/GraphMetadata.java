@@ -15,19 +15,22 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  */
 public class GraphMetadata {
 
-    public String name = "";
+    public String name        = "";
     public String packageName = "";
-    public String author = "";
-    public String revision = "";  // TODO originally version, make XML consistent
-    public String description = ""; // originally captured in "Comment" element(s), now an attribute
-    public String stopTime = "100.0";    
-    public String extendsPackageName = "";
+    public String author      = "";
+    public String revision    = "";  // TODO originally version, make XML consistent
+    public String path        = "";
+    public String description = ""; // originally captured in "Comment" element(s), now is description attribute
+    public String stopTime    = "100.0";    
+    public String extendsPackageName    = "";
     public String implementsPackageName = "";
     
-    public  boolean verbose = false;
-    private boolean project = false;
-    private String label;
-	private String DEFAULT_PACKAGE_NAME = "test";
+    public  boolean pathEditable = false;
+    private boolean project      = false;
+    public  boolean updated      = false;
+    public  boolean verbose      = false;
+    private String  label;
+	private String  DEFAULT_PACKAGE_NAME = "test"; // TODO user preference
 
     public GraphMetadata()
 	{
@@ -62,14 +65,16 @@ public class GraphMetadata {
 		{
 			label   = "Project";
 			project = true;
-			name 				   = "NewProject";
+			name 				    = "NewProject";
 			packageName 	        = ""; // unused
             extendsPackageName      = ""; // unused
             implementsPackageName   = ""; // unused
         }
+		this.updated = false;
     }
 
-    public GraphMetadata(String name, String packageName, String author, String revision, String extendsPackageName, String implementsPackageName, String description, boolean isProject)
+    public GraphMetadata(String name, String packageName, String author, String revision, String extendsPackageName, String implementsPackageName, 
+			             String path, String description, boolean isProject)
 	{
         initialize ();
 		
@@ -79,10 +84,12 @@ public class GraphMetadata {
         this.revision              = revision;
         this.extendsPackageName    = extendsPackageName;
         this.implementsPackageName = implementsPackageName;
+		this.path                  = path;
 		this.description           = description;
 		project                    = isProject;
 		if (project)
 			label   = "project";
+		this.updated = false;
     } 
 	
 	private void initialize ()

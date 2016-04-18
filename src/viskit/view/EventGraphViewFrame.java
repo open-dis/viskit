@@ -111,6 +111,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	
     private EventGraphControllerImpl eventGraphController;
     private int menuShortcutCtrlKeyMask;
+	private boolean pathEditable = false;
 	
     /**
      * Constructor; lays out initial GUI objects
@@ -1367,6 +1368,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	{
         ViskitGlobals.instance().getAssemblyEditViewFrame().closeProject();
     }
+    public void editProjectProperties (boolean pathEditable)
+	{
+		this.pathEditable = pathEditable;
+		editProjectProperties ();
+	}
 	
     public final static String EDIT_PROJECT_PROPERTIES_METHOD = "editProjectProperties"; // must match following method name.  Not possible to accomplish this programmatically.
     /** Edit current project settings.
@@ -1375,6 +1381,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	{
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
 		
+		String projectPath;
+		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+			(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory() != null))
+			 projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
+		else projectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // starting point;
+		
         GraphMetadata graphMetadata = new GraphMetadata (
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY), // name
 				"", // packageName
@@ -1382,24 +1394,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY), // revision
 				"", // extendsPackageName 
 				"", // implementsPackageName
+				projectPath, // project path
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY), // description
 				true); // isProject
 		
-        boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata);
+		graphMetadata.pathEditable = this.pathEditable;
+		
+        boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata); // display user panel
         if (modified)
 		{
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        graphMetadata.name);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, graphMetadata.description);
-			
-			ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
-			viskitProject.setProjectName       (graphMetadata.name);
-			viskitProject.setProjectAuthor     (graphMetadata.author);
-			viskitProject.setProjectRevision   (graphMetadata.revision);
-			viskitProject.setProjectDescription(graphMetadata.description);
-			viskitProject.saveProjectFile (); // save immediately
+			// project path is only saved if creating a new project
+			if (pathEditable)
+				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,    graphMetadata.path);
         }
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY, (new Boolean(modified)).toString());
     }
 	
     /** Remove an Event Graph from current Project.

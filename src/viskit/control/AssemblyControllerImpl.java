@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -61,6 +62,7 @@ import viskit.view.SimulationRunPanel;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.view.AssemblyView;
 import viskit.view.ViskitApplicationFrame;
+import viskit.view.dialog.UserPreferencesDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -204,7 +206,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
         for (File file : files) {
             if (file != null) {
-				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
+				if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
 				{
 					_doOpen(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab();
@@ -215,7 +217,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 							"<html><p>Open assemblies must be within the currently open project.</p>" +
 							"<p>&nbsp</p>" +
 							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
-							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath() + "</p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</p>" +
 							"<p>&nbsp</p>" +
 							"<p>Please choose an assembly in current project, or else open a different project.</p>");
 					// TODO offer to copy?
@@ -577,19 +579,90 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newProject() // method name must exactly match preceding string value
 	{
-        if (handleProjectClosing()) // if a project is currently open, first ask and then perform project closing before continuing
+		// if a project is currently open, first ask to confirm
+        if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+		     ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
+			 confirmProjectClosing())
 		{
-            ViskitGlobals.instance().initializeProjectHomeDirectory();
-            ViskitGlobals.instance().createWorkDirectory();
-
-            // For a brand new empty project open a default Event Graph
-            File[] eventGraphFileArray = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().listFiles();
-            if (eventGraphFileArray.length == 0) {
-                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
-            }
+			// perform project closing before continuing
+			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
         }
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+		
+		File projectDirectory = new File (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY)); // starting point; TODO user preference
+//		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,        projectDirectory.getPath());
+		
+		String newProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
+		File   newProjectRoot = new File (newProjectPath);
+		ViskitProject viskitProject = new ViskitProject(newProjectRoot);
+		
+		do
+		{
+			// directory chooser for new project
+			newProjectRoot = viskitProject.newProjectPath (ViskitGlobals.instance().getEventGraphViewFrame().getContent(), newProjectPath);
+			if (newProjectRoot == null)
+				return; // no project directory chosen, cancel
+			newProjectPath = newProjectRoot.getPath();
+			if (newProjectRoot.list().length > 0)
+			{
+				System.out.println("Directory is not empty!  Please choose or create an empty directory.");
+				messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", "Please choose or create an empty directory");
+			}
+		}
+		while (newProjectRoot.list().length > 0);
+		
+		// User dialog: project properties
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,        newProjectPath);
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        newProjectRoot.getName()); // "*Enter new project name*");
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      System.getProperty("user.name")); // TODO user preference, default author name
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "*Enter new project description*");
+		
+		boolean pathEditable = false; // TODO consider true; if a change-your-mind chooser is added to editProjectProperties panel		
+		ViskitGlobals.instance().getEventGraphViewFrame().editProjectProperties(pathEditable); // user panel for Project Properties
+
+		if (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY).equals("false"))
+			return; // user cancelled Project Properties update, do not continue
+		
+		if (!viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY).equals(newProjectRoot.getName()))
+		{
+			// project name changed, TODO may require further error checking
+			// simpler, better to restring renaming to Projects menu item
+		}
+//		viskitProject.cleanAll(); // dangerous to users file system!
+		
+        viskitProject = new ViskitProject(newProjectRoot); // reset
+		boolean initializedOK = viskitProject.initializeProject ();
+		if (!initializedOK)
+		{
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Problem initializing new project", "Please check logs to find or report problem");
+			return;
+		}
+		viskitProject.setProjectRootDirectory (newProjectRoot);
+		ViskitProject.MY_VISKIT_PROJECTS_DIR = newProjectRoot.getParent();
+		viskitProject.setProjectName       (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY));
+		viskitProject.setProjectAuthor     (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY));
+		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY));
+		viskitProject.setProjectDescription(viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY));
+		viskitProject.saveProjectFile ();
+		
+		ViskitGlobals.setCurrentViskitProject(viskitProject);
+        ViskitStatics.setViskitProjectDirectory(projectDirectory);
+//		ViskitGlobals.instance().initializeProjectHomeDirectory();
+//		ViskitGlobals.instance().createWorkDirectory();
+
+        UserPreferencesDialog.saveExtraClassPathEntries(viskitProject.getProjectClasspathArray());
+		
+		// For a brand new empty project open a default Event Graph
+		File[] eventGraphFileArray = viskitProject.getEventGraphsDirectory().listFiles();
+		if (eventGraphFileArray.length == 0)
+		{
+			((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
+		}
 		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
+        ViskitGlobals.instance().getAssemblyEditViewFrame().showProjectName();
     }
 
     public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -605,7 +678,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
                 projectZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
 
@@ -674,12 +747,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      *
      * @return indication to continue (true) or cancel (false)
      */
-    public boolean handleProjectClosing ()
+    public boolean confirmProjectClosing ()
 	{
-        boolean returnValue = true;
+        boolean continueClosing = true; // default: continue closing unless user says to cancel
+		
 		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
-			return true;
-        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+		{
+			return continueClosing; // project is closed already
+		}
+		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
             String message = "Are you sure you want to close your current Viskit Project?";
             String title   = "Close Current Project";
@@ -689,10 +765,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (responseValue == JOptionPane.YES_OPTION) {
                 doProjectCleanup();
             } else {
-                returnValue = false;
+                continueClosing = false;
             }
+			return continueClosing; // user decision
         }
-        return returnValue;
+		else return continueClosing; // existing project is closed already
     }
 
     @Override

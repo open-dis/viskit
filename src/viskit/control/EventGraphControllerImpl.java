@@ -114,11 +114,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void newEventGraph () // method name must exactly match preceding string value
 	{
         // Don't allow a new event graph to be created if a current project is not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+        if ((ViskitGlobals.instance() == null) || 
+		    (ViskitGlobals.instance().getCurrentViskitProject() == null) || 
+		    !ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
-			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
-					"<html><p>New event graphs are only created within an open project.</p>" +
-					"<p>Open or create a project first.</p>");
+			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory found", 
+					"<html><p align='center'>New event graphs are only created within an open project.</p>" +
+					"<p align='center'>Please open or create a project first.</p>");
 			return;
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // prerequisite to possible file menu dialog
@@ -226,7 +228,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				{
 					break; // skip hidden files
 				}
-				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath()))
+				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
 				{
 					_doOpen(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
@@ -237,7 +239,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 							"<html><p>Event graphs must be within the currently open project.</p>" +
 							"<p>&nbsp</p>" +
 							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
-							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getAbsolutePath() + "</p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</p>" +
 							"<p>&nbsp</p>" +
 							"<p>Please choose an event graph in current project, or else open a different project.</p>");
 					// TODO offer to copy?
