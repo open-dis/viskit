@@ -811,6 +811,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
     public void rebuildLEGOTreePanels()
 	{
+		if (legoTree == null)
+			return; // legoTree is for assemblies
         legoTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentVgraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
@@ -821,6 +823,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     private JSplitPane buildTreePanels()
 	{
+		if (legoTree == null)
+			return (new JSplitPane()); // legoTree is for assemblies
+		
         legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
@@ -867,19 +872,19 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             }
         }
 
-        LegosPanel lPan = new LegosPanel(legoTree);
+        LegosPanel legosPanel = new LegosPanel(legoTree);
         PropertyChangeListenerPanel propertyChangeListenerPanel = new PropertyChangeListenerPanel(propertyChangeListenerTree);
 
         legoTree.setBackground(background);
         propertyChangeListenerTree.setBackground(background);
 
-        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, propertyChangeListenerPanel);
+        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, legosPanel, propertyChangeListenerPanel);
         treePanels.setBorder(null);
         treePanels.setOneTouchExpandable(true);
 
         propertyChangeListenerPanel.setMinimumSize(new Dimension(20, 80));
-        lPan.setMinimumSize(new Dimension(20, 80));
-        lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
+        legosPanel.setMinimumSize(new Dimension(20, 80));
+        legosPanel.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
         legoTree.setDragEnabled(true);
         propertyChangeListenerTree.setDragEnabled(true);
@@ -1012,8 +1017,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void addEventGraphsToLegoTree(File f, boolean b) {
-        if (f.exists()) {
+    public void addEventGraphsToLegoTree(File f, boolean b)
+	{
+        if (f.exists() && (legoTree != null))
+		{
             legoTree.addContentRoot(f, b);
         }
     }
