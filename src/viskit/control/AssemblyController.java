@@ -140,7 +140,7 @@ public interface AssemblyController {
     /**
      * Opens a Viskit Project Assembly File
      */
-    void open();
+    void openAssembly();
 
     /**
      * Performs project clean up tasks before closing out the project

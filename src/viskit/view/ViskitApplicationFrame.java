@@ -116,6 +116,8 @@ public class ViskitApplicationFrame extends JFrame {
 
 	private RecentProjectFileSetListener recentProjectFileSetListener;
 	
+	private String title = new String();
+	
     public ViskitApplicationFrame(String initialFile)
 	{
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME); // default title
@@ -177,7 +179,8 @@ public class ViskitApplicationFrame extends JFrame {
         // Event graph editor
 		
         eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
-        if (UserPreferencesDialog.isEventGraphEditorVisible()) {
+        if (UserPreferencesDialog.isEventGraphEditorVisible())
+		{
             mainTabbedPane.add(eventGraphViewFrame.getContent());
             int idx = mainTabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
             mainTabbedPane.setTitleAt(idx, "Event Graph Editor");
@@ -205,7 +208,8 @@ public class ViskitApplicationFrame extends JFrame {
 		// =============================================================================================
         // Assembly editor
         assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
-        if (UserPreferencesDialog.isAssemblyEditorVisible()) {
+        if (UserPreferencesDialog.isAssemblyEditorVisible())
+		{
             mainTabbedPane.add(assemblyEditViewFrame.getContent());
             int idx = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
             mainTabbedPane.setTitleAt(idx, "Assembly Editor");
@@ -227,27 +231,32 @@ public class ViskitApplicationFrame extends JFrame {
 //            assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
 //            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myExitAction, mainMenuBar);
             tabIndices[TAB_ASSEMBLY_EDITOR] = idx;
-        } else {
+        }
+		else 
+		{
             tabIndices[TAB_ASSEMBLY_EDITOR] = -1;
         }
 
 		// =============================================================================================
         // Simulation Run
         runTabbedPane = new JTabbedPane();
-        JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
-        runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
-        runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
+        JPanel simulationRunTabbedPanePanel = new JPanel(new BorderLayout());
+        simulationRunTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
+        simulationRunTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
 
         // Always selected as visible
-        if (UserPreferencesDialog.isSimulationRunVisible()) {
-            mainTabbedPane.add(runTabbedPanePanel);
-            int idx = mainTabbedPane.indexOfComponent(runTabbedPanePanel);
+        if (UserPreferencesDialog.isSimulationRunVisible()) 
+		{
+            mainTabbedPane.add(simulationRunTabbedPanePanel);
+            int idx = mainTabbedPane.indexOfComponent(simulationRunTabbedPanePanel);
             mainTabbedPane.setTitleAt(idx, "Simulation Run");
             mainTabbedPane.setToolTipTextAt(idx, "First select Assembly Initialization button from Assembly tab");
             menus.add(null); // placeholder TODO?
             tabIndices[TAB_SIMULATION_RUN] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
-        } else {
+        } 
+		else
+		{
             tabIndices[TAB_SIMULATION_RUN] = -1;
         }
 
@@ -304,7 +313,9 @@ public class ViskitApplicationFrame extends JFrame {
             AnalystReportController analystReportController = (AnalystReportController) analystReportFrame.getController();
             analystReportController.setMainTabbedPane(mainTabbedPane, idx);
             assemblyController.addAssemblyFileListener((AnalystReportFrame) analystReportFrame);
-        } else {
+        } 
+		else 
+		{
             tabIndices[TAB_ANALYST_REPORT] = -1;
         }
 		// =============================================================================================
@@ -839,6 +850,14 @@ public class ViskitApplicationFrame extends JFrame {
      */
     public final void showProjectName()
 	{
+		String newTitle = getProjectTitle ();
+	    setTitle(newTitle);
+        if (this.titleListener != null) {
+            titleListener.setTitle(newTitle, titleKey);
+        }
+    }
+	public final String getProjectTitle ()
+	{
         String title = " " + ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME + ": ";
 		if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
 			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() ||
@@ -853,9 +872,6 @@ public class ViskitApplicationFrame extends JFrame {
 			if (!title.contains("Project"))
 				 title += " Project";
 		}
-	    setTitle(title);
-        if (this.titleListener != null) {
-            titleListener.setTitle(title, titleKey);
-        }
-    }
+		return title;
+	}
 }

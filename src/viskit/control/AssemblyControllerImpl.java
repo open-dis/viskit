@@ -181,14 +181,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 return false;
             }
         }
-        boolean ret = true;
-        AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
-        if (mod != null) {
+        boolean returnValue = true;
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+        if (assemblyModel != null) {
             if (((AssemblyModel) getModel()).isDirty()) {
                 return askToSaveAndContinue();
             }
         }
-        return ret;  // proceed
+        return returnValue;  // proceed
     }
 
     @Override
@@ -196,12 +196,22 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // placeholder for combo gui
     }
 
-    public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
+    public final static String OPENASSEMBLY_METHOD = "openAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open () // method name must exactly match preceding string value
+    public void openAssembly () // method name must exactly match preceding string value
 	{
+        // Don't allow a new assembly to be created if a current project is  not open
+        if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
+			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+		{
+			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
+					"<html><p>Assemblies are only opened within an open project.</p>" +
+					"<p>Open or create a project first.</p>");
+			return;
+		}
         File[] files = ((AssemblyView) getView()).openFilesAsk();
-        if (files == null) {
+        if (files == null)
+		{
             return;
         }
         for (File file : files) {
@@ -662,7 +672,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		}
 		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
-        ViskitGlobals.instance().getAssemblyEditViewFrame().showProjectName();
+        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
     }
 
     public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -803,7 +813,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newAssembly () // method name must exactly match preceding string value
 	{
         // Don't allow a new assembly to be created if a current project is  not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+        if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
+			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", 
 					"<html><p>New assemblies are only created within an open project.</p>" +

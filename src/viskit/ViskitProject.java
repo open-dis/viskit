@@ -225,6 +225,8 @@ public class ViskitProject {
             openProjectFromFile(getProjectFile());
         }
         ViskitConfiguration.instance().setProjectXMLConfigurationPath(getProjectFile().getAbsolutePath());
+		
+        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }

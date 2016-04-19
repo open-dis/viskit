@@ -352,6 +352,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     public void buildMenus() 
 	{
+		boolean isProjectOpen = false;
+		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
+			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
+
 		boolean assemblyVisible = false;
 		if (ViskitGlobals.instance() != null)// viskit might open with no project
 			assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
@@ -361,14 +365,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assembliesMenu.removeAll();      // reset
 		
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.NEWASSEMBLY_METHOD, "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), true));
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.OPEN_METHOD,        "Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.OPENASSEMBLY_METHOD,"Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
         if (openRecentAssemblyMenu == null)
 		{
 			openRecentAssemblyMenu = buildMenu("Recent Assembly"); // don't wipe it out if already there!
 			openRecentAssemblyMenu.setToolTipText("Open Recent Assembly");
 			openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
 		}
-		openRecentAssemblyMenu.setEnabled(assemblyController.getRecentAssemblyFileSet().size() > 0);
+		openRecentAssemblyMenu.setEnabled(isProjectOpen && assemblyController.getRecentAssemblyFileSet().size() > 0);
 		assemblyController.updateAssemblyFileLists();
 		assembliesMenu.add(openRecentAssemblyMenu);
 
@@ -823,9 +827,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     private JSplitPane buildTreePanels()
 	{
-		if (legoTree == null)
-			return (new JSplitPane()); // legoTree is for assemblies
-		
         legoTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
@@ -1138,11 +1139,25 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName();
 		
+		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+		{
+			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened", 
+				"<html><p align='center'>Project <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> is open.</p>" +
+						"<p align='center'>&nbsp;</p>" +
+						"<p align='center'>To continue, use the File menu to open or create <br /> either an Assembly or an Event Graph.</p></html>");
+		}
+		else
+		{
+			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, "Project failed to open", 
+				"<html><p>Selected project did not open, see error log for details.</p>");
+		}
+		
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
 		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())
 		{
 			// show relevant pane for new project
-			viskitApplicationFrame.displaySimulationRunTab();
+			viskitApplicationFrame.displayEventGraphEditorTab();
 		}
     }
 
@@ -1248,7 +1263,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public void showAndSaveSource(String className, String s, String fileName) {
         final JFrame f = new SourceWindow(this, className, s);
-        f.setTitle("Generated source from " + fileName);
+        f.setTitle("Generated source " + fileName.substring(0, fileName.lastIndexOf(".xml")) + ".java from model " + fileName);
 
         Runnable r = new Runnable() {
 

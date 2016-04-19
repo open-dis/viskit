@@ -346,7 +346,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 		
-		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Ctrl-E)";
+		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Control-P)";
 		
 //        JLabel implementsLabel = new JLabel("Implements");
 //        implementsLabel.setToolTipText("Event graph superclass (if any)");
@@ -439,8 +439,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     private CodeBlockPanel buildCodeBlockPanel() {
-        CodeBlockPanel cbp = new CodeBlockPanel(this, true, "Event Graph Code Block");
-        cbp.addUpdateListener(new ActionListener() {
+        CodeBlockPanel codeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
+        codeBlockPanel.addUpdateListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -450,25 +450,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 }
             }
         });
-        return cbp;
+        return codeBlockPanel;
     }
 
-    private JComponent buildCodeBlockComponent(CodeBlockPanel cbp) {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        JLabel lab = new JLabel("Code Block");
-        lab.setToolTipText("Use of the code block will cause code to run first" +
-                " in the top of the Event's \"do\" method");
-        lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        p.add(lab);
-        cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        p.add(cbp);
-        p.setBorder(new EmptyBorder(5, 5, 5, 2));
-        Dimension d = new Dimension(p.getPreferredSize());
+    private JComponent buildCodeBlockComponent(CodeBlockPanel codeBlockPanel)
+	{
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JLabel codeBlockLabel = new JLabel("Event Graph Code Block");
+        codeBlockLabel.setToolTipText("Code block source runs runs first in the top of the Event's \"do\" method");
+        codeBlockLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        panel.add(codeBlockLabel);
+        codeBlockPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        panel.add(codeBlockPanel);
+        panel.setBorder(new EmptyBorder(5, 5, 5, 2));
+        Dimension d = new Dimension(panel.getPreferredSize());
         d.width = Integer.MAX_VALUE;
-        p.setMaximumSize(d);
+        panel.setMaximumSize(d);
 
-        return p;
+        return panel;
     }
 
     @Override
@@ -753,7 +753,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		if (openRecentEventGraphMenu == null)
 		{
 			openRecentEventGraphMenu = buildMenu("Recent Event Graph"); // don't wipe it out if already there!
-			openRecentEventGraphMenu.setToolTipText("Open Recent Event Graph");
+			openRecentEventGraphMenu.setToolTipText("open Recent Event Graph");
 			openRecentEventGraphMenu.setMnemonic(KeyEvent.VK_R);
 		}
 		eventGraphController.updateEventGraphFileLists();
@@ -819,7 +819,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
-		openRecentEventGraphMenu.setEnabled(eventGraphController.getRecentEventGraphFileSet().size() > 0);
+		openRecentEventGraphMenu.setEnabled(isProjectOpen && eventGraphController.getRecentEventGraphFileSet().size() > 0);
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
 		
