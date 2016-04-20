@@ -171,10 +171,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			eventGraphController.addRecentEventGraphFileListener(new RecentEventGraphFileListener());
 			menuShortcutCtrlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		}
-		projectsMenu = new JMenu("Projects");
-		eventGraphsMenu     = new JMenu("Event Graphs");
-		editMenu     = new JMenu(FRAME_DEFAULT_TITLE);
-		helpMenu     = new JMenu("Help");
+		projectsMenu    = new JMenu("Projects");
+		eventGraphsMenu = new JMenu("Event Graphs");
+		editMenu        = new JMenu(FRAME_DEFAULT_TITLE );
+		helpMenu        = new JMenu("Help");
+		editMenu.setText(FRAME_DEFAULT_TITLE + "   "); // extra wide in order to align menus with tabs
 		
         projectsMenu.setMnemonic(KeyEvent.VK_P);
             eventGraphsMenu.setMnemonic(KeyEvent.VK_E);

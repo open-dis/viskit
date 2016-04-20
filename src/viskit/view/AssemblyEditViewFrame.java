@@ -172,7 +172,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		}
 		assembliesMenu = new JMenu("Assemblies");
         assembliesMenu.setMnemonic(KeyEvent.VK_A);
-		editMenu = new JMenu(FRAME_DEFAULT_TITLE);
+		editMenu = new JMenu(FRAME_DEFAULT_TITLE + "    "); // extra wide in order to align menus with tabs
 		helpMenu = new JMenu("Help");
 
         buildMenus();
@@ -352,6 +352,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     public void buildMenus() 
 	{
+		if ((ViskitGlobals.instance().getViskitApplicationFrame() != null) &&
+			 ViskitGlobals.instance().getViskitApplicationFrame().isInfoTabSelected())
+			 ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // TODO remove when tab becomes useful
+		
 		boolean isProjectOpen = false;
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
 			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
@@ -1143,9 +1147,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
 			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened", 
-				"<html><p align='center'>Project <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> is open.</p>" +
+				"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is now open.</p>" +
 						"<p align='center'>&nbsp;</p>" +
-						"<p align='center'>To continue, use the File menu to open or create <br /> either an Assembly or an Event Graph.</p></html>");
+						"<p align='center'>Next steps: use the File menu to open or create <br />an Event Graph or an Assembly.</p></html>");
 		}
 		else
 		{

@@ -92,22 +92,24 @@ public class ViskitApplicationFrame extends JFrame {
     protected int titleKey;
 	
     private final String initialFile;
-    private final int TAB_EVENTGRAPH_EDITOR     = 0;
-    private final int TAB_ASSEMBLY_EDITOR       = 1;
-    private final int TAB_SIMULATION_RUN        = 2;
-    private final int TAB_ANALYST_REPORT        = 3;
-    private final int TAB_DESIGN_OF_EXPERIMENTS = 4;
-    private final int TAB_GRID_CLUSTER_JOBS     = 5; // TODO naming
+    private final int TAB_INFO                  = 0;
+    private final int TAB_EVENTGRAPH_EDITOR     = 1;
+    private final int TAB_ASSEMBLY_EDITOR       = 2;
+    private final int TAB_SIMULATION_RUN        = 3;
+    private final int TAB_ANALYST_REPORT        = 4;
+    private final int TAB_DESIGN_OF_EXPERIMENTS = 5;
+    private final int TAB_GRID_CLUSTER_JOBS     = 6; // TODO naming
     private final int[] tabIndices = {
+        TAB_INFO, 
         TAB_EVENTGRAPH_EDITOR, 
         TAB_ASSEMBLY_EDITOR,
         TAB_SIMULATION_RUN,
         TAB_ANALYST_REPORT,
 //		TAB_DESIGN_OF_EXPERIMENTS
 	};
-    private final int TAB1_LOCALRUN_IDX = 0;
-    private final int TAB1_DOE_IDX = 1;
-    private final int TAB1_CLUSTERUN_IDX = 2;
+    private final int SUBTAB_LOCALRUN_INDEX  = 0;
+    private final int SUBTAB_DOE_INDEX       = 1;
+    private final int SUBTAB_CLUSTERUN_INDEX = 2;
 	
 	private JMenuBar mainMenuBar;
     private final int menuShortcutKeyMask;
@@ -166,7 +168,7 @@ public class ViskitApplicationFrame extends JFrame {
         mainMenuBar = new JMenuBar();
         setJMenuBar(mainMenuBar);
 		
-        fileMenu = new JMenu("File");
+        fileMenu = new JMenu("File     "); // extra wide in order to align menus with tabs
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		mainMenuBar.add(fileMenu); // initialize
 		
@@ -176,15 +178,28 @@ public class ViskitApplicationFrame extends JFrame {
         mainTabbedPane.setFont(mainTabbedPane.getFont().deriveFont(Font.BOLD));
 
 		// =============================================================================================
+        // Info frame
+		
+		JPanel infoPanel = new JPanel ();
+		infoPanel.setEnabled(false);
+        mainTabbedPane.add(infoPanel);
+		
+		int newTabIndex = mainTabbedPane.indexOfComponent(infoPanel);
+		mainTabbedPane.setTitleAt(newTabIndex, "Info");
+		mainTabbedPane.setToolTipTextAt(newTabIndex, "TODO");
+		mainTabbedPane.setEnabledAt(newTabIndex, false); // TODO remove when tab becomes useful
+
+		// =============================================================================================
         // Event graph editor
 		
         eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
         if (UserPreferencesDialog.isEventGraphEditorVisible())
 		{
             mainTabbedPane.add(eventGraphViewFrame.getContent());
-            int idx = mainTabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
-            mainTabbedPane.setTitleAt(idx, "Event Graph Editor");
-            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
+            newTabIndex = mainTabbedPane.indexOfComponent(eventGraphViewFrame.getContent());
+            mainTabbedPane.setTitleAt(newTabIndex, "Event Graph Editor");
+            mainTabbedPane.setToolTipTextAt(newTabIndex, "Visual editor for object class definitions");
+			
 
 			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, cleanup
 			eventGraphFileMenu = eventGraphViewFrame.getFileMenu();
@@ -194,26 +209,21 @@ public class ViskitApplicationFrame extends JFrame {
                fileMenu.add(eventGraphFileMenu);  // submenu
             mainMenuBar.add(eventGraphEditMenu);  // top level
 			
-//            eventGraphMenuBar = eventGraphViewFrame.getMenus();
-//            menus.add(eventGraphMenuBar);
-//            doCommonHelp(mainMenuBar);
-//            jamSettingsHandler(mainMenuBar); // TODO investigate, apparently necessary for exit
-//            eventGraphViewFrame.setTitleListener(myTitleListener, idx);
-//            setJMenuBar(mainMenuBar);
-            tabIndices[TAB_EVENTGRAPH_EDITOR] = idx;
+            tabIndices[TAB_EVENTGRAPH_EDITOR] = newTabIndex;
         } else {
             tabIndices[TAB_EVENTGRAPH_EDITOR] = -1;
         }
 
 		// =============================================================================================
         // Assembly editor
+		
         assemblyEditViewFrame = (AssemblyEditViewFrame) ViskitGlobals.instance().buildAssemblyViewFrame();
         if (UserPreferencesDialog.isAssemblyEditorVisible())
 		{
             mainTabbedPane.add(assemblyEditViewFrame.getContent());
-            int idx = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
-            mainTabbedPane.setTitleAt(idx, "Assembly Editor");
-            mainTabbedPane.setToolTipTextAt(idx, "Visual editor for simulation program defined by Assembly");
+            newTabIndex = mainTabbedPane.indexOfComponent(assemblyEditViewFrame.getContent());
+            mainTabbedPane.setTitleAt(newTabIndex, "Assembly Editor");
+            mainTabbedPane.setToolTipTextAt(newTabIndex, "Visual editor for simulation program defined by Assembly");
 			
 			assemblyFileMenu = assemblyEditViewFrame.getFileMenu();
             fileMenu.add(assemblyFileMenu);    // submenu
@@ -221,16 +231,7 @@ public class ViskitApplicationFrame extends JFrame {
 			assemblyEditMenu.setEnabled(false); // activated when corresponding tabbed pane selected and assembly present
             mainMenuBar.add(assemblyEditMenu); // top level
 			
-//            assemblyEditMenuBar = assemblyEditViewFrame.getMenus();
-//            menus.add(assemblyEditMenuBar);
-//            doCommonHelp(mainMenuBar);
-//            jamSettingsHandler(mainMenuBar);
-//            if (getJMenuBar() == null) {
-//                setJMenuBar(mainMenuBar);
-//            }
-//            assemblyEditViewFrame.setTitleListener(myTitleListener, idx);
-//            jamQuitHandler(assemblyViewFrame.getQuitMenuItem(), myExitAction, mainMenuBar);
-            tabIndices[TAB_ASSEMBLY_EDITOR] = idx;
+            tabIndices[TAB_ASSEMBLY_EDITOR] = newTabIndex;
         }
 		else 
 		{
@@ -239,6 +240,7 @@ public class ViskitApplicationFrame extends JFrame {
 
 		// =============================================================================================
         // Simulation Run
+		
         runTabbedPane = new JTabbedPane();
         JPanel simulationRunTabbedPanePanel = new JPanel(new BorderLayout());
         simulationRunTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
@@ -248,12 +250,11 @@ public class ViskitApplicationFrame extends JFrame {
         if (UserPreferencesDialog.isSimulationRunVisible()) 
 		{
             mainTabbedPane.add(simulationRunTabbedPanePanel);
-            int idx = mainTabbedPane.indexOfComponent(simulationRunTabbedPanePanel);
-            mainTabbedPane.setTitleAt(idx, "Simulation Run");
-            mainTabbedPane.setToolTipTextAt(idx, "First select Assembly Initialization button from Assembly tab");
+            newTabIndex = mainTabbedPane.indexOfComponent(simulationRunTabbedPanePanel);
+            mainTabbedPane.setTitleAt(newTabIndex, "Simulation Run");
+            mainTabbedPane.setToolTipTextAt(newTabIndex, "First select Assembly Initialization button from Assembly tab");
             menus.add(null); // placeholder TODO?
-            tabIndices[TAB_SIMULATION_RUN] = idx;
-//          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
+            tabIndices[TAB_SIMULATION_RUN] = newTabIndex;
         } 
 		else
 		{
@@ -266,19 +267,15 @@ public class ViskitApplicationFrame extends JFrame {
         boolean analystReportPanelVisible = UserPreferencesDialog.isAnalystReportVisible();
         assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
 		
-        runTabbedPane.add(assemblyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
-        runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Assembly Initialization Needed");
-        runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run simulation replications for current Assembly on local system");
+        runTabbedPane.add(assemblyRunComponent.getRunnerPanel(), SUBTAB_LOCALRUN_INDEX);
+        runTabbedPane.setTitleAt(SUBTAB_LOCALRUN_INDEX, "Assembly Initialization Needed");
+        runTabbedPane.setToolTipTextAt(SUBTAB_LOCALRUN_INDEX, "Run simulation replications for current Assembly on local system");
 		
 		assemblyRunMenu = assemblyRunComponent.getSimulationRunMenu();
 		assemblyRunMenu.setEnabled(true); // activated when corresponding tabbed pane selected
         fileMenu.add(assemblyRunMenu);
 		
-//        assemblyRunMenuBar = assemblyRunComponent.getMenus();
-//        menus.add(assemblyRunMenuBar);
-//        doCommonHelp(mainMenuBar);
-//        jamSettingsHandler(mainMenuBar);
-        assemblyRunComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
+        assemblyRunComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + SUBTAB_LOCALRUN_INDEX);
 //        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myExitAction, mainMenuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyEditViewFrame.getController());
         controller.setInitialFile(initialFile);
@@ -293,25 +290,16 @@ public class ViskitApplicationFrame extends JFrame {
 		{
             analystReportFrame = ViskitGlobals.instance().buildAnalystReportFrame();
             mainTabbedPane.add(analystReportFrame.getContentPane());
-            int idx = mainTabbedPane.indexOfComponent(analystReportFrame.getContentPane());
-            mainTabbedPane.setTitleAt(idx, "Analyst Report");
-            mainTabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
+            newTabIndex = mainTabbedPane.indexOfComponent(analystReportFrame.getContentPane());
+            mainTabbedPane.setTitleAt(newTabIndex, "Analyst Report");
+            mainTabbedPane.setToolTipTextAt(newTabIndex, "Supports analyst assessment and report generation");
 		
 			analystReportMenu = ((AnalystReportFrame)analystReportFrame).getFileMenu();
             fileMenu.add(analystReportMenu);
 			
-//            analystReportMenuBar = ((AnalystReportFrame)analystReportFrame).getMenus();
-//            menus.add(analystReportMenuBar);
-//            doCommonHelp(mainMenuBar);
-//            jamSettingsHandler(mainMenuBar);
-//            if (getJMenuBar() == null) {
-//                setJMenuBar(mainMenuBar);
-//            }
-//            ((AnalystReportFrame)analystReportFrame).setTitleListener(myTitleListener, idx);
-//            jamQuitHandler(null, myExitAction, mainMenuBar);
-            tabIndices[TAB_ANALYST_REPORT] = idx;
+            tabIndices[TAB_ANALYST_REPORT] = newTabIndex;
             AnalystReportController analystReportController = (AnalystReportController) analystReportFrame.getController();
-            analystReportController.setMainTabbedPane(mainTabbedPane, idx);
+            analystReportController.setMainTabbedPane(mainTabbedPane, newTabIndex);
             assemblyController.addAssemblyFileListener((AnalystReportFrame) analystReportFrame);
         } 
 		else 
@@ -347,12 +335,13 @@ public class ViskitApplicationFrame extends JFrame {
         // Design of experiments
         DoeMainFrame designOfExperimentsFrame = null;
         boolean isDOEVisible = UserPreferencesDialog.isDOEVisible();
-        if (isDOEVisible) {
+        if (isDOEVisible)
+		{
             designOfExperimentsMain = DoeMain.main2();
             designOfExperimentsFrame = designOfExperimentsMain.getMainFrame();
-            runTabbedPane.add(designOfExperimentsFrame.getContent(), TAB1_DOE_IDX);
-            runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
-            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.add(designOfExperimentsFrame.getContent(), SUBTAB_DOE_INDEX);
+            runTabbedPane.setTitleAt(SUBTAB_DOE_INDEX, "Design of Experiments");
+            runTabbedPane.setIconAt(SUBTAB_DOE_INDEX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
             designOfExperimentsMenuBar = designOfExperimentsMain.getMenus();
 //            if (mainMenuBar == null) {
 //                mainMenuBar = new JMenuBar();
@@ -364,7 +353,7 @@ public class ViskitApplicationFrame extends JFrame {
 			}
             menus.add(designOfExperimentsMenuBar);
 //            doCommonHelp(mainMenuBar);
-            designOfExperimentsFrame.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_DOE_IDX);
+            designOfExperimentsFrame.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + SUBTAB_DOE_INDEX);
 //            jamQuitHandler(designOfExperimentsMain.getQuitMenuItem(), myExitAction, mainMenuBar);
             assemblyController.addAssemblyFileListener(designOfExperimentsFrame.getController().getOpenAssemblyListener());
             eventGraphController.addEventGraphFileListener(designOfExperimentsFrame.getController().getOpenEventGraphListener());
@@ -372,13 +361,14 @@ public class ViskitApplicationFrame extends JFrame {
 
 		// =============================================================================================
         // Grid run panel
-        if (UserPreferencesDialog.isClusterRunVisible()) {
+        if (UserPreferencesDialog.isClusterRunVisible())
+		{
             runGridComponent = new JobLauncherTab2(designOfExperimentsMain.getController(), null, null, this);
 			if ((designOfExperimentsFrame != null) && (designOfExperimentsFrame.getController() != null))
 			     designOfExperimentsFrame.getController().setJobLauncher(runGridComponent);
-            runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
-            runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
-            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.add(runGridComponent.getContent(), SUBTAB_CLUSTERUN_INDEX);
+            runTabbedPane.setTitleAt(SUBTAB_CLUSTERUN_INDEX, "LaunchClusterJob");
+            runTabbedPane.setIconAt(SUBTAB_CLUSTERUN_INDEX, new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
 			
 			// TODO clusterGridMenuBar
 			
@@ -387,13 +377,15 @@ public class ViskitApplicationFrame extends JFrame {
 //            jamQuitHandler(null, myExitAction, mainMenuBar);
 //            menus.add(mainMenuBar);
 //            doCommonHelp(mainMenuBar);
-            runGridComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
+            runGridComponent.setTitleListener(myTitleListener, mainTabbedPane.getTabCount() + SUBTAB_CLUSTERUN_INDEX);
             assemblyController.addAssemblyFileListener(runGridComponent);
         }
 		// =============================================================================================
 //		doCommonHelp(mainMenuBar);
         mainMenuBar.add(eventGraphViewFrame.getHelpMenu()); // TODO move that method here
 		
+		mainTabbedPane.setSelectedIndex(TAB_EVENTGRAPH_EDITOR);
+
 		// do not showProjectName(); yet because hashmap isn't ready and project is not loaded 
 
         // let the event graph controller establish the Viskit classpath and open
@@ -685,7 +677,7 @@ public class ViskitApplicationFrame extends JFrame {
 
                 // toggles a tab change listener
                 mainTabbedPane.setSelectedIndex(tabIndices[TAB_SIMULATION_RUN]);
-                runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
+                runTabbedPane.setSelectedIndex(SUBTAB_LOCALRUN_INDEX);
 
 
                 // initializes a fresh class loader
@@ -764,6 +756,17 @@ public class ViskitApplicationFrame extends JFrame {
 	{
 		return (mainTabbedPane.getSelectedIndex() == TAB_ANALYST_REPORT);
     }
+	
+	public boolean isInfoTabSelected ()
+	{
+		return (mainTabbedPane.getSelectedIndex() == TAB_INFO);
+    }
+	
+	public void displayInfoTab ()
+	{
+		mainTabbedPane.setSelectedIndex(TAB_INFO);
+		buildMenus();
+	}
 	
 	public void displayEventGraphEditorTab ()
 	{
