@@ -61,6 +61,7 @@ import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.Help;
+import viskit.ViskitConfiguration;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -1136,17 +1137,24 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
             return; // decision to continue was false, so do not open a new project
         }
-        File file = ViskitProject.openProjectDirectory(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        if (file != null) {
+		
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+		String initialProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
+        File file = ViskitProject.openProjectDirectory(this, initialProjectPath); // ViskitProject.MY_VISKIT_PROJECTS_DIR);
+		if (file != null) {
             assemblyController.openProject(file);
         }
+		else
+		{
+			return; // cancelled by user
+		}
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName();
 		
 		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
 			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
-			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened", 
+			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened successfully", 
 				"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is now open.</p>" +
 						"<p align='center'>&nbsp;</p>" +
 						"<p align='center'>Next steps: use the File menu to open or create <br />an Event Graph or an Assembly.</p></html>");
