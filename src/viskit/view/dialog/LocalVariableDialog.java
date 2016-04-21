@@ -219,9 +219,9 @@ public class LocalVariableDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(LocalVariableDialog.this, "Apply changes?",
+                int returnValue = JOptionPane.showConfirmDialog(LocalVariableDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
                     cancelButton.doClick();

@@ -335,7 +335,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimEntity.setType(className);
         node.opaqueModelObject = jaxbSimEntity;
 
-        VInstantiator vc = new VInstantiator.Constr(jaxbSimEntity.getType(), null);  // null means undefined
+        VInstantiator vc = new VInstantiator.Construct(jaxbSimEntity.getType(), null);  // null means undefined
         node.setInstantiator(vc);
 
         if (!nameCheck()) {
@@ -402,7 +402,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         List<Object> lis = pcl.getParameters();
 
-        VInstantiator vc = new VInstantiator.Constr(pcl.getType(), lis);
+        VInstantiator vc = new VInstantiator.Construct(pcl.getType(), lis);
         pcNode.setInstantiator(vc);
 
         if (!nameCheck()) {
@@ -870,8 +870,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
-    private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
-        return new VInstantiator.FreeF(tp.getType(), tp.getValue());
+    private VInstantiator.FreeForm buildFreeFormFromTermParameter(TerminalParameter tp) {
+        return new VInstantiator.FreeForm(tp.getType(), tp.getValue());
     }
 
     private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
@@ -879,8 +879,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
-    private VInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
-        return new VInstantiator.Constr(o.getType(),
+    private VInstantiator.Construct buildConstrFromMultiParameter(MultiParameter o) {
+        return new VInstantiator.Construct(o.getType(),
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
@@ -905,11 +905,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private Object buildParam(Object vi) {
-        if (vi instanceof VInstantiator.FreeF) {
-            return buildParamFromFreeF((VInstantiator.FreeF) vi);
+        if (vi instanceof VInstantiator.FreeForm) {
+            return buildParamFromFreeF((VInstantiator.FreeForm) vi);
         } //TerminalParm
-        if (vi instanceof VInstantiator.Constr) {
-            return buildParamFromConstr((VInstantiator.Constr) vi);
+        if (vi instanceof VInstantiator.Construct) {
+            return buildParamFromConstr((VInstantiator.Construct) vi);
         } // List of Parms
         if (vi instanceof VInstantiator.Factory) {
             return buildParamFromFactory((VInstantiator.Factory) vi);
@@ -927,7 +927,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return null;
     }
 
-    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeF viff) {
+    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeForm viff) {
         TerminalParameter tp = jaxbObjectFactory.createTerminalParameter();
 
         tp.setType(viff.getType());
@@ -936,7 +936,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return tp;
     }
 
-    private MultiParameter buildParamFromConstr(VInstantiator.Constr vicon) {
+    private MultiParameter buildParamFromConstr(VInstantiator.Construct vicon) {
         MultiParameter mp = jaxbObjectFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
@@ -969,7 +969,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private TerminalParameter buildParamFromVarargs(VInstantiator.Array viarr) {
-        return buildParamFromFreeF((VInstantiator.FreeF) viarr.getInstantiators().get(0));
+        return buildParamFromFreeF((VInstantiator.FreeForm) viarr.getInstantiators().get(0));
     }
 
     private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
@@ -1090,7 +1090,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
 
         List<Object> lis = propertyChangeListener.getParameters();
-        VInstantiator vc = new VInstantiator.Constr(propertyChangeListener.getType(),
+        VInstantiator vc = new VInstantiator.Construct(propertyChangeListener.getType(),
                 getInstantiatorListFromJaxbParmList(lis));
         propertyChangeListenerNode.setInstantiator(vc);
 
@@ -1129,7 +1129,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         List<Object> parameterList = simEntity.getParameters();
 
-        VInstantiator vc = new VInstantiator.Constr(parameterList, simEntity.getType());
+        VInstantiator vc = new VInstantiator.Construct(parameterList, simEntity.getType());
         eventGraphNode.setInstantiator(vc);
 
         eventGraphNode.opaqueModelObject = simEntity;

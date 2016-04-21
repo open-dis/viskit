@@ -211,9 +211,9 @@ public class TextAreaDialog extends JDialog
     public void windowClosing(WindowEvent e)
     {
       if (modified) {
-        int ret = JOptionPane.showConfirmDialog(TextAreaDialog.this, "Apply changes?",
+        int returnValue = JOptionPane.showConfirmDialog(TextAreaDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (ret == JOptionPane.YES_OPTION)
+        if (returnValue == JOptionPane.YES_OPTION)
           okButton.doClick();
         else
           cancelButton.doClick();

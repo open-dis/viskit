@@ -157,9 +157,9 @@ public class EventListDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (selection != -1) {
-                int ret = JOptionPane.showConfirmDialog(EventListDialog.this, "Apply changes?",
+                int returnValue = JOptionPane.showConfirmDialog(EventListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
                     cancelButton.doClick();

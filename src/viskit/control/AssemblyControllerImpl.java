@@ -597,8 +597,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			// perform project closing before continuing
 			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
         }
-        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
 		
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
 		File projectDirectory = new File (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY)); // starting point; TODO user preference
 //		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,        projectDirectory.getPath());
 		

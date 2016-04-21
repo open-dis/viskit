@@ -71,7 +71,7 @@ public abstract class ViskitSmallDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -81,7 +81,7 @@ public abstract class ViskitSmallDialog extends JDialog {
     }
 
     /** NOT USED */
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -92,11 +92,11 @@ public abstract class ViskitSmallDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener implements ActionListener, DocumentListener {
+    class EnableApplyButtonListener implements ActionListener, DocumentListener {
 
         private final JButton applyButton;
 
-        enableApplyButtonListener(JButton applyButton) {
+        EnableApplyButtonListener(JButton applyButton) {
             this.applyButton = applyButton;
         }
 
@@ -142,9 +142,9 @@ public abstract class ViskitSmallDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(parent, "Apply changes?",
+                int returnValue = JOptionPane.showConfirmDialog(parent, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
                     cancelButton.doClick();

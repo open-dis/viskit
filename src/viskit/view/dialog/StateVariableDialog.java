@@ -103,13 +103,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
         cont.add(con);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
+        cancelButton.addActionListener(new CancelButtonListener());
         okButton.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
 
-        enableApplyButtonListener lis = new enableApplyButtonListener(okButton);
-        stateVariableNameField.getDocument().addDocumentListener(lis);//addCaretListener(lis);
-        descriptionField.getDocument().addDocumentListener(lis);// addCaretListener(lis);
-        stateVariableTypeCombo.addActionListener(lis);
+        EnableApplyButtonListener listener = new EnableApplyButtonListener(okButton);
+        stateVariableNameField.getDocument().addDocumentListener(listener);//addCaretListener(lis);
+        descriptionField.getDocument().addDocumentListener(listener);// addCaretListener(lis);
+        stateVariableTypeCombo.addActionListener(listener);
 
         myTyperComponent = stateVariableTypeCombo.getEditor().getEditorComponent();
 

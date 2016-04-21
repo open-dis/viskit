@@ -24,7 +24,7 @@ public class ObjectInspector extends JDialog
   public boolean modified = false;
   private final JButton cancelButton,okButton;
   private final JPanel buttonPanel,contentPanel;
-  InstantiationPanel ip;
+  InstantiationPanel instantiationPanel;
   enableApplyButtonListener lis;
 
   public ObjectInspector(JDialog parent)
@@ -54,10 +54,10 @@ public class ObjectInspector extends JDialog
   {
     contentPanel.removeAll();
 
-    ip = new InstantiationPanel(this,lis,false,true);  // allow type editing
-    ip.setBorder(null);
+    instantiationPanel = new InstantiationPanel(this,lis,false,true);  // allow type editing
+    instantiationPanel.setBorder(null);
 
-    contentPanel.add(ip);
+    contentPanel.add(instantiationPanel);
     //contentP.add(Box.createVerticalGlue());
     contentPanel.add(Box.createVerticalStrut(5));
     contentPanel.add(buttonPanel);
@@ -68,13 +68,13 @@ public class ObjectInspector extends JDialog
 
   public void setData(VInstantiator vi) throws ClassNotFoundException
   {
-    ip.setData(vi);
+    instantiationPanel.setData(vi);
     pack();
   }
 
   public VInstantiator getData()
   {
-    return ip.getData();
+    return instantiationPanel.getData();
   }
 
   class cancelButtonListener implements ActionListener

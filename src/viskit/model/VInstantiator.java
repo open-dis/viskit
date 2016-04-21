@@ -81,17 +81,17 @@ public abstract class VInstantiator {
             if (c.isArray())
                 v.add(new VInstantiator.Array(args, new ArrayList<>()));
             else
-                v.add(new VInstantiator.FreeF(args, ""));
+                v.add(new VInstantiator.FreeForm(args, ""));
         }
         return v;
     }
 
     /***********************************************************************/
-    public static class FreeF extends VInstantiator {
+    public static class FreeForm extends VInstantiator {
 
         private String value;
 
-        public FreeF(String type, String value) {
+        public FreeForm(String type, String value) {
             super(type);
             setValue(value);
         }
@@ -111,7 +111,7 @@ public abstract class VInstantiator {
 
         @Override
         public VInstantiator vcopy() {
-            VInstantiator rv = new VInstantiator.FreeF(getType(), getValue());
+            VInstantiator rv = new VInstantiator.FreeForm(getType(), getValue());
             rv.setName(getName());
             rv.setDescription(getDescription());
             return rv;
@@ -119,32 +119,32 @@ public abstract class VInstantiator {
 
         @Override
         public boolean isValid() {
-            String t = getType();
-            String v = getValue();
-            return t != null & v != null & !t.isEmpty() & !v.isEmpty();
+            String typeName = getType();
+            String value = getValue();
+            return typeName != null & value != null & !typeName.isEmpty() & !value.isEmpty();
         }
     }
 
     /***********************************************************************/
-    public static class Constr extends VInstantiator {
+    public static class Construct extends VInstantiator {
 
         private List<Object> args;
 
         /** Takes a List of Assembly parameters and args for type
          *
-         * @param params a list of Assembly parameters
+         * @param assemblyParameters a list of Assembly parameters
          * @param type a parameter type
          */
-        public Constr(List<Object> params, String type) {
+        public Construct(List<Object> assemblyParameters, String type) {
             super(type);
 
             if (viskit.ViskitStatics.debug) {
-                LOG.info("Building Constr for " + type);
+                LOG.info("Building Constructor for " + type);
             }
             if (viskit.ViskitStatics.debug) {
                 LOG.info("Required Parameters:");
 
-                for (Object o : params) {
+                for (Object o : assemblyParameters) {
 
                     String s1 = "null";
                     if (o instanceof TerminalParameter) { // check if caller is sending assembly param types
@@ -174,33 +174,33 @@ public abstract class VInstantiator {
 
             // gets lists of EventGraph parameters for type if top-level
             // or null if type is a basic class i.e., java.lang.Double
-            List<Object>[] eparams = ViskitStatics.resolveParameters(ViskitStatics.classForName(type));
-            int indx = 0;
+            List<Object>[] eventGraphParameters = ViskitStatics.resolveParameters(ViskitStatics.classForName(type));
+            int index = 0;
 
-            args = buildInstantiators(params);
+            args = buildInstantiators(assemblyParameters);
             // pick the EventGraph list that matches the
             // Assembly arguments
-            if (eparams != null) {
-                while (indx < (eparams.length - 1)) {
-
-                    if (paramsMatch(params, eparams[indx])) {
+            if (eventGraphParameters != null) {
+                while (index < (eventGraphParameters.length - 1))
+				{
+                    if (paramsMatch(assemblyParameters, eventGraphParameters[index])) {
                         break;
                     } else {
-                        indx++;
+                        index++;
                     }
                 }
                 if (viskit.ViskitStatics.debug) {
-                    LOG.info(type + " VInstantiator using constructor #" + indx);
+                    LOG.info(type + " VInstantiator using constructor #" + index);
                 }
                 // bug: weird case where params came in 0 length but no 0 length constuctors
                 // happens if external class used as parameter?
-                if (params.size() != eparams[indx].size()) {
-                    args = buildInstantiators(eparams[indx]);
+                if (assemblyParameters.size() != eventGraphParameters[index].size()) {
+                    args = buildInstantiators(eventGraphParameters[index]);
                     if (viskit.ViskitStatics.debug) {
                         LOG.info("Warning: VInstantiator.Constr tried 0 length when it was more");
                     }
                 }
-                if (eparams[indx] != null) {
+                if (eventGraphParameters[index] != null) {
                     // now that the values, types, etc set, grab names from eg parameters
                     if (viskit.ViskitStatics.debug) {
                         LOG.info("args came back from buildInstantiators as: ");
@@ -209,25 +209,25 @@ public abstract class VInstantiator {
                         }
                     }
                     if (args != null) {
-                        for (int j = 0; j < eparams[indx].size(); j++) {
+                        for (int j = 0; j < eventGraphParameters[index].size(); j++) {
                             if (viskit.ViskitStatics.debug) {
-                                LOG.info("setting name " + ((Parameter)eparams[indx].get(j)).getName());
+                                LOG.info("setting name " + ((Parameter)eventGraphParameters[index].get(j)).getName());
                             }
-                            ((VInstantiator) args.get(j)).setName(((Parameter)eparams[indx].get(j)).getName());
-                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eparams[indx].get(j)).getComment())); // TODO fix
+                            ((VInstantiator) args.get(j)).setName(((Parameter)eventGraphParameters[index].get(j)).getName());
+                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eventGraphParameters[index].get(j)).getComment())); // TODO fix
                         }
                     }
                 }
             }
         }
 
-        public Constr(String type, List<Object> args) {
+        public Construct(String type, List<Object> args) {
             super(type);
             setArgs(args);
             findArgNames(type, args);
         }
 
-        public Constr(String type, List<Object> args, List<String> names) {
+        public Construct(String type, List<Object> args, List<String> names) {
             this(type, args);
             for (int i = 0; i < args.size(); i++) {
                 ((VInstantiator) args.get(i)).setName(names.get(i));
@@ -304,8 +304,8 @@ public abstract class VInstantiator {
             return instr;
         }
 
-        VInstantiator.FreeF buildTerminalParameter(TerminalParameter p) {
-            return new VInstantiator.FreeF(p.getType(), p.getValue());
+        VInstantiator.FreeForm buildTerminalParameter(TerminalParameter p) {
+            return new VInstantiator.FreeForm(p.getType(), p.getValue());
         }
 
         VInstantiator.Array buildMultiParameter(MultiParameter p, boolean dummy) {
@@ -342,7 +342,7 @@ public abstract class VInstantiator {
                     }
                 }
 
-                vAorC = new VInstantiator.Constr(tmp, p.getType());
+                vAorC = new VInstantiator.Construct(tmp, p.getType());
             }
             return vAorC;
         }
@@ -540,7 +540,7 @@ public abstract class VInstantiator {
                 VInstantiator vi = (VInstantiator) o;
                 lis.add(vi.vcopy());
             }
-            VInstantiator rv = new VInstantiator.Constr(getType(), lis);
+            VInstantiator rv = new VInstantiator.Construct(getType(), lis);
             rv.setName(this.getName());
             rv.setDescription(this.getDescription());
             return rv;

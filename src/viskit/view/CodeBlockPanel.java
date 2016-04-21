@@ -55,67 +55,66 @@ import java.awt.event.*;
  */
 public class CodeBlockPanel extends JPanel {
 
-    private JTextComponent jtc;
-    private Window owner;
-    private String title;
-    private JButton editButt;
-    private static final String TOOL_TIP = "Please remember to enter full Java statements including semi-colons";
+    private JTextComponent codeBlockTA; // myJTextArea or myJTextField
+    private Window  owner;
+    private String  title;
+    private JButton editButton;
+    private static final String TOOLTIP = "Advanced feature to insert Java methods, import statements, etc.  Avoid using code blocks!";
 
-    public CodeBlockPanel(Window owner, boolean multilined, String title) {
-        this.owner = owner;
+    public CodeBlockPanel(Window owner, boolean multipleLines, String title) {
+        this.owner = owner; // hunt for the guilty to affix blame and punishment...
         this.title = title;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setOpaque(false);
 
-        if (multilined) {
-            jtc = new myJTextArea();
+        if (multipleLines) {
+            codeBlockTA = new myJTextArea();
         } else {
-            jtc = new myJTextField("");
+            codeBlockTA = new myJTextField("");
         }
-        jtc.setOpaque(true);
-        jtc.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        jtc.setToolTipText("bogus");
+        codeBlockTA.setOpaque(true);
+        codeBlockTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        codeBlockTA.setToolTipText(TOOLTIP);
 
-        jtc.addKeyListener(new KeyAdapter() {
+        codeBlockTA.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyTyped(KeyEvent e) {
                 if (updateListener != null) {
-                    updateListener.actionPerformed(new ActionEvent(jtc.getText(), 0, ""));
+                    updateListener.actionPerformed(new ActionEvent(codeBlockTA.getText(), 0, ""));
                 }
             }
         });
 
-        add(jtc);
+        add(codeBlockTA);
         add(Box.createHorizontalStrut(3));
-        if (!multilined) {
+        if (!multipleLines) {
             Dimension d = getPreferredSize();
             d.width = Integer.MAX_VALUE;
             setMaximumSize(d);
         }
-        editButt = new JButton(" ... ");
-        editButt.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        editButt.setToolTipText("Click to edit a long code block");
-        Dimension dd = new Dimension(editButt.getPreferredSize());
-        if (!multilined) {
+        editButton = new JButton(" ... ");
+        editButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        editButton.setToolTipText("Click to edit a long code block");
+        Dimension dd = new Dimension(editButton.getPreferredSize());
+        if (!multipleLines) {
             dd.height = getPreferredSize().height;
         }
-        editButt.setMaximumSize(dd);
-        add(editButt);
+        editButton.setMaximumSize(dd);
+        add(editButton);
 
-        editButt.addActionListener(new buttListener());
+        editButton.addActionListener(new buttListener());
     }
 
     /**
-     * This sets the preferredSize of the codeblock panel to borders plus
-     * number of lines specified
+     * setVisibleLines sets the preferredSize of the codeblock panel to borders plus number of lines specified
      * @param n the number of lines desired
      */
     public void setVisibleLines(int n) {
-        if (jtc instanceof JTextArea) {
-            ((JTextArea) jtc).setRows(n);
-            Dimension d = new Dimension(jtc.getPreferredScrollableViewportSize());
-            int ph = Math.max(d.height, editButt.getPreferredSize().height);
+        if (codeBlockTA instanceof JTextArea) {
+            ((JTextArea) codeBlockTA).setRows(n);
+            Dimension d = new Dimension(codeBlockTA.getPreferredScrollableViewportSize());
+            int ph = Math.max(d.height, editButton.getPreferredSize().height);
             ph += getInsets().top + getInsets().bottom;
             setPreferredSize(new Dimension(getPreferredSize().width, ph));
             invalidate();
@@ -128,19 +127,19 @@ public class CodeBlockPanel extends JPanel {
     }
 
     public String getData() {
-        String s = jtc.getText();
+        String s = codeBlockTA.getText();
         return (s == null) ? "" : s;
     }
 
-    public void setData(String s) {
-        jtc.setText(s);
+    public void setData(String newText) {
+        codeBlockTA.setText(newText);
     }
 
     class buttListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            StringBuffer sb = new StringBuffer(jtc.getText().trim());
+            StringBuffer sb = new StringBuffer(codeBlockTA.getText().trim());
             boolean modded;
             if (owner instanceof JDialog) {
                 modded = TextAreaDialog.showTitledDialog(title, owner, sb);
@@ -148,10 +147,10 @@ public class CodeBlockPanel extends JPanel {
                 modded = TextAreaDialog.showTitledDialog(title, owner, sb);
             }
             if (modded) {
-                jtc.setText(sb.toString().trim());
-                jtc.setCaretPosition(0);
+                codeBlockTA.setText(sb.toString().trim());
+                codeBlockTA.setCaretPosition(0);
                 if (updateListener != null) {
-                    updateListener.actionPerformed(new ActionEvent(jtc.getText(), 0, ""));
+                    updateListener.actionPerformed(new ActionEvent(codeBlockTA.getText(), 0, ""));
                 }
             }
         }
@@ -167,7 +166,7 @@ public class CodeBlockPanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            return "<html><pre>" + TOOL_TIP + "</pre></html>";
+            return "<html><pre>" + TOOLTIP + "</pre></html>";
         }
 
         @Override
@@ -197,7 +196,7 @@ public class CodeBlockPanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            return "<html><pre>" + TOOL_TIP + "</pre></html>";
+            return "<html><pre>" + TOOLTIP + "</pre></html>";
         }
 
         @Override

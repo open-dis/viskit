@@ -50,7 +50,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             if (dialog == null) {
                 dialog = new EventGraphNodeInspectorDialog(parent, eventGraphNode);
             } else {
-                dialog.setParams(parent, eventGraphNode);
+                dialog.setParameterWidgets(parent, eventGraphNode);
             }
         } catch (ClassNotFoundException e) {
             String message = "An object type specified in this element (probably " + eventGraphNode.getType() + ") was not found.\n" +
@@ -108,7 +108,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
 
-        placeWidgets();
+        placeWidgets(); // Object creation panel
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
@@ -118,20 +118,22 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         descriptionTF.addCaretListener(listener);
         detailedOutputCheckBox.addActionListener(listener);
 
-        setParams(parent, node);
+        setParameterWidgets(parent, node);
     }
 
-    public final void setParams(Component c, EventGraphNode p) throws ClassNotFoundException {
-        eventGraphNode = p;
+    public final void setParameterWidgets(Component relatedComponent, EventGraphNode currentEventGraphNode) throws ClassNotFoundException
+	{
+        eventGraphNode = currentEventGraphNode;
 
         fillWidgets();
         getContentPane().invalidate();
         getRootPane().setDefaultButton(cancelButton);
 
         pack();     // do this prior to next
-        setLocationRelativeTo(c);
+        setLocationRelativeTo(relatedComponent);
     }
 
+	/** Object creation panel */
     private void placeWidgets()
     {
         JPanel content = (JPanel)getContentPane();
@@ -171,7 +173,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             descriptionTF.setText(eventGraphNode.getDescription());
             instantiationPanel.setData(eventGraphNode.getInstantiator());
         } else {
-            handleTF.setText("egNode name");
+            handleTF.setText("Event graph node name");
             detailedOutputCheckBox.setSelected(false);
             descriptionTF.setText("");
        }
@@ -258,13 +260,13 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }   // testLp
 
         // Here if we found a problem
-        int ret = JOptionPane.showConfirmDialog(
+        int returnValue = JOptionPane.showConfirmDialog(
                 EventGraphNodeInspectorDialog.this,
                 "All fields must be completed. Close anyway?",
                 "Question",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-        return ret != JOptionPane.YES_OPTION; // don't cancel
+        return returnValue != JOptionPane.YES_OPTION; // don't cancel
         // cancel close
     }
 

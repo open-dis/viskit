@@ -151,7 +151,7 @@ public class ArrayInspector extends JDialog {
             }
         } else {
             for (int i = 0; i < sz; i++) {
-                v.add(new VInstantiator.FreeF(myTyp, ""));
+                v.add(new VInstantiator.FreeForm(myTyp, ""));
             }
         }
         setData(v);

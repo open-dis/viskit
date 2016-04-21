@@ -288,7 +288,7 @@ abstract public class MetadataDialog extends JDialog {
             modified = true;
             if (modified) {
                 if (nameTF.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(MetadataDialog.this, "Must have a non-zero length name.",
+                    JOptionPane.showMessageDialog(MetadataDialog.this, "Must have a non-zero-length name.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     nameTF.requestFocus();
                     return;
@@ -306,9 +306,9 @@ abstract public class MetadataDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(MetadataDialog.this, "Apply changes?",
+                int returnValue = JOptionPane.showConfirmDialog(MetadataDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
                     cancelButton.doClick();
