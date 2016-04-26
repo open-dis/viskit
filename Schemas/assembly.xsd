@@ -80,6 +80,7 @@
       <xs:attribute name="link" type="xs:ID"/>
       <xs:attribute name="value"/>
       <xs:attribute name="type" use="required"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="DoubleRange" substitutionGroup="ValueRange"/>
@@ -89,6 +90,7 @@
       <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
       <xs:attribute name="name"/>
       <xs:attribute name="type" use="required"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="FactoryParameter">
@@ -98,6 +100,7 @@
       <xs:attribute name="factory" use="required"/>
       <xs:attribute name="method" default="getInstance"/>
       <xs:attribute name="type" use="required"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Coordinate">
