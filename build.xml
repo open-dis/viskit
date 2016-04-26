@@ -210,7 +210,7 @@ their descpritions.
     </target>
 
     <!-- @deprecated - Now a legacy target as we are no longer building schema from DTD -->
-    <target name="build.schema"
+    <target name="deprecated.build.createNewSchemaFromDtd"
             depends="init"
             description="Create xsd Schemas from dtd @deprecated">
         <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
@@ -224,7 +224,7 @@ their descpritions.
         <trang failonerror="true" input="${cli.dtd}" output="${cli.xsd}" schemaIn="dtd" schemaOut="xsd"/>
     </target>
 
-    <target name="bindings.simkit.jaxb"
+    <target name="build.bindings.simkit.jaxb"
             depends="init"
             description="Create bindings to Simkit XML Schemas" >
 
@@ -261,7 +261,7 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit.jaxb,javahelp">
+    <target name="compile" depends="build.bindings.simkit.jaxb,javahelp">
 
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"
