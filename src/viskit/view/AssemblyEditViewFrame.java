@@ -387,7 +387,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
 			recentProjectFileSetListener = new RecentProjectFileSetListener();
 			getRecentProjectFileSetListener().addMenuItem(openRecentProjectsMenu);
-			assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
+			assemblyController.addRecentProjectListener(getRecentProjectFileSetListener());
 		}
         assembliesMenu.addSeparator();
 
@@ -1139,9 +1139,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 		
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
-		String initialProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
+		String initialProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // parent directory
         File file = ViskitProject.openProjectDirectory(this, initialProjectPath); // ViskitProject.MY_VISKIT_PROJECTS_DIR);
-		if (file != null) {
+		if (file != null) 
+		{
             assemblyController.openProject(file);
         }
 		else

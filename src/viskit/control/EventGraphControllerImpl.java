@@ -419,11 +419,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      */
     private void adjustRecentEventGraphFileSet(File file) 
 	{
-        for (Iterator<File> itr = recentEventGraphFileSet.iterator(); itr.hasNext();)
+        for (Iterator<File> iterator = recentEventGraphFileSet.iterator(); iterator.hasNext();)
 		{
-            File f = itr.next();
+            File f = iterator.next();
             if (file.getPath().equals(f.getPath())) {
-                itr.remove();
+                iterator.remove();
                 break;
             }
         }
@@ -519,19 +519,22 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void quit() {
-        if (preQuit()) {
+    public void quit () // method name must exactly match preceding string value
+	{
+        if (preQuit())
+		{
             postQuit();
         }
     }
 
     @Override
-    public boolean preQuit() {
-
-        // Check for dirty models before exiting
-        EventGraphModel[] mods = ((EventGraphView) getView()).getOpenModels();
-        for (EventGraphModel mod : mods) {
-            setModel((mvcModel) mod);
+    public boolean preQuit()
+	{
+        // Check for dirty models before exiting, first ask if user wants to save them
+        EventGraphModel[] openEventGraphModels = ((EventGraphView) getView()).getOpenModels();
+        for (EventGraphModel eventGraphModel : openEventGraphModels)
+		{
+            setModel((mvcModel) eventGraphModel);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -542,7 +545,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void postQuit() {
+    public void postQuit()
+	{
         ViskitGlobals.instance().quitEventGraphEditor();
     }
 
@@ -1220,7 +1224,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages) {
-        Iterator<File> itr = eventGraphImages.listIterator(0);
+        Iterator<File> iterator = eventGraphImages.listIterator(0);
 
         File imageFile;
         TimerCallback tcb;
@@ -1243,8 +1247,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOG.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
-            if (itr.hasNext()) {
-                imageFile = itr.next();
+            if (iterator.hasNext()) {
+                imageFile = iterator.next();
                 LOG.debug("eventGraphImage is: " + imageFile);
 
                 // Don't display an extra frame while taking snapshots

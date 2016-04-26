@@ -110,7 +110,7 @@ public class ViskitStatics {
     @SuppressWarnings("unchecked")
     public static void setViskitProjectDirectory (File projectDirectory)
 	{
-		// must be parent directory!!
+		// must be parent directory!! combination of values results in actual directorn 
         ViskitProject.MY_VISKIT_PROJECTS_DIR = projectDirectory.getParent().replaceAll("\\\\", "/"); // normalize
 		// ViskitConfiguration.instance() creates configuration (if needed) before saving values
         ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -527,19 +527,20 @@ public class ViskitStatics {
     static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
     /**
-     * For the given class type EG, record its specific ParameterMap
-     * @param type the EG class name
-     * @param p a List of parameter map object arrays
+     * For the given class type Event Graph, record its specific ParameterMap
+     * @param typeName the Event Graph class name
+     * @param parameterMapObjectArray a List of parameter map object arrays
      */
-    static public void putParameterList(String type, List<Object>[] p) {
+    static public void putParameterList(String typeName, List<Object>[] parameterMapObjectArray)
+	{
         if (debug) {
-            System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
+            System.out.println("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
         }
-        parameterMap.remove(type);
-        parameterMap.put(type, p);
+        parameterMap.remove(typeName); // ensure correct
+        parameterMap.put(typeName, parameterMapObjectArray);
     }
 
-    /** Checks for and return a varargs type as an array, or the orig type
+    /** Checks for and return a varargs type as an array, or the original type
      *
      * @param type the Class type to check
      * @return return a varargs type as an array, or the orig. type
@@ -557,72 +558,85 @@ public class ViskitStatics {
     /**
      * For the given EG class type, return its specific ParameterMap contents
      *
-     * @param type the EG class type to resolve
+     * @param type the Event Graph class type to resolve
      * @return a List of parameter map object arrays
      */
-    static public List<Object>[] resolveParameters(Class<?> type) {
-        Object testResult = parameterMap.get(type.getName());
-        List<Object>[] resolved = null;
-        if (debug) 
-        {
-            if (testResult != null) {
-                resolved = parameterMap.get(type.getName());
-                System.out.println("parameters already resolved");
-            }
-        }
-        if (resolved == null) {
-
-            Constructor<?>[] constr = type.getConstructors();
-            Annotation[] paramAnnots;
-            List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
+    static public List<Object>[] resolveParameters(Class<?> type)
+	{
+        List<Object>[] resolvedParameterList = null;
+		if ((parameterMap != null) && (parameterMap.get(type.getName()) != null))
+		{
+			resolvedParameterList = parameterMap.get(type.getName());
+			System.out.println("parameters already resolved");
+		}
+		
+        if (resolvedParameterList == null)
+		{
+            Constructor<?>[] constructor = type.getConstructors();
+            Annotation[] parameterAnnotations;
+            List<Object>[] parameterList = GenericConversion.newListObjectTypeArray(List.class, constructor.length);
             ObjectFactory objectFactory = new ObjectFactory();
-            Field f = null;
+            Field field = null;
 
             try {
-                f = type.getField("parameterMap");
-            } catch (SecurityException ex) {
+                field = type.getField("parameterMap");
+            } 
+			catch (SecurityException ex)
+			{
                 LOG.error(ex);
-//                ex.printStackTrace();
-            } catch (NoSuchFieldException ex) {}
+            }
+			catch (NoSuchFieldException ex)
+			{
+				// null result for creating field
+			}
 
-            if (viskit.ViskitStatics.debug) {
+            if (viskit.ViskitStatics.debug)
+			{
                 System.out.println("adding " + type.getName());
-                System.out.println("\t # constructors: " + constr.length);
+                System.out.println("\t # constructors: " + constructor.length);
             }
 
-            for (int i = 0; i < constr.length; i++) {
-                Class<?>[] ptypes = constr[i].getParameterTypes();
-                paramAnnots = constr[i].getDeclaredAnnotations();
-                plist[i] = new ArrayList<>();
+            for (int i = 0; i < constructor.length; i++)
+			{
+                Class<?>[] parameterTypes = constructor[i].getParameterTypes();
+                parameterAnnotations      = constructor[i].getDeclaredAnnotations();
+                parameterList[i] = new ArrayList<>();
                 if (viskit.ViskitStatics.debug) {
-                    System.out.println("\t # params " + ptypes.length + " in constructor " + i);
+                    System.out.println("\t # params " + parameterTypes.length + " in constructor " + i);
                 }
 
                 // possible that a class inherited a parameterMap, check if annotated first
-                if (paramAnnots != null && paramAnnots.length > 0) {
-                    if (paramAnnots.length > 1) {
-                        throw new RuntimeException("Only one Annotation per constructor");
+                if (parameterAnnotations != null && parameterAnnotations.length > 0)
+				{
+                    if (parameterAnnotations.length > 1) {
+                        throw new RuntimeException("Only one Annotation allowed per constructor, found " + parameterAnnotations.length);
                     }
 
-                    ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
-                    if (param != null) {
-                        String[] names = param.names();
-                        String[] types = param.types();
-                        if (names.length != types.length) {
+                    ParameterMap parameterMap = constructor[i].getAnnotation(viskit.ParameterMap.class);
+                    if (parameterMap != null) {
+                        String[] names       = parameterMap.names();
+                        String[] types       = parameterMap.types();
+                        String[] description = parameterMap.descriptions();
+                        if (names.length != types.length)
+						{
                             throw new RuntimeException("ParameterMap names and types length mismatch");
                         }
-                        for (int k = 0; k < names.length; k++) {
-                            Parameter pt = objectFactory.createParameter();
-                            pt.setName(names[k]);
-                            pt.setType(types[k]);
+                        for (int k = 0; k < names.length; k++)
+						{
+                            Parameter parameter = objectFactory.createParameter();
+                            parameter.setName(names[k]);
+                            parameter.setType(types[k]);
+                            parameter.setDescription(description[k]);
 
-                            plist[i].add(pt);
+                            parameterList[i].add(parameter);
                         }
                     }
 
-                } else if (f != null) {
+                } 
+				else if (field != null) // known
+				{
                     if (viskit.ViskitStatics.debug) {
-                        System.out.println(f + " is a parameterMap");
+                        System.out.println(field + " is a parameterMap");
                     }
                     try {
                         // parameters are in the following order
@@ -631,25 +645,31 @@ public class ViskitStatics {
                         //  { "type0","name0", ... }
                         //  ...
                         // }
-                        String[][] pMap = (String[][]) (f.get(new String[0][0]));
-                        int numConstrs = pMap.length;
+                        String[][] parameterMap = (String[][]) (field.get(new String[0][0]));
+                        int constructorCount = parameterMap.length;
+						// TODO check that constructorCount == constr.length
 
-                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
-                            String[] params = pMap[n];
-                            if (params != null) {
-                                plist[n] = new ArrayList<>();
-                                for (int k = 0; k < params.length; k += 2) {
+                        for (int n = 0; n < constructorCount; n++) 
+						{
+                            String[] parameterValueArray = parameterMap[n];
+                            if (parameterValueArray != null) {
+                                parameterList[n] = new ArrayList<>();
+                                for (int k = 0; k < parameterValueArray.length; k += 2)
+								{
                                     try {
-                                        Parameter p = objectFactory.createParameter();
-                                        String ptype = params[k];
-                                        String pname = params[k + 1];
+                                        Parameter parameter = objectFactory.createParameter();
+                                        String parameterTypeName    = parameterValueArray[k];
+                                        String parameterName        = parameterValueArray[k + 1];
+                                        String parameterDescription = parameterTypeName;
 
-                                        p.setName(pname);
-                                        p.setType(ptype);
+                                        parameter.setName       (parameterName);
+                                        parameter.setType       (parameterTypeName);
+                                        parameter.setDescription(parameterDescription);
 
-                                        plist[n].add(p);
-                                        if (viskit.ViskitStatics.debug) {
-                                            System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
+                                        parameterList[n].add(parameter);
+                                        if (viskit.ViskitStatics.debug)
+										{
+                                            System.out.println("\tfrom compiled parameterMap: " + parameter.getName() + " " + parameter.getType());
                                         }
                                     } catch (Exception ex) {
                                         LOG.error(ex);
@@ -663,22 +683,31 @@ public class ViskitStatics {
                         LOG.error(ex);
 //                        ex.printStackTrace();
                     }
-                } else { // unknonws
+                } 
+				else // unknowns
+					
+				{
                     int k = 0;
-                    for (Class<?> ptype : ptypes) {
+                    for (Class<?> parameterType : parameterTypes)
+					{
                         try {
-                            Parameter p = objectFactory.createParameter();
-                            String ptType = ViskitStatics.convertClassName(ptype.getName());
-                            if (ptType.indexOf(".class") > 0) { //??
-                                ptType = ptType.split("\\.")[0];
+                            Parameter newParameter = objectFactory.createParameter();
+                            String newParameterTypeName = ViskitStatics.convertClassName(parameterType.getName());
+                            if (newParameterTypeName.indexOf(".class") > 0) {
+                                newParameterTypeName = newParameterTypeName.split("\\.")[0]; // omit .class from type name
                             }
+							// TODO apparently no way to get Javadoc from reflection for this field parameter
+							String newParameterDescription = newParameterTypeName;
 
                             // Not sure what use a name like this is for PCLs
-                            p.setName("p[" + k++ + "] : ");
-                            p.setType(ptType);
-                            plist[i].add(p);
-                            if (viskit.ViskitStatics.debug) {
-                                System.out.println("\t " + p.getName() + p.getType());
+                            newParameter.setName("parameter[" + k++ + "] : ");
+                            newParameter.setType(newParameterTypeName);
+                            newParameter.setDescription(newParameterDescription);
+							
+                            parameterList[i].add(newParameter);
+                            if (viskit.ViskitStatics.debug)
+							{
+                                System.out.println("\t " + newParameter.getName() + newParameter.getType());
                             }
                         } catch (Exception ex) {
                             LOG.error(ex);
@@ -687,10 +716,10 @@ public class ViskitStatics {
                     }
                 }
             }
-            putParameterList(type.getName(), plist);
-            resolved = plist;
+            putParameterList(type.getName(), parameterList);
+            resolvedParameterList = parameterList;
         }
-        return resolved;
+        return resolvedParameterList;
     }
 
     /**

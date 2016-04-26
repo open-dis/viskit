@@ -32,8 +32,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
-    private final JLabel     handleLabel; //,outputLab;
-    private final JTextField handleTF;
+    private final JLabel     handleNameLabel; //,outputLab;
+    private final JTextField handleNameTF;
 
     // verboseCheck not used, does nothing for Viskit
     private final JCheckBox detailedOutputCheckBox /*, verboseCheck*/;
@@ -73,7 +73,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException
 	{
-        super(parent, "Event Graph Inspector", true);
+        super(parent, "Assembly Editor: Event Graph Instance Initialization", true);
         this.eventGraphNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -85,10 +85,10 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        handleTF = new JTextField();
-        ViskitStatics.clampHeight(handleTF);
-        handleLabel = new JLabel("name", JLabel.TRAILING);
-        handleLabel.setLabelFor(handleTF);
+        handleNameTF = new JTextField();
+        ViskitStatics.clampHeight(handleNameTF);
+        handleNameLabel = new JLabel("name", JLabel.TRAILING);
+        handleNameLabel.setLabelFor(handleNameTF);
         detailedOutputCheckBox = new JCheckBox("detailed output");
         detailedOutputCheckBox.setToolTipText("Enable a list dump of all entity names to the console");
 
@@ -97,7 +97,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
         descriptionLabel.setLabelFor(descriptionTF);
 
-        ViskitStatics.cloneSize(handleLabel, descriptionLabel);    // make handle same size
+        ViskitStatics.cloneSize(handleNameLabel, descriptionLabel);    // make handle same size
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -114,7 +114,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        handleTF.addCaretListener(listener);
+        handleNameTF.addCaretListener(listener);
         descriptionTF.addCaretListener(listener);
         detailedOutputCheckBox.addActionListener(listener);
 
@@ -139,14 +139,14 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         JPanel content = (JPanel)getContentPane();
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JPanel bcont = new JPanel();
-        bcont.setLayout(new BoxLayout(bcont, BoxLayout.X_AXIS));
-        bcont.add(handleLabel);
-        bcont.add(Box.createHorizontalStrut(5));
-        bcont.add(handleTF);
-        bcont.add(Box.createHorizontalStrut(2));
-        bcont.add(detailedOutputCheckBox);
-        content.add(bcont);
+        JPanel eventGraphIdentificationPanel = new JPanel();
+        eventGraphIdentificationPanel.setLayout(new BoxLayout(eventGraphIdentificationPanel, BoxLayout.X_AXIS));
+        eventGraphIdentificationPanel.add(handleNameLabel);
+        eventGraphIdentificationPanel.add(Box.createHorizontalStrut(5));
+        eventGraphIdentificationPanel.add(handleNameTF);
+        eventGraphIdentificationPanel.add(Box.createHorizontalStrut(2));
+        eventGraphIdentificationPanel.add(detailedOutputCheckBox);
+        content.add(eventGraphIdentificationPanel);
 
         JPanel dcont = new JPanel();
         dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
@@ -158,7 +158,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         instantiationPanel = new InstantiationPanel(this, listener, true);
 
         instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+                    "Object creation: parameter initialization", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
         instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(instantiationPanel);
@@ -168,19 +168,19 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     private void fillWidgets() throws ClassNotFoundException {
         if (eventGraphNode != null) {
-            handleTF.setText(eventGraphNode.getName());
+            handleNameTF.setText(eventGraphNode.getName());
             detailedOutputCheckBox.setSelected(eventGraphNode.isOutputMarked());
             descriptionTF.setText(eventGraphNode.getDescription());
             instantiationPanel.setData(eventGraphNode.getInstantiator());
         } else {
-            handleTF.setText("Event graph node name");
+            handleNameTF.setText("Event graph node name");
             detailedOutputCheckBox.setSelected(false);
             descriptionTF.setText("");
        }
     }
 
     private void unloadWidgets() {
-        String nm = handleTF.getText();
+        String nm = handleNameTF.getText();
         nm = nm.replaceAll("\\s", "");
         if (eventGraphNode != null) {
             eventGraphNode.setName(nm);
@@ -250,7 +250,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
         testLp:
         {
-            if (handleTF.getText().trim().isEmpty()) {
+            if (handleNameTF.getText().trim().isEmpty()) {
                 break testLp;
             }
             if (!vi.isValid()) {
@@ -262,7 +262,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         // Here if we found a problem
         int returnValue = JOptionPane.showConfirmDialog(
                 EventGraphNodeInspectorDialog.this,
-                "All fields must be completed. Close anyway?",
+                "All fields need to be completed. Close anyway?",
                 "Question",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);

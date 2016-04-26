@@ -46,6 +46,7 @@ public class ViskitConfiguration {
     public static final String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
     public static final String PROJECT_PATH_KEY        = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
     public static final String PROJECT_NAME_KEY        = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
+    public static final String PROJECT_OPEN_KEY        = PROJECT_HOME_CLEAR_KEY + ".open[@value]";
     public static final String PROJECT_AUTHOR_KEY      = PROJECT_HOME_CLEAR_KEY + ".author[@value]";
     public static final String PROJECT_REVISION_KEY    = PROJECT_HOME_CLEAR_KEY + ".revision[@value]";
     public static final String PROJECT_DESCRIPTION_KEY = PROJECT_HOME_CLEAR_KEY + ".description[@value]";
@@ -266,6 +267,7 @@ public class ViskitConfiguration {
 		else setValue(ViskitConfiguration.PROJECT_PATH_KEY, "");
 		
         setValue(ViskitConfiguration.PROJECT_NAME_KEY, "");
+        setValue(ViskitConfiguration.PROJECT_OPEN_KEY, "false");
         setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY, "");
         setValue(ViskitConfiguration.PROJECT_REVISION_KEY, "");
         setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "");

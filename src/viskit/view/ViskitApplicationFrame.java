@@ -160,8 +160,8 @@ public class ViskitApplicationFrame extends JFrame {
 
     public final void initializeUserInterface()
 	{
-        ViskitGlobals.instance().setAssemblyQuitHandler(null);
-        ViskitGlobals.instance().setEventGraphQuitHandler(null);
+        ViskitGlobals.instance().setAssemblyQuitHandler(null);   // TODO
+        ViskitGlobals.instance().setEventGraphQuitHandler(null); // TODO
         JMenuBar fileMenuBar, eventGraphMenuBar, assemblyEditMenuBar, assemblyRunMenuBar, analystReportMenuBar, 
 				 designOfExperimentsMenuBar, clusterGridMenuBar; // TODO delete
         
@@ -172,7 +172,7 @@ public class ViskitApplicationFrame extends JFrame {
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		mainMenuBar.add(fileMenu); // initialize
 		
-        myExitAction = new ExitAction("Exit");
+        myExitAction = new ExitAction("Exit"); // TODO
 
         mainTabbedPane = new JTabbedPane();
         mainTabbedPane.setFont(mainTabbedPane.getFont().deriveFont(Font.BOLD));
@@ -316,7 +316,8 @@ public class ViskitApplicationFrame extends JFrame {
         userPreferencesMenuItem.addActionListener(myUserPreferencesHandler);
 //        jamSettingsHandler(fileMenu);
 		
-		quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcutKeyMask)); // do not change "quit"
+		final String QUIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically.
+		quitMenuItem = buildMenuItem(eventGraphController, QUIT_METHOD, "Exit", KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcutKeyMask)); // do not change "quit"
         fileMenu.add(quitMenuItem); // TODO omit hotkey
         jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
 
@@ -555,25 +556,26 @@ public class ViskitApplicationFrame extends JFrame {
         }
     };
 
-    private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {
+    private void jamQuitHandler(JMenuItem mi, Action quitAction, JMenuBar menuBar) {
         if (mi == null) {
-            JMenu m = mb.getMenu(0); // first menu
-            if (m == null) {
-                m = new JMenu("File");
-                mb.add(m);
+            JMenu menu = menuBar.getMenu(0); // first menu
+            if (menu == null)
+			{
+                menu = new JMenu("File");
+                menuBar.add(menu);
             }
-            m.addSeparator();
+            menu.addSeparator();
             mi = new JMenuItem("Exit");
             mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-            m.add(mi);
+            menu.add(mi);
         }
 
-        ActionListener[] al = mi.getActionListeners();
-        for (ActionListener al1 : al) {
-            mi.removeActionListener(al1);
+        ActionListener[] actionListeners = mi.getActionListeners();
+        for (ActionListener actionListener : actionListeners)
+		{
+            mi.removeActionListener(actionListener);
         }
-
-        mi.setAction(qa);
+        mi.setAction(quitAction);
     }
 
     class ExitAction extends AbstractAction {
@@ -583,7 +585,8 @@ public class ViskitApplicationFrame extends JFrame {
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+		{
             SystemExitHandler defaultHandler = ViskitGlobals.instance().getSystemExitHandler();
             ViskitGlobals.instance().setSystemExitHandler(nullSystemExitHandler);
 
@@ -592,51 +595,58 @@ public class ViskitApplicationFrame extends JFrame {
 
             outer:
             {
-                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1) {
+                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1)
+				{
                     mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
-                    if (!((EventGraphController) eventGraphViewFrame.getController()).preQuit()) {
-                        break outer;
+					// check all open event graphs, ask user to save as appropriate
+                    if (!((EventGraphController) eventGraphViewFrame.getController()).preQuit())
+					{
+                        break outer; // user cancel
                     }
                 }
-                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1) {
-                    mainTabbedPane.setSelectedIndex(tabIndices[TAB_ASSEMBLY_EDITOR]);
-                    if (!((AssemblyController) assemblyEditViewFrame.getController()).preQuit()) {
-                        break outer;
+                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1)
+				{
+                    mainTabbedPane.setSelectedIndex(tabIndices[TAB_ASSEMBLY_EDITOR]);					
+					// check all open assemblies, ask user to save as appropriate
+                    if (!((AssemblyController) assemblyEditViewFrame.getController()).preQuit())
+					{
+                        break outer; // user cancel
                     }
                 }
 
-                /* DIFF between OA3302 branch and trunk */
                 if (tabIndices[TAB_SIMULATION_RUN] != -1) {
                     mainTabbedPane.setSelectedIndex(tabIndices[TAB_SIMULATION_RUN]);
                     if (designOfExperimentsMain != null) {
-                        if (!designOfExperimentsMain.getController().preQuit()) {
-                            break outer;
+                        if (!designOfExperimentsMain.getController().preQuit())
+						{
+                            break outer; // user cancel
                         }
                     }
                 }
-                /* End DIFF between OA3302 branch and trunk */
-
                 // TODO: other preQuits here if needed
+				
                 ViskitGlobals.instance().setSystemExitHandler(defaultHandler);    // reset default handler
 
-                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1) {
+                if (tabIndices[TAB_EVENTGRAPH_EDITOR] != -1)
+				{
                     ((EventGraphController) eventGraphViewFrame.getController()).postQuit();
                 }
-                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1) {
+                if (tabIndices[TAB_ASSEMBLY_EDITOR] != -1)
+				{
                     ((AssemblyController) assemblyEditViewFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (designOfExperimentsMain != null) {
+                if (designOfExperimentsMain != null)
+				{
                     designOfExperimentsMain.getController().postQuit();
                 }
-                /* End DIFF between OA3302 branch and trunk */
-
                 // TODO: other postQuits here if needed
 
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.ViskitStatics.debug)
+				{
                     LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
                 }
 
@@ -861,7 +871,8 @@ public class ViskitApplicationFrame extends JFrame {
     }
 	public final String getProjectTitle ()
 	{
-        String title = " " + ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME + ": ";
+        String title = " ";
+		
 		if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
 			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() ||
 			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
@@ -869,11 +880,13 @@ public class ViskitApplicationFrame extends JFrame {
 			title = ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME; // no project is open
 		}
 		else // project is open
-		{
+		{ 
+			title = ViskitConfiguration.VISKIT_SHORT_APPLICATION_NAME;
+			if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().contains("Project"))
+				 title += " Project";
+			title += ": ";
 			title += ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
 			// ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
-			if (!title.contains("Project"))
-				 title += " Project";
 		}
 		return title;
 	}

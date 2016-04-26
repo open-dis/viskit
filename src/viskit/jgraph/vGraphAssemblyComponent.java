@@ -300,7 +300,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         description = description.trim();
                         if (description.length() > 0) {
                             sb.append("<br>");
-                            sb.append("<u> description: </u>");
+                            sb.append("<i>description:</i> ");
                             sb.append(wrapAtPosition(description, 60));
                         }
                     }
@@ -333,7 +333,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         description = description.trim();
                         if (description.length() > 0) {
                             sb.append("<br>");
-                            sb.append("<u> description: </u>");
+                            sb.append("<i>description:</i> ");
                             sb.append(wrapAtPosition(escapeLTGT(description), 60));
                         }
                     }

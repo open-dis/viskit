@@ -89,8 +89,9 @@ public class XmlTree extends JTree {
         if (lis.isEmpty()) {
             return;
         }
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            Attribute att = (Attribute) itr.next();
+        for (Iterator iterator = lis.iterator(); iterator.hasNext();)
+		{
+            Attribute att = (Attribute) iterator.next();
             String attrs = "<font color='black'>" + att.getName() + " =</font> " + att.getValue();
             node.add(new DefaultMutableTreeNode(attrs));
         }
@@ -109,8 +110,9 @@ public class XmlTree extends JTree {
         if (lis.isEmpty()) {
             return;
         }
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            Object o = itr.next();
+        for (Iterator iterator = lis.iterator(); iterator.hasNext();)
+		{
+            Object o = iterator.next();
             if (o instanceof Element) {
                 DefaultMutableTreeNode dmt = new DefaultMutableTreeNode(new nElement(level + 1, (Element) o));
                 node.add(dmt);

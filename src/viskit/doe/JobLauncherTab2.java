@@ -823,8 +823,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     // Send EventGraphs
                     Collection egs = cntlr.getLoadedEventGraphs();
 
-                    for (Iterator itr = egs.iterator(); itr.hasNext();) {
-                        addEventGraphFile((File) itr.next());
+                    for (Iterator iterator = egs.iterator(); iterator.hasNext();) {
+                        addEventGraphFile((File) iterator.next());
                     }
 
                     // Construct assembly

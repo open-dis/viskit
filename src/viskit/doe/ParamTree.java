@@ -68,8 +68,8 @@ public class ParamTree extends JTree {
     public void setParams(List lis) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Parameter tree");
 
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            Element elm = (Element) itr.next();
+        for (Iterator iterator = lis.iterator(); iterator.hasNext();) {
+            Element elm = (Element) iterator.next();
             // assert elm.getName().equalsIgnoreCase("SimEntity");
             if (!elm.getName().equalsIgnoreCase("SimEntity")) {
                 System.err.println("ParamTree.setParams, unknown element type: " + elm.getName());
@@ -83,8 +83,8 @@ public class ParamTree extends JTree {
 
     private void addChildren(Element elm, DefaultMutableTreeNode node) {
         List lis = elm.getChildren();
-        for (Iterator itr = lis.iterator(); itr.hasNext();) {
-            Element e = (Element) itr.next();
+        for (Iterator iterator = lis.iterator(); iterator.hasNext();) {
+            Element e = (Element) iterator.next();
             DefaultMutableTreeNode n = new DefaultMutableTreeNode(e);
             String nm = e.getName();
             if (nm.equalsIgnoreCase("MultiParameter")) {

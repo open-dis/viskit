@@ -360,6 +360,7 @@ public class ViskitProject {
 				projectDescription = "";
 				projectDocument.getRootElement().setAttribute("description", projectDescription);
 			}
+			setProjectOpen(true);
         }
 		catch (Exception ex)
 		{
@@ -506,14 +507,21 @@ public class ViskitProject {
     /**
      * @return indication of the projectOpen
      */
-    public boolean isProjectOpen() {
+    public boolean isProjectOpen()
+	{
         return projectOpen;
     }
 
     /**
      * @param projectOpen the projectOpen to set
      */
-    public void setProjectOpen(boolean projectOpen) {
+    public void setProjectOpen(boolean projectOpen)
+	{
+		String projectStatus;
+		if  (projectOpen)
+			 projectStatus = "true";
+		else projectStatus = "false";
+        ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_OPEN_KEY, projectStatus);
         this.projectOpen = projectOpen;
     }
 

@@ -640,8 +640,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         List behaviorList = arb.getBehaviorList();
 
         behaviorTabs.removeAll();
-        for (Iterator itr = behaviorList.iterator(); itr.hasNext();) {
-            List nextBehavior = (List) itr.next();
+        for (Iterator iterator = behaviorList.iterator(); iterator.hasNext();)
+		{
+            List nextBehavior = (List) iterator.next();
             String behaviorName = (String) nextBehavior.get(0);
             String behaviorDescription = (String) nextBehavior.get(1);
             List behaviorParameters = (List) nextBehavior.get(2);

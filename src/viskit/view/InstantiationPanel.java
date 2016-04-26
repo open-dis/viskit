@@ -141,7 +141,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             @Override
             public void actionPerformed(ActionEvent e)
 			{
-                if (!typeTF.getText().trim().equals(myVi.getType())) {
+                if (!typeTF.getText().trim().equals(myVInstantiator.getTypeName())) {
                     String newType = typeTF.getText().trim();
                     // update the panels
                     try {
@@ -199,11 +199,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
     }
 
-    VInstantiator myVi;
+    VInstantiator myVInstantiator;
 
-    public void setData(VInstantiator vi) throws ClassNotFoundException {
-        myVi = vi.vcopy();
-        String typeName = myVi.getType();
+    public void setData(VInstantiator vi) throws ClassNotFoundException
+	{
+        myVInstantiator = vi.vcopy();
+        String typeName = myVInstantiator.getTypeName();
         typeTF.setText(typeName);
 
         // inform all panels of the type of the object
@@ -211,19 +212,25 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             factoryPanel.setType(typeName);
            freeFormPanel.setType(typeName);
 
-        if (vi instanceof VInstantiator.Construct) {
-            constructorPanel.setData((VInstantiator.Construct) myVi);
+        if (vi instanceof VInstantiator.Construct)
+		{
+            constructorPanel.setData((VInstantiator.Construct) myVInstantiator);
             methodCB.setSelectedIndex(CONSTRUCTOR);
-        } else if (vi instanceof VInstantiator.Factory) {
-                factoryPanel.setData((VInstantiator.Factory) myVi);
+        } 
+		else if (vi instanceof VInstantiator.Factory)
+		{
+            factoryPanel.setData((VInstantiator.Factory) myVInstantiator);
             methodCB.setSelectedIndex(FACTORY);
-        } else if (vi instanceof VInstantiator.FreeForm) {
-            freeFormPanel.setData((VInstantiator.FreeForm) myVi);
+        }
+		else if (vi instanceof VInstantiator.FreeForm)
+		{
+            freeFormPanel.setData((VInstantiator.FreeForm) myVInstantiator);
             methodCB.setSelectedIndex(FREEFORM);
-        } else {
+        }
+		else
+		{
             System.err.println("Internal error InstantiationPanel.setData()");
         }
-
     }
 
     @Override
@@ -335,15 +342,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 for (int i = 0; i < parameters.length; ++i) {
 
                     constructor = new VInstantiator.Construct(parameters[i], className);
-                    String parametersSignature = noParametersString;
-                    for (int j = 0; j < constructor.getArgs().size(); j++)
+                    String parametersSignature = "";
+					if (constructor.getArgs().isEmpty())
+						parametersSignature = noParametersString;
+					else
 					{
-                        parametersSignature += ((Parameter)parameters[i].get(j)).getType() + ", ";
+						for (int j = 0; j < constructor.getArgs().size(); j++)
+						{
+							parametersSignature += ((Parameter)parameters[i].get(j)).getType() + ", ";
 
-                        if (!((VInstantiator) (constructor.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
-                             ((VInstantiator) (constructor.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
-                    }
-                    parametersSignature = parametersSignature.substring(0, parametersSignature.length() - 2); // strip trailing comma
+							if (!((VInstantiator) (constructor.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
+								 ((VInstantiator) (constructor.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
+						}
+						parametersSignature = parametersSignature.substring(0, parametersSignature.length() - 2); // strip trailing comma
+					}
 
                     constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
                     constructorPanels[i].setData(constructor.getArgs());
@@ -389,10 +401,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 return;
             }
             if (viskit.ViskitStatics.debug) {
-                System.out.println("setting data for " + vi.getType());
+                System.out.println("setting data for " + vi.getTypeName());
             }
 
-            int argumentIndex = vi.indexOfArgNames(vi.getType(), vi.getArgs());
+            int argumentIndex = vi.indexOfArgNames(vi.getTypeName(), vi.getArgs());
             if (viskit.ViskitStatics.debug) {
                 System.out.println("found a matching constructor at " + argumentIndex);
             }
@@ -483,7 +495,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             add(topPanel);
 
             boolean foundString = false;
-            for (Object o : vi.getParams()) {
+            for (Object o : vi.getParametersList()) {
                 if (o instanceof String) {
                     foundString = true;
                     break;
@@ -495,7 +507,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 v.add(vi);
                 addObjectListPanel(v, foundString);
             } else {
-                addObjectListPanel((Vector<Object>) vi.getParams(), !foundString);
+                addObjectListPanel((Vector<Object>) vi.getParametersList(), !foundString);
             }
         }
 

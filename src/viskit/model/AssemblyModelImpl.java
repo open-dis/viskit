@@ -917,9 +917,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (vi instanceof VInstantiator.Array) {
             VInstantiator.Array via = (VInstantiator.Array) vi;
 
-            if (ViskitGlobals.instance().isArray(via.getType()))
+            if (ViskitGlobals.instance().isArray(via.getTypeName()))
                 return buildParamFromArray(via);
-            else if (via.getType().contains("..."))
+            else if (via.getTypeName().contains("..."))
                 return buildParamFromVarargs(via);
         } // MultiParam
 
@@ -930,7 +930,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private TerminalParameter buildParamFromFreeF(VInstantiator.FreeForm viff) {
         TerminalParameter tp = jaxbObjectFactory.createTerminalParameter();
 
-        tp.setType(viff.getType());
+        tp.setType(viff.getTypeName());
         tp.setValue(viff.getValue());
         tp.setName(viff.getName());
         return tp;
@@ -939,7 +939,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private MultiParameter buildParamFromConstr(VInstantiator.Construct vicon) {
         MultiParameter mp = jaxbObjectFactory.createMultiParameter();
 
-        mp.setType(vicon.getType());
+        mp.setType(vicon.getTypeName());
         for (Object vi : vicon.getArgs()) {
             mp.getParameters().add(buildParam(vi));
         }
@@ -949,10 +949,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private FactoryParameter buildParamFromFactory(VInstantiator.Factory vifact) {
         FactoryParameter fp = jaxbObjectFactory.createFactoryParameter();
 
-        fp.setType(vifact.getType());
+        fp.setType(vifact.getTypeName());
         fp.setFactory(vifact.getFactoryClass());
 
-        for (Object vi : vifact.getParams()) {
+        for (Object vi : vifact.getParametersList()) {
             fp.getParameters().add(buildParam(vi));
         }
         return fp;
@@ -961,7 +961,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private MultiParameter buildParamFromArray(VInstantiator.Array viarr) {
         MultiParameter mp = jaxbObjectFactory.createMultiParameter();
 
-        mp.setType(viarr.getType());
+        mp.setType(viarr.getTypeName());
         for (Object vi : viarr.getInstantiators()) {
             mp.getParameters().add(buildParam(vi));
         }

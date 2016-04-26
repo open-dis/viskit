@@ -120,16 +120,31 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void begin()
 	{
-        // The initialFilePath is set if we have stated a file "arg" upon startup
-        // from the command line
-        if (initialFilePath != null) {
+		// TODO check if prior project was open, if so then open it
+		
+		String projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY);
+		if (projectStatus.equalsIgnoreCase("true"))
+		{
+			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) +
+								 File.separator +
+					             ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+			File projectDirectory = new File (projectPath);
+			if (projectDirectory.isDirectory())
+				openProject (projectDirectory);
+			
+			// TODO previously open assemblies and event graphs
+		}
+		
+        // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
+        if (initialFilePath != null)
+		{
             LOG.debug("Loading initial file: " + initialFilePath);
             compileAssembly(initialFilePath);
         } 
 		else 
 		{
             List<File> openAssemblyFileList = getOpenAssemblyFileList(false);
-//            LOG.debug("Inside begin() and openAssemblyFileList.size()=" + openAssemblyFileList.size());
+            LOG.debug("Inside AssemblyControllerImpl begin() and openAssemblyFileList.size()=" + openAssemblyFileList.size());
 
             for (File f : openAssemblyFileList)
 			{
@@ -162,8 +177,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
-                sb.append(itr.next().getHandle());
+            for (Iterator<OpenAssembly.AssemblyChangeListener> iterator = isLocalDirty.iterator(); iterator.hasNext();) {
+                sb.append(iterator.next().getHandle());
                 sb.append(", ");
             }
             sb.setLength(sb.length() - 2); // last comma-space
@@ -444,17 +459,19 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     Set<mvcRecentFileListener> recentProjectListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjectFileSetListener(mvcRecentFileListener listener) {
+    public void addRecentProjectListener(mvcRecentFileListener listener)
+	{
         recentProjectListeners.add(listener);
     }
 
     @Override
-    public void removeRecentProjectFileSetListener(mvcRecentFileListener listener) {
+    public void removeRecentProjectListener(mvcRecentFileListener listener) {
         recentProjectListeners.remove(listener);
     }
 
     private void notifyRecentProjectFileListeners() {
-        for (mvcRecentFileListener listener : recentProjectListeners) {
+        for (mvcRecentFileListener listener : recentProjectListeners)
+		{
             listener.listChanged();
         }
     }
@@ -587,7 +604,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWPROJECT_METHOD = "newProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newProject() // method name must exactly match preceding string value
+    public void newProject () // method name must exactly match preceding string value
 	{
 		// if a project is currently open, first ask to confirm
         if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
@@ -652,6 +669,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		viskitProject.setProjectRootDirectory (newProjectRoot);
 		ViskitProject.MY_VISKIT_PROJECTS_DIR = newProjectRoot.getParent();
 		viskitProject.setProjectName       (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY));
+		viskitProject.setProjectOpen(true);
 		viskitProject.setProjectAuthor     (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY));
 		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY));
 		viskitProject.setProjectDescription(viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY));
@@ -677,7 +695,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void zipAndMailProject() // method name must exactly match preceding string value
+    public void zipAndMailProject () // method name must exactly match preceding string value
 	{
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
@@ -880,8 +898,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void quit() {
-        if (preQuit()) {
+    public void quit()
+	{
+        if (preQuit())
+		{
             postQuit();
         }
     }
@@ -889,10 +909,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public boolean preQuit() {
 
-        // Check for dirty models before exiting
-        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenAssemblyModelArray();
-        for (AssemblyModel vmod : modAr) {
-            setModel((mvcModel) vmod);
+        // Check for dirty models before exiting, first ask if user wants to save them
+        AssemblyModel[] openAssemblyModels = ((AssemblyView) getView()).getOpenAssemblyModelArray();
+        for (AssemblyModel assemblyModel : openAssemblyModels)
+		{
+            setModel((mvcModel) assemblyModel);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -903,7 +924,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void postQuit() {
+    public void postQuit()
+	{
         ViskitGlobals.instance().quitAssemblyEditor();
     }
 
@@ -988,7 +1010,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraphNode() // method name must exactly match preceding string value
+    public void newEventGraphNode () // method name must exactly match preceding string value
     {
         Object o = ((AssemblyView) getView()).getSelectedEventGraph();
 
@@ -1285,7 +1307,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove() // method name must exactly match preceding string value
+    public void remove () // method name must exactly match preceding string value
 	{
         if (!selectionVector.isEmpty()) {
             // first ask:
@@ -1313,7 +1335,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	 * Not supported
 	 */
     @Override
-    public void cut() // method name must exactly match preceding string value
+    public void cut () // method name must exactly match preceding string value
     {
         // Not supported
     }
@@ -1321,7 +1343,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public final static String COPY_METHOD = "copy"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
     @SuppressWarnings("unchecked")
-    public void copy() // method name must exactly match preceding string value
+    public void copy () // method name must exactly match preceding string value
 	{
         if (selectionVector.isEmpty()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
@@ -1344,7 +1366,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste() // method name must exactly match preceding string value
+    public void paste () // method name must exactly match preceding string value
     {
         if (copyVector.isEmpty()) {
             return;
@@ -1426,7 +1448,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() // method name must exactly match preceding string value
+    public void undo () // method name must exactly match preceding string value
 	{
         isUndo = true;
 
@@ -1539,7 +1561,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource() // method name must exactly match preceding string value
+    public void generateJavaSource () // method name must exactly match preceding string value
 	{
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
@@ -1891,7 +1913,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         SwingWorker worker = new SwingWorker<Void, Void>()
 		{
             @Override
-            public Void doInBackground() // TODO why Void arther than void?  SwingWorker convention of some sort
+            public Void doInBackground () // TODO why Void arther than void?  SwingWorker convention of some sort
 			{
                 initializeAssemblyRun(); // generate, compile sourceCode and prepare the executionParameters
 
@@ -2147,11 +2169,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     private void adjustRecentAssemblyFileSet(File file)
 	{
-        for (Iterator<File> itr = recentAssemblyFileSet.iterator(); itr.hasNext();)
+        for (Iterator<File> iterator = recentAssemblyFileSet.iterator(); iterator.hasNext();)
 		{
-            File f = itr.next();
+            File f = iterator.next();
             if (file.getPath().equals(f.getPath())) {
-                itr.remove();
+                iterator.remove();
                 break;
             }
         }
@@ -2167,16 +2189,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public void adjustRecentProjectFileSet(File file)
 	{
-        for (Iterator<File> itr = recentProjectFileSet.iterator(); itr.hasNext();)
+		if (file == null)
+			return;
+		
+        for (Iterator<File> iterator = recentProjectFileSet.iterator(); 
+				            iterator.hasNext();)
 		{
-            File f = itr.next();
-            if (file.getPath().equals(f.getPath())) {
-                itr.remove();
+            File f = iterator.next();
+            if (file.getPath().equals(f.getPath())) 
+			{
+                iterator.remove();
                 break;
             }
         }
         recentProjectFileSet.add(file); // to the top
-//        notifyRecentProjectFileListeners(); infinite loop?
+        notifyRecentProjectFileListeners(); // TODO infinite loop?
         saveProjectHistoryXML(recentProjectFileSet);
     }
 
@@ -2283,12 +2310,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public Set<File> getRecentProjectFileSet() {
-        return getRecentProjectFileSet(true);
+    public Set<File> getRecentProjectFileSet()
+	{
+        return getRecentProjectFileSet(false); // don't refresh or infinite loop occurs
     }
 
-    private Set<File> getRecentProjectFileSet(boolean refresh) {
-        if (refresh || recentProjectFileSet == null) {
+    private Set<File> getRecentProjectFileSet(boolean refresh)
+	{
+        if (refresh || recentProjectFileSet == null)
+		{
             updateProjectFileLists();
         }
         return recentProjectFileSet;

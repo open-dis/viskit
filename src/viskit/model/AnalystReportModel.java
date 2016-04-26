@@ -321,8 +321,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
             statisticalResults.setAttribute("file", statisticsReportPath);
 
             Element sumReport = new Element("SummaryReport");
-            List<Element> itr = statisticsReport.getRootElement().getChildren("SimEntity");
-            for (Element entity : itr) {
+            List<Element> iterator = statisticsReport.getRootElement().getChildren("SimEntity");
+            for (Element entity : iterator) {
                 Element temp = (Element) entity.clone();
                 temp.removeChildren("SummaryReport");
 
@@ -602,10 +602,10 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private Element extractSMAL(String entityName, Element entityDef) {
         Element table = new Element("EntityParameterTable");
         ElementFilter multiParam = new ElementFilter("MultiParameter");
-        Iterator<Element> itr = entityDef.getDescendants(multiParam);
+        Iterator<Element> iterator = entityDef.getDescendants(multiParam);
         table.setAttribute("name", entityName);
-        while (itr.hasNext()) {
-            Element temp = itr.next();
+        while (iterator.hasNext()) {
+            Element temp = iterator.next();
             String category = temp.getAttributeValue("type");
             if (category.equals("diskit.SMAL.Classification")) {
                 table.addContent(makeTableEntry("Classification", temp));
@@ -880,8 +880,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private String _unMakeContent(Element e, String suffix, String attrName) {
         if (e == null) {return "";}
         List content = e.getContent();
-        for (Iterator itr = content.iterator(); itr.hasNext();) {
-            Object o = itr.next();
+        for (Iterator iterator = content.iterator(); iterator.hasNext();) {
+            Object o = iterator.next();
             if (!(o instanceof Element)) {
                 continue;
             }

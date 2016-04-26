@@ -248,9 +248,9 @@ public interface AssemblyController {
 
     void    clearRecentAssemblyFileList();
 
-    void      addRecentProjectFileSetListener(mvcRecentFileListener listener);
+    void      addRecentProjectListener(mvcRecentFileListener listener);
 
-    void   removeRecentProjectFileSetListener(mvcRecentFileListener listener);
+    void   removeRecentProjectListener(mvcRecentFileListener listener);
 
     Set<File> getRecentProjectFileSet();
 

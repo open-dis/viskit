@@ -142,8 +142,7 @@ public class EventGraphAssemblyComboMain {
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
-
-        viskitMainFrame.setVisible(true);
+        viskitMainFrame.setVisible(true); // display application and commence
     }
 
     private static void setLookAndFeelAndFonts() {

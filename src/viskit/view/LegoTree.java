@@ -408,9 +408,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             }
         }
 
-        List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, targetClass);
-        for (Class<?> c : list) {
-            ViskitStatics.resolveParameters(c);
+        List<Class<?>> interfacesClassList = FindClassesForInterface.findClasses(jarFile, targetClass);
+        for (Class<?> interfaceClass : interfacesClassList) {
+            ViskitStatics.resolveParameters(interfaceClass);
         }
 
         // Shorten long path names
@@ -424,7 +424,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             name = jarFile.getName();
         }
 
-        if (list == null || list.isEmpty()) {
+        if (interfacesClassList == null || interfacesClassList.isEmpty()) {
             LOG.warn("No classes of type " + targetClassName + " found in " + name);
             LOG.info(name + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
         } else {
@@ -432,7 +432,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
             mod.insertNodeInto(localRoot, rootNode, 0);
 
-            for (Class<?> c : list) {
+            for (Class<?> c : interfacesClassList) {
                 hookToParent(c, localRoot);
             }
         }

@@ -58,8 +58,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -67,7 +65,6 @@ import java.util.regex.Pattern;
 import javax.swing.*;
 import org.apache.log4j.Logger;
 import viskit.control.AnalystReportController;
-import viskit.control.AssemblyController;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
@@ -102,6 +99,29 @@ public class ViskitGlobals {
 
     private static ViskitProject currentViskitProject;
 
+    private static boolean projectOpen;
+
+	/**
+	 * @return the projectOpen value
+	 */
+	public static boolean isProjectOpen() {
+		return projectOpen;
+	}
+
+	/**
+	 * @param projectOpenStatus the projectOpen value to set
+	 */
+	public static void setProjectOpen(boolean projectOpenStatus) {
+		projectOpen = projectOpenStatus;
+	}
+
+	/**
+	 * @param projectOpenStatus the projectOpen value to set
+	 */
+	public static void setProjectOpen(String projectOpenStatus) {
+		projectOpen = projectOpenStatus.equalsIgnoreCase("true");
+	}
+
     /** Need hold of the Enable analyst report checkbox */
     private SimulationRunPanel simulationRunPanel;
 
@@ -119,8 +139,10 @@ public class ViskitGlobals {
 	
 	private static String dateFormat = "dd MMMM yyyy";
 
-	/** Singleton pattern */
-    public static synchronized ViskitGlobals instance() {
+	/** Singleton pattern
+	 * @return singleton instance */
+    public static synchronized ViskitGlobals instance() 
+	{
         if (me == null) {
             me = new ViskitGlobals();
         }
@@ -141,7 +163,7 @@ public class ViskitGlobals {
     /* routines to manage the singleton-aspect of the views. */
     mvcAbstractJFrameView assemblyEditViewFrame;
     AssemblyControllerImpl assemblyControllerImpl;
-    boolean assyFirstRun = false;
+    boolean assemblyFirstRun = false;
 
     /**
      * Get a reference to the assembly editor view.
@@ -248,8 +270,8 @@ public class ViskitGlobals {
         }
     }
 
-    public void setEventGraphQuitHandler(ActionListener lis) {
-        eventGraphQuitHandler = lis;
+    public void setEventGraphQuitHandler(ActionListener listener) {
+        eventGraphQuitHandler = listener;
     }
 
     public Vector<ViskitElement> getStateVariablesList() {
@@ -962,8 +984,10 @@ public class ViskitGlobals {
      *
      * @param status the status of JVM shutdown
      */
-    public void systemExit(int status) {
-        if (!isSystemExitCalled()) {
+    public void systemExit(int status)
+	{
+        if (!isSystemExitCalled())
+		{
             systemExitHandler.doSystemExit(status);
             setSystemExitCalled(true);
         }

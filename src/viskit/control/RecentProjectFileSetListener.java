@@ -67,45 +67,57 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
     }
 
     @Override
-    public void listChanged() {
+    public void listChanged()
+	{
         AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Set<File> recentProjectFileSet = assemblyController.getRecentProjectFileSet();
 
-        for (JMenu m : recentProjectMenuList) {
-            m.removeAll();
+        for (JMenu m : recentProjectMenuList)
+		{
+            if (m != null)
+				m.removeAll();
         }
 
         for (File fullPath : recentProjectFileSet) {
 
-            if (!fullPath.exists()) {
+            if (!fullPath.exists())
+			{
                 continue;
             }
-            for (JMenu m : recentProjectMenuList) {
-                String nameOnly = fullPath.getName();
-                Action parameterizedProjectAction = new ParameterizedProjectAction(nameOnly);
-                parameterizedProjectAction.putValue(ViskitStatics.FULL_PATH, fullPath);
-                JMenuItem mi = new JMenuItem(parameterizedProjectAction);
-                mi.setToolTipText(fullPath.getPath());
-                m.add(mi);
+            for (JMenu m : recentProjectMenuList) // TODO why down another level?
+			{
+                if (m != null) // safety net
+				{
+					String nameOnly = fullPath.getName();
+					Action parameterizedProjectAction = new ParameterizedProjectAction(nameOnly);
+					parameterizedProjectAction.putValue(ViskitStatics.FULL_PATH, fullPath);
+					JMenuItem mi = new JMenuItem(parameterizedProjectAction);
+					mi.setToolTipText(fullPath.getPath());
+					m.add(mi);	
+				}
             }
         }
         if (!recentProjectFileSet.isEmpty())
 		{
-            for (JMenu m : recentProjectMenuList) {
-                m.add(new JSeparator());
-                Action act = new ParameterizedProjectAction("clear");
-                act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText("Clear this list");
-                m.add(mi);
+            for (JMenu m : recentProjectMenuList)
+			{
+                if (m != null) // safety net
+				{
+					m.add(new JSeparator());
+					Action clearAction = new ParameterizedProjectAction("clear");
+					clearAction.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
+					JMenuItem mi = new JMenuItem(clearAction);
+					mi.setToolTipText("Clear this list");
+					m.add(mi);
+				}
             }
         }
     }
 
-    class ParameterizedProjectAction extends AbstractAction {
-
-        ParameterizedProjectAction(String s) {
-            super(s);
+    class ParameterizedProjectAction extends AbstractAction
+	{
+        ParameterizedProjectAction(String name) {
+            super(name);
         }
 
         @Override
@@ -119,9 +131,13 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
             else
                 projectDirectory = (File) obj;
 
-            if (projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
+            if (projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG) ||
+				(getValue(NAME) == "clear"))
+			{
                 assemblyController.clearRecentProjectFileSet();
-            } else {
+            } 
+			else
+			{
                 assemblyController.doProjectCleanup();
                 assemblyController.openProject(projectDirectory);
             }
