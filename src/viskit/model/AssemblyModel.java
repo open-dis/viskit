@@ -24,7 +24,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * @param className the EG class from parsing third party libs of the current project
      * @param p the point on the pallete to place the node icon
      */
-     void newEventGraph(String widgetName, String className, Point2D p);
+     void newEventGraph(String widgetName, String className, Point2D p, String description);
 
      /**
       * Support redo for the event graph node
@@ -38,10 +38,11 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * @param widgetName the name of the EG
      * @param node the cached node from parsing the EG directory of the current project
      * @param p the point on the pallete to place the node icon
+	 * @param description the value of description
      */
-    void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
+    void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description);
 
-    void newPropertyChangeListener(String widgetName, String className, Point2D p);
+    void newPropertyChangeListener(String widgetName, String className, Point2D p, String description);
 
     /**
      * Supports redo of a PropertyChangeListenerNode
@@ -49,7 +50,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     void redoPropertyChangeListener(PropertyChangeListenerNode node);
 
-    void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
+    void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description);
 
     /**
      * Boolean to signify whether the model has been changed since last disk
@@ -100,7 +101,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     boolean changePclNode(PropertyChangeListenerNode pclNode);
 
-    boolean changeEvGraphNode(EventGraphNode eventNode);
+    boolean changeEventGraphNode(EventGraphNode eventNode);
 
     void changePclEdge(PropertyChangeListenerEdge pclEdge);
 

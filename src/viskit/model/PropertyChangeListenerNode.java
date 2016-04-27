@@ -26,9 +26,9 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     private boolean getMean  = false;
     private boolean getCount = false;
 
-    PropertyChangeListenerNode(String name, String type) // package access on constructor
+    PropertyChangeListenerNode(String name, String type, String description) // package access on constructor
     {
-        super(name, type);
+        super(name, type, description);
         setType(type);
     }
 

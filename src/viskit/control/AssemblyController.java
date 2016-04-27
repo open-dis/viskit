@@ -35,12 +35,20 @@ public interface AssemblyController {
      * @param p the (x, y) point it will appear
      */
     void newEventGraphNode(String name, Point p);
+	
+    void newEventGraphNode(String name, Point p, String description);
 
     void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
 
+    void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p, String description);
+
     void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
 
+    void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description);
+
     void newPropertyChangeListenerNode(String name, Point p);
+
+    void newPropertyChangeListenerNode(String name, Point p, String description);
 
     /**
      * Edit the properties (metadata) of the Assembly

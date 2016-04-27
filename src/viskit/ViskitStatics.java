@@ -556,19 +556,23 @@ public class ViskitStatics {
     }
 
     /**
-     * For the given EG class type, return its specific ParameterMap contents
+     * For the given Event Graph class type, return its specific ParameterMap contents
      *
      * @param type the Event Graph class type to resolve
      * @return a List of parameter map object arrays
      */
     static public List<Object>[] resolveParameters(Class<?> type)
 	{
+		if (type == null)
+			return null;
+		
         List<Object>[] resolvedParameterList = null;
-		if ((parameterMap != null) && (parameterMap.get(type.getName()) != null))
-		{
-			resolvedParameterList = parameterMap.get(type.getName());
-			System.out.println("parameters already resolved");
-		}
+//		if ((parameterMap != null) && (type.getName() != null) && (parameterMap.get(type.getName()) != null))
+//		{
+//			resolvedParameterList = parameterMap.get(type.getName());
+//			System.out.println("parameters already resolved");
+//			// TODO confirm OK, are we all done?
+//		}
 		
         if (resolvedParameterList == null)
 		{
@@ -614,9 +618,9 @@ public class ViskitStatics {
 
                     ParameterMap parameterMap = constructor[i].getAnnotation(viskit.ParameterMap.class);
                     if (parameterMap != null) {
-                        String[] names       = parameterMap.names();
-                        String[] types       = parameterMap.types();
-                        String[] description = parameterMap.descriptions();
+                        String[] names        = parameterMap.names();
+                        String[] types        = parameterMap.types();
+                        String[] descriptions = parameterMap.descriptions();
                         if (names.length != types.length)
 						{
                             throw new RuntimeException("ParameterMap names and types length mismatch");
@@ -626,7 +630,7 @@ public class ViskitStatics {
                             Parameter parameter = objectFactory.createParameter();
                             parameter.setName(names[k]);
                             parameter.setType(types[k]);
-                            parameter.setDescription(description[k]);
+                            parameter.setDescription(descriptions[k]);
 
                             parameterList[i].add(parameter);
                         }
@@ -660,7 +664,7 @@ public class ViskitStatics {
                                         Parameter parameter = objectFactory.createParameter();
                                         String parameterTypeName    = parameterValueArray[k];
                                         String parameterName        = parameterValueArray[k + 1];
-                                        String parameterDescription = parameterTypeName;
+                                        String parameterDescription = "TODO add description"; // TODO fix
 
                                         parameter.setName       (parameterName);
                                         parameter.setType       (parameterTypeName);

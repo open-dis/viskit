@@ -922,39 +922,45 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         @Override
-        public void drop(DropTargetDropEvent dtde) {
-            if (dragged != null) {
+        public void drop(DropTargetDropEvent dtde)
+		{
+            if (dragged != null)
+			{
                 try {
                     Point p = dtde.getLocation();
 
                     String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
-                    String[] sa = s.split("\t");
+                    String[] sa = s.split("\t"); // two string elements: class name; file path or TODO ??
 
                     // Check for XML-based node
-                    FileBasedAssemblyNode xn = isFileBasedAssemblyNode(sa[1]);
-                    if (xn != null) {
+                    FileBasedAssemblyNode xmlBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
+                    if (xmlBasedAssemblyNode != null)
+					{
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xmlBasedAssemblyNode, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xmlBasedAssemblyNode, p, "TODO add description");
                                 break;
                         }
-                    } else {
-                        // Else class-based node
+                    } 
+					else  // class-based node
+					{   
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
                                 ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p);
+                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p, "TODO add description");
                                 break;
                         }
                     }
 
                     dragged = null;
-                } catch (UnsupportedFlavorException | IOException e) {
+                } 
+				catch (UnsupportedFlavorException | IOException e)
+				{
                     LogUtils.getLogger(AssemblyEditViewFrame.class).error(e);
                 }
             }

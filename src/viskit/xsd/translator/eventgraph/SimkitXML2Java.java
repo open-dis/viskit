@@ -543,6 +543,16 @@ public class SimkitXML2Java {
                 pw.print(SP_8 + SP_4);
             }
         }
+        pw.println(CB + CM);
+        pw.print(SP_8 + "descriptions =" + SP + OB);
+        for (Parameter pt : liParams) {
+            pw.print(QU + pt.getDescription() + QU);
+            if (liParams.indexOf(pt) < liParams.size() - 1) {
+                pw.print(CM);
+                pw.println();
+                pw.print(SP_8 + SP_4);
+            }
+        }
         pw.println(CB);
         pw.println(SP_4 + RP);
         pw.println();

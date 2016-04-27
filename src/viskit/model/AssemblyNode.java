@@ -23,10 +23,11 @@ public abstract class AssemblyNode extends ViskitElement {
     private List<String>  commentsArrayList = new ArrayList<>();
     private String        description = EMPTY;  // instance information
 
-    AssemblyNode(String name, String type) // package access on constructor
+    AssemblyNode(String name, String type, String description) // package access on constructor
     {
         this.name = name;
         this.type = type;
+        this.description = description;
     }
     public Vector<AssemblyEdge> getConnections() {
         return connections;

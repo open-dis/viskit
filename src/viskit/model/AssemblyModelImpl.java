@@ -306,8 +306,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public boolean nameExists(String name) {
-        for (AssemblyNode n : getNodeCache().values()) {
-            if (n.getName().equals(name)) {
+        for (AssemblyNode assemblyNode : getNodeCache().values()) {
+            if (assemblyNode.getName().equals(name)) {
                 return true;
             }
         }
@@ -315,17 +315,21 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
-        newEventGraph(widgetName, node.loadedClass, p);
+    public void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description)
+	{
+        newEventGraph(widgetName, node.loadedClass, p, description);
     }
 
     @Override
-    public void newEventGraph(String widgetName, String className, Point2D p)
+    public void newEventGraph(String widgetName, String className, Point2D p, String description)
 	{
-        EventGraphNode node = new EventGraphNode(widgetName, className);
-        if (p == null) {
+        EventGraphNode node = new EventGraphNode(widgetName, className, description);
+        if (p == null)
+		{
             node.setPosition(pointLess);
-        } else {
+        } 
+		else 
+		{
             node.setPosition(p);
         }
 
@@ -333,6 +337,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         jaxbSimEntity.setName(nullIfEmpty(widgetName));
         jaxbSimEntity.setType(className);
+        jaxbSimEntity.setDescription(description);
         node.opaqueModelObject = jaxbSimEntity;
 
         VInstantiator vc = new VInstantiator.Construct(jaxbSimEntity.getType(), null);  // null means undefined
@@ -381,13 +386,15 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
-        newPropertyChangeListener(widgetName, node.loadedClass, p);
+    public void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description)
+	{
+        newPropertyChangeListener(widgetName, node.loadedClass, p, description);
     }
 
     @Override
-    public void newPropertyChangeListener(String widgetName, String className, Point2D p) {
-        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className);
+    public void newPropertyChangeListener(String widgetName, String className, Point2D p, String description)
+	{
+        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className, description);
         if (p == null) {
             pcNode.setPosition(pointLess);
         } else {
@@ -720,7 +727,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changeEvGraphNode(EventGraphNode eventNode) {
+    public boolean changeEventGraphNode(EventGraphNode eventNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(eventNode);
@@ -849,7 +856,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return v;
     }
 
-   private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
+   private List<Object> getInstantiatorListFromJaxbParameterList(List<Object> lis) {
 
        // To prevent java.util.ConcurrentModificationException
        List<Object> vi = new ArrayList<>();
@@ -876,25 +883,25 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
         return new VInstantiator.Array(o.getType(),
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     private VInstantiator.Construct buildConstrFromMultiParameter(MultiParameter o) {
         return new VInstantiator.Construct(o.getType(),
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
         return new VInstantiator.Factory(o.getType(),
                 o.getFactory(),
                 ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     // We know we will get a List<Object> one way or the other
     @SuppressWarnings("unchecked")
     private List<Object> getJaxbParamList(VInstantiator vi) {
-        Object o = buildParam(vi);
+        Object o = buildParameter(vi);
         if (o instanceof List<?>) {
             return (List<Object>) o;
         }
@@ -904,13 +911,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return v;
     }
 
-    private Object buildParam(Object vi) {
+    private Object buildParameter(Object vi) {
         if (vi instanceof VInstantiator.FreeForm) {
-            return buildParamFromFreeF((VInstantiator.FreeForm) vi);
+            return buildParameterFromFreeForm((VInstantiator.FreeForm) vi);
         } //TerminalParm
         if (vi instanceof VInstantiator.Construct) {
             return buildParamFromConstr((VInstantiator.Construct) vi);
-        } // List of Parms
+        } // List of Parmarameters
         if (vi instanceof VInstantiator.Factory) {
             return buildParamFromFactory((VInstantiator.Factory) vi);
         } // FactoryParam
@@ -918,75 +925,75 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             VInstantiator.Array via = (VInstantiator.Array) vi;
 
             if (ViskitGlobals.instance().isArray(via.getTypeName()))
-                return buildParamFromArray(via);
+                return buildParameterFromArray(via);
             else if (via.getTypeName().contains("..."))
-                return buildParamFromVarargs(via);
+                return buildParameterFromVarargs(via);
         } // MultiParam
 
         //assert false : AssemblyModelImpl.buildJaxbParameter() received null;
         return null;
     }
 
-    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeForm viff) {
-        TerminalParameter tp = jaxbObjectFactory.createTerminalParameter();
+    private TerminalParameter buildParameterFromFreeForm(VInstantiator.FreeForm viff) {
+        TerminalParameter terminalParameter = jaxbObjectFactory.createTerminalParameter();
 
-        tp.setType(viff.getTypeName());
-        tp.setValue(viff.getValue());
-        tp.setName(viff.getName());
-        return tp;
+        terminalParameter.setType(viff.getTypeName());
+        terminalParameter.setValue(viff.getValue());
+        terminalParameter.setName(viff.getName());
+        return terminalParameter;
     }
 
     private MultiParameter buildParamFromConstr(VInstantiator.Construct vicon) {
-        MultiParameter mp = jaxbObjectFactory.createMultiParameter();
+        MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
-        mp.setType(vicon.getTypeName());
+        multiParameter.setType(vicon.getTypeName());
         for (Object vi : vicon.getArgs()) {
-            mp.getParameters().add(buildParam(vi));
+            multiParameter.getParameters().add(buildParameter(vi));
         }
-        return mp;
+        return multiParameter;
     }
 
     private FactoryParameter buildParamFromFactory(VInstantiator.Factory vifact) {
-        FactoryParameter fp = jaxbObjectFactory.createFactoryParameter();
+        FactoryParameter factoryParameter = jaxbObjectFactory.createFactoryParameter();
 
-        fp.setType(vifact.getTypeName());
-        fp.setFactory(vifact.getFactoryClass());
+        factoryParameter.setType(vifact.getTypeName());
+        factoryParameter.setFactory(vifact.getFactoryClass());
 
         for (Object vi : vifact.getParametersList()) {
-            fp.getParameters().add(buildParam(vi));
+            factoryParameter.getParameters().add(buildParameter(vi));
         }
-        return fp;
+        return factoryParameter;
     }
 
-    private MultiParameter buildParamFromArray(VInstantiator.Array viarr) {
-        MultiParameter mp = jaxbObjectFactory.createMultiParameter();
+    private MultiParameter buildParameterFromArray(VInstantiator.Array viarr) {
+        MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
-        mp.setType(viarr.getTypeName());
+        multiParameter.setType(viarr.getTypeName());
         for (Object vi : viarr.getInstantiators()) {
-            mp.getParameters().add(buildParam(vi));
+            multiParameter.getParameters().add(buildParameter(vi));
         }
-        return mp;
+        return multiParameter;
     }
 
-    private TerminalParameter buildParamFromVarargs(VInstantiator.Array viarr) {
-        return buildParamFromFreeF((VInstantiator.FreeForm) viarr.getInstantiators().get(0));
+    private TerminalParameter buildParameterFromVarargs(VInstantiator.Array viarr) {
+        return buildParameterFromFreeForm((VInstantiator.FreeForm) viarr.getInstantiators().get(0));
     }
 
-    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
-        for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            PropertyChangeListenerEdge pce = new PropertyChangeListenerEdge();
-            pce.setProperty(pclc.getProperty());
-            pce.setDescription(pclc.getDescription());
-            AssemblyNode toNode = getNodeCache().get(pclc.getListener());
-            AssemblyNode frNode = getNodeCache().get(pclc.getSource());
-            pce.setTo(toNode);
-            pce.setFrom(frNode);
-            pce.opaqueModelObject = pclc;
+    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> propertyChangeListenerConnectionList) {
+        for (PropertyChangeListenerConnection propertyChangeListenerConnection : propertyChangeListenerConnectionList) {
+            PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
+            propertyChangeListenerEdge.setProperty(propertyChangeListenerConnection.getProperty());
+            propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription());
+            AssemblyNode toNode = getNodeCache().get(propertyChangeListenerConnection.getListener());
+            AssemblyNode frNode = getNodeCache().get(propertyChangeListenerConnection.getSource());
+            propertyChangeListenerEdge.setTo(toNode);
+            propertyChangeListenerEdge.setFrom(frNode);
+            propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
 
-            toNode.getConnections().add(pce);
-            frNode.getConnections().add(pce);
+            toNode.getConnections().add(propertyChangeListenerEdge);
+            frNode.getConnections().add(propertyChangeListenerEdge);
 
-            this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGE_ADDED, "PCL edge added"));
+            this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_ADDED, "PCL edge added"));
         }
     }
 
@@ -1009,29 +1016,29 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList)
 	{
         for (Adapter jaxbAdapter : adaptersList) {
-            AdapterEdge ae = new AdapterEdge();
-            AssemblyNode toNode = getNodeCache().get(jaxbAdapter.getTo());
-            AssemblyNode frNode = getNodeCache().get(jaxbAdapter.getFrom());
-            ae.setTo(toNode);
-            ae.setFrom(frNode);
+            AdapterEdge adapterEdge = new AdapterEdge();
+            AssemblyNode    toNode = getNodeCache().get(jaxbAdapter.getTo());
+            AssemblyNode fromNode = getNodeCache().get(jaxbAdapter.getFrom());
+            adapterEdge.setTo  (  toNode);
+            adapterEdge.setFrom(fromNode);
             // Handle XML names with underscores (XML IDREF issue)
             String event = jaxbAdapter.getEventHeard();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            ae.setSourceEvent(event);
+            adapterEdge.setSourceEvent(event);
 
             event = jaxbAdapter.getEventSent();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            ae.setTargetEvent(event);
+            adapterEdge.setTargetEvent(event);
 			
-            ae.setName(jaxbAdapter.getName());
-            ae.setDescription(jaxbAdapter.getDescription());
-            ae.opaqueModelObject = jaxbAdapter;
+            adapterEdge.setName(jaxbAdapter.getName());
+            adapterEdge.setDescription(jaxbAdapter.getDescription());
+            adapterEdge.opaqueModelObject = jaxbAdapter;
 
-            toNode.getConnections().add(ae);
-            frNode.getConnections().add(ae);
-            this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGE_ADDED, "Adapter connection added"));
+              toNode.getConnections().add(adapterEdge);
+            fromNode.getConnections().add(adapterEdge);
+            this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTEREDGE_ADDED, "Adapter connection added"));
         }
     }
 
@@ -1044,21 +1051,22 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private void buildEventGraphsFromJaxb(List<SimEntity> jaxbSimEntitiesList, List<Output> jaxbOutputList, List<Verbose> jaxbVerboseList)
 	{
-        for (SimEntity jaxbSimEntity : jaxbSimEntitiesList) {
+        for (SimEntity jaxbSimEntity : jaxbSimEntitiesList)
+		{
             boolean isOutput  = false;
             boolean isVerbose = false;
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
             for (Output jaxbOutput : jaxbOutputList) {
-                String simE = jaxbOutput.getEntity();
-                if (simE.equals(jaxbSimEntity.getName())) {
+                String simEntityName = jaxbOutput.getEntity();
+                if (simEntityName.equals(jaxbSimEntity.getName())) {
                     isOutput = true;
                     break;
                 }
             }
             for (Verbose jaxbVerbose : jaxbVerboseList) {
-                String simE = jaxbVerbose.getEntity();
-                if (simE.equals(jaxbSimEntity.getName())) {
+                String simEntityName = jaxbVerbose.getEntity();
+                if (simEntityName.equals(jaxbSimEntity.getName())) {
                     isVerbose = true;
                     break;
                 }
@@ -1070,28 +1078,31 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private PropertyChangeListenerNode buildPropertyChangeListenerNodeFromJaxbPCL(PropertyChangeListener propertyChangeListener)
 	{
         PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) getNodeCache().get(propertyChangeListener.getName());
-        if (propertyChangeListenerNode != null) {
+        if (propertyChangeListenerNode != null)
+		{
             return propertyChangeListenerNode;
         }
-        propertyChangeListenerNode = new PropertyChangeListenerNode(propertyChangeListener.getName(), propertyChangeListener.getType());
+        propertyChangeListenerNode = new PropertyChangeListenerNode(propertyChangeListener.getName(), 
+				                                                    propertyChangeListener.getType(), 
+				                                                    propertyChangeListener.getDescription());
 
         // For backwards compatibility, bug 706
         propertyChangeListenerNode.setClearStatisticsAfterEachRun(propertyChangeListener.getMode().contains("replicationStat"));
         propertyChangeListenerNode.setGetMean(Boolean.parseBoolean(propertyChangeListener.getMeanStatistics()));
         propertyChangeListenerNode.setGetCount(Boolean.parseBoolean(propertyChangeListener.getCountStatistics()));
         propertyChangeListenerNode.setDescription(propertyChangeListener.getDescription());
-        Coordinate coor = propertyChangeListener.getCoordinate();
-        if (coor == null) {
+        Coordinate coordinate = propertyChangeListener.getCoordinate();
+        if (coordinate == null) {
             propertyChangeListenerNode.setPosition(pointLess);
             pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
         } else {
-            propertyChangeListenerNode.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
-                    Double.parseDouble(coor.getY())));
+            propertyChangeListenerNode.setPosition(new Point2D.Double(Double.parseDouble(coordinate.getX()),
+                    Double.parseDouble(coordinate.getY())));
         }
 
-        List<Object> lis = propertyChangeListener.getParameters();
+        List<Object> propertyChangeListenerParameters = propertyChangeListener.getParameters();
         VInstantiator vc = new VInstantiator.Construct(propertyChangeListener.getType(),
-                getInstantiatorListFromJaxbParmList(lis));
+                getInstantiatorListFromJaxbParameterList(propertyChangeListenerParameters));
         propertyChangeListenerNode.setInstantiator(vc);
 
         propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
@@ -1112,7 +1123,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (eventGraphNode != null) {
             return eventGraphNode;
         }
-        eventGraphNode = new EventGraphNode(simEntity.getName(), simEntity.getType());
+		String defaultDescription = "TODO add description"; // better to nag than ignore
+        eventGraphNode = new EventGraphNode(simEntity.getName(), simEntity.getType(), defaultDescription);
 
         Coordinate coor = simEntity.getCoordinate();
         if (coor == null) {

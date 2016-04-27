@@ -232,7 +232,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (r != null) {
                         EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
+                        ((AssemblyModel) parent.getModel()).changeEventGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 } else if (cell instanceof AssemblyPropListCell) {

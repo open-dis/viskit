@@ -1008,6 +1008,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
         return nextPoint;
     }
+	
+	private final String defaultDescription = "TODO add description"; // nagging is better than ignoring
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
@@ -1017,27 +1019,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (o != null) {
             if (o instanceof Class<?>) {
-                newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
+                newEventGraphNode(((Class<?>) o).getName(), getNextPoint(), defaultDescription);
                 return;
             } else if (o instanceof FileBasedAssemblyNode) {
-                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint());
+                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint(), defaultDescription);
                 return;
             }
         }
         // Nothing selected or non-leaf
-        messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create a new node", "You must first open an Event Graph before adding a new node.");
+        messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create a new Event Graph instance", "You must first open and build an Event Graph before adding a new node.");
     }
 
     @Override
-    public void newEventGraphNode(String typeName, Point p) {
-        String shName = shortEventGraphName(typeName);
-        ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
+    public void newEventGraphNode(String typeName, Point point)
+	{
+        String shortName = shortEventGraphName(typeName);
+        ((AssemblyModel) getModel()).newEventGraph(shortName, typeName, point, defaultDescription);
     }
 
     @Override
-    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortEventGraphName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
+    public void newEventGraphNode(String typeName, Point point, String description)
+	{
+        String shortName = shortEventGraphName(typeName);
+        ((AssemblyModel) getModel()).newEventGraph(shortName, typeName, point, description);
+    }
+
+    @Override
+    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point)
+	{
+        String shortName = shortEventGraphName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, defaultDescription);
+    }
+
+    @Override
+    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point, String description)
+	{
+        String shortName = shortEventGraphName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, description);
     }
 
 
@@ -1049,10 +1067,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (o != null) {
             if (o instanceof Class<?>) {
-                newPropertyChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
+                newPropertyChangeListenerNode(((Class<?>) o).getName(), getNextPoint(), "");
                 return;
             } else if (o instanceof FileBasedAssemblyNode) {
-                newFileBasedPropertyChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
+                newFileBasedPropertyChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint(), "");
                 return;
             }
         }
@@ -1062,14 +1080,26 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void newPropertyChangeListenerNode(String name, Point p) {
-        String shName = shortPropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropertyChangeListener(shName, name, p);
+        String shortName = shortPropertyChangeListenerName(name);
+        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, defaultDescription);
+    }
+
+    @Override
+    public void newPropertyChangeListenerNode(String name, Point p, String description) {
+        String shortName = shortPropertyChangeListenerName(name);
+        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, description);
     }
 
     @Override
     public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortPropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shName, xnode, p);
+        String shortName = shortPropertyChangeListenerName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, defaultDescription);
+    }
+
+    @Override
+    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description) {
+        String shortName = shortPropertyChangeListenerName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, description);
     }
 
     /**
@@ -1241,7 +1271,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             done = true;
             boolean modified = ((AssemblyView) getView()).doEditEventGraphNode(eventNode);
             if (modified) {
-                done = ((AssemblyModel) getModel()).changeEvGraphNode(eventNode);
+                done = ((AssemblyModel) getModel()).changeEventGraphNode(eventNode);
             }
         } while (!done);
     }
@@ -1378,16 +1408,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof AssemblyEdge) {
                 continue;
             }
-
             Point2D p = new Point(x + (offset * copyCount), y + (offset * copyCount));
-            if (o instanceof EventGraphNode) {
-                String nm = ((ViskitElement) o).getName();
-                String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
-            } else if (o instanceof PropertyChangeListenerNode) {
-                String nm = ((ViskitElement) o).getName();
-                String typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newPropertyChangeListener(nm + "-copy" + copyCount, typ, p);
+
+            if (o instanceof EventGraphNode)
+			{
+                String eventGraphName        = ((ViskitElement) o).getName();
+                String eventGraphType        = ((ViskitElement) o).getType();
+                String eventGraphDescription = ((ViskitElement) o).getDescription();
+                ((AssemblyModel) getModel()).newEventGraph(eventGraphName + "-copy" + copyCount, eventGraphType, p, eventGraphDescription);
+            } 
+			else if (o instanceof PropertyChangeListenerNode)
+			{
+                String eventGraphName        = ((ViskitElement) o).getName();
+                String eventGraphType        = ((ViskitElement) o).getType();
+                String eventGraphDescription = ((ViskitElement) o).getDescription();
+                ((AssemblyModel) getModel()).newPropertyChangeListener(eventGraphName + "-copy" + copyCount, eventGraphType, p, eventGraphDescription);
             }
             copyCount++;
         }

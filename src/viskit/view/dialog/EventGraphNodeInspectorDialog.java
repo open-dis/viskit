@@ -73,7 +73,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException
 	{
-        super(parent, "Assembly Editor: Event Graph Instance Initialization", true);
+        super(parent, "Assembly Editor: initialize new Event Graph instance", true);
         this.eventGraphNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -89,13 +89,18 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         ViskitStatics.clampHeight(handleNameTF);
         handleNameLabel = new JLabel("name", JLabel.TRAILING);
         handleNameLabel.setLabelFor(handleNameTF);
+        handleNameLabel.setToolTipText("Unique name for this node (no spaces allowed)");
+           handleNameTF.setToolTipText("Unique name for this node (no spaces allowed)");
+		
         detailedOutputCheckBox = new JCheckBox("detailed output");
-        detailedOutputCheckBox.setToolTipText("Enable a list dump of all entity names to the console");
+        detailedOutputCheckBox.setToolTipText("Enable a list dump of all entity names to the console"); // TODO improve
 
         descriptionTF = new JTextField();
         ViskitStatics.clampHeight(descriptionTF);
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
         descriptionLabel.setLabelFor(descriptionTF);
+        descriptionLabel.setToolTipText("Describe purpose of this event graph instance");
+           descriptionTF.setToolTipText("Describe purpose of this event graph instance");
 
         ViskitStatics.cloneSize(handleNameLabel, descriptionLabel);    // make handle same size
 
@@ -112,9 +117,9 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+            okButton.addActionListener(new applyButtonListener());
 
-        handleNameTF.addCaretListener(listener);
+         handleNameTF.addCaretListener(listener);
         descriptionTF.addCaretListener(listener);
         detailedOutputCheckBox.addActionListener(listener);
 
@@ -148,13 +153,13 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         eventGraphIdentificationPanel.add(detailedOutputCheckBox);
         content.add(eventGraphIdentificationPanel);
 
-        JPanel dcont = new JPanel();
-        dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
-        dcont.add(descriptionLabel);
-        dcont.add(Box.createHorizontalStrut(5));
-        dcont.add(descriptionTF);
+        JPanel descriptionContent = new JPanel();
+        descriptionContent.setLayout(new BoxLayout(descriptionContent, BoxLayout.X_AXIS));
+        descriptionContent.add(descriptionLabel);
+        descriptionContent.add(Box.createHorizontalStrut(5));
+        descriptionContent.add(descriptionTF);
+        content.add(descriptionContent);
 
-        content.add(dcont);
         instantiationPanel = new InstantiationPanel(this, listener, true);
 
         instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
@@ -166,29 +171,38 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         content.add(buttonPanel);
     }
 
-    private void fillWidgets() throws ClassNotFoundException {
-        if (eventGraphNode != null) {
+    private void fillWidgets() throws ClassNotFoundException
+	{
+        if (eventGraphNode != null)
+		{
             handleNameTF.setText(eventGraphNode.getName());
             detailedOutputCheckBox.setSelected(eventGraphNode.isOutputMarked());
             descriptionTF.setText(eventGraphNode.getDescription());
             instantiationPanel.setData(eventGraphNode.getInstantiator());
-        } else {
+        } 
+		else
+		{
             handleNameTF.setText("Event graph node name");
             detailedOutputCheckBox.setSelected(false);
-            descriptionTF.setText("");
-       }
+        }
+		if (descriptionTF.getText().isEmpty())			
+            descriptionTF.setText("TODO add description"); // better to nag than ignore
     }
 
-    private void unloadWidgets() {
-        String nm = handleNameTF.getText();
-        nm = nm.replaceAll("\\s", "");
-        if (eventGraphNode != null) {
-            eventGraphNode.setName(nm);
+    private void unloadWidgets()
+	{
+        String name = handleNameTF.getText();
+        name = name.replaceAll("\\s", ""); // squeeze out illegal whitespace
+        if (eventGraphNode != null)
+		{
+            eventGraphNode.setName(name);
             eventGraphNode.setDescription(descriptionTF.getText().trim());
             eventGraphNode.setInstantiator(instantiationPanel.getData());
             eventGraphNode.setOutputMarked(detailedOutputCheckBox.isSelected());
-        } else {
-            newName = nm;
+        } 
+		else
+		{
+            newName = name;
             newInstantiator = instantiationPanel.getData();
         }
     }
