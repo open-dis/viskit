@@ -120,10 +120,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void begin()
 	{
-		// TODO check if prior project was open, if so then open it
-		
-		String projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY);
-		if (projectStatus.equalsIgnoreCase("true"))
+		// check if prior project was open, if so then open it
+		String projectStatus = "false";
+		if (ViskitConfiguration.instance() != null)
+			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY);
+		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
 		{
 			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) +
 								 File.separator +
@@ -132,7 +133,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			if (projectDirectory.isDirectory())
 				openProject (projectDirectory);
 			
-			// TODO previously open assemblies and event graphs
+			// TODO re-open previously open assemblies and event graphs
 		}
 		
         // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
