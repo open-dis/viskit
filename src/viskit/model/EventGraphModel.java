@@ -68,7 +68,7 @@ public interface EventGraphModel {
      *
      * @return Vector of vParameter objects.
      */
-    Vector<ViskitElement> getSimParameters();
+    Vector<ViskitElement> getSimulationParameters();
 
     /**
      * Add a new event to the graph with the given label, at the given point

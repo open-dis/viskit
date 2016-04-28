@@ -241,17 +241,18 @@ public class EventInspectorDialog extends JDialog {
             // bug fix 1183
             @Override
             public void mouseClicked(MouseEvent e) {
-                EventStateTransition est = (EventStateTransition) e.getSource();
+                EventStateTransition eventStateTransition = (EventStateTransition) e.getSource();
 
                 // modified comes back true even if a caret was placed in a
                 // text box
                 boolean modified = EventStateTransitionDialog.showDialog(
                         frame,
-                        est,
+                        eventStateTransition,
                         argumentsPanel,
                         localVariablesPanel);
-                if (modified) {
-                    transitionsPanel.updateTransition(est);
+                if (modified)
+				{
+                    transitionsPanel.updateTransition(eventStateTransition);
                     setModified(modified);
                 }
             }
@@ -260,9 +261,10 @@ public class EventInspectorDialog extends JDialog {
         setParameters(frame, node);
     }
 
-    private void setModified(boolean f) {
-        okButton.setEnabled(f);
-        modified = f;
+    private void setModified(boolean value)
+	{
+        okButton.setEnabled(value);
+        modified = value;
     }
 
     private void sizeAndPosition(Component c) {
@@ -283,7 +285,8 @@ public class EventInspectorDialog extends JDialog {
         sizeAndPosition(c);
     }
 
-    private void fillWidgets() {
+    private void fillWidgets()
+	{
         String nmSt = node.getName();
         nmSt = nmSt.replace(' ', '_');
         setTitle("Event Inspector: " + nmSt);
@@ -296,14 +299,14 @@ public class EventInspectorDialog extends JDialog {
 
         showDescription(true); // always show descriptions by default, they are important for model definition
 
-        String s = node.getCodeBlock();
-        codeBlockPanel.setData(s);
+        String codeBlockSourceText = node.getCodeBlock();
+        codeBlockPanel.setData(codeBlockSourceText);
         codeBlockPanel.setVisibleLines(1);
-        showCodeBlock(s != null && !s.isEmpty());
+        showCodeBlock(codeBlockSourceText != null && !codeBlockSourceText.isEmpty());
 
         transitionsPanel.setTransitions(node.getTransitions());
-        s = transitionsPanel.getString();
-        showStateTransitions(s != null && !s.isEmpty());
+        codeBlockSourceText = transitionsPanel.getString();
+        showStateTransitions(codeBlockSourceText != null && !codeBlockSourceText.isEmpty());
 
         argumentsPanel.setData(node.getArguments());
         showArguments(!argumentsPanel.isEmpty());

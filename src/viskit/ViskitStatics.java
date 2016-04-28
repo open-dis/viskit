@@ -95,6 +95,7 @@ public class ViskitStatics {
     public static final String JAVA_LANG_STRING = "java.lang.String";
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
     public static final String VISKIT_MAILING_LIST = "viskit@www.movesinstitute.org";
+    public static final String DEFAULT_DESCRIPTION = "TODO add description"; // better to nag than ignore
 
     public static final String FULL_PATH = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
@@ -664,7 +665,7 @@ public class ViskitStatics {
                                         Parameter parameter = objectFactory.createParameter();
                                         String parameterTypeName    = parameterValueArray[k];
                                         String parameterName        = parameterValueArray[k + 1];
-                                        String parameterDescription = "TODO add description"; // TODO fix
+                                        String parameterDescription = DEFAULT_DESCRIPTION; // TODO fix
 
                                         parameter.setName       (parameterName);
                                         parameter.setType       (parameterTypeName);
@@ -689,7 +690,6 @@ public class ViskitStatics {
                     }
                 } 
 				else // unknowns
-					
 				{
                     int k = 0;
                     for (Class<?> parameterType : parameterTypes)
@@ -701,7 +701,7 @@ public class ViskitStatics {
                                 newParameterTypeName = newParameterTypeName.split("\\.")[0]; // omit .class from type name
                             }
 							// TODO apparently no way to get Javadoc from reflection for this field parameter
-							String newParameterDescription = newParameterTypeName;
+							String newParameterDescription = DEFAULT_DESCRIPTION; // better to nag than ignore
 
                             // Not sure what use a name like this is for PCLs
                             newParameter.setName("parameter[" + k++ + "] : ");

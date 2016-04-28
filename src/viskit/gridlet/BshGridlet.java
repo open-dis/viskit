@@ -49,6 +49,8 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.assembly.ViskitAssembly;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.cli.Boot;
+import static java.lang.Boolean.valueOf;
+import static java.lang.Integer.parseInt;
 
 /**
  * @author Rick Goldberg

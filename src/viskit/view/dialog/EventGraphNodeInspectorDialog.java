@@ -13,6 +13,7 @@ import javax.swing.event.CaretListener;
 import viskit.model.EventGraphNode;
 import viskit.model.VInstantiator;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.DEFAULT_DESCRIPTION;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -186,7 +187,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
             detailedOutputCheckBox.setSelected(false);
         }
 		if (descriptionTF.getText().isEmpty())			
-            descriptionTF.setText("TODO add description"); // better to nag than ignore
+            descriptionTF.setText(DEFAULT_DESCRIPTION); // better to nag than ignore
     }
 
     private void unloadWidgets()

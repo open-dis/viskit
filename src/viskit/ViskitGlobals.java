@@ -278,12 +278,12 @@ public class ViskitGlobals {
         return getActiveEventGraphModel().getStateVariables();
     }
 
-    public ComboBoxModel<ViskitElement> getStateVarsCBModel() {
+    public ComboBoxModel<ViskitElement> getStateVariablesCBModel() {
         return new DefaultComboBoxModel<>(getStateVariablesList());
     }
 
     public Vector<ViskitElement> getSimParametersList() {
-        return getActiveEventGraphModel().getSimParameters();
+        return getActiveEventGraphModel().getSimulationParameters();
     }
 
     public ComboBoxModel<ViskitElement> getSimParamsCBModel() {

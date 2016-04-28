@@ -98,9 +98,9 @@ public class SimkitXML2Java {
         }
     }
 
-    /** Instance that facilitates code generation via the given input stream
+    /** Instance that facilitates source code generation via the given input stream
      *
-     * @param stream the file stream to generate code from
+     * @param stream the file stream to generate source code from
      */
     public SimkitXML2Java(InputStream stream) {
         this();
@@ -112,7 +112,7 @@ public class SimkitXML2Java {
      * when used from another class.  Instance this
      * with a String for the className of the xmlFile
      *
-     * @param xmlFile the file to generate code from
+     * @param xmlFile the file to generate source code from
      */
     public SimkitXML2Java(String xmlFile) {
         this(ViskitStatics.classForName(
@@ -777,13 +777,13 @@ public class SimkitXML2Java {
 
         if (!liLocalV.isEmpty()) {pw.println();}
 
-        if (run.getCode() != null && !run.getCode().isEmpty()) {
-            pw.println(SP_8 + "/* Code insertion for Event " + run.getName() + " */");
-            String[] lines = run.getCode().split("\\n");
+        if (run.getCodeBlock() != null && !run.getCodeBlock().isEmpty()) {
+            pw.println(SP_8 + "/* Code Block insertion for Event " + run.getName() + " */");
+            String[] lines = run.getCodeBlock().split("\\n");
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* End Code insertion */");
+            pw.println(SP_8 + "/* End Code Block insertion */");
             pw.println();
         }
 
@@ -926,13 +926,13 @@ public class SimkitXML2Java {
             pw.println();
         }
 
-        if (e.getCode() != null && !e.getCode().isEmpty()) {
-            pw.println(SP_8 + "/* Code insertion for Event " + eventName + " */");
-            String[] lines = e.getCode().split("\\n");
+        if (e.getCodeBlock() != null && !e.getCodeBlock().isEmpty()) {
+            pw.println(SP_8 + "/* Code Block insertion for Event " + eventName + " */");
+            String[] lines = e.getCodeBlock().split("\\n");
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* End Code insertion */");
+            pw.println(SP_8 + "/* End Code Block insertion */");
             pw.println();
         }
 
@@ -1128,14 +1128,14 @@ public class SimkitXML2Java {
 
     void buildCodeBlock(StringWriter t) {
         PrintWriter pw = new PrintWriter(t);
-        String code = root.getCode();
-        if (code != null) {
-            pw.println(SP_4 + "/* Inserted code for " + root.getName() + " */");
-            String[] lines = code.split("\\n");
+        String codeBlock = root.getCodeBlock();
+        if (codeBlock != null) {
+            pw.println(SP_4 + "/* Inserted Code Block for " + root.getName() + " */");
+            String[] lines = codeBlock.split("\\n");
             for (String codeLines : lines) {
                 pw.println(SP_4 + codeLines);
             }
-            pw.println(SP_4 + "/* End inserted code */");
+            pw.println(SP_4 + "/* End inserted Code Block */");
         }
         pw.println(CB);
     }
@@ -1204,8 +1204,7 @@ public class SimkitXML2Java {
             return localSuperParams;
         }
 
-        // the extendz field may also contain an implements
-        // codeBlock.
+        // the extendz field may also contain an implements codeBlock. TODO confirm OK
 
         Class<?> c = resolveExtensionClass();
 

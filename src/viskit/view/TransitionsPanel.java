@@ -26,10 +26,10 @@ import viskit.model.ViskitElement;
  */
 public class TransitionsPanel extends JPanel {
 
-    private JList<String> lis;
-    private JButton minusButt, plusButt;
+    private JList<String> modelList;
+    private JButton minusButton, plusButton;
     private myListModel model;
-    private JButton edButt;
+    private JButton editButton;
 
     public TransitionsPanel() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -41,11 +41,11 @@ public class TransitionsPanel extends JPanel {
         int bigSz = getFont().getSize();
         instructions.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
         p.add(instructions);
-        edButt = new JButton("edit.");
-        edButt.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        edButt.setBorder(null);
-        edButt.setEnabled(false);
-        p.add(edButt);
+        editButton = new JButton("edit.");
+        editButton.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+        editButton.setBorder(null);
+        editButton.setEnabled(false);
+        p.add(editButton);
         p.add(Box.createHorizontalGlue());
         add(p);
 
@@ -53,10 +53,12 @@ public class TransitionsPanel extends JPanel {
         model.addElement("1");
         model.addElement("2");
         model.addElement("3");
-        lis = new JList<>(model);
-        lis.setVisibleRowCount(3);
+        model.addElement("4");
+        model.addElement("5");
+        modelList = new JList<>(model);
+        modelList.setVisibleRowCount(5);
 
-        JScrollPane jsp = new JScrollPane(lis);
+        JScrollPane jsp = new JScrollPane(modelList);
         Dimension dd = jsp.getPreferredSize();
         dd.width = Integer.MAX_VALUE;
         jsp.setMinimumSize(dd);
@@ -67,23 +69,23 @@ public class TransitionsPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.add(Box.createHorizontalGlue());
-        plusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
-        plusButt.setBorder(null);
-        plusButt.setText(null);
-        Dimension d = plusButt.getPreferredSize();
-        plusButt.setMinimumSize(d);
-        plusButt.setMaximumSize(d);
-        buttonPanel.add(plusButt);
-        minusButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
-        minusButt.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minusGrey.png")));
-        d = plusButt.getPreferredSize();
-        minusButt.setMinimumSize(d);
-        minusButt.setMaximumSize(d);
-        minusButt.setBorder(null);
-        minusButt.setText(null);
-        minusButt.setActionCommand("m");
-        minusButt.setEnabled(false);
-        buttonPanel.add(minusButt);
+        plusButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
+        plusButton.setBorder(null);
+        plusButton.setText(null);
+        Dimension d = plusButton.getPreferredSize();
+        plusButton.setMinimumSize(d);
+        plusButton.setMaximumSize(d);
+        buttonPanel.add(plusButton);
+        minusButton =   new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
+        minusButton.setDisabledIcon(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minusGrey.png")));
+        d = plusButton.getPreferredSize();
+        minusButton.setMinimumSize(d);
+        minusButton.setMaximumSize(d);
+        minusButton.setBorder(null);
+        minusButton.setText(null);
+        minusButton.setActionCommand("m");
+        minusButton.setEnabled(false);
+        buttonPanel.add(minusButton);
         buttonPanel.add(Box.createHorizontalGlue());
         add(buttonPanel);
 
@@ -92,17 +94,17 @@ public class TransitionsPanel extends JPanel {
         dd = this.getPreferredSize();
         this.setMinimumSize(dd);
 
-        plusButt.addActionListener(new plusButtonListener());
-        minusButt.addActionListener(new minusButtonListener());
+        plusButton.addActionListener(new plusButtonListener());
+        minusButton.addActionListener(new minusButtonListener());
 
-        lis.addListSelectionListener(new myListSelectionListener());
-        lis.addMouseListener(new MouseAdapter() {
+        modelList.addListSelectionListener(new myListSelectionListener());
+        modelList.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    if (myMouseLis != null) {
-                        int idx = lis.getSelectedIndex();
+                    if (myMouseListener != null) {
+                        int idx = modelList.getSelectedIndex();
 
                         // Don't fail on ArrayIndexOutOfBoundsException
                         if (idx == -1) {
@@ -110,7 +112,7 @@ public class TransitionsPanel extends JPanel {
                         }
                         ViskitElement est = arrayList.get(idx);
                         event.setSource(est);
-                        myMouseLis.mouseClicked(event);
+                        myMouseListener.mouseClicked(event);
                     }
                 }
             }
@@ -153,7 +155,8 @@ public class TransitionsPanel extends JPanel {
      */
     public String getString() {
         String s = "";
-        for (Enumeration<String> en = model.elements(); en.hasMoreElements();) {
+        for (Enumeration<String> en = model.elements(); en.hasMoreElements();)
+		{
             s += en.nextElement();
             s += "\n";
         }
@@ -166,23 +169,23 @@ public class TransitionsPanel extends JPanel {
     }
     private ActionListener myPlusListener;
 
-    public void addPlusListener(ActionListener al) {
-        myPlusListener = al;
+    public void addPlusListener(ActionListener actionListener) {
+        myPlusListener = actionListener;
     }
     private ActionListener myMinusListener;
 
-    public void addMinusListener(ActionListener al) {
-        myMinusListener = al;
+    public void addMinusListener(ActionListener actionListener) {
+        myMinusListener = actionListener;
     }
+    private MouseListener myMouseListener;
 
     public void addDoubleClickedListener(MouseListener ml) {
-        myMouseLis = ml;
+        myMouseListener = ml;
     }
-    private MouseListener myMouseLis;
 
-    public void updateTransition(EventStateTransition est) {
-        int idx = arrayList.indexOf(est);
-        model.setElementAt(transitionString(est), idx);
+    public void updateTransition(EventStateTransition eventStateTransition) {
+        int index = arrayList.indexOf(eventStateTransition);
+        model.setElementAt(transitionString(eventStateTransition), index);
     }
 
     class myListModel extends DefaultListModel<String> {
@@ -197,7 +200,7 @@ public class TransitionsPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent event)
 		{
-            if (ViskitGlobals.instance().getStateVarsCBModel().getSize() <= 0) {
+            if (ViskitGlobals.instance().getStateVariablesCBModel().getSize() <= 0) {
                 ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Alert",
@@ -206,28 +209,29 @@ public class TransitionsPanel extends JPanel {
                 return;
             }
             model.addElement("double click to edit");
-            lis.setVisibleRowCount(Math.max(model.getSize(), 3));
-            lis.ensureIndexIsVisible(model.getSize() - 1);
-            lis.setSelectedIndex(model.getSize() - 1);
+            modelList.setVisibleRowCount(Math.max(model.getSize(), 5));
+            modelList.ensureIndexIsVisible(model.getSize() - 1);
+            modelList.setSelectedIndex(model.getSize() - 1);
             TransitionsPanel.this.invalidate();
-            minusButt.setEnabled(true);
-            EventStateTransition est = new EventStateTransition();
-            arrayList.add(est);
+            minusButton.setEnabled(true);
+            EventStateTransition eventStateTransition = new EventStateTransition();
+            arrayList.add(eventStateTransition);
             if (myPlusListener != null) {
                 myPlusListener.actionPerformed(event);
             }
 
             // This does an edit immediately, and doesn't require a separate double click
-            if (myMouseLis != null) {
-                MouseEvent me = new MouseEvent(plusButt, 0, 0, 0, 0, 0, 2, false);   // plusButt temporarily used
-                me.setSource(est);
-                myMouseLis.mouseClicked(me);
+            if (myMouseListener != null) {
+                MouseEvent mouseEvent = new MouseEvent(plusButton, 0, 0, 0, 0, 0, 2, false);   // plusButt temporarily used
+                mouseEvent.setSource(eventStateTransition);
+                myMouseListener.mouseClicked(mouseEvent);
 
                 // If they cancelled, kill it
                 String result = model.get(model.getSize() - 1);
-                if ("double click to edit".equals(result) || result.isEmpty()) {  // remove it
-                    ActionEvent ae = new ActionEvent(minusButt, 0, "delete");  // dummy
-                    minusButt.getActionListeners()[0].actionPerformed(ae);
+                if ("double click to edit".equals(result) || result.isEmpty())
+				{  // remove it
+                    ActionEvent ae = new ActionEvent(minusButton, 0, "delete");  // dummy
+                    minusButton.getActionListeners()[0].actionPerformed(ae);
                 }
             }
         }
@@ -237,7 +241,7 @@ public class TransitionsPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (lis.getSelectionModel().getValueIsAdjusting()) {
+            if (modelList.getSelectionModel().getValueIsAdjusting()) {
                 return;
             }
 
@@ -246,17 +250,17 @@ public class TransitionsPanel extends JPanel {
                 return;
             }
 
-            int[] sel = lis.getSelectedIndices();
+            int[] sel = modelList.getSelectedIndices();
             if (sel.length != 0) {
                 for (int i = 0; i < sel.length; i++) {
                     model.remove(sel[i] - i);
                     arrayList.remove(sel[i] - i);
                 }
             }
-            if (lis.getModel().getSize() <= 0) {
-                minusButt.setEnabled(false);
+            if (modelList.getModel().getSize() <= 0) {
+                minusButton.setEnabled(false);
             }
-            lis.setVisibleRowCount(Math.max(3, model.getSize()));
+            modelList.setVisibleRowCount(Math.max(3, model.getSize()));
             TransitionsPanel.this.invalidate();
 
             if (myMinusListener != null) {
@@ -272,9 +276,9 @@ public class TransitionsPanel extends JPanel {
             if (event.getValueIsAdjusting()) {
                 return;
             }
-            if (lis.getModel().getSize() != 0) {
-                boolean b = lis.getSelectedValue() != null;
-                minusButt.setEnabled(b);
+            if (modelList.getModel().getSize() != 0) {
+                boolean b = modelList.getSelectedValue() != null;
+                minusButton.setEnabled(b);
             }
         }
     }

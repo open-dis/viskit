@@ -157,7 +157,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                         buildEventsFromJaxb(jaxbSimEntity.getEvent());
                     buildParametersFromJaxb(jaxbSimEntity.getParameter());
                 buildStateVariablesFromJaxb(jaxbSimEntity.getStateVariable());
-                     buildCodeBlockFromJaxb(jaxbSimEntity.getCode());
+                     buildCodeBlockFromJaxb(jaxbSimEntity.getCodeBlock());
             } catch (JAXBException ee) {
                 // want a clear way toEventNode know if they're trying toEventNode load an assembly vs. some unspecified XML.
                 try {
@@ -427,7 +427,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             }
         }
 
-        eventNode.setCodeBLock(jaxbEvent.getCode());
+        eventNode.setCodeBLock(jaxbEvent.getCodeBlock());
 
         eventNode.getTransitions().clear();
         for (StateTransition stateTransition : jaxbEvent.getStateTransition()) {
@@ -649,17 +649,15 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return new Vector<ViskitElement>(eventNodeCache.values());
     }
 
-    // TODO: Known unchecked cast toEventNode ViskitElement
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") // TODO: Known unchecked cast toEventNode ViskitElement
     @Override
     public Vector<ViskitElement> getStateVariables() {
         return (Vector<ViskitElement>) stateVariables.clone();
     }
 
-    // TODO: Known unchecked cast toEventNode ViskitElement
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") // TODO: Known unchecked cast toEventNode ViskitElement
     @Override
-    public Vector<ViskitElement> getSimParameters() {
+    public Vector<ViskitElement> getSimulationParameters() {
         return (Vector<ViskitElement>) simulationParameters.clone();
     }
 

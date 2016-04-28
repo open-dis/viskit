@@ -58,7 +58,7 @@ public class EventStateTransitionDialog extends JDialog {
     public static boolean showDialog(JFrame parent, EventStateTransition eventStateTransition, ArgumentsPanel argumentsPanel, LocalVariablesPanel localVariablesPanel) {
         if  (dialog == null)
              dialog = new EventStateTransitionDialog(parent, eventStateTransition, argumentsPanel, localVariablesPanel);
-		else dialog.setParams(parent, eventStateTransition);
+		else dialog.setParameters(parent, eventStateTransition);
 
         if (allGood)
             dialog.setVisible(true); // this call blocks
@@ -200,8 +200,8 @@ public class EventStateTransitionDialog extends JDialog {
         actionTF.addCaretListener(lis);
         localInvocationTF.addCaretListener(lis);
 
-        stateVariablesCB.addActionListener(new ActionListener() {
-
+        stateVariablesCB.addActionListener(new ActionListener()
+		{
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 JComboBox cb = (JComboBox) actionEvent.getSource();
@@ -217,12 +217,15 @@ public class EventStateTransitionDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nm = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
-                if (nm != null) {
-                    stateVariablesCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
-                    for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
+                String name = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
+                if (name != null)
+				{
+                    stateVariablesCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
+                    for (int i = 0; i < stateVariablesCB.getItemCount(); i++)
+					{
                         vStateVariable vsv = (vStateVariable) stateVariablesCB.getItemAt(i);
-                        if (vsv.getName().contains(nm)) {
+                        if (vsv.getName().contains(name))
+						{
                             stateVariablesCB.setSelectedIndex(i);
                             break;
                         }
@@ -248,17 +251,20 @@ public class EventStateTransitionDialog extends JDialog {
         });
 
         // to start off:
-        if (stateVariablesCB.getItemCount() > 0) {
+        if (stateVariablesCB.getItemCount() > 0)
+		{
             descriptionTF.setText(((vStateVariable) stateVariablesCB.getItemAt(0)).getDescription());
-        } else {
+        } 
+		else 
+		{
             descriptionTF.setText("");
         }
 
-        RadButtListener rbl = new RadButtListener();
-        assignToRB.addActionListener(rbl);
-        invokeOnRB.addActionListener(rbl);
+        RadioButtListener radioButtListener = new RadioButtListener();
+        assignToRB.addActionListener(radioButtListener);
+        invokeOnRB.addActionListener(radioButtListener);
 
-        setParams(parent, eventStateTransition);
+        setParameters(parent, eventStateTransition);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -267,7 +273,7 @@ public class EventStateTransitionDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    private ComboBoxModel<String> resolveStateTranMethodCalls() {
+    private ComboBoxModel<String> resolveStateTransitionMethodCalls() {
         Class<?> type;
         String typ;
         java.util.List<Method> methods;
@@ -327,7 +333,8 @@ public class EventStateTransitionDialog extends JDialog {
         return new DefaultComboBoxModel<>(methodNames);
     }
 
-    private ComboBoxModel<String> resolveLocalMethodCalls() {
+    private ComboBoxModel<String> resolveLocalMethodCalls()
+	{
         Class<?> type;
         Method[] methods;
         String typ;
@@ -386,16 +393,17 @@ public class EventStateTransitionDialog extends JDialog {
         return new DefaultComboBoxModel<>(methodNames);
     }
 
-    public final void setParams(Component c, EventStateTransition p) {
+    public final void setParameters(Component c, EventStateTransition pEventStateTransition)
+	{
         allGood = true;
-        eventStateTransition = p;
+        this.eventStateTransition = pEventStateTransition;
 
         fillWidgets();
 
         if (!allGood) {return;}
 
-        modified = (p == null);
-        okButton.setEnabled(p == null);
+        modified =         (eventStateTransition == null);
+        okButton.setEnabled(eventStateTransition == null);
 
         getRootPane().setDefaultButton(cancelButton);
         pack(); // do this prior to next
@@ -474,7 +482,7 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     private void setStateVariableCBValue(EventStateTransition est) {
-        stateVariablesCB.setModel(ViskitGlobals.instance().getStateVarsCBModel());
+        stateVariablesCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
         stateVariablesCB.setSelectedIndex(0);
         for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
             vStateVariable sv = (vStateVariable) stateVariablesCB.getItemAt(i);
@@ -495,7 +503,7 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     private void setStateTranMethodsCBValue(EventStateTransition est) {
-        stateTransitionMethodsCB.setModel(resolveStateTranMethodCalls());
+        stateTransitionMethodsCB.setModel(resolveStateTransitionMethodCalls());
         stateTransInvokePanel.setVisible(invokeOnRB.isSelected());
         pack();
 
@@ -597,10 +605,11 @@ public class EventStateTransitionDialog extends JDialog {
         }
     }
 
-    class RadButtListener implements ActionListener {
-
+    class RadioButtListener implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+		{
             modified = true;
             okButton.setEnabled(true);
 
