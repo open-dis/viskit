@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +60,7 @@ import viskit.view.AnalystReportFrame;
  */
 public class AnalystReportController extends mvcAbstractController {
 
-    static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
+    static final Logger LOG = LogUtilities.getLogger(AnalystReportController.class);
 
     private AnalystReportFrame frame;
     private File analystReportFile;

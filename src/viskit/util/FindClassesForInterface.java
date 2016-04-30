@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -97,14 +97,14 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                LogUtils.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
+                LogUtilities.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
 
                 clazz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
                 found.put(name, clazz);
 
-                LogUtils.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
+                LogUtilities.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
             } catch (Exception e) {
-                LogUtils.getLogger(FindClassesForInterface.class).error(e);
+                LogUtilities.getLogger(FindClassesForInterface.class).error(e);
             } finally {
                 try {
                     classFile.close();

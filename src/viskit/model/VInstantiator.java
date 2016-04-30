@@ -1,6 +1,6 @@
 package viskit.model;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public abstract class VInstantiator {
 
-    static final Logger LOG = LogUtils.getLogger(VInstantiator.class);
+    static final Logger LOG = LogUtilities.getLogger(VInstantiator.class);
     private String type;
     private String name = "";
     private String description = "";
@@ -193,10 +193,10 @@ public abstract class VInstantiator {
 					{
                         index++; // continue
                     }
-					// TODO if not found prior to end of loop, warn of model inconsistency, probably should not continue
 					if (index == (eventGraphParameters.length - 1))
 					{
-						LOG.error("Model inconsistency: no matching eventGraphParameter found to match assemblyPrameter[" + index + "]");
+						// TODO if not found prior to end of loop, warn of model inconsistency, probably should not continue
+						LOG.error("Model inconsistency: no matching eventGraphParameter found to match assemblyPrameter[" + index + "]"); // TODO
 					}
                 }
                 if (viskit.ViskitStatics.debug) {

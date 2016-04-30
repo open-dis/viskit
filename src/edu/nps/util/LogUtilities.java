@@ -17,8 +17,9 @@ import org.apache.log4j.PropertyConfigurator;
  * @author suleyman <br>
  * @version $Id: LogUtils.java 4921 2008-11-19 00:44:23Z tnorbraten $
  */
-public class LogUtils {
-    private static final Logger LOG = Logger.getLogger(LogUtils.class);
+public class LogUtilities
+{
+    private static final Logger LOG = Logger.getLogger(LogUtilities.class);
 
     static {
         configureLog4j("configuration/log4j.properties");
@@ -43,26 +44,26 @@ public class LogUtils {
      * If requested configuration file can not be read, the default behavior
      * will be to use BasicConfigurator and set the debug level to INFO.
      *
-     * @param configFileFname The file name to configure the logger with.
+     * @param configurationFileFname The file name to configure the logger with.
      * @param watch           not used
      * @return true if successful, false if failed to find/use the file
      */
-    public static boolean configureLog4j(String configFileFname, boolean watch) {
-
-        if (!configFileFname.isEmpty()) {
-            Properties props = new Properties();
+    public static boolean configureLog4j(String configurationFileFname, boolean watch) 
+	{
+        if (!configurationFileFname.isEmpty()) {
+            Properties properties = new Properties();
 
             // Use the class loader to find the path in a jar file
             try {
-                props.load(ClassLoader.getSystemResourceAsStream(configFileFname));
+                properties.load(ClassLoader.getSystemResourceAsStream(configurationFileFname));
             } catch (IOException e) {
                 LOG.error(e);
             }
 
             if (watch) {
-                PropertyConfigurator.configureAndWatch(configFileFname);
+                PropertyConfigurator.configureAndWatch(configurationFileFname);
             } else {
-                PropertyConfigurator.configure(props);
+                PropertyConfigurator.configure(properties);
             }
 
             return true;
@@ -75,7 +76,7 @@ public class LogUtils {
             // The following is useful early on when developers are starting to
             // use log4j to know what is going on. We can remove this printout
             // in the future, or turn it into a log4j message!
-            LOG.warn("Failed to read " + configFileFname + ". " +
+            LOG.warn("Failed to read " + configurationFileFname + ". " +
                     "Assuming INFO level and Console appender.");
 
             return false;

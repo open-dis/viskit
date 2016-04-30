@@ -193,7 +193,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private void unloadWidgets()
 	{
         String name = handleNameTF.getText();
-        name = name.replaceAll("\\s", ""); // squeeze out illegal whitespace
+        name = name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
         if (eventGraphNode != null)
 		{
             eventGraphNode.setName(name);

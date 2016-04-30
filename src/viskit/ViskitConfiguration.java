@@ -1,6 +1,6 @@
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class ViskitConfiguration {
 
     private static ViskitConfiguration me;
 
-    static final Logger LOG = LogUtils.getLogger(ViskitConfiguration.class);
+    static final Logger LOG = LogUtilities.getLogger(ViskitConfiguration.class);
 
     private Map<String, XMLConfiguration> xmlConfigurations;
     private Map<String, String>           sessionHashMap;

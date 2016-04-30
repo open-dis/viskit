@@ -1,6 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
@@ -29,7 +29,7 @@ import viskit.ViskitStatics;
 @SuppressWarnings("serial")
 public class SourceWindow extends JFrame {
 
-    static final Logger LOGGER = LogUtils.getLogger(SourceWindow.class);
+    static final Logger LOGGER = LogUtilities.getLogger(SourceWindow.class);
 
     public final String src;
     Thread sysOutThread;

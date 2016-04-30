@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import simkit.random.*;
 import viskit.ViskitStatics;
 
@@ -55,12 +55,12 @@ public class VsimkitObjects {
                 // TODO: this breaks on AR1Variate instance "getting"
                 Object m = method.invoke(null, (Object[]) null);
                 Object o = new FullNameAndInstance(name, m);
-                LogUtils.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
+                LogUtilities.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
                 HASH_MAP.put(name, o);
                 HASH_MAP.put(noPackageName, o);
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            LogUtils.getLogger(VsimkitObjects.class).error(e);
+            LogUtilities.getLogger(VsimkitObjects.class).error(e);
 //            e.printStackTrace();
         }
     }

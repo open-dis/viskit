@@ -2,7 +2,7 @@ package viskit.control;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtils;
 import java.awt.BorderLayout;
@@ -79,7 +79,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
+    static final Logger LOG = LogUtilities.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFilePath;
@@ -131,9 +131,30 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					             ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
 			File projectDirectory = new File (projectPath);
 			if (projectDirectory.isDirectory())
-				openProject (projectDirectory);
+				openProjectDirectory (projectDirectory);
+		
+			// TODO there are two variations of this block, refactor/combine
+			if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+			{
+				// TODO re-open previously open assemblies and event graphs, otherwise:
 			
-			// TODO re-open previously open assemblies and event graphs
+				messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened successfully", 
+					"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is open</p>" +
+							"<p align='center'>&nbsp;</p>" +
+							"<p align='center'>Now open or create either an Event Graph or Assembly</p></html>");
+			}
+			else
+			{
+				messageToUser (JOptionPane.ERROR_MESSAGE, "Project failed to open", 
+					"<html><p>Selected project did not open, see error log for details</p>");
+				return;
+			}
+		}
+		else
+		{
+			messageToUser (JOptionPane.INFORMATION_MESSAGE, "Ready to go!", 
+					"<html><p>Open or create a project to begin</p>");
 		}
 		
         // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
@@ -772,13 +793,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssemblyView and this AssemblyyController
+    /** Common method between the AssemblyView and this AssemblyController
      *
-     * @return indication to continue (true) or cancel (false)
+     * @return indication to continue closing (true) or cancel closing (false)
      */
     public boolean confirmProjectClosing ()
 	{
-        boolean continueClosing = true; // default: continue closing unless user says to cancel
+        boolean continueClosing = true; // default: continue closing process after this dialog, unless user says to cancel
 		
 		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
 		{
@@ -786,17 +807,20 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		}
 		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
-            String message = "Are you sure you want to close your current Viskit Project?";
-            String title   = "Close Current Project";
-			if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-				title += ": " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
-            int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
-            if (responseValue == JOptionPane.YES_OPTION) {
+             String title   = "Close Project";
+             String message = "Are you sure you want to close this project?";
+			 if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+			 	 title += " " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName();
+             int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
+             if (responseValue == JOptionPane.YES_OPTION)
+			 {
                 doProjectCleanup();
-            } else {
+             } 
+			 else 
+			 {
                 continueClosing = false;
-            }
-			return continueClosing; // user decision
+             }
+			 return continueClosing; // user decision
         }
 		else return continueClosing; // existing project is closed already
     }
@@ -813,17 +837,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void openProject(File projectDirectory)
+    public void openProjectDirectory(File projectDirectory)
 	{
         ViskitStatics.setViskitProjectDirectory(projectDirectory);
         ViskitGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectFileSet(projectDirectory);
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();   // reset
+		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
+		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
-		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())
+		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && 
+			!viskitApplicationFrame.isAssemblyEditorTabSelected()) 
 			 viskitApplicationFrame.displayAssemblyEditorTab(); // select relevant tab
     }
 
@@ -1436,11 +1461,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (elem instanceof AssemblyEdge) {
                 removeEdge((AssemblyEdge) elem);
             } else if (elem instanceof EventGraphNode) {
-                EventGraphNode en = (EventGraphNode) elem;
-                for (AssemblyEdge ed : en.getConnections()) {
-                    removeEdge(ed);
+                EventGraphNode eventGraphNode = (EventGraphNode) elem;
+                for (AssemblyEdge assemblyEdge : eventGraphNode.getConnections()) {
+                    removeEdge(assemblyEdge);
                 }
-                ((AssemblyModel) getModel()).deleteEvGraphNode(en);
+                ((AssemblyModel) getModel()).deleteEvGraphNode(eventGraphNode);
             } else if (elem instanceof PropertyChangeListenerNode) {
                 PropertyChangeListenerNode en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {

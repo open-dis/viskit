@@ -121,7 +121,8 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(ActionEvent ev)
+		{
             AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
             File projectDirectory;
@@ -131,7 +132,7 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
             else
                 projectDirectory = (File) obj;
 
-            if (projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG) ||
+            if ( projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG) ||
 				(getValue(NAME) == "clear"))
 			{
                 assemblyController.clearRecentProjectFileSet();
@@ -139,7 +140,7 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
 			else
 			{
                 assemblyController.doProjectCleanup();
-                assemblyController.openProject(projectDirectory);
+                assemblyController.openProjectDirectory(projectDirectory);
             }
         }
     }

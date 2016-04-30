@@ -17,7 +17,7 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -27,6 +27,9 @@ import javax.xml.bind.JAXBException;
 import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcHandler;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
 
 /**
  *
@@ -34,7 +37,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class AssemblyHandler implements XmlRpcHandler {
 
-    static Logger LOG = LogUtils.getLogger(AssemblyHandler.class);
+    static Logger LOG = LogUtilities.getLogger(AssemblyHandler.class);
     SessionManager sessionManager;
     Hashtable<String, GridRunner> gridRuns;
 

@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -446,7 +446,7 @@ public class UserPreferencesDialog extends JDialog {
         if (lis != null) {
             for (String s : lis) {
                 s = s.replaceAll("\\\\", "/");
-                LogUtils.getLogger(UserPreferencesDialog.class).debug("lis[" + ix + "]: " + s);
+                LogUtilities.getLogger(UserPreferencesDialog.class).debug("lis[" + ix + "]: " + s);
                 projectConfiguration.setProperty(ViskitConfiguration.EXTRA_CLASSPATHS_PATH_KEY + "(" + ix + ")[@value]", s);
                 ix++;
             }
@@ -710,7 +710,7 @@ public class UserPreferencesDialog extends JDialog {
                 try {
                     extClassPathsUrls[i++] = file.toURI().toURL();
                 } catch (MalformedURLException ex) {
-                    LogUtils.getLogger(UserPreferencesDialog.class).error(ex);
+                    LogUtilities.getLogger(UserPreferencesDialog.class).error(ex);
                 }
             }
         }

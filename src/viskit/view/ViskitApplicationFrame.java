@@ -35,7 +35,7 @@ package viskit.view;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -647,7 +647,7 @@ public class ViskitApplicationFrame extends JFrame {
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.ViskitStatics.debug)
 				{
-                    LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
+                    LogUtilities.getLogger(ExitAction.class).info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user
@@ -840,9 +840,9 @@ public class ViskitApplicationFrame extends JFrame {
                 file.delete();
             }
             if (dotViskit.delete())
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
+                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
 
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+            LogUtilities.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }
 

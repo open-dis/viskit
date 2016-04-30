@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 // Local imports
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import viskit.ViskitConfiguration;
 
 /**
@@ -63,7 +63,7 @@ public class XMLValidationTool {
     public static final String LOCAL_EVENT_GRAPH_SCHEMA =
             System.getProperty("user.dir") + "/Schemas/simkit.xsd";
 
-    static Logger log = LogUtils.getLogger(XMLValidationTool.class);
+    static Logger log = LogUtilities.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
     private File xmlFile, schemaFile;

@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -96,7 +96,7 @@ public class ViskitProject {
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENTGRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
-    static Logger log = LogUtils.getLogger(ViskitProject.class);
+    static Logger log = LogUtilities.getLogger(ViskitProject.class);
 
 	private String   projectName        = ""; // empty string if no project open
 	private String   projectAuthor      = "";

@@ -2,7 +2,7 @@ package viskit.xsd.translator.assembly;
 
 // TODO new pattern for instantiating SimEntity objects 
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,7 +33,7 @@ public class SimkitAssemblyXML2Java {
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean debug = false;
-    static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
+    static Logger log = LogUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
     final private String sp  = SimkitXML2Java.SP;

@@ -2,7 +2,7 @@ package viskit.view;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
@@ -527,7 +527,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger(EventGraphViewFrame.class).error(tmle);
+            LogUtilities.getLogger(EventGraphViewFrame.class).error(tmle);
         }
         graphPane.setToolTipText(eventGraphModel.getMetadata().description);
 
@@ -766,7 +766,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
 			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
 		
-        projectsMenu.add(buildMenuItem(eventGraphController, AssemblyControllerImpl.NEWPROJECT_METHOD, "New Viskit Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
+        projectsMenu.add(buildMenuItem(eventGraphController, AssemblyControllerImpl.NEWPROJECT_METHOD, "New Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
         
 		projectsMenu.add(buildMenuItem(this, OPENPROJECT_METHOD, "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
 		if (openRecentProjectsMenu == null) // don't wipe it out if already there!
@@ -905,7 +905,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			}
 			catch (Exception e)
 			{
-				LogUtils.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored");
+				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored");
 			}
 		}
     }

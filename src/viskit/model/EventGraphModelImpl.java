@@ -48,15 +48,15 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     JAXBContext   jaxbContext;
     ObjectFactory jaxbObjectFactory;
     SimEntity     jaxbSimEntity;
-    File currentFile;
+    File          currentFile;
     Map<Event, EventNode> eventNodeCache       = new HashMap<>();
     Map<Object, Edge>     edgeCache            = new HashMap<>();
     Vector<ViskitElement> stateVariables       = new Vector<>();
     Vector<ViskitElement> simulationParameters = new Vector<>();
-    private final String schemaLocation        = XMLValidationTool.EVENT_GRAPH_SCHEMA;
-    private final String indexVariablePrefix   = "_idxvar_";
-    private final String localVariablePrefix= "locvar_";
-    private final String stateVariablePrefix   = "state_";
+    private final String  schemaLocation        = XMLValidationTool.EVENT_GRAPH_SCHEMA;
+    private final String  indexVariablePrefix   = "_idxvar_";
+    private final String  localVariablePrefix   = "locvar_";
+    private final String  stateVariablePrefix   = "state_";
     private GraphMetadata graphMetadata;
     private final EventGraphControllerImpl eventGraphController;
     private boolean modelDirty = false;
@@ -157,7 +157,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                         buildEventsFromJaxb(jaxbSimEntity.getEvent());
                     buildParametersFromJaxb(jaxbSimEntity.getParameter());
                 buildStateVariablesFromJaxb(jaxbSimEntity.getStateVariable());
-                     buildCodeBlockFromJaxb(jaxbSimEntity.getCodeBlock());
+                     buildCodeBlockFromJaxb(jaxbSimEntity.getCode()); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
             } catch (JAXBException ee) {
                 // want a clear way toEventNode know if they're trying toEventNode load an assembly vs. some unspecified XML.
                 try {
@@ -427,7 +427,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             }
         }
 
-        eventNode.setCodeBLock(jaxbEvent.getCodeBlock());
+        eventNode.setCodeBLock(jaxbEvent.getCode()); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
 
         eventNode.getTransitions().clear();
         for (StateTransition stateTransition : jaxbEvent.getStateTransition()) {
@@ -586,11 +586,11 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return alis;
     }
 
-    private void buildCodeBlockFromJaxb(String code)
+    private void buildCodeBlockFromJaxb(String codeBlock)
 	{
-        code = (code == null) ? "" : code; // ensure non-null
+        codeBlock = (codeBlock == null) ? "" : codeBlock; // ensure non-null
 
-        notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCK_CHANGED, "Code block changed"));
+        notifyChanged(new ModelEvent(codeBlock, ModelEvent.CODEBLOCK_CHANGED, "Code block changed"));
     }
 
     private void buildStateVariablesFromJaxb(List<StateVariable> jaxbStateVariableList)
@@ -703,8 +703,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     @Override
-    public void changeCodeBlock(String s) {
-        jaxbSimEntity.setCode(s);
+    public void changeCodeBlock(String newCodeBlock) {
+        jaxbSimEntity.setCode(newCodeBlock);
         setDirty(true);
     }
 

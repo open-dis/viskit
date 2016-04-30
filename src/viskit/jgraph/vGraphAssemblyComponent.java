@@ -18,6 +18,7 @@ import viskit.view.AssemblyEditViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.AssemblyController;
 import viskit.model.*;
+import viskit.view.dialog.PclEdgeInspectorDialog;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects MOVES Institute. Naval
@@ -266,32 +267,44 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 if (c instanceof vAssemblyEdgeCell) {
                     vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
                     AssemblyEdge assemblyEdge = (AssemblyEdge) vc.getUserObject();
-                    Object to = assemblyEdge.getTo();
-                    Object from = assemblyEdge.getFrom();
+					// events flow out of fromObject into toObject
+                    Object   toObject = assemblyEdge.getTo();
+                    Object fromObject = assemblyEdge.getFrom();
 
                     if (assemblyEdge instanceof AdapterEdge) {
                         Object   toEvent = ((AdapterEdge) assemblyEdge).getTargetEvent();
                         Object fromEvent = ((AdapterEdge) assemblyEdge).getSourceEvent();
                         sb.append("<center>Adapter<br><u>");// +
-                        sb.append(from);
+                        sb.append(fromObject);
                         sb.append(".");
                         sb.append(fromEvent);
                         sb.append("</u> connected to <u>");
-                        sb.append(to);
+                        sb.append(toObject);
                         sb.append(".");
                         sb.append(toEvent);
                     } else if (assemblyEdge instanceof SimEventListenerEdge) {
                         sb.append("<center>SimEvent Listener<br><u>");
-                        sb.append(to);
+                        sb.append(toObject);
                         sb.append("</u> listening to <u>");
-                        sb.append(from);
+                        sb.append(fromObject);
                     } else {
                         String property = ((PropertyChangeListenerEdge) assemblyEdge).getProperty();
-                        property = (property != null && property.length() > 0) ? property : "*all*";
+                        property = (property != null && property.length() > 0) ? property : PclEdgeInspectorDialog.ALL_STATE_VARIABLES_NAME;
                         sb.append("<center>Property Change Listener<br><u>");
-                        sb.append(to);
+						String    className = ((PropertyChangeListenerNode) toObject).getType();
+						if (className.contains("."))
+							className = className.substring(className.lastIndexOf(".")+1);
+						String instanceName = ((PropertyChangeListenerNode) toObject).getName();
+						if (!instanceName.toLowerCase().contains(className.toLowerCase()))
+						{
+							sb.append(className);
+							sb.append(" ");
+						}
+                        sb.append(instanceName);
                         sb.append("</u> listening to <u>");
-                        sb.append(from);
+                        sb.append(((EventGraphNode)fromObject).getName()); // class name
+						// also need instance name? probably only if more than one instance of this class exists,
+						//      and perhaps not even then since this is a tooltip
                         sb.append(".");
                         sb.append(property);
                     }

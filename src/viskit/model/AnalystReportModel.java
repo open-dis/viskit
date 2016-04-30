@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.model;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.FileWriter;
@@ -69,7 +69,7 @@ import viskit.reports.LinearRegressionChart;
  */
 public final class AnalystReportModel extends mvcAbstractModel {
 
-    static final Logger LOG = LogUtils.getLogger(AnalystReportModel.class);
+    static final Logger LOG = LogUtilities.getLogger(AnalystReportModel.class);
 
     private boolean debug = false;
 

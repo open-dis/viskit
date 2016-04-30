@@ -19,7 +19,7 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -60,7 +60,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     private Hashtable<String, String> sessions;
     private JAXBContext jaxbContext;
 
-    Logger LOG = LogUtils.getLogger(SessionManager.class);
+    Logger LOG = LogUtilities.getLogger(SessionManager.class);
 
     private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";

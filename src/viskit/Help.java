@@ -1,6 +1,6 @@
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -83,7 +83,7 @@ public class Help {
             hb = new HelpSet(null, helpSetURL).createHelpBroker();
         } catch (HelpSetException e) {
 //        e.printStackTrace();
-            LogUtils.getLogger(Help.class).error(e);
+            LogUtilities.getLogger(Help.class).error(e);
         }
 
         // Here we're setting up the action event peripherals for the tutorial menu selection

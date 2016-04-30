@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -341,12 +341,12 @@ public class EventInspectorDialog extends JDialog {
 
                     // and, this SchedulingEdge is going toEventNode this node
                     if (((SchedulingEdge) viskitElement).toEventNode.getName().equals(eventNode.getName())) {
-                        LogUtils.getLogger(EventInspectorDialog.class).debug("Found the SE's 'to' Node that matches this EventNode");
+                        LogUtilities.getLogger(EventInspectorDialog.class).debug("Found the SE's 'to' Node that matches this EventNode");
 
                         // The lower key values signal when it was connected toEventNode
                         // toEventNode this event node.  We're interested in the first
                         // SchedulingEdge toEventNode this EventNode
-                        LogUtils.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) viskitElement).getModelKey());
+                        LogUtilities.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ((SchedulingEdge) viskitElement).getModelKey());
 
                         // If this isn't the first time, then skip over this edge
                         if (!((SchedulingEdge) viskitElement).parametersList.isEmpty()) {continue;}

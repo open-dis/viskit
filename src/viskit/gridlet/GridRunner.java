@@ -6,7 +6,7 @@
  */
 package viskit.gridlet;
 
-import static edu.nps.util.LogUtils.getLogger;
+import static edu.nps.util.LogUtilities.getLogger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,6 +46,27 @@ import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
 
 /**
  * The GridRunner launches a number of Gridlets to

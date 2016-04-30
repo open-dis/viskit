@@ -1,6 +1,6 @@
 package viskit.xsd.translator.eventgraph;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -24,7 +24,7 @@ import viskit.xsd.bindings.eventgraph.*;
  */
 public class SimkitXML2Java {
 
-    static Logger log = LogUtils.getLogger(SimkitXML2Java.class);
+    static Logger log = LogUtilities.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
 	/** space character */
@@ -171,32 +171,41 @@ public class SimkitXML2Java {
     /** @return the XML to Java translated source as a string */
     public String translate() {
 
-        StringBuilder source = new StringBuilder();
-        StringWriter head = new StringWriter();
-        StringWriter parameters = new StringWriter();
-        StringWriter stateVariables = new StringWriter();
-        StringWriter accessorBlock = new StringWriter();
-        StringWriter parameterMap = new StringWriter();
-        StringWriter constructors = new StringWriter();
-        StringWriter runBlock = new StringWriter();
-        StringWriter eventBlock = new StringWriter();
-        StringWriter toStringBlock = new StringWriter();
-        StringWriter codeBlock = new StringWriter();
+        StringBuilder sourceStringBuilder = new StringBuilder();
+		
+        StringWriter           headStringWriter = new StringWriter();
+        StringWriter     parametersStringWriter = new StringWriter();
+        StringWriter stateVariablesStringWriter = new StringWriter();
+        StringWriter   parameterMapStringWriter = new StringWriter();
+        StringWriter  accessorBlockStringWriter = new StringWriter();
+        StringWriter   constructorsStringWriter = new StringWriter();
+        StringWriter       runBlockStringWriter = new StringWriter();
+        StringWriter     eventBlockStringWriter = new StringWriter();
+        StringWriter  toStringBlockStringWriter = new StringWriter();
+        StringWriter      codeBlockStringWriter = new StringWriter();
 
-        buildHead(head);
-        buildParameters(parameters, accessorBlock);
-        buildStateVariables(stateVariables, accessorBlock);
-        buildParameterMap(parameterMap);
-        buildConstructors(constructors);
-        buildEventBlock(runBlock, eventBlock);
-        buildToString(toStringBlock);
-        buildCodeBlock(codeBlock);
+        buildHead          (headStringWriter);
+        buildParameters    (parametersStringWriter,     accessorBlockStringWriter);
+        buildStateVariables(stateVariablesStringWriter, accessorBlockStringWriter);
+        buildParameterMap  (parameterMapStringWriter);
+        buildConstructors  (constructorsStringWriter);
+        buildEventBlock    (runBlockStringWriter, eventBlockStringWriter);
+        buildToString      (toStringBlockStringWriter);
+        buildCodeBlock     (codeBlockStringWriter);
 
-        buildSource(source, head, parameters, stateVariables, parameterMap,
-                constructors, runBlock, eventBlock, accessorBlock,
-                toStringBlock, codeBlock);
+        buildSource(sourceStringBuilder, 
+				    headStringWriter, 
+					parametersStringWriter, 
+					stateVariablesStringWriter, 
+					parameterMapStringWriter,
+					constructorsStringWriter, 
+					runBlockStringWriter, 
+					eventBlockStringWriter, 
+					accessorBlockStringWriter,
+					toStringBlockStringWriter, 
+					codeBlockStringWriter);
 
-        return source.toString();
+        return sourceStringBuilder.toString();
     }
 
     /** @return the base name of this EG file */
@@ -669,17 +678,20 @@ public class SimkitXML2Java {
         return type.substring(0, left) + type.substring(right + 1);
     }
 
-    void buildEventBlock(StringWriter runBlock, StringWriter eventBlock) {
+    void buildEventBlock(StringWriter runBlockStringWriter, StringWriter eventBlockStringWriter) {
 
         List<Event> events = root.getEvent();
 
-        // Bugfix 1398
-        for (Event e : events) {
-            if (e.getName().equals("Run")) {
-                doResetBlock(e, runBlock);
-                doRunBlock(e, runBlock);
-            } else {
-                doEventBlock(e, eventBlock);
+        for (Event event : events)
+		{
+            if (event.getName().equals("Run")) // reserved event name
+			{
+                doResetBlock(event, runBlockStringWriter);
+                  doRunBlock(event, runBlockStringWriter);
+            } 
+			else
+			{
+                doEventBlock(event, eventBlockStringWriter);
             }
         }
     }
@@ -777,9 +789,10 @@ public class SimkitXML2Java {
 
         if (!liLocalV.isEmpty()) {pw.println();}
 
-        if (run.getCodeBlock() != null && !run.getCodeBlock().isEmpty()) {
+        if (run.getCode() != null && !run.getCode().isEmpty()) // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
+		{
             pw.println(SP_8 + "/* Code Block insertion for Event " + run.getName() + " */");
-            String[] lines = run.getCodeBlock().split("\\n");
+            String[] lines = run.getCode().split("\\n"); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
@@ -842,16 +855,16 @@ public class SimkitXML2Java {
 
     /** These Events should now be any other than the Run, or Reset events
      *
-     * @param e the Event to process
-     * @param eventBlock the StringWriter assigned to write the Event
+     * @param event the Event to process
+     * @param eventBlockStringWriter the StringWriter assigned to write the Event
      */
-    void doEventBlock(Event e, StringWriter eventBlock) {
-        log.debug("Event is: " + e.getName());
-        PrintWriter pw = new PrintWriter(eventBlock);
-        List<StateTransition> liStateT = e.getStateTransition();
-        List<Argument> liArgs = e.getArgument();
-        List<LocalVariable> liLocalV = e.getLocalVariable();
-        List<Object> liSchedCanc = e.getScheduleOrCancel();
+    void doEventBlock(Event event, StringWriter eventBlockStringWriter) {
+        log.debug("Event is: " + event.getName());
+        PrintWriter pw = new PrintWriter(eventBlockStringWriter);
+        List<StateTransition> liStateT = event.getStateTransition();
+        List<Argument> liArgs = event.getArgument();
+        List<LocalVariable> liLocalV = event.getLocalVariable();
+        List<Object> liSchedCanc = event.getScheduleOrCancel();
 
         String doEvent = null;
 
@@ -861,7 +874,7 @@ public class SimkitXML2Java {
             Class<?> sup = resolveExtensionClass();
             Method[] methods = sup.getMethods();
             for (Method m : methods) {
-                if (("do"+e.getName()).equals(m.getName()) && m.getParameterCount() == liArgs.size()) {
+                if (("do"+event.getName()).equals(m.getName()) && m.getParameterCount() == liArgs.size()) {
                     doEvent = m.getName();
                     break;
                 }
@@ -875,7 +888,7 @@ public class SimkitXML2Java {
         // Strip out name mangling artifacts imposed by the EventGraph Model.
         // This is done to keep XML happy with no identical IDREFs, but let's
         // Simkit work its magic with reflection
-        String eventName = e.getName().replaceAll("_\\w+_*", "");
+        String eventName = event.getName().replaceAll("_\\w+_*", "");
 
         pw.print(SP_4 + "public void do" + eventName + LP);
 
@@ -926,9 +939,10 @@ public class SimkitXML2Java {
             pw.println();
         }
 
-        if (e.getCodeBlock() != null && !e.getCodeBlock().isEmpty()) {
+        if (event.getCode() != null && !event.getCode().isEmpty()) // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
+		{
             pw.println(SP_8 + "/* Code Block insertion for Event " + eventName + " */");
-            String[] lines = e.getCodeBlock().split("\\n");
+            String[] lines = event.getCode().split("\\n"); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
@@ -1025,9 +1039,9 @@ public class SimkitXML2Java {
         // waitDelay/interrupt
         for (Object o : liSchedCanc) {
             if (o instanceof Schedule) {
-                doSchedule((Schedule) o, e, pw);
+                doSchedule((Schedule) o, event, pw);
             } else {
-                doCancel((Cancel) o, e, pw);
+                doCancel((Cancel) o, event, pw);
             }
         }
         pw.println(SP_4 + CB);
@@ -1128,7 +1142,7 @@ public class SimkitXML2Java {
 
     void buildCodeBlock(StringWriter t) {
         PrintWriter pw = new PrintWriter(t);
-        String codeBlock = root.getCodeBlock();
+        String codeBlock = root.getCode(); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
         if (codeBlock != null) {
             pw.println(SP_4 + "/* Inserted Code Block for " + root.getName() + " */");
             String[] lines = codeBlock.split("\\n");
@@ -1140,16 +1154,22 @@ public class SimkitXML2Java {
         pw.println(CB);
     }
 
-    void buildSource(StringBuilder source, StringWriter head,
-            StringWriter parameters, StringWriter stateVars,
-            StringWriter parameterMap, StringWriter constructors,
-            StringWriter runBlock, StringWriter eventBlock,
-            StringWriter accessorBlock, StringWriter toStringBlock,
-            StringWriter codeBlock) {
-
+    void buildSource( // TODO make these class variables to avoid possibility of misordering
+			StringBuilder source, 
+			StringWriter head,
+            StringWriter parameters, 
+			StringWriter stateVariables,
+            StringWriter parameterMap, 
+			StringWriter constructors,
+            StringWriter runBlock, 
+			StringWriter eventBlock,
+            StringWriter accessorBlock, 
+			StringWriter toStringBlock,
+            StringWriter codeBlock)
+	{
         source.append(head.getBuffer());
         source.append(parameters.getBuffer());
-        source.append(stateVars.getBuffer());
+        source.append(stateVariables.getBuffer());
         source.append(parameterMap.getBuffer());
         source.append(constructors.getBuffer());
         source.append(runBlock.getBuffer());
@@ -1159,20 +1179,23 @@ public class SimkitXML2Java {
         source.append(codeBlock.getBuffer());
     }
 
-    private String capitalize(String s) {
+    private String capitalize(String s)
+	{
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-    private boolean isGeneric(String type) {
-        return ViskitGlobals.instance().isGeneric(type);
+    private boolean isGeneric(String typeName)
+	{
+        return ViskitGlobals.instance().isGeneric(typeName);
     }
 
-    private String stripLength(String s) {
+    private String stripLength(String s)
+	{
         int left, right;
         if (!isArray(s)) {
             return s;
         }
-        left = s.indexOf(LB);
+         left = s.indexOf(LB);
         right = s.indexOf(RB);
         return s.substring(0, left + 1) + s.substring(right);
     }

@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ import viskit.ViskitGlobals;
  */
 public class Version {
 
-    static Logger log = LogUtils.getLogger(Version.class);
+    static Logger log = LogUtilities.getLogger(Version.class);
 
     protected String versionString;
 

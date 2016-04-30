@@ -12,7 +12,7 @@ package viskit.model;
  */
 public class PropertyChangeListenerEdge extends AssemblyEdge {
 
-    protected String property;
+    protected String property; // state variable
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;

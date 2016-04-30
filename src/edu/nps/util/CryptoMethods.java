@@ -75,7 +75,7 @@ public class CryptoMethods
       return getString(ciphertext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        LogUtils.getLogger(CryptoMethods.class).error(e);
+        LogUtilities.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }
@@ -91,7 +91,7 @@ public class CryptoMethods
       return new String(cleartext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        LogUtils.getLogger(CryptoMethods.class).error(e);
+        LogUtilities.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }
@@ -106,7 +106,7 @@ public class CryptoMethods
       return s;
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-        LogUtils.getLogger(CryptoMethods.class).error(e);
+        LogUtilities.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }

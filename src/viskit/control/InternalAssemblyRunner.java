@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.control;
 
 import viskit.view.SimulationRunPanel;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -72,7 +72,7 @@ import viskit.model.AssemblyModelImpl;
  */
 public class InternalAssemblyRunner implements PropertyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
+    static final Logger LOG = LogUtilities.getLogger(InternalAssemblyRunner.class);
 
     /** The name of the basicAssembly to run */
     String             assemblyClassName;

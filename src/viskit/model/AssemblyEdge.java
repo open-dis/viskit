@@ -12,8 +12,7 @@ package viskit.model;
  */
 abstract public class AssemblyEdge extends ViskitElement {
 
-    private Object to;
-    private Object from;
+    private Object to, from;
     private String description = "";
 
     public Object getTo() { // TODO use proper class, if possible

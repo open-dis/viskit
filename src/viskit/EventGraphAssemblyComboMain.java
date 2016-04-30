@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.io.File;
@@ -63,23 +63,27 @@ public class EventGraphAssemblyComboMain {
      * Viskit entry point from the command line, or introspection
      * @param args command line arguments if any
      */
-    public static void main(final String[] args) {
-
+    public static void main(final String[] args)
+	{
         // Launch all GUI stuff on, or within the EDT
         try {
 //            throw new InvocationTargetException(new Throwable("mail this error"));
 
-            if (!EventQueue.isDispatchThread()) {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
+            if (!EventQueue.isDispatchThread())
+			{
+                SwingUtilities.invokeAndWait(new Runnable()
+				{
                     @Override
-                    public void run() {
+                    public void run()
+					{
                         createGUI(args);
                     }
                 });
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
+            } 
+			else 
+			{
+                SwingUtilities.invokeLater(new Runnable()
+				{
                     @Override
                     public void run() {
                         createGUI(args);
@@ -89,7 +93,7 @@ public class EventGraphAssemblyComboMain {
         } 
 		catch (InterruptedException | InvocationTargetException e) // catch all
 		{
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
+            LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
 			// A corrupted viskitProject can cause an InvocationTargetException. 
 			// The Apache Commons config files have behaved rather well and don't
@@ -105,7 +109,7 @@ public class EventGraphAssemblyComboMain {
                         "?subject=Viskit%20startup%20error%20log&body=log%20output:");
 				mailtoString = "<a href=\"" + url.toString()+ "\">" + "view and email the session log" + "</a>";
             } catch (MalformedURLException ex) {
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(ex);
+                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(ex);
             }
             String message = "Visual Simkit (Viskit) has experienced a startup problem.   "
                     + "Details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " <br/> "

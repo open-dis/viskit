@@ -37,7 +37,7 @@ package viskit.view;
 import viskit.jgraph.VgraphAssemblyComponentWrapper;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -369,8 +369,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		assembliesMenu.setEnabled(true); // always on
         assembliesMenu.removeAll();      // reset
 		
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.NEWASSEMBLY_METHOD, "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), true));
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.OPENASSEMBLY_METHOD,"Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), true));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.NEWASSEMBLY_METHOD, "New Assembly",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutKeyMask), isProjectOpen));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.OPENASSEMBLY_METHOD,"Open Assembly", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask), isProjectOpen));
         if (openRecentAssemblyMenu == null)
 		{
 			openRecentAssemblyMenu = buildMenu("Recent Assembly"); // don't wipe it out if already there!
@@ -467,7 +467,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			}
 			catch (Exception e)
 			{
-				LogUtils.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu, ignored");
+				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu, ignored");
 			}
 		}
     }
@@ -518,7 +518,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         if (propertyChangeConnectorModeButton.isSelected()) {
             return PCL_MODE;
         }
-        LogUtils.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
+        LogUtilities.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -736,7 +736,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger(AssemblyEditViewFrame.class).error(tmle);
+            LogUtilities.getLogger(AssemblyEditViewFrame.class).error(tmle);
         }
         graphPane.setToolTipText(assemblyModel.getMetadata().description);
 
@@ -961,7 +961,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 } 
 				catch (UnsupportedFlavorException | IOException e)
 				{
-                    LogUtils.getLogger(AssemblyEditViewFrame.class).error(e);
+                    LogUtilities.getLogger(AssemblyEditViewFrame.class).error(e);
                 }
             }
         }
@@ -1149,7 +1149,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         File file = ViskitProject.openProjectDirectory(this, initialProjectPath); // ViskitProject.MY_VISKIT_PROJECTS_DIR);
 		if (file != null) 
 		{
-            assemblyController.openProject(file);
+            assemblyController.openProjectDirectory(file);
         }
 		else
 		{
@@ -1158,18 +1158,22 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName();
 		
+		// TODO there are two variations of this block, refactor/combine
+		
 		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
 			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
+			// TODO re-open previously open assemblies and event graphs, otherwise:
+			
 			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened successfully", 
-				"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is now open.</p>" +
+				"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is open</p>" +
 						"<p align='center'>&nbsp;</p>" +
-						"<p align='center'>Next steps: use the File menu to open or create <br />an Event Graph or an Assembly.</p></html>");
+						"<p align='center'>Now open or create either an Event Graph or Assembly</p></html>");
 		}
 		else
 		{
 			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, "Project failed to open", 
-				"<html><p>Selected project did not open, see error log for details.</p>");
+				"<html><p>Selected project did not open, see error log for details</p>");
 		}
 		
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();

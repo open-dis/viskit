@@ -36,7 +36,7 @@ package viskit.doe;
 import edu.nps.util.CryptoMethods;
 import edu.nps.util.SpringUtilities;
 import static edu.nps.util.GenericConversion.toArray;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.*;
 import java.awt.event.*;
@@ -139,7 +139,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             unmarshaller = jaxbCtx.createUnmarshaller();
         } catch (JAXBException je) {
-            LogUtils.getLogger(JobLauncherTab2.class).error(je);
+            LogUtilities.getLogger(JobLauncherTab2.class).error(je);
             je.printStackTrace();
         }
         this.title = title;
@@ -417,7 +417,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             getParams();
         } catch (Exception e) {
-            LogUtils.getLogger(JobLauncherTab2.class).error(e);
+            LogUtilities.getLogger(JobLauncherTab2.class).error(e);
         }
         doTitle(title);
     }
@@ -682,7 +682,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                         fw.write(statusTextArea.getText());
                                     }
                                 } catch (IOException e1) {
-                                    LogUtils.getLogger(ButtListener.class).error(e1);
+                                    LogUtilities.getLogger(ButtListener.class).error(e1);
                                 }
                             }
                         }
@@ -851,7 +851,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
 
                 } catch (Exception e) {
-                    LogUtils.getLogger(ButtListener.class).error(e);
+                    LogUtilities.getLogger(ButtListener.class).error(e);
                     writeStatus("Error: " + e.getMessage());
                     doe = null; // will cause GC to hit finally() which in grid will logout()
                 }
@@ -970,12 +970,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         }
 
                     } catch (NumberFormatException | DoeException e) {
-                        LogUtils.getLogger(ButtListener.class).error(e);
+                        LogUtilities.getLogger(ButtListener.class).error(e);
                     }
 
                 }
             } catch (DoeException e) {
-                LogUtils.getLogger(ButtListener.class).error(e);
+                LogUtilities.getLogger(ButtListener.class).error(e);
                 writeStatus("Error in cluster execution: " + e.getMessage());
             }
             stopRun();
@@ -1400,7 +1400,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
                         statisticsGraph.addSampleStatistic(sst, dp.designPtIndex, dp.sampleIndex);
                     } catch (JAXBException ex) {
-                        LogUtils.getLogger(GraphUpdater.class).error(ex);
+                        LogUtilities.getLogger(GraphUpdater.class).error(ex);
 						ex.printStackTrace();
                     }
                 }

@@ -160,7 +160,7 @@ public interface AssemblyController {
      *
      * @param file the project root file for an existing Viskit project
      */
-    void openProject(File file);
+    void openProjectDirectory(File file);
 
     void openRecentAssembly(File fullPath);
 

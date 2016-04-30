@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
@@ -56,7 +56,7 @@ import viskit.view.dialog.ViskitProjectGenerationDialog3;
  */
 public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 	
-    static final Logger LOG = LogUtils.getLogger(ViskitProjectButtonPanel.class);
+    static final Logger LOG = LogUtilities.getLogger(ViskitProjectButtonPanel.class);
 
     private static JDialog dialog;
 

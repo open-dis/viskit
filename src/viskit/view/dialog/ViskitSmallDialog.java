@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -46,7 +46,7 @@ public abstract class ViskitSmallDialog extends JDialog {
                 Constructor<?> constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-                LogUtils.getLogger(ViskitSmallDialog.class).error(e);
+                LogUtilities.getLogger(ViskitSmallDialog.class).error(e);
             }
         } else {
             dialog.setParams(f, var);

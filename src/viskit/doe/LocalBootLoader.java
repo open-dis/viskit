@@ -1,6 +1,6 @@
 package viskit.doe;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.FileInputStream;
@@ -98,7 +98,7 @@ public class LocalBootLoader extends URLClassLoader {
         super(new URL[] {}, parent);
         externalClasspathUrls = classes;
         this.workDir = workDir;
-        LogUtils.getLogger(LocalBootLoader.class).debug(ViskitGlobals.instance().printCallerLog());
+        LogUtilities.getLogger(LocalBootLoader.class).debug(ViskitGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with the generated

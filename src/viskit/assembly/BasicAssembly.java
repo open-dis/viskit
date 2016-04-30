@@ -35,7 +35,7 @@ package viskit.assembly;
 
 import viskit.reports.ReportStatisticsConfig;
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -71,7 +71,7 @@ import viskit.model.AssemblyNode;
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
-    static final Logger LOG = LogUtils.getLogger(BasicAssembly.class);
+    static final Logger LOG = LogUtilities.getLogger(BasicAssembly.class);
     protected Map<Integer, List<SavedStats>> replicationData;
     protected PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray;
     protected SampleStatistics[] designPointStatistics;

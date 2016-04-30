@@ -58,7 +58,7 @@
  */
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.File;
 
 import java.io.IOException;
@@ -100,7 +100,7 @@ import viskit.ViskitGlobals;
  */
 public class EventGraphCache {
 
-    static Logger log = LogUtils.getLogger(EventGraphCache.class);
+    static Logger log = LogUtilities.getLogger(EventGraphCache.class);
 
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;

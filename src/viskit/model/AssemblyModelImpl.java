@@ -1,6 +1,6 @@
 package viskit.model;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -16,6 +16,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.util.FileBasedAssemblyNode;
@@ -36,7 +37,9 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 9:16:44 AM
  * @version $Id$
  */
-public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel {
+public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
+{
+    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
     private JAXBContext    jaxbContext;
     private ObjectFactory  jaxbObjectFactory;
@@ -979,36 +982,52 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return buildParameterFromFreeForm((VInstantiator.FreeForm) viarr.getInstantiators().get(0));
     }
 
-    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> propertyChangeListenerConnectionList) {
-        for (PropertyChangeListenerConnection propertyChangeListenerConnection : propertyChangeListenerConnectionList) {
+    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> propertyChangeListenerConnectionList)
+	{
+        for (PropertyChangeListenerConnection propertyChangeListenerConnection : propertyChangeListenerConnectionList)
+		{
             PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
             propertyChangeListenerEdge.setProperty(propertyChangeListenerConnection.getProperty());
             propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription());
-            AssemblyNode toNode = getNodeCache().get(propertyChangeListenerConnection.getListener());
-            AssemblyNode frNode = getNodeCache().get(propertyChangeListenerConnection.getSource());
-            propertyChangeListenerEdge.setTo(toNode);
-            propertyChangeListenerEdge.setFrom(frNode);
+            AssemblyNode   toNode = getNodeCache().get(propertyChangeListenerConnection.getListener());
+            AssemblyNode fromNode = getNodeCache().get(propertyChangeListenerConnection.getSource());
             propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
-
-            toNode.getConnections().add(propertyChangeListenerEdge);
-            frNode.getConnections().add(propertyChangeListenerEdge);
-
+            propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription()); // TODO check
+			
+			if (toNode != null)
+			{
+				propertyChangeListenerEdge.setTo(toNode);
+                toNode.getConnections().add(propertyChangeListenerEdge);
+			}
+            if (fromNode != null)
+			{
+				propertyChangeListenerEdge.setFrom(fromNode);
+				fromNode.getConnections().add(propertyChangeListenerEdge);
+			}
             this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_ADDED, "PCL edge added"));
         }
     }
 
-    private void buildSimEventListenerConnectionsFromJaxb(List<SimEventListenerConnection> simEventListenerConnectionsList) {
-        for (SimEventListenerConnection simEventListenerConnection : simEventListenerConnectionsList) {
+    private void buildSimEventListenerConnectionsFromJaxb(List<SimEventListenerConnection> simEventListenerConnectionsList)
+	{
+        for (SimEventListenerConnection simEventListenerConnection : simEventListenerConnectionsList)
+		{
             SimEventListenerEdge simEventListenerEdge = new SimEventListenerEdge();
             AssemblyNode toNode = getNodeCache().get(simEventListenerConnection.getListener());
             AssemblyNode fromNode = getNodeCache().get(simEventListenerConnection.getSource());
-            simEventListenerEdge.setTo(toNode);
-            simEventListenerEdge.setFrom(fromNode);
             simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
             simEventListenerEdge.setDescription(simEventListenerConnection.getDescription());
-
-            toNode.getConnections().add(simEventListenerEdge);
-            fromNode.getConnections().add(simEventListenerEdge);
+			
+			if (toNode != null)
+			{
+				simEventListenerEdge.setTo(toNode);
+				toNode.getConnections().add(simEventListenerEdge);
+			}
+            if (fromNode != null)
+			{
+				simEventListenerEdge.setFrom(fromNode);
+				fromNode.getConnections().add(simEventListenerEdge);
+			}
             this.notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENTLISTEDGE_ADDED, "Sim event listener connection added"));
         }
     }
@@ -1017,12 +1036,24 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         for (Adapter jaxbAdapter : adaptersList) {
             AdapterEdge adapterEdge = new AdapterEdge();
-            AssemblyNode    toNode = getNodeCache().get(jaxbAdapter.getTo());
+            AssemblyNode   toNode = getNodeCache().get(jaxbAdapter.getTo());
             AssemblyNode fromNode = getNodeCache().get(jaxbAdapter.getFrom());
-            adapterEdge.setTo  (  toNode);
-            adapterEdge.setFrom(fromNode);
+			
+			if (toNode != null)
+			{
+				adapterEdge.setTo  (  toNode);
+			}
+            if (fromNode != null)
+			{
+				adapterEdge.setFrom(fromNode);
+			}
             // Handle XML names with underscores (XML IDREF issue)
             String event = jaxbAdapter.getEventHeard();
+			if ((event == null) || event.isEmpty())
+			{
+				LOG.error ("event name not found, buildAdapterConnectionsFromJaxb failed");
+				return;
+			}
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
             adapterEdge.setSourceEvent(event);
@@ -1106,7 +1137,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         propertyChangeListenerNode.setInstantiator(vc);
 
         propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
-        LogUtils.getLogger(AssemblyModelImpl.class).debug("propertyChangeListenerNode name: " + propertyChangeListenerNode.getName());
+        LogUtilities.getLogger(AssemblyModelImpl.class).debug("propertyChangeListenerNode name: " + propertyChangeListenerNode.getName());
 
         getNodeCache().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode);   // key = se
 

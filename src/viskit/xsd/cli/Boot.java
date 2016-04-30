@@ -5,7 +5,7 @@
  */
 package viskit.xsd.cli;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ public class Boot extends URLClassLoader implements Runnable {
     static Boot bootee;
     static Thread booter;
     static Thread runner;
-    static Logger log = LogUtils.getLogger(Boot.class);
+    static Logger log = LogUtilities.getLogger(Boot.class);
     String[] args;
     public URL baseJarURL;
 

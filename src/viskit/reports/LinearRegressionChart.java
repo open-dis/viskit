@@ -58,7 +58,7 @@
  */
 package viskit.reports;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -193,7 +193,7 @@ public class LinearRegressionChart {
             fos = new FileOutputStream(outFile);
             ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger(LinearRegressionChart.class).error(ioe);
+            LogUtilities.getLogger(LinearRegressionChart.class).error(ioe);
         } finally {
             try {
                 fos.flush();

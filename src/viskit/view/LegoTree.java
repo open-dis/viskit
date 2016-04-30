@@ -1,6 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -43,7 +43,7 @@ import viskit.control.AssemblyControllerImpl;
  */
 public class LegoTree extends JTree implements DragGestureListener, DragSourceListener {
 
-    static final Logger LOG = LogUtils.getLogger(LegoTree.class);
+    static final Logger LOG = LogUtilities.getLogger(LegoTree.class);
 
     private DefaultMutableTreeNode rootNode;
 

@@ -44,7 +44,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.SystemExitHandler;
 import java.awt.Component;
 import java.awt.Frame;
@@ -89,7 +89,7 @@ import viskit.view.ViskitApplicationFrame;
 public class ViskitGlobals {
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
-    static final Logger LOG = LogUtils.getLogger(ViskitGlobals.class);
+    static final Logger LOG = LogUtilities.getLogger(ViskitGlobals.class);
     private static ViskitGlobals me;
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;

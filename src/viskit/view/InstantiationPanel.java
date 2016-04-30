@@ -1,6 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -325,7 +325,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String className) throws ClassNotFoundException
 		{
-            LogUtils.getLogger(InstantiationPanel.class).debug("Constructor for class " + className);
+            LogUtilities.getLogger(InstantiationPanel.class).debug("Constructor for class " + className);
             List<Object>[] parameters = ViskitStatics.resolveParameters(ViskitStatics.classForName(className));
             typeName = className;
             removeAll();

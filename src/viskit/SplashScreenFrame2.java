@@ -1,6 +1,6 @@
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -89,7 +89,7 @@ public class SplashScreenFrame2 extends JFrame {
                 robot = new Robot();
             }
         } catch (AWTException ex) {
-            LogUtils.getLogger(getClass()).error(ex);
+            LogUtilities.getLogger(getClass()).error(ex);
         }
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -174,7 +174,7 @@ public class SplashScreenFrame2 extends JFrame {
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            LogUtils.getLogger(SplashScreenFrame2.class).error(ex);
+            LogUtilities.getLogger(SplashScreenFrame2.class).error(ex);
         }
         progressBar.setString("Complete");
 

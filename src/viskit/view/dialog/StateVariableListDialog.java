@@ -10,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -28,31 +30,30 @@ import java.awt.event.WindowEvent;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class PropertyListDialog extends JDialog {
+public class StateVariableListDialog extends JDialog {
 
-    private static PropertyListDialog dialog;
-    private static int selection = -1;
-    private String[][] pnamesTypes;
-    private final JButton okButton,  cancelButton;
-    private final JTable table;
-    private final JPanel buttonPanel;
+    private static StateVariableListDialog dialog;
+    public  static int NO_SELECTION = -1;
+    private static int selection    = NO_SELECTION;
+    private String[][] beanParameterNamesTypes;
+    private JButton okButton,  cancelButton;
+    private JTable table;
+    private JPanel buttonPanel;
     public static String newProperty;
 
-    public static int showDialog(Dialog f, String title, String[][] namesTypes) {
-        if (dialog == null) {
-            dialog = new PropertyListDialog(f, title, namesTypes);
-        } else {
-            dialog.setParams(f, namesTypes);
-        }
+    String[] columnNames = {"State Variable", "type", "description"};
 
-        dialog.setVisible(true);
-        // above call blocks
-        return selection;
-    }
-
-    private PropertyListDialog(Dialog parent, String title, String[][] namesTypes) {
+    private StateVariableListDialog(Dialog parent, String title, String[][] namesTypes)
+	{
         super(parent, title, true);
-        this.pnamesTypes = namesTypes;
+		
+		initialize ();
+
+        setParameters(parent, namesTypes);
+    }
+	
+	private void initialize ()
+	{
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -71,33 +72,64 @@ public class PropertyListDialog extends JDialog {
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());		
+	}
 
-        setParams(parent, namesTypes);
+    public static int showDialog(Dialog dialogWindow, String title, String[][] namesTypes)
+	{
+        if (dialog == null)
+		{
+            dialog = new StateVariableListDialog(dialogWindow, title, namesTypes);
+        } 
+		else
+		{
+            dialog.setParameters(dialogWindow, namesTypes);
+        }
+        dialog.setVisible(true); // this call blocks
+		
+        return selection;
     }
 
-    public final void setParams(Component c, String[][] namesTypes) {
-        pnamesTypes = namesTypes;
+    public final void setParameters(Component c, String[][] namesTypes)
+	{
+        beanParameterNamesTypes = namesTypes;
 
         fillWidgets();
 
-        if (pnamesTypes == null) {
+        if (beanParameterNamesTypes == null)
+		{
             selection = 0;
         }
-        okButton.setEnabled(pnamesTypes == null);
+        okButton.setEnabled(beanParameterNamesTypes == null);
 
         getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
+	
+	// http://stackoverflow.com/questions/17627431/auto-resizing-the-jtable-column-widths
+	public void resizeColumnWidth(JTable table) {
+		final TableColumnModel columnModel = table.getColumnModel();
+		for (int column = 0; column < table.getColumnCount(); column++) {
+			int width = 50; // Min width
+			for (int row = 0; row < table.getRowCount(); row++) {
+				TableCellRenderer renderer = table.getCellRenderer(row, column);
+				Component comp = table.prepareRenderer(renderer, row, column);
+				width = Math.max(comp.getPreferredSize().width + 1, width);
+			}
+			columnModel.getColumn(column).setPreferredWidth(width);
+		}
+	}
 
-    String[] colNames = {"property name", "property type"};
-
-    private void fillWidgets() {
-        if (pnamesTypes != null) {
-            DefaultTableModel dtm = new myUneditableTableModel(pnamesTypes, colNames);
-            table.setModel(dtm);
-            table.setPreferredScrollableViewportSize(new Dimension(400, 200));
+    private void fillWidgets()
+	{
+        if (beanParameterNamesTypes != null)
+		{
+            DefaultTableModel defaultTableModel = new myUneditableTableModel(beanParameterNamesTypes, columnNames);
+            table.setModel(defaultTableModel);
+			table.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+            table.setPreferredScrollableViewportSize(new Dimension(800, 200));
+			resizeColumnWidth(table);
         }
         JPanel content = new JPanel();
         content.setLayout(new BorderLayout());
@@ -111,14 +143,16 @@ public class PropertyListDialog extends JDialog {
         setContentPane(content);
     }
 
-    private void unloadWidgets() {
-    }
+//    private void unloadWidgets ()
+//	{
+//		// connect via callback if needed
+//    }
 
     class cancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            selection = -1;
+            selection = NO_SELECTION;
             dispose();
         }
     }
@@ -131,15 +165,14 @@ public class PropertyListDialog extends JDialog {
         }
     }
 
-    class mySelectionListener implements ListSelectionListener {
-
+    class mySelectionListener implements ListSelectionListener
+	{
         @Override
         public void valueChanged(ListSelectionEvent e) {
             //Ignore extra messages.
             if (e.getValueIsAdjusting()) {
                 return;
             }
-
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
             if (!lsm.isSelectionEmpty()) {
                 selection = lsm.getMinSelectionIndex();
@@ -149,19 +182,26 @@ public class PropertyListDialog extends JDialog {
         }
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class myCloseListener extends WindowAdapter
+	{
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (selection != -1) {
-                int returnValue = JOptionPane.showConfirmDialog(PropertyListDialog.this, "Apply changes?",
+        public void windowClosing(WindowEvent e)
+		{
+            if (selection != NO_SELECTION)
+			{
+                int returnValue = JOptionPane.showConfirmDialog(StateVariableListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION)
+				{
                     okButton.doClick();
-                } else {
+                } 
+				else
+				{
                     cancelButton.doClick();
                 }
-            } else {
+            } 
+			else
+			{
                 cancelButton.doClick();
             }
         }
