@@ -14,21 +14,27 @@ import java.util.List;
  * @since 8:33:17 AM
  * @version $Id$
  */
-public class ConstructorPanel extends JPanel {
+public final class ConstructorPanel extends JPanel {
 
     private JButton selectButton;
-    private ActionListener modifiedListener;
+    private final ActionListener modifiedListener;
     private JPanel selectButtonPanel;
-    private boolean showButton;
-    private ActionListener selectButtonListener;
+    private final boolean showButton;
+    private final ActionListener selectButtonListener;
     private ObjectListPanel objectListPanel;
-    private JDialog parent;
+    private final JDialog parent;
 
     public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButton, ActionListener selectListener, JDialog parentDialog) {
         this.modifiedListener = modifiedListener;
         showButton = showSelectButton;
         selectButtonListener = selectListener;
         this.parent = parentDialog;
+		
+		initialize ();
+    }
+	
+	public void initialize ()
+	{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         selectButtonPanel = new JPanel();
@@ -37,7 +43,21 @@ public class ConstructorPanel extends JPanel {
         selectButton = new JButton("Select this constructor");
         selectButtonPanel.add(selectButton);
         selectButtonPanel.add(Box.createHorizontalGlue());
-    }
+	}
+	
+	public void hideSelectConstructorButton ()
+	{
+		selectButton.setVisible(false);
+		selectButtonPanel.setVisible(false);
+		repaint();
+	}
+	
+	public void showSelectConstructorButton ()
+	{
+		selectButton.setVisible(true);
+		selectButtonPanel.setVisible(true);
+		repaint();
+	}
 
     public void setData(List<Object> args) // of VInstantiators
     {
@@ -49,7 +69,9 @@ public class ConstructorPanel extends JPanel {
         objectListPanel.setData(args, true);
         if (args.size() > 0) {
             add(objectListPanel);
-        } else {
+        } 
+		else
+		{
             JLabel label = new JLabel("zero argument constructor");
             label.setAlignmentX(Box.CENTER_ALIGNMENT);
             add(label);

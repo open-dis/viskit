@@ -62,7 +62,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public EventGraphModelImpl(mvcController controller) {
+    public EventGraphModelImpl(mvcController controller)
+	{
         this.eventGraphController = (EventGraphControllerImpl) controller;
         graphMetadata = new GraphMetadata(this);
     }

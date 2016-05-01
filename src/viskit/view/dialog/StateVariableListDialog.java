@@ -40,12 +40,18 @@ public class StateVariableListDialog extends JDialog {
     private JTable table;
     private JPanel buttonPanel;
     public static String newProperty;
+	private Point newLocation = new Point();
+	private int   parentWidth;
 
     String[] columnNames = {"State Variable", "type", "description"};
 
     private StateVariableListDialog(Dialog parent, String title, String[][] namesTypes)
 	{
         super(parent, title, true);
+		
+		parentWidth   = parent.getWidth();
+		newLocation.x = parent.getLocation().x;
+		newLocation.y = parent.getLocation().y + parent.getHeight(); // below
 		
 		initialize ();
 
@@ -63,7 +69,7 @@ public class StateVariableListDialog extends JDialog {
 
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
+            okButton = new JButton("Select");
         cancelButton = new JButton("Cancel");
         buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttonPanel.add(okButton);
@@ -72,7 +78,7 @@ public class StateVariableListDialog extends JDialog {
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());		
+            okButton.addActionListener(new  applyButtonListener());		
 	}
 
     public static int showDialog(Dialog dialogWindow, String title, String[][] namesTypes)
@@ -104,7 +110,9 @@ public class StateVariableListDialog extends JDialog {
 
         getRootPane().setDefaultButton(cancelButton);
         pack();
-        setLocationRelativeTo(c);
+//        setLocationRelativeTo(c);
+		newLocation.x = newLocation.x - ((this.getWidth() - parentWidth) / 2); // shift left
+		this.setLocation(newLocation);
     }
 	
 	// http://stackoverflow.com/questions/17627431/auto-resizing-the-jtable-column-widths

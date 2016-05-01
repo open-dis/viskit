@@ -4,6 +4,7 @@ import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
@@ -65,6 +66,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     private JDialog packMeOwnerDialog;
 
     boolean constructorOnly = false;
+	
+	private boolean typeEditable                   = false;
 
     public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener) {
         this(ownerDialog, changedListener, false);
@@ -76,10 +79,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
     public InstantiationPanel(final JDialog ownerDialog, ActionListener changedListener, boolean onlyConstructor, boolean typeEditable)
 	{
-        modifiedListener     = changedListener;
         packMeOwnerDialog    = ownerDialog;
+        modifiedListener     = changedListener;
         this.constructorOnly = onlyConstructor;
+		this.typeEditable    = typeEditable;
 
+		initialize ();
+    }
+	private void initialize ()
+	{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel topPanel = new JPanel(new SpringLayout());
@@ -258,6 +266,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         public FreeFormPanel(InstantiationPanel instantiationPanel)
 		{
             this.instantiationPanel = instantiationPanel;
+			
+			initialize ();
+        }
+		private final void initialize ()
+		{
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -268,7 +281,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             add(valueTF);
             add(Box.createVerticalGlue());
-        }
+		}
 
         public void setData(VInstantiator.FreeForm viff) {
             if (viff == null) {
@@ -306,7 +319,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private JTabbedPane tabbedPane;
 
-        private ConstructorPanel[] constructorPanels;
+        private ConstructorPanel[]        constructorPanels;
+		private VInstantiator.Construct[] constructors;
+		private String[]                  parametersSignature;
 
         private String noParametersString = "(no parameters)";
 
@@ -321,49 +336,88 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             checkMark = new ImageIcon(ClassLoader.getSystemResource("viskit/images/checkMark.png"));
         }
 
-        String typeName;
+        private String typeName;
+		private int constructorTabCount = 0;
 
         public void setType(String className) throws ClassNotFoundException
 		{
-            LogUtilities.getLogger(InstantiationPanel.class).debug("Constructor for class " + className);
+            LogUtilities.getLogger(InstantiationPanel.class).debug("ConstrPanel constructor for class " + className);
             List<Object>[] parameters = ViskitStatics.resolveParameters(ViskitStatics.classForName(className));
+
             typeName = className;
             removeAll();
             tabbedPane.removeAll();
 
             if (parameters == null)
 			{
-                tabbedPane.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface, "));
+                tabbedPane.addTab("Constructor 0", null, new JLabel("No constructor. Factory, Abstract or Interface"));
             } 
 			else
 			{
-                constructorPanels = new ConstructorPanel[parameters.length];
-                VInstantiator.Construct constructor;
-                for (int i = 0; i < parameters.length; ++i) {
-
-                    constructor = new VInstantiator.Construct(parameters[i], className);
-                    String parametersSignature = "";
-					if (constructor.getArgs().isEmpty())
-						parametersSignature = noParametersString;
+                constructorPanels   = new ConstructorPanel       [parameters.length];
+				constructors        = new VInstantiator.Construct[parameters.length];
+				parametersSignature = new String                 [parameters.length];
+				
+                for (int i = 0; i < parameters.length; ++i)
+				{
+                    constructors[i] = new VInstantiator.Construct(parameters[i], className);
+					parametersSignature[i] = "";
+					if (constructors[i].getArgs().isEmpty())
+					{
+						parametersSignature[i] = noParametersString;
+					}
 					else
 					{
-						for (int j = 0; j < constructor.getArgs().size(); j++)
+						for (int j = 0; j < constructors[i].getArgs().size(); j++)
 						{
-							parametersSignature += ((Parameter)parameters[i].get(j)).getType() + ", ";
+							String typeName = ((Parameter)parameters[i].get(j)).getType();
+							String     name = "";
+							if      (typeName == null)
+								     typeName = ""; // Error condition
+							else if (typeName.contains("."))
+								     typeName = typeName.substring(typeName.lastIndexOf(".")+1);
+							parametersSignature[i] += typeName;
 
-							if (!((VInstantiator) (constructor.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
-								 ((VInstantiator) (constructor.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
+							if (!((VInstantiator) (constructors[i].getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
+							{
+								name = ((Parameter)parameters[i].get(j)).getName();
+								((VInstantiator) (constructors[i].getArgs().get(j))).setName(name);
+								parametersSignature[i] += " " + name;
+							}
+							parametersSignature[i] += ", ";
 						}
-						parametersSignature = parametersSignature.substring(0, parametersSignature.length() - 2); // strip trailing comma
+						parametersSignature[i] = parametersSignature[i].substring(0, parametersSignature[i].length() - 2); // strip trailing comma from set
 					}
 
-                    constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
-                    constructorPanels[i].setData(constructor.getArgs());
-
-                    tabbedPane.addTab("Constructor " + i, null, constructorPanels[i], parametersSignature);
+					// TODO further hiding of duplicate constructors, also see below
+					if (!constructors[i].getArgs().isEmpty() || zeroArgumentConstructorAllowed)
+					{
+						constructorTabCount++;
+					}
                 }
+                for (int i = 0; i < parameters.length; ++i) // only add tabs of interest
+				{
+					// TODO further hiding of duplicate constructors, also see above
+					if (!constructors[i].getArgs().isEmpty() || zeroArgumentConstructorAllowed)
+					{
+						constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
+						String constructorTabLabel;
+						if (constructorTabCount <= 1) 
+						{
+							constructorTabLabel = "Constructor";
+							constructorPanels[i].hideSelectConstructorButton();
+						}
+						else constructorTabLabel = "Constructor " + i;
+						
+						constructorPanels[i].setData(constructors[i].getArgs());
+						tabbedPane.addTab(constructorTabLabel, null, constructorPanels[i], parametersSignature[i]); // null icon
+					}
+				}
             }
-            add(tabbedPane);
+			if (constructorTabCount > 0)
+			{
+				add(tabbedPane);
+			}
             actionPerformed(null);    // set icon for initially selected pane
         }
 
@@ -375,22 +429,32 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         @Override
         public void actionPerformed(ActionEvent e)
 		{
-            int selectedTypeIndex = tabbedPane.getSelectedIndex();
+            int selectedTabIndex = tabbedPane.getSelectedIndex();
 
-            // tell mommy...put up here to emphasize that it is the chief reason for having this listener
+            // tell parent... put up here to emphasize that it is the chief reason for having this listener
             instantiationPanel.actionPerformed(e);
 
             // But we can do this: leave off the red border if only one to choose from
-            if (tabbedPane.getTabCount() > 1) {
-                for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                    if (i == selectedTypeIndex) {
+            if (tabbedPane.getTabCount() > 1)
+			{
+                for (int i = 0; i < tabbedPane.getTabCount(); i++) 
+				{
+					JPanel selectedPanel = ((JPanel) tabbedPane.getComponentAt(i));
+                    if (i == selectedTabIndex)
+					{
                         tabbedPane.setIconAt(i, checkMark);
-                        constructorPanels[i].setBorder(BorderFactory.createLineBorder(Color.red));
-                        constructorPanels[i].setSelected(true);
-                    } else {
+						selectedPanel.setBorder(BorderFactory.createLineBorder(Color.red));
+						// TODO turn off "Select this constructor" button
+						if (selectedPanel instanceof ConstructorPanel)
+							((ConstructorPanel) selectedPanel).hideSelectConstructorButton();
+                    } 
+					else
+					{
                         tabbedPane.setIconAt(i, null);
-                        constructorPanels[i].setBorder(null);
-                        constructorPanels[i].setSelected(false);
+                        selectedPanel.setBorder(null);
+						// TODO turn off "Select this constructor" button
+						if (selectedPanel instanceof ConstructorPanel)
+							((ConstructorPanel) selectedPanel).showSelectConstructorButton();
                     }
                 }
             }
@@ -649,4 +713,19 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
     }
+
+	private boolean zeroArgumentConstructorAllowed = false;
+	/**
+	 * @return the zeroArgumentConstructorAllowed
+	 */
+	public boolean isZeroArgumentConstructorAllowed() {
+		return zeroArgumentConstructorAllowed;
+	}
+
+	/**
+	 * @param zeroArgumentConstructorAllowed the zeroArgumentConstructorAllowed to set
+	 */
+	public void setZeroArgumentConstructorAllowed(boolean zeroArgumentConstructorAllowed) {
+		this.zeroArgumentConstructorAllowed = zeroArgumentConstructorAllowed;
+	}
 }

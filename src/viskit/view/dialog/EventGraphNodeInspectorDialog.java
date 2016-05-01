@@ -74,7 +74,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 
     private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException
 	{
-        super(parent, "Assembly Editor: initialize new Event Graph instance", true);
+        super(parent, "Assembly Editor: initialize new Event Graph", true); // instance
         this.eventGraphNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -164,7 +164,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         instantiationPanel = new InstantiationPanel(this, listener, true);
 
         instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    "Object creation: parameter initialization", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+                    /* Event Graph Parameter initialization*/ 
+				    "initialize parameters", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
         instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(instantiationPanel);

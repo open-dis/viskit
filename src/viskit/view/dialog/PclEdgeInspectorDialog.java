@@ -41,20 +41,20 @@ import viskit.model.ViskitElement;
  */
 public class PclEdgeInspectorDialog extends JDialog {
 
-    private JLabel sourceLabel,  targetLabel,  propertyLabel,  descriptionLabel;
-    private JTextField sourceTF,  targetTF,  propertyTF,  descriptionTF;
+    private JLabel  sourceLabel,  propertyLabel,  descriptionLabel,  targetLabel;
+    private JTextField sourceTF,  propertyTF,     descriptionTF,     targetTF;
     private JPanel propertyTFPanel;
     private static PclEdgeInspectorDialog pclEdgeInspectorDialog;
     private static boolean modified = false;
     private PropertyChangeListenerEdge pclEdge;
     private JButton okButton,  cancelButton;
     private JButton findStateVariableButton;
-    private JPanel buttonPanel;
+    private JPanel buttonPanel, contentPanel, containerPanel;
     private enableApplyButtonListener listener;
 	
 	public static final String ALL_STATE_VARIABLES_NAME        = "(All state variables)";
 	public static final String ALL_STATE_VARIABLES_TYPE        = "(any type)";
-	public static final String ALL_STATE_VARIABLES_DESCRIPTION = "Property Change events from all state variables are connected";
+	public static final String ALL_STATE_VARIABLES_DESCRIPTION = "Property Change events from all state variables get heard";
 	
     static final Logger LOG = LogUtilities.getLogger(PclEdgeInspectorDialog.class);
 
@@ -77,14 +77,15 @@ public class PclEdgeInspectorDialog extends JDialog {
         findStateVariableButton = new JButton("...");
         findStateVariableButton.addActionListener(new ChooseStateVariableAction());
         findStateVariableButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-             sourceLabel = new JLabel("source event graph", JLabel.TRAILING);
-             targetLabel = new JLabel("property change listener", JLabel.TRAILING);
-           propertyLabel = new JLabel("Event Graph State Variable", JLabel.TRAILING); // originally labelled "property"
-        descriptionLabel = new JLabel("description");
+             sourceLabel = new JLabel("from: source event graph", JLabel.TRAILING);
+           propertyLabel = new JLabel("state variable",     JLabel.TRAILING); // originally labelled "property" but that seems misleading...
+        descriptionLabel = new JLabel("description",        JLabel.TRAILING);
+             targetLabel = new JLabel("to: property change listener", JLabel.TRAILING);
+			 
 		     sourceLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-	     	 targetLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
 	       propertyLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
 		descriptionLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+	     	 targetLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
 
              sourceTF = new JTextField();
              targetTF = new JTextField();
@@ -98,9 +99,9 @@ public class PclEdgeInspectorDialog extends JDialog {
         propertyTFPanel.add(findStateVariableButton);
         propertyTF.addCaretListener(listener);
         pairWidgets(  sourceLabel, sourceTF, false);
-        pairWidgets(  targetLabel, targetTF, false);
         pairWidgets(propertyLabel, propertyTFPanel, true);
         pairWidgets(descriptionLabel, descriptionTF, true);
+        pairWidgets(  targetLabel, targetTF, false);
 
            okButton = new JButton("Apply changes");
        cancelButton = new JButton("Cancel");
@@ -111,14 +112,34 @@ public class PclEdgeInspectorDialog extends JDialog {
         buttonPanel.add(cancelButton);
         buttonPanel.add(Box.createHorizontalStrut(5));
 
+        // attach listeners
+        cancelButton.addActionListener(new cancelButtonListener());
+            okButton.addActionListener(new applyButtonListener());
+
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+        containerPanel = new JPanel(new SpringLayout());
+        containerPanel.add(sourceLabel);
+        containerPanel.add(sourceTF);
+        containerPanel.add(propertyLabel);
+        containerPanel.add(propertyTFPanel);
+        containerPanel.add(targetLabel);
+        containerPanel.add(targetTF);
+        containerPanel.add(descriptionLabel);
+        containerPanel.add(descriptionTF);
+        SpringUtilities.makeCompactGrid(containerPanel, 4, 2, 10, 10, 10, 10);
+        contentPanel.add(containerPanel);
+
+        contentPanel.add(buttonPanel);
+        contentPanel.add(Box.createVerticalStrut(5));
+        setContentPane(contentPanel);
+
         // Make the first display of this panel a minimum of 600 width
         Dimension d = getSize();
         d.width = Math.max(d.width, 600);
         setSize(d);
-
-        // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
 	}
 
     public static boolean showDialog(JFrame parentFrame, PropertyChangeListenerEdge parm)
@@ -168,8 +189,52 @@ public class PclEdgeInspectorDialog extends JDialog {
 	{
         if (pclEdge != null)
 		{
-                 sourceTF.setText(pclEdge.getFrom().toString());
-                 targetTF.setText(pclEdge.getTo().toString());
+			String fromText         = "";
+			try
+			{
+				String fromClassName    = ((EventGraphNode) pclEdge.getFrom()).getType();
+				if    (fromClassName == null)
+					   fromClassName    = "";
+				if    (fromClassName.contains("."))
+					   fromClassName    = fromClassName.substring(fromClassName.lastIndexOf(".")+1);
+				String fromInstanceName = ((EventGraphNode) pclEdge.getFrom()).getName();
+				if    (fromInstanceName == null)
+					   fromInstanceName = "";
+				if   (!fromInstanceName.toLowerCase().contains(fromClassName.toLowerCase()))
+				{
+					 fromText = fromClassName + " " + fromInstanceName;
+				}
+				else fromText =                       fromInstanceName;
+			}
+			catch (Exception e)
+			{
+				fromText = pclEdge.getFrom().toString();
+			}
+			
+			String toText         = "";
+			try
+			{
+				String toClassName    = ((PropertyChangeListenerNode) pclEdge.getTo()).getType();
+				if    (toClassName == null)
+					   toClassName    = "";
+				if    (toClassName.contains("."))
+					   toClassName    = toClassName.substring(toClassName.lastIndexOf(".")+1);
+				String toInstanceName = ((PropertyChangeListenerNode) pclEdge.getTo()).getName();
+				if    (toInstanceName == null)
+					   toInstanceName = "";
+				if   (!toInstanceName.toLowerCase().contains(toClassName.toLowerCase()))
+				{
+					 toText = toClassName + " " + toInstanceName;
+				}
+				else toText =                     toInstanceName;
+			}
+			catch (Exception e)
+			{
+				toText = pclEdge.getFrom().toString();
+			}
+			
+			     sourceTF.setText(fromText);
+	   		     targetTF.setText(  toText);
                propertyTF.setText(pclEdge.getProperty());
             descriptionTF.setText(pclEdge.getDescription());
 			
@@ -179,6 +244,8 @@ public class PclEdgeInspectorDialog extends JDialog {
                propertyTF.setToolTipText(ALL_STATE_VARIABLES_DESCRIPTION);
             descriptionTF.setText       (ALL_STATE_VARIABLES_DESCRIPTION);
 			}
+			SpringUtilities.makeCompactGrid(containerPanel, 4, 2, 10, 10, 10, 10);
+			pack();
         }
 		else // why are we here?  presumably some code failure
 		{
@@ -187,26 +254,6 @@ public class PclEdgeInspectorDialog extends JDialog {
                 propertyTF.setText("listened-to property");
             descriptionTF.setText("");
         }
-
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-
-        JPanel containerPanel = new JPanel(new SpringLayout());
-        containerPanel.add(sourceLabel);
-        containerPanel.add(sourceTF);
-        containerPanel.add(targetLabel);
-        containerPanel.add(targetTF);
-        containerPanel.add(propertyLabel);
-        containerPanel.add(propertyTFPanel);
-        containerPanel.add(descriptionLabel);
-        containerPanel.add(descriptionTF);
-        SpringUtilities.makeCompactGrid(containerPanel, 4, 2, 10, 10, 5, 5);
-        contentPanel.add(containerPanel);
-
-        contentPanel.add(buttonPanel);
-        contentPanel.add(Box.createVerticalStrut(5));
-        setContentPane(contentPanel);
     }
 
     private void unloadWidgets()
@@ -287,6 +334,10 @@ public class PclEdgeInspectorDialog extends JDialog {
 				{
                     throw new ClassNotFoundException(objectClassName + " not found");
                 }
+				if (objectClassName.contains("."))
+				{
+					objectClassName = objectClassName.substring(objectClassName.lastIndexOf(".")+1);
+				}
                 Class<?> stopClass = ViskitStatics.classForName("simkit.BasicSimEntity");
                 BeanInfo beanInfo = Introspector.getBeanInfo(objectBaseClass, stopClass);
                 PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
@@ -339,6 +390,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 				nameTypeDescriptionArray[0][0] = ALL_STATE_VARIABLES_NAME;
 				nameTypeDescriptionArray[0][1] = ALL_STATE_VARIABLES_TYPE;
 				nameTypeDescriptionArray[0][2] = ALL_STATE_VARIABLES_DESCRIPTION;
+				
                 for (int i = 0; i < nameVector.size(); i++)
 				{
                     nameTypeDescriptionArray[i+1][0] =        nameVector.get(i);

@@ -1,5 +1,7 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
+import edu.nps.util.TempFileManager;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.undo.UndoManager;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
@@ -31,9 +34,11 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphComponent extends JGraph implements GraphModelListener {
+public class vGraphComponent extends JGraph implements GraphModelListener
+{
+    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
-    JGraphVisualModel vGModel;
+    JGraphVisualModel jGraphVisualModel;
     EventGraphViewFrame parent;
     private UndoManager undoManager;
 
@@ -42,13 +47,19 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
      * @param model a model of the node with its specific edges
      * @param frame the main view frame canvas toEventNode render toEventNode
      */
-    public vGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame) {
+    public vGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame)
+	{
         super(model);
         parent = frame;
-
+		
+        this.jGraphVisualModel = model;
+		
+		initialize ();
+	}
+	private void initialize ()
+	{
         vGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
-        this.vGModel = model;
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
@@ -69,8 +80,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // Set up the cut/remove/paste/copy/undo/redo actions
         undoManager = new vGraphUndoManager(parent.getController());
         addGraphSelectionListener((GraphSelectionListener) undoManager);
-        model.addUndoableEditListener(undoManager);
-        model.addGraphModelListener(instance);
+        jGraphVisualModel.addUndoableEditListener(undoManager);
+        jGraphVisualModel.addGraphModelListener(instance);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
@@ -114,7 +125,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 return view;
             }
         });
-    }
+	}
+
 
     @Override
     public void updateUI() {
@@ -133,43 +145,48 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     }
     private ModelEvent currentModelEvent = null;
 
-    public void viskitModelChanged(ModelEvent modelEvent) {
+    public void viskitModelChanged(ModelEvent modelEvent)
+	{
+        if (jGraphVisualModel == null)
+		{
+			LOG.error("jGraphVisualModel not initialized");
+			return;
+		}
         currentModelEvent = modelEvent;
-
-        switch (modelEvent.getID()) {
+		
+		switch (modelEvent.getID())
+		{
             case ModelEvent.NEWMODEL:
-
                 // Ensure we start fresh
-                vGModel.deleteAll();
+                jGraphVisualModel.deleteAll();
                 break;
             case ModelEvent.EVENT_ADDED:
-
                 // Reclaimed from eventNode the vGModel toEventNode here
                 insert                 ((EventNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENT_CHANGED:
-                vGModel.changeEvent    ((EventNode) modelEvent.getSource());
+                jGraphVisualModel.changeEvent    ((EventNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENT_DELETED:
-                vGModel.deleteEventNode((EventNode) modelEvent.getSource());
+                jGraphVisualModel.deleteEventNode((EventNode) modelEvent.getSource());
                 break;
             case ModelEvent.EDGE_ADDED:
-                vGModel.addEdge        ((Edge) modelEvent.getSource());
+                jGraphVisualModel.addEdge        ((Edge) modelEvent.getSource());
                 break;
             case ModelEvent.EDGE_CHANGED:
-                vGModel.changeEdge     ((Edge) modelEvent.getSource());
+                jGraphVisualModel.changeEdge     ((Edge) modelEvent.getSource());
                 break;
             case ModelEvent.EDGE_DELETED:
-                vGModel.deleteEdge     ((Edge) modelEvent.getSource());
+                jGraphVisualModel.deleteEdge     ((Edge) modelEvent.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGE_ADDED:
-                vGModel.addCancelEdge  ((Edge) modelEvent.getSource());
+                jGraphVisualModel.addCancelEdge  ((Edge) modelEvent.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGE_CHANGED:
-                vGModel.changeCancellingEdge((Edge) modelEvent.getSource());
+                jGraphVisualModel.changeCancellingEdge((Edge) modelEvent.getSource());
                 break;
             case ModelEvent.CANCELLINGEDGE_DELETED:
-                vGModel.deleteCancellingEdge((Edge) modelEvent.getSource());
+                jGraphVisualModel.deleteCancellingEdge((Edge) modelEvent.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
@@ -180,16 +197,16 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.UNDO_CANCELLING_EDGE:
             case ModelEvent.UNDO_SCHEDULING_EDGE:
             case ModelEvent.UNDO_EVENT_NODE:
-                vGModel.reDrawNodes();
+            case ModelEvent.METADATA_CHANGED:
+                jGraphVisualModel.reDrawNodes();
                 break;
             default:
-                //System.out.println("duh");
+				LOG.error ("modelEvent.getID()=" + modelEvent.getID() + " not handled");
         }
         currentModelEvent = null;
     }
 
-    // TODO: This version JGraph does not support generics
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") // TODO: This version JGraph does not support generics
     @Override
     public void graphChanged(GraphModelEvent e) {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {
@@ -219,106 +236,123 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         }
     }
 
-    private String escapeLTGT(String s) {
+    private String escapeLTGT(String s)
+	{
         s = s.replaceAll("<", "&lt;");
         s = s.replaceAll(">", "&gt;");
         return s;
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
-        if (event != null) {
+    public String getToolTipText(MouseEvent event)
+	{
+        if (event != null)
+		{
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
-            if (c != null) {
+            if (c != null)
+			{
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vEdgeCell) {
-                    vEdgeCell vc = (vEdgeCell) c;
-                    Edge se = (Edge) vc.getUserObject();
+                if (c instanceof vEdgeCell)
+				{
+                    vEdgeCell edgeCell = (vEdgeCell) c;
+                    Edge schedulingEdge = (Edge) edgeCell.getUserObject();
 
-                    if (se instanceof SchedulingEdge) {
-
-                        if (vc instanceof vSelfEdgeCell)
-                            sb.append("<center>Self Scheduling Edge</center>");
-                        else
-                            sb.append("<center>Scheduling Edge</center>");
+                    if (schedulingEdge instanceof SchedulingEdge)
+					{
+                        if (edgeCell instanceof vSelfEdgeCell)
+                             sb.append("<center>Self-Scheduling Edge</center>");
+						else sb.append("<center>Scheduling Edge</center>");
 
                         double priority;
                         String s;
 
                         // Assume numeric comes in, avoid NumberFormatException via Regex check
-                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority)) {
-                            priority = Double.parseDouble(((SchedulingEdge) se).priority);
-                            NumberFormat df = DecimalFormat.getNumberInstance();
-                            df.setMaximumFractionDigits(3);
-                            df.setMaximumIntegerDigits(3);
-                            if (Double.compare(priority, Double.MAX_VALUE) >= 0) {
+                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) schedulingEdge).priority))
+						{
+                            priority = Double.parseDouble(((SchedulingEdge) schedulingEdge).priority);
+                            NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
+                            decimalFormat.setMaximumFractionDigits(3);
+                            decimalFormat.setMaximumIntegerDigits(3);
+                            if (Double.compare(priority, Double.MAX_VALUE) >= 0)
+							{
                                 s = "MAX";
-                            } else if (Double.compare(priority, -Double.MAX_VALUE) <= 0) {
-                                s = "MIN";
-                            } else {
-                                s = df.format(priority);
                             }
-                        } else {
-                            s = ((SchedulingEdge) se).priority;
+							else if (Double.compare(priority, -Double.MAX_VALUE) <= 0)
+							{
+                                s = "MIN";
+                            } 
+							else
+							{
+                                s = decimalFormat.format(priority);
+                            }
+                        } 
+						else // bad format
+						{
+                            s = ((SchedulingEdge) schedulingEdge).priority;
                         }
-
                         sb.append("<u>priority</u><br>&nbsp;");
                         sb.append(s);
                         sb.append("<br>");
 
-                        if (se.delay != null) {
-                            String dly = se.delay.trim();
-                            if (dly.length() > 0) {
-                                sb.append("<u>delay</u><br>&nbsp;");
-                                sb.append(dly);
+                        if (schedulingEdge.delay != null)
+						{
+                            String delayValue = schedulingEdge.delay.trim();
+                            if (delayValue.length() > 0) {
+                                sb.append("<u>delay</u>&nbsp;");
+                                sb.append(delayValue);
                                 sb.append("<br>");
                             }
                         }
 
-                        int idx = 1;
-                        if (!se.parametersList.isEmpty()) {
-
+                        int index = 1;
+                        if (!schedulingEdge.parametersList.isEmpty())
+						{
                             sb.append("<u>edge parameters</u><br>");
-                            for (ViskitElement e : se.parametersList) {
-                                vEdgeParameter ep = (vEdgeParameter) e;
+                            for (ViskitElement viskitElement : schedulingEdge.parametersList)
+							{
+                                vEdgeParameter edgeParameter = (vEdgeParameter) viskitElement;
                                 sb.append("&nbsp;");
-                                sb.append(idx++);
+                                sb.append(index++);
                                 sb.append(" ");
-                                sb.append(ep.getValue());
-
-                                if (ep.getType() != null && !ep.getType().isEmpty()) {
+                                sb.append(edgeParameter.getValue());
+                                if (edgeParameter.getType() != null && !edgeParameter.getType().isEmpty())
+								{
                                     sb.append(" ");
                                     sb.append("(");
-                                    sb.append(ep.getType());
+                                    sb.append(edgeParameter.getType());
                                     sb.append(")");
                                 }
                                 sb.append("<br>");
                             }
                         }
-
-                    } else {
-
-                        if (vc instanceof vSelfEdgeCell)
+                    }
+					else
+					{
+                        if (edgeCell instanceof vSelfEdgeCell)
                             sb.append("<center>Self Cancelling Edge</center>");
                         else
                             sb.append("<center>Cancelling Edge</center>");
 
                     }
 
-                    if (se.conditionDescription != null) {
-                        String cmt = se.conditionDescription.trim();
-                        if (cmt.length() > 0) {
+                    if (schedulingEdge.conditionDescription != null)
+					{
+                        String description = schedulingEdge.conditionDescription.trim();
+                        if (description.length() > 0)
+						{
                             sb.append("<br><u>description</u><br>");
-                            sb.append(wrapAtPos(escapeLTGT(cmt), 60));
+                            sb.append(wrapAtLineWidth(escapeLTGT(description), 60));
                             sb.append("<br>");
                         }
                     }
 
-                    if (se.condition != null) {
-                        String cond = se.condition.trim();
-                        if (cond.length() > 0) {
+                    if (schedulingEdge.condition != null)
+					{
+                        String conditionName = schedulingEdge.condition.trim();
+                        if (conditionName.length() > 0)
+						{
                             sb.append("<u>condition</u><br>&nbsp;if (");
-                            sb.append(escapeLTGT(cond));
+                            sb.append(escapeLTGT(conditionName));
                             sb.append(")<br>");
                         }
                     }
@@ -330,7 +364,9 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     sb.append("</html>");
                     return sb.toString();
 
-                } else if (c instanceof CircleCell) {
+                } 
+				else if (c instanceof CircleCell)
+				{
                     CircleCell circleCell = (CircleCell) c;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
                     sb.append("<center>");
@@ -351,69 +387,75 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                     }
                     sb.append("</center>");
 
-                    if (!eventNode.getDescription().isEmpty()) {
+                    if (!eventNode.getDescription().isEmpty())
+					{
                         String description = eventNode.getDescription();
-                        if (description.length() > 0) {
+                        if (description.length() > 0)
+						{
                             sb.append("<u>description</u><br>");
-//                          sb.append(wrapAtPos(escapeLTGT(stripBrackets), 60));
-                            sb.append(wrapAtPos(description, 60));
+                            sb.append(wrapAtLineWidth(description, 60));
                             sb.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> argLis = eventNode.getArguments();
-                    if (!argLis.isEmpty()) {
-
+                    List<ViskitElement> argumentList = eventNode.getArguments();
+                    if (!argumentList.isEmpty())
+					{
                         sb.append("<u>arguments</u><br>");
                         int n = 0;
-                        for (ViskitElement ve : argLis) {
-                            EventArgument arg = (EventArgument) ve;
-                            String as = arg.getName() + " (" + arg.getType() + ")";
+                        for (ViskitElement viskitElement : argumentList)
+						{
+                            EventArgument eventArgument = (EventArgument) viskitElement;
+                            String eventArgumentString = eventArgument.getName() + " (" + eventArgument.getType() + ")";
                             sb.append("&nbsp;");
                             sb.append(++n);
                             sb.append(" ");
-                            sb.append(as);
+                            sb.append(eventArgumentString);
                             sb.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> locVarLis = eventNode.getLocalVariables();
-                    if (!locVarLis.isEmpty()) {
-
+                    List<ViskitElement> localVariablesList = eventNode.getLocalVariables();
+                    if (!localVariablesList.isEmpty()) 
+					{
                         sb.append("<u>local variables</u><br>");
-                        for (ViskitElement ve : locVarLis) {
-                            EventLocalVariable lv = (EventLocalVariable) ve;
+                        for (ViskitElement viskitElement : localVariablesList)
+						{
+                            EventLocalVariable eventLocalVariable = (EventLocalVariable) viskitElement;
                             sb.append("&nbsp;");
-                            sb.append(lv.getName());
+                            sb.append(eventLocalVariable.getName());
                             sb.append(" (");
-                            sb.append(lv.getType());
+                            sb.append(eventLocalVariable.getType());
                             sb.append(") = ");
-                            String val = lv.getValue();
+                            String val = eventLocalVariable.getValue();
                             sb.append(val.isEmpty() ? "<i><default></i>" : val);
                             sb.append("<br>");
                         }
                     }
 
                     String codeBlock = eventNode.getCodeBlock();
-                    if (codeBlock != null && !codeBlock.isEmpty()) {
+                    if (codeBlock != null && !codeBlock.isEmpty())
+					{
                         sb.append("<u>code block</u><br>");
-
                         String[] sa = codeBlock.split("\\n");
-                        for (String s : sa) {
+                        for (String s : sa)
+						{
                             sb.append("&nbsp;");
                             sb.append(s);
                             sb.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> st = eventNode.getTransitions();
-                    if (!st.isEmpty()) {
-
+                    List<ViskitElement> stateTransitions = eventNode.getTransitions();
+                    if (!stateTransitions.isEmpty())
+					{
                         sb.append("<u>state transitions</u><br>");
-                        for (ViskitElement ve : st) {
-                            EventStateTransition est = (EventStateTransition) ve;
-                            String[] sa = est.toString().split("\\n");
-                            for (String s : sa) {
+                        for (ViskitElement viskitElement : stateTransitions)
+						{
+                            EventStateTransition eventStateTransition = (EventStateTransition) viskitElement;
+                            String[] sa = eventStateTransition.toString().split("\\n");
+                            for (String s : sa)
+							{
                                 sb.append("&nbsp;");
                                 sb.append(s);
                                 sb.append("<br>");
@@ -433,7 +475,8 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         return null;
     }
 
-    private String wrapAtPos(String s, int len) {
+    private String wrapAtLineWidth(String s, int length)
+	{
         String[] sa = s.split(" ");
         StringBuilder sb = new StringBuilder();
         int idx = 0;
@@ -444,15 +487,17 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 ll += sa[idx].length() + 1;
                 sb.append(sa[idx++]);
                 sb.append(" ");
-            } while (idx < sa.length && ll < len);
+            }
+			while (idx < sa.length && ll < length);
             sb.append("<br>");
-        } while (idx < sa.length);
+        } 
+		while (idx < sa.length);
 
-        String st = sb.toString();
-        if (st.endsWith("<br>")) {
-            st = st.substring(0, st.length() - 4);
+        String result = sb.toString().trim();
+        if (result.endsWith("<br>")) {
+            result = result.substring(0, result.length() - 4);
         }
-        return st.trim();
+        return result;
     }
 
     @Override
@@ -587,7 +632,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);
 
-        vGModel.reDrawNodes();
+        jGraphVisualModel.reDrawNodes();
     }
 }
 

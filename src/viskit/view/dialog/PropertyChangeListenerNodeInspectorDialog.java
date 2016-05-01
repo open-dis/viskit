@@ -30,7 +30,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
     private final JLabel     nameLabel;
     private final JLabel     typeLabel;
     private final JTextField nameTF;    // Text field that holds the parameter name
-    private final JTextField typeTF;
+    private final JTextField typeNameTF;
     private InstantiationPanel instantiationPanel;
     private Class<?> myClass;
     private static PropertyChangeListenerNodeInspectorDialog dialog;
@@ -92,10 +92,10 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         descriptionLabel.setLabelFor(descriptionTF);
 
         typeLabel = new JLabel("type", JLabel.TRAILING);
-        typeTF = new JTextField();
-        ViskitStatics.clampHeight(typeTF);
-        typeTF.setEditable(false);
-        typeLabel.setLabelFor(typeTF);
+        typeNameTF = new JTextField();
+        ViskitStatics.clampHeight(typeNameTF);
+        typeNameTF.setEditable(false);
+        typeLabel.setLabelFor(typeNameTF);
 
         clearStatisticsCB = new JCheckBox("Clear statistics after each replication");
         clearStatisticsCB.setSelected(true); // bug 706
@@ -147,15 +147,14 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "Class " + propertyChangeListenerNode.getType() + " not found.");
                 return;
             }
-
-                nameTF.setText(propertyChangeListenerNode.getName());
-                typeTF.setText(propertyChangeListenerNode.getType());
+                   nameTF.setText(propertyChangeListenerNode.getName());
+               typeNameTF.setText(propertyChangeListenerNode.getType());
             descriptionTF.setText(propertyChangeListenerNode.getDescription());
 
             instantiationPanel = new InstantiationPanel(this, lis, true);
             setupInstantiationPanel();
             instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+                    "Listener initialization", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
             JPanel content = new JPanel();
             content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -163,18 +162,18 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
                     BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                     BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 4)));
 
-            JPanel cont = new JPanel(new SpringLayout());
-            cont.add(nameLabel);
-            cont.add(nameTF);
+            JPanel containerPanel = new JPanel(new SpringLayout());
+            containerPanel.add(nameLabel);
+            containerPanel.add(nameTF);
 
-            cont.add(descriptionLabel);
-            cont.add(descriptionTF);
+            containerPanel.add(descriptionLabel);
+            containerPanel.add(descriptionTF);
 
-            cont.add(typeLabel);
-            cont.add(typeTF);
-            SpringUtilities.makeCompactGrid(cont, 3, 2, 10, 10, 5, 5);
+            containerPanel.add(typeLabel);
+            containerPanel.add(typeNameTF);
+            SpringUtilities.makeCompactGrid(containerPanel, 3, 2, 10, 10, 5, 5);
 
-            content.add(cont);
+            content.add(containerPanel);
 
             /* Put up a "clear statistics after each replication" checkbox if
              * type is descendent of one of these:

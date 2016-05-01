@@ -58,11 +58,12 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  2 instantiate it in the constructor, mapping it to a handler (name)
  3 write the handler
  */
-public class EventGraphControllerImpl extends mvcAbstractController implements EventGraphController {
-
+public class EventGraphControllerImpl extends mvcAbstractController implements EventGraphController
+{
     static final Logger LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
 
-    public EventGraphControllerImpl() {
+    public EventGraphControllerImpl()
+	{
         initializeViskitConfiguration();
         initializeOpenEventGraphWatch();
     }
@@ -260,41 +261,47 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     void _doOpen(File file)
 	{
         EventGraphView eventGraphView = (EventGraphView) getView();
-        EventGraphModelImpl model = new EventGraphModelImpl(this);
-        model.initialize();
-        eventGraphView.addTab(model);
-        ViskitGlobals.instance().getEventGraphViewFrame().getSelectedPane().setToolTipText(model.getMetadata().description);
+        EventGraphModelImpl eventGraphModel = new EventGraphModelImpl(this);
+        eventGraphModel.initialize();
+        eventGraphView.addTab(eventGraphModel);
+        ViskitGlobals.instance().getEventGraphViewFrame().getSelectedPane().setToolTipText(eventGraphModel.getMetadata().description);
 
-        EventGraphModel[] openAlready = eventGraphView.getOpenModels();
+		// determine whether this eventGraphModel isOpenAlready
+        EventGraphModel[] eventGraphViewOpenModelsList = eventGraphView.getOpenModels();
         boolean isOpenAlready = false;
-        if (openAlready != null) {
-            for (EventGraphModel eventGraphModel : openAlready) {
-                if (eventGraphModel.getCurrentFile() != null) {
-                    String path = eventGraphModel.getCurrentFile().getAbsolutePath();
-                    if (path.equals(file.getAbsolutePath())) {
+        if (eventGraphViewOpenModelsList != null) // TODO needed?
+		{
+            for (EventGraphModel openModel : eventGraphViewOpenModelsList)
+			{
+                if (openModel.getCurrentFile() != null)
+				{
+                    String path = openModel.getCurrentFile().getAbsolutePath();
+                    if (path.equals(file.getAbsolutePath()))
+					{
                         isOpenAlready = true;
+						break;
                     }
                 }
             }
         }
-        if (model.newModel(file) && !isOpenAlready) {
-
+        if (eventGraphModel.newModel(file) && !isOpenAlready)
+		{
             // We may find one or more simkit.Priority(s) with numeric values vice
             // eneumerations in the EG XML.  Modify and save the EG XML silently
-            if (model.isNumericPriority()) {
+            if (eventGraphModel.isNumericPriority()) {
                 save();
-                model.setNumericPriority(false);
+                eventGraphModel.setNumericPriority(false);
             }
 
-            eventGraphView.setSelectedEventGraphName(model.getMetadata().name);
-            eventGraphView.setSelectedEventGraphDescription(model.getMetadata().description);
+            eventGraphView.setSelectedEventGraphName(eventGraphModel.getMetadata().name);
+            eventGraphView.setSelectedEventGraphDescription(eventGraphModel.getMetadata().description);
             adjustRecentEventGraphFileSet(file);
             markEventGraphFilesAsOpened();
 
             // Check for good compilation
-            handleCompileAndSave(model, file);
+            handleCompileAndSave(eventGraphModel, file);
         } else {
-            eventGraphView.deleteTab(model);   // Not a good open, tell view
+            eventGraphView.deleteTab(eventGraphModel);   // Not a good open, tell view
         }
 
         resetRedoUndoStatus();

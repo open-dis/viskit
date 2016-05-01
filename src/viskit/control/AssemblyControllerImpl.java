@@ -153,7 +153,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		}
 		else
 		{
-			messageToUser (JOptionPane.INFORMATION_MESSAGE, "Ready to go!", 
+			messageToUser (JOptionPane.INFORMATION_MESSAGE, "Visual Simkit is ready to go!", 
 					"<html><p>Open or create a project to begin</p>");
 		}
 		
@@ -1655,7 +1655,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         XMLValidationTool xmlValidationTool = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
         if (!xmlValidationTool.isValidXML()) {
-			String message = f.getName() + " is not valid XML";
+			String message = f.getName() + " is not valid XML, see log console";
 			messageToUser(JOptionPane.ERROR_MESSAGE, "Invalid Assembly XML", message);
             LOG.error(message + "\n");
             // TODO: implement a Dialog pointing to the validationErrors.LOG
@@ -1700,7 +1700,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (!xmlValidationTool.isValidXML())
 		{
-			String message = simkitXML2Java.getEventGraphFile().getName() + " is not valid XML";
+			String message = simkitXML2Java.getEventGraphFile().getName() + " is not valid XML, see log console";
 			messageToUser(JOptionPane.ERROR_MESSAGE, " Invalid Event Graph XML", message);
 			LOG.error(message + "\n");
             return null;
@@ -2202,12 +2202,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			{
                 tempFile = file;
 
-                // _doOpen checks if a tab is already opened
+                // _doOpen includes checks whether a tab is already opened
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
             }
 			ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab(); // ensure correct context when building menus
 			ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
-        } catch (Exception ex) {
+        } 
+		catch (Exception ex)
+		{
             LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
             messageToUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",

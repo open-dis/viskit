@@ -287,7 +287,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append(toObject);
                         sb.append("</u> listening to <u>");
                         sb.append(fromObject);
-                    } else {
+                    } else
+					{
                         String property = ((PropertyChangeListenerEdge) assemblyEdge).getProperty();
                         property = (property != null && property.length() > 0) ? property : PclEdgeInspectorDialog.ALL_STATE_VARIABLES_NAME;
                         sb.append("<center>Property Change Listener<br><u>");

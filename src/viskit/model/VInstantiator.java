@@ -137,7 +137,8 @@ public abstract class VInstantiator {
          * @param assemblyParametersList a list of Assembly parameters
          * @param typeName a parameter type
          */
-        public Construct(List<Object> assemblyParametersList, String typeName) {
+        public Construct(List<Object> assemblyParametersList, String typeName)
+		{
             super(typeName);
 
             if (viskit.ViskitStatics.debug) {
