@@ -14,7 +14,7 @@
 
 package viskit.test;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import viskit.ViskitGlobals;
  * @version $Id: TestGridkitServerAssembly3.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
 public class TestGridkitServerAssembly3 extends Thread {
-    static Logger log = LogUtils.getLogger(TestGridkitServerAssembly3.class);
+    static Logger log = LogUtilities.getLogger(TestGridkitServerAssembly3.class);
     XmlRpcClientLite xmlrpc;
     Vector<Object> args;
     String usid;

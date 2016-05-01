@@ -7,7 +7,7 @@
  */
 package viskit.test;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -24,7 +24,7 @@ import viskit.ViskitGlobals;
  */
 public class TestGridkitLogin extends Thread {
 
-    static Logger LOG = LogUtils.getLogger(TestGridkitLogin.class);
+    static Logger LOG = LogUtilities.getLogger(TestGridkitLogin.class);
 
     XmlRpcClientLite xmlrpc;
 

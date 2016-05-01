@@ -7,7 +7,7 @@
  */
 package viskit.test;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.LogUtilities;
 import java.io.IOException;
 import java.util.Vector;
 import org.apache.log4j.Logger;
@@ -23,7 +23,7 @@ import org.apache.xmlrpc.XmlRpcException;
 public class TestGridkitQstat extends Thread {
 
     XmlRpcClientLite xmlrpc;
-    static Logger log = LogUtils.getLogger(TestGridkitQstat.class);
+    static Logger log = LogUtilities.getLogger(TestGridkitQstat.class);
 
     /**
      * Creates a new instance of TestGridkitLogin

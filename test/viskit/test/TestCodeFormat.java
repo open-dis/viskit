@@ -60,7 +60,7 @@ public class TestCodeFormat extends Thread {
             modifyEventGraph();
             showXML(System.out);
             System.out.println("Code inserted was:");
-            System.out.println(root.getCode());
+            System.out.println(root.getCodeBlock());
             showXML(bufferOut);
             byte[] buff = bufferOut.toByteArray();
             bufferIn = new ByteArrayInputStream(buff);
