@@ -28,9 +28,9 @@ public class GraphMetadata {
     public  boolean pathEditable = false;
     private boolean project      = false;
     public  boolean updated      = false;
-    public  boolean verbose      = false;
+    public  boolean verbose      = true; // TODO user preference
     private String  label;
-	private String  DEFAULT_PACKAGE_NAME = "test"; // TODO user preference
+	private String  DEFAULT_PACKAGE_NAME = "examples"; // TODO user preference
 
     public GraphMetadata()
 	{

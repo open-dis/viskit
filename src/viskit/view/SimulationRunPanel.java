@@ -203,7 +203,7 @@ public class SimulationRunPanel extends JPanel {
         simulationRunControlPanel.add(vcrPanel); // updated
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
 		
-        vcrVerboseCB = new JCheckBox("Verbose output", false);
+        vcrVerboseCB = new JCheckBox("Verbose output", true); // TODO user preference
         vcrVerboseCB.addActionListener(new VcrVerboseCBListener());
         vcrVerboseCB.setToolTipText("Enables verbose output for all runs");
         simulationRunControlPanel.add(vcrVerboseCB); // updated

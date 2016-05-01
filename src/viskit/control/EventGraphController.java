@@ -125,7 +125,7 @@ public interface EventGraphController {
     /**
      * Opens selected files from a FileChooser
      */
-    void open();
+    void openEventGraph();
 
     void openRecentEventGraph(File path);
 

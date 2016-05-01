@@ -335,7 +335,7 @@ public class ViskitProject {
 				projectName = root.getAttribute("name").getValue();
 			else 
 			{
-				projectName = "";
+				projectName = "TODO provide project name";
 				projectDocument.getRootElement().setAttribute("name", projectName);
 			}
 			if (root.getAttribute("author") != null)
@@ -357,7 +357,7 @@ public class ViskitProject {
 				projectDescription = root.getAttribute("description").getValue();
 			else 
 			{
-				projectDescription = "";
+				projectDescription = ViskitStatics.DEFAULT_DESCRIPTION;
 				projectDocument.getRootElement().setAttribute("description", projectDescription);
 			}
 			setProjectOpen(true);
@@ -709,8 +709,12 @@ public class ViskitProject {
             projectChooser.setMultiSelectionEnabled(false);
             projectChooser.setFileFilter(new ProjectFilter());
             projectChooser.setApproveButtonToolTipText("Open selected project");
-        } else {
-            projectChooser.setCurrentDirectory(new File(startPath));
+        } 
+		else
+		{
+			File projectDirectory = new File(startPath);
+			if  (projectDirectory.exists())
+				 projectChooser.setCurrentDirectory(projectDirectory);
         }
     }
 
@@ -724,7 +728,7 @@ public class ViskitProject {
 	{
         initializeProjectChooser(startingDirectoryPath);
 
-        projectChooser.setDialogTitle("New Viskit Project Directory");
+        projectChooser.setDialogTitle("Create New Viskit Project Directory");
 		projectChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnValue = projectChooser.showSaveDialog(parent);
         if (returnValue == JFileChooser.CANCEL_OPTION)
@@ -774,7 +778,7 @@ public class ViskitProject {
 				projectDirectory = projectDirectory.getParentFile(); // gracefully support subdirectory mis-selection
 				LOG.info("changed project directory to parent: " + projectDirectory.getPath());
 			}
-			// check for project configuration file
+			// look for for project configuration file
 			File viskitProjectFile = new File(projectDirectory.getPath() + File.separator + PROJECT_FILE_NAME);
 		
             isProjectDirectory = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDirectory);
@@ -784,9 +788,15 @@ public class ViskitProject {
 				LOG.error("Illegal viskit project directory: " + originalProjectDirectory.getPath());
                 Object[] options = {"Select project", "Cancel"};
 				String TRY_AGAIN = "Please try another selection...";
-                returnValue = JOptionPane.showOptionDialog(parentFrame, "<html><p>Your selection is not a valid Visual Simkit (Viskit) project.</p>" + 
-						    "<p>Look for the Viskit icon when choosing the correct directory.)</p>" + "<p>&nbsp;</p>" +
-						    "<p>" + TRY_AGAIN + "</p>", TRY_AGAIN,
+                returnValue = JOptionPane.showOptionDialog(parentFrame, 
+						    "<html>" +
+						    "<p align='center'>Selected directory <i>" + originalProjectDirectory.getName() + "</i> is not a valid Viskit project." + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+						    "<p>&nbsp;</p>" +
+						    "<p align='center'>(Hint: look for the Viskit icon to choose a valid directory)" + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+						    "<p>&nbsp;</p>" +
+						    "<p align='center'>" + TRY_AGAIN + ViskitGlobals.RECENTER_SPACING + "</p>" +
+						    "<p>&nbsp;</p>", 
+						TRY_AGAIN, // title
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
                 if (returnValue != 0) {

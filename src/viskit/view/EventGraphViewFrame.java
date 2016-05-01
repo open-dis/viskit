@@ -289,10 +289,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             adjustMenus((EventGraphModel) getModel()); // enable/disable menu items based on new EG
 
             GraphMetadata graphMetadata = ((EventGraphModel) getModel()).getMetadata();
-            if (graphMetadata != null) {
-                setSelectedEventGraphName(graphMetadata.name);
+			
+            if (graphMetadata != null)
+			{
+				if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
+					 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
+			
+                setSelectedEventGraphName       (graphMetadata.name);
                 setSelectedEventGraphDescription(graphMetadata.description);
-            } else if (viskit.ViskitStatics.debug) {
+            } 
+			else if (viskit.ViskitStatics.debug) 
+			{
                 System.err.println("error: EventGraphViewFrame graphMetadata null..");
             }
         }
@@ -818,8 +825,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		eventGraphsMenu.setEnabled(true); // always on
         eventGraphsMenu.removeAll();      // reset
 		
-        eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), true));
-        eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), true));
+        eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcutCtrlKeyMask), isProjectOpen));
+        eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutCtrlKeyMask), isProjectOpen));
 		openRecentEventGraphMenu.setEnabled(isProjectOpen && eventGraphController.getRecentEventGraphFileSet().size() > 0);
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();

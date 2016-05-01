@@ -117,7 +117,7 @@ public class EventGraphAssemblyComboMain {
 					+ "<b>" + ViskitStatics.VISKIT_MAILING_LIST  + "</b>"
                     + "<br/><br/><p>Click the link to open up an email form, then copy and paste the log's contents. Thanks!</p>";
 
-            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, message, true);
+            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, message, true); // need to debug, often caused by a method-naming problem
         }
     }
 

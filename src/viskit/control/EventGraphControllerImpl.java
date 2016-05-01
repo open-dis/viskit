@@ -120,8 +120,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		    !ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory found", 
-					"<html><p align='center'>New event graphs are only created within an open project.</p>" +
-					"<p align='center'>Please open or create a project first.</p>");
+					"<html><p align='center'>New event graphs are only created within an open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Please open or create a project first." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+					"<p>&nbsp</p>");
 			return;
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // prerequisite to possible file menu dialog
@@ -142,9 +143,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // If we have models already opened, then use most recent package name as default for this new EventGraph
         GraphMetadata newEventGraphMetadata = eventGraphModel.getMetadata();
-        if (priorEventGraphMetadata != null) {
+        if (priorEventGraphMetadata != null)
+		{
             newEventGraphMetadata.packageName = priorEventGraphMetadata.packageName;
+            newEventGraphMetadata.author = priorEventGraphMetadata.author;
         }
+		if ((newEventGraphMetadata.author == null) || newEventGraphMetadata.author.trim().isEmpty())
+		{
+			newEventGraphMetadata.author = System.getProperty("user.name"); // TODO user preference
+		}
 		newEventGraphMetadata.description = "TODO: enter a description for this new event graph";
 
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), newEventGraphMetadata);
@@ -159,7 +166,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // Bugfix 1398
             String message =
                     "<html><body><p align='center'>Do you want " + newEventGraphMetadata.name + 
-					" execution to start with a <b>\"Run\"</b> Event?</p></body></html>";
+					" execution to start with a <b>\"Run\"</b> Event?" + ViskitGlobals.RECENTER_SPACING + "</p>"  +
+				     "<p>&nbsp</p></body></html>";
             String title = "Confirm Run Event";
 
             int returnValue = ((EventGraphView) getView()).genericAskYN(title, message);
@@ -182,8 +190,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * Dialog operation
      * @return true = continue, false = don't (i.e., we canceled)
      */
-    private boolean askToSaveAndContinue() {
-        int yesNo = (((EventGraphView) getView()).genericAsk("Question", "Save modified event graph?"));
+    private boolean askToSaveAndContinue()
+	{
+		String eventGraphName = ((EventGraphModel) getModel()).getMetadata().name;
+		if ((eventGraphName == null) || eventGraphName.trim().isEmpty())
+			 eventGraphName = "NoNameFound";				
+        int yesNo = (((EventGraphView) getView()).genericAsk("Closing " + eventGraphName, "Save modified event graph?"));
 
         boolean returnValue;
 
@@ -212,11 +224,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return returnValue;
     }
 
-    public final static String OPEN_METHOD = "open"; // must match following method name.  Not possible to accomplish this programmatically.
+    public final static String OPEN_METHOD = "openEventGraph"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void open () // method name must exactly match preceding string value
+    public void openEventGraph () // method name must exactly match preceding string value
 	{
-        // Bug fix: 1249
         File[] files = ((EventGraphView) getView()).openFilesAsk();
         if (files == null) {
             return;
@@ -229,20 +240,32 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				{
 					break; // skip hidden files
 				}
-				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
+				else if (!file.getName().endsWith(".xml"))
 				{
+					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Event Graph file", "<html>" +
+							"<p align='center'>Event graph files always end with .xml" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>" +
+							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>");
+					break;
+				}
+				else if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+						 file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
+				{
+					// Event graph found within current project directory
 					_doOpen(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
 				}
 				else 
 				{
-					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", 
-							"<html><p>Event graphs must be within the currently open project.</p>" +
+					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project",  "<html>" +
+							"<p align='center'>Event graphs must be within a currently open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b></p>" +
-							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</p>" +
+							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b>" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "" + ViskitGlobals.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p>Please choose an event graph in current project, or else open a different project.</p>");
+							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>");
 					// TODO offer to copy?
 					break;
 				}
@@ -843,7 +866,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (!nodeSelected()) {
             messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
-                    "Edges cannot be copied.");
+                    "Edges cannot be copied." + ViskitGlobals.RECENTER_SPACING);
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
@@ -1053,7 +1076,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         } catch (FileNotFoundException fnfe)
 		{	
 			String message = localLastFile.getName() + " updated Event Graph Java file not found when unmarshalling";
-			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph Java file not found", message);
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph Java file not found" + ViskitGlobals.RECENTER_SPACING, message);
             LOG.error(fnfe);
         }
 

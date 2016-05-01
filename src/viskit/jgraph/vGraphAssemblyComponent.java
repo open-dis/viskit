@@ -259,19 +259,24 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
-        if (event != null) {
+    public String getToolTipText(MouseEvent event)
+	{
+        if (event != null)
+		{
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
-            if (c != null) {
+            if (c != null)
+			{
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vAssemblyEdgeCell) {
+                if (c instanceof vAssemblyEdgeCell)
+				{
                     vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
                     AssemblyEdge assemblyEdge = (AssemblyEdge) vc.getUserObject();
 					// events flow out of fromObject into toObject
                     Object   toObject = assemblyEdge.getTo();
                     Object fromObject = assemblyEdge.getFrom();
 
-                    if (assemblyEdge instanceof AdapterEdge) {
+                    if (assemblyEdge instanceof AdapterEdge)
+					{
                         Object   toEvent = ((AdapterEdge) assemblyEdge).getTargetEvent();
                         Object fromEvent = ((AdapterEdge) assemblyEdge).getSourceEvent();
                         sb.append("<center>Adapter<br><u>");// +
@@ -282,12 +287,14 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append(toObject);
                         sb.append(".");
                         sb.append(toEvent);
-                    } else if (assemblyEdge instanceof SimEventListenerEdge) {
+                    }
+					else if (assemblyEdge instanceof SimEventListenerEdge) {
                         sb.append("<center>SimEvent Listener<br><u>");
                         sb.append(toObject);
                         sb.append("</u> listening to <u>");
                         sb.append(fromObject);
-                    } else
+                    }
+					else
 					{
                         String property = ((PropertyChangeListenerEdge) assemblyEdge).getProperty();
                         property = (property != null && property.length() > 0) ? property : PclEdgeInspectorDialog.ALL_STATE_VARIABLES_NAME;
@@ -310,7 +317,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append(property);
                     }
                     String description = assemblyEdge.getDescription();
-                    if (description != null) {
+                    if (description != null)
+					{
                         description = description.trim();
                         if (description.length() > 0) {
                             sb.append("<br>");

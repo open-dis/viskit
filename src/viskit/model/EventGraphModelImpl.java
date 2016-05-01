@@ -18,6 +18,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.mvcAbstractModel;
 import viskit.mvc.mvcController;
@@ -66,6 +67,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 	{
         this.eventGraphController = (EventGraphControllerImpl) controller;
         graphMetadata = new GraphMetadata(this);
+		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
+			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
     }
 
     @Override
@@ -153,6 +156,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 						newDescription = jaxbSimEntity.getDescription();
 					newMetadata.description = newDescription.trim();
 				}
+				if ((newMetadata.description == null) || newMetadata.description.trim().isEmpty())
+					 newMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
                 setMetadata(newMetadata);
 
                         buildEventsFromJaxb(jaxbSimEntity.getEvent());
@@ -348,7 +353,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         return sb.toString();
     }
 
-    private void mangleName(ViskitElement node) {
+    private void mangleName(ViskitElement node)
+	{
         do
 		{
             node.setName(EventGraphModelImpl.this.mangleName(node.getName()));
@@ -356,7 +362,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 		while (!nameCheck());
     }
 
-    private boolean nameCheck() {
+    private boolean nameCheck()
+	{
         Set<String> stringHashSet = new HashSet<>(10);
         for (EventNode eventNode : eventNodeCache.values())
 		{

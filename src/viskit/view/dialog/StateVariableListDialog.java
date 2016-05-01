@@ -111,7 +111,7 @@ public class StateVariableListDialog extends JDialog {
         getRootPane().setDefaultButton(cancelButton);
         pack();
 //        setLocationRelativeTo(c);
-		newLocation.x = newLocation.x - ((this.getWidth() - parentWidth) / 2); // shift left
+		newLocation.x = newLocation.x - ((this.getWidth() - parentWidth) / 2); // shift left, center sub-panel
 		this.setLocation(newLocation);
     }
 	

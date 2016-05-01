@@ -100,6 +100,11 @@ public class ViskitGlobals {
     private static ViskitProject currentViskitProject;
 
     private static boolean projectOpen;
+	
+	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
+	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
+	public final static String PROJECT_OPEN_FAILURE_MESSAGE = "Project failed to open...";
+	public final static String             RECENTER_SPACING = " &nbsp &nbsp &nbsp &nbsp ";
 
 	/**
 	 * @return the projectOpen value
@@ -137,7 +142,7 @@ public class ViskitGlobals {
     /** JavaHelp set for the main application */
     private Help help;
 	
-	private static String dateFormat = "dd MMMM yyyy";
+	private static String dateFormat = "d MMMM yyyy"; // TODO confirm OK for 2-digit dates; don't want leading 0
 
 	/** Singleton pattern
 	 * @return singleton instance */

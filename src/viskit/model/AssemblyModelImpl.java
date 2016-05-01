@@ -54,11 +54,14 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl assemblyController;
 
-    public AssemblyModelImpl(mvcController assemblyController) {
+    public AssemblyModelImpl(mvcController assemblyController)
+	{
         pointLess = new Point2D.Double(30, 60);
         this.assemblyController = (AssemblyControllerImpl) assemblyController;
         graphMetadata = new GraphMetadata(this);
-        nodeCacheMap = new LinkedHashMap<>();
+		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
+			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
+        nodeCacheMap  = new LinkedHashMap<>();
     }
 
     public void initialize() {
@@ -128,10 +131,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 }
 
                 GraphMetadata myMetadata = new GraphMetadata(this);
-                myMetadata.revision       = jaxbSimkitAssembly.getVersion();
+                myMetadata.revision      = jaxbSimkitAssembly.getVersion();
                 myMetadata.name          = jaxbSimkitAssembly.getName();
                 myMetadata.packageName   = jaxbSimkitAssembly.getPackage();
                 myMetadata.description   = jaxbSimkitAssembly.getDescription(); // TODO salvage Comment entries in older versions
+				if ((myMetadata.description == null) || myMetadata.description.trim().isEmpty())
+					 myMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 
                 Schedule schedule = jaxbSimkitAssembly.getSchedule();
                 if (schedule != null) {

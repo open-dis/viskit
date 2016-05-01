@@ -465,9 +465,9 @@ public class ViskitStatics {
      */
     static Class<?> tryUnqualifiedName(String name) {
 
-        String userDir = System.getProperty("user.dir");
+        String userDir  = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
-        String workDir = ViskitGlobals.instance().getWorkDirectory().getPath();
+        String workDir  = ViskitGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
         Path startingDir;

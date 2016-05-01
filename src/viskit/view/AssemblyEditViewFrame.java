@@ -1165,15 +1165,19 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
 			// TODO re-open previously open assemblies and event graphs, otherwise:
 			
-			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, "Project opened successfully", 
-				"<html><p align='center'><b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b> project is open</p>" +
-						"<p align='center'>&nbsp;</p>" +
-						"<p align='center'>Now open or create either an Event Graph or Assembly</p></html>");
+			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitGlobals.PROJECT_OPEN_SUCCESS_MESSAGE, 
+					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>&nbsp;</p>" +
+							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitGlobals.RECENTER_SPACING +  "</p>" +
+							"<p>&nbsp</p>");
 		}
 		else
 		{
-			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, "Project failed to open", 
-				"<html><p>Selected project did not open, see error log for details</p>");
+			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, ViskitGlobals.PROJECT_OPEN_FAILURE_MESSAGE, 
+				"<html><p>Selected project <i>" +  file.getName() + "</i> did not open" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>&nbsp;</p>" +
+							"<p align='center'>See error log for details" + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+							"<p>&nbsp</p>");
 		}
 		
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();

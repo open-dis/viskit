@@ -110,19 +110,22 @@ public class Compiler {
             if (diagnosticMessages.toString().isEmpty()) {
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
             }
-        } catch (Exception ex) {
+        } catch (Exception ex)
+		{
             if (ex instanceof NullPointerException) {
 
-                String msg = "Your environment variable for Path likely has the JRE's "
+                String message = "Your environment variable for Path likely has the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
                                 + "Please reset your Path to have the JDK's "
                                 + "java.exe first in the Path";
+				
+				// TODO fixable?
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
                 ViskitGlobals.instance().getAssemblyEditViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                        "Incorrect Path", msg);
+                        "Incorrect Path", message);
 
-                log.error(msg);
+                log.error(message);
             }
             log.error(ex);
 //            log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());

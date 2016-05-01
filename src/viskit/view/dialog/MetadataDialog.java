@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -199,6 +200,9 @@ abstract public class MetadataDialog extends JDialog {
         if (graphMetadata == null) {
             graphMetadata = new GraphMetadata();
         }
+		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
+			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
+		
 		String path = "";
 		if      (this instanceof AssemblyMetadataDialog)
 			 path = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
