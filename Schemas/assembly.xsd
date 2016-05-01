@@ -38,7 +38,7 @@
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="version" default="1.0"/>
-      <xs:attribute name="package" use="required"/>
+      <xs:attribute name="package" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="author"/>
       <xs:attribute name="extend" default="viskit.assembly.ViskitAssembly"/>
       <xs:attribute name="implement"/>
@@ -54,7 +54,7 @@
   </xs:element>
   <xs:element name="meta">
     <xs:complexType>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="content"/>
     </xs:complexType>
   </xs:element>
@@ -64,8 +64,8 @@
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
-      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="type" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
     </xs:complexType>
@@ -75,11 +75,11 @@
       <xs:sequence>
         <xs:element minOccurs="0" ref="ValueRange"/>
       </xs:sequence>
-      <xs:attribute name="name"/>
+      <xs:attribute name="name" use="required"/> <!-- TODO type="xs:NMTOKEN" -->
       <xs:attribute name="linkRef" type="xs:IDREF"/>
       <xs:attribute name="link" type="xs:ID"/>
       <xs:attribute name="value"/>
-      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="type" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -89,7 +89,7 @@
     <xs:complexType>
       <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
       <xs:attribute name="name"/>
-      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="type" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -97,16 +97,16 @@
     <xs:complexType>
       <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
       <xs:attribute name="name"/>
-      <xs:attribute name="factory" use="required"/>
-      <xs:attribute name="method" default="getInstance"/>
-      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="factory" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="method" default="getInstance" type="xs:NMTOKEN"/>
+      <xs:attribute name="type" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Coordinate">
     <xs:complexType>
-      <xs:attribute name="x" use="required"/>
-      <xs:attribute name="y" use="required"/>
+      <xs:attribute name="x" use="required"/> <!-- TODO  type="xs:float" -->
+      <xs:attribute name="y" use="required"/> <!-- TODO  type="xs:float" -->
     </xs:complexType>
   </xs:element>
   <!--
@@ -221,9 +221,9 @@
       <xs:sequence>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
-      <xs:attribute name="eventHeard" use="required"/>
-      <xs:attribute name="eventSent" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="eventHeard" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="eventSent" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="from" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="to" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="description"/>
@@ -236,7 +236,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
       </xs:sequence>
-      <xs:attribute name="listenerName" use="required"/>
+      <xs:attribute name="listenerName" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="property"/>
     </xs:complexType>
   </xs:element>

@@ -57,7 +57,7 @@
   </xs:element>
   <xs:element name="meta">
     <xs:complexType>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="content"/>
     </xs:complexType>
   </xs:element>
@@ -67,7 +67,7 @@
         <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
@@ -108,8 +108,8 @@
   </xs:element>
   <xs:element name="Coordinate">
     <xs:complexType>
-      <xs:attribute name="x" use="required"/>
-      <xs:attribute name="y" use="required"/>
+      <xs:attribute name="x" use="required"/> <!-- TODO  type="xs:float" -->
+      <xs:attribute name="y" use="required"/> <!-- TODO  type="xs:float" -->
     </xs:complexType>
   </xs:element>
   <!--
@@ -250,7 +250,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="eventHeard" use="required"/>
       <xs:attribute name="eventSent" use="required"/>
       <xs:attribute name="from" use="required" type="xs:NMTOKEN"/>
@@ -405,7 +405,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Event"/>
         <xs:element minOccurs="0" ref="Code"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="package" default="examples"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="author"/>
