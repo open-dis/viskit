@@ -489,29 +489,40 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
                 saveChooser.setDialogTitle("Save Assembly Output");
             }
-            File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
-            saveChooser.setSelectedFile(fil);
+			String className = assemblyClassName;
+			if    (className.contains("."))
+				   className = className.substring(className.lastIndexOf(".")+1);
+			File assemblyOutputDirectory = new File (saveChooser.getCurrentDirectory().getPath() + File.separator + "AnalystReports");
+			if (!assemblyOutputDirectory.isDirectory())
+				 assemblyOutputDirectory = saveChooser.getCurrentDirectory();
+            File   simulationOutputFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName(className + "Output.txt", assemblyOutputDirectory);
+            saveChooser.setSelectedFile(simulationOutputFile); // note that analyst gets to confirm directory destination
 
-            int retv = saveChooser.showSaveDialog(null);
-            if (retv != JFileChooser.APPROVE_OPTION) {
+            int returnValue = saveChooser.showSaveDialog(null);
+            if (returnValue != JFileChooser.APPROVE_OPTION)
+			{
                 return;
             }
 
-            fil = saveChooser.getSelectedFile();
-            if (fil.exists()) {
-                int r = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
+            simulationOutputFile = saveChooser.getSelectedFile();
+            if (simulationOutputFile.exists())
+			{
+                returnValue = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (r != JOptionPane.YES_OPTION) {
+                if (returnValue != JOptionPane.YES_OPTION)
+				{
                     return;
                 }
             }
 
             try {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
-                    bw.write(simulationRunPanel.simulationOutputTA.getText());
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(simulationOutputFile))) {
+                    bufferedWriter.write(simulationRunPanel.simulationOutputTA.getText());
                 }
-            } catch (IOException e1) {
-                JOptionPane.showMessageDialog(null, e1.getMessage(), "Input/Output (I/O) Error,", JOptionPane.ERROR_MESSAGE);
+            } catch (IOException e1)
+			{
+                JOptionPane.showMessageDialog(null, e1.getMessage(), "Input/Output (I/O) Error", JOptionPane.ERROR_MESSAGE);
+				LOG.error("Input/Output (I/O) Error" + "\n" + e1.getMessage());
             }
         }
     }
