@@ -178,8 +178,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             int returnValue = ((EventGraphView) getView()).genericAskYN(title, message);
             boolean dirty = false;
-            if (returnValue == JOptionPane.YES_OPTION) {
-                buildNewNode(new Point(30, 60), "Run");
+            if (returnValue == JOptionPane.YES_OPTION)
+			{
+                buildNewNode(new Point(30, 60), "Run"); // TODO add description
                 dirty = true;
             }
             ((EventGraphModel) getModel()).setDirty(dirty);
@@ -1135,7 +1136,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void buildNewNode(Point p) //--------------------------
     {
-        buildNewNode(p, "evnt_" + nodeCount++);
+        buildNewNode(p, "NewEvent_" + nodeCount++);
     }
 
     @Override

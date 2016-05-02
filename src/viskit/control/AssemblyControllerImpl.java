@@ -604,15 +604,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private String shortEventGraphName(String typeName) {
-        return shortName(typeName, "evgr_", eventGraphNodeCountField);
+        return shortName(typeName, "EventGraph_", eventGraphNodeCountField);
     }
 
     private String shortPropertyChangeListenerName(String typeName) {
-        return shortName(typeName, "lstnr_", propertyChangeListenerNodeCountField); // use same counter
+        return shortName(typeName, "Listener_", propertyChangeListenerNodeCountField); // use same counter
     }
 
     private String shortAdapterName(String typeName) {
-        return shortName(typeName, "adptr_", adapterNodeCountField); // use same counter
+        return shortName(typeName, "Adapter_", adapterNodeCountField); // use same counter
     }
 
     private String shortName(String typeName, String prefix, Field intField) {

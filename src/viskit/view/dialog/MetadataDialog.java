@@ -56,6 +56,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
         JLabel nameLabel = new JLabel(graphMetadata.getLabel() + " " + "name", JLabel.TRAILING);
+		nameLabel.setToolTipText("name is used for both entity and file name"); // TODO spacification rules
         nameTF = new JTextField(20);
         nameLabel.setLabelFor(nameTF);
         textFieldPanel.add(nameLabel);
