@@ -376,6 +376,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			openRecentAssemblyMenu = buildMenu("Recent Assembly"); // don't wipe it out if already there!
 			openRecentAssemblyMenu.setToolTipText("Open Recent Assembly");
 			openRecentAssemblyMenu.setMnemonic(KeyEvent.VK_R);
+			// no accelerator hotkey for JMenu
 		}
 		openRecentAssemblyMenu.setEnabled(isProjectOpen && assemblyController.getRecentAssemblyFileSet().size() > 0);
 		assemblyController.updateAssemblyFileLists();
@@ -392,12 +393,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assembliesMenu.addSeparator();
 
 		// be careful when changing controller method names!!  refactoring won't catch these
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.SAVE_METHOD,     "Save Assembly",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.SAVEAS_METHOD,   "Save Assembly As...", KeyEvent.VK_A, null, assemblyVisible));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.SAVE_METHOD,     "Save Assembly",                            KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.SAVEAS_METHOD,   "Save Assembly As...",                      KeyEvent.VK_A, KeyStroke.getKeyStroke(KeyEvent.VK_A, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
 		JMenuItem saveAssemblyDiagramMI = buildMenuItem(assemblyController, AssemblyControllerImpl.IMAGECAPTURE_METHOD, "Save Assembly Diagram", KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible);
         assembliesMenu.add(saveAssemblyDiagramMI);
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSE_METHOD,    "Close Assembly",      KeyEvent.VK_W, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
-        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSEALL_METHOD, "Close All Assemblies",KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSE_METHOD,    "Close Assembly",                           KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
+        assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSEALL_METHOD, "Close All Assemblies",                     KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
 
         // TODO: Unknown as to what this does exactly
           assembliesMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null, false));
@@ -430,19 +431,19 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         ActionIntrospector.getAction(assemblyController, AssemblyControllerImpl.REMOVE_METHOD).setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.NEWEVENTGRAPH_METHOD,        "Add Event Graph...", KeyEvent.VK_V, null, assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.NEWEVENTGRAPH_METHOD,        "Add Event Graph...",                KeyEvent.VK_V, null, assemblyVisible));
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.NEWPCLNODE_METHOD,           "Add Property Change Listener...",   KeyEvent.VK_L, null, assemblyVisible));
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.SHOWXML_METHOD,              "View Saved XML",                    KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible));
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.JAVASOURCE_METHOD,           "Generate, Compile Java Source",     KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible));
-		JMenuItem saveAssemblyDiagramMI2 = 
-				     buildMenuItem(  assemblyController, AssemblyControllerImpl.IMAGECAPTURE_METHOD,         "Save Assembly Diagram",             KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible);
-        editMenu.add(saveAssemblyDiagramMI2); // shown in two places
+//		JMenuItem saveAssemblyDiagramMI2 = 
+//				     buildMenuItem(  assemblyController, AssemblyControllerImpl.IMAGECAPTURE_METHOD,         "Save Assembly Diagram",             KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible);
+        editMenu.add(saveAssemblyDiagramMI); // shown in two places
 
         editMenu.addSeparator();
 		// TODO icon
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PREPARESIMULATIONRUN_METHOD, "Initialization for Simulation Run", KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PREPARESIMULATIONRUN_METHOD, "Initialize Simulation Run",         KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK | InputEvent.SHIFT_MASK), assemblyVisible));
         editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.EDITGRAPHMETADATA_METHOD,    "Edit Assembly Properties...",       KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutKeyMask | InputEvent.SHIFT_MASK), assemblyVisible));
 
         // Create a new menu bar and add the created menus

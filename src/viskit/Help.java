@@ -143,14 +143,15 @@ public class Help {
         TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }
 
-    public void mainFrameLocated(Rectangle bounds) {
-        Point p = new Point(bounds.x, bounds.y);
-        Dimension d = new Dimension(bounds.width, bounds.height);
+    public void mainFrameLocated(Rectangle bounds)
+	{
+        Point panelLocation = new Point(bounds.x, bounds.y);
+        Dimension  d = new Dimension(bounds.width, bounds.height);
         Dimension hd = new Dimension(1200, 700);
         hb.setSize(hd);
-        p.x = p.x + d.width / 2 - hd.width / 2;
-        p.y = p.y + d.height / 2 - hd.height / 2;
-        hb.setLocation(p);
+        panelLocation.x = Math.max(panelLocation.x + d.width  / 2 - hd.width  / 2, 0); // non-negative
+        panelLocation.y = Math.max(panelLocation.y + d.height / 2 - hd.height / 2, 0);
+        hb.setLocation(panelLocation);
     }
 
     public static String LinkURLString(String urlString) {

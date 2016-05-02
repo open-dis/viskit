@@ -119,12 +119,17 @@ public class EventInspectorDialog extends JDialog {
         descriptionPanel.add(editDescriptionButton);
         panel.add(descriptionPanel);
 
+        // state transitions
+        transitionsPanel = new TransitionsPanel();
+        transitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
+        panel.add(transitionsPanel);
+
         // Event arguments
         argumentsPanel = new ArgumentsPanel(300, 2);
         argumentsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event arguments")));
         panel.add(argumentsPanel);
 
-        // local vars
+        // local variables
         localVariablesPanel = new LocalVariablesPanel(300, 2);
         localVariablesPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
         panel.add(localVariablesPanel);
@@ -133,11 +138,6 @@ public class EventInspectorDialog extends JDialog {
         codeBlockPanel = new CodeBlockPanel(this, true, "Event Code Block");
         codeBlockPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
         panel.add(codeBlockPanel);
-
-        // state transitions
-        transitionsPanel = new TransitionsPanel();
-        transitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
-        panel.add(transitionsPanel);
 
         // buttons
         JPanel twoRowButtonPanel = new JPanel();
@@ -148,25 +148,25 @@ public class EventInspectorDialog extends JDialog {
         addButtonPanel.setBorder(new TitledBorder("add"));
 
         addDescriptionButton = new JButton("description"); //add description");
-        addArgumentsButton = new JButton("arguments"); //add arguments");
-        addLocalsButton = new JButton("locals"); //add locals");
-        addCodeBlockButton = new JButton("code block"); //add code block");
-        addStateTransitionsButton = new JButton("state transitions"); //add state transitions");
+   addStateTransitionsButton = new JButton("state transitions"); //add state transitions");
+          addArgumentsButton = new JButton("arguments"); //add arguments");
+             addLocalsButton = new JButton("locals"); //add locals");
+          addCodeBlockButton = new JButton("code block"); //add code block");
 
         //Font defButtFont = addDescriptionButton.getFont();
         //int defButtFontSize = defButtFont.getSize();
         //addDescriptionButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
-        addArgumentsButton.setFont(addDescriptionButton.getFont());
-        addLocalsButton.setFont(addDescriptionButton.getFont());
-        addCodeBlockButton.setFont(addDescriptionButton.getFont());
         addStateTransitionsButton.setFont(addDescriptionButton.getFont());
+               addArgumentsButton.setFont(addDescriptionButton.getFont());
+                  addLocalsButton.setFont(addDescriptionButton.getFont());
+               addCodeBlockButton.setFont(addDescriptionButton.getFont());
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
+        addButtonPanel.add(addStateTransitionsButton);
         addButtonPanel.add(addArgumentsButton);
         addButtonPanel.add(addLocalsButton);
         addButtonPanel.add(addCodeBlockButton);
-        addButtonPanel.add(addStateTransitionsButton);
         addButtonPanel.add(Box.createHorizontalGlue());
         twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
@@ -287,10 +287,10 @@ public class EventInspectorDialog extends JDialog {
 
     private void fillWidgets()
 	{
-        String nmSt = node.getName();
-        nmSt = nmSt.replace(' ', '_');
-        setTitle("Event Inspector: " + nmSt);
-        name.setText(nmSt);
+        String nameOfStateTransition = node.getName();
+        nameOfStateTransition = nameOfStateTransition.replace(' ', '_');
+        setTitle("Event Inspector: " + nameOfStateTransition);
+        name.setText(nameOfStateTransition);
 
         Dimension d = description.getPreferredSize();
         description.setText(node.getDescription());

@@ -95,7 +95,9 @@ public class EventGraphAssemblyComboMain {
 		{
             LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
-			// A corrupted viskitProject can cause an InvocationTargetException. 
+			// A corrupted viskitProject can cause an InvocationTargetException.
+			// Check the log output.  Try clean all and rebuilding.
+			
 			// The Apache Commons config files have behaved rather well and don't
 			// need to be nuked as of late: 03 DEC 2014.
             // nukeDotViskit(); moved to user preferences

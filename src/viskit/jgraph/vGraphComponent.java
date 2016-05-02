@@ -244,7 +244,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     }
 
     @Override
-    public String getToolTipText(MouseEvent event)
+    public String getToolTipText(MouseEvent event) // TODO review
 	{
         if (event != null)
 		{

@@ -120,6 +120,8 @@ public class ViskitApplicationFrame extends JFrame {
 	
 	private String title = new String();
 	
+	private JMenuItem closeProjectMI = new JMenuItem();
+	
     public ViskitApplicationFrame(String initialFile)
 	{
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME); // default title
@@ -312,9 +314,12 @@ public class ViskitApplicationFrame extends JFrame {
         fileMenu.addSeparator();
 		JMenuItem userPreferencesMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
 		userPreferencesMenuItem.setMnemonic(KeyEvent.VK_U);
+        userPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_MASK));
         fileMenu.add(userPreferencesMenuItem);
         userPreferencesMenuItem.addActionListener(myUserPreferencesHandler);
-//        jamSettingsHandler(fileMenu);
+		
+		closeProjectMI = eventGraphViewFrame.getCloseProjectMI();
+		fileMenu.add(closeProjectMI); // duplicate entry, also on Projects submenu
 		
 		final String QUIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically.
 		quitMenuItem = buildMenuItem(eventGraphController, QUIT_METHOD, "Exit", KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcutKeyMask)); // do not change "quit"
@@ -505,8 +510,15 @@ public class ViskitApplicationFrame extends JFrame {
 			else myTitleListener.setTitle(titles[i], i);
         }
     }
+	
+	public void refreshCloseProjectMI (boolean status)
+	{
+		closeProjectMI.setEnabled(status);
+	}
+	
 	public void buildMenus ()
 	{
+		refreshCloseProjectMI (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen());
 		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // refresh to keep current
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus();
 	}

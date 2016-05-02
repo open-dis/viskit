@@ -97,11 +97,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     private JMenu openRecentEventGraphMenu, openRecentProjectsMenu;
 	
-	private JMenu projectsMenu = new JMenu("Projects");
-	private JMenu eventGraphsMenu     = new JMenu("Event Graphs");
-	private JMenu editMenu     = new JMenu(FRAME_DEFAULT_TITLE);
-    private JMenu helpMenu     = new JMenu("Help");
+	private JMenu projectsMenu    = new JMenu("Projects");
+	private JMenu eventGraphsMenu = new JMenu("Event Graphs");
+	private JMenu editMenu        = new JMenu(FRAME_DEFAULT_TITLE);
+    private JMenu helpMenu        = new JMenu("Help");
 	private viskit.Help help;
+	private JMenuItem closeProjectMI; // expose to top-level menu via getter
 
     private final String  FULLPATH     = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
@@ -112,6 +113,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private EventGraphControllerImpl eventGraphController;
     private int menuShortcutCtrlKeyMask;
 	private boolean pathEditable = false;
+	private boolean boundsInitialized = false;
 	
     /**
      * Constructor; lays out initial GUI objects
@@ -178,7 +180,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		editMenu.setText(FRAME_DEFAULT_TITLE + "   "); // extra wide in order to align menus with tabs
 		
         projectsMenu.setMnemonic(KeyEvent.VK_P);
-            eventGraphsMenu.setMnemonic(KeyEvent.VK_E);
+     eventGraphsMenu.setMnemonic(KeyEvent.VK_E);
             editMenu.setMnemonic(KeyEvent.VK_E); // submenu
 		    helpMenu.setMnemonic(KeyEvent.VK_H);
 
@@ -260,6 +262,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	 */
 	public JMenu getHelpMenu() {
 		return helpMenu;
+	}
+
+	/**
+	 * @return the closeProjectMI
+	 */
+	public JMenuItem getCloseProjectMI() {
+		return closeProjectMI;
 	}
 
     /** Tab switch: this will come in with the newly selected tab in place */
@@ -763,6 +772,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			openRecentEventGraphMenu = buildMenu("Recent Event Graph"); // don't wipe it out if already there!
 			openRecentEventGraphMenu.setToolTipText("open Recent Event Graph");
 			openRecentEventGraphMenu.setMnemonic(KeyEvent.VK_R);
+			// no accelerator hotkey for JMenu
 		}
 		eventGraphController.updateEventGraphFileLists();
 		
@@ -773,6 +783,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
 			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
 		
+		if (ViskitGlobals.instance().getViskitApplicationFrame() != null)
+			ViskitGlobals.instance().getViskitApplicationFrame().refreshCloseProjectMI (isProjectOpen);
+		
         projectsMenu.add(buildMenuItem(eventGraphController, AssemblyControllerImpl.NEWPROJECT_METHOD, "New Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK), true));
         
 		projectsMenu.add(buildMenuItem(this, OPENPROJECT_METHOD, "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_MASK), true));
@@ -781,6 +794,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			openRecentProjectsMenu = buildMenu ("Recent Project");
 			openRecentProjectsMenu.setToolTipText("Open Recent Project");
 			openRecentProjectsMenu.setMnemonic(KeyEvent.VK_R);
+			// no accelerator hotkey for JMenu
 		}
 		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 		if (assemblyController != null)
@@ -816,9 +830,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         zipAndMailProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(zipAndMailProjectMI);
 		
-		JMenuItem closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), isProjectOpen);
+		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), isProjectOpen);
 		closeProjectMI.setEnabled (isProjectOpen);
-		projectsMenu.add(closeProjectMI);
+		projectsMenu.add(closeProjectMI); // duplicate entry, also on top-level ViskitApplicationFrame Files menu
 		
 		// ===================================================
 		// Set up Event Graphs menu
@@ -831,15 +845,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
 		
-        JMenuItem saveEventGraphMI        = buildMenuItem(eventGraphController, EventGraphControllerImpl.SAVE_METHOD,   "Save Event Graph", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), eventGraphVisible);
+        JMenuItem saveEventGraphMI        = buildMenuItem(eventGraphController, EventGraphControllerImpl.SAVE_METHOD,         "Save Event Graph",         KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), eventGraphVisible);
         eventGraphsMenu.add(saveEventGraphMI);
-        JMenuItem saveAsEventGraphMI      = buildMenuItem(eventGraphController, EventGraphControllerImpl.SAVEAS_METHOD, "Save Event Graph as...", KeyEvent.VK_A, null, eventGraphVisible);
+        JMenuItem saveAsEventGraphMI      = buildMenuItem(eventGraphController, EventGraphControllerImpl.SAVEAS_METHOD,       "Save Event Graph as...",   KeyEvent.VK_A, KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutCtrlKeyMask), eventGraphVisible);
         eventGraphsMenu.add(saveAsEventGraphMI);
-        JMenuItem saveEventGraphDiagramMI = buildMenuItem(eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD, "Save Event Graph Diagram", KeyEvent.VK_I, KeyStroke.getKeyStroke(KeyEvent.VK_I, menuShortcutCtrlKeyMask), eventGraphVisible);
+        JMenuItem saveEventGraphDiagramMI = buildMenuItem(eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD, "Save Event Graph Diagram", KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutCtrlKeyMask), eventGraphVisible);
 		eventGraphsMenu.add(saveEventGraphDiagramMI);
-		JMenuItem closeEventGraphMI       = buildMenuItem(eventGraphController, EventGraphControllerImpl.CLOSE_METHOD,    "Close Event Graph", null, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutCtrlKeyMask), eventGraphVisible);
+		JMenuItem closeEventGraphMI       = buildMenuItem(eventGraphController, EventGraphControllerImpl.CLOSE_METHOD,        "Close Event Graph",        KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_W, menuShortcutCtrlKeyMask), eventGraphVisible);
         eventGraphsMenu.add(closeEventGraphMI);
-		JMenuItem closeAllEventGraphsMI   = buildMenuItem(eventGraphController, EventGraphControllerImpl.CLOSEALL_METHOD, "Close All Event Graphs", null, null, eventGraphVisible);
+		JMenuItem closeAllEventGraphsMI   = buildMenuItem(eventGraphController, EventGraphControllerImpl.CLOSEALL_METHOD,     "Close All Event Graphs",   KeyEvent.VK_L, null, eventGraphVisible);
         eventGraphsMenu.add(closeAllEventGraphsMI);
 
 		// ===================================================
@@ -881,15 +895,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.SHOWXML_METHOD,           "View Saved XML",                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_MASK), eventGraphVisible));
         editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.JAVASOURCE_METHOD,        "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_MASK), eventGraphVisible));
-        JMenuItem saveEventGraphDiagramMI2 = 
-				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), eventGraphVisible);
-		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
+//        JMenuItem saveEventGraphDiagramMI2 = 
+//				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), eventGraphVisible);
+		editMenu.add(saveEventGraphDiagramMI); // shown in two places
 
         editMenu.addSeparator();
         editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.EDIT_EVENT_GRAPH_METADATA_METHOD, "Edit Event Graph Properties...",KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcutCtrlKeyMask), eventGraphVisible));
 
 		// ===================================================
         // Create a new menu bar and add the created menus
+		
 		if (myMenuBar == null)
 		{
 			myMenuBar = new JMenuBar();
@@ -899,7 +914,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			try 
 			{
 				help = new viskit.Help(this);
-				help.mainFrameLocated(this.getBounds());
+				if ((this.getBounds().height > 0)  && (this.getBounds().getBounds().width > 0))
+				{
+					help.mainFrameLocated(this.getBounds());
+				}
 				ViskitGlobals.instance().setHelp(help);
 
 				helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
@@ -915,7 +933,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored");
 			}
 		}
+		else checkHelpBounds ();
     }
+	
+	private void checkHelpBounds ()
+	{
+		if (!boundsInitialized && (ViskitGlobals.instance().getViskitApplicationFrame() != null))
+		{
+			Rectangle applicationFrameBounds = ViskitGlobals.instance().getViskitApplicationFrame().getBounds();
+			if ((applicationFrameBounds.height > 0)  && (applicationFrameBounds.getBounds().width > 0))
+			{
+				help.mainFrameLocated(applicationFrameBounds.getBounds());
+				boundsInitialized = true;
+			}
+		}
+	}
 
     // Use the actions package
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled) {
@@ -976,7 +1008,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return newLabel;
     }
 
-    private void setupToolbar() {
+    private void setupToolbar()
+	{
         ButtonGroup modeButtonGroup = new ButtonGroup();
         setToolBar(new JToolBar());
 

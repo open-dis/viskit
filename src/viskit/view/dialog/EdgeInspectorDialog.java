@@ -60,7 +60,7 @@ public class EdgeInspectorDialog extends JDialog {
     private int priorityDefaultIndex = 3;      // set properly below
     private final JLabel schedulingLabel, cancellingLabel;
     private final JButton addConditionalButton, addDescriptionButton;
-    private JTextArea descriptionJta;
+    private JTextArea descriptionTextArea;
     private final JScrollPane descriptionScrollPane;
     private JLabel dotLabel;
 
@@ -155,22 +155,22 @@ public class EdgeInspectorDialog extends JDialog {
         edgeInspectorPanel.add(sourceTargetPanel);
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
-        descriptionJta = new JTextArea(2, 25);
-        descriptionScrollPane = new JScrollPane(descriptionJta);
+        descriptionTextArea = new JTextArea(2, 25);
+        descriptionScrollPane = new JScrollPane(descriptionTextArea);
         descriptionScrollPane.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
-                BorderFactory.createTitledBorder("Description")));
+                BorderFactory.createTitledBorder("description")));
         edgeInspectorPanel.add(descriptionScrollPane);
 
         Dimension descriptionJspDimension = descriptionScrollPane.getPreferredSize();
         descriptionScrollPane.setMinimumSize(descriptionJspDimension);
 
-        descriptionJta.addCaretListener(new CaretListener() {
+        descriptionTextArea.addCaretListener(new CaretListener() {
 
             @Override
             public void caretUpdate(CaretEvent e) {
                 if (changeListener != null) {
-                    changeListener.stateChanged(new ChangeEvent(descriptionJta));
+                    changeListener.stateChanged(new ChangeEvent(descriptionTextArea));
                 }
             }
         });
@@ -270,7 +270,7 @@ public class EdgeInspectorDialog extends JDialog {
         okButton.addActionListener(new applyButtonListener());
 
         final myChangeListener chlis = new myChangeListener();
-        descriptionJta.addKeyListener(chlis);
+        descriptionTextArea.addKeyListener(chlis);
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
         timeDelayVariablesCB.addActionListener(chlis);
@@ -285,7 +285,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         addHideButtonListener hideList = new addHideButtonListener();
         addConditionalButton.addActionListener(hideList);
-        addDescriptionButton.addActionListener(hideList);
+//        addDescriptionButton.addActionListener(hideList);
 
         parameters.addDoubleClickedListener(new ActionListener() {
 
@@ -577,7 +577,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         if (edge.conditionDescription == null || edge.conditionDescription.isEmpty()) {
             setDescription("");
-            hideShowDescription(false);
+            hideShowDescription(true); // nagging is better than ignoring
         } else {
             setDescription(edge.conditionDescription);
             hideShowDescription(true);
@@ -750,8 +750,8 @@ public class EdgeInspectorDialog extends JDialog {
 
     private void setSchedulingType(boolean wh) {
         schedulingType = wh;
-        priorityPanel.setVisible(wh);
-        timeDelayPanel.setVisible(wh);
+          priorityPanel.setVisible(wh);
+         timeDelayPanel.setVisible(wh);
         schedulingLabel.setVisible(wh);
         cancellingLabel.setVisible(!wh);
     }
@@ -765,13 +765,13 @@ public class EdgeInspectorDialog extends JDialog {
     }
 
     public void setDescription(String s) {
-        descriptionJta.setText(s);
+        descriptionTextArea.setText(s);
         modified = true;
         okButton.setEnabled(true);
     }
 
     public String getDescription() {
-        return descriptionJta.getText().trim();
+        return descriptionTextArea.getText().trim();
     }
     private ChangeListener changeListener;
 

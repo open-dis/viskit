@@ -117,7 +117,7 @@ public class EventStateTransitionDialog extends JDialog {
         descriptionTF = new JTextField(25);
         setMaxHeight(descriptionTF);
         actionTF = new JTextField(15);
-        actionTF.setToolTipText("Use this field to provide a method argument, or a value to assign");
+        actionTF.setToolTipText("Use this field to provide an assignment value or a method argument"); // 
         setMaxHeight(actionTF);
         arrayIndexTF = new JTextField(5);
         setMaxHeight(arrayIndexTF);
@@ -183,17 +183,17 @@ public class EventStateTransitionDialog extends JDialog {
             okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
         buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(    okButton);
         buttonPanel.add(cancelButton);
-        buttonPanel.add(okButton);
 
         content.add(buttonPanel);
         content.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
 
         // attach listeners
+            okButton.addActionListener(new  applyButtonListener());
         cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
 
-        enableApplyButtonListener lis = new enableApplyButtonListener();
+        EnableApplyButtonListener lis = new EnableApplyButtonListener();
         descriptionTF.addCaretListener(lis);
         localAssignmentTF.addCaretListener(lis);
         arrayIndexTF.addCaretListener(lis);
@@ -664,7 +664,7 @@ public class EventStateTransitionDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener implements CaretListener, ActionListener {
+    class EnableApplyButtonListener implements CaretListener, ActionListener {
 
         @Override
         public void caretUpdate(CaretEvent event) {

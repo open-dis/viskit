@@ -52,9 +52,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
+		this.setScale(this.getScale() * 1.5f); // TODO set scale properly
 
-        // Set the Tolerance to 2 Pixel
-        setTolerance(2);
+        // Set the Tolerance for minimum movement
+        setTolerance(5); // TODO adjust  // TODO JGraph javadoc set in project
 
         // Jump to default port on connect
         setJumpToDefaultPort(true);
