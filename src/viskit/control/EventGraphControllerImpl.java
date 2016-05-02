@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -151,6 +152,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		if ((newEventGraphMetadata.author == null) || newEventGraphMetadata.author.trim().isEmpty())
 		{
 			newEventGraphMetadata.author = System.getProperty("user.name"); // TODO user preference
+		}
+		if ((newEventGraphMetadata.revision == null) || newEventGraphMetadata.revision.trim().isEmpty())
+		{
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+			newEventGraphMetadata.revision = simpleDateFormat.format(new Date()); // TODO user preference
 		}
 		newEventGraphMetadata.description = "TODO: enter a description for this new event graph";
 
@@ -658,12 +664,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void save () // method name must exactly match preceding string value
 	{
-        EventGraphModel mod = (EventGraphModel) getModel();
-        File localLastFile = mod.getCurrentFile();
-        if (localLastFile == null) {
+        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        File localLastFile = eventGraphModel.getCurrentFile();
+        if (localLastFile == null)
+		{
             saveAs();
-        } else {
-            handleCompileAndSave(mod, localLastFile);
+        }
+		else
+		{
+            handleCompileAndSave(eventGraphModel, localLastFile);
         }
     }
 
@@ -677,7 +686,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = eventGraphView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false, "Save Event Graph File As");
+		String    fileName = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
+        File saveFile = eventGraphView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + fileName + ".xml", false, "Save Event Graph File As");
 
         if (saveFile != null) {
             File localLastFile = eventGraphModel.getCurrentFile();
@@ -1043,17 +1053,20 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         ((EventGraphModel) getModel()).deleteStateVariable(var);
     }
 
-    private boolean checkSave() {
+    private boolean checkSaveForSourceCompile()
+	{
         EventGraphModel eventGraphModel = (EventGraphModel) getModel();
         if (eventGraphModel == null) {return false;}
-        if (eventGraphModel.isDirty() || eventGraphModel.getCurrentFile() == null) {
-            String msg = "The model will be saved.\nContinue?";
+        if (eventGraphModel.isDirty() || eventGraphModel.getCurrentFile() == null)
+		{
+            String message = "The model will be saved.\nContinue?";
             String title = "Confirm";
-            int ret = ((EventGraphView) getView()).genericAskYN(title, msg);
-            if (ret != JOptionPane.YES_OPTION) {
+            int returnValue = ((EventGraphView) getView()).genericAskYN(title, message);
+            if (returnValue != JOptionPane.YES_OPTION)
+			{
                 return false;
             }
-            save();
+            save(); // falls back to saveAs when needed
         }
         return true;
     }
@@ -1063,29 +1076,32 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void generateJavaSource () // method name must exactly match preceding string value
 	{
         EventGraphModel eventGraphModel = (EventGraphModel) getModel();
-        if (eventGraphModel == null) {return;}
+        if (eventGraphModel == null) 
+		{
+			return;
+		}
         File localLastFile = eventGraphModel.getCurrentFile();
-        if (!checkSave() || localLastFile == null) {
+        if (!checkSaveForSourceCompile() || localLastFile == null) {
             return;
         }
-
         SimkitXML2Java simkitXML2Java = null;
         try {
             simkitXML2Java = new SimkitXML2Java(localLastFile);
             simkitXML2Java.unmarshal();
-        } catch (FileNotFoundException fnfe)
+        } 
+		catch (FileNotFoundException fnfe)
 		{	
 			String message = localLastFile.getName() + " updated Event Graph Java file not found when unmarshalling";
 			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph Java file not found" + ViskitGlobals.RECENTER_SPACING, message);
             LOG.error(fnfe);
         }
-
         String source = (ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(simkitXML2Java);
         LOG.debug(source);
-        if (source != null && source.length() > 0) {
+        if (source != null && source.length() > 0)
+		{
             String className = eventGraphModel.getMetadata().packageName + "." +
                     eventGraphModel.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyEditViewFrame().showAndSaveSource(className, source, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyEditViewFrame().showSource(className, source, localLastFile.getName());
         }
     }
 
@@ -1093,10 +1109,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void showXML () // method name must exactly match preceding string value
 	{
-        if (!checkSave() || ((EventGraphModel) getModel()).getCurrentFile() == null) {
+        if (!checkSaveForSourceCompile() || ((EventGraphModel) getModel()).getCurrentFile() == null)
+		{
             return;
         }
-
         ViskitGlobals.instance().getAssemblyEditViewFrame().displayXML(((EventGraphModel) getModel()).getCurrentFile());
     }
 
@@ -1240,7 +1256,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			if (fileName.endsWith(".xml"))
 				fileName = fileName.substring (0, fileName.indexOf(".xml"));
         }
-        File imageFile = ((EventGraphView) getView()).saveFileAsk(fileName + imageSaveCount + ".png", false, "Save Event Graph Diagram Image");
+        File imageFile = ((EventGraphView) getView()).saveFileAsk(fileName + imageSaveCount + ".png", false, "Save Event Graph Diagram");
 
         if (imageFile == null) {
             return;

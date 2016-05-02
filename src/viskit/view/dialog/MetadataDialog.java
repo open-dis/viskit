@@ -23,8 +23,8 @@ import viskit.ViskitStatics;
  * @since 3:52:05 PM
  * @version $Id$
  */
-abstract public class MetadataDialog extends JDialog {
-
+abstract public class MetadataDialog extends JDialog // TODO add clear, update buttons
+{
     protected static boolean modified = false;
     protected JComponent runtimePanel;
     private   JButton    cancelButton;
@@ -74,7 +74,7 @@ abstract public class MetadataDialog extends JDialog {
         textFieldPanel.add(revisionTF);
 
         JLabel pathLabel = new JLabel("path", JLabel.TRAILING);
-        pathTF = new JTextField(20);
+        pathTF = new JTextField(60);
 		pathTF.setEditable (graphMetadata.pathEditable);
         pathLabel.setLabelFor(pathTF);
         textFieldPanel.add(pathLabel);
@@ -114,8 +114,27 @@ abstract public class MetadataDialog extends JDialog {
 			implementsLabel.setLabelFor(implementsTF);
 			textFieldPanel.add(implementsLabel);
 			textFieldPanel.add(implementsTF);
+
+			JLabel descriptionLabel = new JLabel("description", JLabel.TRAILING);
+			descriptionLabel.setToolTipText("Good descriptions make the purpose of a model understandable and clear");
+			descriptionLabel.setSize(implementsLabel.getSize());
+			descriptionLabel.setVerticalAlignment(JLabel.TOP);
+			textFieldPanel.add(descriptionLabel);
+//			metaDataDialogPanel.add(Box.createVerticalStrut(5));
+
+			descriptionTextArea = new JTextArea(6, 40);
+			descriptionTextArea.setWrapStyleWord(true);
+			descriptionTextArea.setLineWrap(true);
+			descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+			JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
+			descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+			descriptionScrollPane.setBorder(authorTF.getBorder());
+
+			descriptionLabel.setLabelFor(descriptionScrollPane); // TODO not working
+			textFieldPanel.add(descriptionScrollPane);
+			textFieldPanel.add(Box.createVerticalStrut(5));
 			
-			rowCount = 7;
+			rowCount = 8;
 		}
 		
         // Lay out the panel
@@ -151,22 +170,6 @@ abstract public class MetadataDialog extends JDialog {
 
         metaDataDialogPanel.add(runtimePanel);
 
-        JLabel descriptionLabel = new JLabel("description");
-        descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        metaDataDialogPanel.add(descriptionLabel);
-        metaDataDialogPanel.add(Box.createVerticalStrut(5));
-
-        descriptionTextArea = new JTextArea(6, 40);
-        descriptionTextArea.setWrapStyleWord(true);
-        descriptionTextArea.setLineWrap(true);
-        descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
-        JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
-        descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        descriptionScrollPane.setBorder(authorTF.getBorder());
-
-        metaDataDialogPanel.add(descriptionScrollPane);
-        metaDataDialogPanel.add(Box.createVerticalStrut(5));
-
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -197,8 +200,9 @@ abstract public class MetadataDialog extends JDialog {
 
     private void fillWidgets() 
 	{
-        if (graphMetadata == null) {
-            graphMetadata = new GraphMetadata();
+        if (graphMetadata == null)
+		{
+            graphMetadata = new GraphMetadata(); // re-initialize
         }
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
@@ -207,7 +211,7 @@ abstract public class MetadataDialog extends JDialog {
 		if      (this instanceof AssemblyMetadataDialog)
 			 path = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
 		else if (this instanceof EventGraphMetadataDialog)
-			 path = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
+			 path = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().getPath();
 		else if ((this instanceof ProjectMetadataDialog) && (ViskitGlobals.instance().getCurrentViskitProject() != null))
 			 path = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
 		else if ( this instanceof ProjectMetadataDialog)
@@ -217,9 +221,11 @@ abstract public class MetadataDialog extends JDialog {
                      nameTF.setText(graphMetadata.name);
                    authorTF.setText(graphMetadata.author);
                  revisionTF.setText(graphMetadata.revision);
-                     pathTF.setText(path);
+                     pathTF.setText       (path);
+                     pathTF.setToolTipText(path);
 					 pathTF.setEditable(graphMetadata.pathEditable);
         descriptionTextArea.setText(graphMetadata.description);
+        descriptionTextArea.setToolTipText(graphMetadata.description);
                  stopTimeTF.setText(graphMetadata.stopTime);
                   verboseCB.setSelected(graphMetadata.verbose);
                      nameTF.selectAll();
@@ -268,8 +274,8 @@ abstract public class MetadataDialog extends JDialog {
 			graphMetadata.stopTime = stopTimeTF.getText().trim();
 			graphMetadata.verbose  =  verboseCB.isSelected();
 		}
-		
 		graphMetadata.updated = true;
+		modified = true;
     }
 
     class cancelButtonListener implements ActionListener {

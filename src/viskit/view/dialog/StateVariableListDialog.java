@@ -33,15 +33,15 @@ import javax.swing.table.TableColumnModel;
 public class StateVariableListDialog extends JDialog {
 
     private static StateVariableListDialog dialog;
-    public  static int NO_SELECTION = -1;
-    private static int selection    = NO_SELECTION;
+    public  static final int NO_SELECTION = -1;
+    private static       int selection    = NO_SELECTION;
     private String[][] beanParameterNamesTypes;
     private JButton okButton,  cancelButton;
     private JTable table;
     private JPanel buttonPanel;
     public static String newProperty;
-	private Point newLocation = new Point();
-	private int   parentWidth;
+	private final Point newLocation = new Point();
+	private final int   parentWidth;
 
     String[] columnNames = {"State Variable", "type", "description"};
 
@@ -110,7 +110,7 @@ public class StateVariableListDialog extends JDialog {
 
         getRootPane().setDefaultButton(cancelButton);
         pack();
-//        setLocationRelativeTo(c);
+//      setLocationRelativeTo(c);
 		newLocation.x = newLocation.x - ((this.getWidth() - parentWidth) / 2); // shift left, center sub-panel
 		this.setLocation(newLocation);
     }

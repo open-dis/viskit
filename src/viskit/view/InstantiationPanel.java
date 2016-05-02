@@ -2,9 +2,9 @@ package viskit.view;
 
 import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
+import edu.nps.util.TempFileManager;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
@@ -28,6 +28,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.VInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -42,6 +43,8 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @version $Id$
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
+
+    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
     private static final int FREEFORM = 0, CONSTRUCTOR = 1, FACTORY = 2;
 
@@ -141,6 +144,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         add(Box.createVerticalStrut(5));
         add(instantiationPane);
+		
+		packMeOwnerDialog.pack(); // TODO doesn't appear to be working
 
         methodCB.addActionListener(new ActionListener()
 		{
@@ -193,16 +198,18 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         });
     }
 
-    public VInstantiator getData() {
-        switch (methodCB.getSelectedIndex()) {
+    public VInstantiator getData()
+	{
+        switch (methodCB.getSelectedIndex())
+		{
             case FREEFORM:
-                return freeFormPanel.getData();
+                return    freeFormPanel.getData();
             case CONSTRUCTOR:
                 return constructorPanel.getData();
             case FACTORY:
                 return     factoryPanel.getData();
             default:
-                System.err.println("bad data Instantiation panel getData()");
+				LOG.error("Instantiation panel bad invocation for getData()");
                 return null;
         }
     }
@@ -269,7 +276,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 			
 			initialize ();
         }
-		private final void initialize ()
+		private void initialize ()
 		{
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -317,24 +324,30 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
      */
     class ConstrPanel extends JPanel implements ActionListener, CaretListener {
 
-        private JTabbedPane tabbedPane;
+        private final JTabbedPane tabbedPane;
 
         private ConstructorPanel[]        constructorPanels;
 		private VInstantiator.Construct[] constructors;
 		private String[]                  parametersSignature;
 
-        private String noParametersString = "(no parameters)";
+        private final String noParametersString = "(no parameters)";
 
-        private ImageIcon checkMark;
+        private final ImageIcon checkMark;
 
-        private InstantiationPanel instantiationPanel;
+        private final InstantiationPanel instantiationPanel;
 
-        public ConstrPanel(InstantiationPanel instantiationPanel) {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        public ConstrPanel(InstantiationPanel instantiationPanel)
+		{
             this.instantiationPanel = instantiationPanel;
             tabbedPane = new JTabbedPane();
-            checkMark = new ImageIcon(ClassLoader.getSystemResource("viskit/images/checkMark.png"));
+            checkMark  = new ImageIcon(ClassLoader.getSystemResource("viskit/images/checkMark.png"));
+			
+			initialize ();
         }
+		private void initialize ()
+		{
+            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		}
 
         private String typeName;
 		private int constructorTabCount = 0;
@@ -371,7 +384,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 						for (int j = 0; j < constructors[i].getArgs().size(); j++)
 						{
 							String typeName = ((Parameter)parameters[i].get(j)).getType();
-							String     name = "";
 							if      (typeName == null)
 								     typeName = ""; // Error condition
 							else if (typeName.contains("."))
@@ -380,7 +392,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
 							if (!((VInstantiator) (constructors[i].getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
 							{
-								name = ((Parameter)parameters[i].get(j)).getName();
+								String name = ((Parameter)parameters[i].get(j)).getName();
 								((VInstantiator) (constructors[i].getArgs().get(j))).setName(name);
 								parametersSignature[i] += " " + name;
 							}

@@ -12,18 +12,20 @@ import javax.tools.JavaFileObject;
 public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> {
 
     public long startOffset = -1;
-    public long endOffset = 0;
-    public long lineNumber;
+    public long   endOffset = 0;
+    public long   lineNumber;
     public long columnNumber = 0;
 
     private StringBuilder messageString;
 
-    public CompilerDiagnosticsListener(StringBuilder messageString) {
+    public CompilerDiagnosticsListener(StringBuilder messageString)
+	{
         this.messageString = messageString;
     }
 
     @Override
-    public void report(Diagnostic<? extends JavaFileObject> message) {
+    public void report(Diagnostic<? extends JavaFileObject> message)
+	{
         String msg = message.getMessage(null);
 
         messageString.append(msg);
@@ -59,7 +61,7 @@ public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileO
             startOffset = startOffset < message.getStartPosition() ? startOffset : message.getStartPosition();
         }
 
-        endOffset = message.getEndPosition();
+         endOffset = message.getEndPosition();
         lineNumber = message.getLineNumber();
     }
 

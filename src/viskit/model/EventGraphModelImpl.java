@@ -131,7 +131,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
                 GraphMetadata newMetadata = new GraphMetadata(this);
                 newMetadata.author                = jaxbSimEntity.getAuthor();
-                newMetadata.revision               = jaxbSimEntity.getVersion();
+                newMetadata.revision              = // Previous jaxbSimEntity.getVersion();
                 newMetadata.name                  = jaxbSimEntity.getName();
                 newMetadata.packageName           = jaxbSimEntity.getPackage();
                 newMetadata.extendsPackageName    = jaxbSimEntity.getExtend();

@@ -530,11 +530,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void save () // method name must exactly match preceding string value 
 	{
-        AssemblyModel mod = (AssemblyModel) getModel();
-        if (mod.getLastFile() == null) {
-            saveAs();
-        } else {
-            mod.saveModel(mod.getLastFile());
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel.getLastFile() == null)
+		{
+            saveAs ();
+        } 
+		else
+		{
+            assemblyModel.saveModel(assemblyModel.getLastFile());
         }
     }
 
@@ -545,10 +548,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel model         = (AssemblyModel) getModel();
         AssemblyView  view          = (AssemblyView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
+		String    fileName = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false, "Save Assembly File As");
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + fileName + ".xml", false, "Save Assembly File As");
 
         if (saveFile != null) {
 
@@ -1066,8 +1070,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
         return nextPoint;
     }
-	
-	private final String defaultDescription = "TODO add description"; // nagging is better than ignoring
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
@@ -1077,10 +1079,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (o != null) {
             if (o instanceof Class<?>) {
-                newEventGraphNode(((Class<?>) o).getName(), getNextPoint(), defaultDescription);
+                newEventGraphNode(((Class<?>) o).getName(), getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
                 return;
             } else if (o instanceof FileBasedAssemblyNode) {
-                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint(), defaultDescription);
+                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
                 return;
             }
         }
@@ -1095,7 +1097,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newEventGraphNode(String typeName, Point point)
 	{
         String shortName = shortEventGraphName(typeName);
-        ((AssemblyModel) getModel()).newEventGraph(shortName, typeName, point, defaultDescription);
+        ((AssemblyModel) getModel()).newEventGraph(shortName, typeName, point, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
@@ -1109,7 +1111,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point)
 	{
         String shortName = shortEventGraphName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, defaultDescription);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
@@ -1145,7 +1147,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newPropertyChangeListenerNode(String name, Point p) {
         String shortName = shortPropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, defaultDescription);
+        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
@@ -1157,7 +1159,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shortName = shortPropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, defaultDescription);
+        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
@@ -1644,25 +1646,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void showXML () // method name must exactly match preceding string value
 	{
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+		
+        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
             return;
         }
 
-        ((AssemblyView) getView()).displayXML(vmod.getLastFile());
+        ((AssemblyView) getView()).displayXML(assemblyModel.getLastFile()); // TODO getCurrentFile ?
     }
 
-    private boolean checkSaveForSourceCompile() {
-        AssemblyModel vmod = (AssemblyModel) getModel();
+    private boolean checkSaveForSourceCompile()
+	{
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
 
         // Perhaps a cached file is no longer present in the path
-        if (vmod == null) {return false;}
-        if (vmod.isDirty() || vmod.getLastFile() == null) {
-            int ret = ((AssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
-            if (ret != JOptionPane.YES_OPTION) {
+        if (assemblyModel == null) {return false;}
+        if (assemblyModel.isDirty() || assemblyModel.getLastFile() == null)
+		{
+            int returnValue = ((AssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
+            if (returnValue != JOptionPane.YES_OPTION)
+			{
                 return false;
             }
-            this.saveAs();
+            this.save(); // falls back to saveAs when needed
         }
         return true;
     }
@@ -1675,7 +1681,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
             String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
-            ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
+            ((AssemblyView) getView()).showSource(className, source, vmod.getLastFile().getName());
         }
     }
 
@@ -2150,13 +2156,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void windowImageCapture () // method name must exactly match preceding string value
 	{
         AssemblyModel vmod = (AssemblyModel) getModel();
-        String fileName = "AssemblyDiagram"; // default, replaced by filename
-        if (vmod.getLastFile() != null) {
-            fileName = vmod.getLastFile().getName();
-			if (fileName.endsWith(".xml"))
-				fileName = fileName.substring (0, fileName.indexOf(".xml"));
+        String assemblyDiagramfileName = "AssemblyDiagram"; // default, replaced by filename
+        if (vmod.getLastFile() != null)
+		{
+            assemblyDiagramfileName = vmod.getLastFile().getName();
+            assemblyDiagramfileName = assemblyDiagramfileName.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
+			if (assemblyDiagramfileName.endsWith(".xml"))
+				assemblyDiagramfileName = assemblyDiagramfileName.substring (0, assemblyDiagramfileName.indexOf(".xml"));
         }
-        File imageFile = ((AssemblyView) getView()).saveFileAsk(fileName + imageSaveCount + ".png", true, "Save Assembly Diagram Image");
+        File imageFile = ((AssemblyView) getView()).saveFileAsk(assemblyDiagramfileName + imageSaveCount + ".png", true, "Save Assembly Diagram");
         if (imageFile == null) {
             return;
         }
@@ -2386,8 +2394,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         int index = 0;
 
         // The value's modelPath is already delimited with "/"
-        for (File value : recentFiles) {
-            historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@value]", value.getPath());
+        for (File recentFile : recentFiles) {
+            historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@value]", recentFile.getPath());
             index++;
         }
         historyXMLConfiguration.getDocument().normalize();
@@ -2397,11 +2405,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      *
      * @param recentFiles a Set of recently opened projects
      */
-    private void saveProjectHistoryXML(Set<File> recentFiles) {
-        int ix = 0;
-        for (File value : recentFiles) {
-            historyXMLConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
-            ix++;
+    private void saveProjectHistoryXML(Set<File> recentFiles)
+	{
+        int index = 0;
+        for (File recentFile : recentFiles) {
+            historyXMLConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + index + ")[@value]", recentFile.getPath());
+            index++;
         }
         historyXMLConfiguration.getDocument().normalize();
     }

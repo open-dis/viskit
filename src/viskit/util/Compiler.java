@@ -34,24 +34,24 @@ public class Compiler {
     private static OutputStream baosOut;
 
     /** Compiler diagnostic object */
-    private static CompilerDiagnosticsListener diag;
+    private static CompilerDiagnosticsListener compilerDiagnosticsListener;
 
     /** Call the java compiler to test compile our event graph java source
      *
-     * @param pkg package containing java file
+     * @param packageName package containing java file
      * @param className name of the java file
-     * @param src a string containing the full source code
+     * @param sourceCode a string containing the full source code
      * @return diagnostic messages from the compiler
      */
-    public static String invoke(String pkg, String className, String src) {
+    public static String invoke(String packageName, String className, String sourceCode) {
 
         StringBuilder diagnosticMessages = new StringBuilder();
         StandardJavaFileManager sjfm = null;
         StringBuilder classPaths;
-        String cp;
+        String classPath;
 
-        if (pkg != null && !pkg.isEmpty()) {
-            pkg += ".";
+        if (packageName != null && !packageName.isEmpty()) {
+            packageName += ".";
         }
 
         try {
@@ -61,37 +61,37 @@ public class Compiler {
             // JDK's java.exe.  If so, correct the Path in Computer ->
             // Properties -> Advanced system settings -> Environment variables
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            diag = new CompilerDiagnosticsListener(diagnosticMessages);
-            sjfm = compiler.getStandardFileManager(diag, null, null);
+            compilerDiagnosticsListener = new CompilerDiagnosticsListener(diagnosticMessages);
+            sjfm = compiler.getStandardFileManager(compilerDiagnosticsListener, null, null);
 
-            JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
-            Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
-            File workDir = ViskitGlobals.instance().getWorkDirectory();
-            String workDirPath = workDir.getCanonicalPath();
+            JavaObjectFromString javaObjectFromString = new JavaObjectFromString(packageName + className, sourceCode);
+            Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(javaObjectFromString);
+            File workDirectory = ViskitGlobals.instance().getWorkDirectory();
+            String workDirectoryPath = workDirectory.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
             String[] workClassPath = ((viskit.doe.LocalBootLoader) (ViskitGlobals.instance().getWorkClassLoader())).getClassPath();
-            int wkpLength = workClassPath.length;
-            classPaths = new StringBuilder(wkpLength);
+            int workClassPathLength = workClassPath.length;
+            classPaths = new StringBuilder(workClassPathLength);
 
-            for (String cPath : workClassPath) {
-                classPaths.append(cPath);
+            for (String nextClassPath : workClassPath) {
+                classPaths.append(nextClassPath);
                 classPaths.append(File.pathSeparator);
             }
 
             // Get rid of the last ";" or ":" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
-            cp = classPaths.toString();
-            log.debug("cp is: " + cp);
+            classPath = classPaths.toString();
+            log.debug("classPath is: " + classPath);
 
             String[] options = {
                 "-Xlint:unchecked",
                 "-Xlint:deprecation",
                 "-cp",
-                 cp,
+                 classPath,
                 "-d",
-                workDirPath
+                workDirectoryPath
             };
             java.util.List<String> optionsList = Arrays.asList(options);
 
@@ -101,7 +101,7 @@ public class Compiler {
 
             compiler.getTask(new BufferedWriter(new OutputStreamWriter(baosOut)),
                     sjfm,
-                    diag,
+                    compilerDiagnosticsListener,
                     optionsList,
                     null,
                     fileObjects).call();
@@ -110,14 +110,14 @@ public class Compiler {
             if (diagnosticMessages.toString().isEmpty()) {
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
             }
-        } catch (Exception ex)
+        } 
+		catch (Exception ex)
 		{
-            if (ex instanceof NullPointerException) {
-
+            if (ex instanceof NullPointerException)
+			{
                 String message = "Your environment variable for Path likely has the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
-                                + "Please reset your Path to have the JDK's "
-                                + "java.exe first in the Path";
+                                + "Please reset your Path to have the JDK's java.exe first in the Path";
 				
 				// TODO fixable?
 
@@ -154,7 +154,7 @@ public class Compiler {
      * @return the compiler diagnostic tool
      */
     public static CompilerDiagnosticsListener getDiagnostic() {
-        return diag;
+        return compilerDiagnosticsListener;
     }
 
 } // end class file Compiler.java

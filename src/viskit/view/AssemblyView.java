@@ -122,7 +122,7 @@ public interface AssemblyView {
      * @param sourceText Java source
      * @param filename the source file's name
      */
-    void showAndSaveSource(String className, String sourceText, String filename);
+    void showSource(String className, String sourceText, String filename);
 
     /**
      * Shows the XML representation of the given file

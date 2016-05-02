@@ -28,20 +28,22 @@ import viskit.view.InstantiationPanel;
 public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
     private final JLabel     nameLabel;
-    private final JLabel     typeLabel;
+	private final JLabel     typeLabel;
     private final JTextField nameTF;    // Text field that holds the parameter name
     private final JTextField typeNameTF;
+    private final JTextField descriptionTF;
+    private final JLabel     descriptionLabel;
     private InstantiationPanel instantiationPanel;
     private Class<?> myClass;
     private static PropertyChangeListenerNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropertyChangeListenerNode propertyChangeListenerNode;
     private final JButton okButton, cancelButton;
-    private final EnableApplyButtonListener lis;
-    JPanel buttonPanel;
-    private final JCheckBox clearStatisticsCB, getMeanStatisticsCB, getCountStatisticsCB;
-    private final JTextField descriptionTF;
-    private final JLabel descriptionLabel;
+    private final EnableApplyButtonListener enableApplyButtonListener;
+	JPanel statisticsContainerPanel = new JPanel();
+    JPanel buttonPanel              = new JPanel();
+    private final JRadioButton getMeanStatisticsRB, getCountStatisticsRB;
+    private final JCheckBox    clearStatisticsCB;
 
     public static boolean showDialog(JFrame f, PropertyChangeListenerNode parm) {
         try {
@@ -70,7 +72,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new MyCloseListener());
 
-        lis = new EnableApplyButtonListener();
+        enableApplyButtonListener = new EnableApplyButtonListener();
 
         JPanel content = new JPanel();
         setContentPane(content);
@@ -81,36 +83,38 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
         nameTF = new JTextField();
         ViskitStatics.clampHeight(nameTF);
-        nameTF.addCaretListener(lis);
+        nameTF.addCaretListener(enableApplyButtonListener);
         nameLabel = new JLabel("name", JLabel.TRAILING);
         nameLabel.setLabelFor(nameTF);
 
         descriptionTF = new JTextField();
         ViskitStatics.clampHeight(descriptionTF);
-        descriptionTF.addCaretListener(lis);
+        descriptionTF.addCaretListener(enableApplyButtonListener);
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
         descriptionLabel.setLabelFor(descriptionTF);
 
-        typeLabel = new JLabel("type", JLabel.TRAILING);
+        typeLabel  = new JLabel("type", JLabel.TRAILING);
         typeNameTF = new JTextField();
         ViskitStatics.clampHeight(typeNameTF);
         typeNameTF.setEditable(false);
         typeLabel.setLabelFor(typeNameTF);
 
+        statisticsContainerPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+                    "Statistics configuration", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+
         clearStatisticsCB = new JCheckBox("Clear statistics after each replication");
         clearStatisticsCB.setSelected(true); // bug 706
-        clearStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        clearStatisticsCB.addActionListener(lis);
+        clearStatisticsCB.setAlignmentX(JCheckBox.LEFT_ALIGNMENT);
+        clearStatisticsCB.addActionListener(enableApplyButtonListener);
 
-        getMeanStatisticsCB = new JCheckBox("Obtain mean statistics only");
-        getMeanStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getMeanStatisticsCB.addActionListener(new GetMeanStatisticsCBListener());
+        getMeanStatisticsRB = new JRadioButton("Obtain mean statistics only");
+        getMeanStatisticsRB.setAlignmentX(JCheckBox.LEFT_ALIGNMENT);
+        getMeanStatisticsRB.addActionListener(new GetMeanStatisticsCBListener());
 
-        getCountStatisticsCB = new JCheckBox("Obtain raw count statistics only");
-        getCountStatisticsCB.setAlignmentX(JCheckBox.CENTER_ALIGNMENT);
-        getCountStatisticsCB.addActionListener(new GetCountStatisticsCBListener());
+        getCountStatisticsRB = new JRadioButton("Obtain raw count statistics only");
+        getCountStatisticsRB.setAlignmentX(JCheckBox.LEFT_ALIGNMENT);
+        getCountStatisticsRB.addActionListener(new GetCountStatisticsCBListener());
 
-        buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
@@ -151,7 +155,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
                typeNameTF.setText(propertyChangeListenerNode.getType());
             descriptionTF.setText(propertyChangeListenerNode.getDescription());
 
-            instantiationPanel = new InstantiationPanel(this, lis, true);
+            instantiationPanel = new InstantiationPanel(this, enableApplyButtonListener, true);
             setupInstantiationPanel();
             instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     "Listener initialization", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
@@ -175,27 +179,30 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 
             content.add(containerPanel);
 
+            // No need to display mean and count CBs for a SPD PCL
+            if (!propertyChangeListenerNode.getType().contains("SimplePropertyDumper"))
+			{
+                getMeanStatisticsRB.setSelected(propertyChangeListenerNode.isGetMean());
+                statisticsContainerPanel.add(getMeanStatisticsRB);
+                statisticsContainerPanel.add(Box.createVerticalStrut(3));
+
+                getCountStatisticsRB.setSelected(propertyChangeListenerNode.isGetCount());
+                statisticsContainerPanel.add(getCountStatisticsRB);
+                statisticsContainerPanel.add(Box.createVerticalStrut(3));
+            }
             /* Put up a "clear statistics after each replication" checkbox if
              * type is descendent of one of these:
              */
-            if (propertyChangeListenerNode.isSampleStatistics()) {
+            if (propertyChangeListenerNode.isSampleStatistics())
+			{
                 clearStatisticsCB.setSelected(propertyChangeListenerNode.isClearStatisticsAfterEachRun());
-                content.add(clearStatisticsCB);
-                content.add(Box.createVerticalStrut(3));
-            }
-
-            // No need to display mean and count CBs for a SPD PCL
-            if (!propertyChangeListenerNode.getType().contains("SimplePropertyDumper")) {
-                getMeanStatisticsCB.setSelected(propertyChangeListenerNode.isGetMean());
-                content.add(getMeanStatisticsCB);
-                content.add(Box.createVerticalStrut(3));
-
-                getCountStatisticsCB.setSelected(propertyChangeListenerNode.isGetCount());
-                content.add(getCountStatisticsCB);
-                content.add(Box.createVerticalStrut(3));
+                statisticsContainerPanel.add(clearStatisticsCB);
+                statisticsContainerPanel.add(Box.createVerticalStrut(3));
             }
 
             content.add(instantiationPanel);
+            content.add(Box.createVerticalStrut(5));
+			content.add(statisticsContainerPanel);
             content.add(Box.createVerticalStrut(5));
             content.add(buttonPanel);
             setContentPane(content);
@@ -204,7 +211,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
     }
 
-    private void unloadWidgets() {
+    private void unloadWidgets()
+	{
         String name = nameTF.getText();
         name = name.replaceAll("\\s", "");
         if (propertyChangeListenerNode != null)
@@ -212,12 +220,13 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
             propertyChangeListenerNode.setName(name);
             propertyChangeListenerNode.setDescription(descriptionTF.getText().trim());
             propertyChangeListenerNode.setInstantiator(instantiationPanel.getData());
+			
+            propertyChangeListenerNode.setGetCount(getCountStatisticsRB.isSelected());
+            propertyChangeListenerNode.setGetMean (getMeanStatisticsRB.isSelected());
             if (propertyChangeListenerNode.isSampleStatistics())
 			{
                 propertyChangeListenerNode.setClearStatisticsAfterEachRun(clearStatisticsCB.isSelected());
             }
-            propertyChangeListenerNode.setGetCount(getCountStatisticsCB.isSelected());
-            propertyChangeListenerNode.setGetMean (getMeanStatisticsCB.isSelected());
         }
     }
 
@@ -238,8 +247,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
-            boolean isSelected = getMeanStatisticsCB.isSelected();
-            getCountStatisticsCB.setSelected(!isSelected);
+            boolean isSelected = getMeanStatisticsRB.isSelected();
+            getCountStatisticsRB.setSelected(!isSelected);
             caretUpdate(null);
         }
     }
@@ -253,8 +262,8 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
-            boolean isSelected = getCountStatisticsCB.isSelected();
-            getMeanStatisticsCB.setSelected(!isSelected);
+            boolean isSelected = getCountStatisticsRB.isSelected();
+            getMeanStatisticsRB.setSelected(!isSelected);
             caretUpdate(null);
         }
     }

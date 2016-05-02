@@ -2,7 +2,6 @@ package viskit.view.dialog;
 
 import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
-import edu.nps.util.TempFileManager;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -39,8 +38,8 @@ import viskit.model.ViskitElement;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class PclEdgeInspectorDialog extends JDialog {
-
+public class PclEdgeInspectorDialog extends JDialog
+{
     private JLabel  sourceLabel,  propertyLabel,  descriptionLabel,  targetLabel;
     private JTextField sourceTF,  propertyTF,     descriptionTF,     targetTF;
     private JPanel propertyTFPanel;
@@ -65,7 +64,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 		
 		initialize ();
 
-        setParams(parent, this.pclEdge);
+        setParameters(parent, this.pclEdge);
     }
 	
 	private void initialize ()
@@ -150,7 +149,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         } 
 		else 
 		{
-            pclEdgeInspectorDialog.setParams(parentFrame, parm);
+            pclEdgeInspectorDialog.setParameters(parentFrame, parm);
         }
         pclEdgeInspectorDialog.setVisible(true); // this call blocks while panel dialog is shown
 		
@@ -171,7 +170,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         }
     }
 
-    public final void setParams(Component c, PropertyChangeListenerEdge p)
+    public final void setParameters(Component c, PropertyChangeListenerEdge p)
 	{
         pclEdge = p;
 
@@ -189,7 +188,7 @@ public class PclEdgeInspectorDialog extends JDialog {
 	{
         if (pclEdge != null)
 		{
-			String fromText         = "";
+			String fromText, toText;
 			try
 			{
 				String fromClassName    = ((EventGraphNode) pclEdge.getFrom()).getType();
@@ -211,7 +210,6 @@ public class PclEdgeInspectorDialog extends JDialog {
 				fromText = pclEdge.getFrom().toString();
 			}
 			
-			String toText         = "";
 			try
 			{
 				String toClassName    = ((PropertyChangeListenerNode) pclEdge.getTo()).getType();

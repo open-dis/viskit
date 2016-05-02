@@ -1159,8 +1159,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (eventGraphNode != null) {
             return eventGraphNode;
         }
-		String defaultDescription = "TODO add description"; // better to nag than ignore
-        eventGraphNode = new EventGraphNode(simEntity.getName(), simEntity.getType(), defaultDescription);
+        eventGraphNode = new EventGraphNode(simEntity.getName(), simEntity.getType(), ViskitStatics.DEFAULT_DESCRIPTION);
 
         Coordinate coor = simEntity.getCoordinate();
         if (coor == null) {

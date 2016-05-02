@@ -242,7 +242,7 @@ public class ViskitGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public mvcAbstractJFrameView buildEventGraphViewFrame()
+    public EventGraphViewFrame buildEventGraphViewFrame()
 	{
         eventGraphController   = new EventGraphControllerImpl();
         eventGraphViewFrame    = new EventGraphViewFrame(eventGraphController);
@@ -250,7 +250,7 @@ public class ViskitGlobals {
         return eventGraphViewFrame;
     }
 
-    public mvcController getEventGraphController() {
+    public EventGraphControllerImpl getEventGraphController() {
         return eventGraphController;
     }
 
@@ -298,7 +298,7 @@ public class ViskitGlobals {
     /* AnalystReport model / view / controller */
 
     /* routines to manage the singleton-aspect of the view */
-    mvcAbstractJFrameView AnalystReportFrame;
+    AnalystReportFrame AnalystReportFrame;
     mvcController analystReportController;
 
     /**

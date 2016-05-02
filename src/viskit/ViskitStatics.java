@@ -96,6 +96,7 @@ public class ViskitStatics {
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
     public static final String VISKIT_MAILING_LIST = "viskit@www.movesinstitute.org";
     public static final String DEFAULT_DESCRIPTION = "TODO add description"; // better to nag than ignore
+    public static final String EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success, red = modifications need saving or compile failure";
 
     public static final String FULL_PATH = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";

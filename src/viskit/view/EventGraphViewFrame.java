@@ -542,7 +542,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // but this call serves also to register the view with the passed eventGraphModel
         // by virtue of calling stateChanged()
         tabbedPane.add("EventGraph" + nextTabIndex, graphPane.drawingSplitPane);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, eventGraphModel.getMetadata().description);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, ViskitStatics.EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS); // TODO eventGraphModel.getMetadata().description);
 
         // Bring the JGraph component to front. Also, allows models their own
         // canvas to draw to prevent a NPE
@@ -793,17 +793,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		boolean   assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
 
 		 // ensures selected before allowing deletion
-        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (eventGraphVisible && hasActiveEventGraph()));
+        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
 		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteEventGraphFromProjectMI);
 
 		 // ensures selected before allowing deletion
-        JMenuItem deleteAssemblyFromProjectMI = buildMenuItem(this, "deleteAssemblyFromProject", "Delete Assembly from Project",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), (assemblyVisible && hasActiveAssembly()));
+        JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, "deleteAssemblyFromProject",   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous no hotkey */, (assemblyVisible && hasActiveAssembly()));
 		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
 		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
-        JMenuItem renameProjectMI = buildMenuItem(this, "renameProject", "Rename Project",      KeyEvent.VK_R, KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK), isProjectOpen);
+        JMenuItem renameProjectMI               = buildMenuItem(this, "renameProject",                "Rename Project",                   KeyEvent.VK_R, null /* dangerous no hotkey */, isProjectOpen);
 		renameProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(renameProjectMI);
 
@@ -879,10 +879,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         ActionIntrospector.getAction(eventGraphController, EventGraphControllerImpl.NEWSELFCANCELLINGEDGE_METHOD).setEnabled(false);
 
         editMenu.addSeparator();
-        editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.SHOWXML_METHOD,           "View Saved XML",                KeyEvent.VK_X, null, eventGraphVisible));
-        editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.JAVASOURCE_METHOD,        "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.SHOWXML_METHOD,           "View Saved XML",                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_MASK), eventGraphVisible));
+        editMenu.add(buildMenuItem(  eventGraphController, EventGraphControllerImpl.JAVASOURCE_METHOD,        "Generate, Compile Java Source", KeyEvent.VK_J, KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_MASK), eventGraphVisible));
         JMenuItem saveEventGraphDiagramMI2 = 
-				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_D, null, eventGraphVisible);
+				     buildMenuItem(  eventGraphController, EventGraphControllerImpl.IMAGECAPTURE_METHOD,      "Save Event Graph Diagram",      KeyEvent.VK_D, KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK), eventGraphVisible);
 		editMenu.add(saveEventGraphDiagramMI2); // shown in two places
 
         editMenu.addSeparator();
@@ -1129,7 +1129,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     }
 
-    /** Changes the background color of EG tabs depending on eventGraphModel.isDirty()
+    /** Changes the background color of Event Graph tabs depending on eventGraphModel.isDirty()
 	 * status to give the user an indication of a good/bad save &amp; compile
      * operation.  Of note is that the default L&amp;F on must be selected for
      * Windows machines, else no color will be visible.  On Macs, the platform

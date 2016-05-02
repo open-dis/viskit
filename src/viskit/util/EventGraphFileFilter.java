@@ -3,7 +3,7 @@
  *
  * Created on:  December 17, 2007, 0413Z
  *
- * Refenences:  This code adapted from Roedy Green's FileFilter suite at:
+ * References:  This code adapted from Roedy Green's FileFilter suite at:
  *              <a href="http://mindprod.com/products1.html#FILTER">http://mindprod.com/products1.html#FILTER</a>
  *
  * Assumptions: Just give it the String to parse and it should filter based on
