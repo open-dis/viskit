@@ -3,6 +3,7 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.LogUtilities;
+import edu.nps.util.TempFileManager;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
@@ -18,8 +19,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
-import viskit.Help;
 import viskit.ViskitConfiguration;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
@@ -71,29 +72,31 @@ import viskit.view.dialog.UserPreferencesDialog;
  * @since 12:52:59 PM
  * @version $Id$
  */
-public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
+public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView
+{
+    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
-    public final static int SELECT_MODE = 0;
-    public final static int ADD_NODE_MODE = 1;
-    public final static int ARC_MODE = 2;
-    public final static int CANCEL_ARC_MODE = 3;
-    public final static int SELF_REF_MODE = 4;
+    public final static int SELECT_MODE          = 0;
+    public final static int ADD_NODE_MODE        = 1;
+    public final static int ARC_MODE             = 2;
+    public final static int CANCEL_ARC_MODE      = 3;
+    public final static int SELF_REF_MODE        = 4;
     public final static int SELF_REF_CANCEL_MODE = 5;
 
     private static final String FRAME_DEFAULT_TITLE = "Event Graph Editor";
     private static final String LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel();;
 
     /** Toolbar for dropping icons, connecting, etc. */
-    private JToolBar toolBar;    // Mode buttons on the toolbar
-    private JLabel addEvent;
-    private JLabel addSelfReferential;
-    private JLabel addSelfCancelRef;
+    private JToolBar      toolBar;    // Mode buttons on the toolbar
+    private JLabel        addEvent;
+    private JLabel        addSelfReferential;
+    private JLabel        addSelfCancelRef;
     private JToggleButton selectMode;
     private JToggleButton arcMode;
     private JToggleButton cancelArcMode;
-    private JTabbedPane tabbedPane;
-    private JMenuBar myMenuBar;
+    private JTabbedPane   tabbedPane;
+    private JMenuBar      myMenuBar;
 
     private JMenu openRecentEventGraphMenu, openRecentProjectsMenu;
 	
@@ -111,7 +114,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	public static String saveCompileLabelTooltip = "Save file (Ctrl-S) then generate source code and compile Java (Ctrl-J)";
 	
     private EventGraphControllerImpl eventGraphController;
-    private int menuShortcutCtrlKeyMask;
+    private int     menuShortcutCtrlKeyMask;
 	private boolean pathEditable = false;
 	private boolean boundsInitialized = false;
 	
@@ -122,7 +125,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public EventGraphViewFrame(mvcController controller)
 	{
         super(FRAME_DEFAULT_TITLE);
-        initializeMVC(controller);       // set up mvc linkages
+        initializeMVC(controller); // set up mvc linkages
         initializeUserInterface(); // build widgets
     }
 
@@ -173,6 +176,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			eventGraphController.addRecentEventGraphFileListener(new RecentEventGraphFileListener());
 			menuShortcutCtrlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
 		}
+		
 		projectsMenu    = new JMenu("Projects");
 		eventGraphsMenu = new JMenu("Event Graphs");
 		editMenu        = new JMenu(FRAME_DEFAULT_TITLE );
@@ -869,9 +873,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.CUT_METHOD,    "Cut",          KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.CUT_METHOD,    "Cut Events",   KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutCtrlKeyMask), eventGraphVisible));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText(EventGraphControllerImpl.CUT_METHOD + " is not supported in Viskit.");
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.COPY_METHOD,   "Copy",         KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutCtrlKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.COPY_METHOD,   "Copy Events",  KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, menuShortcutCtrlKeyMask), eventGraphVisible));
         editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.PASTE_METHOD,  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcutCtrlKeyMask), eventGraphVisible));
         editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.REMOVE_METHOD, "Delete",       KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuShortcutCtrlKeyMask), eventGraphVisible));
 
@@ -984,22 +988,32 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return (JToggleButton) buttonCommon(jtb, icPath, tt);
     }
 
-    private JButton makeButton(Action a, String icPath, String tt) {
-        JButton b;
-        if (a != null) {
-            b = new JButton(a);
+    private JButton makeButton(Action action, String iconPath, String toolTip)
+	{
+        JButton button;
+        if (action != null) {
+            button = new JButton(action);
         } else {
-            b = new JButton();
+            button = new JButton();
         }
-        return (JButton) buttonCommon(b, icPath, tt);
+        return (JButton) buttonCommon(button, iconPath, toolTip);
     }
 
-    private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(icPath)));
-        b.setToolTipText(tt);
-        b.setBorder(BorderFactory.createEtchedBorder());
-        b.setText(null);
-        return b;
+    private AbstractButton buttonCommon(AbstractButton button, String iconPath, String toolTip)
+	{
+		ImageIcon imageIcon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(iconPath));
+		if (imageIcon != null)
+		{
+			button.setIcon(imageIcon);
+		}
+		else
+		{
+			LOG.error ("Illegal icon path, no image found: " + iconPath);
+		}
+        button.setToolTipText(toolTip);
+        button.setBorder(BorderFactory.createEtchedBorder());
+        button.setText(null);
+        return button;
     }
 
     private JLabel makeJLabel(String icPath, String tt) {
@@ -1049,11 +1063,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         modeButtonGroup.add(arcMode);
         modeButtonGroup.add(cancelArcMode);
 
-        JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
-                "Zoom in on the graph");
+        JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
+                "Zoom in on the assembly");
 
-        JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
-                "Zoom out on the graph");
+        JButton zoomOutButton = makeButton(null, "viskit/images/ZoomOut24.gif",
+                "Zoom out on the assembly");
+
+        JButton zoomResetButton = makeButton(null, "viskit/images/Stop24.gif",
+                "Zoom reset to default");
 
         JButton saveButton = makeButton(null, "viskit/images/save.png",
                 "Save and compile event graph (Ctrl-S)");
@@ -1083,12 +1100,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("Zoom"));
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(zoomIn);
+        getToolBar().add(zoomInButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(zoomOut);
+        getToolBar().add(zoomOutButton);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(zoomResetButton);
+        getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
-        getToolBar().addSeparator(new Dimension(24, 24));
 		JLabel saveLabel = new JLabel(saveCompileLabelText);
 		saveLabel.setToolTipText(     saveCompileLabelTooltip);
 		saveLabel.setHorizontalAlignment(JButton.RIGHT);
@@ -1101,18 +1120,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);
 
-        zoomIn.addActionListener(new ActionListener() {
+        zoomInButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setScale(getCurrentEventGraphComponentWrapper().getScale() + 0.1d);
+                getCurrentEventGraphComponentWrapper().setScale(getCurrentEventGraphComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT);
             }
         });
-        zoomOut.addActionListener(new ActionListener() {
+        zoomOutButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setScale(Math.max(getCurrentEventGraphComponentWrapper().getScale() - 0.1d, 0.1d));
+                getCurrentEventGraphComponentWrapper().setScale(Math.max(getCurrentEventGraphComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT));
+            }
+        });
+        zoomResetButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getCurrentEventGraphComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
             }
         });
         saveButton.addActionListener(new ActionListener() {

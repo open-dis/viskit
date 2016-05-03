@@ -874,10 +874,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @SuppressWarnings("unchecked")
     public void copy() // method name must exactly match preceding string value
     {
-        if (!nodeSelected()) {
+        if (!nodeSelected())
+		{
             messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
-                    "Edges cannot be copied." + ViskitGlobals.RECENTER_SPACING);
+                    "Scheduling edges cannot be copied, only Event Graph nodes." + ViskitGlobals.RECENTER_SPACING);
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
@@ -896,10 +897,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void paste() // method name must exactly match preceding string value
     {
-        if (copyVector.isEmpty()) {
+        if (copyVector.isEmpty())
+		{
             return;
         }
-        int x = 100, y = 100;
+        int x = 100, y = 100; // TODO get mouse click?
         int offset = 20;
         // We only paste un-attached nodes (at first)
         for (Object o : copyVector) {

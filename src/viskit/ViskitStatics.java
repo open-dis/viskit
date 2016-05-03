@@ -102,6 +102,10 @@ public class ViskitStatics {
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
+	
+	public static final double DEFAULT_ZOOM           = 1.50d;
+	public static final double DEFAULT_ZOOM_INCREMENT = 0.25d;
+	public static final int    DEFAULT_DRAG_TOLERANCE = 10; // pixels
 
     static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 

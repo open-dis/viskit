@@ -14,6 +14,7 @@ import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+import viskit.ViskitStatics;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.AssemblyController;
@@ -52,10 +53,12 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
-		this.setScale(this.getScale() * 1.5f); // TODO set scale properly
+		
+//		double defaultScale = this.getScale();
+		this.setScale(ViskitStatics.DEFAULT_ZOOM); // initialization
 
         // Set the Tolerance for minimum movement
-        setTolerance(5); // TODO adjust  // TODO JGraph javadoc set in project
+        setTolerance(ViskitStatics.DEFAULT_DRAG_TOLERANCE); // TODO adjust  // TODO JGraph javadoc set in project
 
         // Jump to default port on connect
         setJumpToDefaultPort(true);

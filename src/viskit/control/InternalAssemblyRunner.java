@@ -492,11 +492,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 			String className = assemblyClassName;
 			if    (className.contains("."))
 				   className = className.substring(className.lastIndexOf(".")+1);
-			File assemblyOutputDirectory = new File (saveChooser.getCurrentDirectory().getPath() + File.separator + "AnalystReports");
-			if (!assemblyOutputDirectory.isDirectory())
-				 assemblyOutputDirectory = saveChooser.getCurrentDirectory();
-            File   simulationOutputFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName(className + "Output.txt", assemblyOutputDirectory);
-            saveChooser.setSelectedFile(simulationOutputFile); // note that analyst gets to confirm directory destination
+			File simulationRunOutputDirectory = new File (saveChooser.getCurrentDirectory().getPath() + File.separator + "AnalystReports");
+			if (!simulationRunOutputDirectory.isDirectory())
+				 simulationRunOutputDirectory = saveChooser.getCurrentDirectory();
+            File simulationRunOutputFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName(className + "Output.txt", simulationRunOutputDirectory);
+            saveChooser.setSelectedFile(simulationRunOutputFile); // note that analyst gets to confirm directory destination
 
             int returnValue = saveChooser.showSaveDialog(null);
             if (returnValue != JFileChooser.APPROVE_OPTION)
@@ -504,8 +504,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 return;
             }
 
-            simulationOutputFile = saveChooser.getSelectedFile();
-            if (simulationOutputFile.exists())
+            simulationRunOutputFile = saveChooser.getSelectedFile();
+            if (simulationRunOutputFile.exists())
 			{
                 returnValue = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -516,7 +516,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
 
             try {
-                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(simulationOutputFile))) {
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(simulationRunOutputFile))) {
                     bufferedWriter.write(simulationRunPanel.simulationOutputTA.getText());
                 }
             } catch (IOException e1)

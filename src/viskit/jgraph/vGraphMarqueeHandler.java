@@ -196,22 +196,29 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
         highlight(graph, null);
 
         // If Valid Event, Current and First Port
-        if (e != null && port != null && firstPort != null
-                && firstPort != port) {
+        if (e != null && port != null && firstPort != null && firstPort != port)
+		{
             // Then Establish Connection
-            if (graph instanceof vGraphComponent) {
-                ((vGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
-            } else {
-                ((vGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+            if (graph instanceof vGraphEventGraphComponent)
+			{
+                ((vGraphEventGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+            } 
+			else
+			{
+                (  (vGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             }
             e.consume();
-            // Else Repaint the Graph
-        } else {
-            GraphModel mod = graph.getModel();
-            if (mod instanceof JGraphVisualModel) {
-                ((JGraphVisualModel)mod).reDrawNodes();
-            } else {
-                ((vGraphAssemblyModel)mod).reDrawNodes();
+        }
+		else // Else Repaint the Graph
+		{
+            GraphModel graphModel = graph.getModel();
+            if (graphModel instanceof JGraphVisualModel)
+			{
+                ((JGraphVisualModel)graphModel).reDrawNodes();
+            }
+			else
+			{
+                ((vGraphAssemblyModel)graphModel).reDrawNodes();
             }
         }
         // Reset Global Vars

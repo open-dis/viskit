@@ -835,7 +835,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
              String title   = "Close Project";
-             String message = "<html><p align='center'>Are you sure you want to close this project?" + ViskitGlobals.RECENTER_SPACING + "</p>";
+             String message = "<html><p align='center'>Are you sure you want to close the current project?" + ViskitGlobals.RECENTER_SPACING + "</p>";
 			 if (ViskitGlobals.instance().getCurrentViskitProject() != null)
 			 	 message += "<p>&nbsp</p>" + 
 						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitGlobals.RECENTER_SPACING + "</p>" + 

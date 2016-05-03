@@ -52,7 +52,7 @@ import viskit.view.StateVariablesPanel;
  * @since 11:13:40 AM
  * @version $Id$
  */
-public class EventGraphComponentWrapper extends vGraphComponent {
+public class EventGraphComponentWrapper extends vGraphEventGraphComponent {
 
     public EventGraphModel     eventGraphModel;
     public JSplitPane          drawingSplitPane;

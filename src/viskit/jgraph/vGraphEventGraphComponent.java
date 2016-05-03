@@ -19,6 +19,7 @@ import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+import viskit.ViskitStatics;
 import viskit.view.EventGraphViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.EventGraphController;
@@ -34,7 +35,7 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphComponent extends JGraph implements GraphModelListener
+public class vGraphEventGraphComponent extends JGraph implements GraphModelListener
 {
     static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
@@ -47,7 +48,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
      * @param model a model of the node with its specific edges
      * @param frame the main view frame canvas toEventNode render toEventNode
      */
-    public vGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame)
+    public vGraphEventGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame)
 	{
         super(model);
         parent = frame;
@@ -58,7 +59,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
 	}
 	private void initialize ()
 	{
-        vGraphComponent instance = this;
+        vGraphEventGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         this.setSizeable(false);
         this.setGridVisible(true);
@@ -70,9 +71,12 @@ public class vGraphComponent extends JGraph implements GraphModelListener
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
+		
+//		double defaultScale = this.getScale();
+		this.setScale(ViskitStatics.DEFAULT_ZOOM); // initialization
 
         // Set the Tolerance toEventNode 2 Pixel
-        setTolerance(2);
+        setTolerance(ViskitStatics.DEFAULT_DRAG_TOLERANCE);
 
         // Jump toEventNode default port on connect
         setJumpToDefaultPort(true);
@@ -137,7 +141,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener
     }
 
     public ViskitElement getViskitElementAt(Point p) {
-        Object cell = vGraphComponent.this.getFirstCellForLocation(p.x, p.y);
+        Object cell = vGraphEventGraphComponent.this.getFirstCellForLocation(p.x, p.y);
         if (cell != null && cell instanceof CircleCell) {
             return (ViskitElement) ((CircleCell) cell).getUserObject();
         }

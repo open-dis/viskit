@@ -550,10 +550,13 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         adapterModeButton.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
         JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
-                "Zoom in on the graph");
+                "Zoom in on the event graph");
 
         JButton zoomOutButton = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
+
+        JButton zoomResetButton = makeButton(null, "viskit/images/Stop24.gif",
+                "Zoom reset to default");
 
         JButton saveButton = makeButton(null, "viskit/images/save.png",
                 "Save and compile assembly (Ctrl-S)");
@@ -588,6 +591,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getToolBar().add(zoomInButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOutButton);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(zoomResetButton);
         getToolBar().addSeparator(new Dimension(24, 24));
 
 		// right aligned
@@ -620,14 +625,21 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setScale(getCurrentVgraphAssemblyComponentWrapper().getScale() + 0.1d);
+                getCurrentVgraphAssemblyComponentWrapper().setScale(getCurrentVgraphAssemblyComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT);
             }
         });
         zoomOutButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setScale(Math.max(getCurrentVgraphAssemblyComponentWrapper().getScale() - 0.1d, 0.1d));
+                getCurrentVgraphAssemblyComponentWrapper().setScale(Math.max(getCurrentVgraphAssemblyComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT));
+            }
+        });
+        zoomResetButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                getCurrentVgraphAssemblyComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
             }
         });
         saveButton.addActionListener(new ActionListener() {
