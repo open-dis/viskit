@@ -47,8 +47,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
-        this.setGridEnabled(true); // means snap
-        this.setGridSize(10);
+        this.setGridEnabled(true); // means snap - TODO expose interface
+        this.setGridSize(ViskitStatics.DEFAULT_GRID_SIZE);
         this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
@@ -58,7 +58,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 		this.setScale(ViskitStatics.DEFAULT_ZOOM); // initialization
 
         // Set the Tolerance for minimum movement
-        setTolerance(ViskitStatics.DEFAULT_DRAG_TOLERANCE); // TODO adjust  // TODO JGraph javadoc set in project
+        setTolerance(ViskitStatics.DEFAULT_GRID_SNAP); // TODO adjust
 
         // Jump to default port on connect
         setJumpToDefaultPort(true);

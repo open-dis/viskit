@@ -105,7 +105,13 @@ public class ViskitStatics {
 	
 	public static final double DEFAULT_ZOOM           = 1.50d;
 	public static final double DEFAULT_ZOOM_INCREMENT = 0.25d;
-	public static final int    DEFAULT_DRAG_TOLERANCE = 10; // pixels
+	public static final int    DEFAULT_GRID_SIZE      = 10; // pixels
+	public static final int    DEFAULT_GRID_SNAP      = 40; // pixels
+	
+	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
+	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
+	public final static String PROJECT_OPEN_FAILURE_MESSAGE = "Project failed to open...";
+	public final static String             RECENTER_SPACING = " &nbsp &nbsp &nbsp &nbsp ";
 
     static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 

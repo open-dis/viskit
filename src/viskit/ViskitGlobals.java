@@ -100,12 +100,6 @@ public class ViskitGlobals {
     private static ViskitProject currentViskitProject;
 
     private static boolean projectOpen;
-	
-	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
-	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
-	public final static String PROJECT_OPEN_FAILURE_MESSAGE = "Project failed to open...";
-	public final static String             RECENTER_SPACING = " &nbsp &nbsp &nbsp &nbsp ";
-
 	/**
 	 * @return the projectOpen value
 	 */

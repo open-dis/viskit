@@ -790,11 +790,11 @@ public class ViskitProject {
 				String TRY_AGAIN = "Please try another selection...";
                 returnValue = JOptionPane.showOptionDialog(parentFrame, 
 						    "<html>" +
-						    "<p align='center'>Selected directory <i>" + originalProjectDirectory.getName() + "</i> is not a valid Viskit project." + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+						    "<p align='center'>Selected directory <i>" + originalProjectDirectory.getName() + "</i> is not a valid Viskit project." + ViskitStatics.RECENTER_SPACING + "</p>" + 
 						    "<p>&nbsp;</p>" +
-						    "<p align='center'>(Hint: look for the Viskit icon to choose a valid directory)" + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+						    "<p align='center'>(Hint: look for the Viskit icon to choose a valid directory)" + ViskitStatics.RECENTER_SPACING + "</p>" + 
 						    "<p>&nbsp;</p>" +
-						    "<p align='center'>" + TRY_AGAIN + ViskitGlobals.RECENTER_SPACING + "</p>" +
+						    "<p align='center'>" + TRY_AGAIN + ViskitStatics.RECENTER_SPACING + "</p>" +
 						    "<p>&nbsp;</p>", 
 						TRY_AGAIN, // title
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);

@@ -397,7 +397,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             ViskitGlobals.instance().getAssemblyController().messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Input/Output (I/O) Error", 
-					"Error reading <i>" + jarFilePath + "</i>" + ViskitGlobals.RECENTER_SPACING);
+					"Error reading <i>" + jarFilePath + "</i>" + ViskitStatics.RECENTER_SPACING);
             return;
         }
         jarFileCommon(jarFile);

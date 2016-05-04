@@ -1002,7 +1002,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private AbstractButton buttonCommon(AbstractButton button, String iconPath, String toolTip)
 	{
 		ImageIcon imageIcon = new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(iconPath));
-		if (imageIcon != null)
+		if (imageIcon.getImage() != null)
 		{
 			button.setIcon(imageIcon);
 		}

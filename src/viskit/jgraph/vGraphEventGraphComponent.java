@@ -65,8 +65,8 @@ public class vGraphEventGraphComponent extends JGraph implements GraphModelListe
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
-        this.setGridEnabled(true); // means snap
-        this.setGridSize(10);
+        this.setGridEnabled(true); // means snap - TODO expose interface
+        this.setGridSize(ViskitStatics.DEFAULT_GRID_SIZE);
         this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
@@ -76,7 +76,7 @@ public class vGraphEventGraphComponent extends JGraph implements GraphModelListe
 		this.setScale(ViskitStatics.DEFAULT_ZOOM); // initialization
 
         // Set the Tolerance toEventNode 2 Pixel
-        setTolerance(ViskitStatics.DEFAULT_DRAG_TOLERANCE);
+        setTolerance(ViskitStatics.DEFAULT_GRID_SNAP);
 
         // Jump toEventNode default port on connect
         setJumpToDefaultPort(true);

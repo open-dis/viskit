@@ -121,8 +121,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		    !ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory found", 
-					"<html><p align='center'>New event graphs are only created within an open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
-					"<p align='center'>Please open or create a project first." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+					"<html><p align='center'>New event graphs are only created within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Please open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>");
 			return;
 		}
@@ -172,7 +172,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // Bugfix 1398
             String message =
                     "<html><body><p align='center'>Do you want " + newEventGraphMetadata.name + 
-					" execution to start with a <b>\"Run\"</b> Event?" + ViskitGlobals.RECENTER_SPACING + "</p>"  +
+					" execution to start with a <b>\"Run\"</b> Event?" + ViskitStatics.RECENTER_SPACING + "</p>"  +
 				     "<p>&nbsp</p></body></html>";
             String title = "Confirm Run Event";
 
@@ -250,9 +250,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				else if (!file.getName().endsWith(".xml"))
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Event Graph file", "<html>" +
-							"<p align='center'>Event graph files always end with .xml" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Event graph files always end with .xml" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>");
 					break;
 				}
@@ -266,12 +266,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				else 
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project",  "<html>" +
-							"<p align='center'>Event graphs must be within a currently open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Event graphs must be within a currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b>" + ViskitGlobals.RECENTER_SPACING + "</p>" +
-							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b>" + ViskitStatics.RECENTER_SPACING + "</p>" +
+							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>");
 					// TODO offer to copy?
 					break;
@@ -878,7 +878,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		{
             messageToUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
-                    "Scheduling edges cannot be copied, only Event Graph nodes." + ViskitGlobals.RECENTER_SPACING);
+                    "Scheduling edges cannot be copied, only Event Graph nodes." + ViskitStatics.RECENTER_SPACING);
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
@@ -1094,8 +1094,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         } 
 		catch (FileNotFoundException fnfe)
 		{	
-			String message = localLastFile.getName() + " updated Event Graph Java file not found when unmarshalling";
-			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph Java file not found" + ViskitGlobals.RECENTER_SPACING, message);
+			String message = localLastFile.getName() + " updated Event Graph .java file not found when unmarshalling";
+			messageToUser(JOptionPane.ERROR_MESSAGE, "Event Graph .java file not found" + ViskitStatics.RECENTER_SPACING, message);
             LOG.error(fnfe);
         }
         String source = (ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(simkitXML2Java);

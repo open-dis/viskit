@@ -127,9 +127,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY);
 		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
 		{
-			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) +
-								 File.separator +
-					             ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+			String projectName = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+			if (projectName == null)
+				projectName = "";
+			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
 			File projectDirectory = new File (projectPath);
 			if (projectDirectory.isDirectory())
 				openProjectDirectory (projectDirectory);
@@ -140,24 +141,26 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			{
 				// TODO re-open previously open assemblies and event graphs, otherwise:
 			
-				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitGlobals.PROJECT_OPEN_SUCCESS_MESSAGE, 
-					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
+					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p align='center'>&nbsp;</p>" +
-							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitGlobals.RECENTER_SPACING + "</p>"  +
+							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING + "</p>"  +
 							"<p align='center'>&nbsp;</p></html>");
 			}
 			else
 			{
-				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitGlobals.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
-					"<p>Selected project did not open, see error log for details" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
+					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p>&nbsp</p>" + 
+					"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>");
 				return;
 			}
 		}
 		else
 		{
-			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitGlobals.VISKIT_READY_MESSAGE, 
-					"<html><p>Open or create a project to begin" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.VISKIT_READY_MESSAGE, "<html>" +
+					"<p align='center'>Open or create a project to begin" + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>");
 		}
 		
@@ -246,8 +249,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", "<html>" +
-					"<p align='center'>Assemblies are only opened within an open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
-					"<p align='center'>Open or create a project first." + ViskitGlobals.RECENTER_SPACING + "</p>");
+					"<p align='center'>Assemblies are only opened within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>");
 			return;
 		}
         File[] files = ((AssemblyView) getView()).openFilesAsk();
@@ -262,9 +265,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				if (!file.getName().endsWith(".xml"))
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Assembly file", "<html>" +
-							"<p align='center'>Assembly files always end with .xml" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Assembly files always end with .xml" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Please choose an assemly in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>");
+							"<p align='center'>Please choose an assemly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					break;
 				}
 				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
@@ -275,12 +278,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				else 
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", "<html>" +
-							"<p align='center'>Open assemblies must be within the currently open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Open assemblies must be within the currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p>Current project name: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitGlobals.RECENTER_SPACING + "</p>" +
-							"<p>Current project path: <i>"    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>Current project name: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
+							"<p>Current project path: <i>"    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Please choose an assembly in current project, or else open a different project." + ViskitGlobals.RECENTER_SPACING + "</p>");
+							"<p align='center'>Please choose an assembly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					// TODO offer to copy?
 					break;
 				}
@@ -681,11 +684,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					System.out.println("Directory was not created, probably due to insufficient user permissions.  Please choose or create an empty directory.");
 					messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", 
 							"<html>" + 
-							"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> cannot be created here!" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> cannot be created here!" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Do you have permissions to create a new directory at that location?" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>You do not have permissions to create a new directory at that location" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
-							"<p align='center'>Please try again: create or choose an empty directory" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>");
 				}
 				continue;
@@ -697,9 +700,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				System.out.println("Directory is not empty!  Please choose or create an empty directory.");
 				messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", 
 						"<html>" + 
-						"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> is not empty!" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+						"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> is not empty!" + ViskitStatics.RECENTER_SPACING + "</p>" +
 						"<p>&nbsp</p>" +
-						"<p align='center'>Please try again: create or choose an empty directory" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+						"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
 						"<p>&nbsp</p>");
 				continue;
 			}
@@ -733,7 +736,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					"Problem initializing new project", 
-					"<html><p>Please check logs to find or report problem" + ViskitGlobals.RECENTER_SPACING + "</p>");
+					"<html><p>Please check logs to find or report problem" + ViskitStatics.RECENTER_SPACING + "</p>");
 			return;
 		}
 		viskitProject.setProjectRootDirectory (newProjectRoot);
@@ -856,10 +859,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
              String title   = "Close Project";
-             String message = "<html><p align='center'>Are you sure you want to close the current project?" + ViskitGlobals.RECENTER_SPACING + "</p>";
+             String message = "<html><p align='center'>Are you sure you want to close the current project?" + ViskitStatics.RECENTER_SPACING + "</p>";
 			 if (ViskitGlobals.instance().getCurrentViskitProject() != null)
 			 	 message += "<p>&nbsp</p>" + 
-						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" + 
 						    "<p>&nbsp</p>";
              int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
              if (responseValue == JOptionPane.YES_OPTION)
@@ -911,9 +914,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory",  "<html>" +
-					"<p align='center'>New assemblies are only created within an open project." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+					"<p align='center'>New assemblies are only created within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>" +
-					"<p align='center'>Open or create a project first." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>");
 			return;
 		}
@@ -1114,7 +1117,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // Nothing selected or non-leaf
         messageToUser(JOptionPane.ERROR_MESSAGE, 
 				"Can't create a new Event Graph instance", 
-				"<html><p>You must first open and build an Event Graph before adding a new node." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+				"<html><p>You must first open and build an Event Graph before adding a new node." + ViskitStatics.RECENTER_SPACING + "</p>" +
 				"<p>&nbsp</p>");
     }
 
@@ -1165,7 +1168,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // If nothing selected or a non-leaf
         messageToUser(JOptionPane.ERROR_MESSAGE, 
 				"Can't create", 
-				"<html><p>You must first select a Property Change Listener from the panel on the left." + ViskitGlobals.RECENTER_SPACING + "</p>" +
+				"<html><p>You must first select a Property Change Listener from the panel on the left." + ViskitStatics.RECENTER_SPACING + "</p>" +
 				"<p>&nbsp</p>");
     }
 
@@ -2080,9 +2083,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "Please open an Assembly file before running a simulation");
                     } else {
                         String message = "<html>" + 
-								         "<p align='center'>Runtime error: no executionParameters found." + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+								         "<p align='center'>Runtime error: no executionParameters found." + ViskitStatics.RECENTER_SPACING + "</p>" + 
 								         "<p>&nbsp</p>" +
-										 "<p align='center'>Please locate and correct the source error in assembly XML for proper compilation." + ViskitGlobals.RECENTER_SPACING + "</p>" + 
+										 "<p align='center'>Please locate and correct the source error in assembly XML for proper compilation." + ViskitStatics.RECENTER_SPACING + "</p>" + 
 								         "<p>&nbsp</p>";
                         messageToUser(JOptionPane.WARNING_MESSAGE, "Failed Assembly source generation/compilation", message);
                     }
