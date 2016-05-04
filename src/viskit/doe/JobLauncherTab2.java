@@ -446,7 +446,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         public void keyTyped(KeyEvent e) {
             //System.out.println("sending paramlocallyeditted from JobLauncherTab");
-            OpenAssembly.inst().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
+            OpenAssembly.getInstance().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
         }
     };
 
@@ -470,7 +470,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 tmo.setText(s);
             }
         } else {
-            exp = OpenAssembly.inst().jaxbFactory.createExperiment();
+            exp = OpenAssembly.getInstance().jaxbFactory.createExperiment();
 
             jaxbRoot.setExperiment(exp);
 
@@ -491,7 +491,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
             saveDesignParametersToJaxbNoNotify();
-            OpenAssembly.inst().doSendAssyJaxbChanged(JobLauncherTab2.this);
+            OpenAssembly.getInstance().doSendAssyJaxbChanged(JobLauncherTab2.this);
         }
     }
 
@@ -512,10 +512,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Experiment jaxbExperiment = jaxbRoot.getExperiment();
         Schedule   jaxbSchedule   = jaxbRoot.getSchedule();
         if (jaxbExperiment == null) {
-            jaxbExperiment = OpenAssembly.inst().jaxbFactory.createExperiment();
+            jaxbExperiment = OpenAssembly.getInstance().jaxbFactory.createExperiment();
         }
         if (jaxbSchedule == null) {
-            jaxbSchedule = OpenAssembly.inst().jaxbFactory.createSchedule();
+            jaxbSchedule = OpenAssembly.getInstance().jaxbFactory.createSchedule();
         }
 
         String numberOfReplications = numberOfReplicationsTF.getText().trim();

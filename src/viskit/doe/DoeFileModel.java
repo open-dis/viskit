@@ -78,7 +78,7 @@ public class DoeFileModel {
     }
 
     public void saveEventGraphsToJaxb(Collection<File> evGraphs) {
-        SimkitAssembly assembly = OpenAssembly.inst().jaxbRoot;
+        SimkitAssembly assembly = OpenAssembly.getInstance().jaxbRoot;
         List<EventGraph> lis = assembly.getEventGraph();
         lis.clear();
 
@@ -93,7 +93,7 @@ public class DoeFileModel {
                     sb.append(cbuf, 0, retc);
                 }
 
-                EventGraph eg = OpenAssembly.inst().jaxbFactory.createEventGraph();
+                EventGraph eg = OpenAssembly.getInstance().jaxbFactory.createEventGraph();
                 eg.setFileName(f.getName());
                 String s = sb.toString();
                 String[] sa = s.split("<\\?xml.*\\?>"); // remove the hdr if present
@@ -112,8 +112,8 @@ public class DoeFileModel {
     }
 
     public void saveTableEditsToJaxb() {
-        SimkitAssembly jaxbSimkitAssembly = OpenAssembly.inst().jaxbRoot;
-        ObjectFactory objectFactory = OpenAssembly.inst().jaxbFactory;
+        SimkitAssembly jaxbSimkitAssembly = OpenAssembly.getInstance().jaxbRoot;
+        ObjectFactory objectFactory = OpenAssembly.getInstance().jaxbFactory;
 
         List<TerminalParameter> jaxbDesignParameters = jaxbSimkitAssembly.getDesignParameters();
 

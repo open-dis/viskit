@@ -257,12 +257,12 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // clone the jaxbroot (we want to use currently checked widgets, but don't want to force save
     // No clone method, but save the params
 
-        savedDesignParameters = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
+        savedDesignParameters = new Vector<>(OpenAssembly.getInstance().jaxbRoot.getDesignParameters());
         saveDoeParametersNoNotify();
 
         // put Event graphs in place (CDATA stuff)
 
-        savedEvGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
+        savedEvGraphs = new Vector<>(OpenAssembly.getInstance().jaxbRoot.getEventGraph());
         // eventgraphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
         return true;
     }
@@ -272,7 +272,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     public void restorePrepRun() {
-        SimkitAssembly sa = OpenAssembly.inst().jaxbRoot;
+        SimkitAssembly sa = OpenAssembly.getInstance().jaxbRoot;
         sa.getDesignParameters().clear();
         sa.getDesignParameters().addAll(savedDesignParameters);
         savedDesignParameters = null;
@@ -340,7 +340,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
      */
     public void saveDoeParams() {
         saveDoeParametersNoNotify();
-        OpenAssembly.inst().doSendAssyJaxbChanged(this);
+        OpenAssembly.getInstance().doSendAssyJaxbChanged(this);
     }
 
     private void saveDoeParametersNoNotify() {
@@ -363,10 +363,10 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 break;
 
             case NEW_ASSEMBLY:
-                doOpen(OpenAssembly.inst().jaxbRoot, OpenAssembly.inst().file);
+                doOpen(OpenAssembly.getInstance().jaxbRoot, OpenAssembly.getInstance().file);
 
                 if (jobLauncher != null) {
-                    jobLauncher.setAssemblyFile(OpenAssembly.inst().jaxbRoot, OpenAssembly.inst().file); //todo fixfile);
+                    jobLauncher.setAssemblyFile(OpenAssembly.getInstance().jaxbRoot, OpenAssembly.getInstance().file); //todo fixfile);
           //todo required? remarshallEvGraphs();
                 }
                 break;

@@ -52,18 +52,22 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * This is a singleton class to coordinate opening of and modifications of
  * Assembly files
  */
-public class OpenAssembly {
-
+public class OpenAssembly
+{
     private static OpenAssembly instance;
-    private static final Object SYNCHER = new Object();
+    private static final Object SYNCHRONIZER = new Object();
 
-    public static OpenAssembly inst() {
-        if (instance != null) {
+    public static OpenAssembly getInstance()
+	{
+        if (instance != null)
+		{
             return instance;
         }
-
-        synchronized (SYNCHER) {
-            if (instance == null) {
+		
+        synchronized (SYNCHRONIZER)
+		{
+            if (instance == null)
+			{
                 instance = new OpenAssembly();
             }
             return instance;

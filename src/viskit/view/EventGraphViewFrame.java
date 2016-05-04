@@ -220,9 +220,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     public Component getCurrentJgraphComponent()
 	{
-        EventGraphComponentWrapper vcw = getCurrentEventGraphComponentWrapper();
-        if (vcw == null || vcw.drawingSplitPane == null) {return null;}
-        return vcw.drawingSplitPane.getLeftComponent();
+        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentEventGraphComponentWrapper();
+        if (eventGraphComponentWrapper == null || eventGraphComponentWrapper.drawingSplitPane == null) {return null;}
+        return eventGraphComponentWrapper.drawingSplitPane.getLeftComponent();
     }
 
     public JToolBar getToolBar() {

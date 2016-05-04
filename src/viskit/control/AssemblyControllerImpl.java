@@ -88,7 +88,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private AssemblyRunnerPlug runner;
 
     /** Creates a new instance of AssemblyController */
-    public AssemblyControllerImpl() {
+    public AssemblyControllerImpl()
+	{
         initializeHistoryXMLConfiguration();
     }
 
@@ -375,7 +376,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param jaxbroot the JAXB root of this XML file
      */
     public void initOpenAssemblyWatch(File f, SimkitAssembly jaxbroot) {
-        OpenAssembly.inst().setFile(f, jaxbroot);
+        OpenAssembly.getInstance().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyControllerImpl */
@@ -463,12 +464,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
-        OpenAssembly.inst().addListener(listener);
+        OpenAssembly.getInstance().addListener(listener);
     }
 
     @Override
     public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
-        OpenAssembly.inst().removeListener(listener);
+        OpenAssembly.getInstance().removeListener(listener);
     }
 
     Set<mvcRecentFileListener> recentAssemblyListeners = new HashSet<>();
@@ -671,7 +672,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			newProjectRoot = viskitProject.newProjectPath (ViskitGlobals.instance().getEventGraphViewFrame().getContent(), newProjectPath);
 			if (newProjectRoot == null)
 				return; // no project directory chosen, cancel and return
-			newProjectPath = newProjectRoot.getPath();
+			
+			newProjectPath = newProjectRoot.getPath(); // update to match chooser selection
 			if (newProjectRoot.list().length > 0)
 			{
 				System.out.println("Directory is not empty!  Please choose or create an empty directory.");
@@ -1033,39 +1035,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void postClose() {
-        OpenAssembly.inst().doSendCloseAssembly();
+    public void postClose()
+	{
+        OpenAssembly.getInstance().doSendCloseAssembly();
     }
 
-    private void markAssemblyConfigurationClosed(File f) {
+    private void markAssemblyConfigurationClosed(File f)
+	{
+        if (f == null) {return;} // Someone may try to close a file that hasn't been saved
 
-        // Someone may try to close a file that hasn't been saved
-        if (f == null) {return;}
-
-        int idx = 0;
-        for (File key : recentAssemblyFileSet) {
-            if (key.getPath().contains(f.getName())) {
-                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+        int index = 0;
+        for (File recentAssemblyFile : recentAssemblyFileSet)
+		{
+            if ((historyXMLConfiguration != null) && recentAssemblyFile.getPath().contains(f.getName()))
+			{
+                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]", "false");
             }
-            idx++;
+            index++;
         }
     }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
-    private void markAssemblyConfigurationOpen(String path) {
-
-        int idx = 0;
-        for (File tempPath : recentAssemblyFileSet) {
-
-            if (tempPath.getPath().equals(path)) {
-                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+    private void markAssemblyConfigurationOpen(String path)
+	{
+        int index = 0;
+        for (File tempPath : recentAssemblyFileSet)
+		{
+            if ((historyXMLConfiguration != null) && tempPath.getPath().equals(path))
+			{
+                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]", "true");
             }
-            idx++;
+            index++;
         }
     }
 
     private final Point nextPoint = new Point(25, 25);
-    private Point getNextPoint() {
+    private Point getNextPoint()
+	{
         nextPoint.x = nextPoint.x >= 200 ? 25 : nextPoint.x + 25;
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
         return nextPoint;
@@ -2354,6 +2360,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			initializeHistoryXMLConfiguration();
 		}
         List<String> assemblyFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
+		
+		if (assemblyFilePathList == null)
+		{
+			LOG.error ("updateAssemblyFileLists () failing mysteriously, apparently historyXMLConfiguration is null");
+		}
 //        LOG.debug("recordAssemblyFiles() assemblyFilePathList.size()=" + assemblyFilePathList.size());
         int index = 0;
         for (String assemblyFilePath : assemblyFilePathList)
@@ -2464,10 +2475,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     XMLConfiguration historyXMLConfiguration;
 
-    private void initializeHistoryXMLConfiguration() {
+    private void initializeHistoryXMLConfiguration()
+	{
         try {
             historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
-        } catch (Exception e) {
+        } catch (Exception e)
+		{
             LOG.error("Error loading recent history file: " + e.getMessage());
             LOG.warn ("Error, recent history file disabled");
             historyXMLConfiguration = null;

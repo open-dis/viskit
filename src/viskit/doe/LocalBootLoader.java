@@ -178,7 +178,7 @@ public class LocalBootLoader extends URLClassLoader {
         // reboot it with cleanWorkJar
         LOG.debug("Stage1 reinit");
 //        initStage1();
-        LOG.debug("Adding cleaned jar "+jar);
+        LOG.debug("Adding cleaned jar " + jar);
 
         // Now add our tmp jars containing compiled EGs and Assemblies
 //        try {

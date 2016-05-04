@@ -143,7 +143,7 @@ public class FileHandler {
         jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
         //fillRoot();
-        jaxbMarshaller.marshal(OpenAssembly.inst().jaxbRoot, fos);
+        jaxbMarshaller.marshal(OpenAssembly.getInstance().jaxbRoot, fos);
     }
 
     public static void runFile(File fil, String title, JFrame mainFrame) {
