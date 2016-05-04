@@ -9,7 +9,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
@@ -36,7 +35,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
     private   JTextArea  descriptionTextArea;
 
     public MetadataDialog(JFrame f, GraphMetadata graphMetadata) {
-        this(f, graphMetadata, "Event Graph Properties");
+        this(f, graphMetadata, "");
     }
 
     public MetadataDialog(JFrame f, GraphMetadata graphMetadata, String title)
@@ -68,10 +67,10 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         textFieldPanel.add(authorLabel);
         textFieldPanel.add(authorTF);
 
-        JLabel versionLabel = new JLabel("revision", JLabel.TRAILING);
+        JLabel revisionLabel = new JLabel("revision", JLabel.TRAILING);
         revisionTF = new JTextField(20);
-        versionLabel.setLabelFor(revisionTF);
-        textFieldPanel.add(versionLabel);
+        revisionLabel.setLabelFor(revisionTF);
+        textFieldPanel.add(revisionLabel);
         textFieldPanel.add(revisionTF);
 
         JLabel pathLabel = new JLabel("path", JLabel.TRAILING);
@@ -80,8 +79,24 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         pathLabel.setLabelFor(pathTF);
         textFieldPanel.add(pathLabel);
         textFieldPanel.add(pathTF);
+
+		JLabel descriptionLabel = new JLabel("description", JLabel.TRAILING);
+		descriptionLabel.setToolTipText("Good descriptions make the purpose of a model understandable and clear");
+		descriptionLabel.setVerticalAlignment(JLabel.TOP);
+
+		descriptionTextArea = new JTextArea(6, 40);
+		descriptionTextArea.setWrapStyleWord(true);
+		descriptionTextArea.setLineWrap(true);
+		descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
+		JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
+		descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		descriptionScrollPane.setBorder(authorTF.getBorder());
+
+		descriptionLabel.setLabelFor(descriptionScrollPane); // TODO not working
+		textFieldPanel.add(descriptionLabel);
+		textFieldPanel.add(descriptionScrollPane);
 		
-		int rowCount = 4;
+		int rowCount = 5;
 
 		if (graphMetadata.isProject())
 		{
@@ -115,25 +130,6 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			implementsLabel.setLabelFor(implementsTF);
 			textFieldPanel.add(implementsLabel);
 			textFieldPanel.add(implementsTF);
-
-			JLabel descriptionLabel = new JLabel("description", JLabel.TRAILING);
-			descriptionLabel.setToolTipText("Good descriptions make the purpose of a model understandable and clear");
-			descriptionLabel.setSize(implementsLabel.getSize());
-			descriptionLabel.setVerticalAlignment(JLabel.TOP);
-			textFieldPanel.add(descriptionLabel);
-//			metaDataDialogPanel.add(Box.createVerticalStrut(5));
-
-			descriptionTextArea = new JTextArea(6, 40);
-			descriptionTextArea.setWrapStyleWord(true);
-			descriptionTextArea.setLineWrap(true);
-			descriptionTextArea.setBorder(BorderFactory.createEmptyBorder());
-			JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
-			descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-			descriptionScrollPane.setBorder(authorTF.getBorder());
-
-			descriptionLabel.setLabelFor(descriptionScrollPane); // TODO not working
-			textFieldPanel.add(descriptionScrollPane);
-			textFieldPanel.add(Box.createVerticalStrut(5));
 			
 			rowCount = 8;
 		}
@@ -201,10 +197,11 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
     private void fillWidgets() 
 	{
-        if (graphMetadata == null)
+		if (graphMetadata == null)
 		{
-            graphMetadata = new GraphMetadata(); // re-initialize
-        }
+			graphMetadata = new GraphMetadata(); // unexpected error condition
+		} 
+		 
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 		
@@ -233,6 +230,11 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 					 
 		if (!graphMetadata.isProject())
 		{
+			while (graphMetadata.packageName.endsWith("."))
+			{
+				   graphMetadata.packageName = graphMetadata.packageName.substring(0,graphMetadata.packageName.length()-1); // strip trailing .
+			}
+			
                   packageTF.setText(graphMetadata.packageName);
                   extendsTF.setText(graphMetadata.extendsPackageName);
                implementsTF.setText(graphMetadata.implementsPackageName);
@@ -241,15 +243,15 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
     private void unloadWidgets() 
 	{
-        graphMetadata.author = authorTF.getText().trim();
+        graphMetadata.author      = authorTF.getText().trim();
         graphMetadata.description = descriptionTextArea.getText().trim();
 
         if (this instanceof AssemblyMetadataDialog)
 		{
             // The default names are AssemblyName, or EventGraphName
-            if (!graphMetadata.name.contains("Assembly") || graphMetadata.name.equals("AssemblyName"))
+            if (!graphMetadata.name.toLowerCase().contains(GraphMetadata.ASSEMBLY) || graphMetadata.name.equals("AssemblyName"))
 
-                // Note: we need to force "Assembly" in the file name for special recognition
+                // Note: we need to force "Assembly" as part of the file name for special recognition
                 graphMetadata.name = nameTF.getText().trim() + "Assembly";
             else
                 graphMetadata.name = nameTF.getText().trim();
@@ -268,8 +270,13 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			    graphMetadata.path =            pathTF.getText().trim();
 		}
 		else // Event Graph or Assembly
-		{
+		{			
 			graphMetadata.packageName           =    packageTF.getText().trim();
+			while (graphMetadata.packageName.endsWith("."))
+			{
+				   graphMetadata.packageName = graphMetadata.packageName.substring(0,graphMetadata.packageName.length()-1); // strip trailing .
+			}
+			
 			graphMetadata.extendsPackageName    =    extendsTF.getText().trim();
 			graphMetadata.implementsPackageName = implementsTF.getText().trim();
 			graphMetadata.stopTime = stopTimeTF.getText().trim();

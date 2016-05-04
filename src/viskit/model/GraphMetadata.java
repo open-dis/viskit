@@ -31,6 +31,10 @@ public class GraphMetadata {
     public  boolean verbose      = true; // TODO user preference
     private String  label;
 	private String  DEFAULT_PACKAGE_NAME = "examples"; // TODO user preference
+	
+	public static final String ASSEMBLY    = "assembly";
+	public static final String EVENT_GRAPH = "event graph";
+	public static final String PROJECT     = "project";
 
     public GraphMetadata()
 	{
@@ -43,7 +47,7 @@ public class GraphMetadata {
         
         if (caller instanceof AssemblyModelImpl)
 		{
-			label   = "assembly";
+			label   = ASSEMBLY;
 			project = false;
             name    = "NewAssembly";
             viskit.xsd.bindings.assembly.ObjectFactory objectFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
@@ -53,7 +57,7 @@ public class GraphMetadata {
         } 
 		else if (caller instanceof EventGraphModelImpl)
 		{
-			label   = "event graph";
+			label   = EVENT_GRAPH;
 			project = false;
             name    = "NewEventGraph";
             viskit.xsd.bindings.eventgraph.ObjectFactory objectFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
@@ -63,7 +67,7 @@ public class GraphMetadata {
         }
 		else // project TODO verify OK
 		{
-			label   = "Project";
+			label   = PROJECT;
 			project = true;
 			name 				    = "NewProject";
 			packageName 	        = ""; // unused
@@ -88,7 +92,7 @@ public class GraphMetadata {
 		this.description           = description;
 		project                    = isProject;
 		if (project)
-			label   = "project";
+			label   = PROJECT;
 		this.updated = false;
     } 
 	

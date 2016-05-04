@@ -670,8 +670,26 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
 			// directory chooser for new project
 			newProjectRoot = viskitProject.newProjectPath (ViskitGlobals.instance().getEventGraphViewFrame().getContent(), newProjectPath);
-			if (newProjectRoot == null)
+			if  (newProjectRoot == null)
 				return; // no project directory chosen, cancel and return
+			
+			if (!newProjectRoot.exists()) // create directory with name that user typed in
+			{
+				boolean directoryCreated = newProjectRoot.mkdir();
+				if    (!directoryCreated)
+				{
+					System.out.println("Directory was not created, probably due to insufficient user permissions.  Please choose or create an empty directory.");
+					messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", 
+							"<html>" + 
+							"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> cannot be created here!" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>" +
+							"<p align='center'>Do you have permissions to create a new directory at that location?" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>" +
+							"<p align='center'>Please try again: create or choose an empty directory" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+							"<p>&nbsp</p>");
+				}
+				continue;
+			}
 			
 			newProjectPath = newProjectRoot.getPath(); // update to match chooser selection
 			if (newProjectRoot.list().length > 0)
@@ -681,11 +699,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 						"<html>" + 
 						"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> is not empty!" + ViskitGlobals.RECENTER_SPACING + "</p>" +
 						"<p>&nbsp</p>" +
-						"<p align='center'>Please create or choose an empty directory" + ViskitGlobals.RECENTER_SPACING + "</p>" +
+						"<p align='center'>Please try again: create or choose an empty directory" + ViskitGlobals.RECENTER_SPACING + "</p>" +
 						"<p>&nbsp</p>");
+				continue;
 			}
 		}
-		while (newProjectRoot.list().length > 0);
+		while (!newProjectRoot.exists() || (newProjectRoot.list() == null) || (newProjectRoot.list().length > 0));
 		
 		// User dialog: project properties
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,        newProjectPath);
