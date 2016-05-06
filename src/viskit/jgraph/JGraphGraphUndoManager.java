@@ -56,12 +56,12 @@ import viskit.mvc.mvcController;
  * Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
+public class JGraphGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
     private Vector<Object> selected;
     private mvcController controller;
 
-    public vGraphUndoManager(mvcController controller) {
+    public JGraphGraphUndoManager(mvcController controller) {
         this.controller = controller;
         selected = new Vector<>();
     }
@@ -102,4 +102,4 @@ public class vGraphUndoManager extends GraphUndoManager implements GraphSelectio
             ((AssemblyControllerImpl) controller).selectNodeOrEdge(selected);
     }
 
-} // end class file vGraphUndoManager.java
+} // end class file JGraphGraphUndoManager.java

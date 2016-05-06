@@ -23,7 +23,7 @@ import org.jgraph.util.Spline2D;
  * @since 2:32:30 PM
  * @version $Id$
  */
-public class vEdgeRenderer extends EdgeRenderer {
+public class JGraphEdgeRenderer extends EdgeRenderer {
 
     double[] coo = new double[6];
 
@@ -205,4 +205,4 @@ public class vEdgeRenderer extends EdgeRenderer {
         return null;
     }
 
-} // end class file vEdgeRenderer.java
+} // end class file JGraphEdgeRenderer.java

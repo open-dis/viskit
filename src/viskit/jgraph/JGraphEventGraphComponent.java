@@ -35,7 +35,7 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphEventGraphComponent extends JGraph implements GraphModelListener
+public class JGraphEventGraphComponent extends JGraph implements GraphModelListener
 {
     static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
 
@@ -48,7 +48,7 @@ public class vGraphEventGraphComponent extends JGraph implements GraphModelListe
      * @param model a model of the node with its specific edges
      * @param frame the main view frame canvas toEventNode render toEventNode
      */
-    public vGraphEventGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame)
+    public JGraphEventGraphComponent(JGraphVisualModel model, EventGraphViewFrame frame)
 	{
         super(model);
         parent = frame;
@@ -59,30 +59,29 @@ public class vGraphEventGraphComponent extends JGraph implements GraphModelListe
 	}
 	private void initialize ()
 	{
-        vGraphEventGraphComponent instance = this;
+        JGraphEventGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
+		// jGraph initializations
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap - TODO expose interface
         this.setGridSize(ViskitStatics.DEFAULT_GRID_SIZE);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new JGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
 		
-//		double defaultScale = this.getScale();
 		this.setScale(ViskitStatics.DEFAULT_ZOOM); // initialization
-
-        // Set the Tolerance toEventNode 2 Pixel
-        setTolerance(ViskitStatics.DEFAULT_GRID_SNAP);
+		this.setMinimumMove (ViskitStatics.DEFAULT_GRID_SIZE);
+        this.setTolerance(ViskitStatics.DEFAULT_SELECT_TOLERANCE);
 
         // Jump toEventNode default port on connect
         setJumpToDefaultPort(true);
 
         // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new JGraphGraphUndoManager(parent.getController());
         addGraphSelectionListener((GraphSelectionListener) undoManager);
         jGraphVisualModel.addUndoableEditListener(undoManager);
         jGraphVisualModel.addGraphModelListener(instance);
@@ -135,13 +134,13 @@ public class vGraphEventGraphComponent extends JGraph implements GraphModelListe
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphUI());    // we use our own for node/edge inspector editing
+        setUI(new JGraphUI());    // we use our own for node/edge inspector editing
         //setUI(new BasicGraphUI());  // test
         invalidate();
     }
 
     public ViskitElement getViskitElementAt(Point p) {
-        Object cell = vGraphEventGraphComponent.this.getFirstCellForLocation(p.x, p.y);
+        Object cell = JGraphEventGraphComponent.this.getFirstCellForLocation(p.x, p.y);
         if (cell != null && cell instanceof CircleCell) {
             return (ViskitElement) ((CircleCell) cell).getUserObject();
         }
@@ -699,7 +698,7 @@ class vPortView extends PortView {
  */
 class vEdgeView extends EdgeView {
 
-    static vEdgeRenderer localRenderer = new vEdgeRenderer();
+    static JGraphEdgeRenderer localRenderer = new JGraphEdgeRenderer();
 
     public vEdgeView(Object cell) {
         super(cell);
@@ -716,7 +715,7 @@ class vEdgeView extends EdgeView {
  */
 class vSelfEdgeView extends vEdgeView {
 
-    static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
+    static JGraphSelfEdgeRenderer localRenderer2 = new JGraphSelfEdgeRenderer();
 
     public vSelfEdgeView(Object cell) {
         super(cell);
@@ -747,7 +746,7 @@ class CircleCell extends DefaultGraphCell {
  */
 class CircleView extends VertexView {
 
-    static vVertexRenderer localRenderer = new vVertexRenderer();
+    static JGraphVertexRenderer localRenderer = new JGraphVertexRenderer();
 
     public CircleView(Object cell) {
         super(cell);

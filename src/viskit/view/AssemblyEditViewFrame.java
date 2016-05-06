@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.view;
 
-import viskit.jgraph.VgraphAssemblyComponentWrapper;
+import viskit.jgraph.JGraphAssemblyComponentWrapper;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.LogUtilities;
@@ -72,7 +72,7 @@ import viskit.images.AdapterIcon;
 import viskit.images.PropertyChangeListenerImageIcon;
 import viskit.images.PropertyChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
-import viskit.jgraph.vGraphAssemblyModel;
+import viskit.jgraph.JGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
@@ -197,18 +197,18 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphAssemblyComponentWrapper getCurrentVgraphAssemblyComponentWrapper() {
+    public JGraphAssemblyComponentWrapper getCurrentVgraphAssemblyComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
         }
 
         JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
-        return (VgraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
+        return (JGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphAssemblyComponentWrapper vcw = getCurrentVgraphAssemblyComponentWrapper();
+        JGraphAssemblyComponentWrapper vcw = getCurrentVgraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
@@ -252,7 +252,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         @Override
         public void stateChanged(ChangeEvent e) {
-            VgraphAssemblyComponentWrapper myVgacw = getCurrentVgraphAssemblyComponentWrapper();
+            JGraphAssemblyComponentWrapper myVgacw = getCurrentVgraphAssemblyComponentWrapper();
 
             if (myVgacw == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
@@ -723,8 +723,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public void addTab(AssemblyModel assemblyModel)
 	{
-        vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
-        VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
+        JGraphAssemblyModel vGAmod = new JGraphAssemblyModel();
+        JGraphAssemblyComponentWrapper graphPane = new JGraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.setjGraph(graphPane);                               // todo fix this
 
 		if (treePanels == null) // viskit opened with no active project
@@ -784,7 +784,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         for (int i = 0; i < ca.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            JGraphAssemblyComponentWrapper vgacw = (JGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgacw.assemblyModel == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
@@ -824,7 +824,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         for (int i = 0; i < vm.length; i++) {
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            JGraphAssemblyComponentWrapper vgacw = (JGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgacw.assemblyModel;
         }
         return vm;

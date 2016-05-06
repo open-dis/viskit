@@ -61,7 +61,7 @@ import org.jgraph.graph.PortView;
  * Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class vGraphMarqueeHandler extends BasicMarqueeHandler {
+public class JGraphMarqueeHandler extends BasicMarqueeHandler {
 
     /** Holds the Start and the Current Point */
     protected Point2D start, current;
@@ -77,7 +77,7 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
 
     private JGraph graph;
 
-    public vGraphMarqueeHandler(JGraph graph) {
+    public JGraphMarqueeHandler(JGraph graph) {
 
         this.graph = graph;
 
@@ -199,13 +199,13 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
         if (e != null && port != null && firstPort != null && firstPort != port)
 		{
             // Then Establish Connection
-            if (graph instanceof vGraphEventGraphComponent)
+            if (graph instanceof JGraphEventGraphComponent)
 			{
-                ((vGraphEventGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+                ((JGraphEventGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             } 
 			else
 			{
-                (  (vGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+                (  (JGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             }
             e.consume();
         }
@@ -218,7 +218,7 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
             }
 			else
 			{
-                ((vGraphAssemblyModel)graphModel).reDrawNodes();
+                ((JGraphAssemblyModel)graphModel).reDrawNodes();
             }
         }
         // Reset Global Vars
@@ -358,4 +358,4 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
                 (int) (r.getWidth() + 2 * s), (int) (r.getHeight() + 2 * s));
     }
 
-} // end class file vGraphMarqueeHandler.java
+} // end class file JGraphMarqueeHandler.java

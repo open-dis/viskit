@@ -103,10 +103,11 @@ public class ViskitStatics {
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 	
-	public static final double DEFAULT_ZOOM           = 1.50d;
-	public static final double DEFAULT_ZOOM_INCREMENT = 0.25d;
-	public static final int    DEFAULT_GRID_SIZE      = 10; // pixels
-	public static final int    DEFAULT_GRID_SNAP      = 40; // pixels
+	public static final double DEFAULT_ZOOM             = 1.50d;
+	public static final double DEFAULT_ZOOM_INCREMENT   = 0.25d;
+	public static final int    DEFAULT_SELECT_TOLERANCE =  4; // pixels, used for seleting an object, jGraph default is 4
+	public static final int    DEFAULT_GRID_SIZE        = 10; // pixels, also applied to minimumMove
+	public static final int    DEFAULT_GRID_SNAP        = 10; // pixels, also used for minimumMove  // TODO fix
 	
 	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
 	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";

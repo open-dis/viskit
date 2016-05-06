@@ -20,9 +20,9 @@ import viskit.model.*;
  * @since 3:17:59 PM
  * @version $Id$
  */
-public class vGraphAssemblyUI extends BasicGraphUI {
+public class JGraphAssemblyUI extends BasicGraphUI {
 
-    public vGraphAssemblyUI() {
+    public JGraphAssemblyUI() {
         super();
     }
 
@@ -56,8 +56,8 @@ public class vGraphAssemblyUI extends BasicGraphUI {
         } else if (cell instanceof AssemblyCircleCell) {
             Object nodeObj = ((AssemblyCircleCell) cell).getUserObject();
             cntl.eventGraphEdit((EventGraphNode) nodeObj);
-        } else if (cell instanceof AssemblyPropListCell) {
-            Object nodeObj = ((AssemblyPropListCell) cell).getUserObject();
+        } else if (cell instanceof AssemblyPropertyListCell) {
+            Object nodeObj = ((AssemblyPropertyListCell) cell).getUserObject();
             cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) nodeObj);
         }
     }

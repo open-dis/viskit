@@ -32,7 +32,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
-import viskit.jgraph.vGraphUndoManager;
+import viskit.jgraph.JGraphGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -344,7 +344,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
         if (eventGraphViewFrame.getCurrentEventGraphComponentWrapper() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
+            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -977,7 +977,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         isUndo = true;
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
 
         Object[] roots = view.getCurrentEventGraphComponentWrapper().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
@@ -1025,7 +1025,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentEventGraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -1038,7 +1038,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
 
         ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));

@@ -81,7 +81,7 @@ import org.jgraph.graph.*;
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
  */
-public class vVertexRenderer
+public class JGraphVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
@@ -123,7 +123,7 @@ public class vVertexRenderer
     /**
      * Constructs a renderer that may be used to render vertices.
      */
-    public vVertexRenderer() {
+    public JGraphVertexRenderer() {
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
@@ -141,7 +141,7 @@ public class vVertexRenderer
      * Constructs a renderer that may be used to render vertices.
      * @param hideGroups
      */
-    public vVertexRenderer(boolean hideGroups) {
+    public JGraphVertexRenderer(boolean hideGroups) {
         this();
         this.hideGroups = hideGroups;
     }

@@ -23,9 +23,9 @@ import viskit.model.SchedulingEdge;
  * @since 3:17:59 PM
  * @version $Id$
  */
-public class vGraphUI extends BasicGraphUI {
+public class JGraphUI extends BasicGraphUI {
 
-    public vGraphUI() {
+    public JGraphUI() {
         super();
     }
 

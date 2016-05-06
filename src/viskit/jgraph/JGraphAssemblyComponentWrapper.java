@@ -79,15 +79,15 @@ import viskit.view.AssemblyEditViewFrame;
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
+public class JGraphAssemblyComponentWrapper extends JGraphAssemblyComponent {
 
     public AssemblyModel assemblyModel;
     public JSplitPane drawingSplitPane;
     public JSplitPane trees;
     public boolean isActive = true;
 
-    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyEditViewFrame frame) {
+    public JGraphAssemblyComponentWrapper(JGraphAssemblyModel model, AssemblyEditViewFrame frame) {
         super(model, frame);
     }
 
-} // end class file VgraphAssemblyComponentWrapper.java
+} // end class file JGraphAssemblyComponentWrapper.java

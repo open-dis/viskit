@@ -62,7 +62,7 @@ import viskit.model.ViskitElement;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vRouting">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
+public class JGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
     Map<String, Vector<Object>> nodePairs = new HashMap<>();
 
@@ -190,7 +190,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
             return egn.getModelKey();
         } else if (o instanceof AssemblyPropListView) {
             AssemblyPropListView apv = (AssemblyPropListView) o;
-            AssemblyPropListCell apc = (AssemblyPropListCell) apv.getCell();
+            AssemblyPropertyListCell apc = (AssemblyPropertyListCell) apv.getCell();
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
@@ -248,4 +248,4 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         return GraphConstants.STYLE_BEZIER;
     }
 
-} // end class file vRouting.java
+} // end class file JGraphRouting.java

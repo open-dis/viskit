@@ -47,7 +47,7 @@ public class JGraphVisualModel extends DefaultGraphModel {
         GraphConstants.setOpaque(viskitEdgeStyle, true);
         GraphConstants.setBackground(viskitEdgeStyle, new Color(255, 255, 255, 180));
         GraphConstants.setForeground(viskitEdgeStyle, Color.black);
-        GraphConstants.setRouting(viskitEdgeStyle, new vRouting());
+        GraphConstants.setRouting(viskitEdgeStyle, new JGraphRouting());
 
         // dup for cancel
         viskitCancelEdgeStyle = new AttributeMap();

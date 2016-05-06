@@ -6,7 +6,9 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.AssemblyNode;
@@ -51,6 +53,7 @@ import viskit.model.AssemblyNode;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 /**
  * This renderer displays entries that implement the CellView interface
  * and supports the following attributes. If the cell view is not a leaf,
@@ -74,38 +77,57 @@ import viskit.model.AssemblyNode;
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
  */
-public class vAssemblyEgVertexRenderer
+public class JGraphAssemblyPclVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
-    /** Use this flag to control if groups should appear transparent. */
+    /**
+     * Use this flag to control if groups should appear transparent.
+     */
     protected boolean hideGroups = true;
 
-    /** Cache the current graph for drawing. */
+    /**
+     * Cache the current graph for drawing.
+     */
     transient protected JGraph graph;
 
-    /** Cache the current shape for drawing. */
+    /**
+     * Cache the current shape for drawing.
+     */
     transient protected VertexView view;
 
-    /** Cached hasFocus and selected value. */
-    transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
+    /**
+     * Cached hasFocus and selected value.
+     */
+    transient protected boolean hasFocus,
+            selected,
+            preview,
+            opaque,
+            childrenSelected;
 
-    /** Cached default foreground and default background. */
-    transient protected Color defaultForeground,  defaultBackground,  bordercolor;
+    /**
+     * Cached default foreground and default background.
+     */
+    transient protected Color defaultForeground, defaultBackground, bordercolor;
 
-    /** Cached borderwidth. */
+    /**
+     * Cached borderwidth.
+     */
     transient protected int borderWidth;
 
-    /** Cached value of the double buffered state */
+    /**
+     * Cached value of the double buffered state
+     */
     transient boolean isDoubleBuffered = false;
 
     /**
      * Constructs a renderer that may be used to render vertices.
      */
-    public vAssemblyEgVertexRenderer() {
+    public JGraphAssemblyPclVertexRenderer() {
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
+
     private float[] dash = {5f, 5f};
     private BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -118,25 +140,24 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
-     * @param hideGroups whether or not to hide groups
+     * @param hideGroups
      */
-    public vAssemblyEgVertexRenderer(boolean hideGroups) {
+    public JGraphAssemblyPclVertexRenderer(boolean hideGroups) {
         this();
         this.hideGroups = hideGroups;
     }
 
     /**
-     * Configure and return the renderer based on the passed in
-     * components. The value is typically set from messaging the
-     * graph with <code>convertValueToString</code>.
-     * We recommend you check the value's class and throw an
-     * illegal argument exception if it's not correct.
+     * Configure and return the renderer based on the passed in components. The
+     * value is typically set from messaging the graph with
+     * <code>convertValueToString</code>. We recommend you check the value's
+     * class and throw an illegal argument exception if it's not correct.
      *
-     * @param   graph the graph that that defines the rendering context.
-     * @param   view the object that should be rendered.
-     * @param   sel whether the object is selected.
-     * @param   focus whether the object has the focus.
-     * @param   preview whether we are drawing a preview.
+     * @param graph the graph that that defines the rendering context.
+     * @param view the object that should be rendered.
+     * @param sel whether the object is selected.
+     * @param focus whether the object has the focus.
+     * @param preview whether we are drawing a preview.
      * @return	the component used to render the value.
      */
     @Override
@@ -164,7 +185,7 @@ public class vAssemblyEgVertexRenderer
                 // jmb setText(null);
                 setBorder(null);
                 setOpaque(false);
-            // jmb setIcon(null);
+                // jmb setIcon(null);
             }
             return this;
         }
@@ -172,12 +193,11 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Install the attributes of specified cell in this
-     * renderer instance. This means, retrieve every published
-     * key from the cells hashtable and set global variables
-     * or superclass properties accordingly.
+     * Install the attributes of specified cell in this renderer instance. This
+     * means, retrieve every published key from the cells hashtable and set
+     * global variables or superclass properties accordingly.
      *
-     * @param view cell to retrieve the attribute values from.
+     * @param view to retrieve the attribute values from.
      */
     protected void installAttributes(CellView view) {
         Map map = view.getAllAttributes();
@@ -201,21 +221,20 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Paint the renderer. Overrides superclass paint
-     * to add specific painting.
+     * Paint the renderer. Overrides superclass paint to add specific painting.
      */
     @Override
     public void paint(Graphics g) {
         try {
             //if (preview && !isDoubleBuffered)
             //	setOpaque(false);
-            super.paint(g);   // jmb this will come down to paintComponent
+            super.paint(g);   // jmb this will come down to paintCompoent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
-        // JDK Bug: Zero length string passed to TextLayout constructor
+            // JDK Bug: Zero length string passed to TextLayout constructor
         }
     }
-    Color circColor = new Color(0xCE, 0xCE, 0xFF); // pale blue 255,255,204); // pale yellow
+    Color circColor = new Color(0xFF, 0xC8, 0xC8); //255,255,204); // pale yellow
     Font myfont = new Font("Verdana", Font.PLAIN, 10);
 
     // jmb
@@ -226,11 +245,12 @@ public class vAssemblyEgVertexRenderer
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(circColor);
         int myoff = 2;
-        g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         //g2.fillOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff); // size of rect is 54,54
+        g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         g2.setColor(Color.darkGray);
         //g2.drawOval(myoff,myoff,r.width-2*myoff,r.height-2*myoff);
-        g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
+        g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
+        g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
@@ -265,32 +285,6 @@ public class vAssemblyEgVertexRenderer
         return sb.toString();
     }
 
-    /*
-    public static void main(String[] args) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-
-                JLabel j = new JLabel("yup");
-                JFrame jf = new JFrame();
-                jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                jf.getContentPane().add(j);
-                jf.pack();
-                jf.setVisible(true);
-                Image ii = j.createImage(500, 500); //"viskit/images/eventNode.png");
-                Graphics gr = ii.getGraphics();
-                FontMetrics fm = gr.getFontMetrics();
-                new vAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia", 50, fm);
-                new vAssemblyEgVertexRenderer().splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA", 50, fm);
-                new vAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia", 50, fm);
-                new vAssemblyEgVertexRenderer().splitIfNeeded("mynameismikebaileyandiliveincalifornia", 50, fm);
-            }
-        });
-    }
-     */
-
     private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
         String[] nuts = new String[2];
         nuts[1] = s;
@@ -324,9 +318,8 @@ public class vAssemblyEgVertexRenderer
             }
         }
         if (i <= 0) {
-            return ra;
-        }    // couldn't get small enough...?
-
+            return ra;    // couldn't get small enough...?
+        }
         // ws is now a small piece of string less than our max
 
         int j;
@@ -337,9 +330,8 @@ public class vAssemblyEgVertexRenderer
             }
         }
         if (j <= 0) {
-            return ra;
-        } // couldn't find a break
-
+            return ra; // couldn't find a break
+        }
         ra[0] = ws.substring(0, j + 1);
         ra[1] = ws.substring(j + 1) + s.substring(i);
         return ra;
@@ -347,24 +339,11 @@ public class vAssemblyEgVertexRenderer
 
     @Override
     protected void paintBorder(Graphics g) {
-    // jmb lose the rectangle super.paintBorder(g);
-
-    // To put a red border around "incompletely-specified" nodes, establish
-    // some connection to the user object, and do a conditional here
-    /*
-    if(userobject shows incomplete) {
-    Graphics2D g2 = (Graphics2D)g;
-    Rectangle r = view.getBounds();
-    g2.setColor(Color.red);
-    g2.drawRoundRect(2,2,r.width-4,r.height-4,20,20);
-    }
-    else
-    ;  // Do nothing
-     */
+        // jmb lose the rectangle super.paintBorder(g);
     }
 
     /**
-     * Provided for subclass users to paint a selection border.
+     * Provided for subclasses to paint a selection border.
      * @param g
      */
     protected void paintSelectionBorder(Graphics g) {
@@ -385,6 +364,7 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * TODO: Not currently used.
+     *
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
@@ -427,45 +407,40 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void validate() {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void revalidate() {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(Rectangle r) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     protected void firePropertyChange(
@@ -473,15 +448,14 @@ public class vAssemblyEgVertexRenderer
             Object oldValue,
             Object newValue) {
         // Strings get interned...
-        if (propertyName.equals("text")) {
+        if ("text".equals(propertyName)) {
             super.firePropertyChange(propertyName, oldValue, newValue);
         }
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -491,9 +465,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -503,9 +476,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -515,9 +487,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -527,9 +498,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -539,9 +509,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -551,9 +520,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -563,9 +531,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -576,6 +543,7 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Returns the hideGroups.
+     *
      * @return boolean
      */
     public boolean isHideGroups() {
@@ -584,9 +552,11 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Sets the hideGroups.
+     *
      * @param hideGroups The hideGroups to set
      */
     public void setHideGroups(boolean hideGroups) {
         this.hideGroups = hideGroups;
     }
+
 }

@@ -1421,20 +1421,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     public final static String OPENPROJECT_METHOD = "openProject"; // must match following method name.  Not possible to accomplish this programmatically.
-    /** Open an already existing Viskit Project.  Called via reflection from
-     * the Actions library.
-     */
+    /** Open an already existing Viskit Project.  Called via reflection from the Actions library. */
     public void openProject () // method name must exactly match preceding string value
 	{
         ViskitGlobals.instance().getAssemblyEditViewFrame().openProject();
     }
 
-    /** Close the current project.
-     */
+    /** Close the current project. */
     public void closeProject ()
 	{
         ViskitGlobals.instance().getAssemblyEditViewFrame().closeProject();
     }
+	
+    /** Edit the current project properties. */
     public void editProjectProperties (boolean pathEditable)
 	{
 		this.pathEditable = pathEditable;
