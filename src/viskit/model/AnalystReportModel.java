@@ -1030,7 +1030,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * Assembly image of the loaded Assembly File.  This PNG will be dropped
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
-    private void captureAssemblyImage() {
+    private void captureAssemblyImage()
+	{
         String assemblyFilePath = assemblyFile.getPath();
         assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf("Assemblies"), assemblyFilePath.length());
         File assemblyImage = new File(

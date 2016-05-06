@@ -834,9 +834,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         zipAndMailProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(zipAndMailProjectMI);
 		
+		// duplicate entry, also on top-level ViskitApplicationFrame Files menu
 		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK), isProjectOpen);
 		closeProjectMI.setEnabled (isProjectOpen);
-		projectsMenu.add(closeProjectMI); // duplicate entry, also on top-level ViskitApplicationFrame Files menu
+		projectsMenu.add(closeProjectMI);
 		
 		// ===================================================
 		// Set up Event Graphs menu

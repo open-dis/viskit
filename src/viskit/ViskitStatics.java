@@ -106,8 +106,10 @@ public class ViskitStatics {
 	public static final double DEFAULT_ZOOM             = 1.50d;
 	public static final double DEFAULT_ZOOM_INCREMENT   = 0.25d;
 	public static final int    DEFAULT_SELECT_TOLERANCE =  4; // pixels, used for seleting an object, jGraph default is 4
+	
+    // apparently jGraph has a factor-of-2 error when applying grid size; see ViskitGlobals.snapToGrid() method
 	public static final int    DEFAULT_GRID_SIZE        = 10; // pixels, also applied to minimumMove
-	public static final int    DEFAULT_GRID_SNAP        = 10; // pixels, also used for minimumMove  // TODO fix
+	public static final int    DEFAULT_GRID_SNAP        = 10; // pixels, also used for minimumMove
 	
 	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
 	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
@@ -130,18 +132,20 @@ public class ViskitStatics {
         ViskitProject.DEFAULT_PROJECT_NAME = projectDirectory.getName();
         ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
 
-        XMLConfiguration historyConfig = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
-        List<String> valueAr = historyConfig.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
+        XMLConfiguration projectHistoryConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
+        List<String> projectHistoryList = projectHistoryConfiguration.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
+		if (projectHistoryList == null)
+			projectHistoryList = new ArrayList<>();
         boolean match = false;
-        for (String s : valueAr) {
+        for (String s : projectHistoryList) {
             if (s.equals(projectDirectory.getPath())) {
                 match = true;
                 break;
             }
         }
         if (!match) {
-            historyConfig.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projectDirectory.getPath());
-            historyConfig.getDocument().normalize();
+            projectHistoryConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + projectHistoryList.size() + ")[@value]", projectDirectory.getPath());
+            projectHistoryConfiguration.getDocument().normalize();
         }
     }
 

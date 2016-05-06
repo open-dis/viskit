@@ -42,11 +42,12 @@ public class ArgumentsPanel extends ViskitTablePanel {
     }
 
     @Override
-    public ViskitElement newRowObject() {
-        EventArgument ea = new EventArgument();
-        ea.setName("arg_" + count++);
-        ea.setType("int");
-        return ea;
+    public ViskitElement newRowObject()
+	{
+        EventArgument eventArgument = new EventArgument();
+        eventArgument.setName("argument_" + count++);
+        eventArgument.setType("int");
+        return eventArgument;
     }
 
     @Override

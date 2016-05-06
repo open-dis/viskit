@@ -52,6 +52,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -1116,13 +1117,25 @@ public class ViskitGlobals {
         @Override
         public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
 
-            JLabel lab = new JLabel(value);
+            JLabel label = new JLabel(value);
             if (value.equals(moreTypesString)) {
-                lab.setBorder(BorderFactory.createRaisedBevelBorder());
+                label.setBorder(BorderFactory.createRaisedBevelBorder());
             }
 
-            return lab;
+            return label;
         }
     }
+	
+	public static Point2D snapToGrid (Point2D point)
+	{
+		Point2D snappedPoint = (Point2D) point.clone();
+		// apparently jGraph has a factor-of-2 error when applying grid size
+//		double gridSize = // TODO
+		double roundOff = ViskitStatics.DEFAULT_GRID_SIZE / 4.0;
+		
+		snappedPoint.setLocation(Math.round((point.getX() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE / 2.0)) * (ViskitStatics.DEFAULT_GRID_SIZE / 2.0),
+				                 Math.round((point.getY() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE / 2.0)) * (ViskitStatics.DEFAULT_GRID_SIZE / 2.0));
+		return snappedPoint;
+	}
 
 } // end class file ViskitGlobals.java

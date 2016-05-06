@@ -1255,24 +1255,30 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle) {
-        if (assemblyFileChooser == null) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
+	{
+        if (assemblyFileChooser == null)
+		{
             assemblyFileChooser = buildOpenSaveChooser();
         }
 
         assemblyFileChooser.setDialogTitle(dialogTitle);
         File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory(), suggestedName);
-        if (!file.getParentFile().isDirectory()) {
+        if (!file.getParentFile().isDirectory())
+		{
              file.getParentFile().mkdirs();
         }
-        if (showUniqueName) {
+        if (showUniqueName)
+		{
              file = getUniqueName(suggestedName);
         }
 
         assemblyFileChooser.setSelectedFile(file);
-        int retv = assemblyFileChooser.showSaveDialog(this);
-        if (retv == JFileChooser.APPROVE_OPTION) {
-            if (assemblyFileChooser.getSelectedFile().exists()) {
+        int returnValue = assemblyFileChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION)
+		{
+            if (assemblyFileChooser.getSelectedFile().exists())
+			{
                 if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
@@ -1290,10 +1296,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
      *
      * @param file to candidate EG file
      */
-    public void deleteCanceledSave(File file) {
-        if (file.exists()) {
-            if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory())) {
+    public void deleteCanceledSave(File file)
+	{
+        if (file.exists())
+		{
+            if (file.delete())
+			{
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory()))
+				{
                     deleteCanceledSave(file.getParentFile());
                 }
             }

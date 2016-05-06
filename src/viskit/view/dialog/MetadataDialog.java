@@ -206,7 +206,10 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 		
 		String path = "";
-		if      (this instanceof AssemblyMetadataDialog)
+		
+		if (ViskitGlobals.instance().getCurrentViskitProject() == null) // safety net
+			path = graphMetadata.path;
+		else if (this instanceof AssemblyMetadataDialog)
 			 path = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
 		else if (this instanceof EventGraphMetadataDialog)
 			 path = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().getPath();

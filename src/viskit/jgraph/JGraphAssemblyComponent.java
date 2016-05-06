@@ -14,6 +14,7 @@ import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.view.AssemblyEditViewFrame;
 import viskit.model.ModelEvent;
@@ -238,26 +239,27 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 if (cell instanceof AssemblyCircleCell)
 				{
                     AssemblyCircleCell assemblyCircleCell = (AssemblyCircleCell) cell;
-                    AttributeMap m = assemblyCircleCell.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
-                    if (r != null) {
-                        EventGraphNode eventGraphNod = (EventGraphNode) assemblyCircleCell.getUserObject();
-                        eventGraphNod.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent.getModel()).changeEventGraphNode(eventGraphNod);
-                        m.put("bounds", m.createRect(eventGraphNod.getPosition().getX(), eventGraphNod.getPosition().getY(), r.width, r.height));
+                    AttributeMap attributeMap = assemblyCircleCell.getAttributes();
+                    Rectangle2D.Double rectangle2D = (Rectangle2D.Double) attributeMap.get("bounds");
+                    if (rectangle2D != null) {
+                        EventGraphNode eventGraphNode = (EventGraphNode) assemblyCircleCell.getUserObject();
+                        eventGraphNode.setPosition((ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)))));
+                        ((AssemblyModel) parent.getModel()).changeEventGraphNode(eventGraphNode);
+                        attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 } 
 				else if (cell instanceof AssemblyPropertyListCell)
 				{
-                    AssemblyPropertyListCell plc = (AssemblyPropertyListCell) cell;
+                    AssemblyPropertyListCell assemblyPropertyListCell = (AssemblyPropertyListCell) cell;
 
-                    AttributeMap m = plc.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
-                    if (r != null) {
-                        PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) plc.getUserObject();
-                        pcln.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent. getModel()).changePclNode(pcln);
-                        m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
+                    AttributeMap attributeMap = assemblyPropertyListCell.getAttributes();
+                    Rectangle2D.Double rectangle2D = (Rectangle2D.Double) attributeMap.get("bounds");
+                    if (rectangle2D != null)
+					{
+                        PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) assemblyPropertyListCell.getUserObject();
+                        propertyChangeListenerNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y))));
+                        ((AssemblyModel) parent. getModel()).changePclNode(propertyChangeListenerNode);
+                        attributeMap.put("bounds", attributeMap.createRect(propertyChangeListenerNode.getPosition().getX(), propertyChangeListenerNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 }
             }
@@ -468,6 +470,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         } else {
             point = (Point2D) point.clone();
         }
+		point = ViskitGlobals.snapToGrid (point); // utilize Viskit grid size rather that faulty jGraph snap
 
         // Add a Bounds Attribute to the Map
         GraphConstants.setBounds(map, new Rectangle2D.Double(
@@ -656,7 +659,7 @@ class vAssyAdapterEdgeView extends vEdgeView {
 
 class vAssySelEdgeView extends vEdgeView {
 
-    static vAssySelEdgeRenderer vaser = new vAssySelEdgeRenderer();
+    static JGraphAssemblySelectedEdgeRenderer vaser = new JGraphAssemblySelectedEdgeRenderer();
 
     public vAssySelEdgeView(Object cell) {
         super(cell);
@@ -757,7 +760,8 @@ class vAssyAdapterEdgeRenderer extends JGraphEdgeRenderer {
     }
 
     @Override
-    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
+    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst)
+	{
         double d = Math.max(1, dst.distance(src));
         double ax = -(size * (dst.getX() - src.getX()) / d);
         double ay = -(size * (dst.getY() - src.getY()) / d);
@@ -770,7 +774,7 @@ class vAssyAdapterEdgeRenderer extends JGraphEdgeRenderer {
     }
 }
 
-class vAssySelEdgeRenderer extends JGraphEdgeRenderer {
+class JGraphAssemblySelectedEdgeRenderer extends JGraphEdgeRenderer {
 
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {

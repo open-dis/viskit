@@ -479,6 +479,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			initializeViskitConfiguration();
 		}
         List<String> eventGraphFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
+		if (eventGraphFilePathList == null)
+			openEventGraphsFileList = new ArrayList<>(4);
+		
         int index = 0;
         for (String eventGraphFilePath : eventGraphFilePathList) {
             if (recentEventGraphFileSet.add(new File(eventGraphFilePath))) // returns true if file added

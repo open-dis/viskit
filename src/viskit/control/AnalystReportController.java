@@ -83,7 +83,14 @@ public class AnalystReportController extends mvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+        File analystReportDirectory;
+		if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+			 analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+		else
+		{
+			LOG.error ("No current viskit project");
+			return;
+		}
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today

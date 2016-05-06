@@ -41,8 +41,8 @@ public class JGraphAssemblyUI extends BasicGraphUI {
         return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
-    private void createEditDialog(Object cell) {
-
+    private void createEditDialog(Object cell)
+	{
         AssemblyController cntl = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         if (cell instanceof vAssemblyEdgeCell) {
             Object edgeObj = ((vAssemblyEdgeCell) cell).getUserObject();

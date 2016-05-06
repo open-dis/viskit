@@ -777,8 +777,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             File logFile;
 
             @Override
-            public Void doInBackground() {
-
+            public Void doInBackground()
+			{
+				if (ViskitGlobals.instance().getCurrentViskitProject() == null)
+					return null;
                 projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
                 projectZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
@@ -2413,6 +2415,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			initializeHistoryXMLConfiguration();
 		}
         List<String> projectHistoryList = historyXMLConfiguration.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
+		if (projectHistoryList == null)
+			projectHistoryList = new ArrayList<>();
         LOG.debug("recordProjectFiles projectHistoryList.size()=" + projectHistoryList.size());
         for (String project : projectHistoryList)
 		{
@@ -2501,7 +2505,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	{
         try {
             historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
-        } catch (Exception e)
+			if (historyXMLConfiguration == null)
+				historyXMLConfiguration = new XMLConfiguration();
+        } 
+		catch (Exception e)
 		{
             LOG.error("Error loading recent history file: " + e.getMessage());
             LOG.warn ("Error, recent history file disabled");

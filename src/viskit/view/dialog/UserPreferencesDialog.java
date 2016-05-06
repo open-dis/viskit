@@ -702,7 +702,8 @@ public class UserPreferencesDialog extends JDialog {
             if (!file.exists()) {
 
                 // Allow a relative path for Diskit-Test (Diskit)
-                if (path.contains("..")) {
+                if (path.contains("..") && (ViskitGlobals.instance().getCurrentViskitProject() != null))
+				{
                     file = new File(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getParent() + "/" + path.replaceFirst("../", ""));
                 }
             }

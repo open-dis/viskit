@@ -52,6 +52,7 @@ import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphModel;
 import org.jgraph.graph.Port;
 import org.jgraph.graph.PortView;
+import viskit.ViskitGlobals;
 
 /**
  * Custom MarqueeHandler that Connects Vertices
@@ -64,7 +65,7 @@ import org.jgraph.graph.PortView;
 public class JGraphMarqueeHandler extends BasicMarqueeHandler {
 
     /** Holds the Start and the Current Point */
-    protected Point2D start, current;
+    protected Point2D startPoint, currentPoint;
 
     /** Holds the First and the Current Port */
     protected PortView port, firstPort;
@@ -133,7 +134,7 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
     public void mousePressed(final MouseEvent e) {
         if (port != null && graph.isPortsVisible()) {
             // Remember Start Location
-            start = graph.toScreen(port.getLocation());
+            startPoint = graph.toScreen(port.getLocation());
             // Remember First Port
             firstPort = port;
         } else // Call Superclass
@@ -144,9 +145,10 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
 
     // Find Port under Mouse and Repaint Connector
     @Override
-    public void mouseDragged(MouseEvent e) {
+    public void mouseDragged(MouseEvent e)
+	{
         // If remembered Start Point is Valid
-        if (start != null) {
+        if (startPoint != null) {
             // Fetch Graphics from Graph
             Graphics g = graph.getGraphics();
             // Reset Remembered Port
@@ -158,10 +160,10 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
                 // If Port was found then Point to Port Location
                 port = newPort;
                 if (port != null) {
-                    current = graph.toScreen(port.getLocation());
+                    currentPoint = graph.toScreen(port.getLocation());
                 } // Else If no Port was found then Point to Mouse Location
                 else {
-                    current = graph.snap(e.getPoint());
+                    currentPoint = ViskitGlobals.snapToGrid(graph.snap(e.getPoint()));
                 }
                 // Xor-Paint the new Connector
                 paintConnector(graph.getBackground(), Color.black, g);
@@ -223,7 +225,7 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
         }
         // Reset Global Vars
         firstPort = port = null;
-        start = current = null;
+        startPoint = currentPoint = null;
         // Call Superclass
         super.mouseReleased(e);
     }
@@ -258,10 +260,10 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
 
             drawConnectorLine(g);
         } else {
-            Rectangle dirty = new Rectangle((int) start.getX(), (int) start.getY(), 1, 1);
+            Rectangle dirty = new Rectangle((int) startPoint.getX(), (int) startPoint.getY(), 1, 1);
 
-            if (current != null) {
-                dirty.add(current);
+            if (currentPoint != null) {
+                dirty.add(currentPoint);
             }
 
             dirty.grow(1, 1);
@@ -284,10 +286,10 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
     }
 
     protected void drawConnectorLine(Graphics g) {
-        if (firstPort != null && start != null && current != null) {
+        if (firstPort != null && startPoint != null && currentPoint != null) {
             // Then Draw A Line From Start to Current Point
-            g.drawLine((int) start.getX(), (int) start.getY(),
-                    (int) current.getX(), (int) current.getY());
+            g.drawLine((int) startPoint.getX(), (int) startPoint.getY(),
+                    (int) currentPoint.getX(), (int) currentPoint.getY());
         }
     }
 

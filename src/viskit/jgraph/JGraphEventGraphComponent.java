@@ -19,6 +19,7 @@ import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.view.EventGraphViewFrame;
 import viskit.model.ModelEvent;
@@ -577,6 +578,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
         } else {
             point = (Point2D) point.clone();
         }
+		point = ViskitGlobals.snapToGrid (point); // utilize Viskit grid size rather that faulty jGraph snap
 
         // Add a Bounds Attribute toEventNode the Map.  NOTE: using the length of the
         // node name toEventNode help size the cell does not bode well with the
