@@ -443,10 +443,10 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             case AssemblyEditViewFrame.ADAPTER_MODE:
                 controller.newAdapterArc(oa);
                 break;
-            case AssemblyEditViewFrame.SIMEVLIS_MODE:
+            case AssemblyEditViewFrame.SIM_EVENT_LISTENER_MODE:
                 controller.newSimEvListArc(oa);
                 break;
-            case AssemblyEditViewFrame.PCL_MODE:
+            case AssemblyEditViewFrame.PROPERTY_CHANGE_LISTENER_MODE:
                 controller.newPropertyChangeListArc(oa);
                 break;
             default:

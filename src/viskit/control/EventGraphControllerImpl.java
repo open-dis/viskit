@@ -37,11 +37,11 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
-import viskit.view.AssemblyView;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.EventGraphView;
 import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.view.AssemblyEditView;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -410,7 +410,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
         ofile.delete();
-        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getAssemblyController().getView();
+        AssemblyEditView view = (AssemblyEditView) ViskitGlobals.instance().getAssemblyController().getView();
         view.removeEventGraphFromLEGOTree(f);
     }
 

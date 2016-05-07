@@ -179,7 +179,7 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         mvcController assemblyController = ViskitGlobals.instance().getAssemblyController();
         if (assemblyController != null)
 		{
-            AssemblyView assemblyView = (AssemblyView) assemblyController.getView();
+            AssemblyEditView assemblyView = (AssemblyEditView) assemblyController.getView();
 
             if (assemblyView != null) {
                 assemblyView.openProject();

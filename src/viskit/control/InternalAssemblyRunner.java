@@ -637,7 +637,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 		
         JMenu         editMenu = new JMenu("Edit");
         JMenuItem       copyMI = new JMenuItem("Copy");
-        JMenuItem  selectAllMI = new JMenuItem("Select all");
+        JMenuItem  selectAllMI = new JMenuItem("Select all"); // TODO move to EventGraph and Assembly menus
         JMenuItem   clearAllMI = new JMenuItem("Clear all");
 
         saveOutputMI.addActionListener(saveListener);

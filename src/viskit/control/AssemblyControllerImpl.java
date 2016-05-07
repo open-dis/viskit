@@ -60,12 +60,12 @@ import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.SimulationRunPanel;
 import viskit.view.AssemblyEditViewFrame;
-import viskit.view.AssemblyView;
 import viskit.view.ViskitApplicationFrame;
 import viskit.view.dialog.UserPreferencesDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.view.AssemblyEditView;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -214,7 +214,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int yn = (((AssemblyView) getView()).genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
+            int yn = (((AssemblyEditView) getView()).genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
                     "Ignore my execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -253,7 +253,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>");
 			return;
 		}
-        File[] files = ((AssemblyView) getView()).openFilesAsk();
+        File[] files = ((AssemblyEditView) getView()).openFilesAsk();
         if (files == null)
 		{
             return;
@@ -298,7 +298,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             return;
         }
 
-        AssemblyView vaw = (AssemblyView) getView();
+        AssemblyEditView vaw = (AssemblyEditView) getView();
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
         mod.initialize();
         vaw.addTab(mod);
@@ -358,7 +358,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void markAssemblyFilesOpened() {
 
         // Mark every vAMod opened as "open"
-        AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenAssemblyModelArray();
+        AssemblyModel[] openAlready = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel vAMod : openAlready) {
             if (vAMod.getLastFile() != null) {
                 String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
@@ -424,7 +424,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     AssemblyModel vAMod = (AssemblyModel) getModel();
                     markAssemblyConfigurationClosed(vAMod.getLastFile());
 
-                    AssemblyView view = (AssemblyView) getView();
+                    AssemblyEditView view = (AssemblyEditView) getView();
                     view.deleteTab(vAMod);
 
                     // NOTE: This doesn't work quite right.  If no Assembly is open,
@@ -550,7 +550,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void saveAs () // method name must exactly match preceding string value
 	{
         AssemblyModel model         = (AssemblyModel) getModel();
-        AssemblyView  view          = (AssemblyView) getView();
+        AssemblyEditView  view          = (AssemblyEditView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
 		String    fileName = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
 
@@ -587,7 +587,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyModel) getModel()).setMetadata(graphMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(graphMetadata.name);
+            ((AssemblyEditView) getView()).setSelectedAssemblyName(graphMetadata.name);
         }
     }
     private int eventGraphNodeCount             = 0;
@@ -651,11 +651,19 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	{
 		// if a project is currently open, first ask to confirm
         if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-		     ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
-			 confirmProjectClosing())
+		     ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 		{
-			// perform project closing before continuing
-			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+			boolean continueClosing = confirmProjectClosing();
+			
+			if (!continueClosing)
+			{
+				return; // user decided not to continue, so do not open a new project
+			}
+			else
+			{
+				// perform project closing before continuing
+				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+			}
         }
 		
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
@@ -846,7 +854,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssemblyView and this AssemblyController
+    /** Common method between the AssemblyEditView and this AssemblyController
      *
      * @return indication to continue closing (true) or cancel closing (false)
      */
@@ -866,7 +874,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			 	 message += "<p>&nbsp</p>" + 
 						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" + 
 						    "<p>&nbsp</p>";
-             int responseValue = ((AssemblyView) getView()).genericAskYN(title, message);
+             int responseValue = ((AssemblyEditView) getView()).genericAskYN(title, message);
              if (responseValue == JOptionPane.YES_OPTION)
 			 {
                 doProjectCleanup();
@@ -936,7 +944,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // No vAssemblyModel set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((AssemblyView) getView()).addTab(assemblyModel);
+        ((AssemblyEditView) getView()).addTab(assemblyModel);
 
         GraphMetadata newAssemblyMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assembly
         if (priorAssemblyMetadata != null)
@@ -956,14 +964,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyModel) getModel()).setMetadata(newAssemblyMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
+            ((AssemblyEditView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
 
             // TODO: Implement this
-//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(graphMetadata.description);
+//            ((AssemblyEditView)  getView()).setSelectedEventGraphDescription(graphMetadata.description);
         } 
 		else 
 		{
-            ((AssemblyView) getView()).deleteTab(assemblyModel);
+            ((AssemblyEditView) getView()).deleteTab(assemblyModel);
         }
 		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // prerequisite to buildMenus
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
@@ -978,9 +986,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     @Override
     public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
-    {   AssemblyView view = (AssemblyView) getView();
+    {   AssemblyEditView view = (AssemblyEditView) getView();
         if (view != null)
-            ((AssemblyView) getView()).genericReport(dialogType, title, message);
+            ((AssemblyEditView) getView()).genericReport(dialogType, title, message);
         else {
             JOptionPane.showMessageDialog(null, message, title, dialogType);
         }
@@ -999,7 +1007,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public boolean preQuit() {
 
         // Check for dirty models before exiting, first ask if user wants to save them
-        AssemblyModel[] openAssemblyModels = ((AssemblyView) getView()).getOpenAssemblyModelArray();
+        AssemblyModel[] openAssemblyModels = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel assemblyModel : openAssemblyModels)
 		{
             setModel((mvcModel) assemblyModel);
@@ -1024,7 +1032,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void closeAll () // method name must exactly match preceding string value
 	{
-        AssemblyModel[] assemblyModelArray = ((AssemblyView) getView()).getOpenAssemblyModelArray();
+        AssemblyModel[] assemblyModelArray = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
         for (AssemblyModel assemblyModel : assemblyModelArray) {
             setModel((mvcModel) assemblyModel);
 			setCloseAll(true);
@@ -1105,7 +1113,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newEventGraphNode () // method name must exactly match preceding string value
     {
-        Object o = ((AssemblyView) getView()).getSelectedEventGraph();
+        Object o = ((AssemblyEditView) getView()).getSelectedEventGraph();
 
         if (o != null) {
             if (o instanceof Class<?>) {
@@ -1156,7 +1164,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newPropertyChangeListenerNode () // method name must exactly match preceding string value
     {
-        Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
+        Object o = ((AssemblyEditView) getView()).getSelectedPropertyChangeListener();
 
         if (o != null) {
             if (o instanceof Class<?>) {
@@ -1203,7 +1211,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @return true = continue, false = don't (i.e., we canceled)
      */
     private boolean askToSaveAndContinue() {
-        int yn = (((AssemblyView) getView()).genericAsk("Question", "Save modified assembly?"));
+        int yn = (((AssemblyEditView) getView()).genericAsk("Question", "Save modified assembly?"));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -1361,7 +1369,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerNode(pclNode);
+            boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerNode(pclNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changePclNode(pclNode);
             }
@@ -1373,7 +1381,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditEventGraphNode(eventNode);
+            boolean modified = ((AssemblyEditView) getView()).doEditEventGraphNode(eventNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changeEventGraphNode(eventNode);
             }
@@ -1382,7 +1390,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
+        boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
         }
@@ -1390,7 +1398,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void adapterEdgeEdit(AdapterEdge aEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditAdapterEdge(aEdge);
+        boolean modified = ((AssemblyEditView) getView()).doEditAdapterEdge(aEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeAdapterEdge(aEdge);
         }
@@ -1398,7 +1406,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditSimEventListEdge(seEdge);
+        boolean modified = ((AssemblyEditView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
@@ -1457,7 +1465,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 msg += ", \n" + s;
             }
             String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
-            doRemove = ((AssemblyView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            doRemove = ((AssemblyEditView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
             if (doRemove) {
                 // do edges first?
                 delete();
@@ -1682,7 +1690,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             return;
         }
 
-        ((AssemblyView) getView()).displayXML(assemblyModel.getLastFile()); // TODO getCurrentFile ?
+        ((AssemblyEditView) getView()).displayXML(assemblyModel.getLastFile()); // TODO getCurrentFile ?
     }
 
     private boolean checkSaveForSourceCompile()
@@ -1693,7 +1701,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (assemblyModel == null) {return false;}
         if (assemblyModel.isDirty() || assemblyModel.getLastFile() == null)
 		{
-            int returnValue = ((AssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
+            int returnValue = ((AssemblyEditView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
             if (returnValue != JOptionPane.YES_OPTION)
 			{
                 return false;
@@ -1711,7 +1719,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
             String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
-            ((AssemblyView) getView()).showSource(className, source, vmod.getLastFile().getName());
+            ((AssemblyEditView) getView()).showSource(className, source, vmod.getLastFile().getName());
         }
     }
 
@@ -1783,7 +1791,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param simkitXML2Java the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitXML2Java simkitXML2Java) {
+    public String buildJavaEventGraphSource(SimkitXML2Java simkitXML2Java)
+	{
         String eventGraphSource;
 
         // Must validate XML first and handle any errors before compiling
@@ -1926,7 +1935,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             x2j.unmarshal();
 
             boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
-            if (!isEventGraph) {
+            if (!isEventGraph)
+			{
                 LOG.debug("Is an Assembly: " + !isEventGraph);
                 return null;
             }
@@ -2194,7 +2204,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			if (assemblyDiagramfileName.endsWith(".xml"))
 				assemblyDiagramfileName = assemblyDiagramfileName.substring (0, assemblyDiagramfileName.indexOf(".xml"));
         }
-        File imageFile = ((AssemblyView) getView()).saveFileAsk(assemblyDiagramfileName + imageSaveCount + ".png", true, "Save Assembly Diagram");
+        File imageFile = ((AssemblyEditView) getView()).saveFileAsk(assemblyDiagramfileName + imageSaveCount + ".png", true, "Save Assembly Diagram");
         if (imageFile == null) {
             return;
         }

@@ -14,7 +14,7 @@ import viskit.model.*;
  The MVC design of Viskit means that the ViskitModel and the ViskitView know about the
  chosen view only as much as is described by this interface.
  */
-public interface AssemblyView {
+public interface AssemblyEditView {
 
     // permit user to edit existing entities
     boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode pclNode);
