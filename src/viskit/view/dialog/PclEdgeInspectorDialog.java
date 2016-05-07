@@ -413,10 +413,11 @@ public class PclEdgeInspectorDialog extends JDialog
         }
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class myCloseListener extends WindowAdapter
+	{
         @Override
-        public void windowClosing(WindowEvent e) {
+        public void windowClosing(WindowEvent e)
+		{
             if (modified)
 			{
                 int returnValue = JOptionPane.showConfirmDialog(PclEdgeInspectorDialog.this, "Apply changes?",

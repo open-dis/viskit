@@ -51,7 +51,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap - TODO expose interface
         this.setGridSize(ViskitStatics.DEFAULT_GRID_SIZE);
-        this.setMarqueeHandler(new JGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new JGraphMarqueeHandler(instance, "Assembly"));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -234,6 +234,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         // bounds (position) might have changed:
         if (graphModelChangeArray != null)
 		{
+			double assemblyZoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();
             for (Object cell : graphModelChangeArray)
 			{
                 if (cell instanceof AssemblyCircleCell)
@@ -241,9 +242,10 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     AssemblyCircleCell assemblyCircleCell = (AssemblyCircleCell) cell;
                     AttributeMap attributeMap = assemblyCircleCell.getAttributes();
                     Rectangle2D.Double rectangle2D = (Rectangle2D.Double) attributeMap.get("bounds");
-                    if (rectangle2D != null) {
+                    if (rectangle2D != null)
+					{
                         EventGraphNode eventGraphNode = (EventGraphNode) assemblyCircleCell.getUserObject();
-                        eventGraphNode.setPosition((ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)))));
+                        eventGraphNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)),assemblyZoomFactor));
                         ((AssemblyModel) parent.getModel()).changeEventGraphNode(eventGraphNode);
                         attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
@@ -257,7 +259,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     if (rectangle2D != null)
 					{
                         PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) assemblyPropertyListCell.getUserObject();
-                        propertyChangeListenerNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y))));
+                        propertyChangeListenerNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)),assemblyZoomFactor));
                         ((AssemblyModel) parent. getModel()).changePclNode(propertyChangeListenerNode);
                         attributeMap.put("bounds", attributeMap.createRect(propertyChangeListenerNode.getPosition().getX(), propertyChangeListenerNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
@@ -463,6 +465,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     public Map createCellAttributes(AssemblyNode node) {
         Map map = new Hashtable();
         Point2D point = node.getPosition();
+		double assemblyZoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();
 
         // Snap the Point to the Grid
         if (this != null) {
@@ -470,7 +473,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         } else {
             point = (Point2D) point.clone();
         }
-		point = ViskitGlobals.snapToGrid (point); // utilize Viskit grid size rather that faulty jGraph snap
+		point = ViskitGlobals.snapToGrid (point, assemblyZoomFactor); // utilize Viskit grid size rather that faulty jGraph snap
 
         // Add a Bounds Attribute to the Map
         GraphConstants.setBounds(map, new Rectangle2D.Double(

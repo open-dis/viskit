@@ -125,6 +125,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
+	private double  currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
 
     private int nextTabIndex = 0;
 	
@@ -197,7 +198,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public JGraphAssemblyComponentWrapper getCurrentVgraphAssemblyComponentWrapper() {
+    public JGraphAssemblyComponentWrapper getCurrentJGraphAssemblyComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
@@ -208,7 +209,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     public Component getCurrentJgraphComponent() {
-        JGraphAssemblyComponentWrapper vcw = getCurrentVgraphAssemblyComponentWrapper();
+        JGraphAssemblyComponentWrapper vcw = getCurrentJGraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
@@ -247,12 +248,26 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		return editMenu;
 	}
 
+	/**
+	 * @return the currentZoomFactor
+	 */
+	public double getCurrentZoomFactor() {
+		return currentZoomFactor;
+	}
+
+	/**
+	 * @param currentZoomFactor the currentZoomFactor to set
+	 */
+	public void setCurrentZoomFactor(double currentZoomFactor) {
+		this.currentZoomFactor = currentZoomFactor;
+	}
+
     /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
 
         @Override
         public void stateChanged(ChangeEvent e) {
-            JGraphAssemblyComponentWrapper myVgacw = getCurrentVgraphAssemblyComponentWrapper();
+            JGraphAssemblyComponentWrapper myVgacw = getCurrentJGraphAssemblyComponentWrapper();
 
             if (myVgacw == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
@@ -621,25 +636,31 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
 
-        zoomInButton.addActionListener(new ActionListener() {
-
+        zoomInButton.addActionListener(new ActionListener()
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setScale(getCurrentVgraphAssemblyComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT);
+            public void actionPerformed(ActionEvent e)
+			{
+				currentZoomFactor = getCurrentJGraphAssemblyComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT;
+                getCurrentJGraphAssemblyComponentWrapper().setScale(currentZoomFactor);
             }
         });
         zoomOutButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setScale(Math.max(getCurrentVgraphAssemblyComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT));
+            public void actionPerformed(ActionEvent e)
+			{
+				currentZoomFactor = Math.max(getCurrentJGraphAssemblyComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT); // no smaller than increment value, avoid zero/negative scaling
+                getCurrentJGraphAssemblyComponentWrapper().setScale(currentZoomFactor);
             }
         });
-        zoomResetButton.addActionListener(new ActionListener() {
-
+        zoomResetButton.addActionListener(new ActionListener() 
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
+            public void actionPerformed(ActionEvent e)
+			{
+				currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
+                getCurrentJGraphAssemblyComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
             }
         });
         saveButton.addActionListener(new ActionListener() {
@@ -665,7 +686,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgraphAssemblyComponentWrapper().setPortsVisible(tOrF);
+                getCurrentJGraphAssemblyComponentWrapper().setPortsVisible(tOrF);
             }
         }
 
@@ -837,7 +858,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			return; // legoTree is for assemblies
         legoTree.clear();
         JSplitPane treeSplit = buildTreePanels();
-        getCurrentVgraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
+        getCurrentJGraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         legoTree.repaint();
     }
@@ -992,7 +1013,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public void modelChanged(mvcModelEvent event) {
         switch (event.getID()) {
             default:
-                getCurrentVgraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
+                getCurrentJGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
                 break;
         }
     }

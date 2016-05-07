@@ -90,8 +90,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar      toolBar;    // Mode buttons on the toolbar
     private JLabel        addEvent;
-    private JLabel        addSelfReferential;
-    private JLabel        addSelfCancelRef;
+    private JLabel        addSelfReferentialEdge;
+    private JLabel        addSelfReferentialCancellingEdge;
     private JToggleButton selectMode;
     private JToggleButton arcMode;
     private JToggleButton cancelArcMode;
@@ -117,6 +117,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private int     menuShortcutCtrlKeyMask;
 	private boolean pathEditable = false;
 	private boolean boundsInitialized = false;
+	private double  currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
 	
     /**
      * Constructor; lays out initial GUI objects
@@ -208,7 +209,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public EventGraphComponentWrapper getCurrentEventGraphComponentWrapper()
+    public EventGraphComponentWrapper getCurrentJGraphEventGraphComponentWrapper()
 	{
         JSplitPane splitPane = (JSplitPane) tabbedPane.getSelectedComponent();
         if (splitPane == null) {
@@ -220,7 +221,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     public Component getCurrentJgraphComponent()
 	{
-        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentEventGraphComponentWrapper();
+        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentJGraphEventGraphComponentWrapper();
         if (eventGraphComponentWrapper == null || eventGraphComponentWrapper.drawingSplitPane == null) {return null;}
         return eventGraphComponentWrapper.drawingSplitPane.getLeftComponent();
     }
@@ -275,13 +276,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		return closeProjectMI;
 	}
 
+	/**
+	 * @return the currentZoomFactor
+	 */
+	public double getCurrentZoomFactor() {
+		return currentZoomFactor;
+	}
+
+	/**
+	 * @param currentZoomFactor the currentZoomFactor to set
+	 */
+	public void setCurrentZoomFactor(double currentZoomFactor) {
+		this.currentZoomFactor = currentZoomFactor;
+	}
+
     /** Tab switch: this will come in with the newly selected tab in place */
     class TabSelectionHandler implements ChangeListener {
 
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            EventGraphComponentWrapper myVgcw = getCurrentEventGraphComponentWrapper();
+            EventGraphComponentWrapper myVgcw = getCurrentJGraphEventGraphComponentWrapper();
 
             if (myVgcw == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
@@ -509,7 +524,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void setSelectedEventGraphDescription(String description) {
-        JSplitPane splitPane = getCurrentEventGraphComponentWrapper().stateParameterSplitPane;
+        JSplitPane splitPane = getCurrentJGraphEventGraphComponentWrapper().stateParameterSplitPane;
         JPanel panel = (JPanel) splitPane.getTopComponent();
         Component[] components = panel.getComponents();
         for (Component c : components) {
@@ -1037,15 +1052,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
         addEvent.setIcon(new EventNodeIcon());
 
-        addSelfReferential = makeJLabel("viskit/images/selfReferentialArc.png",
+        addSelfReferentialEdge = makeJLabel("viskit/images/selfReferentialArc.png",
                 "Drag onto an existing SimEntity node to add a self-referential scheduling edge");
-        addSelfReferential.setBorder(BorderFactory.createCompoundBorder(
+        addSelfReferentialEdge.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        addSelfCancelRef = makeJLabel("viskit/images/selfCancelArc.png",
+        addSelfReferentialCancellingEdge = makeJLabel("viskit/images/selfCancelArc.png",
                 "Drag onto an existing SimEntity node to add a self-referential cancelling edge");
-        addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
+        addSelfReferentialCancellingEdge.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
@@ -1084,9 +1099,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(addEvent);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(addSelfReferential);
+        getToolBar().add(addSelfReferentialEdge);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(addSelfCancelRef);
+        getToolBar().add(addSelfReferentialCancellingEdge);
 
         getToolBar().addSeparator(new Dimension(24, 24));
 
@@ -1121,25 +1136,31 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);
 
-        zoomInButton.addActionListener(new ActionListener() {
-
+        zoomInButton.addActionListener(new ActionListener()
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setScale(getCurrentEventGraphComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT);
+            public void actionPerformed(ActionEvent e)
+			{
+				currentZoomFactor = getCurrentJGraphEventGraphComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT;
+                getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
             }
         });
-        zoomOutButton.addActionListener(new ActionListener() {
-
+        zoomOutButton.addActionListener(new ActionListener()
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setScale(Math.max(getCurrentEventGraphComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT));
+            public void actionPerformed(ActionEvent e)
+			{
+				currentZoomFactor = Math.max(getCurrentJGraphEventGraphComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT); // no smaller than increment value, avoid zero/negative scaling
+                getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
             }
         });
         zoomResetButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
+            public void actionPerformed(ActionEvent e) 
+			{
+				currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
+                getCurrentJGraphEventGraphComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
             }
         });
         saveButton.addActionListener(new ActionListener() {
@@ -1156,10 +1177,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         DragMouseAdapter dma = new DragMouseAdapter();
         addEvent.setTransferHandler(th);
         addEvent.addMouseListener(dma);
-        addSelfReferential.setTransferHandler(th);
-        addSelfReferential.addMouseListener(dma);
-        addSelfCancelRef.setTransferHandler(th);
-        addSelfCancelRef.addMouseListener(dma);
+        addSelfReferentialEdge.setTransferHandler(th);
+        addSelfReferentialEdge.addMouseListener(dma);
+        addSelfReferentialCancellingEdge.setTransferHandler(th);
+        addSelfReferentialCancellingEdge.addMouseListener(dma);
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
@@ -1169,21 +1190,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setPortsVisible(false);
+                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(false);
             }
         });
         arcMode.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setPortsVisible(true);
+                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
             }
         });
         cancelArcMode.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentEventGraphComponentWrapper().setPortsVisible(true);
+                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
             }
         });
 
@@ -1315,49 +1336,53 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
                 case ARC_MODE:
-                    getCurrentEventGraphComponentWrapper().setCursor(arc);
+                    getCurrentJGraphEventGraphComponentWrapper().setCursor(arc);
                     break;
                 case CANCEL_ARC_MODE:
-                    getCurrentEventGraphComponentWrapper().setCursor(cancel);
+                    getCurrentJGraphEventGraphComponentWrapper().setCursor(cancel);
                     break;
                 default:
-                    getCurrentEventGraphComponentWrapper().setCursor(select);
+                    getCurrentJGraphEventGraphComponentWrapper().setCursor(select);
             }
         }
     }
 
     final static int NODE_DRAG = 0;
-    final static int SELF_REF_DRAG = 1;
-    final static int SELF_REF_CANCEL_DRAG = 2;
+    final static int SELF_REFERENTIAL_EDGE_DRAG = 1;
+    final static int SELF_REFERENTIAL_CANCELLING_EDGE_DRAG = 2;
     private int dragger;
 
     /** Class to support dragging and dropping on the jGraph pallette */
     class DragMouseAdapter extends MouseAdapter {
 
         @Override
-        public void mousePressed(MouseEvent e) {
-            JComponent c = (JComponent) e.getSource();
-            if (c == EventGraphViewFrame.this.addSelfReferential) {
-                dragger = SELF_REF_DRAG;
-            } else if (c == EventGraphViewFrame.this.addSelfCancelRef) {
-                dragger = SELF_REF_CANCEL_DRAG;
-            } else {
+        public void mousePressed(MouseEvent mouseEvent)
+		{
+            JComponent component = (JComponent) mouseEvent.getSource();
+            if (component == EventGraphViewFrame.this.addSelfReferentialEdge)
+			{
+                dragger = SELF_REFERENTIAL_EDGE_DRAG;
+            } 
+			else if (component == EventGraphViewFrame.this.addSelfReferentialCancellingEdge)
+			{
+                dragger = SELF_REFERENTIAL_CANCELLING_EDGE_DRAG;
+            } 
+			else
+			{
                 dragger = NODE_DRAG;
             }
-
-            TransferHandler handler = c.getTransferHandler();
-            handler.exportAsDrag(c, e, TransferHandler.COPY);
+            TransferHandler handler = component.getTransferHandler();
+            handler.exportAsDrag(component, mouseEvent, TransferHandler.COPY);
         }
     }
 
     /** Class to facilitate dragging new nodes, or self-referential edges onto nodes on the jGraph pallette */
-    class vDropTargetAdapter extends DropTargetAdapter {
-
+    class vDropTargetAdapter extends DropTargetAdapter 
+	{
         @Override
         public void dragOver(DropTargetDragEvent e) {
 
-            // NOTE: this action is very critical in getting JGraph 5.14 to
-            // signal the drop method
+            // NOTE: this action is very critical in getting JGraph 5.14 to signal the drop method
             e.acceptDrag(e.getDropAction());
         }
 
@@ -1366,23 +1391,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             Point p = e.getLocation();  // subtract the size of the label
 
             // get the node in question from the jGraph
-            Object o = getCurrentEventGraphComponentWrapper().getViskitElementAt(p);
+            Object o = getCurrentJGraphEventGraphComponentWrapper().getViskitElementAt(p);
 
             if (dragger == NODE_DRAG) {
                 Point pp = new Point(
                         p.x - addEvent.getWidth(),
                         p.y - addEvent.getHeight());
                 ((EventGraphController) getController()).buildNewNode(pp);
-            } else if (dragger == SELF_REF_CANCEL_DRAG) {
-
+            } 
+			else if (dragger == SELF_REFERENTIAL_CANCELLING_EDGE_DRAG) 
+			{
                 if (o != null && o instanceof EventNode) {
                     EventNode en = (EventNode) o;
                     // We're making a self-referential arc
                     ((EventGraphController) getController()).buildNewCancellingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
                 }
-            } else {
-
-                if (o != null && o instanceof EventNode) {
+            } 
+			else 
+			{
+                if (o != null && o instanceof EventNode)
+				{
                     EventNode en = (EventNode) o;
                     // We're making a self-referential arc
                     ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
@@ -1631,7 +1659,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public void modelChanged(mvcModelEvent event)
 	{
-        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentEventGraphComponentWrapper();
+        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentJGraphEventGraphComponentWrapper();
         ParametersPanel     parametersPanel     = eventGraphComponentWrapper.parametersPanel;
         StateVariablesPanel stateVariablesPanel = eventGraphComponentWrapper.stateVariablesPanel;
         switch (event.getID()) {

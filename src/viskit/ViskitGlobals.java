@@ -1112,29 +1112,54 @@ public class ViskitGlobals {
     }
 
     @SuppressWarnings("serial")
-    class myTypeListRenderer extends JLabel implements ListCellRenderer<String> {
-
+    class myTypeListRenderer extends JLabel implements ListCellRenderer<String> 
+	{
         @Override
-        public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
-
+        public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus)
+		{
             JLabel label = new JLabel(value);
-            if (value.equals(moreTypesString)) {
+            if (value.equals(moreTypesString))
+			{
                 label.setBorder(BorderFactory.createRaisedBevelBorder());
             }
-
             return label;
         }
     }
 	
-	public static Point2D snapToGrid (Point2D point)
+	public static Point2D snapToGrid (Point2D point, String displayType)
+	{
+		double zoomFactor;
+		
+		if      ((ViskitGlobals.instance().getAssemblyEditViewFrame() == null) ||
+				 (ViskitGlobals.instance().getEventGraphViewFrame()   == null))
+		{
+			zoomFactor = ViskitStatics.DEFAULT_ZOOM;
+		}
+		else if (displayType.equalsIgnoreCase("Assembly"))
+		{
+			zoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();
+			
+		}
+		else if (displayType.equalsIgnoreCase("EventGraph"))
+		{
+			zoomFactor = ViskitGlobals.instance().getEventGraphViewFrame().getCurrentZoomFactor();
+		}
+		else
+		{
+			LOG.error ("Incorrect displayType=" + displayType + " when invoking snapToGrid(), value must be Assemly or EventGraph");
+			zoomFactor = ViskitStatics.DEFAULT_ZOOM;
+		}
+		return snapToGrid(point, zoomFactor);
+    }
+	
+	public static Point2D snapToGrid (Point2D point, double zoomFactor)
 	{
 		Point2D snappedPoint = (Point2D) point.clone();
-		// apparently jGraph has a factor-of-2 error when applying grid size
-//		double gridSize = // TODO
-		double roundOff = ViskitStatics.DEFAULT_GRID_SIZE / 4.0;
+		// apparently jGraph has a factor-of-2 error when applying grid size?
+		double roundOff = 0.0; // could use zoomFactor in this snap equation, but snapping likely needs to be independent of zoom
 		
-		snappedPoint.setLocation(Math.round((point.getX() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE / 2.0)) * (ViskitStatics.DEFAULT_GRID_SIZE / 2.0),
-				                 Math.round((point.getY() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE / 2.0)) * (ViskitStatics.DEFAULT_GRID_SIZE / 2.0));
+		snappedPoint.setLocation(Math.round((point.getX() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE)) * (ViskitStatics.DEFAULT_GRID_SIZE),
+				                 Math.round((point.getY() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE)) * (ViskitStatics.DEFAULT_GRID_SIZE));
 		return snappedPoint;
 	}
 

@@ -343,8 +343,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
-        if (eventGraphViewFrame.getCurrentEventGraphComponentWrapper() != null) {
-            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
+        if (eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper() != null) {
+            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -980,9 +980,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         isUndo = true;
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
 
-        Object[] roots = view.getCurrentEventGraphComponentWrapper().getRoots();
+        Object[] roots = view.getCurrentJGraphEventGraphComponentWrapper().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
 
         // Prevent dups
@@ -996,7 +996,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentEventGraphComponentWrapper().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentJGraphEventGraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
             LOG.error("Unable to undo: " + ex);
         } finally {
@@ -1028,9 +1028,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentEventGraphComponentWrapper().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentJGraphEventGraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
             LOG.error("Unable to redo: " + ex);
         } finally {
@@ -1041,10 +1041,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(eventGraphViewFrame.getCurrentEventGraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }

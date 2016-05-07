@@ -67,7 +67,7 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
     /** Holds the Start and the Current Point */
     protected Point2D startPoint, currentPoint;
 
-    /** Holds the First and the Current Port */
+    /** Holds the Current Port and the First Port */
     protected PortView port, firstPort;
 
     /**
@@ -77,10 +77,13 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
     protected JComponent highlight;
 
     private JGraph graph;
+	
+	private String displayType;
 
-    public JGraphMarqueeHandler(JGraph graph) {
-
+    public JGraphMarqueeHandler(JGraph graph, String displayType)
+	{
         this.graph = graph;
+        this.displayType = displayType;
 
         // Configures the panel for highlighting ports
         Runnable r = new Runnable() {
@@ -98,7 +101,8 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
      *
      * @return a component that is used for highlighting cells
      */
-    private JComponent createHighlight() {
+    private JComponent createHighlight()
+	{
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         panel.setVisible(false);
@@ -109,7 +113,8 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
 
     // Override to Gain Control (for PopupMenu and ConnectMode)
     @Override
-    public boolean isForceMarqueeEvent(MouseEvent e) {
+    public boolean isForceMarqueeEvent(MouseEvent e)
+	{
         if (e.isShiftDown()) {
             return false;
         }
@@ -163,7 +168,7 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler {
                     currentPoint = graph.toScreen(port.getLocation());
                 } // Else If no Port was found then Point to Mouse Location
                 else {
-                    currentPoint = ViskitGlobals.snapToGrid(graph.snap(e.getPoint()));
+                    currentPoint = ViskitGlobals.snapToGrid(graph.snap(e.getPoint()), displayType);
                 }
                 // Xor-Paint the new Connector
                 paintConnector(graph.getBackground(), Color.black, g);

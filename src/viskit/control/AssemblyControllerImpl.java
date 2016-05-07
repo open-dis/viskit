@@ -347,8 +347,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
 
-        if (view.getCurrentVgraphAssemblyComponentWrapper() != null) {
-            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
+        if (view.getCurrentJGraphAssemblyComponentWrapper() != null) {
+            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -1593,9 +1593,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         isUndo = true;
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
 
-        Object[] roots = view.getCurrentVgraphAssemblyComponentWrapper().getRoots();
+        Object[] roots = view.getCurrentJGraphAssemblyComponentWrapper().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
 
         // Prevent dups
@@ -1609,7 +1609,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
             LOG.error("Unable to undo: " + ex);
         } finally {
@@ -1651,9 +1651,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
             LOG.error("Unable to redo: " + ex);
         } finally {
@@ -1664,10 +1664,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentVgraphAssemblyComponentWrapper().getUndoManager();
+        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(view.getCurrentVgraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }

@@ -20,6 +20,7 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.ViskitGlobals;
+import static viskit.ViskitGlobals.snapToGrid;
 import viskit.ViskitStatics;
 import viskit.view.EventGraphViewFrame;
 import viskit.model.ModelEvent;
@@ -69,7 +70,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap - TODO expose interface
         this.setGridSize(ViskitStatics.DEFAULT_GRID_SIZE);
-        this.setMarqueeHandler(new JGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new JGraphMarqueeHandler(instance, "EventGraph"));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -212,28 +213,35 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 
     @SuppressWarnings("unchecked") // TODO: This version JGraph does not support generics
     @Override
-    public void graphChanged(GraphModelEvent e) {
-        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {
-            return;
-        } // this came in fromventNode outside, we don't have toEventNode inform anybody..prevent reentry
+    public void graphChanged(GraphModelEvent graphModelEvent)
+	{
+        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL)
+		{
+            return; // this came in fromventNode outside, we don't have toEventNode inform anybody.. prevent reentry
+        }
 
         // TODO: confirm any other events that should cause us toEventNode bail here
-        GraphModelEvent.GraphModelChange c = e.getChange();
-        Object[] ch = c.getChanged();
+        GraphModelEvent.GraphModelChange change = graphModelEvent.getChange();
+        Object[] changedCells = change.getChanged();
 
         // bounds (position) might have changed:
-        if (ch != null) {
-            for (Object cell : ch) {
-                if (cell instanceof CircleCell) {
-                    CircleCell cc = (CircleCell) cell;
+        if (changedCells != null)
+		{
+			double eventGraphZoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();
+            for (Object cell : changedCells)
+			{
+                if (cell instanceof CircleCell)
+				{
+                    CircleCell circleCell = (CircleCell) cell;
 
-                    AttributeMap m = cc.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
-                    if (r != null) {
-                        EventNode en = (EventNode) cc.getUserObject();
-                        en.setPosition(new Point2D.Double(r.x, r.y));
-                         ((EventGraphModel) parent.getModel()).changeEvent(en);
-                        m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
+                    AttributeMap attributeMap = circleCell.getAttributes();
+                    Rectangle2D.Double rectangle2D = (Rectangle2D.Double) attributeMap.get("bounds");
+                    if (rectangle2D != null)
+					{
+                        EventNode eventNode = (EventNode) circleCell.getUserObject();
+                        eventNode.setPosition(snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)),eventGraphZoomFactor));
+                        ((EventGraphModel) parent.getModel()).changeEvent(eventNode);
+                        attributeMap.put("bounds", attributeMap.createRect(eventNode.getPosition().getX(), eventNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 }
             }
@@ -568,9 +576,11 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
      * @param node the named EventNode toEventNode create attributes for
      * @return the cells attributes before rendering on the graph
      */
-    public Map createCellAttributes(EventNode node) {
+    public Map createCellAttributes(EventNode node)
+	{
         Map map = new Hashtable();
         Point2D point = node.getPosition();
+		double eventGraphZoomFactor = ViskitGlobals.instance().getEventGraphViewFrame().getCurrentZoomFactor();
 
         // Snap the Point toEventNode the Grid
         if (this != null) {
@@ -578,7 +588,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
         } else {
             point = (Point2D) point.clone();
         }
-		point = ViskitGlobals.snapToGrid (point); // utilize Viskit grid size rather that faulty jGraph snap
+		point = ViskitGlobals.snapToGrid (point, eventGraphZoomFactor); // utilize Viskit grid size rather that faulty jGraph snap
 
         // Add a Bounds Attribute toEventNode the Map.  NOTE: using the length of the
         // node name toEventNode help size the cell does not bode well with the
