@@ -46,6 +46,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     private DefaultMutableTreeNode rootTreeNode;
 
+    private DefaultTreeModel treeModel;
+
     private Class<?> targetClass;
 
     private String targetClassName;
@@ -58,15 +60,13 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     private Image myLeafIconImage;
 
-    private DefaultTreeModel treeModel;
-
     private DragStartListener dragStartListener;
 
     private String genericTableToolTip = "Drag onto canvas";
 
-    String userDir  = System.getProperty("user.dir");
+    String userDirectory  = System.getProperty("user.dir");
 
-    String userHome = System.getProperty("user.home");
+    String userHome       = System.getProperty("user.home");
 
     String projectPath;
 
@@ -115,12 +115,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         setModel(treeModel);
         directoryRoots     = new HashMap<>();
 		
-        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION); // selection can only contain one path at a time
 
-        MyRenderer myCellRenderer = new MyRenderer();
+        MyTreeCellRenderer myCellRenderer = new MyTreeCellRenderer();
         setCellRenderer(myCellRenderer);
 
-        setToolTipText("");  // needs to be done first to enable tt below
+        setToolTipText("");   // needs to be done first to enable tt below
         setRootVisible(true); // we want this to be false, but there is some sort of JTree bug...see paintComponent override below
         setShowsRootHandles(true);
         setVisibleRowCount(100);    // means always fill a normal size panel
@@ -142,7 +142,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     // beginning of hack to hide the tree rootNode
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g)
+	{
         super.paintComponent(g);
         if (bugHack) {
             doBugHack();
@@ -151,7 +152,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     private boolean bugHack = true;
 
-    private void doBugHack() {
+    private void doBugHack()
+	{
         expandRow(0);
         setRootVisible(false);
         collapseRow(0);
@@ -179,14 +181,18 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         return targetClass;
     }
 
-    public void removeSelected() {
+    public void removeSelected()
+	{
         TreePath[] selections;
-        while ((selections = getSelectionPaths()) != null) {
+        while ((selections = getSelectionPaths()) != null)
+		{
             TreePath currentSelection = selections[0];
-            if (currentSelection != null) {
+            if (currentSelection != null)
+			{
                 DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
                 MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
-                if (parent != null) {
+                if (parent != null)
+				{
                     treeModel.removeNodeFromParent(currentNode);
                 }
             }
@@ -200,30 +206,39 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      *
      * @param f the file to remove from the LEGO tree
      */
-    public void removeContentRoot(File f) {
+    public void removeContentRoot(File f)
+	{
         //System.out.println("LegoTree.removeContentRoot: "+f.getAbsolutePath());
         _removeNode(rootTreeNode, f);
     }
 
-    private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
-        for (int i = 0; i < dmtn.getChildCount(); i++) {
+    private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f)
+	{
+        for (int i = 0; i < dmtn.getChildCount(); i++)
+		{
             DefaultMutableTreeNode n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
-            if (n != null) {
+            if (n != null)
+			{
                 Object uo = n.getUserObject();
-                if (!(uo instanceof FileBasedAssemblyNode)) {
-
+                if (!(uo instanceof FileBasedAssemblyNode)) 
+				{
                     // Keep looking for a FBAN in the root branches
                     _removeNode(n, f);
-                } else {
+                } 
+				else 
+				{
                     FileBasedAssemblyNode fban = (FileBasedAssemblyNode) uo;
 
                     try {
-                        if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
+                        if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath()))
+						{
                             treeModel.removeNodeFromParent(n);
                             FileBasedClassManager.instance().unloadFile(fban);
                             return n;
                         }
-                    } catch (IOException e) {
+                    } 
+					catch (IOException e)
+					{
                         LOG.error(e);
                     }
                 }
@@ -239,103 +254,130 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * tree, but if its children have errors when marshaling they will not
      * appear.
      *
-     * @param f the directory to recurse to find SimEntitiy based EGs
+     * @param f the directory to recurse to find SimEntity-based Event Graphs
      * @param recurse if true, recurse the directory
      */
-    public void addContentRoot(File f, boolean recurse) {
-        if (!f.getName().contains("svn")) {
-
-            if (f.getName().toLowerCase().endsWith(".jar")) {
+    public void addContentRoot(File f, boolean recurse)
+	{
+        if (!f.getPath().contains(".svn") && !f.getPath().contains(".cvs") && !f.getPath().contains(".git")) // exclude directories
+		{
+            if (f.getName().toLowerCase().endsWith(".jar"))
+			{
                 addJarFile(f.getPath());
-            } else if (!f.getName().endsWith(".java")) {
+            } 
+			else if (!f.getName().endsWith(".java"))
+			{
                 _addContentRoot(f, recurse);
             }
         }
     }
 
     // Does the real work
-    private void _addContentRoot(File f, boolean recurse) {
-        DefaultMutableTreeNode myNode;
+    private void _addContentRoot(File f, boolean recurse)
+	{
+        DefaultMutableTreeNode myMutableTreeNode;
 
-        // Prevent duplicates of the EG icons
-        removeContentRoot(f);
+        removeContentRoot(f); // Prevent duplicates of the event graph icons
 
-        if (f.isDirectory()) {
-            if (!recurse) {
-                myNode = new DefaultMutableTreeNode(f.getPath());
-                rootTreeNode.add(myNode);
-                directoryRoots.put(f.getPath(), myNode);
-                int idx = rootTreeNode.getIndex(myNode);
-                treeModel.nodesWereInserted(rootTreeNode, new int[]{idx});
-
-                File[] fa = f.listFiles(new MyClassTypeFilter(false));
-                for (File file : fa) {
-                    _addContentRoot(file, file.isDirectory());
+        if (f.isDirectory())
+		{
+            if (!recurse)
+			{
+                myMutableTreeNode = new DefaultMutableTreeNode(f.getPath());
+                rootTreeNode.add(myMutableTreeNode);
+                directoryRoots.put(f.getPath(), myMutableTreeNode);
+                int index = rootTreeNode.getIndex(myMutableTreeNode);
+                treeModel.nodesWereInserted(rootTreeNode, new int[]{index});
+                File[] containedFileList = f.listFiles(new MyClassTypeFilter(false));
+                for (File file : containedFileList)
+				{
+					// TODO why are we recursing here if recurse=false ?
+                    _addContentRoot(file, file.isDirectory()); // recurse on subdirectories
                 }
-            } else { // recurse = true
+            } 
+			else // recurse = true, directory
+			{
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
                 // If not, put me in under the rootNode
-                myNode = directoryRoots.get(f.getPath());
-                if (myNode == null) {
-                    myNode = directoryRoots.get(f.getParent());
-                    if (myNode != null) {
-                        DefaultMutableTreeNode parent = myNode;
-                        myNode = new DefaultMutableTreeNode(f.getName());
-                        parent.add(myNode);
-                        directoryRoots.put(f.getPath(), myNode);
-                        int idx = parent.getIndex(myNode);
-                        treeModel.nodesWereInserted(parent, new int[]{idx});
-                    } else {
-
+                myMutableTreeNode = directoryRoots.get(f.getPath());
+                if (myMutableTreeNode == null)
+				{
+                    myMutableTreeNode = directoryRoots.get(f.getParent());
+                    if (myMutableTreeNode != null)
+					{
+                        DefaultMutableTreeNode parent = myMutableTreeNode;
+                        myMutableTreeNode = new DefaultMutableTreeNode(f.getName());
+                        parent.add(myMutableTreeNode);
+                        directoryRoots.put(f.getPath(), myMutableTreeNode);
+                        int index = parent.getIndex(myMutableTreeNode);
+                        treeModel.nodesWereInserted(parent, new int[]{index});
+                    } 
+					else
+					{
                         // Shorten long path names
-                        if (f.getPath().contains(userDir)) {
-                            name = f.getPath().substring(userDir.length() + 1, f.getPath().length());
-                        } else if (f.getPath().contains(userHome)) {
+                        if (f.getPath().contains(userDirectory)) 
+						{
+                            name = f.getPath().substring(userDirectory.length() + 1, f.getPath().length());
+                        } 
+						else if (f.getPath().contains(userHome)) 
+						{
                             name = f.getPath().substring(userHome.length() + 1, f.getPath().length());
-                        } else if (f.getPath().contains(projectPath)) {
+                        } 
+						else if (f.getPath().contains(projectPath)) 
+						{
                             name = f.getPath().substring(projectPath.length() + 1, f.getPath().length());
-                        } else {
+                        } 
+						else 
+						{
                             name = f.getPath();
                         }
 
-                        myNode = new DefaultMutableTreeNode(name);
-                        rootTreeNode.add(myNode);
-                        directoryRoots.put(f.getPath(), myNode);
-                        int idx = rootTreeNode.getIndex(myNode);
-                        treeModel.nodesWereInserted(rootTreeNode, new int[]{idx});
+                        myMutableTreeNode = new DefaultMutableTreeNode(name);
+                        rootTreeNode.add(myMutableTreeNode);
+                        directoryRoots.put(f.getPath(), myMutableTreeNode);
+                        int index = rootTreeNode.getIndex(myMutableTreeNode);
+                        treeModel.nodesWereInserted(rootTreeNode, new int[]{index});
                     }
                 }
-                File[] fa = f.listFiles(new MyClassTypeFilter(true));
-                for (File file : fa) {
-                    _addContentRoot(file, file.isDirectory());
+                File[] containedFileList = f.listFiles(new MyClassTypeFilter(true));
+                for (File file : containedFileList) 
+				{
+                    _addContentRoot(file, file.isDirectory()); // recurse on subdirectories
                 }
             }   // recurse = true
         } // is directory
-        // We're NOT a directory...
-        else {
+		
+        else // We're NOT a directory...
+		{
             FileBasedAssemblyNode fban;
             try {
-
                 // This call generates the source, compiles and validates EG XML files
                 // Also checks for extensions of SimEntityBase in .class files
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
-                if (fban != null) {
-                    myNode = new DefaultMutableTreeNode(fban);
-                    int idx;
-                    DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
-                    if (par != null) {
-                        par.add(myNode);
-                        idx = par.getIndex(myNode);
-                        treeModel.nodesWereInserted(par, new int[] {idx});
-                    } else {
-                        rootTreeNode.add(myNode);
-                        idx = rootTreeNode.getIndex(myNode);
-                        treeModel.nodesWereInserted(rootTreeNode, new int[] {idx});
+                if (fban != null) 
+				{
+                    myMutableTreeNode = new DefaultMutableTreeNode(fban);
+                    int index;
+                    DefaultMutableTreeNode parentNode = directoryRoots.get(f.getParent());
+                    if (parentNode != null) 
+					{
+                        parentNode.add(myMutableTreeNode);
+                        index = parentNode.getIndex(myMutableTreeNode);
+                        treeModel.nodesWereInserted(parentNode, new int[] {index});
+                    } 
+					else 
+					{
+                        rootTreeNode.add(myMutableTreeNode);
+                        index = rootTreeNode.getIndex(myMutableTreeNode);
+                        treeModel.nodesWereInserted(rootTreeNode, new int[] {index});
                     }
-                } else {
-                    LOG.info(f.getName() + " will not be listed in the LEGOs tree\n");
+                } 
+				else 
+				{
+                    LOG.info(f.getName() + " not be listed in the LEGOs tree because compiled class not found\n"); 
+					// TODO notify user with popup
                 }
 
                 // Note:
@@ -347,9 +389,16 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                     ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
                     ViskitGlobals.instance().getEventGraphViewFrame().toggleEventGraphStatusIndicators();
                 }
-
-            } catch (Throwable t) {
-
+						
+//						// TODO move this code to event dispatch thread
+//						// http://stackoverflow.com/questions/11256159/expanding-specific-jtree-path
+//						if (true) // f.getPath().contains("EventGraphs")) // TODO string constant
+//						{
+//							this.expandPath(new TreePath(myMutableTreeNode)); // TODO not working
+//						}
+            } 
+			catch (Throwable t)
+			{
                 // Uncomment to reveal common reason for Exceptions
 //                t.printStackTrace();
                 LOG.error(t);
@@ -361,22 +410,22 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
 
-    DefaultMutableTreeNode getParent(String pkg, DefaultMutableTreeNode lroot) {
-        DefaultMutableTreeNode parent = packagesHM.get(pkg);
+    DefaultMutableTreeNode getParent(String packageName, DefaultMutableTreeNode lroot) {
+        DefaultMutableTreeNode parent = packagesHM.get(packageName);
 
         if (parent == null) {
-            if (!pkg.contains(".")) {
+            if (!packageName.contains(".")) {
                 // we're as far up as we can be
-                parent = new DefaultMutableTreeNode(pkg);
+                parent = new DefaultMutableTreeNode(packageName);
                 treeModel.insertNodeInto(parent, lroot, 0);
             } else {
                 // go further
-                String ppkg = pkg.substring(0, pkg.lastIndexOf('.'));
+                String ppkg = packageName.substring(0, packageName.lastIndexOf('.'));
                 DefaultMutableTreeNode granddaddy = getParent(ppkg, lroot);
-                parent = new DefaultMutableTreeNode(pkg.substring(pkg.lastIndexOf('.') + 1));
+                parent = new DefaultMutableTreeNode(packageName.substring(packageName.lastIndexOf('.') + 1));
                 treeModel.insertNodeInto(parent, granddaddy, 0);
             }
-            packagesHM.put(pkg, parent);
+            packagesHM.put(packageName, parent);
         }
 
         return parent;
@@ -426,8 +475,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
 
         // Shorten long path names
-        if (jarFile.getName().contains(userDir)) {
-            name = jarFile.getName().substring(userDir.length() + 1, jarFile.getName().length());
+        if (jarFile.getName().contains(userDirectory)) {
+            name = jarFile.getName().substring(userDirectory.length() + 1, jarFile.getName().length());
         } else if (jarFile.getName().contains(userHome)) {
             name = jarFile.getName().substring(userHome.length() + 1, jarFile.getName().length());
         } else if (jarFile.getName().contains(projectPath)) {
@@ -450,50 +499,68 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
     }
 
-    private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot) {
+    private void hookToParent(Class<?> c, DefaultMutableTreeNode myroot)
+	{
         String pkg = c.getPackage().getName();
         DefaultMutableTreeNode dmtn = getParent(pkg, myroot);
         dmtn.add(new DefaultMutableTreeNode(c));
     }
 
-    class MyRenderer extends DefaultTreeCellRenderer {
-
+    class MyTreeCellRenderer extends DefaultTreeCellRenderer
+	{
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            Object uo = ((DefaultMutableTreeNode) value).getUserObject();
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean isLeaf, int row, boolean hasFocus) 
+		{
+            Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
             setLeafIcon(LegoTree.this.myLeafIcon); // default
 
-            if (uo instanceof Class<?>) {
-                Class<?> c = (Class<?>) uo;
-                String nm = c.getName();
+            if (userObject instanceof Class<?>) // precompiled .class file
+			{
+                Class<?> classType = (Class<?>) userObject;
+                String   className = classType.getName();
 
-                setToolTipText(nm);
-                nm = nm.substring(nm.lastIndexOf('.') + 1);
-                //      if(sel)
-                //        nm = "<html><b>"+nm+"</b></html>";   // sizes inst screwed up
-                value = nm;
-            } else if (uo instanceof FileBasedAssemblyNode) {
-                FileBasedAssemblyNode xn = (FileBasedAssemblyNode) uo;
-                String nm = xn.loadedClass;
-                nm = nm.substring(nm.lastIndexOf('.') + 1);
-                if (xn.isXML) {
-                    nm += "(XML)";
-                    setToolTipText(nm + " (loaded from XML)");
-                } else {
-                    nm += "(C)";
-                    setToolTipText(nm + " (loaded from .class)");
+                className = className.substring(className.lastIndexOf('.') + 1); // short form
+                setToolTipText(className + " (separately compiled)");
+//              className += " (externally compiled)";
+                value = className;
+            }
+			else if (userObject instanceof FileBasedAssemblyNode)
+			{
+                FileBasedAssemblyNode xmlFileBasedAssemblyNode = (FileBasedAssemblyNode) userObject;
+                String className = xmlFileBasedAssemblyNode.loadedClass;
+                className = className.substring(className.lastIndexOf('.') + 1); // short form
+                if (xmlFileBasedAssemblyNode.isXML)
+				{
+                    setToolTipText(className + " (loaded from Viskit XML)");
+                    className += " (XML)";
+                } 
+				else
+				{
+                    setToolTipText(className + " (loaded from Viskit-compiled .class)");
+                    className += " (compiled)";
                 }
-                value = nm;
-            } else {
-                if (leaf) // don't show a leaf icon for a directory in the filesys which doesn't happen to have contents
+                value = className;
+            } 
+			else 
+			{
+                if (isLeaf) // don't show a leaf icon for a directory in the file system which doesn't happen to have contents
                 {
                     setLeafIcon(LegoTree.this.standardNonLeafIcon);
                 }
-                setToolTipText(uo.toString());
+				String toolTipText = userObject.toString();
+				if (toolTipText.equals("EventGraphs")) // TODO String constant
+				{
+					toolTipText += " project subdirectory containing your models";
+					selected = true; // TODO must be on event dispatch thread?
+				}
+				else 
+				{
+					selected = false;
+				}
+                setToolTipText(toolTipText);
                 value = value.toString();
-                sel = false;
             }
-            return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            return super.getTreeCellRendererComponent(tree, value, selected, expanded, isLeaf, row, hasFocus);
         }
     }
 

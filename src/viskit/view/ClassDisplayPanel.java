@@ -20,13 +20,14 @@ import viskit.ViskitProject;
  * @since 9:44:55 AM
  * @version $Id$
  */
-public class ClassPanel extends JPanel {
+public class ClassDisplayPanel extends JPanel {
 
     JButton plusButton, minusButton;
     LegoTree tree;
     JFileChooser jfc;
 
-    public ClassPanel(LegoTree ltree, String title, String hint, String plusButtonTooltip, String minusButtonTooltip) {
+    public ClassDisplayPanel(LegoTree ltree, String title, String hint, String plusButtonTooltip, String minusButtonTooltip)
+	{
         this.tree = ltree;
         jfc = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 		
@@ -43,7 +44,7 @@ public class ClassPanel extends JPanel {
         buttonPanel.add(Box.createHorizontalGlue());
 		
         JLabel plusMinusButtonLabel = new JLabel("Configuration"); // e.g. "Event Graph Selection"
-		plusMinusButtonLabel.setToolTipText("Add or remove files, jars, directories");
+		plusMinusButtonLabel.setToolTipText("Add or remove files, jars, or directories");
         plusMinusButtonLabel.setAlignmentX(Box.RIGHT_ALIGNMENT);
         buttonPanel.add(plusMinusButtonLabel);
         buttonPanel.add(Box.createHorizontalStrut(4));
@@ -80,28 +81,32 @@ public class ClassPanel extends JPanel {
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(jsp);
 		
-        minusButton.addActionListener(new ActionListener() {
-
+        minusButton.addActionListener(new ActionListener()
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e)
+			{
                 tree.removeSelected();
             }
         });
 
-        plusButton.addActionListener(new ActionListener() {
-
+        plusButton.addActionListener(new ActionListener()
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e)
+			{
                 jfc.setFileFilter(new ClassTypeFilter(tree.getTargetClass()));
                 jfc.setAcceptAllFileFilterUsed(false);
                 jfc.setMultiSelectionEnabled(true);
                 jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
-                int retv = jfc.showOpenDialog(ClassPanel.this);
-                if (retv == JFileChooser.APPROVE_OPTION) {
-                    File[] fa = jfc.getSelectedFiles();
-                    for (File fa1 : fa) {
-                        tree.addContentRoot(fa1, fa1.isDirectory());
+                int returnValue = jfc.showOpenDialog(ClassDisplayPanel.this);
+                if (returnValue == JFileChooser.APPROVE_OPTION)
+				{
+                    File[] selectedFiles = jfc.getSelectedFiles();
+                    for (File selectedFile : selectedFiles)
+					{
+                        tree.addContentRoot(selectedFile, selectedFile.isDirectory());
                     }
                 }
             }
@@ -150,7 +155,7 @@ public class ClassPanel extends JPanel {
             } catch (Throwable e) {}
 
             // Here we don't show any classes that are reachable through the viskit classpath..i.e., simkit.jar
-            // We want no dups there.
+            // We want no duplicates there.
 
             if (c != null) {
                 try {

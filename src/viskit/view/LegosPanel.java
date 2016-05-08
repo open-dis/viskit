@@ -9,7 +9,7 @@ package viskit.view;
  * Date: May 14, 2004
  * Time: 9:44:55 AM
  */
-public class LegosPanel extends ClassPanel {
+public class LegosPanel extends ClassDisplayPanel {
   public LegosPanel(LegoTree ltree) {
     super(ltree,"Event Graph Selection",
 			"Select and drag an event graph onto the Assembly Editor",              // hint

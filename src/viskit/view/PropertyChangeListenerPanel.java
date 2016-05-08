@@ -9,7 +9,7 @@ package viskit.view;
  * Date: May 14, 2004
  * Time: 10:10:13 AM
  */
-public class PropertyChangeListenerPanel extends ClassPanel {
+public class PropertyChangeListenerPanel extends ClassDisplayPanel {
   public PropertyChangeListenerPanel(LegoTree ltree) {
     super(ltree,"Property Change Listener Selection", 
 			"Select and drag a property change listener (PCL) onto the Assembly Editor", // hint

@@ -912,8 +912,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) viskitGlobalsInstance.getWorkClassLoader()).getClassPath();
-        for (String path : classPath) {
-            if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
+        for (String path : classPath) 
+		{
+            if (path.contains("simkit.jar") || (path.contains("diskit.jar")))
+			{
                 addEventGraphsToLegoTree(new File(path), false);
                 addPropertyChangeListenersToLegoTree(new File(path), false);
             }

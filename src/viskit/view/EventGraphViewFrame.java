@@ -1491,7 +1491,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
         GraphMetadata graphMetadata = new GraphMetadata (
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY), // name
-				"", // packageName
+				"", // packageName not used by project, TODO remember latest value?
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY), // author
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY), // revision
 				"", // extendsPackageName 
@@ -1502,15 +1502,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
 		graphMetadata.pathEditable = this.pathEditable;
 		
-        boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata); // display user panel
+        boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata); // display user panel, report if values were modified
         if (modified)
 		{
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        graphMetadata.name);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, graphMetadata.description);
-			// project path is only saved if creating a new project
-			if (pathEditable)
+			
+			if (pathEditable) // project path is only saved if creating a new project
 				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,    graphMetadata.path);
         }
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY, (new Boolean(modified)).toString());
