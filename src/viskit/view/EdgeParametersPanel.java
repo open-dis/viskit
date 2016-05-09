@@ -1,7 +1,7 @@
 package viskit.view;
 
 import viskit.model.EventArgument;
-import viskit.model.vEdgeParameter;
+import viskit.model.ViskitEdgeParameter;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -31,7 +31,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
         init(false);
 
         // Set the first column background to be the color of the panel (indicating r/o)
-        TableColumn tc = tab.getColumnModel().getColumn(0);
+        TableColumn tc = table.getColumnModel().getColumn(0);
         tc.setCellRenderer(new DifferentTableColumnBackgroundRenderer(getBackground()));
 
         super.addDoubleClickedListener(new myEditListener());
@@ -58,7 +58,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        return new vEdgeParameter("value");
+        return new ViskitEdgeParameter("value");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
             // more arguments than we've got.
             for (int i = 0; i < diff; i++) {
-                myList.add(new vEdgeParameter("0"));
+                myList.add(new ViskitEdgeParameter("0"));
             }
             super.setData(myList);
         } else {
@@ -126,7 +126,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
                 Object o = e.getSource();
                 int row = findObjectRow(o);
                 EventArgument ea = (EventArgument) argList.get(row);
-                ((vEdgeParameter) o).bogus = ea.getType();
+                ((ViskitEdgeParameter) o).bogus = ea.getType();
                 ActionEvent ae = new ActionEvent(o, 0, "");
                 alis.actionPerformed(ae);
             }

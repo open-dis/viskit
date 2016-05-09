@@ -32,11 +32,11 @@ import viskit.model.ViskitElement;
  */
 public abstract class ViskitTablePanel extends JPanel {
 
-    protected JTable tab;
-    private JScrollPane jsp;
-    private JButton plusButt,  minusButt,  edButt;
-    private ThisTableModel mod;
-    private int defaultWidth = 0,  defaultNumRows = 3;
+    protected JTable table;
+    private JScrollPane jScrollPane;
+    private JButton plusButton,  minusButton,  editButton;
+    private ThisTableModel thisTableModel;
+    private int defaultWidth = 0,  defaultNumberRows = 3;
 
     // List has no implemented clone method
     private final ArrayList<ViskitElement> shadow = new ArrayList<>();
@@ -50,108 +50,114 @@ public abstract class ViskitTablePanel extends JPanel {
         this.defaultWidth = defaultWidth;
     }
 
-    public ViskitTablePanel(int defaultWidth, int numRows) {
+    public ViskitTablePanel(int defaultWidth, int numberRows) {
         this.defaultWidth = defaultWidth;
-        this.defaultNumRows = numRows;
+        this.defaultNumberRows = numberRows;
     }
 
-    public void init(boolean wantAddDelButts) {
-        plusMinusEnabled = wantAddDelButts;
+    public final void init(boolean wantAddDeleteButtons)
+	{
+        plusMinusEnabled = wantAddDeleteButtons;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // edit instructions line
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        p.add(Box.createHorizontalGlue());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(Box.createHorizontalGlue());
         JLabel instructions = new JLabel("Double click a row to ");
-        int bigSz = instructions.getFont().getSize();
-        instructions.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        p.add(instructions);
-        edButt = new JButton("edit.");
-        edButt.setFont(instructions.getFont()); //.deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        edButt.setBorder(null);
-        edButt.setEnabled(false);
-        edButt.setActionCommand("e");
-        p.add(edButt);
-        p.add(Box.createHorizontalGlue());
-        add(p);
+        int bigFontSize = instructions.getFont().getSize();
+        instructions.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigFontSize - 2)));
+        panel.add(instructions);
+        editButton = new JButton("edit.");
+        editButton.setFont(instructions.getFont()); //.deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+        editButton.setBorder(null);
+        editButton.setEnabled(false);
+        editButton.setActionCommand("e");
+        panel.add(editButton);
+        panel.add(Box.createHorizontalGlue());
+        add(panel);
 
         // the table
-        tab = new ThisToolTipTable(mod = new ThisTableModel(getColumnTitles()));
+        table = new ThisToolTipTable(thisTableModel = new ThisTableModel(getColumnTitles()));
         adjustColumnWidths();
-        int rowHeight = tab.getRowHeight();
-        int defaultHeight = rowHeight * (defaultNumRows + 1);
+        int rowHeight = table.getRowHeight();
+        int defaultHeight = rowHeight * (defaultNumberRows + 1);
 
-        tab.setPreferredScrollableViewportSize(new Dimension(defaultWidth, rowHeight * 3));
-        tab.setMinimumSize(new Dimension(20, rowHeight * 2));
-        jsp = new JScrollPane(tab);
-        jsp.setMinimumSize(new Dimension(defaultWidth, defaultHeight));       // jmb test
-        add(jsp);
+        table.setPreferredScrollableViewportSize(new Dimension(defaultWidth, rowHeight * 3));
+        table.setMinimumSize(new Dimension(20, rowHeight * 2));
+        jScrollPane = new JScrollPane(table);
+        jScrollPane.setMinimumSize(new Dimension(defaultWidth, defaultHeight));       // jmb test
+        add(jScrollPane);
 
-        ActionListener lis = new MyAddDelEditHandler();
+        ActionListener actionListener = new MyAddDeleteEditHandler();
 
-        if (wantAddDelButts) {// plus, minus and edit buttons
+        if (wantAddDeleteButtons) {// plus, minus and edit buttons
             add(Box.createVerticalStrut(5));
             JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
             buttonPanel.add(Box.createHorizontalGlue());
             // add button
-            plusButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
-            plusButt.setBorder(null);
-            plusButt.setText(null);
-            plusButt.setToolTipText(getPlusToolTip());
-            Dimension dd = plusButt.getPreferredSize();
-            plusButt.setMinimumSize(dd);
-            plusButt.setMaximumSize(dd);
-            plusButt.setActionCommand("p");
-            buttonPanel.add(plusButt);
+            plusButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
+            plusButton.setBorder(null);
+            plusButton.setText(null);
+            plusButton.setToolTipText(getPlusToolTip());
+            Dimension preferredButtonSize = plusButton.getPreferredSize();
+            plusButton.setMinimumSize(preferredButtonSize);
+            plusButton.setMaximumSize(preferredButtonSize);
+            plusButton.setActionCommand("p");
+            buttonPanel.add(plusButton);
             // delete button
-            minusButt = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
-            minusButt.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
-            minusButt.setBorder(null);
-            minusButt.setText(null);
-            minusButt.setToolTipText(getMinusToolTip());
-            dd = minusButt.getPreferredSize();
-            minusButt.setMinimumSize(dd);
-            minusButt.setMaximumSize(dd);
-            minusButt.setActionCommand("m");
-            minusButt.setEnabled(false);
-            buttonPanel.add(minusButt);
+            minusButton = new JButton(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
+            minusButton.setDisabledIcon(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
+            minusButton.setBorder(null);
+            minusButton.setText(null);
+            minusButton.setToolTipText(getMinusToolTip());
+            preferredButtonSize = minusButton.getPreferredSize();
+            minusButton.setMinimumSize(preferredButtonSize);
+            minusButton.setMaximumSize(preferredButtonSize);
+            minusButton.setActionCommand("m");
+            minusButton.setEnabled(false);
+            buttonPanel.add(minusButton);
             buttonPanel.add(Box.createHorizontalGlue());
             add(buttonPanel);
 
             // install local add, delete handlers
-            plusButt.addActionListener(lis);
-            minusButt.addActionListener(lis);
+             plusButton.addActionListener(actionListener);
+            minusButton.addActionListener(actionListener);
         }
         // don't let the whole panel get squeezed smaller that what we start out with
         Dimension d = getPreferredSize();
         setMinimumSize(d);
 
         // install local edit handler
-        edButt.addActionListener(lis);
+        editButton.addActionListener(actionListener);
 
         // install the handler to enable delete and edit buttons only on row-select
-        tab.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
-            public void valueChanged(ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    boolean yn = tab.getSelectedRowCount() > 0;
-                    if (plusMinusEnabled) {
-                        minusButt.setEnabled(yn);
+            public void valueChanged(ListSelectionEvent event)
+			{
+                if (!event.getValueIsAdjusting())
+				{
+                    boolean yesNo = table.getSelectedRowCount() > 0;
+                    if (plusMinusEnabled)
+					{
+                        minusButton.setEnabled(yesNo);
                     }
-                    edButt.setEnabled(yn);
+                    editButton.setEnabled(yesNo);
                 }
             }
         });
 
         // install the double-clicked handler to duplicate action of edit button
-        tab.addMouseListener(new MouseAdapter() {
-
+        table.addMouseListener(new MouseAdapter() 
+		{
             @Override
-            public void mouseClicked(MouseEvent event) {
-                if (event.getClickCount() == 2) {
+            public void mouseClicked(MouseEvent event) 
+			{
+                if (event.getClickCount() == 2) 
+				{
                     doEdit();
                 }
             }
@@ -162,82 +168,89 @@ public abstract class ViskitTablePanel extends JPanel {
     /**
      * Install external handler for row edit requests.  The row object can be retrieved by
      * ActionEvent.getSource().
-     * @param edLis
+     * @param editListener
      */
-    public void addDoubleClickedListener(ActionListener edLis) {
-        myEditListener = edLis;
+    public void addDoubleClickedListener(ActionListener editListener) 
+	{
+        myEditListener = editListener;
     }
 
     /**
      * Install external handler for row-add requests.
-     * @param addLis
+     * @param addListener
      */
-    public void addPlusListener(ActionListener addLis) {
-        myPlusListener = addLis;
+    public void addPlusListener(ActionListener addListener) 
+	{
+        myPlusListener = addListener;
     }
 
     /**
      * Install external handler for row-delete requests.  The row object can be retrieved by
      * ActionEvent.getSource().
-     * @param delLis
+     * @param deleteListener
      */
-    public void addMinusListener(ActionListener delLis) {
-        myMinusListener = delLis;
+    public void addMinusListener(ActionListener deleteListener) 
+	{
+        myMinusListener = deleteListener;
     }
 
     /**
-     * Add a row defined by the argument to the end of the table.  The table data
-     * will be retrieved through the abstract method, getFields(o).
-     * @param e the argument for this row
+     * Add a row defined by the argument to the end of the table. 
+     * The table data is retrieved via abstract method getFields(o).
+     * @param viskitElement the argument for this row
      */
-    public void addRow(ViskitElement e) {
-        shadow.add(e);
+    public void addRow(ViskitElement viskitElement)
+	{
+        shadow.add(viskitElement);
 
         Vector<String> rowData = new Vector<>();
-        String[] fields = getFields(e, 0);
+        String[] fields = getFields(viskitElement, 0);
         rowData.addAll(Arrays.asList(fields));
-        mod.addRow(rowData);
+        thisTableModel.addRow(rowData);
 
         adjustColumnWidths();
 
         // This doesn't work perfectly on the Mac
-        JScrollBar vsb = jsp.getVerticalScrollBar();
-        vsb.setValue(vsb.getMaximum());
+        JScrollBar verticalScrollBar = jScrollPane.getVerticalScrollBar();
+        verticalScrollBar.setValue(verticalScrollBar.getMaximum());
     }
 
     /**
      * Add a row to the end of the table.  The row object will be built through
      * the abstract method, newRowObject().
      */
-    public void addRow() {
+    public void addRow()
+	{
         addRow(newRowObject());
     }
 
     /**
      * Remove the row representing the argument from the table.
-     * @param e the element row to remove
+     * @param viskitElement the element row to remove
      */
-    public void removeRow(ViskitElement e) {
-        removeRow(findObjectRow(e));
+    public void removeRow(ViskitElement viskitElement) 
+	{
+        removeRow(findObjectRow(viskitElement));
     }
 
     /**
-     * Remove the row identified by the passed zero-based row number from the
-     * table.
-     * @param r index of the object to remove
+     * Remove the row identified by the passed zero-based row number from the table.
+     * @param rowNumber index of the object to remove
      */
-    public void removeRow(int r) {
-        ViskitElement e = shadow.remove(r);
-        mod.removeRow(r);
+    public void removeRow(int rowNumber) 
+	{
+        ViskitElement e = shadow.remove(rowNumber);
+        thisTableModel.removeRow(rowNumber);
     }
 
     /**
      * Initialize the table with the passed data.
      * @param data
      */
-    public void setData(List<? extends ViskitElement> data) {
+    public void setData(List<? extends ViskitElement> data) 
+	{
         shadow.clear();
-        mod.setRowCount(0);
+        thisTableModel.setRowCount(0);
 
         if (data != null) {
             for (ViskitElement o : data) {
@@ -257,7 +270,7 @@ public abstract class ViskitTablePanel extends JPanel {
     }
 
     public boolean isEmpty() {
-        return mod.getRowCount() == 0;
+        return thisTableModel.getRowCount() == 0;
     }
 
     /**
@@ -268,8 +281,8 @@ public abstract class ViskitTablePanel extends JPanel {
         int row = findObjectRow(rowObject);
 
         String[] fields = getFields(rowObject, 0);
-        for (int i = 0; i < mod.getColumnCount(); i++) {
-            mod.setValueAt(fields[i], row, i);
+        for (int i = 0; i < thisTableModel.getColumnCount(); i++) {
+            thisTableModel.setValueAt(fields[i], row, i);
         }
         adjustColumnWidths();
     }
@@ -317,7 +330,7 @@ public abstract class ViskitTablePanel extends JPanel {
      */
     private void doEdit() {
         if (myEditListener != null) {
-            Object o = shadow.get(tab.getSelectedRow());
+            Object o = shadow.get(table.getSelectedRow());
             ActionEvent ae = new ActionEvent(o, 0, "");
             myEditListener.actionPerformed(ae);
         }
@@ -332,8 +345,8 @@ public abstract class ViskitTablePanel extends JPanel {
         int row = 0;
 
         // the most probable case
-        if (o == shadow.get(tab.getSelectedRow())) {
-            row = tab.getSelectedRow();
+        if (o == shadow.get(table.getSelectedRow())) {
+            row = table.getSelectedRow();
         } // else look at all
         else {
             int r;
@@ -343,7 +356,7 @@ public abstract class ViskitTablePanel extends JPanel {
                 }
                 break;
             }
-            if (r >= mod.getRowCount()) //assert false: "Bad table processing, ViskitTablePanel.updateRow)
+            if (r >= thisTableModel.getRowCount()) //assert false: "Bad table processing, ViskitTablePanel.updateRow)
             {
                 System.err.println("Bad table processing, ViskitTablePanel.updateRow");
             }  // will die here
@@ -356,18 +369,18 @@ public abstract class ViskitTablePanel extends JPanel {
      */
     private void adjustColumnWidths() {
         String[] titles = getColumnTitles();
-        FontMetrics fm = tab.getFontMetrics(tab.getFont());
+        FontMetrics fm = table.getFontMetrics(table.getFont());
 
-        for (int c = 0; c < tab.getColumnCount(); c++) {
-            TableColumn col = tab.getColumnModel().getColumn(c);
+        for (int c = 0; c < table.getColumnCount(); c++) {
+            TableColumn col = table.getColumnModel().getColumn(c);
             int maxWidth = 0;
             int w = fm.stringWidth(titles[c]);
             col.setMinWidth(w);
             if (w > maxWidth) {
                 maxWidth = w;
             }
-            for (int r = 0; r < tab.getRowCount(); r++) {
-                String s = (String) mod.getValueAt(r, c);
+            for (int r = 0; r < table.getRowCount(); r++) {
+                String s = (String) thisTableModel.getValueAt(r, c);
                 // shouldn't happen, but:
                 if (s != null) {
                     w = fm.stringWidth(s);
@@ -376,14 +389,14 @@ public abstract class ViskitTablePanel extends JPanel {
                     }
                 }
             }
-            if (c != tab.getColumnCount() - 1) {    // leave the last one alone
+            if (c != table.getColumnCount() - 1) {    // leave the last one alone
                 // its important to set maxwidth before preferred width because the latter
                 // gets clamped by the former.
                 col.setMaxWidth(maxWidth + 5);       // why the fudge?
                 col.setPreferredWidth(maxWidth + 5); // why the fudge?
             }
         }
-        tab.invalidate();
+        table.invalidate();
     }
 
     /**
@@ -396,7 +409,7 @@ public abstract class ViskitTablePanel extends JPanel {
         Vector<String> rowData = new Vector<>();
         String[] fields = getFields(e, shadow.size() - 1);
         rowData.addAll(Arrays.asList(fields));
-        mod.addRow(rowData);
+        thisTableModel.addRow(rowData);
     }
 
     /**
@@ -409,7 +422,7 @@ public abstract class ViskitTablePanel extends JPanel {
     }
 
     /** The local listener for plus, minus and edit clicks */
-    class MyAddDelEditHandler implements ActionListener {
+    class MyAddDeleteEditHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -428,7 +441,7 @@ public abstract class ViskitTablePanel extends JPanel {
                         return;
                     }
                     if (myMinusListener != null) {
-                        event.setSource(shadow.get(tab.getSelectedRow()));
+                        event.setSource(shadow.get(table.getSelectedRow()));
                         myMinusListener.actionPerformed(event);
                     }
 
@@ -436,7 +449,7 @@ public abstract class ViskitTablePanel extends JPanel {
                     // parameters not only from the preceding EdgeInspectorDialog,
                     // but also from the EG XML representation
                     if (shouldDoAddsAndDeletes) {
-                        removeRow(tab.getSelectedRow());
+                        removeRow(table.getSelectedRow());
                     }
                     break;
                 default:

@@ -424,7 +424,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
 
         eventNode.getLocalVariables().clear();
-        for (LocalVariable localVariable : jaxbEvent.getLocalVariable()) {
+        for (LocalVariable localVariable : jaxbEvent.getLocalVariable())
+		{
             if (!localVariable.getName().startsWith(indexVariablePrefix)) {    // only if it's a "public" one
                 EventLocalVariable eventLocalVariable = new EventLocalVariable(
                         localVariable.getName(), localVariable.getType(), localVariable.getValue());
@@ -438,8 +439,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         eventNode.setCodeBLock(jaxbEvent.getCode()); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
 
         eventNode.getTransitions().clear();
-        for (StateTransition stateTransition : jaxbEvent.getStateTransition()) {
-
+        for (StateTransition stateTransition : jaxbEvent.getStateTransition())
+		{
             EventStateTransition eventStateTransition = new EventStateTransition();
 
             LocalVariableAssignment l = stateTransition.getLocalVariableAssignment();
@@ -516,12 +517,14 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
             // We have a FP number
             // TODO: Deal with LOWEST or HIGHEST values containing exponents, i.e. (+/-) 1.06E8
-            if (s.contains("-3")) {
+            if        (s.contains("-3")) {
                 s = "LOWEST";
             } else if (s.contains("-2")) {
                 s = "LOWER";
             } else if (s.contains("-1")) {
                 s = "LOW";
+            } else if (s.contains("-")) {
+                s = "LOWEST";
             } else if (s.contains("1")) {
                 s = "HIGH";
             } else if (s.contains("2")) {
@@ -588,7 +591,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
         List<ViskitElement> alis = new ArrayList<>(3);
         for (EdgeParameter ep : lis) {
-            vEdgeParameter vep = new vEdgeParameter(ep.getValue());
+            ViskitEdgeParameter vep = new ViskitEdgeParameter(ep.getValue());
             alis.add(vep);
         }
         return alis;
@@ -613,7 +616,10 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             }
 			String description = (jaxbStateVariable.getDescription() + comments).trim();
 			
-            vStateVariable stateVariable = new vStateVariable(jaxbStateVariable.getName(), jaxbStateVariable.getType(), description);
+            ViskitStateVariable stateVariable = new ViskitStateVariable(jaxbStateVariable.getName(),
+																		jaxbStateVariable.getType(),
+																		jaxbStateVariable.getValue(),
+																		description);
             stateVariable.opaqueModelObject = jaxbStateVariable;
 
             if (!stateVariableParameterNameCheck()) {
@@ -743,23 +749,24 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         setDirty(true);
 
         // get the new one here and show it around
-        vStateVariable vsv = new vStateVariable(name, type, description);
-        stateVariables.add(vsv);
+        ViskitStateVariable viskitStateVariable = new ViskitStateVariable(name, type, initialValue, description);
+        stateVariables.add(viskitStateVariable);
         if (!stateVariableParameterNameCheck()) {
-            mangleName(vsv);
+            mangleName(viskitStateVariable);
         }
         StateVariable stateVariable = jaxbObjectFactory.createStateVariable();
         stateVariable.setName(nullIfEmpty(name));
         stateVariable.setType(nullIfEmpty(type));
+        stateVariable.setValue(nullIfEmpty(initialValue));
         stateVariable.setDescription(description);
 
-        vsv.opaqueModelObject = stateVariable;
+        viskitStateVariable.opaqueModelObject = stateVariable;
         jaxbSimEntity.getStateVariable().add(stateVariable);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_ADDED, "State variable added: " + stateVariable.getName()));
+        notifyChanged(new ModelEvent(viskitStateVariable, ModelEvent.STATEVARIABLE_ADDED, "State variable added: " + stateVariable.getName()));
     }
 
     @Override
-    public void deleteStateVariable(vStateVariable vsv)
+    public void deleteStateVariable(ViskitStateVariable vsv)
 	{
         // remove jaxb variable
         Iterator<StateVariable> svItr = jaxbSimEntity.getStateVariable().iterator();
@@ -775,7 +782,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     @Override
-    public boolean changeStateVariable(vStateVariable vsv)
+    public boolean changeStateVariable(ViskitStateVariable vsv)
 	{
         boolean success = true;
         if (!stateVariableParameterNameCheck()) {
@@ -786,6 +793,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         StateVariable jaxbStateVariable = (StateVariable) vsv.opaqueModelObject;
         jaxbStateVariable.setName(nullIfEmpty(vsv.getName()));
         jaxbStateVariable.setType(nullIfEmpty(vsv.getType()));
+        jaxbStateVariable.setValue(nullIfEmpty(vsv.getValue()));
         jaxbStateVariable.setDescription(nullIfEmpty(vsv.getDescription()));
 
         setDirty(true);
@@ -1094,7 +1102,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new vEdgeParameter(arg.getValue()));
+                edgeParameters.add(new ViskitEdgeParameter(arg.getValue()));
             }
             schedulingEdge.parametersList = edgeParameters;
         }
@@ -1147,7 +1155,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         if (!args.isEmpty()) {
             List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new vEdgeParameter(arg.getValue()));
+                edgeParameters.add(new ViskitEdgeParameter(arg.getValue()));
             }
             cancellingEdge.parametersList = edgeParameters;
         }

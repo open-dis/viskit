@@ -43,7 +43,7 @@ public interface EventGraphView {
 
     boolean doEditParameter(vParameter param);
 
-    boolean doEditStateVariable(vStateVariable var);
+    boolean doEditStateVariable(ViskitStateVariable var);
 
     /**
      * Question dialog

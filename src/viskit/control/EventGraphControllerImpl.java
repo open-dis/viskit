@@ -762,7 +762,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void stateVariableEdit(vStateVariable var) {
+    public void stateVariableEdit(ViskitStateVariable var) {
         boolean modified = ((EventGraphView) getView()).doEditStateVariable(var);
         if (modified) {
             ((viskit.model.EventGraphModel) getModel()).changeStateVariable(var);
@@ -1055,7 +1055,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void deleteStateVariable(vStateVariable var) {
+    public void deleteStateVariable(ViskitStateVariable var) {
         ((EventGraphModel) getModel()).deleteStateVariable(var);
     }
 

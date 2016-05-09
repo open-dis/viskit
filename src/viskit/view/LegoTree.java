@@ -376,8 +376,15 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 } 
 				else 
 				{
-                    LOG.info(f.getName() + " not be listed in the LEGOs tree because compiled class not found\n"); 
-					// TODO notify user with popup
+
+					LOG.info(f.getName() + " not be listed in the LEGOs tree because compiled class not found\n");
+					
+					ViskitGlobals.instance().getAssemblyController().messageToUser(
+							JOptionPane.ERROR_MESSAGE,
+							"Compilation Error", "<html>" +
+							"<p align='center'>Error compiling <i>" + f.getName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
+						    "<p>&nbsp;</p>" +
+							"<p align='center'><i>" + f.getName() + ".class</i> file cannot be added to Event Graph Selection tree for Assembly use" + ViskitStatics.RECENTER_SPACING + "</p>");
                 }
 
                 // Note:
@@ -551,7 +558,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 				if (toolTipText.equals("EventGraphs")) // TODO String constant
 				{
 					toolTipText += " project subdirectory containing your models";
-					selected = true; // TODO must be on event dispatch thread?
+					selected = true; 
+					expanded = true; // TODO must be moved, put code on event dispatch thread?
 				}
 				else 
 				{

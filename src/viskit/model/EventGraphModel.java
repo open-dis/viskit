@@ -140,13 +140,13 @@ public interface EventGraphModel {
 
     void newSimParameter(String name, String type, String initialValue, String description);
 
-    boolean changeStateVariable(vStateVariable stateParameter);
+    boolean changeStateVariable(ViskitStateVariable stateParameter);
 
     boolean changeSimParameter(vParameter simParameter);
 
     void changeCodeBlock(String newCodeBlock);
 
-    void deleteStateVariable(vStateVariable stateVariable);
+    void deleteStateVariable(ViskitStateVariable stateVariable);
 
     void deleteSimParameter(vParameter simParameter);
 

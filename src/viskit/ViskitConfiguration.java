@@ -96,7 +96,7 @@ public class ViskitConfiguration {
 
     static {
         LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
-        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " (exists=" + VISKIT_CONFIG_DIR.exists() + ")\n");
+        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " (exists=" + VISKIT_CONFIG_DIR.exists() + ")");
     }
 
     public static synchronized ViskitConfiguration instance() {

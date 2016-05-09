@@ -15,8 +15,8 @@ import viskit.model.vParameter;
  */
 public class ParametersPanel extends ViskitTablePanel {
 
-    private String[] mytitles = {"name", "type", "description"};
-    private String plusToolTip = "Add a simulation parameter";
+    private String[] mytitles   = {"type", "name", "description"};
+    private String plusToolTip  = "Add a simulation parameter";
     private String minusToolTip = "Removed the selected parameter";
 
     ParametersPanel(int wid) {
@@ -36,15 +36,15 @@ public class ParametersPanel extends ViskitTablePanel {
     @Override
     public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = e.getName();
-        sa[1] = e.getType();
+        sa[0] = e.getType();
+        sa[1] = e.getName();
         sa[2] = e.getDescription();
         return sa;
     }
 
     @Override
     public ViskitElement newRowObject() {
-        vParameter ea = new vParameter("name", "int", "description");
+        vParameter ea = new vParameter("someType", "someName", "description");
         return ea;
     }
 

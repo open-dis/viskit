@@ -1,7 +1,8 @@
 package viskit.view;
 
+import viskit.ViskitStatics;
 import viskit.model.ViskitElement;
-import viskit.model.vStateVariable;
+import viskit.model.ViskitStateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -15,33 +16,64 @@ import viskit.model.vStateVariable;
  */
 public class StateVariablesPanel extends ViskitTablePanel {
 
-    private final String[] columnTitles = {"name", "type", "description"};
-    private final String  plusToolTip = "Add a state variable";
-    private final String minusToolTip = "Removed the selected state variable";
+    private final String[] columnTitles = {"type", "name", "initial value", "description"};
+    private final String    plusToolTip = "Add a state variable";
+    private final String   minusToolTip = "Removed the selected state variable";
 
-    StateVariablesPanel(int wid, int height) {
-        super(wid, height);            // separate constructor from initialization
+    StateVariablesPanel(int width, int height)
+	{
+        super(width, height); // separate constructor from initialization
         init(true);
     }
 
     @Override
-    public String[] getColumnTitles() {
+    public String[] getColumnTitles()
+	{
         return columnTitles;
     }
 
     @Override
-    public String[] getFields(ViskitElement e, int rowNum) {
-        String[] sa = new String[3];
-        sa[0] = e.getName();
-        sa[1] = e.getType();
-        sa[2] = e.getDescription();
+    public String[] getFields(ViskitElement viskitElement, int rowNum)
+	{
+		ViskitStateVariable stateVariable = (ViskitStateVariable)viskitElement;
+        String[] sa = new String[4];
+        sa[0] = stateVariable.getType();
+        sa[1] = stateVariable.getName();
+        sa[2] = stateVariable.getValue();
+        sa[3] = stateVariable.getDescription();
+		
+		// ensure non-empty
+		for (int index = 0; index < sa.length; index++)
+		{
+			if ((sa[index] == null) || sa[index].isEmpty())
+			{
+				sa[index] = "TODO";
+				switch (index)
+				{
+					case 0:
+						stateVariable.setType(sa[index]);
+						break;
+					case 1:
+						stateVariable.setName(sa[index]);
+						break;
+					case 2:
+						stateVariable.setValue(sa[index]);
+						break;
+					case 3:
+						sa[index] = ViskitStatics.DEFAULT_DESCRIPTION;
+						stateVariable.setDescription(sa[index]);
+						break;
+				}
+			}
+		}
         return sa;
     }
 
     @Override
-    public ViskitElement newRowObject() {
-        vStateVariable ea = new vStateVariable("name", "int", "description");
-        return ea;
+    public ViskitElement newRowObject()
+	{
+        ViskitStateVariable viskitStateVariable = new ViskitStateVariable("name", "int", "0", ViskitStatics.DEFAULT_DESCRIPTION);
+        return viskitStateVariable;
     }
 
     @Override

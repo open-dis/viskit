@@ -1752,13 +1752,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					"Invalid Assembly XML", 
 					message);
-            LOG.error(message + "\n");
+            LOG.error(message);
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } 
 		else
 		{
-            LOG.info(f.getName() + " is valid XML\n");
+            LOG.info(f.getName() + " is valid XML");
         }
 
         SimkitAssemblyXML2Java simkitAssemblyXML2Java = null;
@@ -1806,10 +1806,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					" Invalid Event Graph XML", 
 					message);
-			LOG.error(message + "\n");
+			LOG.error(message);
             return null;
         } else {
-            LOG.info(simkitXML2Java.getEventGraphFile() + " is valid XML\n");
+            LOG.info(simkitXML2Java.getEventGraphFile() + " is valid XML");
         }
 
         try {
@@ -1822,7 +1822,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					"Failed Event Graph conversion to Java",
 					message);
-			LOG.error(message + "\n");
+			LOG.error(message);
 			eventGraphSource = "Error, no Java source produced";
         }
         return eventGraphSource;
@@ -1897,16 +1897,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
             if (compileSuccess)
 			{
-                LOG.info(diagnostic + "\n");
+                LOG.info(diagnostic);
                 return new File(classesDirectory, packagePath + baseName + ".class");
             } 
 			else
 			{
 				String message = "Error compiling " + javaFile.getCanonicalPath();
-                LOG.error(message + "\n");
-                LOG.error(diagnostic + "\n");
+                LOG.error(message);
+                LOG.error(diagnostic);
                 if (!byteArrayOutputStream.toString().isEmpty()) {
-                    LOG.error(byteArrayOutputStream.toString() + "\n");
+                    LOG.error(byteArrayOutputStream.toString());
                 }
             }
         } catch (IOException ioe) {
@@ -1975,7 +1975,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 paf = compileJavaClassAndSetPackage(sourceCode);
             }
         } catch (FileNotFoundException e) {
-            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
+            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
         return paf;
@@ -2317,7 +2317,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 tempFile = file;
 
                 // _doOpen includes checks whether a tab is already opened
-                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
+                ViskitGlobals.instance().getEventGraphController()._doOpen(file);
             }
 			ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab(); // ensure correct context when building menus
 			ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
@@ -2398,8 +2398,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		if (assemblyFilePathList == null)
 		{
 			LOG.error ("updateAssemblyFileLists () failing mysteriously, apparently historyXMLConfiguration is null");
+			return;
 		}
-//        LOG.debug("recordAssemblyFiles() assemblyFilePathList.size()=" + assemblyFilePathList.size());
+        LOG.debug("updateAssemblyFileLists() assemblyFilePathList.size()=" + assemblyFilePathList.size());
+		
         int index = 0;
         for (String assemblyFilePath : assemblyFilePathList)
 		{

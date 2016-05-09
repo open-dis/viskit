@@ -20,13 +20,14 @@ import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
 import viskit.ViskitGlobals;
-import static viskit.ViskitGlobals.snapToGrid;
 import viskit.ViskitStatics;
 import viskit.view.EventGraphViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -322,7 +323,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                             sb.append("<u>edge parameters</u><br>");
                             for (ViskitElement viskitElement : schedulingEdge.parametersList)
 							{
-                                vEdgeParameter edgeParameter = (vEdgeParameter) viskitElement;
+                                ViskitEdgeParameter edgeParameter = (ViskitEdgeParameter) viskitElement;
                                 sb.append("&nbsp;");
                                 sb.append(index++);
                                 sb.append(" ");

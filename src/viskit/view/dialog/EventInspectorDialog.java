@@ -368,7 +368,7 @@ public class EventInspectorDialog extends JDialog {
                             // The user will be able toEventNode change any values fromventNode
                             // the EdgeInspectorDialog.  Right now, values are
                             // defaulted toEventNode zeros.
-                            ((SchedulingEdge) viskitElement).parametersList.add(new vEdgeParameter(v.getValue()));
+                            ((SchedulingEdge) viskitElement).parametersList.add(new ViskitEdgeParameter(v.getValue()));
                         }
                     }
                 }

@@ -7,7 +7,7 @@ package viskit.model;
  * @since 3:19:43 PM
  * @version $Id$
  */
-public class vEdgeParameter extends ViskitElement {
+public class ViskitEdgeParameter extends ViskitElement {
 
     public String bogus; //todo fix
 
@@ -18,7 +18,7 @@ public class vEdgeParameter extends ViskitElement {
     private String  comment;
     private String  description = new String();
 
-    public vEdgeParameter(String value) {
+    public ViskitEdgeParameter(String value) {
         this.value = value;
     }
 

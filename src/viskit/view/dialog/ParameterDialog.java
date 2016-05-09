@@ -68,11 +68,11 @@ public class ParameterDialog extends JDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("name");
-        JLabel initLab = new JLabel("initial value");
-        JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
-        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, commLab});
+        JLabel         typeLabel = new JLabel("type");
+        JLabel         nameLabel = new JLabel("name");
+        JLabel initialValueLabel = new JLabel("initial value"); // not used, force instantiation
+        JLabel  descriptionLabel = new JLabel("description");
+        int labelWidth = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
 
         parameterNameField = new JTextField(15);
         setMaxHeight(parameterNameField);
@@ -84,9 +84,9 @@ public class ParameterDialog extends JDialog {
         parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
-        fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
-        fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
+        fieldsPanel.add(new OneLinePanel(typeLabel,        labelWidth, parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(nameLabel,        labelWidth, parameterNameField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, labelWidth, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 

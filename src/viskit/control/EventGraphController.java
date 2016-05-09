@@ -118,7 +118,7 @@ public interface EventGraphController {
 
     void simParameterEdit(vParameter parameter);
 
-    void stateVariableEdit(vStateVariable stateVariable);
+    void stateVariableEdit(ViskitStateVariable stateVariable);
 
     void codeBlockEdit(String codeBlockSource);
 
@@ -187,7 +187,7 @@ public interface EventGraphController {
 
     void deleteSimParameter(vParameter p);
 
-    void deleteStateVariable(vStateVariable var);
+    void deleteStateVariable(ViskitStateVariable var);
 
     void eventList();
 

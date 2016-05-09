@@ -372,7 +372,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).deleteStateVariable((vStateVariable) event.getSource());
+                ((EventGraphController) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
             }
         });
 
@@ -380,7 +380,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).stateVariableEdit((vStateVariable) event.getSource());
+                ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
             }
         });
 
@@ -1238,6 +1238,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
+				
+				// TODO save button
             } 
 			else
 			{
@@ -1245,6 +1247,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
+				
+				// TODO save button
             }
         }
         // Restore active tab and eventGraphModel by virtue of firing a call to stateChanged()
@@ -1566,31 +1570,38 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName)
+	{
 		 return saveFileAsk(suggestedName,  showUniqueName, "Save Event Graph File");
     }
 
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
+	{
         if (eventGraphFileChooser == null) {
             eventGraphFileChooser = buildOpenSaveChooser();
         }
         eventGraphFileChooser.setDialogTitle(dialogTitle);
 
         File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggestedName);
-        if (!file.getParentFile().isDirectory()) {
+        if (!file.getParentFile().isDirectory())
+		{
             file.getParentFile().mkdirs();
         }
-        if (showUniqueName) {
+        if (showUniqueName)
+		{
             file = getUniqueName(suggestedName, file.getParentFile());
         }
 
         eventGraphFileChooser.setSelectedFile(file);
-        int retv = eventGraphFileChooser.showSaveDialog(this);
-        if (retv == JFileChooser.APPROVE_OPTION) {
-            if (eventGraphFileChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
-                    return null;
+        int returnValue = eventGraphFileChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION)
+		{
+            if (eventGraphFileChooser.getSelectedFile().exists())
+			{
+                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm"))
+				{
+                    return null; // user cancelled
                 }
             }
             return eventGraphFileChooser.getSelectedFile();
@@ -1638,7 +1649,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public boolean doEditStateVariable(vStateVariable var) {
+    public boolean doEditStateVariable(ViskitStateVariable var) {
         return StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), var);
     }
 
@@ -1669,7 +1680,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentJGraphEventGraphComponentWrapper();
         ParametersPanel     parametersPanel     = eventGraphComponentWrapper.parametersPanel;
         StateVariablesPanel stateVariablesPanel = eventGraphComponentWrapper.stateVariablesPanel;
-        switch (event.getID()) {
+        switch (event.getID())
+		{
             // Changes the two side panels need to know about
             case ModelEvent.SIMPARAMETER_ADDED:
                 parametersPanel.addRow((ViskitElement) event.getSource());
