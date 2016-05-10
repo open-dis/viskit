@@ -15,11 +15,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.control.EventGraphControllerImpl;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
 import viskit.view.CodeBlockPanel;
 import viskit.view.LocalVariablesPanel;
-import viskit.view.TransitionsPanel;
+import viskit.view.StateTransitionsPanel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -39,7 +40,7 @@ public class EventInspectorDialog extends JDialog {
     private JTextField          nameTF;
     private JTextField          descriptionTF;
     private JPanel              descriptionPanel;
-    private TransitionsPanel    transitionsPanel;
+    private StateTransitionsPanel    stateTransitionsPanel;
     private ArgumentsPanel      argumentsPanel;
     private LocalVariablesPanel localVariablesPanel;
     private CodeBlockPanel      codeBlockPanel;
@@ -121,9 +122,9 @@ public class EventInspectorDialog extends JDialog {
         panel.add(descriptionPanel);
 
         // state transitions
-        transitionsPanel = new TransitionsPanel();
-        transitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
-        panel.add(transitionsPanel);
+        stateTransitionsPanel = new StateTransitionsPanel();
+        stateTransitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
+        panel.add(stateTransitionsPanel);
 
         // Event arguments
         argumentsPanel = new ArgumentsPanel(300, 2);
@@ -242,9 +243,9 @@ public class EventInspectorDialog extends JDialog {
             }
         });
 
-        transitionsPanel.addPlusListener(myChangeListener);
-        transitionsPanel.addMinusListener(myChangeListener);
-        transitionsPanel.addDoubleClickedListener(new MouseAdapter() {
+        stateTransitionsPanel.addPlusListener(myChangeListener);
+        stateTransitionsPanel.addMinusListener(myChangeListener);
+        stateTransitionsPanel.addDoubleClickedListener(new MouseAdapter() {
 
             // EventStateTransitionDialog: State transition
             // bug fix 1183
@@ -262,13 +263,25 @@ public class EventInspectorDialog extends JDialog {
                         localVariablesPanel);
                 if (modified)
 				{
-                    transitionsPanel.updateTransition(eventStateTransition);
+                    stateTransitionsPanel.updateStateTransition(eventStateTransition);
                     setModified(modified);
                 }
             }
         });
 
         setParameters(frame, eventNode);
+		
+		// warn that Run event state transitions are re-generated each time, no point in editing them
+		if (eventNode.getName().equals("Run"))
+		{
+			      localVariablesPanel.setEnabled (false);
+			    stateTransitionsPanel.setEnabled (false);
+				
+                ViskitGlobals.instance().getEventGraphController().messageToUser(
+                    JOptionPane.INFORMATION_MESSAGE,
+                    "Run Event has special semantics",
+                    "Run Event state transitions are defined by State Variable initial values");
+		}
     }
 
     private void setModified(boolean value)
@@ -314,8 +327,8 @@ public class EventInspectorDialog extends JDialog {
         codeBlockPanel.setVisibleLines(1);
         showCodeBlock(codeBlockSourceText != null && !codeBlockSourceText.isEmpty());
 
-        transitionsPanel.setTransitions(eventNode.getTransitions());
-        codeBlockSourceText = transitionsPanel.getString();
+        stateTransitionsPanel.setTransitions(eventNode.getStateTransitions());
+        codeBlockSourceText = stateTransitionsPanel.getString();
         showStateTransitions(codeBlockSourceText != null && !codeBlockSourceText.isEmpty());
 
         argumentsPanel.setData(eventNode.getArguments());
@@ -332,7 +345,7 @@ public class EventInspectorDialog extends JDialog {
         if (modified) {
             eventNode.setName(nameTF.getText().trim().replace(' ', '_'));
 
-            eventNode.setTransitions(transitionsPanel.getTransitions());
+            eventNode.setStateTransitions(stateTransitionsPanel.getTransitions());
 
             // Bug 1373: This is how an EventNode will have knowledge
             // of edge parameter additions, or removals
@@ -430,7 +443,7 @@ public class EventInspectorDialog extends JDialog {
 //
 //                // Parse the state transitions
 //                StringBuilder parseThis = new StringBuilder();
-//                for (ViskitElement transition : transitions.getTransitions()) {
+//                for (ViskitElement transition : transitions.getStateTransitions()) {
 //                    EventStateTransition est = (EventStateTransition) transition;
 //                    parseThis.append(est.toString());
 //                    parseThis.append(";");
@@ -489,7 +502,7 @@ public class EventInspectorDialog extends JDialog {
     }
 
     private void showStateTransitions(boolean show) {
-        transitionsPanel.setVisible(show);
+        stateTransitionsPanel.setVisible(show);
         addStateTransitionsButton.setVisible(!show);
         pack();
     }

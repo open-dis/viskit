@@ -164,16 +164,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		
         if (modified)
 		{
-            // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(newEventGraphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphName(newEventGraphMetadata.name); // update title bar
 			
             ((EventGraphView) getView()).setSelectedEventGraphDescription(newEventGraphMetadata.description);
 
-            // Bugfix 1398
             String message =
                     "<html><body><p align='center'>Do you want " + newEventGraphMetadata.name + 
-					" execution to start with a <b>\"Run\"</b> Event?" + ViskitStatics.RECENTER_SPACING + "</p>"  +
-				     "<p>&nbsp</p></body></html>";
+					" execution to start with a <i>\"Run\"</i> Event?" + ViskitStatics.RECENTER_SPACING + "</p>"  +
+				    "<p>&nbsp</p>" +
+					"<p><i>\"Run\"</i> Event is needed for initializing state variables and scheduling edges." + ViskitStatics.RECENTER_SPACING + "</p></body></html>";
             String title = "Confirm Run Event";
 
             int returnValue = ((EventGraphView) getView()).genericAskYN(title, message);

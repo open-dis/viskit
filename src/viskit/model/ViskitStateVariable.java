@@ -10,8 +10,8 @@ import viskit.ViskitStatics;
  * @author DMcG
  * @version $Id$
  */
-public class ViskitStateVariable extends ViskitElement {
-
+public class ViskitStateVariable extends ViskitElement
+{
     /** array size, for (multi-dim) array */
     private String[] arraySize;
 

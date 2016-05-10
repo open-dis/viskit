@@ -1373,13 +1373,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
-        //xt.setVisibleRowCount(25);
+        //xTreePanel.setVisibleRowCount(25);
         xTreePanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
-        final JFrame frame = new JFrame(xmlFile.getName());
+        final JFrame xmlModelFrame = new JFrame();
+		xmlModelFrame.setTitle(xmlFile.getName() + " model source");
 
         JPanel contentPanel = new JPanel();
-        frame.setContentPane(contentPanel);
+        xmlModelFrame.setContentPane(contentPanel);
 
         contentPanel.setLayout(new BorderLayout());
         contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -1393,16 +1394,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         //jf.pack();
-        frame.setSize(600, 800);
-        frame.setLocationRelativeTo(this);
-        frame.setLocation(frame.getLocation().x - frame.getWidth(), // shift left
-		                  frame.getLocation().y);
+        xmlModelFrame.setSize(600, 800);
+        xmlModelFrame.setLocationRelativeTo(this);
+        xmlModelFrame.setLocation(xmlModelFrame.getLocation().x - xmlModelFrame.getWidth(), // shift left
+		                          xmlModelFrame.getLocation().y);
 
         Runnable r = new Runnable() {
 
             @Override
             public void run() {
-                frame.setVisible(true);
+                xmlModelFrame.setVisible(true);
             }
         };
         SwingUtilities.invokeLater(r);
@@ -1416,7 +1417,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
                     @Override
                     public void run() {
-                        frame.dispose();
+                        xmlModelFrame.dispose();
                     }
                 };
                 SwingUtilities.invokeLater(r);

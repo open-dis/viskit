@@ -30,9 +30,10 @@ public class XmlTree extends JTree {
         return new XTreePanel(xmlF);
     }
 
-    public XmlTree(File xmlF) throws Exception {
+    public XmlTree(File xmlFile) throws Exception
+	{
         super();
-        setFile(xmlF);
+        setFile(xmlFile);
     }
     XMLOutputter xmlOut;
     Document doc = null;
@@ -265,14 +266,15 @@ public class XmlTree extends JTree {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
-            public void run() {
+            public void run() 
+			{
                 JFrame f = new JFrame("XML Tree Widget Test");
 
                 JFileChooser jfc = new JFileChooser();
 				jfc.setDialogTitle("XML Tree of Viskit Model");
                 jfc.showOpenDialog(f);
-                File fil = jfc.getSelectedFile();
-                if (fil == null) {
+                File file = jfc.getSelectedFile();
+                if (file == null) {
                     ViskitGlobals.instance().systemExit(0);
                 }
 
@@ -282,14 +284,14 @@ public class XmlTree extends JTree {
 
                 //XTree xt = new XTree(fil);
                 //c.add(new JScrollPane(xt), BorderLayout.CENTER);
-                XTreePanel p = null;
+                XTreePanel xTreePanel = null;
                 try {
-                    p = XmlTree.getTreeInPanel(fil);
+                    xTreePanel = XmlTree.getTreeInPanel(file);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println(p.xtree.getXML());
-                c.add(p, BorderLayout.CENTER);
+                System.out.println(xTreePanel.xmlTree.getXML());
+                c.add(xTreePanel, BorderLayout.CENTER);
                 f.setSize(500, 400);
                 f.setLocation(300, 300);
                 f.setVisible(true);
@@ -314,54 +316,60 @@ public class XmlTree extends JTree {
 
 class XTreePanel extends JPanel {
 
-    public XmlTree xtree;
-    public JTextArea srcXML;
+    public XmlTree   xmlTree;
+    public JTextArea sourceXmlTextArea;
 
-    XTreePanel(File xmlF) throws Exception {
+    XTreePanel(File xmlFile) throws Exception {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+		
         try {
-            xtree = new XmlTree(xmlF);
-        } catch (Exception e) {
-            xtree = null;
+            xmlTree = new XmlTree(xmlFile);
+        } 
+		catch (Exception e)
+		{
+            xmlTree = null;
             throw (e);
         }
+		
+		initialize ();
+	}
+	private void initialize ()
+	{
+        sourceXmlTextArea = new JTextArea("raw XML here");
+        sourceXmlTextArea.setWrapStyleWord(true);
+        sourceXmlTextArea.setLineWrap(true);
+        sourceXmlTextArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        Font oldFont = sourceXmlTextArea.getFont();
+        sourceXmlTextArea.setFont(new Font("Monospaced", oldFont.getStyle(), oldFont.getSize()));
+        sourceXmlTextArea.setText(getElementText((DefaultMutableTreeNode) xmlTree.mod.getRoot()));
+        sourceXmlTextArea.setCaretPosition(0);
 
-        srcXML = new JTextArea("raw XML here");
-        srcXML.setWrapStyleWord(true);
-        srcXML.setLineWrap(true);
-        srcXML.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        Font oldF = srcXML.getFont();
-        srcXML.setFont(new Font("Monospaced", oldF.getStyle(), oldF.getSize()));
-        srcXML.setText(getElementText((DefaultMutableTreeNode) xtree.mod.getRoot()));
-        srcXML.setCaretPosition(0);
+        JScrollPane treeScrollPane = new JScrollPane(xmlTree);
+        JScrollPane sourceXmlScrollPane = new JScrollPane(sourceXmlTextArea);
+        sourceXmlScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
 
-        JScrollPane treeJsp = new JScrollPane(xtree);
-        JScrollPane taJsp = new JScrollPane(srcXML);
-        taJsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
+        JSplitPane xmlSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treeScrollPane, sourceXmlScrollPane);
+        xmlSplitPane.setOneTouchExpandable(false);
+        xmlSplitPane.setResizeWeight(0.75);
 
-        JSplitPane jspt = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treeJsp, taJsp);
-        jspt.setOneTouchExpandable(false);
-        jspt.setResizeWeight(0.75);
-
-        Dimension d1 = xtree.getPreferredSize();
-        Dimension d2 = srcXML.getPreferredSize();
-        jspt.setPreferredSize(new Dimension(d1.width, d1.height + d2.height));
-        add(jspt);
+        Dimension d1 = xmlTree.getPreferredSize();
+        Dimension d2 = sourceXmlTextArea.getPreferredSize();
+        xmlSplitPane.setPreferredSize(new Dimension(d1.width, d1.height + d2.height));
+        add(xmlSplitPane);
         add(Box.createVerticalGlue());
 
-        xtree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-
+        xmlTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener()
+		{
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xtree.getLastSelectedPathComponent();
+                DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xmlTree.getLastSelectedPathComponent();
                 if (dmt == null) {
                     return;
                 }
-                srcXML.setText(getElementText(dmt));
-                srcXML.revalidate();
-                srcXML.setCaretPosition(0);
+                sourceXmlTextArea.setText(getElementText(dmt));
+                sourceXmlTextArea.revalidate();
+                sourceXmlTextArea.setCaretPosition(0);
             }
         });
     }
@@ -370,7 +378,7 @@ class XTreePanel extends JPanel {
         Object o = dmt.getUserObject();
         if (o instanceof XmlTree.nElement) {
             Element elm = ((XmlTree.nElement) o).elem;
-            return xtree.xmlOut.outputString(elm);
+            return xmlTree.xmlOut.outputString(elm);
         } else {
             return "";
         }

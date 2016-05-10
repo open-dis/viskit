@@ -67,8 +67,8 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     private EventStateTransitionDialog(JFrame parent, String nodeName, EventStateTransition eventStateTransition, ArgumentsPanel argumentsPanel, LocalVariablesPanel localVariablesPanel)
-	{
-        super(parent, "State Transition: " + nodeName, true);
+	{		
+        super(parent, "State Transitions for " + nodeName + " Event", true);
         this.argumentsPanel      = argumentsPanel;
         this.localVariablesPanel = localVariablesPanel;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -192,12 +192,12 @@ public class EventStateTransitionDialog extends JDialog {
             okButton.addActionListener(new  ApplyButtonListener());
         cancelButton.addActionListener(new CancelButtonListener());
 
-        EnableApplyButtonListener lis = new EnableApplyButtonListener();
-        descriptionTF.addCaretListener(lis);
-        localAssignmentTF.addCaretListener(lis);
-        arrayIndexTF.addCaretListener(lis);
-        actionTF.addCaretListener(lis);
-        localInvocationTF.addCaretListener(lis);
+        EnableApplyButtonListener enableApplyButtonListener = new EnableApplyButtonListener();
+        descriptionTF.addCaretListener(enableApplyButtonListener);
+        localAssignmentTF.addCaretListener(enableApplyButtonListener);
+        arrayIndexTF.addCaretListener(enableApplyButtonListener);
+        actionTF.addCaretListener(enableApplyButtonListener);
+        localInvocationTF.addCaretListener(enableApplyButtonListener);
 
         stateVariablesCB.addActionListener(new ActionListener()
 		{
@@ -256,12 +256,12 @@ public class EventStateTransitionDialog extends JDialog {
         } 
 		else 
 		{
-            descriptionTF.setText("");
+            descriptionTF.setText(ViskitStatics.DEFAULT_DESCRIPTION);
         }
 
-        RadioButtonListener radioButtListener = new RadioButtonListener();
-        assignToRB.addActionListener(radioButtListener);
-        invokeOnRB.addActionListener(radioButtListener);
+        RadioButtonListener radioButtonListener = new RadioButtonListener();
+        assignToRB.addActionListener(radioButtonListener);
+        invokeOnRB.addActionListener(radioButtonListener);
 
         setParameters(parent, eventStateTransition);
     }
@@ -425,22 +425,30 @@ public class EventStateTransitionDialog extends JDialog {
 
         if (eventStateTransition != null)
 		{
-            if (stateVariablesCB.getItemCount() > 0) {
+            if (stateVariablesCB.getItemCount() > 0) 
+			{
                 descriptionTF.setText(((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getDescription());
-            } else {
-                descriptionTF.setText("");
+            } else 
+			{
+                descriptionTF.setText(ViskitStatics.DEFAULT_DESCRIPTION);
             }
             localAssignmentTF.setText(eventStateTransition.getLocalVariableAssignment());
             setStateVariableCBValue(eventStateTransition);
-            String ie = eventStateTransition.getIndexingExpression();
-            if (ie == null || ie.isEmpty()) {
+            String indexingExpression = eventStateTransition.getIndexingExpression();
+            if (indexingExpression == null || indexingExpression.isEmpty())
+			{
                 arrayIndexTF.setText(indexArgument);
-            } else {
-                arrayIndexTF.setText(ie);
+            } 
+			else 
+			{
+                arrayIndexTF.setText(indexingExpression);
             }
             boolean isOperation = eventStateTransition.isOperation();
-            if (isOperation) {
+            if (isOperation)
+			{
                 invokeOnRB.setSelected(isOperation);
+                invokeOnRB.setEnabled( isOperation);
+                assignToRB.setEnabled(!isOperation);
                 actionLabel1.setText("(");
                 actionLabel2.setText(" )");
 
@@ -451,8 +459,12 @@ public class EventStateTransitionDialog extends JDialog {
                 operation = operation.replace("(", "");
                 operation = operation.replace(")", "");
                 actionTF.setText(operation);
-            } else {
+            } 
+			else 
+			{
                 assignToRB.setSelected(!isOperation);
+                assignToRB.setEnabled(!isOperation);
+                invokeOnRB.setEnabled( isOperation);
                 actionLabel1.setText("=");
                 actionLabel2.setText("");
                 actionTF.setText(eventStateTransition.getOperationOrAssignment());
@@ -466,22 +478,22 @@ public class EventStateTransitionDialog extends JDialog {
 
             setLocalVariableCBValue(eventStateTransition);
         } 
-		else 
+		else // eventStateTransition == null
 		{
-            descriptionTF.setText("");
+                descriptionTF.setText("");
             localAssignmentTF.setText("");
-            stateVariablesCB.setSelectedIndex(0);
-            arrayIndexTF.setText(indexArgument);
-            stateTransitionMethodsCB.setSelectedIndex(0);
-            actionTF.setText("");
-            assignToRB.setSelected(true);
+             stateVariablesCB.setSelectedIndex(0);
+                 arrayIndexTF.setText(indexArgument);
+     stateTransitionMethodsCB.setSelectedIndex(0);
+                     actionTF.setText("");
+                   assignToRB.setSelected(true);
             localInvocationTF.setText("");
-            localVariableMethodsCB.setSelectedIndex(0);
+       localVariableMethodsCB.setSelectedIndex(0);
         }
 
         // We have an indexing argument already set
-        String typ = ((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType();
-        indexPanel.setVisible(ViskitGlobals.instance().isArray(typ));
+        String typeName = ((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType();
+        indexPanel.setVisible(ViskitGlobals.instance().isArray(typeName));
         localAssignmentPanel.setVisible(invokeOnRB.isSelected());
     }
 
@@ -499,7 +511,7 @@ public class EventStateTransitionDialog extends JDialog {
         // TODO: determine if this is necessary
 //        if (est.getStateVarName().isEmpty()) // for first time
 //        {
-//            ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
+//            ViskitGlobals.instance().getEventGraphController().messageToUser(
 //                    JOptionPane.ERROR_MESSAGE,
 //                    "Alert",
 //                    "State variable " + est.getStateVarName() + "not found.");
@@ -629,7 +641,7 @@ public class EventStateTransitionDialog extends JDialog {
 			{
                 if (ViskitGlobals.instance().isPrimitive(typeName))
 				{
-                    ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
+                    ViskitGlobals.instance().getEventGraphController().messageToUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Java Language Error",
                             "A method cannot be invoked on a primitive type.");

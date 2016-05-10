@@ -858,13 +858,14 @@ public class SimkitXML2Java {
      * @param event the Event to process
      * @param eventBlockStringWriter the StringWriter assigned to write the Event
      */
-    void doEventBlock(Event event, StringWriter eventBlockStringWriter) {
+    void doEventBlock(Event event, StringWriter eventBlockStringWriter)
+	{
         log.debug("Event is: " + event.getName());
         PrintWriter pw = new PrintWriter(eventBlockStringWriter);
-        List<StateTransition> liStateT = event.getStateTransition();
-        List<Argument> liArgs = event.getArgument();
-        List<LocalVariable> liLocalV = event.getLocalVariable();
-        List<Object> liSchedCanc = event.getScheduleOrCancel();
+        List<StateTransition> stateTransitionList = event.getStateTransition();
+        List<Argument>               argumentList = event.getArgument();
+        List<LocalVariable>     localVariableList = event.getLocalVariable();
+        List<Object>         scheduleOrCancelList = event.getScheduleOrCancel();
 
         String doEvent = null;
 
@@ -874,7 +875,7 @@ public class SimkitXML2Java {
             Class<?> sup = resolveExtensionClass();
             Method[] methods = sup.getMethods();
             for (Method m : methods) {
-                if (("do"+event.getName()).equals(m.getName()) && m.getParameterCount() == liArgs.size()) {
+                if (("do"+event.getName()).equals(m.getName()) && m.getParameterCount() == argumentList.size()) {
                     doEvent = m.getName();
                     break;
                 }
@@ -892,9 +893,9 @@ public class SimkitXML2Java {
 
         pw.print(SP_4 + "public void do" + eventName + LP);
 
-        for (Argument a : liArgs) {
+        for (Argument a : argumentList) {
             pw.print(a.getType() + SP + a.getName());
-            if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+            if (argumentList.size() > 1 && argumentList.indexOf(a) < argumentList.size() - 1) {
                 pw.print(CM + SP);
             }
         }
@@ -904,9 +905,9 @@ public class SimkitXML2Java {
 
         if (doEvent != null) {
             pw.print(SP_8 + "super." + doEvent + LP);
-            for (Argument a : liArgs) {
+            for (Argument a : argumentList) {
                 pw.print(a.getName());
-                if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+                if (argumentList.size() > 1 && argumentList.indexOf(a) < argumentList.size() - 1) {
                     pw.print(CM + SP);
                 }
             }
@@ -917,10 +918,10 @@ public class SimkitXML2Java {
 
         pw.println();
 
-        if (!liLocalV.isEmpty()) {
+        if (!localVariableList.isEmpty()) {
             pw.println(SP_8 + "/* local variable decarlations */");
         }
-        for (LocalVariable local : liLocalV) {
+        for (LocalVariable local : localVariableList) {
             String[] lines = {" "};
             String value = local.getValue();
             if (!("".equals(value))) {
@@ -935,7 +936,7 @@ public class SimkitXML2Java {
             }
         }
 
-        if (liLocalV.size() > 0) {
+        if (localVariableList.size() > 0) {
             pw.println();
         }
 
@@ -951,7 +952,7 @@ public class SimkitXML2Java {
         }
 
         List<String> decls = new LinkedList<>();
-        for (StateTransition st : liStateT) {
+        for (StateTransition st : stateTransitionList) {
             StateVariable sv = (StateVariable) st.getState();
             Assignment asg = st.getAssignment();
             Operation ops = st.getOperation();
@@ -1037,10 +1038,14 @@ public class SimkitXML2Java {
         }
 
         // waitDelay/interrupt
-        for (Object o : liSchedCanc) {
-            if (o instanceof Schedule) {
+        for (Object o : scheduleOrCancelList)
+		{
+            if (o instanceof Schedule)
+			{
                 doSchedule((Schedule) o, event, pw);
-            } else {
+            } 
+			else
+			{
                 doCancel((Cancel) o, event, pw);
             }
         }
@@ -1048,11 +1053,13 @@ public class SimkitXML2Java {
         pw.println();
     }
 
-    void doSchedule(Schedule s, Event e, PrintWriter pw) {
+    void doSchedule(Schedule s, Event e, PrintWriter pw)
+	{
         String condent = "";
         Event event = (Event) s.getEvent();
 
-        if (s.getCondition() != null && !s.getCondition().equals("true")) {
+        if (s.getCondition() != null && !s.getCondition().equals("true"))
+		{
             condent = SP_4;
             pw.println(SP_8 + "if" + SP + LP + s.getCondition() + RP + SP + OB);
         }
@@ -1066,10 +1073,9 @@ public class SimkitXML2Java {
 
         // according to schema, to meet Priority class definition, the following
         // tags should be permitted:
-        // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST,
-        // however, historically these could be numbers.
+        // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST
 
-        // Bugfix 1400: These should now be eneumerations instead of FP values
+        // Bugfix 1400: These should now be enumerations instead of FP values
         pw.print(s.getDelay() + CM + " Priority" + PD + s.getPriority());
 
         // Note: The following loop covers all possibilities with the

@@ -27,7 +27,6 @@ import viskit.control.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
 import static viskit.ViskitGlobals.snapToGrid;
-import static viskit.ViskitGlobals.snapToGrid;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -342,7 +341,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 					else
 					{
                         if (edgeCell instanceof vSelfEdgeCell)
-                            sb.append("<center>Self Cancelling Edge</center>");
+                            sb.append("<center>Self-Cancelling Edge</center>");
                         else
                             sb.append("<center>Cancelling Edge</center>");
 
@@ -382,11 +381,11 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 				{
                     CircleCell circleCell = (CircleCell) c;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
-                    sb.append("<center>");
+                    sb.append("<center> Event ");
 
                     // Show event node names with corresponding parametersList if any
                     String nodeName = eventNode.getName();
-                    String[] nodeNameArray = nodeName.split("_"); // TODO better algorithm including camel case
+                    String[] nodeNameArray = nodeName.split("_"); // TODO better algorithm including camel case for name mangling
 
                     if (nodeNameArray.length > 1) {
                         sb.append(nodeNameArray[0]);
@@ -459,7 +458,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                         }
                     }
 
-                    List<ViskitElement> stateTransitions = eventNode.getTransitions();
+                    List<ViskitElement> stateTransitions = eventNode.getStateTransitions();
                     if (!stateTransitions.isEmpty())
 					{
                         sb.append("<u>state transitions</u><br>");

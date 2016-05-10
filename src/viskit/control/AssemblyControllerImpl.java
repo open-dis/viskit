@@ -1905,7 +1905,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				String message = "Error compiling " + javaFile.getCanonicalPath();
                 LOG.error(message);
                 LOG.error(diagnostic);
-                if (!byteArrayOutputStream.toString().isEmpty()) {
+                if (!byteArrayOutputStream.toString().isEmpty())
+				{
                     LOG.error(byteArrayOutputStream.toString());
                 }
             }

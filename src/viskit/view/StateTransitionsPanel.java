@@ -24,23 +24,25 @@ import viskit.model.ViskitElement;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class TransitionsPanel extends JPanel {
+public class StateTransitionsPanel extends JPanel {
 
     private JList<String> modelList;
     private JButton minusButton, plusButton;
-    private myListModel model;
+    private MyListModel model;
     private JButton editButton;
+	private boolean enabled = true;
+    private JLabel instructionsLabel = new JLabel("Double click a row to ");
 
-    public TransitionsPanel() {
+    public StateTransitionsPanel()
+	{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
         p.add(Box.createHorizontalGlue());
-        JLabel instructions = new JLabel("Double click a row to ");
         int bigSz = getFont().getSize();
-        instructions.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        p.add(instructions);
+        instructionsLabel.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+        p.add(instructionsLabel);
         editButton = new JButton("edit.");
         editButton.setFont(getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
         editButton.setBorder(null);
@@ -49,7 +51,7 @@ public class TransitionsPanel extends JPanel {
         p.add(Box.createHorizontalGlue());
         add(p);
 
-        model = new myListModel();
+        model = new MyListModel();
         model.addElement("1");
         model.addElement("2");
         model.addElement("3");
@@ -94,23 +96,27 @@ public class TransitionsPanel extends JPanel {
         dd = this.getPreferredSize();
         this.setMinimumSize(dd);
 
-        plusButton.addActionListener(new plusButtonListener());
-        minusButton.addActionListener(new minusButtonListener());
+        plusButton.addActionListener(new PlusButtonListener());
+        minusButton.addActionListener(new MinusButtonListener());
 
-        modelList.addListSelectionListener(new myListSelectionListener());
+        modelList.addListSelectionListener(new MyListSelectionListener());
         modelList.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mouseClicked(MouseEvent event) {
-                if (event.getClickCount() == 2) {
-                    if (myMouseListener != null) {
-                        int idx = modelList.getSelectedIndex();
+            public void mouseClicked(MouseEvent event)
+			{
+                if (event.getClickCount() == 2)
+				{
+                    if (myMouseListener != null)
+					{
+                        int index = modelList.getSelectedIndex();
 
                         // Don't fail on ArrayIndexOutOfBoundsException
-                        if (idx == -1) {
+                        if (index == -1)
+						{
                             return;
                         }
-                        ViskitElement est = arrayList.get(idx);
+                        ViskitElement est = arrayList.get(index);
                         event.setSource(est);
                         myMouseListener.mouseClicked(event);
                     }
@@ -122,6 +128,20 @@ public class TransitionsPanel extends JPanel {
     // TODO: combine with list model.  List has no clone method implemented
     ArrayList<ViskitElement> arrayList = new ArrayList<>();
 
+	@Override
+	public void setEnabled (boolean value)
+	{
+		super.setEnabled(value);
+		minusButton.setEnabled(value);
+		plusButton.setEnabled(value);
+		modelList.setEnabled(value);
+		enabled = value;
+		if (!value)
+		{
+			instructionsLabel.setVisible(false);
+			       editButton.setVisible(false);
+		}
+	}
     public void setTransitions(List<? extends ViskitElement> tLis) {
         clearTransitions();
         for (ViskitElement est : tLis) {
@@ -183,36 +203,38 @@ public class TransitionsPanel extends JPanel {
         myMouseListener = ml;
     }
 
-    public void updateTransition(EventStateTransition eventStateTransition) {
+    public void updateStateTransition(EventStateTransition eventStateTransition)
+	{
         int index = arrayList.indexOf(eventStateTransition);
         model.setElementAt(transitionString(eventStateTransition), index);
     }
 
-    class myListModel extends DefaultListModel<String> {
+    class MyListModel extends DefaultListModel<String> {
 
-        myListModel() {
+        MyListModel() {
             super();
         }
     }
 
-    class plusButtonListener implements ActionListener {
-
+    class PlusButtonListener implements ActionListener
+	{
         @Override
         public void actionPerformed(ActionEvent event)
 		{
             if (ViskitGlobals.instance().getStateVariablesCBModel().getSize() <= 0) {
-                ((EventGraphControllerImpl)ViskitGlobals.instance().getEventGraphController()).messageToUser(
+                ViskitGlobals.instance().getEventGraphController().messageToUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Alert",
                     "No state variables have been defined," +
                         "\ntherefore no state transitions are possible.");
                 return;
             }
+			
             model.addElement("double click to edit");
             modelList.setVisibleRowCount(Math.max(model.getSize(), 5));
             modelList.ensureIndexIsVisible(model.getSize() - 1);
             modelList.setSelectedIndex(model.getSize() - 1);
-            TransitionsPanel.this.invalidate();
+            StateTransitionsPanel.this.invalidate();
             minusButton.setEnabled(true);
             EventStateTransition eventStateTransition = new EventStateTransition();
             arrayList.add(eventStateTransition);
@@ -237,15 +259,15 @@ public class TransitionsPanel extends JPanel {
         }
     }
 
-    class minusButtonListener implements ActionListener {
-
+    class MinusButtonListener implements ActionListener
+	{
         @Override
         public void actionPerformed(ActionEvent event) {
             if (modelList.getSelectionModel().getValueIsAdjusting()) {
                 return;
             }
 
-            int reti = JOptionPane.showConfirmDialog(TransitionsPanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+            int reti = JOptionPane.showConfirmDialog(StateTransitionsPanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
             if (reti != JOptionPane.YES_OPTION) {
                 return;
             }
@@ -261,7 +283,7 @@ public class TransitionsPanel extends JPanel {
                 minusButton.setEnabled(false);
             }
             modelList.setVisibleRowCount(Math.max(3, model.getSize()));
-            TransitionsPanel.this.invalidate();
+            StateTransitionsPanel.this.invalidate();
 
             if (myMinusListener != null) {
                 myMinusListener.actionPerformed(event);
@@ -269,11 +291,17 @@ public class TransitionsPanel extends JPanel {
         }
     }
 
-    class myListSelectionListener implements ListSelectionListener {
-
+    class MyListSelectionListener implements ListSelectionListener
+	{
         @Override
-        public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) {
+        public void valueChanged(ListSelectionEvent event)
+		{
+			if (!enabled)
+			{
+				return;
+			}
+            if (event.getValueIsAdjusting())
+			{
                 return;
             }
             if (modelList.getModel().getSize() != 0) {

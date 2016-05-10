@@ -444,8 +444,8 @@ public class ViskitApplicationFrame extends JFrame {
             EventGraphModel dirtyEventGraphModel = null;
 
             // Make sure we save modified EGs if we wander off to the Assembly tab
-            for (EventGraphModel eventGraphModel : eventGraphModels) {
-
+            for (EventGraphModel eventGraphModel : eventGraphModels)
+			{
                 if (eventGraphModel.isDirty()) {
                     dirtyEventGraphModel = eventGraphModel;
                     ViskitGlobals.instance().getEventGraphController().setModel((mvcModel) eventGraphModel);
@@ -458,7 +458,7 @@ public class ViskitApplicationFrame extends JFrame {
                 // This will fire another call to stateChanged()
                 mainTabbedPane.setSelectedIndex(tabIndices[TAB_EVENTGRAPH_EDITOR]);
 				eventGraphEditMenu.setEnabled(true);
-			     ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
+			    ((AnalystReportFrame)analystReportFrame).getFileMenu().setEnabled(false);
             }
             
 			int i = mainTabbedPane.getSelectedIndex();

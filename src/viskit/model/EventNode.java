@@ -20,10 +20,10 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class EventNode extends ViskitElement {
 
-    private ArrayList<ViskitElement>   argumentsArrayList      = new ArrayList<>();
-    private Vector<ViskitElement>      connectionsVector       = new Vector<>();
-    private ArrayList<ViskitElement>   localVariablesArrayList = new ArrayList<>();
-    private ArrayList<ViskitElement>   transitionsArrayList    = new ArrayList<>();
+    private ArrayList<ViskitElement>          argumentsArrayList = new ArrayList<>();
+    private Vector<ViskitElement>              connectionsVector = new Vector<>();
+    private ArrayList<ViskitElement>     localVariablesArrayList = new ArrayList<>();
+    private ArrayList<ViskitElement>   stateTransitionsArrayList = new ArrayList<>();
 	
     private Point2D position = new Point2D.Double(0.d, 0.d);
     private String  codeblock = EMPTY;
@@ -48,13 +48,13 @@ public class EventNode extends ViskitElement {
     public EventNode shallowCopy()
 	{
         EventNode eventNode = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
-        eventNode.argumentsArrayList      = argumentsArrayList;
-        eventNode.codeblock               = codeblock;
-        eventNode.connectionsVector       = connectionsVector;
-        eventNode.localVariablesArrayList = localVariablesArrayList;
-        eventNode.transitionsArrayList    = transitionsArrayList;
-        eventNode.commentsArrayList       = commentsArrayList;
-        eventNode.description             = description;
+        eventNode.argumentsArrayList        = argumentsArrayList;
+        eventNode.codeblock                 = codeblock;
+        eventNode.connectionsVector         = connectionsVector;
+        eventNode.localVariablesArrayList   = localVariablesArrayList;
+        eventNode.stateTransitionsArrayList = stateTransitionsArrayList;
+        eventNode.commentsArrayList         = commentsArrayList;
+        eventNode.description               = description;
 		
 		if (!eventNode.commentsArrayList.isEmpty())
 		{
@@ -108,12 +108,12 @@ public class EventNode extends ViskitElement {
         this.localVariablesArrayList = localVariables;
     }
 
-    public ArrayList<ViskitElement> getTransitions() {
-        return transitionsArrayList;
+    public ArrayList<ViskitElement> getStateTransitions() {
+        return stateTransitionsArrayList;
     }
 
-    public void setTransitions(ArrayList<ViskitElement> transitions) {
-        this.transitionsArrayList = transitions;
+    public void setStateTransitions(ArrayList<ViskitElement> stateTransitions) {
+        this.stateTransitionsArrayList = stateTransitions;
     }
 
     public Point2D getPosition() {
