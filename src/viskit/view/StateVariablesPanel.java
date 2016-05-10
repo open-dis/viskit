@@ -16,7 +16,7 @@ import viskit.model.ViskitStateVariable;
  */
 public class StateVariablesPanel extends ViskitTablePanel {
 
-    private final String[] columnTitles = {"type", "name", "initialization", "description"};
+    private final String[] columnTitles = {"type", "name", "initialization value", "description"};
     private final String    plusToolTip = "Add a state variable";
     private final String   minusToolTip = "Removed the selected state variable";
 

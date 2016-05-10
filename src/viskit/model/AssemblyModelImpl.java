@@ -39,7 +39,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 {
-    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
+    static final Logger LOG = LogUtilities.getLogger(AssemblyModelImpl.class);
 
     private JAXBContext    jaxbContext;
     private ObjectFactory  jaxbObjectFactory;

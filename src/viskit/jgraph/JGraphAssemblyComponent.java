@@ -345,7 +345,9 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     sb.append("</center>");
                     sb.append("</html>");
                     return sb.toString();
-                } else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropertyListCell) {
+                } 
+				else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropertyListCell)
+				{
                     String type;
                     String name;
                     String description;
@@ -365,7 +367,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 
                     sb.append("<center><u>");
                     sb.append(type);
-                    sb.append("</u><br>");
+                    sb.append("</u> Assembly <br>");
                     sb.append(name);
                     if (description != null) {
                         description = description.trim();
@@ -407,7 +409,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     }
 
     @Override
-    public String convertValueToString(Object value) {
+    public String convertValueToString(Object value)
+	{
         CellView view = (value instanceof CellView)
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
@@ -462,7 +465,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
      * @param node the named AssemblyNode to create attributes for
      * @return the cells attributes before rendering on the graph
      */
-    public Map createCellAttributes(AssemblyNode node) {
+    public Map createCellAttributes(AssemblyNode node)
+	{
         Map map = new Hashtable();
         Point2D point = node.getPosition();
 		double assemblyZoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();

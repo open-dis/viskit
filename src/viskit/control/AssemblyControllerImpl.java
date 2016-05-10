@@ -49,6 +49,7 @@ import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
+import static viskit.control.EventGraphControllerImpl.LOG;
 import viskit.doe.LocalBootLoader;
 import viskit.jgraph.JGraphGraphUndoManager;
 import viskit.model.*;
@@ -77,10 +78,11 @@ import viskit.view.AssemblyEditView;
  * @since 9:26:02 AM
  * @version $Id$
  */
-public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener {
-
+public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener 
+{
     static final Logger LOG = LogUtilities.getLogger(AssemblyControllerImpl.class);
-    private static int mutex = 0;
+    
+	private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
     private String initialFilePath;
 
@@ -298,44 +300,49 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             return;
         }
 
-        AssemblyEditView vaw = (AssemblyEditView) getView();
-        AssemblyModelImpl mod = new AssemblyModelImpl(this);
-        mod.initialize();
-        vaw.addTab(mod);
-        ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(mod.getMetadata().description);
+        AssemblyEditView assemblyEditView = (AssemblyEditView) getView();
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel.initialize();
+        assemblyEditView.addTab(assemblyModel);
+        ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(assemblyModel.getMetadata().description);
 
         // these may initialize to null on startup, check
         // before doing any openAlready lookups
         AssemblyModel[] openAlready = null;
-        if (vaw != null) {
-            openAlready = vaw.getOpenAssemblyModelArray();
+        if (assemblyEditView != null)
+		{
+            openAlready = assemblyEditView.getOpenAssemblyModelArray();
         }
         boolean isOpenAlready = false;
-        if (openAlready != null) {
-            for (AssemblyModel model : openAlready) {
-                if (model.getLastFile() != null) {
+        if (openAlready != null)
+		{
+            for (AssemblyModel model : openAlready)
+			{
+                if (model.getLastFile() != null)
+				{
                     String path = model.getLastFile().getAbsolutePath();
-                    if (path.equals(file.getAbsolutePath())) {
+                    if (path.equals(file.getAbsolutePath()))
+					{
                         isOpenAlready = true;
                     }
                 }
             }
         }
 
-        if (mod.newModel(file) && !isOpenAlready) {
+        if (assemblyModel.newModel(file) && !isOpenAlready) {
 
-            vaw.setSelectedAssemblyName(mod.getMetadata().name);
+            assemblyEditView.setSelectedAssemblyName(assemblyModel.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblyFileSet(file);
             markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssemblyWatch(file, mod.getJaxbRoot());
+            initOpenAssemblyWatch(file, assemblyModel.getJaxbRoot());
             openEventGraphs(file);
 
         } else {
-            vaw.deleteTab(mod);
+            assemblyEditView.deleteTab(assemblyModel);
         }
 
         resetRedoUndoStatus();
@@ -980,7 +987,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /**
      * A component wants to say something.
      *
-     * @param dialogType the type of dialog popup, i.e. WARN, ERROR, INFO, QUESTION
+     * @param dialogType the type of dialog popup, i.e. ERROR, WARN, INFO, QUESTION
      * @param title the title of the dialog frame
      * @param message the information to present
      */
@@ -988,10 +995,26 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
     {   AssemblyEditView view = (AssemblyEditView) getView();
         if (view != null)
-            ((AssemblyEditView) getView()).genericReport(dialogType, title, message);
-        else {
+		{
+			((AssemblyEditView) getView()).genericReport(dialogType, title, message);
+		}
+        else
+		{
             JOptionPane.showMessageDialog(null, message, title, dialogType);
         }
+		
+		switch (dialogType)
+		{
+			case JOptionPane.ERROR_MESSAGE:
+				LOG.error (title + ": " + message);
+				break;
+			case JOptionPane.WARNING_MESSAGE:
+				LOG.warn (title + ": " + message);
+				break;
+			default:
+				LOG.info (title + ": " + message);
+				break;
+		}
     }
 
     @Override

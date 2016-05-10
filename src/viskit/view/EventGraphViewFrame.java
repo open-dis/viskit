@@ -74,7 +74,7 @@ import viskit.view.dialog.UserPreferencesDialog;
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView
 {
-    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
+    static final Logger LOG = LogUtilities.getLogger(EventGraphViewFrame.class);
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE          = 0;
@@ -577,7 +577,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // but this call serves also to register the view with the passed eventGraphModel
         // by virtue of calling stateChanged()
         tabbedPane.add("EventGraph" + nextTabIndex, graphPane.drawingSplitPane);
-        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, ViskitStatics.EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS); // TODO eventGraphModel.getMetadata().description);
+        tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, ViskitStatics.TOOLTIP_EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS); // TODO eventGraphModel.getMetadata().description);
 
         // Bring the JGraph component to front. Also, allows models their own
         // canvas to draw to prevent a NPE
@@ -667,7 +667,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (ParameterDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
-                    "new value here",
+                    "TODO new value here",
                     ParameterDialog.newDescription);
             return ParameterDialog.newName;
         }
@@ -679,7 +679,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
-                    "new value here",
+                    "TODO new value here",
                     StateVariableDialog.newDescription);
             return StateVariableDialog.newName;
         }
@@ -947,17 +947,23 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 				}
 				ViskitGlobals.instance().setHelp(help);
 
-				helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
-				helpMenu.add(buildMenuItem(help, "doSearch",   "Search",   KeyEvent.VK_S, null, true));
+				// TODO method enumerations for reliability
+				
+				helpMenu.add(buildMenuItem(help, "doContents", "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_H, projectMenuShortcutKeyMask), true));
+				helpMenu.add(buildMenuItem(help, "doSearch",   "Search",        KeyEvent.VK_S, null, true));
+				
+				helpMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.SEND_ERROR_REPORT_METHOD, "Trouble Report", KeyEvent.VK_T, KeyStroke.getKeyStroke(KeyEvent.VK_T, projectMenuShortcutKeyMask), true));
+				
+				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial",      KeyEvent.VK_U, KeyStroke.getKeyStroke(KeyEvent.VK_U, projectMenuShortcutKeyMask), true));
+				
 				helpMenu.addSeparator();
 
-				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
 				helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
 				myMenuBar.add(helpMenu);
 			}
 			catch (Exception e)
 			{
-				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored");
+				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored. " + e);
 			}
 		}
 		else checkHelpBounds ();
@@ -1408,7 +1414,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 Point pp = new Point(
                         p.x - addEvent.getWidth(),
                         p.y - addEvent.getHeight());
-                ((EventGraphController) getController()).buildNewNode(pp);
+                ((EventGraphController) getController()).buildNewEventNode(pp);
             } 
 			else if (dragger == SELF_REFERENTIAL_CANCELLING_EDGE_DRAG) 
 			{

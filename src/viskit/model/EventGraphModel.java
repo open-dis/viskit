@@ -74,8 +74,9 @@ public interface EventGraphModel {
      * Add a new event to the graph with the given label, at the given point
      * @param nodeName the name of the Event Node
      * @param p the (x, y) position of the Event Node
+	 * @return new EventNode
      */
-    void newEvent(String nodeName, Point2D p);
+    EventNode newEventNode(String nodeName, Point2D p);
 
     /** Models a scheduling edge between two nodes
      *

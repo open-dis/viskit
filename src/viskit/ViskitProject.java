@@ -766,7 +766,8 @@ public class ViskitProject {
 			}
 			File originalProjectDirectory = projectDirectory;
 
-			if (projectDirectory.getName().equals(ASSEMBLIES_DIRECTORY_NAME)      ||
+			if (projectDirectory.getName().equals("nbproject")                    ||
+				projectDirectory.getName().equals(ASSEMBLIES_DIRECTORY_NAME)      ||
 				projectDirectory.getName().equals(EVENTGRAPHS_DIRECTORY_NAME)     ||
 				projectDirectory.getName().equals(ANALYST_REPORTS_DIRECTORY_NAME) ||
 				projectDirectory.getName().equals(BUILD_DIRECTORY_NAME)           ||
@@ -937,13 +938,17 @@ public class ViskitProject {
     private static class ProjectFilter extends javax.swing.filechooser.FileFilter {
 
         @Override
-        public boolean accept(File pathname) {
-            return !pathname.getName().contains("svn");
+        public boolean accept(File pathname)
+		{
+			boolean acceptable = !pathname.getName().contains("svn") && 
+							 	 !pathname.getName().contains("cvs") && 
+								 !pathname.getName().contains("nbproject");
+            return acceptable;
         }
 
         @Override
         public String getDescription() {
-            return "Viskit projects";
+            return "Viskit project directories";
         }
     }
 }

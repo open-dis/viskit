@@ -1,5 +1,6 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -17,6 +18,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
@@ -44,7 +46,9 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 1:09:38 PM
  * @version $Id$
  */
-public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphModel {
+public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphModel
+{
+    static final Logger LOG = LogUtilities.getLogger(EventGraphModelImpl.class);
 
     JAXBContext   jaxbContext;
     ObjectFactory jaxbObjectFactory;
@@ -226,7 +230,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         try {
             tempFile = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
         } 
-		catch (IOException e) {
+		catch (IOException e)
+		{
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "Input/Output (I/O) Error",
                     "Exception creating temporary file, EventGraphModelImpl.saveModel():" +
@@ -387,7 +392,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                 eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE,
                         "Duplicate Event Name",
                         "Duplicate event name detected: " + eventNode.getName() +
-                        "\nUnique name will be substituted.");
+                        "\n\nUnique name will be substituted.");
                 return false;
             }
         }
@@ -621,16 +626,21 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 	
 	/** Initialize state transitions from state variables */
-	private void runEventStateTransitionsUpdate ()
+	public void runEventStateTransitionsUpdate ()
 	{
         EventNode       runEventNode = null;
-		for (ViskitElement eventNode : getAllNodes()) 
+		for (ViskitElement eventNode : getAllNodes())
 		{
 			if (eventNode.name.equals("Run"))
 			{
 				runEventNode = (EventNode) eventNode;
 				break; // found it
 			}
+		}
+		if ((runEventNode == null) && (stateVariables != null) && (stateVariables.size() > 0))
+		{
+			LOG.info("need to create Run node to support stateVariable initializations");
+			eventGraphController.buildNewRunNode();
 		}
 		if (runEventNode != null)
 		{
@@ -656,6 +666,10 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 //                eventStateTransition.setOperationOrAssignment(jaxbStateTransition.getAssignment().getValue());
 //            }
 			}
+		}
+		else
+		{
+			
 		}
 	}
 
@@ -861,7 +875,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     // -----------------
 
     @Override
-    public void newEvent(String nodeName, Point2D point)
+    public EventNode newEventNode(String nodeName, Point2D point)
 	{
         EventNode eventNode = new EventNode(nodeName);
         if (point == null) {
@@ -887,6 +901,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
         setDirty(true);
         notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_ADDED, "Event added: " + eventNode.name));
+		
+		return eventNode;
     }
 
     @Override

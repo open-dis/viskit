@@ -27,6 +27,133 @@ import viskit.control.EventGraphController;
 import viskit.model.*;
 import viskit.model.Edge;
 import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
+import static viskit.ViskitGlobals.snapToGrid;
 
 /**
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -39,7 +166,7 @@ import static viskit.ViskitGlobals.snapToGrid;
  */
 public class JGraphEventGraphComponent extends JGraph implements GraphModelListener
 {
-    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
+    static final Logger LOG = LogUtilities.getLogger(JGraphEventGraphComponent.class);
 
     JGraphVisualModel jGraphVisualModel;
     EventGraphViewFrame parent;
@@ -381,7 +508,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 				{
                     CircleCell circleCell = (CircleCell) c;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
-                    sb.append("<center> Event ");
+                    sb.append("<center> ");
 
                     // Show event node names with corresponding parametersList if any
                     String nodeName = eventNode.getName();
@@ -397,7 +524,7 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                     } else {
                         sb.append(nodeName);
                     }
-                    sb.append("</center>");
+                    sb.append(" Event </center>");
 
                     if (!eventNode.getDescription().isEmpty())
 					{

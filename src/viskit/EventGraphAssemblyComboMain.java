@@ -36,14 +36,14 @@ package viskit;
 import edu.nps.util.LogUtilities;
 import java.awt.EventQueue;
 import java.awt.Image;
-import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.MalformedURLException;
-import java.net.URL;
 import javax.swing.*;
+import viskit.control.EventGraphControllerImpl;
 import viskit.view.ViskitApplicationFrame;
 import viskit.view.dialog.UserPreferencesDialog;
 
@@ -55,7 +55,9 @@ import viskit.view.dialog.UserPreferencesDialog;
  * @since Sep 22, 2005 : 3:23:52 PM
  * @version $Id$
  */
-public class EventGraphAssemblyComboMain {
+public class EventGraphAssemblyComboMain
+{
+    static final org.apache.log4j.Logger LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
 
     private static ImageIcon aboutIcon = null;
 
@@ -101,25 +103,8 @@ public class EventGraphAssemblyComboMain {
 			// The Apache Commons config files have behaved rather well and don't
 			// need to be nuked as of late: 03 DEC 2014.
             // nukeDotViskit(); moved to user preferences
-
-            e.printStackTrace();
-
-            URL url = null;
-			String mailtoString = new String();
-            try {
-                url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
-                        "?subject=Viskit%20startup%20error%20log&body=log%20output:");
-				mailtoString = "<a href=\"" + url.toString()+ "\">" + "view and email the session log" + "</a>";
-            } catch (MalformedURLException ex) {
-                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(ex);
-            }
-            String message = "Visual Simkit (Viskit) has experienced a startup problem.   "
-                    + "Details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " <br/> "
-                    + "Please " + mailtoString + " to " 
-					+ "<b>" + ViskitStatics.VISKIT_MAILING_LIST  + "</b>"
-                    + "<br/><br/><p>Click the link to open up an email form, then copy and paste the log's contents. Thanks!</p>";
-
-            ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, message, true); // need to debug, often caused by a method-naming problem
+			
+			ViskitStatics.sendErrorReport ("Visual Simkit (Viskit) has experienced a significant startup problem.", e);
         }
     }
 

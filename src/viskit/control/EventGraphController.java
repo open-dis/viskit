@@ -22,24 +22,24 @@ public interface EventGraphController {
      */
     void begin();
 
-    /**
-     * User has clicked a button or menu item
-     */
-    void newNode();
-
     void newSimParameter();
 
     /** Comes in from plus button on State Variables panel */
     void newStateVariable();
 
+    void newNode();
+
     /**
      * User has established some entity parameters, model can create objects
      *
      * @param p the graphical point of new node
+	 * @return newly created EventNode
      */
-    void buildNewNode(Point p);
+    EventNode buildNewEventNode(Point p);
 
-    void buildNewNode(Point p, String name);
+    EventNode buildNewEventNode(String name);
+
+    EventNode buildNewEventNode(Point p, String name);
 
     void buildNewSimParameter(String name, String type, String initialValue, String description);
 

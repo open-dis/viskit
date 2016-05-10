@@ -32,6 +32,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.sendErrorReport;
 import viskit.jgraph.JGraphGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -72,7 +73,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void begin()
 	{
-        List<File> fileList = EventGraphControllerImpl.this.getOpenEventGraphFileList(false);
+        List<File> fileList = getOpenEventGraphFileList(false);
 
         if (!fileList.isEmpty()) {
 
@@ -179,7 +180,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             boolean dirty = false;
             if (returnValue == JOptionPane.YES_OPTION)
 			{
-                buildNewNode(new Point(30, 60), "Run"); // TODO add description
+                buildNewEventNode(new Point(30, 60), "Run"); // TODO add description
                 dirty = true;
             }
             ((EventGraphModel) getModel()).setDirty(dirty);
@@ -479,10 +480,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		}
         List<String> eventGraphFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
 		if (eventGraphFilePathList == null)
-			openEventGraphsFileList = new ArrayList<>(4);
+			eventGraphFilePathList = new ArrayList<>(4);
+		
+		openEventGraphsFileList = new ArrayList<>(4);
 		
         int index = 0;
-        for (String eventGraphFilePath : eventGraphFilePathList) {
+        for (String eventGraphFilePath : eventGraphFilePathList)
+		{
             if (recentEventGraphFileSet.add(new File(eventGraphFilePath))) // returns true if file added
 			{
                 String openValue = historyXMLConfiguration.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + index + ")[@open]");
@@ -547,7 +551,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /**
      * A component wants to say something.
      *
-     * @param dialogType the type of dialog popup, i.e. WARN, ERROR, INFO, QUESTION
+     * @param dialogType the type of dialog popup, i.e. ERROR, WARN, INFO, QUESTION
      * @param title the title of the dialog frame
      * @param message the information to present
      */
@@ -555,6 +559,19 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
     {
         ((EventGraphView) getView()).genericReport(dialogType, title, message);
+		
+		switch (dialogType)
+		{
+			case JOptionPane.ERROR_MESSAGE:
+				LOG.error (title + ": " + message);
+				break;
+			case JOptionPane.WARNING_MESSAGE:
+				LOG.warn (title + ": " + message);
+				break;
+			default:
+				LOG.info (title + ": " + message);
+				break;
+		}
     }
 
     @Override
@@ -765,6 +782,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         boolean modified = ((EventGraphView) getView()).doEditStateVariable(var);
         if (modified) {
             ((viskit.model.EventGraphModel) getModel()).changeStateVariable(var);
+		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
         }
     }
 
@@ -773,6 +791,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void newStateVariable() // method name must exactly match preceding string value
 	{
         ((EventGraphView) getView()).addStateVariableDialog();
+		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
     }
 
     // Comes in from view
@@ -850,7 +869,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 msg = msg.substring(3);
             } // remove leading stuff
 
-            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
+            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected/sattached edges are permanently removed.)" : "");
             doRemove = ((EventGraphView) getView()).genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
             if (doRemove) {
                 // do edges first?
@@ -911,7 +930,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 continue;
             }
             String nm = ((ViskitElement) o).getName();
-            buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
+            buildNewEventNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
             bias++;
         }
     }
@@ -1054,8 +1073,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void deleteStateVariable(ViskitStateVariable var) {
+    public void deleteStateVariable(ViskitStateVariable var)
+	{
         ((EventGraphModel) getModel()).deleteStateVariable(var);
+		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
     }
 
     private boolean checkSaveForSourceCompile()
@@ -1134,19 +1155,34 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void newNode () // method name must exactly match preceding string value
     {
-        buildNewNode(new Point(100, 100)); // TODO avoid collision
+        buildNewEventNode(new Point(100, 100)); // TODO avoid collision
     }
 
     @Override
-    public void buildNewNode(Point p) //--------------------------
+    public EventNode buildNewEventNode(Point p) //--------------------------
     {
-        buildNewNode(p, "NewEvent_" + nodeCount++);
+        return buildNewEventNode(p, "NewEvent_" + nodeCount++);
     }
 
     @Override
-    public void buildNewNode(Point point, String nodeName) //------------------------------------
+    public EventNode buildNewEventNode(String eventName) //--------------------------
     {
-        ((viskit.model.EventGraphModel) getModel()).newEvent(nodeName, point);
+        return buildNewEventNode(new Point(100, 100), eventName); // TODO avoid collision
+    }
+
+    public EventNode buildNewRunNode() //--------------------------
+    {
+        return buildNewEventNode(new Point(30, 60), "Run"); // TODO avoid collision
+    }
+
+    @Override
+    public EventNode buildNewEventNode(Point point, String nodeName) //------------------------------------
+    {
+		if (getModel() == null)
+		{
+			setModel (new EventGraphModelImpl(this)); // TODO fix this hack
+		}
+        return ((viskit.model.EventGraphModel) getModel()).newEventNode(nodeName, point);
     }
 
     @Override
@@ -1387,5 +1423,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOG.warn ("Recent file saving disabled");
             historyXMLConfiguration = null;
         }
+    }
+	
+    public final static String SEND_ERROR_REPORT_METHOD = "sendErrorReport"; // must match following method name.  Not possible to accomplish this programmatically.
+	
+	public static void sendErrorReport () // method name must exactly match preceding string value
+	{
+		ViskitStatics.sendErrorReport ("Visual Simkit (Viskit) Trouble Report", null);
     }
 }

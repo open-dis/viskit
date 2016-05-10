@@ -42,6 +42,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -63,7 +65,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
-import static viskit.ViskitProject.*;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
@@ -81,7 +82,9 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:27:07 AM
  * @version $Id$
  */
-public class ViskitStatics {
+public class ViskitStatics
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 
     public static boolean debug = false;
 
@@ -95,8 +98,13 @@ public class ViskitStatics {
     public static final String JAVA_LANG_STRING = "java.lang.String";
     public static final String JAVA_LANG_OBJECT = "java.lang.Object";
     public static final String VISKIT_MAILING_LIST = "viskit@www.movesinstitute.org";
-    public static final String DEFAULT_DESCRIPTION = "TODO add description"; // better to nag than ignore
-    public static final String EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success, red = modifications need saving or compile failure";
+	
+    public static final String TOOLTIP_EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success, red = modifications need saving or compile failure";
+    public static final String DEFAULT_DESCRIPTION       = "TODO add description"; // better to nag than ignore
+    public static final String TOOLTIP_EVENT_ARGUMENTS   = "Define initialization arguments for this Event, passed by a Schedulng Edge";
+    public static final String TOOLTIP_LOCAL_VARIABLES   = "Define local variables for this Event, persistent and usable in State Transition computations and code block";
+    public static final String TOOLTIP_CODE_BLOCK        = "Define a Java source-code block for this Event (advanced feature, not recommended)";
+    public static final String TOOLTIP_STATE_TRANSITIONS = "Define state transitions for this Event";
 
     public static final String FULL_PATH = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
@@ -115,8 +123,6 @@ public class ViskitStatics {
 	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
 	public final static String PROJECT_OPEN_FAILURE_MESSAGE = "Project failed to open...";
 	public final static String             RECENTER_SPACING = " &nbsp &nbsp &nbsp &nbsp ";
-
-    static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 
     /** Utility method to configure a Viskit project
      *
@@ -822,13 +828,11 @@ public class ViskitStatics {
      * @param parent the parent component to center the JOptionPane panel
      * @param cause a throwable instance name to reference
      * @param url a URL used to populate an email form
-     * @param msg the message to inform the user with
+     * @param message the message to inform the user with
      * @param showLog a flag to denote showing the debug.log in an output text editor
      */
-    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg, final boolean showLog) {
-
-        // Bugfix 1377
-
+    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String message, final boolean showLog)
+	{
         // for copying style
         JLabel label = new JLabel();
         Font font = label.getFont();
@@ -841,7 +845,7 @@ public class ViskitStatics {
         // html content
         JEditorPane ep = new JEditorPane("text/html",
                 "<html><body style=\"" + style + "\">"
-                + msg + "</body></html>");
+                + message + "</body></html>");
 
         // handle link events to bring up mail client and debug.log
         ep.addHyperlinkListener(new HyperlinkListener() {
@@ -865,4 +869,52 @@ public class ViskitStatics {
 
         JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
+	
+	public static void sendErrorReport (Exception e)
+	{
+		sendErrorReport ("Visual Simkit (Viskit) has experienced a significant execution problem.", e);
+    }
+	
+	public static void sendErrorReport (String preamble, Exception e)
+	{
+			if (e != null)
+			{
+				// http://stackoverflow.com/questions/1149703/how-can-i-convert-a-stack-trace-to-a-string
+				StringWriter sw = new StringWriter();
+				 PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				LOG.error (e.getMessage());
+				LOG.error (sw.toString()); // stack trace as a string
+			}
+			
+            URL mailtoUrl = null;
+			String mailtoString = new String();
+            try {
+				// http://stackoverflow.com/questions/326390/how-do-i-create-a-java-string-from-the-contents-of-a-file
+				byte[] encoded = Files.readAllBytes(Paths.get(ViskitConfiguration.V_DEBUG_LOG.getPath()));
+				String logText = new String (encoded);
+                mailtoUrl = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
+                        "?subject=Viskit%20execution%20trouble%20report&body=Please%20describe%20what%20happened:%0D%0A%0D%0ATo%20help%20debug,%20also%20please%20copy%20and%20paste%20log%20output:%0D%0A%0D%0A"
+//						+ logText // not working, probably clobbers mailer
+				);
+				
+				mailtoString = "<a href=\"" + mailtoUrl.toString()+ "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a>";
+            } 
+			catch (Exception ex) 
+			{
+                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(ex);
+			}
+            String message = "<html>"
+					+ "<p align='center'>" + preamble + ViskitStatics.RECENTER_SPACING + "</p>"
+//                  + "<p align='center'>Execution log details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
+                    + "<p align='center'>Please view and email the session log to " 
+					+ "<i>" + mailtoString  + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
+					+ "<p align='center'>Click the link above to draft an email, then copy &amp; paste the log's contents." + ViskitStatics.RECENTER_SPACING + "</p>"
+					+ "<p align='center'>Thanks!" + ViskitStatics.RECENTER_SPACING + "</p>";
+
+			String exceptionString = "";
+			if (e != null)
+				   exceptionString = e.toString();
+            ViskitStatics.showHyperlinkedDialog(null, exceptionString, mailtoUrl, message, true); // need to debug, often caused by a method-naming problem		
+	}
 }

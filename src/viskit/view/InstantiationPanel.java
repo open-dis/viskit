@@ -42,9 +42,9 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:31:41 AM
  * @version $Id$
  */
-public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
-
-    static final Logger LOG = LogUtilities.getLogger(TempFileManager.class);
+public class InstantiationPanel extends JPanel implements ActionListener, CaretListener
+{
+    static final Logger LOG = LogUtilities.getLogger(InstantiationPanel.class);
 
     private static final int FREEFORM = 0, CONSTRUCTOR = 1, FACTORY = 2;
 

@@ -120,26 +120,32 @@ public class EventInspectorDialog extends JDialog {
         editDescriptionButton.setMaximumSize(new Dimension(dd));
         descriptionPanel.add(editDescriptionButton);
         panel.add(descriptionPanel);
+		
+		// order of panels is important to match Java output ordering
+
+        // Event arguments (initialization parameters for the event itself)
+        argumentsPanel = new ArgumentsPanel(300, 2);
+        argumentsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event arguments")));
+        argumentsPanel.setToolTipText(ViskitStatics.TOOLTIP_EVENT_ARGUMENTS);
+        panel.add(argumentsPanel);
+
+        // local variables, usable in State Variable computations
+        localVariablesPanel = new LocalVariablesPanel(300, 2);
+        localVariablesPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
+        localVariablesPanel.setToolTipText(ViskitStatics.TOOLTIP_LOCAL_VARIABLES);
+        panel.add(localVariablesPanel);
+
+        // code block, usable before State Variable computations
+        codeBlockPanel = new CodeBlockPanel(this, true, "Event Code Block");
+        codeBlockPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
+        codeBlockPanel.setToolTipText(ViskitStatics.TOOLTIP_CODE_BLOCK);
+        panel.add(codeBlockPanel);
 
         // state transitions
         stateTransitionsPanel = new StateTransitionsPanel();
         stateTransitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
+        stateTransitionsPanel.setToolTipText(ViskitStatics.TOOLTIP_STATE_TRANSITIONS);
         panel.add(stateTransitionsPanel);
-
-        // Event arguments
-        argumentsPanel = new ArgumentsPanel(300, 2);
-        argumentsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event arguments")));
-        panel.add(argumentsPanel);
-
-        // local variables
-        localVariablesPanel = new LocalVariablesPanel(300, 2);
-        localVariablesPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
-        panel.add(localVariablesPanel);
-
-        // code block
-        codeBlockPanel = new CodeBlockPanel(this, true, "Event Code Block");
-        codeBlockPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
-        panel.add(codeBlockPanel);
 
         // buttons
         JPanel twoRowButtonPanel = new JPanel();
@@ -150,16 +156,16 @@ public class EventInspectorDialog extends JDialog {
         addButtonPanel.setBorder(new TitledBorder("add"));
 
         addDescriptionButton = new JButton("description"); //add description");
-   addStateTransitionsButton = new JButton("state transitions"); //add state transitions");
           addArgumentsButton = new JButton("arguments"); //add arguments");
      addLocalVariablesButton = new JButton("locals"); //add locals");
           addCodeBlockButton = new JButton("code block"); //add code block");
+   addStateTransitionsButton = new JButton("state transitions"); //add state transitions");
 		  
              addDescriptionButton.setToolTipText(ViskitStatics.DEFAULT_DESCRIPTION);
-        addStateTransitionsButton.setToolTipText("Define state transitions for this Event");
-               addArgumentsButton.setToolTipText("Define initialization arguments for this Event");
-          addLocalVariablesButton.setToolTipText("Define local variables for this Event");
-               addCodeBlockButton.setToolTipText("Define a Java source-code block for this Event (advanced feature, not recommended)");
+               addArgumentsButton.setToolTipText(ViskitStatics.TOOLTIP_EVENT_ARGUMENTS);
+          addLocalVariablesButton.setToolTipText(ViskitStatics.TOOLTIP_LOCAL_VARIABLES);
+               addCodeBlockButton.setToolTipText(ViskitStatics.TOOLTIP_CODE_BLOCK);
+        addStateTransitionsButton.setToolTipText(ViskitStatics.TOOLTIP_STATE_TRANSITIONS);
 
         //Font defButtFont = addDescriptionButton.getFont();
         //int defButtFontSize = defButtFont.getSize();
@@ -171,10 +177,10 @@ public class EventInspectorDialog extends JDialog {
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
-        addButtonPanel.add(addStateTransitionsButton);
         addButtonPanel.add(addArgumentsButton);
         addButtonPanel.add(addLocalVariablesButton);
         addButtonPanel.add(addCodeBlockButton);
+        addButtonPanel.add(addStateTransitionsButton);
         addButtonPanel.add(Box.createHorizontalGlue());
         twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
@@ -194,17 +200,17 @@ public class EventInspectorDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        AddShowButtonListener hideList = new AddShowButtonListener();
-        addDescriptionButton.addActionListener(hideList);
-        addArgumentsButton.addActionListener(hideList);
-        addLocalVariablesButton.addActionListener(hideList);
-        addCodeBlockButton.addActionListener(hideList);
-        addStateTransitionsButton.addActionListener(hideList);
+        AddShowButtonListener hideButtonListener = new AddShowButtonListener();
+             addDescriptionButton.addActionListener(hideButtonListener);
+               addArgumentsButton.addActionListener(hideButtonListener);
+          addLocalVariablesButton.addActionListener(hideButtonListener);
+               addCodeBlockButton.addActionListener(hideButtonListener);
+        addStateTransitionsButton.addActionListener(hideButtonListener);
 
         myChangeActionListener myChangeListener = new myChangeActionListener();
         //name.addActionListener(chlis);
         KeyListener keyListener = new MyKeyListener();
-        nameTF.addKeyListener(keyListener);
+               nameTF.addKeyListener(keyListener);
         descriptionTF.addKeyListener(keyListener);
         editDescriptionButton.addActionListener(new commentListener());
 
@@ -274,13 +280,18 @@ public class EventInspectorDialog extends JDialog {
 		// warn that Run event state transitions are re-generated each time, no point in editing them
 		if (eventNode.getName().equals("Run"))
 		{
+				   addArgumentsButton.setEnabled (false);
+		      addLocalVariablesButton.setEnabled (false);
+		    addStateTransitionsButton.setEnabled (false);
+				   addArgumentsButton.setEnabled (false);
+					   argumentsPanel.setEnabled (false);
 			      localVariablesPanel.setEnabled (false);
 			    stateTransitionsPanel.setEnabled (false);
 				
                 ViskitGlobals.instance().getEventGraphController().messageToUser(
                     JOptionPane.INFORMATION_MESSAGE,
                     "Run Event has special semantics",
-                    "Run Event state transitions are defined by State Variable initial values");
+                    "Run Event state transitions are defined by State Variable declarations");
 		}
     }
 
@@ -310,10 +321,10 @@ public class EventInspectorDialog extends JDialog {
 
     private void fillWidgets()
 	{
-        String nameOfStateTransition = eventNode.getName();
-        nameOfStateTransition = nameOfStateTransition.replace(' ', '_');
-        setTitle("Event Inspector: " + nameOfStateTransition);
-        nameTF.setText(nameOfStateTransition);
+        String eventNodeName = eventNode.getName();
+        eventNodeName = eventNodeName.replace(' ', '_'); // TODO use de-mangler
+        setTitle("Event Inspector: " + eventNodeName);
+        nameTF.setText(eventNodeName);
 
         Dimension d = descriptionTF.getPreferredSize();
         descriptionTF.setText(eventNode.getDescription());
