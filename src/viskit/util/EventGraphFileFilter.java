@@ -126,7 +126,7 @@ public final class EventGraphFileFilter extends FileFilter {
     @Override
     public String getDescription() 
 	{
-		return "EventGraph XML Files Only";
+		return "Event Graph XML files only";
 	}
 
 } // end class file EventGraphFileFilter.java

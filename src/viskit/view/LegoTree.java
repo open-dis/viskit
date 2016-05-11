@@ -384,7 +384,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 								"Compilation Error", "<html>" +
 								"<p align='center'>Error compiling <i>" + f.getName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
 								"<p>&nbsp;</p>" +
-								"<p align='center'><i>" + f.getName() + ".class</i> file cannot be added to Event Graph Selection tree for Assembly use" + ViskitStatics.RECENTER_SPACING + "</p>");
+								"<p align='center'><i>" + f.getName() + ".class</i> file cannot be added to Event Graph Selection tree for Assembly use" + ViskitStatics.RECENTER_SPACING + "</p>" +
+								"<p>&nbsp;</p>" +
+								"<p>View Java Source (Control-Shift-J), compile code, and also view/validate XML source to debug further.</p>");
 						return;
 					}
                 }

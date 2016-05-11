@@ -389,7 +389,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 		
-		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Control-P)";
+		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Control-Shift-P)";
 		
 //        JLabel implementsLabel = new JLabel("Implements");
 //        implementsLabel.setToolTipText("Event graph superclass (if any)");

@@ -170,10 +170,10 @@ public class EventInspectorDialog extends JDialog {
         //Font defButtFont = addDescriptionButton.getFont();
         //int defButtFontSize = defButtFont.getSize();
         //addDescriptionButton.setFont(defButtFont.deriveFont((float) (defButtFontSize - 4)));
-        addStateTransitionsButton.setFont(addDescriptionButton.getFont());
                addArgumentsButton.setFont(addDescriptionButton.getFont());
           addLocalVariablesButton.setFont(addDescriptionButton.getFont());
                addCodeBlockButton.setFont(addDescriptionButton.getFont());
+        addStateTransitionsButton.setFont(addDescriptionButton.getFont());
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
@@ -276,23 +276,6 @@ public class EventInspectorDialog extends JDialog {
         });
 
         setParameters(frame, eventNode);
-		
-		// warn that Run event state transitions are re-generated each time, no point in editing them
-		if (eventNode.getName().equals("Run"))
-		{
-				   addArgumentsButton.setEnabled (false);
-		      addLocalVariablesButton.setEnabled (false);
-		    addStateTransitionsButton.setEnabled (false);
-				   addArgumentsButton.setEnabled (false);
-					   argumentsPanel.setEnabled (false);
-			      localVariablesPanel.setEnabled (false);
-			    stateTransitionsPanel.setEnabled (false);
-				
-                ViskitGlobals.instance().getEventGraphController().messageToUser(
-                    JOptionPane.INFORMATION_MESSAGE,
-                    "Run Event has special semantics",
-                    "Run Event state transitions are defined by State Variable declarations");
-		}
     }
 
     private void setModified(boolean value)
@@ -350,6 +333,33 @@ public class EventInspectorDialog extends JDialog {
 
         setModified(false);
         getRootPane().setDefaultButton(cancelButton);
+		
+		// warn that Run event state transitions are re-generated each time, no point in editing them
+		if (eventNode.getName().equals("Run"))
+		{
+				   addArgumentsButton.setEnabled (false);
+		      addLocalVariablesButton.setEnabled (false);
+		    addStateTransitionsButton.setEnabled (false);
+				   addArgumentsButton.setEnabled (false);
+					   argumentsPanel.setEnabled (false);
+			      localVariablesPanel.setEnabled (false);
+			    stateTransitionsPanel.setEnabled (false);
+				
+                ViskitGlobals.instance().getEventGraphController().messageToUser(
+                    JOptionPane.INFORMATION_MESSAGE,
+                    "Run Event has special semantics",
+                    "Run Event state transitions are defined by State Variable declarations");
+		}
+		else
+		{
+				   addArgumentsButton.setEnabled (true);
+		      addLocalVariablesButton.setEnabled (true);
+		    addStateTransitionsButton.setEnabled (true);
+				   addArgumentsButton.setEnabled (true);
+					   argumentsPanel.setEnabled (true);
+			      localVariablesPanel.setEnabled (true);
+			    stateTransitionsPanel.setEnabled (true);
+		}
     }
 
     private void unloadWidgets(EventNode eventNode) {

@@ -826,12 +826,12 @@ public class ViskitStatics
      * an installed email client
      *
      * @param parent the parent component to center the JOptionPane panel
-     * @param cause a throwable instance name to reference
+     * @param title dialog title, such as a trouble cause or throwable instance name to reference
      * @param url a URL used to populate an email form
      * @param message the message to inform the user with
      * @param showLog a flag to denote showing the debug.log in an output text editor
      */
-    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String message, final boolean showLog)
+    public static void showHyperlinkedDialog(Component parent, String title, final URL url, String message, final boolean showLog)
 	{
         // for copying style
         JLabel label = new JLabel();
@@ -843,36 +843,39 @@ public class ViskitStatics
         style.append("font-size:").append(font.getSize()).append("pt;");
 
         // html content
-        JEditorPane ep = new JEditorPane("text/html",
+        JEditorPane editorPane = new JEditorPane("text/html",
                 "<html><body style=\"" + style + "\">"
                 + message + "</body></html>");
 
         // handle link events to bring up mail client and debug.log
-        ep.addHyperlinkListener(new HyperlinkListener() {
+        editorPane.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
+            public void hyperlinkUpdate(HyperlinkEvent event) {
                 try {
-                    if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+                    if (event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED))
+					{
                         if (showLog)
                             Desktop.getDesktop().browse(ViskitConfiguration.V_DEBUG_LOG.toURI());
 
-                        Desktop.getDesktop().mail(url.toURI()); // mail on top
+                        Desktop.getDesktop().mail(url.toURI()); // mail invoked second, thus goes on top
                     }
-                } catch (IOException | URISyntaxException ex) {
+                } 
+				catch (IOException | URISyntaxException ex) 
+				{
                     LOG.error(ex);
                 }
             }
         });
-        ep.setEditable(false);
-        ep.setBackground(label.getBackground());
+        editorPane.setEditable(false);
+        editorPane.setBackground(label.getBackground());
 
-        JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(parent, editorPane, title, JOptionPane.ERROR_MESSAGE);
     }
 	
 	public static void sendErrorReport (Exception e)
 	{
-		sendErrorReport ("Visual Simkit (Viskit) has experienced a significant execution problem.", e);
+		sendErrorReport ("Viskit has experienced a significant execution problem.", e);
     }
 	
 	public static void sendErrorReport (String preamble, Exception e)
@@ -908,13 +911,13 @@ public class ViskitStatics
 					+ "<p align='center'>" + preamble + ViskitStatics.RECENTER_SPACING + "</p>"
 //                  + "<p align='center'>Execution log details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
                     + "<p align='center'>Please view and email the session log to " 
-					+ "<i>" + mailtoString  + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
+					  + "<i>" + mailtoString  + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
 					+ "<p align='center'>Click the link above to draft an email, then copy &amp; paste the log's contents." + ViskitStatics.RECENTER_SPACING + "</p>"
-					+ "<p align='center'>Thanks!" + ViskitStatics.RECENTER_SPACING + "</p>";
+					+ "<p align='center'>Thanks!" + ViskitStatics.RECENTER_SPACING + ViskitStatics.RECENTER_SPACING + "</p>";
 
-			String exceptionString = "";
+			String title = ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME;
 			if (e != null)
-				   exceptionString = e.toString();
-            ViskitStatics.showHyperlinkedDialog(null, exceptionString, mailtoUrl, message, true); // need to debug, often caused by a method-naming problem		
+				   title = e.toString();
+            ViskitStatics.showHyperlinkedDialog(null, title, mailtoUrl, message, true); // need to debug, often caused by a method-naming problem		
 	}
 }
