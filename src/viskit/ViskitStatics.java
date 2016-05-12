@@ -830,14 +830,14 @@ public class ViskitStatics
     }
 
     /** Utility method to bring up a hyperlinked message to allow the user to
-     * email the debug.log to the Viskit mailing list if the user's machine has
-     * an installed email client
+ email the debug.LOG to the Viskit mailing list if the user's machine has
+ an installed email client
      *
      * @param parent the parent component to center the JOptionPane panel
      * @param title dialog title, such as a trouble cause or throwable instance name to reference
      * @param url a URL used to populate an email form
      * @param message the message to inform the user with
-     * @param showLog a flag to denote showing the debug.log in an output text editor
+     * @param showLog a flag to denote showing the debug.LOG in an output text editor
      */
     public static void showHyperlinkedDialog(Component parent, String title, final URL url, String message, final boolean showLog)
 	{
@@ -855,7 +855,7 @@ public class ViskitStatics
                 "<html><body style=\"" + style + "\">"
                 + message + "</body></html>");
 
-        // handle link events to bring up mail client and debug.log
+        // handle link events to bring up mail client and debug.LOG
         editorPane.addHyperlinkListener(new HyperlinkListener()
 		{
             @Override
@@ -918,7 +918,7 @@ public class ViskitStatics
 			}
             String message = "<html>"
 					+ "<p align='center'>" + preamble + ViskitStatics.RECENTER_SPACING + "</p>"
-//                  + "<p align='center'>Execution log details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
+//                  + "<p align='center'>Execution LOG details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
                     + "<p align='center'>Please view and email the session log to " 
 					  + "<i>" + mailtoString  + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
 					+ "<p align='center'>Click the link above to draft an email, then copy &amp; paste the log's contents." + ViskitStatics.RECENTER_SPACING + "</p>"

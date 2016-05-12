@@ -30,11 +30,13 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class Boot extends URLClassLoader implements Runnable {
+public class Boot extends URLClassLoader implements Runnable 
+{
+    static Logger LOG = LogUtilities.getLogger(Boot.class);
+	
     static Boot bootee;
     static Thread booter;
     static Thread runner;
-    static Logger log = LogUtilities.getLogger(Boot.class);
     String[] args;
     public URL baseJarURL;
 
@@ -85,7 +87,7 @@ public class Boot extends URLClassLoader implements Runnable {
 
 
             } catch (IOException e) {
-                log.error(e);
+                LOG.error(e);
             }
         } else {
             // I'm in command line mode
@@ -103,9 +105,9 @@ public class Boot extends URLClassLoader implements Runnable {
                 }
 
             } catch (IllegalArgumentException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (MalformedURLException e) {
-                log.error(e);
+                LOG.error(e);
             }
         }
     }
@@ -149,7 +151,7 @@ public class Boot extends URLClassLoader implements Runnable {
                     // note this depends on the builder to rename the tools.jars appropriately!
 
                     if ( name.endsWith("jar") ) {
-                        log.debug("Found internal jar externalizing " + name);
+                        LOG.debug("Found internal jar externalizing " + name);
                         File extJar = TempFileManager.createTempFile(name,".jar");
 
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
@@ -165,27 +167,27 @@ public class Boot extends URLClassLoader implements Runnable {
                         }
                         // capture any jars within the jar in the jar...
                         addURL(extJar.toURI().toURL());
-                        log.debug("File to new jar " + extJar.getCanonicalPath());
-                        log.debug("Added jar " + extJar.toURI().toURL().toString());
+                        LOG.debug("File to new jar " + extJar.getCanonicalPath());
+                        LOG.debug("Added jar " + extJar.toURI().toURL().toString());
                         String systemClassPath = System.getProperty("java.class.path");
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
-                        log.debug("ClassPath " + System.getProperty("java.class.path"));
+                        LOG.debug("ClassPath " + System.getProperty("java.class.path"));
                     }
                 }
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        log.debug("Finding class " + name);
+        LOG.debug("Finding class " + name);
 
         Class<?> clz = super.findClass(name);
         resolveClass(clz); // still needed?
 
-        log.debug(clz);
+        LOG.debug(clz);
 
         return clz;
     }
@@ -202,7 +204,7 @@ public class Boot extends URLClassLoader implements Runnable {
             runner.join();
 
         } catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | InterruptedException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -218,19 +220,19 @@ public class Boot extends URLClassLoader implements Runnable {
                 rev = "java14";
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
         }
         return rev;
     }
 
     public static void main(String[] args) throws Exception {
         URL u = Boot.class.getClassLoader().getResource("viskit/xsd/cli/Boot.class");
-        log.debug(u);
+        LOG.debug(u);
         URLConnection urlc = u.openConnection();
         if ( urlc instanceof JarURLConnection ) {
             u = ((JarURLConnection)urlc).getJarFileURL();
         }
-        log.debug("Booting " + u);
+        LOG.debug("Booting " + u);
         bootee = new Boot(new URL[] { u });
         bootee.setArgs(args);
         booter = new Thread(bootee);

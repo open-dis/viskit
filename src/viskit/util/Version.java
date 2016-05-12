@@ -24,7 +24,7 @@ import viskit.ViskitGlobals;
  */
 public class Version {
 
-    static Logger log = LogUtilities.getLogger(Version.class);
+    static Logger LOG = LogUtilities.getLogger(Version.class);
 
     protected String versionString;
 
@@ -62,14 +62,14 @@ public class Version {
             svnRevisionNumber = parseRevisionString(revisionString);
             versionString += "." + svnRevisionNumber;
         } catch (IOException e) {
-            log.error("Problem reading " + fileName + ": " + e);
+            LOG.error("Problem reading " + fileName + ": " + e);
         }
     }
 
     protected static int[] parseVersionString(String versionString) {
         String[] versions = versionString.split("\\.");
 //        if (versions.length != 4) {
-//            log.warn("Expected w.x.y.z: " + versionString);
+//            LOG.warn("Expected w.x.y.z: " + versionString);
 //            throw new IllegalArgumentException("Expected w.x.y.z: " + versionString +
 //                    " length = " + versions.length);
 //        }
@@ -90,7 +90,7 @@ public class Version {
                 date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matcher.group());
             }
         } catch (Throwable t) {
-            log.error("Problem parsing date string " + dateString + ": " + t);
+            LOG.error("Problem parsing date string " + dateString + ": " + t);
         }
         return date;
     }

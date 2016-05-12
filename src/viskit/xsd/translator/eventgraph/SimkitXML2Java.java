@@ -22,9 +22,9 @@ import viskit.xsd.bindings.eventgraph.*;
  * @since March 23, 2004, 4:59 PM
  * @version $Id$
  */
-public class SimkitXML2Java {
-
-    static Logger log = LogUtilities.getLogger(SimkitXML2Java.class);
+public class SimkitXML2Java 
+{
+    static Logger LOG = LogUtilities.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
 	/** space character */
@@ -92,7 +92,7 @@ public class SimkitXML2Java {
         try {
             jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             error(ex.getMessage());
             ex.printStackTrace();
         }
@@ -146,7 +146,7 @@ public class SimkitXML2Java {
         } catch (JAXBException ex) {
 
             // Silence attempting to unmarshal an Assembly here
-            log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
+            LOG.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
             ex.printStackTrace();
         }
     }
@@ -365,7 +365,7 @@ public class SimkitXML2Java {
                     try {
                         cst = c.getConstructor(new Class<?>[]{});
                     } catch (NoSuchMethodException nsme) {
-//                    log.error(nsme);
+//                    LOG.error(nsme);
 
                         // reset
                         cst = null;
@@ -860,7 +860,7 @@ public class SimkitXML2Java {
      */
     void doEventBlock(Event event, StringWriter eventBlockStringWriter)
 	{
-        log.debug("Event is: " + event.getName());
+        LOG.debug("Event is: " + event.getName());
         PrintWriter pw = new PrintWriter(eventBlockStringWriter);
         List<StateTransition> stateTransitionList = event.getStateTransition();
         List<Argument>               argumentList = event.getArgument();
@@ -1267,7 +1267,7 @@ public class SimkitXML2Java {
 
             localSuperParams = Arrays.asList(parray);
         } else {
-            log.error(extendz + " was not found on the working classpath");
+            LOG.error(extendz + " was not found on the working classpath");
         }
 
         return localSuperParams;
@@ -1317,7 +1317,7 @@ public class SimkitXML2Java {
         try {
             aClass = ViskitGlobals.instance().getWorkClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
-//            log.error(cnfe);
+//            LOG.error(cnfe);
         }
 
         if (aClass != null) {
@@ -1335,7 +1335,7 @@ public class SimkitXML2Java {
      * @param desc a description of the encountered error
      */
     private void error(String desc) {
-        log.error(desc);
+        LOG.error(desc);
         System.exit(1);
     }
 
@@ -1348,13 +1348,13 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        log.info("EventGraph (EG) file is: " + xmlFile);
-        log.info("Generating Java Source...");
+        LOG.info("EventGraph (EG) file is: " + xmlFile);
+        LOG.info("Generating Java Source...");
 
         InputStream is = null;
         try {
             is = new FileInputStream(xmlFile);
-        } catch (FileNotFoundException fnfe) {log.error(fnfe);}
+        } catch (FileNotFoundException fnfe) {LOG.error(fnfe);}
 
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
@@ -1363,21 +1363,21 @@ public class SimkitXML2Java {
         sx2j.unmarshal();
         String dotJava = sx2j.translate();
         if (dotJava != null && !dotJava.isEmpty()) {
-            log.info("Done.");
+            LOG.info("Done.");
         } else {
-            log.warn("Compile error on: " + xmlFile);
+            LOG.warn("Compile error on: " + xmlFile);
             return;
         }
 
         // also write out the .java to a file and compile it
         // to a .class
-        log.info("Generating Java Bytecode...");
+        LOG.info("Generating Java Bytecode...");
         try {
             if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
-                log.info("Done.");
+                LOG.info("Done.");
             }
         } catch (NullPointerException npe) {
-            log.error(npe);
+            LOG.error(npe);
 //            npe.printStackTrace();
         }
     }

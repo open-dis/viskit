@@ -30,6 +30,10 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import static javax.xml.bind.JAXBContext.newInstance;
 import static javax.xml.bind.JAXBContext.newInstance;
 import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static javax.xml.bind.JAXBContext.newInstance;
 
 /**
  *

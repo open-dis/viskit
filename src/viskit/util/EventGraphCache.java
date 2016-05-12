@@ -100,7 +100,7 @@ import viskit.ViskitGlobals;
  */
 public class EventGraphCache {
 
-    static Logger log = LogUtilities.getLogger(EventGraphCache.class);
+    static Logger LOG = LogUtilities.getLogger(EventGraphCache.class);
 
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;
@@ -202,7 +202,7 @@ public class EventGraphCache {
             SAXBuilder builder = new SAXBuilder();
             doc = builder.build(xmlFile);
         } catch (JDOMException | IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
         return doc;
     }
@@ -215,7 +215,7 @@ public class EventGraphCache {
      * @param egFile the EG file type and name to save
      */
     private void saveEventGraphReferences(File egFile) {
-        log.debug("EG: " + egFile);
+        LOG.debug("EG: " + egFile);
 
         // find the package seperator
         int lastSlash = egFile.getPath().lastIndexOf(File.separator);
@@ -225,10 +225,10 @@ public class EventGraphCache {
         String egName = egFile.getPath().substring(lastSlash + 1, pos);
         eventGraphNamesList.add(pkg + "." + egName);
 
-        log.debug("EventGraph Name: " + egName);
+        LOG.debug("EventGraph Name: " + egName);
 
         File imgFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + pkg + "/" + egName + ".xml.png");
-        log.debug("Event Graph Image location: " + imgFile);
+        LOG.debug("Event Graph Image location: " + imgFile);
 
         eventGraphImageFilesList.add(imgFile);
     }

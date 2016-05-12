@@ -49,7 +49,6 @@ import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import static viskit.control.EventGraphControllerImpl.LOG;
 import viskit.doe.LocalBootLoader;
 import viskit.jgraph.JGraphGraphUndoManager;
 import viskit.model.*;
@@ -67,6 +66,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.view.AssemblyEditView;
+import static viskit.ViskitConfiguration.VISKIT_CONFIGURATION_DIR;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -800,17 +800,30 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 projectDirectory  = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
                 projectArchiveZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
+                File readmeFile = new File(projectDirectory, "debug.log");
 
                 if (projectArchiveZip.exists())
-                    projectArchiveZip.delete();
+                    projectArchiveZip.delete(); // delete previous version
 
 //                if (logFile.exists())
 //                    logFile.delete(); // cleanup for next time
 
                 try {
-                    // First, copy the debug.log to the project dir
-                    Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // First, copy the README.txt file to the project dir
+                    Files.copy(ViskitConfiguration.VISKIT_README_FILE.toPath(), 
+							   (new File (logFile.getParentFile().getPath() + File.separatorChar + ViskitConfiguration.VISKIT_README_FILE.getName())).toPath(), 
+							   StandardCopyOption.REPLACE_EXISTING);
+                    // Next, copy the debug.LOG to the project dir
+                    Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projectDirectory, projectArchiveZip);
+
+                    try // open directory holding the .zip so that use can select, drag and mail it
+					{
+                        Desktop.getDesktop().open(projectArchiveZip.getParentFile());
+                    } 
+					catch (IOException e) {
+                        LOG.error(e);
+                    }
                 } 
 				catch (IOException e)
 				{
@@ -824,15 +837,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			{
                 try 
 				{       
-                    get(); // Waits for the zip process to finish
-
-                    try // open directory holding the .zip so that use can select, drag and mail it
-					{
-                        Desktop.getDesktop().open(projectArchiveZip.getParentFile());
-                    } 
-					catch (IOException e) {
-                        LOG.error(e);
-                    }
+                    get(); // Waits for the zip process and directory opening to finish
                     get(); // Waits for the directory launch process to finish
 					
                     URL url = null;
@@ -841,7 +846,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					{
                         url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Archive%20for%20"
-                                + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached");
+                                + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached...");
 						urlString =  url.toString();
                     } catch (MalformedURLException e) {
                         LOG.error(e);

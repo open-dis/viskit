@@ -96,7 +96,7 @@ public class ViskitProject {
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENTGRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
-    static Logger log = LogUtilities.getLogger(ViskitProject.class);
+    static Logger LOG = LogUtilities.getLogger(ViskitProject.class);
 
 	private String   projectName        = ""; // empty string if no project open
 	private String   projectAuthor      = "";
@@ -145,7 +145,7 @@ public class ViskitProject {
             try {
                 Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
         }
 
@@ -215,7 +215,7 @@ public class ViskitProject {
             try {
                 getProjectFile().createNewFile();
             } catch (IOException e) {
-                log.error(e.getMessage());
+                LOG.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
             saveProjectFile();
@@ -290,13 +290,13 @@ public class ViskitProject {
             xmlOutputter.output(projectDocument, fileOutputStream);
             projectFileExists = true;
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         } finally {
             try {
                 if (fileOutputStream != null)
                     fileOutputStream.close();
             } catch (IOException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
         }
     }
@@ -315,9 +315,9 @@ public class ViskitProject {
 			catch (JDOMException | IOException e)
 			{
                 projectDocument = null;
-				log.error(e);
+				LOG.error(e);
 				String errorMessage = inputProjectFile.getAbsolutePath() + " is not a valid Viskit Project File";
-				log.error(errorMessage);
+				LOG.error(errorMessage);
                 throw new IllegalArgumentException(errorMessage);
 			}
             Element root = projectDocument.getRootElement();
@@ -325,7 +325,7 @@ public class ViskitProject {
 			{
                 projectDocument = null;
 				String errorMessage = inputProjectFile.getAbsolutePath() + " is not a valid Viskit Project File, bad root element";
-				log.error(errorMessage);
+				LOG.error(errorMessage);
                 throw new IllegalArgumentException(errorMessage);
             }
             projectFileExists = true;
@@ -364,7 +364,7 @@ public class ViskitProject {
         }
 		catch (Exception ex)
 		{
-            log.error(ex);
+            LOG.error(ex);
             throw new RuntimeException(ex);
         }
     }
@@ -380,11 +380,11 @@ public class ViskitProject {
             for (File f : getLibDirectory().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
                     String file = f.getCanonicalPath().replaceAll("\\\\", "/");
-                    log.debug(file);
+                    LOG.debug(file);
                     classPathSet.add(file);
                 }
             }
-            log.debug(getEventGraphsDirectory().getCanonicalPath());
+            LOG.debug(getEventGraphsDirectory().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.EXTRA_CLASSPATHS_KEY);
@@ -393,7 +393,7 @@ public class ViskitProject {
             }
 
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         } catch (NullPointerException npe) {
             return null;
         }
@@ -481,7 +481,7 @@ public class ViskitProject {
 		}
 		catch (Exception e)
 		{
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
 		}
     }
 
@@ -668,7 +668,7 @@ public class ViskitProject {
         try {
             xmlOutputter.output(projectDocument, stringWriter);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
         }
         return stringWriter.toString();
     }

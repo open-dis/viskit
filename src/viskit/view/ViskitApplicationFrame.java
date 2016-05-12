@@ -846,7 +846,7 @@ public class ViskitApplicationFrame extends JFrame {
 	 * TODO expose this functionality on User Preferences
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfiguration.VISKIT_CONFIG_DIR;
+        File dotViskit = ViskitConfiguration.VISKIT_CONFIGURATION_DIR;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty

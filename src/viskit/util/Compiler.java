@@ -28,7 +28,7 @@ public class Compiler {
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
 
-    static Logger log = LogUtilities.getLogger(Compiler.class);
+    static Logger LOG = LogUtilities.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;
@@ -83,7 +83,7 @@ public class Compiler {
             // Get rid of the last ";" or ":" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
             classPath = classPaths.toString();
-            log.debug("classPath is: " + classPath);
+            LOG.debug("classPath is: " + classPath);
 
             String[] options = {
                 "-Xlint:unchecked",
@@ -125,18 +125,18 @@ public class Compiler {
                 ViskitGlobals.instance().getAssemblyEditViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                         "Incorrect Path", message);
 
-                log.error(message);
+                LOG.error(message);
             }
-            log.error(ex);
-//            log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
-//            log.info("Classpath is: " + cp);
+            LOG.error(ex);
+//            LOG.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+//            LOG.info("Classpath is: " + cp);
         } finally {
 
             if (sjfm != null) {
                 try {
                     sjfm.close();
                 } catch (IOException ex) {
-                    log.error(ex);
+                    LOG.error(ex);
                 }
             }
         }

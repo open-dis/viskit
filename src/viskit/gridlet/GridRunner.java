@@ -67,6 +67,90 @@ import static java.lang.Long.parseLong;
 import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
 import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static java.io.File.createTempFile;
+import static java.lang.Integer.parseInt;
+import static java.lang.Integer.valueOf;
+import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static javax.xml.bind.JAXBContext.newInstance;
 
 /**
  * The GridRunner launches a number of Gridlets to
@@ -103,7 +187,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
     Integer jobID;
     int port;
-    static Logger log = getLogger(GridRunner.class);
+    static Logger LOG = getLogger(GridRunner.class);
     Vector<String> eventGraphs;
     Hashtable<String, Object> thirdPartyJars;
     File experimentFile;
@@ -155,7 +239,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             assemblyFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
             eventGraphFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory(); //?
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
 
         this.usid = "LOCAL-RUN";
@@ -189,8 +273,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         Unmarshaller u;
         InputStream inputStream;
 
-        log.debug("Setting assembly");
-        log.debug(assembly);
+        LOG.debug("Setting assembly");
+        LOG.debug(assembly);
 
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
@@ -198,7 +282,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
             return Boolean.FALSE;
         }
@@ -251,7 +335,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
-                log.debug("Accepting jar transfer: " + filename + " of " + sequence);
+                LOG.debug("Accepting jar transfer: " + filename + " of " + sequence);
                 lastSequence = sequence;
                 jarData = new ByteArrayOutputStream();
                 jarData.write(data);
@@ -277,12 +361,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     // in no transfer. URL will be retrieved by Gridlets
                     // later.
                     thirdPartyJars.put(filename, u);
-                    log.debug("Cached jar " + u);
+                    LOG.debug("Cached jar " + u);
                 }
             }
             return valueOf(""+data.length);
         } catch (IOException | NumberFormatException e) {
-            log.error(e);
+            LOG.error(e);
             return valueOf("-1");
         }
     }
@@ -342,7 +426,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         } catch (NumberFormatException | JAXBException e) {
             error = true;
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
         }
 
@@ -403,12 +487,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     r.setSample(""+sample);
 
                 } catch (Exception e) {
-                    log.error(e);
+                    LOG.error(e);
                 }
             }
             return (new SimkitAssemblyXML2Java()).marshalFragmentToString(r);
         } catch (Exception e) {
-            log.error(e); // do nothing, the request came before design was in
+            LOG.error(e); // do nothing, the request came before design was in
         }
 
         return "WAIT";
@@ -510,7 +594,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
 
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
             return Boolean.FALSE;
         }
@@ -537,7 +621,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 System.out.println("addReplicationStatistic "+statistic);
             }
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
             return Boolean.FALSE;
         }
@@ -567,7 +651,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             addResult((new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
             System.out.println("addResult for "+(new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
         return taskID;
     }
@@ -577,7 +661,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public synchronized Integer removeTask(int jobID, int taskID) {
         try {
-            log.debug("qdel: " + jobID + "." + taskID);
+            LOG.debug("qdel: " + jobID + "." + taskID);
             if (!usid.equals("LOCAL-RUN")) {
                 getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
             } else {
@@ -653,7 +737,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
         }
         runFinalization();
         gc();
@@ -671,13 +755,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         try {
             getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (IOException e) {
-            log.debug(e);
+            LOG.debug(e);
         }
         if (root != null) {
             try {
                 new SimkitAssemblyXML2Java().marshal(root, new FileOutputStream(new File(root.getName() + "Exp.xml")));
             } catch (FileNotFoundException e) {
-                log.error(e);
+                LOG.error(e);
             }
         }
 
@@ -764,7 +848,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 }
                 return sw.toString();
             } catch (IOException e) {
-                log.error(e);
+                LOG.error(e);
                 return "QSTAT-ERROR";
             }
         }
@@ -786,7 +870,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
             return sw.toString();
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return "QSTAT-ERROR";
         }
     }
@@ -816,7 +900,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 experimentFile = createTempFile(root.getName()+"Exp",".xml");
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -831,13 +915,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         try {
             new SimkitAssemblyXML2Java().marshal(root, new FileOutputStream(experimentFile));
         } catch (FileNotFoundException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
         // spawn Gridlets
         int totalTasks = designPointCount*totalSamples;
-        log.info("usid is: " + usid);
+        LOG.info("usid is: " + usid);
         try {
             if (!usid.equals("LOCAL-RUN")) {
                 getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
@@ -845,7 +929,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 localRun(experimentFile,totalTasks);
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -874,7 +958,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             // TODO: fix generics
             queue = new LocalTaskQueue(this,experimentFile,totalTasks);
         } catch (DoeException e) {
-            log.error(e);
+            LOG.error(e);
         }
 
         // this shouldn't block on the very first call
@@ -988,7 +1072,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         while (it.hasNext()) {
 
             TerminalParameter t = it.next();
-            log.debug("Batch Mode " + t);
+            LOG.debug("Batch Mode " + t);
             JAXBElement<ValueRange> range = t.getValueRange();
             Object returns;
             if (range.getName().toString().contains("DoubleRange")) {

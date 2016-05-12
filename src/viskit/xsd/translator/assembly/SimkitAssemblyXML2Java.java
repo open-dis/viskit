@@ -29,11 +29,12 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since April 1, 2004, 10:09 AM
  * @version $Id$
  */
-public class SimkitAssemblyXML2Java {
+public class SimkitAssemblyXML2Java 
+{
+    static Logger LOG = LogUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean debug = false;
-    static Logger log = LogUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
     final private String sp  = SimkitXML2Java.SP;
@@ -62,7 +63,7 @@ public class SimkitAssemblyXML2Java {
         try {
             this.jaxbContext = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             error(ex.getMessage());
             ex.printStackTrace();
         }
@@ -105,7 +106,7 @@ public class SimkitAssemblyXML2Java {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             ex.printStackTrace();
         }
     }
@@ -148,7 +149,7 @@ public class SimkitAssemblyXML2Java {
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.marshal(this.root, System.out);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             ex.printStackTrace();
         }
     }
@@ -182,7 +183,7 @@ public class SimkitAssemblyXML2Java {
             jaxbMarshaller.marshal(jaxb,pw);
             s = sw.toString();
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
         }
         return s;
@@ -198,7 +199,7 @@ public class SimkitAssemblyXML2Java {
             fos = new FileOutputStream(f);
             marshal(root, fos);
         } catch (FileNotFoundException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
         }
     }
@@ -219,7 +220,7 @@ public class SimkitAssemblyXML2Java {
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.marshal(node,o);
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             e.printStackTrace();
         }
     }
@@ -336,7 +337,7 @@ public class SimkitAssemblyXML2Java {
                 String clazz = listI.next();
                 if (exList.contains(clazz)) {
                     listI.remove();
-                    log.debug("Removed type \"" + clazz + "\" from the TreeSet");
+                    LOG.debug("Removed type \"" + clazz + "\" from the TreeSet");
                 }
             }
         }
@@ -841,7 +842,7 @@ public class SimkitAssemblyXML2Java {
      * @param desc a description of the encountered error
      */
     private void error(String desc) {
-        log.error(desc);
+        LOG.error(desc);
         System.exit(1);
     }
 
@@ -888,8 +889,8 @@ public class SimkitAssemblyXML2Java {
             }
         }
 
-        log.info("Assembly file is: " + fileName);
-        log.info("Generating Java Source...");
+        LOG.info("Assembly file is: " + fileName);
+        LOG.info("Generating Java Source...");
 
         if (fileName == null) {
             usage();
@@ -898,20 +899,20 @@ public class SimkitAssemblyXML2Java {
             try {
                 sax2j = new SimkitAssemblyXML2Java(new File(fileName));
             } catch (FileNotFoundException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
 
             if (sax2j != null) {
 
                 sax2j.unmarshal();
                 String dotJava = sax2j.translate();
-                log.info("Done.");
+                LOG.info("Done.");
 
                 // also write out the .java to a file and compile it
                 // to a .class
-                log.info("Generating Java Bytecode...");
+                LOG.info("Generating Java Bytecode...");
                 if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
-                    log.info("Done.");
+                    LOG.info("Done.");
                 }
             }
         }

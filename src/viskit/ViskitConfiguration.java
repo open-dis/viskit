@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.configuration.*;
@@ -29,11 +30,13 @@ public class ViskitConfiguration {
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 	
-    public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
-    public static final File V_CONFIG_FILE     = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
-    public static final File C_APP_FILE        = new File(VISKIT_CONFIG_DIR, "c_app.xml");
-    public static final File C_GUI_FILE        = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
-    public static final File V_DEBUG_LOG       = new File(VISKIT_CONFIG_DIR, "debug.log");
+    public static final File VISKIT_CONFIGURATION_DIR      = new File(System.getProperty("user.home"), ".viskit");
+    public static final File VISKIT_CONFIGURATION_FILE_OLD = new File(VISKIT_CONFIGURATION_DIR, "vconfig.xml");
+    public static final File VISKIT_CONFIGURATION_FILE     = new File(VISKIT_CONFIGURATION_DIR, "viskitConfiguration.xml");
+    public static final File VISKIT_README_FILE            = new File(VISKIT_CONFIGURATION_DIR, "README.txt");
+    public static final File C_APP_FILE                    = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
+    public static final File C_GUI_FILE                    = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
+    public static final File V_DEBUG_LOG                   = new File(VISKIT_CONFIGURATION_DIR, "debug.log");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE               = GUI_BEANSHELL_ERROR_DIALOG + ".title";
@@ -96,7 +99,7 @@ public class ViskitConfiguration {
 
     static {
         LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
-        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " (exists=" + VISKIT_CONFIG_DIR.exists() + ")");
+        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIGURATION_DIR + " (exists=" + VISKIT_CONFIGURATION_DIR.exists() + ")");
     }
 
     public static synchronized ViskitConfiguration instance() {
@@ -112,25 +115,34 @@ public class ViskitConfiguration {
     private ViskitConfiguration()
 	{
         try {
-            if (!VISKIT_CONFIG_DIR.exists()) {
-                 VISKIT_CONFIG_DIR.mkdirs();
-                 LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
+            if (!VISKIT_CONFIGURATION_DIR.exists()) {
+                 VISKIT_CONFIGURATION_DIR.mkdirs();
+                 LOG.info("Created dir: " + VISKIT_CONFIGURATION_DIR);
             }
-            File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
+            File viskitConfigurationFile = new File("configuration" + File.separator + VISKIT_CONFIGURATION_FILE.getName());
+			
 			// clear out corrupted files, if found
-			if (V_CONFIG_FILE.length() == 0L)
-				V_CONFIG_FILE.delete();
+			if (VISKIT_CONFIGURATION_FILE.length() == 0L)
+				VISKIT_CONFIGURATION_FILE.delete();
 			if (C_APP_FILE.length() == 0L)
 				C_APP_FILE.delete();
 			if (C_GUI_FILE.length() == 0L)
 				C_GUI_FILE.delete();
+			
 			// create configuration files, if needed
-            if (!V_CONFIG_FILE.exists()) {
-                Files.copy(vconfigSrc.toPath(), V_CONFIG_FILE.toPath());
+            if (VISKIT_CONFIGURATION_FILE_OLD.exists() && !VISKIT_CONFIGURATION_FILE.exists())
+			{
+				LOG.info ("copying original-style " + VISKIT_CONFIGURATION_FILE_OLD + " to " + VISKIT_CONFIGURATION_FILE.toPath());
+				Files.copy(VISKIT_CONFIGURATION_FILE_OLD.toPath(), VISKIT_CONFIGURATION_FILE.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			}
+            if (!VISKIT_CONFIGURATION_FILE.exists())
+			{
+                Files.copy(viskitConfigurationFile.toPath(), VISKIT_CONFIGURATION_FILE.toPath());
             }
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
-            if (!C_APP_FILE.exists()) {
-                Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
+            if (!VISKIT_README_FILE.exists())
+			{
+                Files.copy(VISKIT_README_FILE.toPath(), VISKIT_CONFIGURATION_DIR.toPath());
             }
             File cGuiSrc;
             if (ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
@@ -141,7 +153,12 @@ public class ViskitConfiguration {
             if (!C_GUI_FILE.exists()) {
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
             }
-        } catch (IOException ex) {
+            if (!C_APP_FILE.exists())
+			{
+                Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
+            }
+        } 
+		catch (IOException ex) {
             LOG.error(ex);
         }
         xmlConfigurations = new HashMap<>();
@@ -153,7 +170,7 @@ public class ViskitConfiguration {
     private void setDefaultConfiguration() {
         try {
             defaultConfigurationBuilder = new DefaultConfigurationBuilder();
-            defaultConfigurationBuilder.setFile(V_CONFIG_FILE);
+            defaultConfigurationBuilder.setFile(VISKIT_CONFIGURATION_FILE);
             try {
                 combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true); // TODO silence unhelpful verbose output
             }
@@ -297,8 +314,8 @@ public class ViskitConfiguration {
             xout.output(document,  new FileWriter(C_GUI_FILE));
 
             // For vconfig.xml
-            document = FileHandler.unmarshallJdom(V_CONFIG_FILE);
-            xout.output(document,  new FileWriter(V_CONFIG_FILE));
+            document = FileHandler.unmarshallJdom(VISKIT_CONFIGURATION_FILE);
+            xout.output(document,  new FileWriter(VISKIT_CONFIGURATION_FILE));
 
             // For the current Viskit project file
             document = FileHandler.unmarshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile());

@@ -18,10 +18,11 @@ import viskit.ViskitStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
-public class Launcher extends Thread implements Runnable {
+public class Launcher extends Thread implements Runnable
+{
+    static Logger LOG = LogUtilities.getLogger(Launcher.class);
 
     static ClassLoader classLoader;
-    static Logger log = LogUtilities.getLogger(Launcher.class);
     String assembly = null;
     String assemblyName;
     Hashtable<String, String> eventGraphs = new Hashtable<>();
@@ -62,7 +63,7 @@ public class Launcher extends Thread implements Runnable {
             }
 
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -82,7 +83,7 @@ public class Launcher extends Thread implements Runnable {
                 // a specific directory is more automated
                 String eventGraphDir = p.getProperty("EventGraphDir");
                 eventGraphDir = (eventGraphDir == null) ? "?" : eventGraphDir;
-                log.info("eventGraphDir is " + eventGraphDir);
+                LOG.info("eventGraphDir is " + eventGraphDir);
                 if (classLoader instanceof Boot) {
                     Boot b = (Boot) classLoader;
                     u = b.baseJarURL;
@@ -94,7 +95,7 @@ public class Launcher extends Thread implements Runnable {
 
                         // Assemblies are foreced to be identified with "Assembly" in the file name
                         if (name.contains(eventGraphDir) && name.endsWith("xml") && !name.contains("Assembly") ) {
-                            log.info("Loading EventGraph from: " + name);
+                            LOG.info("Loading EventGraph from: " + name);
                             addEventGraph(jis);
                         }
                     }
@@ -147,9 +148,9 @@ public class Launcher extends Thread implements Runnable {
                 if (p.getProperty("Port") != null) {
                     launchGridkit(p.getProperty("Port"));
                 } else if (p.getProperty("Assembly") != null) {
-                    log.debug("Running Assembly " + p.getProperty("Assembly"));
+                    LOG.debug("Running Assembly " + p.getProperty("Assembly"));
                     u = classLoader.getResource(p.getProperty("Assembly"));
-                    log.debug("From URL: " + u);
+                    LOG.debug("From URL: " + u);
                     setAssembly(u);
                     // EventGraphs can also be dropped onto the top-level dir
                     // as long as they are enumerated
@@ -162,11 +163,11 @@ public class Launcher extends Thread implements Runnable {
                     launchGUI();
                 }
             } catch (Exception e) {
-                log.error(e);
+                LOG.error(e);
             }
 
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -185,17 +186,17 @@ public class Launcher extends Thread implements Runnable {
         }
         assembly = xml.toString();
 
-        log.debug("Assembly XML" + xml.toString());
+        LOG.debug("Assembly XML" + xml.toString());
 
         // get the class name as defined in the XML
-        log.debug("Trying ClassLoader " + classLoader);
+        LOG.debug("Trying ClassLoader " + classLoader);
 
         ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
 
         if (classLoader instanceof java.net.URLClassLoader) {
             URL[] usz = ((java.net.URLClassLoader) classLoader).getURLs();
             for (URL usz1 : usz) {
-                log.debug("URL " + usz1.toString());
+                LOG.debug("URL " + usz1.toString());
             }
         }
 
@@ -256,12 +257,12 @@ public class Launcher extends Thread implements Runnable {
             eventGraphName += "." + m.invoke(eventgraph, new Object[]{});
 
             eventGraphs.put(eventGraphName, xml.toString());
-            log.debug(eventGraphName + "EventGraph XML");
-            log.debug(xml.toString());
+            LOG.debug(eventGraphName + "EventGraph XML");
+            LOG.debug(xml.toString());
 
         // silent this may not be an event-graph xml
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            log.error(e);
+            LOG.error(e);
         }
 
     }
@@ -281,7 +282,7 @@ public class Launcher extends Thread implements Runnable {
             }
 
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -293,7 +294,7 @@ public class Launcher extends Thread implements Runnable {
                 execInterpreted();
             }
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -310,7 +311,7 @@ public class Launcher extends Thread implements Runnable {
                 t.join();
             }
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -354,7 +355,7 @@ public class Launcher extends Thread implements Runnable {
                     out = m.invoke(out, new Object[]{});
                     eventGraphJava = (String) out;
 
-                    log.debug(eventGraphJava);
+                    LOG.debug(eventGraphJava);
 
                     // these could be handled by viskit.AssemblyController.createJavaClassFromString()
                     // since it is not likely to be run in Grid mode here, if at all, so no worries
@@ -371,13 +372,13 @@ public class Launcher extends Thread implements Runnable {
 
                     m = assyContlr.getDeclaredMethod("compileJavaClassFromString", new Class<?>[]{String.class});
 
-                    log.info("Generating Java Bytecode...");
+                    LOG.info("Generating Java Bytecode...");
 
                     // This will now generate source and byte code and place each
                     // in thier respective ${viskit.project}/build directories,
                     // once for src and one for classes
                     if (m.invoke(null, new Object[]{eventGraphJava}) != null) {
-                        log.info("Compilation of " + eventGraphName + " complete.");
+                        LOG.info("Compilation of " + eventGraphName + " complete.");
                     }
 
                     //normal to have exception as eventGraphs
@@ -386,7 +387,7 @@ public class Launcher extends Thread implements Runnable {
                     //include assemblies. must be caught though
                     //and ingored
                 } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    log.error(ex);
+                    LOG.error(ex);
                 }
             }
 
@@ -403,11 +404,11 @@ public class Launcher extends Thread implements Runnable {
                 out = m.invoke(out, new Object[]{});
                 assemblyJava = (String) out;
 
-                log.debug(assemblyJava);
+                LOG.debug(assemblyJava);
 
-                log.info("Generating Java Bytecode...");
+                LOG.info("Generating Java Bytecode...");
                 if (m.invoke(null, new Object[]{assemblyJava}) != null) {
-                    log.info("Compilation of assembly complete.");
+                    LOG.info("Compilation of assembly complete.");
                 }
             }
 
@@ -424,10 +425,10 @@ public class Launcher extends Thread implements Runnable {
             ((Boot) classLoader).addURL(url);
             // jam the classpath with the new directory
             System.setProperty("java.class.path", System.getProperty("java.class.path") + File.pathSeparator + jarFromDir.getCanonicalPath());
-            log.debug(System.getProperty("java.class.path"));
+            LOG.debug(System.getProperty("java.class.path"));
 
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
     }
 
@@ -456,7 +457,7 @@ public class Launcher extends Thread implements Runnable {
         bshcm = m.invoke(bsh, new Object[]{});
         m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
         out = m.invoke(bshcm, new Object[]{"viskit.xsd.translator.assembly.BasicAssembly"});
-        log.debug("Checking if viskit.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
+        LOG.debug("Checking if viskit.assembly.BasicAssembly exists... " + ((Boolean) out).toString());
 
         try {
             Enumeration<String> e = eventGraphs.keys();
@@ -476,7 +477,7 @@ public class Launcher extends Thread implements Runnable {
                 m = out.getClass().getDeclaredMethod("translate", new Class<?>[]{});
                 out = m.invoke(out, new Object[]{});
                 eventGraphJava = (String) out;
-                log.debug(eventGraphJava);
+                LOG.debug(eventGraphJava);
 
                 // bsh eval generated java source
                 m = bshz.getDeclaredMethod("eval", new Class<?>[]{String.class});
@@ -499,7 +500,7 @@ public class Launcher extends Thread implements Runnable {
             m = axml2jz.getDeclaredMethod("translate", new Class<?>[]{});
             out = m.invoke(out, new Object[]{});
             assemblyJava = (String) out;
-            log.debug(assemblyJava);
+            LOG.debug(assemblyJava);
 
             // bsh eval the generated source
             m = bshz.getDeclaredMethod("eval", new Class<?>[]{String.class});
@@ -511,9 +512,9 @@ public class Launcher extends Thread implements Runnable {
             // sanity check the bsh class loaders if assembly exists
             m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
             out = m.invoke(bshcm, new Object[]{assemblyName});
-            log.debug("Checking if " + assemblyName + " exists... " + ((Boolean) out).toString());
+            LOG.debug("Checking if " + assemblyName + " exists... " + ((Boolean) out).toString());
             out = m.invoke(bshcm, new Object[]{ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS});
-            log.debug("Checking if simkit.random.RandomVariateFactory exists... " + ((Boolean) out).toString());
+            LOG.debug("Checking if simkit.random.RandomVariateFactory exists... " + ((Boolean) out).toString());
 
             // get the assembly class, create instance and thread it
             m = bshcmz.getDeclaredMethod("classForName", new Class<?>[]{String.class});
@@ -531,8 +532,76 @@ public class Launcher extends Thread implements Runnable {
         //((Thread)out).start();
 
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
+
+    /*
+     * Above is mostly introspection of below, which only works in command line mode
+     * (ie with classpath set normally)
+     *
+     * to run within a jar of jars it has to be done via introspection.
+     *
+    if (bsh.getClassManager().classExists("simkit.BasicAssembly")) System.out.println("simkit.BasicAssembly found");
+    else System.out.println("simkit.BasicAssembly not found");
+    try {
+    bsh.eval("debug();");
+    // load eventGraph XML as classes
+    // since we've overridden the default bsh ClassLoader, need to
+    // add the defined class in this ClassLoader
+    Enumeration e = eventGraphs.keys();
+    while( e.hasMoreElements() ){
+    String eventGraphName = (String) (e.nextElement());
+    String eventGraph = (String)eventGraphs.get(eventGraphName);
+    bais = new ByteArrayInputStream(eventGraph.getBytes());
+    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+    Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
+    //xml2j = new SimkitXML2Java(bais);
+    xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
+    xml2j.unmarshal();
+    bsh.eval(xml2j.translate());
+    if (debug) {
+    System.out.println("Bsh eval of:");
+    System.out.println(xml2j.translate());
+    }
+    Class evgc = bsh.getClassManager().classForName(eventGraphName);
+    // add these, since this is going to be the class loader,
+    // and could conflict with the one beanshell last used to
+    // eval the string (?)
+    eventGraphs.put(eventGraphName, evgc);
+    if (debug) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
+    }
+    // now any and all dependencies are loaded for the assembly
+    bais = new ByteArrayInputStream(assembly.getBytes());
+    Class clz = classLoader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
+    Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
+    axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
+    axml2j.unmarshal();
+    bsh.eval(axml2j.translate());
+    if (debug) {
+    System.out.println("Bsh eval of:");
+    System.out.println(axml2j.translate());
+    }
+    // run the assembly
+    BshClassManager bcm = bsh.getClassManager();
+    bcm.dump(new java.io.PrintWriter(System.out));
+    // according to bsh docs, can't reload classes
+    // if not using the addClassPath method, since
+    // Launcher overrides the default bsh loader,
+    // don't do the following:
+    // bcm.reloadAllClasses();
+    // instead, relaunch.
+    if (bcm.classExists(assemblyName)) {
+    System.out.println("Running Assembly "+assemblyName);
+    //bsh.eval(assemblyName+".main(new String[0])");
+    bsh.eval("Thread t = new Thread( new "+assemblyName+"() );");
+    Thread t = (Thread) bsh.get("t");
+    t.start();
+    } else {
+    System.out.println("Can't find Assembly "+assemblyName);
+    }
+    } catch (Exception e) {
+    e.printStackTrace();
+    }
 
     /*
      * Above is mostly introspection of below, which only works in command line mode
@@ -610,7 +679,7 @@ public class Launcher extends Thread implements Runnable {
             Method m = viskitz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"viskit.EventGraphAssemblyComboMain"}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            log.error(e);
+            LOG.error(e);
             System.exit(1);
         }
     }
@@ -624,7 +693,7 @@ public class Launcher extends Thread implements Runnable {
                 launchAssemblyServer(Integer.parseInt(port));
             }
         } catch (NumberFormatException e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -638,7 +707,7 @@ public class Launcher extends Thread implements Runnable {
             Method m = gridletz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            log.error(e);
+            LOG.error(e);
             System.exit(1);
         }
     }
@@ -649,7 +718,7 @@ public class Launcher extends Thread implements Runnable {
             Method m = serverz.getDeclaredMethod("main", new Class<?>[]{String[].class});
             m.invoke(null, new Object[]{new String[]{"-p", "" + port}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            log.error(e);
+            LOG.error(e);
             System.exit(1);
         }
     }
@@ -667,14 +736,14 @@ public class Launcher extends Thread implements Runnable {
             jos.flush();
 
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         } finally {
             try {
                 if (jos != null) {
                     jos.close();
                 }
             } catch (IOException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
         }
         return jarOut;
@@ -699,7 +768,7 @@ public class Launcher extends Thread implements Runnable {
                     }
                     jos.closeEntry();
                 } catch (IOException ex) {
-                    log.error(ex);
+                    LOG.error(ex);
                 }
             }
         }

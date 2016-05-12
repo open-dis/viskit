@@ -25,7 +25,7 @@ import viskit.doe.LocalBootLoader;
 @SuppressWarnings("serial")
 public class LocalTaskQueue extends ArrayList<Object> {
 
-    static Logger log = LogUtilities.getLogger(LocalTaskQueue.class);
+    static Logger LOG = LogUtilities.getLogger(LocalTaskQueue.class);
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;
@@ -120,19 +120,19 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 ((Thread) task).start();
 
             } catch (NoSuchMethodException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (SecurityException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (IllegalAccessException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (IllegalArgumentException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (InvocationTargetException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (InstantiationException e) {
-                log.error(e);
+                LOG.error(e);
             } catch (ClassNotFoundException e) {
-                log.error(e);
+                LOG.error(e);
             }
         }
         return false;

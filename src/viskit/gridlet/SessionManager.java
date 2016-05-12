@@ -12,8 +12,8 @@
  *
  * The cookie returned by the login call is a Unique Session ID (USID)
  * that must be used by subsequent calls during that session. An explicit
- * logout will delete a session, however a complete log of the experiment
- * is still stored in the user spool, and as well a log of login activity.
+ * logout will delete a session, however a complete LOG of the experiment
+ * is still stored in the user spool, and as well a LOG of login activity.
  * (TBD later retrieval post session).
  * Sessions may timeout due to inactivity (TBD).
  */
