@@ -52,23 +52,23 @@ import javax.xml.bind.JAXBElement;
  * @since 4:13:25 PM
  * @version $Id$
  */
-public class ParamTableModel extends DefaultTableModel implements TableModelListener {
+public class ParameterTableModel extends DefaultTableModel implements TableModelListener {
 
     public static final int NUM_COLS = 6;
     public static String[] columnNames = {
-        "SimEntity/Parameter name",
-        "Type",
-        "Value",
+        "SimEntity/Parameter name", // TODO clarify
+        "type",
+        "value",
         "Is factor?",
-        "Min",
-        "Max"
+        "min",
+        "max"
     };
-    public static final int NAME_COL = 0;
-    public static final int TYPE_COL = 1;
-    public static final int VALUE_COL = 2;
-    public static final int FACTOR_COL = 3;
-    public static final int MIN_COL = 4;
-    public static final int MAX_COL = 5;
+    public static final int   NAME_COLUMN = 0;
+    public static final int   TYPE_COLUMN = 1;
+    public static final int  VALUE_COLUMN = 2;
+    public static final int FACTOR_COLUMN = 3;
+    public static final int    MIN_COLUMN = 4;
+    public static final int    MAX_COLUMN = 5;
     Object[][] mydata = new Object[0][0];
     Vector<Object[]> rows;
     public Set<Integer> noEditRows = new HashSet<>();
@@ -80,7 +80,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
      * @param simEntitiesJaxb
      * @param designParamsJaxb
      */
-    public ParamTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParamsJaxb) {
+    public ParameterTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParamsJaxb) {
         super(0, 0);
 
         initBeanShell();
@@ -103,7 +103,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             }
         }
         dirty = false;
-        this.addTableModelListener(ParamTableModel.this);
+        this.addTableModelListener(ParameterTableModel.this);
     }
 
     @Override
@@ -127,14 +127,14 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
 
         String val = tp.getValue();
         val = (val == null) ? "" : val;
-        setValueAt(val, row, VALUE_COL);
+        setValueAt(val, row, VALUE_COLUMN);
 
         JAXBElement<ValueRange> vr = tp.getValueRange();
 
-        setValueAt(vr.getValue().getLowValue(), row, MIN_COL);
-        setValueAt(vr.getValue().getHighValue(), row, MAX_COL);
+        setValueAt(vr.getValue().getLowValue(), row, MIN_COLUMN);
+        setValueAt(vr.getValue().getHighValue(), row, MAX_COLUMN);
 
-        setValueAt(true, row, FACTOR_COL); //cb
+        setValueAt(true, row, FACTOR_COLUMN); //cb
     }
 
     Interpreter interpreter;
@@ -163,13 +163,13 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
                 SEname = defaultName;
             }
 
-            oa[NAME_COL] = "<html><b>" + SEname;
+            oa[NAME_COLUMN] = "<html><b>" + SEname;
 
             String typ = se.getType();
             typ = (typ == null ? "" : typ);
-            oa[TYPE_COL] = "<html><b>" + loseDots(typ);
-            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = false;
+            oa[TYPE_COLUMN] = "<html><b>" + loseDots(typ);
+            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
+            oa[FACTOR_COLUMN] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
@@ -197,14 +197,14 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
                 tpname = defaultName;
             }
 
-            oa[NAME_COL] = tpname;
+            oa[NAME_COLUMN] = tpname;
             String typ = tp.getType();
             typ = (typ == null ? "" : typ);
-            oa[TYPE_COL] = loseDots(typ);
+            oa[TYPE_COLUMN] = loseDots(typ);
             String value = tp.getValue();
-            oa[VALUE_COL] = (value == null ? "" : value);
-            oa[MIN_COL] = oa[MAX_COL] = ""; // will be editted or filled in from existing file
-            oa[FACTOR_COL] = false;
+            oa[VALUE_COLUMN] = (value == null ? "" : value);
+            oa[MIN_COLUMN] = oa[MAX_COLUMN] = ""; // will be editted or filled in from existing file
+            oa[FACTOR_COLUMN] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
@@ -215,11 +215,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             if (MPname == null || MPname.length() <= 0) {
                 MPname = defaultName;
             }
-            oa[NAME_COL] = MPname;
+            oa[NAME_COLUMN] = MPname;
             String typ = mp.getType();
-            oa[TYPE_COL] = loseDots(typ == null ? "" : typ);
-            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = false;
+            oa[TYPE_COLUMN] = loseDots(typ == null ? "" : typ);
+            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
+            oa[FACTOR_COLUMN] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
@@ -236,11 +236,11 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
                 FPname = defaultName;
             }
 
-            oa[NAME_COL] = FPname;
+            oa[NAME_COLUMN] = FPname;
             String typ = fp.getType();
-            oa[TYPE_COL] = typ; //loseDots(typ)
-            oa[VALUE_COL] = oa[MIN_COL] = oa[MAX_COL] = "";
-            oa[FACTOR_COL] = false;
+            oa[TYPE_COLUMN] = typ; //loseDots(typ)
+            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
+            oa[FACTOR_COLUMN] = false;
             rows.add(oa);
             elementsByRow.add(obj);
 
@@ -298,16 +298,16 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     public Class getColumnClass(int c) {
         //return getValueAt(0, c).getClass();
         switch (c) {
-            case NAME_COL:
-            case TYPE_COL:
-            case VALUE_COL:
-            case MIN_COL:
-            case MAX_COL:
+            case NAME_COLUMN:
+            case TYPE_COLUMN:
+            case VALUE_COLUMN:
+            case MIN_COLUMN:
+            case MAX_COLUMN:
                 return String.class;
-            case FACTOR_COL:
+            case FACTOR_COLUMN:
                 return Boolean.class;
             default:
-                //assert false:"Column error in ParamTableModel";
+                //assert false:"Column error in ParameterTableModel";
                 System.err.println("Column error in ParamTableModel");
         }
         return null;
@@ -319,14 +319,14 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
      */
     @Override
     public boolean isCellEditable(int row, int col) {
-        if (col == TYPE_COL) {
+        if (col == TYPE_COLUMN) {
             return false;
         }
         Integer rowKey = row;
         if (noEditRows.contains(rowKey)) {
             return false;
         }
-        return col <= TYPE_COL || !multiRows.contains(rowKey);
+        return col <= TYPE_COLUMN || !multiRows.contains(rowKey);
     }
 
     /*

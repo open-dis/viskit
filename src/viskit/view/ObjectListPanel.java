@@ -24,7 +24,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
 import viskit.ViskitStatics;
@@ -47,7 +47,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
     private JLabel         typeLabelArray[];
     private JTextField     entryTFArray  [];
 	private JComponent     panelArray[];
-    private VInstantiator  shadowInstantiatorArray[];
+    private ViskitInstantiator  shadowInstantiatorArray[];
     private ActionListener changeListener;
 
     public ObjectListPanel(ActionListener changeListener) {
@@ -67,7 +67,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
         nameLabelArray = (numberOfParameters <= 0 ? null : new JLabel[numberOfParameters]);
           entryTFArray = new JTextField[numberOfParameters]; // user enters initialization value here
             panelArray = new JComponent[numberOfParameters];
-        shadowInstantiatorArray = new VInstantiator[numberOfParameters];
+        shadowInstantiatorArray = new ViskitInstantiator[numberOfParameters];
 
         if (viskit.ViskitStatics.debug) {
             System.out.println("really has " + numberOfParameters + "parameters");
@@ -76,7 +76,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
         String parameterTypeName;
         for (Iterator<Object> iterator = parameterObjectList.iterator(); iterator.hasNext(); i++)
 		{
-            VInstantiator instantiator = (VInstantiator) iterator.next();
+            ViskitInstantiator instantiator = (ViskitInstantiator) iterator.next();
             shadowInstantiatorArray[i] = instantiator;
             typeLabelArray[i] = new JLabel("(" + instantiator.getTypeName() + ")" + " " + instantiator.getName(), JLabel.TRAILING); // html screws up table sizing below
             String parameterName        = instantiator.getName();
@@ -101,17 +101,17 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
             // If we have a factory, then reflect the Object... input to the getInstance() method of RandomVariateFactory (RVF)
 			String parameterInitializationValue = new String();
 			String parameterInitializationHint  = new String();
-            if (instantiator instanceof VInstantiator.Factory) {
-                VInstantiator.Factory vif = (VInstantiator.Factory) instantiator;
-                if (!vif.getParametersList().isEmpty() && vif.getParametersList().get(0) instanceof VInstantiator.FreeForm)
+            if (instantiator instanceof ViskitInstantiator.Factory) {
+                ViskitInstantiator.Factory vif = (ViskitInstantiator.Factory) instantiator;
+                if (!vif.getParametersList().isEmpty() && vif.getParametersList().get(0) instanceof ViskitInstantiator.FreeForm)
 				{
-                    VInstantiator.FreeForm viff = (VInstantiator.FreeForm) vif.getParametersList().get(0);
+                    ViskitInstantiator.FreeForm viff = (ViskitInstantiator.FreeForm) vif.getParametersList().get(0);
                     parameterInitializationValue = viff.getValue();
 					parameterInitializationHint = "enter " + parameterTypeName + " initialization value(s) using Java syntax (quoted strings, comma-separated values, etc.)";
                 }
             }
-			else if (instantiator instanceof VInstantiator.FreeForm) {
-				parameterInitializationValue = ((VInstantiator.FreeForm) instantiator).getValue();
+			else if (instantiator instanceof ViskitInstantiator.FreeForm) {
+				parameterInitializationValue = ((ViskitInstantiator.FreeForm) instantiator).getValue();
 				parameterInitializationHint = "enter initialization value";
 			}
 			String traceMessage = "parameter name=" + parameterName + ", type=" + parameterTypeName + ", value=" + parameterInitializationValue + ", description=" + parameterDescription;
@@ -187,22 +187,22 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
     public List<Object> getData() {
         Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLabelArray.length; i++) {
-            if (shadowInstantiatorArray[i] instanceof VInstantiator.FreeForm) {
-                ((VInstantiator.FreeForm) shadowInstantiatorArray[i]).setValue(entryTFArray[i].getText().trim());
-            } else if (shadowInstantiatorArray[i] instanceof VInstantiator.Array) {
-                VInstantiator.Array via = (VInstantiator.Array) shadowInstantiatorArray[i];
+            if (shadowInstantiatorArray[i] instanceof ViskitInstantiator.FreeForm) {
+                ((ViskitInstantiator.FreeForm) shadowInstantiatorArray[i]).setValue(entryTFArray[i].getText().trim());
+            } else if (shadowInstantiatorArray[i] instanceof ViskitInstantiator.Array) {
+                ViskitInstantiator.Array via = (ViskitInstantiator.Array) shadowInstantiatorArray[i];
                 List<Object> insts = via.getInstantiators();
 
                 // TODO: Limit one instantiator per Array?
                 if (insts.isEmpty())
-                    insts.add(new VInstantiator.FreeForm(via.getTypeName(), entryTFArray[i].getText().trim()));
-            } else if (shadowInstantiatorArray[i] instanceof VInstantiator.Factory) {
-                VInstantiator.Factory vif = (VInstantiator.Factory) shadowInstantiatorArray[i];
+                    insts.add(new ViskitInstantiator.FreeForm(via.getTypeName(), entryTFArray[i].getText().trim()));
+            } else if (shadowInstantiatorArray[i] instanceof ViskitInstantiator.Factory) {
+                ViskitInstantiator.Factory vif = (ViskitInstantiator.Factory) shadowInstantiatorArray[i];
                 List<Object> params = vif.getParametersList();
 
                 // TODO: Limit one parameter per Factory?
                 if (params.isEmpty())
-                    params.add(new VInstantiator.FreeForm(vif.getTypeName(), entryTFArray[i].getText().trim()));
+                    params.add(new ViskitInstantiator.FreeForm(vif.getTypeName(), entryTFArray[i].getText().trim()));
             }
             v.add(shadowInstantiatorArray[i]);
         }
@@ -214,7 +214,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
     public void actionPerformed(ActionEvent e) {
         int actionCommandIndex = Integer.parseInt(e.getActionCommand());
 
-        VInstantiator vInstantiator = shadowInstantiatorArray[actionCommandIndex];
+        ViskitInstantiator vInstantiator = shadowInstantiatorArray[actionCommandIndex];
 
         Class<?> classForInstantiatorType = ViskitStatics.getClassForInstantiatorType(vInstantiator.getTypeName());
         if (classForInstantiatorType == null) {
@@ -226,12 +226,12 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
             arrayInspector.setType(vInstantiator.getTypeName());
 
             // Special case for Object... (varargs)
-            if (vInstantiator instanceof VInstantiator.FreeForm) {
+            if (vInstantiator instanceof ViskitInstantiator.FreeForm) {
                 List<Object> objectList = new ArrayList<>();
-                objectList.add((VInstantiator.FreeForm) vInstantiator);
+                objectList.add((ViskitInstantiator.FreeForm) vInstantiator);
                 arrayInspector.setData(objectList);
             } else {
-                arrayInspector.setData(((VInstantiator.Array) vInstantiator).getInstantiators());
+                arrayInspector.setData(((ViskitInstantiator.Array) vInstantiator).getInstantiators());
             }
 
             arrayInspector.setVisible(true); // blocks
@@ -258,13 +258,13 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
             objectInspector.setVisible(true); // blocks
             if (objectInspector.modified) {
 
-                VInstantiator vi = objectInspector.getData();
+                ViskitInstantiator vi = objectInspector.getData();
                 if (vi == null) {return;}
 
                 // Prevent something like RVF.getInstance(RandomVariate) from
                 // being entered in the text field
-                if (vi instanceof VInstantiator.Factory) {
-                    VInstantiator.Factory viFactory = (VInstantiator.Factory) vi;
+                if (vi instanceof ViskitInstantiator.Factory) {
+                    ViskitInstantiator.Factory viFactory = (ViskitInstantiator.Factory) vi;
                     if (!viFactory.getParametersList().isEmpty()) {
                         return;
                     }

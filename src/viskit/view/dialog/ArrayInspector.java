@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitStatics;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitInstantiator;
 import viskit.view.ObjectListPanel;
 
 /**
@@ -116,8 +116,8 @@ public class ArrayInspector extends JDialog {
         typeTF.setText(typ);
     }
 
-    public VInstantiator.Array getData() {
-        return new VInstantiator.Array(typeTF.getText().trim(), olp.getData());
+    public ViskitInstantiator.Array getData() {
+        return new ViskitInstantiator.Array(typeTF.getText().trim(), olp.getData());
     }
 
     class sizeListener implements ActionListener {
@@ -143,7 +143,7 @@ public class ArrayInspector extends JDialog {
         Vector<Object> v = new Vector<>(sz);
         if (myTyp.equals(ViskitStatics.RANDOM_VARIATE_CLASS)) {
             for (int i = 0; i < sz; i++) {
-                v.add(new VInstantiator.Factory(myTyp,
+                v.add(new ViskitInstantiator.Factory(myTyp,
                         ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS,
                         ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                         new Vector<>()
@@ -151,7 +151,7 @@ public class ArrayInspector extends JDialog {
             }
         } else {
             for (int i = 0; i < sz; i++) {
-                v.add(new VInstantiator.FreeForm(myTyp, ""));
+                v.add(new ViskitInstantiator.FreeForm(myTyp, ""));
             }
         }
         setData(v);

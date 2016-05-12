@@ -55,13 +55,13 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  */
 public class ParamTable extends JTable {
 
-    private ParamTableModel ptm;
+    private ParameterTableModel ptm;
 
     ParamTable(List<SimEntity> simEntities, List<TerminalParameter> designParms) {
         if (simEntities != null) {
             setParams(simEntities, designParms);
         } else {
-            setModel(new DefaultTableModel(new Object[][]{{}}, ParamTableModel.columnNames));
+            setModel(new DefaultTableModel(new Object[][]{{}}, ParameterTableModel.columnNames));
         }
         setShowGrid(true);
         setDefaultRenderer(String.class, new myStringClassRenderer());
@@ -74,7 +74,7 @@ public class ParamTable extends JTable {
      * @param designParams
      */
     private void setParams(List<SimEntity> simEntities, List<TerminalParameter> designParams) {
-        ptm = new ParamTableModel(simEntities, designParams);
+        ptm = new ParameterTableModel(simEntities, designParams);
         setModel(ptm);
         setColumnWidths();
     }
@@ -82,7 +82,7 @@ public class ParamTable extends JTable {
 
     private void setColumnWidths() {
         TableColumn column;
-        for (int i = 0; i < ParamTableModel.NUM_COLS; i++) {
+        for (int i = 0; i < ParameterTableModel.NUM_COLS; i++) {
             column = getColumnModel().getColumn(i);
             column.setPreferredWidth(colWidths[i]);
         }
@@ -103,16 +103,16 @@ public class ParamTable extends JTable {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Integer rowKey = row;
-            if (ptm.noEditRows.contains(rowKey) || column == ParamTableModel.TYPE_COL) {
+            if (ptm.noEditRows.contains(rowKey) || column == ParameterTableModel.TYPE_COLUMN) {
                 setBackground(noedit);
             } else if (ptm.multiRows.contains(rowKey)) {
-                if (column == ParamTableModel.NAME_COL) {
+                if (column == ParameterTableModel.NAME_COLUMN) {
                     setBackground(multiP);
                 } else {
                     setBackground(noedit);
                 }
-            } else if (column == ParamTableModel.VALUE_COL || column == ParamTableModel.MIN_COL ||
-                    column == ParamTableModel.MAX_COL) {
+            } else if (column == ParameterTableModel.VALUE_COLUMN || column == ParameterTableModel.MIN_COLUMN ||
+                    column == ParameterTableModel.MAX_COLUMN) {
                 handleFactorSwitchable(row, column);
             } else {
                 setBackground(defaultC);
@@ -126,17 +126,17 @@ public class ParamTable extends JTable {
 
         private String getTT(int col) {
             switch (col) {
-                case ParamTableModel.NAME_COL:
+                case ParameterTableModel.NAME_COLUMN:
                     return "Name of variable.  Each variable used in the experiment must have a name.";
-                case ParamTableModel.TYPE_COL:
+                case ParameterTableModel.TYPE_COLUMN:
                     return "Variable type.";
-                case ParamTableModel.VALUE_COL:
+                case ParameterTableModel.VALUE_COLUMN:
                     return "Value of variable.  Not used if variable is used in experiment.";
-                case ParamTableModel.FACTOR_COL:
+                case ParameterTableModel.FACTOR_COLUMN:
                     return "Whether this variable is used as an indepedent variable in the experiment.";
-                case ParamTableModel.MIN_COL:
+                case ParameterTableModel.MIN_COLUMN:
                     return "Beginning value of independent variable.";
-                case ParamTableModel.MAX_COL:
+                case ParameterTableModel.MAX_COLUMN:
                     return "Final value of independent variable.";
                 default:
                     return "";
@@ -150,10 +150,10 @@ public class ParamTable extends JTable {
          * @param col
          */
         private void handleFactorSwitchable(int row, int col) {
-            boolean factor = ((Boolean) getValueAt(row, ParamTableModel.FACTOR_COL));
+            boolean factor = ((Boolean) getValueAt(row, ParameterTableModel.FACTOR_COLUMN));
             if (factor) {
                 switch (col) {
-                    case ParamTableModel.VALUE_COL:
+                    case ParameterTableModel.VALUE_COLUMN:
                         setBackground(noedit);
                         break;
                     default:
@@ -162,8 +162,8 @@ public class ParamTable extends JTable {
                 }
             } else {
                 switch (col) {
-                    case ParamTableModel.MIN_COL:
-                    case ParamTableModel.MAX_COL:
+                    case ParameterTableModel.MIN_COLUMN:
+                    case ParameterTableModel.MAX_COLUMN:
                         setBackground(noedit);
                         break;
                     default:
@@ -203,12 +203,12 @@ public class ParamTable extends JTable {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Integer rowKey = row;
             setEnabled(true);
-            if (ptm.noEditRows.contains(rowKey) || column == ParamTableModel.TYPE_COL) {
+            if (ptm.noEditRows.contains(rowKey) || column == ParameterTableModel.TYPE_COLUMN) {
                 setBackground(noedit);
                 setEnabled(false);
             } else if (ptm.multiRows.contains(rowKey)) {
                 setEnabled(false);
-                if (column == ParamTableModel.NAME_COL) {
+                if (column == ParameterTableModel.NAME_COLUMN) {
                     setBackground(multiP);
                 } else {
                     setBackground(noedit);

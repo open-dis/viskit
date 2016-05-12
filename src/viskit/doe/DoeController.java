@@ -156,7 +156,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         DoeFileModel dfm = doeFrame.getModel();
         int response = JOptionPane.YES_OPTION;
         if (dfm != null) {
-            if (((ParamTableModel) dfm.paramTable.getModel()).dirty) {
+            if (((ParameterTableModel) dfm.paramTable.getModel()).dirty) {
                 response = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
                 if (response == JOptionPane.YES_OPTION) {
                     doSave(dfm);
@@ -171,7 +171,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 	{
         DoeFileModel doeFileModel = doeFrame.getModel();
         if (doeFileModel != null) {
-            ((ParamTableModel) doeFileModel.paramTable.getModel()).dirty = false;
+            ((ParameterTableModel) doeFileModel.paramTable.getModel()).dirty = false;
         }
     }
 
@@ -245,7 +245,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             int n = doeFileModel.paramTable.getModel().getRowCount();
 
             for (int r = 0; r < n; r++) {
-                if (((Boolean) doeFileModel.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
+                if (((Boolean) doeFileModel.paramTable.getModel().getValueAt(r, ParameterTableModel.FACTOR_COLUMN))) {
                     break check;
                 }
             }

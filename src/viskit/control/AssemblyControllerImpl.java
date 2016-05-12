@@ -1297,7 +1297,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"The node connection must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
+        ((AssemblyModel) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
     }
 
     @Override
@@ -1431,7 +1431,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
         boolean modified = ((AssemblyEditView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
-            ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
+            ((AssemblyModel) getModel()).changeSimEventListenerEdge(seEdge);
         }
     }
 
@@ -1575,7 +1575,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 for (AssemblyEdge assemblyEdge : eventGraphNode.getConnections()) {
                     removeEdge(assemblyEdge);
                 }
-                ((AssemblyModel) getModel()).deleteEvGraphNode(eventGraphNode);
+                ((AssemblyModel) getModel()).deleteEventGraphNode(eventGraphNode);
             } else if (elem instanceof PropertyChangeListenerNode) {
                 PropertyChangeListenerNode en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
@@ -1596,7 +1596,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } else if (e instanceof PropertyChangeListenerEdge) {
             ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
         } else if (e instanceof SimEventListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEventListenerEdge) e);
+            ((AssemblyModel) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
         }
     }
 
@@ -1665,10 +1665,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
             } else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge) {
                 PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
+                ((AssemblyModel) getModel()).redoPropertyChangeListenerEdge(ed);
             } else {
                 SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
+                ((AssemblyModel) getModel()).redoSimEventListenerEdge(ed);
             }
         } else {
 

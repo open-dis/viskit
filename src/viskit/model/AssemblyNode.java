@@ -19,7 +19,7 @@ public abstract class AssemblyNode extends ViskitElement {
 
     private Vector<AssemblyEdge> connections = new Vector<>();
     private Point2D       position = new Point2D.Double(0d, 0d);
-    private VInstantiator instantiator;
+    private ViskitInstantiator instantiator;
     private List<String>  commentsArrayList = new ArrayList<>();
     private String        description = EMPTY;  // instance information
 
@@ -45,11 +45,11 @@ public abstract class AssemblyNode extends ViskitElement {
         this.position = position;
     }
 
-    public VInstantiator getInstantiator() {
+    public ViskitInstantiator getInstantiator() {
         return instantiator;
     }
 
-    public void setInstantiator(VInstantiator instantiator) {
+    public void setInstantiator(ViskitInstantiator instantiator) {
         this.instantiator = instantiator;
     }
 

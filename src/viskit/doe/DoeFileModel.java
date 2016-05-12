@@ -124,12 +124,12 @@ public class DoeFileModel {
         // For each row that's a factor (design point) add a design point TP at top
         // If experiment tag doesn't exist add it with default values
 
-        ParamTableModel ptm = (ParamTableModel) paramTable.getModel();
+        ParameterTableModel ptm = (ParameterTableModel) paramTable.getModel();
         int n = ptm.getRowCount();
 
         int dpCount = 0;
         for (int r = 0; r < n; r++) {
-            if (!ptm.isCellEditable(r, ParamTableModel.FACTOR_COL)) {
+            if (!ptm.isCellEditable(r, ParameterTableModel.FACTOR_COLUMN)) {
                 continue;
             }
 
@@ -139,13 +139,13 @@ public class DoeFileModel {
 
             // 20 Mar 2006, RG's new example for setting design points does not use "setValue", only "setValueRange"
             // I'm going to retain the value bit
-            String val = (String) rData[ParamTableModel.VALUE_COL];
+            String val = (String) rData[ParameterTableModel.VALUE_COLUMN];
             if (val != null && val.length() > 0) {
                 tp.setValue(val);
             }
 
-            if (((Boolean) rData[ParamTableModel.FACTOR_COL])) {
-                String name = (String) rData[ParamTableModel.NAME_COL];
+            if (((Boolean) rData[ParameterTableModel.FACTOR_COLUMN])) {
+                String name = (String) rData[ParameterTableModel.NAME_COLUMN];
                 name = name.replace('.', '_');  // periods illegal in java identifiers
                 tp.setName(name);
                 Integer cnt = nameSpace.get(name);
@@ -170,8 +170,8 @@ public class DoeFileModel {
                 String lowRange = tp.getValue();     // default
                 String highRange = tp.getValue();
 
-                String lowTable = (String) rData[ParamTableModel.MIN_COL];
-                String hiTable = (String) rData[ParamTableModel.MAX_COL];
+                String lowTable = (String) rData[ParameterTableModel.MIN_COLUMN];
+                String hiTable = (String) rData[ParameterTableModel.MAX_COLUMN];
                 if (lowTable != null && lowTable.length() > 0) {
                     lowRange = lowTable;
                 }

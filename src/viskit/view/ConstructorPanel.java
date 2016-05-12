@@ -24,7 +24,8 @@ public final class ConstructorPanel extends JPanel {
     private ObjectListPanel objectListPanel;
     private final JDialog parent;
 
-    public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButton, ActionListener selectListener, JDialog parentDialog) {
+    public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButton, ActionListener selectListener, JDialog parentDialog) 
+	{
         this.modifiedListener = modifiedListener;
         showButton = showSelectButton;
         selectButtonListener = selectListener;

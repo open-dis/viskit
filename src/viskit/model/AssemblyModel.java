@@ -97,7 +97,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropertyChangeListenerNode target);
 
-    void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
+    void newSimEventListenerEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
 
     boolean changePclNode(PropertyChangeListenerNode pclNode);
 
@@ -107,9 +107,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     void changeAdapterEdge(AdapterEdge aEdge);
 
-    void changeSimEvEdge(SimEventListenerEdge seEdge);
+    void changeSimEventListenerEdge(SimEventListenerEdge seEdge);
 
-    void deleteEvGraphNode(EventGraphNode eventNode);
+    void deleteEventGraphNode(EventGraphNode eventNode);
 
     void deletePropertyChangeListener(PropertyChangeListenerNode pclNode);
 
@@ -131,15 +131,15 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Supports redo of a PropertyChangeListenerEdge
      * @param pce the edge to redo
      */
-    void redoPropChangeEdge(PropertyChangeListenerEdge pce);
+    void redoPropertyChangeListenerEdge(PropertyChangeListenerEdge pce);
 
-    void deleteSimEvLisEdge(SimEventListenerEdge sele);
+    void deleteSimEventListenerEdge(SimEventListenerEdge sele);
 
     /**
      * Supports redo of a SimEvLisEdge
      * @param sele the edge to redo
      */
-    void redoSimEvLisEdge(SimEventListenerEdge sele);
+    void redoSimEventListenerEdge(SimEventListenerEdge sele);
 
     /** Retrieve a list of detailed output entity names
      *

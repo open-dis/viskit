@@ -6,7 +6,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitInstantiator;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -78,13 +78,13 @@ public class ObjectInspector extends JDialog
 	this.setLocation(newLocation);
   }
 
-  public void setData(VInstantiator vi) throws ClassNotFoundException
+  public void setData(ViskitInstantiator vi) throws ClassNotFoundException
   {
     instantiationPanel.setData(vi);
     pack();
   }
 
-  public VInstantiator getData()
+  public ViskitInstantiator getData()
   {
     return instantiationPanel.getData();
   }

@@ -11,7 +11,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import viskit.model.EventGraphNode;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitInstantiator;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DEFAULT_DESCRIPTION;
 import viskit.view.InstantiationPanel;
@@ -26,10 +26,10 @@ import viskit.view.InstantiationPanel;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class EventGraphNodeInspectorDialog extends JDialog {
-
+public class EventGraphNodeInspectorDialog extends JDialog
+{
     public static String newName;
-    public static VInstantiator newInstantiator;
+    public static ViskitInstantiator newInstantiator;
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
@@ -46,7 +46,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private final JTextField descriptionTF;
     private final JLabel descriptionLabel;
 
-    public static boolean showDialog(JFrame parent, EventGraphNode eventGraphNode) {
+    public static boolean showDialog(JFrame parent, EventGraphNode eventGraphNode)
+	{
         try {
             if (dialog == null) {
                 dialog = new EventGraphNodeInspectorDialog(parent, eventGraphNode);
@@ -162,11 +163,11 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         content.add(descriptionContent);
 
         instantiationPanel = new InstantiationPanel(this, listener, true);
-
         instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     /* Event Graph Parameter initialization*/ 
 				    "initialize parameters", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
+        instantiationPanel.setToolTipText("initialize Event Graph parameters");
         instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
         content.add(instantiationPanel);
         content.add(Box.createVerticalStrut(5));
@@ -177,14 +178,14 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 	{
         if (eventGraphNode != null)
 		{
-            handleNameTF.setText(eventGraphNode.getName());
-            detailedOutputCheckBox.setSelected(eventGraphNode.isOutputMarked());
-            descriptionTF.setText(eventGraphNode.getDescription());
-            instantiationPanel.setData(eventGraphNode.getInstantiator());
+                  handleNameTF.setText    (eventGraphNode.getName());
+                 descriptionTF.setText    (eventGraphNode.getDescription());
+        detailedOutputCheckBox.setSelected(eventGraphNode.isOutputMarked());
+            instantiationPanel.setData    (eventGraphNode.getInstantiator());
         } 
 		else
 		{
-            handleNameTF.setText("Event graph node name");
+            handleNameTF.setText("Event Graph node name");
             detailedOutputCheckBox.setSelected(false);
         }
 		if (descriptionTF.getText().isEmpty())			
@@ -199,8 +200,8 @@ public class EventGraphNodeInspectorDialog extends JDialog {
 		{
             eventGraphNode.setName(name);
             eventGraphNode.setDescription(descriptionTF.getText().trim());
-            eventGraphNode.setInstantiator(instantiationPanel.getData());
             eventGraphNode.setOutputMarked(detailedOutputCheckBox.isSelected());
+            eventGraphNode.setInstantiator(instantiationPanel.getData());
         } 
 		else
 		{
@@ -209,22 +210,26 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
     }
 
-    class cancelButtonListener implements ActionListener {
-
+    class cancelButtonListener implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+		{
             modified = false;    // for the caller
             dispose();
         }
     }
 
-    class applyButtonListener implements ActionListener {
-
+    class applyButtonListener implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent event) {
-            if (modified) {
+        public void actionPerformed(ActionEvent event) 
+		{
+            if (modified)
+			{
                 unloadWidgets();
-                if (checkBlankFields()) {
+                if (checkBlankFields())
+				{
                     return;
                 }
             }
@@ -232,15 +237,17 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
     }
 
-    class enableApplyButtonListener implements CaretListener, ActionListener {
-
+    class enableApplyButtonListener implements CaretListener, ActionListener
+	{
         @Override
-        public void caretUpdate(CaretEvent event) {
+        public void caretUpdate(CaretEvent event) 
+		{
             common();
         }
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+		{
             common();
         }
 
@@ -256,20 +263,26 @@ public class EventGraphNodeInspectorDialog extends JDialog {
      * Check for blank fields and return true if user wants to cancel close
      * @return true = cancel close
      */
-    boolean checkBlankFields() {
-        VInstantiator vi;
+    boolean checkBlankFields() 
+	{
+        ViskitInstantiator vi;
 
-        if (eventGraphNode != null) {
+        if (eventGraphNode != null) 
+		{
             vi = eventGraphNode.getInstantiator();
-        } else {
+        } 
+		else 
+		{
             vi = newInstantiator;
         }
         testLp:
         {
-            if (handleNameTF.getText().trim().isEmpty()) {
+            if (handleNameTF.getText().trim().isEmpty()) 
+			{
                 break testLp;
             }
-            if (!vi.isValid()) {
+            if (!vi.isValid()) 
+			{
                 break testLp;
             }
             return false; // no blank fields, don't cancel close
@@ -286,23 +299,29 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         // cancel close
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class myCloseListener extends WindowAdapter 
+	{
         @Override
-        public void windowClosing(WindowEvent e) {
+        public void windowClosing(WindowEvent e) 
+		{
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(
+                int returnValue = JOptionPane.showConfirmDialog(
                         EventGraphNodeInspectorDialog.this,
                         "Apply changes?",
                         "Question",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) 
+				{
                     okButton.doClick();
-                } else {
+                } 
+				else 
+				{
                     cancelButton.doClick();
                 }
-            } else {
+            } 
+			else 
+			{
                 cancelButton.doClick();
             }
         }

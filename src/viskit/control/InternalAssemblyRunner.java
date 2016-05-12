@@ -629,6 +629,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 	
     private void buildMenus() 
 	{
+		// TODO use buildMI method, add hotkeys
         simulationRunMenu = new JMenu("Simulation Run");
 		simulationRunMenu.setMnemonic(KeyEvent.VK_S);
         JMenuItem  saveOutputMI = new JMenuItem("Save simulation output to text file");
