@@ -68,7 +68,7 @@ public interface AssemblyController {
     /** Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */
-    void zipAndMailProject();
+    void mailZippedProjectFiles();
 
     void showXML();
 

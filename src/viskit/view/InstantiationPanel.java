@@ -367,21 +367,21 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             } 
 			else
 			{
-                constructorPanels   = new ConstructorPanel       [parameters.length];
+                constructorPanels   = new ConstructorPanel            [parameters.length];
 				constructors        = new ViskitInstantiator.Construct[parameters.length];
-				parametersSignature = new String                 [parameters.length];
+				parametersSignature = new String                      [parameters.length];
 				
                 for (int i = 0; i < parameters.length; ++i)
 				{
                            constructors[i] = new ViskitInstantiator.Construct(parameters[i], className);
 					parametersSignature[i] = "";
-					if (constructors[i].getArgs().isEmpty())
+					if (constructors[i].getParametersList().isEmpty())
 					{
 						parametersSignature[i] = noParametersString;
 					}
 					else
 					{
-						for (int j = 0; j < constructors[i].getArgs().size(); j++)
+						for (int j = 0; j < constructors[i].getParametersList().size(); j++)
 						{
 							String typeName = ((Parameter)parameters[i].get(j)).getType();
 							if      (typeName == null)
@@ -390,10 +390,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 								     typeName = typeName.substring(typeName.lastIndexOf(".")+1);
 							parametersSignature[i] += typeName;
 
-							if (!((ViskitInstantiator) (constructors[i].getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
+							if (!((ViskitInstantiator) (constructors[i].getParametersList().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
 							{
 								String name = ((Parameter)parameters[i].get(j)).getName();
-								((ViskitInstantiator) (constructors[i].getArgs().get(j))).setName(name);
+								((ViskitInstantiator) (constructors[i].getParametersList().get(j))).setName(name);
 								parametersSignature[i] += " " + name;
 							}
 							parametersSignature[i] += ", ";
@@ -402,7 +402,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 					}
 
 					// TODO further hiding of duplicate constructors, also see below
-					if (!constructors[i].getArgs().isEmpty() || zeroArgumentConstructorAllowed)
+					if (!constructors[i].getParametersList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorTabCount++;
 					}
@@ -410,7 +410,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 for (int i = 0; i < parameters.length; ++i) // only add tabs of interest
 				{
 					// TODO further hiding of duplicate constructors, also see above
-					if (!constructors[i].getArgs().isEmpty() || zeroArgumentConstructorAllowed)
+					if (!constructors[i].getParametersList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
 						String constructorTabLabel;
@@ -421,7 +421,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 						}
 						else constructorTabLabel = "Constructor " + i;
 						
-						constructorPanels[i].setData(constructors[i].getArgs());
+						constructorPanels[i].setData(constructors[i].getParametersList());
 						tabbedPane.addTab(constructorTabLabel, null, constructorPanels[i], parametersSignature[i]); // null icon
 					}
 				}
@@ -480,12 +480,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 System.out.println("setting data for " + vi.getTypeName());
             }
 
-            int argumentIndex = vi.indexOfArgNames(vi.getTypeName(), vi.getArgs());
+            int argumentIndex = vi.indexOfArgNames(vi.getTypeName(), vi.getParametersList());
             if (viskit.ViskitStatics.debug) {
                 System.out.println("found a matching constructor at " + argumentIndex);
             }
             if (argumentIndex != -1) {
-                constructorPanels[argumentIndex].setData(vi.getArgs());
+                constructorPanels[argumentIndex].setData(vi.getParametersList());
                 tabbedPane.setSelectedIndex(argumentIndex);
             }
             actionPerformed(null);

@@ -86,7 +86,7 @@ public class ViskitStatics
 {
     static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 
-    public static boolean debug = false;
+    public static boolean debug = true; // TODO expose?
 
     /* Commonly used class names */
     public static final String RANDOM_NUMBER_CLASS = "simkit.random.RandomNumber";
@@ -590,18 +590,20 @@ public class ViskitStatics
 			return null;
 		
         List<Object>[] resolvedParameterList = null;
-//		if ((parameterMap != null) && (type.getName() != null) && (parameterMap.get(type.getName()) != null))
-//		{
-//			resolvedParameterList = parameterMap.get(type.getName());
-//			System.out.println("parameters already resolved");
-//			// TODO confirm OK, are we all done?
-//		}
+		
+		// test
+		if ((parameterMap != null) && (type.getName() != null) && (parameterMap.get(type.getName()) != null))
+		{
+			resolvedParameterList = parameterMap.get(type.getName());
+			System.out.println("parameters already resolved");
+			// TODO confirm OK, are we all done?
+		}
 		
         if (resolvedParameterList == null)
 		{
-            Constructor<?>[] constructor = type.getConstructors();
+            Constructor<?>[] constructors = type.getConstructors(); // reflection
             Annotation[] parameterAnnotations;
-            List<Object>[] parameterList = GenericConversion.newListObjectTypeArray(List.class, constructor.length);
+            List<Object>[] parameterList = GenericConversion.newListObjectTypeArray(List.class, constructors.length);
             ObjectFactory objectFactory = new ObjectFactory();
             Field field = null;
 
@@ -620,30 +622,34 @@ public class ViskitStatics
             if (viskit.ViskitStatics.debug)
 			{
                 System.out.println("adding " + type.getName());
-                System.out.println("\t # constructors: " + constructor.length);
+                System.out.println("\t # constructors: " + constructors.length);
             }
 
-            for (int i = 0; i < constructor.length; i++)
+            for (int i = 0; i < constructors.length; i++)
 			{
-                Class<?>[] parameterTypes = constructor[i].getParameterTypes();
-                parameterAnnotations      = constructor[i].getDeclaredAnnotations();
+                Class<?>[] parameterTypes = constructors[i].getParameterTypes();
+                parameterAnnotations      = constructors[i].getDeclaredAnnotations();
                 parameterList[i] = new ArrayList<>();
                 if (viskit.ViskitStatics.debug) {
-                    System.out.println("\t # params " + parameterTypes.length + " in constructor " + i);
+                    LOG.info("\tparameter count=" + parameterTypes.length + " in constructor " + i);
                 }
 
-                // possible that a class inherited a parameterMap, check if annotated first
+                // possible that a class inherited an annotated parameterMap, check that first
                 if (parameterAnnotations != null && parameterAnnotations.length > 0)
 				{
-                    if (parameterAnnotations.length > 1) {
-                        throw new RuntimeException("Only one Annotation allowed per constructor, found " + parameterAnnotations.length);
+                    if (parameterAnnotations.length > 1)
+					{
+						String message = "Only one Annotation allowed per constructor, found " + parameterAnnotations.length;
+						LOG.error (message);
+                        throw new RuntimeException(message);
                     }
 
-                    ParameterMap parameterMap = constructor[i].getAnnotation(viskit.ParameterMap.class);
-                    if (parameterMap != null) {
-                        String[] names        = parameterMap.names();
-                        String[] types        = parameterMap.types();
-                        String[] descriptions = parameterMap.descriptions();
+                    ParameterMap annotationParameterMap = constructors[i].getAnnotation(viskit.ParameterMap.class);
+                    if (annotationParameterMap != null)
+					{
+                        String[] names        = annotationParameterMap.names();
+                        String[] types        = annotationParameterMap.types();
+                        String[] descriptions = annotationParameterMap.descriptions();
                         if (names.length != types.length)
 						{
                             throw new RuntimeException("ParameterMap names and types length mismatch");
@@ -706,9 +712,9 @@ public class ViskitStatics
                             }
                         }
 //                        break; // fix this up, should index along with i not n
-                    } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    } 
+					catch (IllegalArgumentException | IllegalAccessException ex) {
                         LOG.error(ex);
-//                        ex.printStackTrace();
                     }
                 } 
 				else // unknowns
@@ -719,14 +725,15 @@ public class ViskitStatics
                         try {
                             Parameter newParameter = objectFactory.createParameter();
                             String newParameterTypeName = ViskitStatics.convertClassName(parameterType.getName());
-                            if (newParameterTypeName.indexOf(".class") > 0) {
-                                newParameterTypeName = newParameterTypeName.split("\\.")[0]; // omit .class from type name
+                            if (newParameterTypeName.indexOf(".class") > 0)
+							{
+                                newParameterTypeName = newParameterTypeName.substring(0,newParameterTypeName.indexOf(".class")); // omit .class from type name
                             }
 							// TODO apparently no way to get Javadoc from reflection for this field parameter
 							String newParameterDescription = DEFAULT_DESCRIPTION; // better to nag than ignore
 
                             // Not sure what use a name like this is for PCLs
-                            newParameter.setName("parameter[" + k++ + "] : ");
+                            newParameter.setName("parameter[" + k++ + "]");
                             newParameter.setType(newParameterTypeName);
                             newParameter.setDescription(newParameterDescription);
 							
@@ -735,9 +742,10 @@ public class ViskitStatics
 							{
                                 System.out.println("\t " + newParameter.getName() + newParameter.getType());
                             }
-                        } catch (Exception ex) {
+                        } 
+						catch (Exception ex)
+						{
                             LOG.error(ex);
-//                            ex.printStackTrace();
                         }
                     }
                 }
@@ -848,10 +856,11 @@ public class ViskitStatics
                 + message + "</body></html>");
 
         // handle link events to bring up mail client and debug.log
-        editorPane.addHyperlinkListener(new HyperlinkListener() {
-
+        editorPane.addHyperlinkListener(new HyperlinkListener()
+		{
             @Override
-            public void hyperlinkUpdate(HyperlinkEvent event) {
+            public void hyperlinkUpdate(HyperlinkEvent event)
+			{
                 try {
                     if (event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED))
 					{
@@ -870,7 +879,7 @@ public class ViskitStatics
         editorPane.setEditable(false);
         editorPane.setBackground(label.getBackground());
 
-        JOptionPane.showMessageDialog(parent, editorPane, title, JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(parent, editorPane, title, JOptionPane.INFORMATION_MESSAGE);
     }
 	
 	public static void sendErrorReport (Exception e)

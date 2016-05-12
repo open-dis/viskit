@@ -43,6 +43,13 @@ import viskit.view.EventGraphView;
 import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.view.AssemblyEditView;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
+import static viskit.ViskitStatics.sendErrorReport;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -108,8 +115,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void zipAndMailProject() {
-        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).zipAndMailProject();
+    public void mailZippedProjectFiles() {
+        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).mailZippedProjectFiles();
     }
 
     public final static String NEWEVENTGRAPH_METHOD = "newEventGraph"; // must match following method name.  Not possible to accomplish this programmatically.

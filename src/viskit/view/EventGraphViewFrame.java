@@ -833,17 +833,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		boolean   assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
 
 		 // ensures selected before allowing deletion
-        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
+        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
 		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteEventGraphFromProjectMI);
 
 		 // ensures selected before allowing deletion
-        JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, "deleteAssemblyFromProject",   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous no hotkey */, (assemblyVisible && hasActiveAssembly()));
+        JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, "deleteAssemblyFromProject",   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (assemblyVisible && hasActiveAssembly()));
 		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
 		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
-        JMenuItem renameProjectMI               = buildMenuItem(this, "renameProject",                "Rename Project",                   KeyEvent.VK_R, null /* dangerous no hotkey */, isProjectOpen);
+        JMenuItem renameProjectMI               = buildMenuItem(this, "renameProject",                "Rename Project",                   KeyEvent.VK_R, null /* dangerous operation, no hotkey */, isProjectOpen);
 		renameProjectMI.setEnabled (isProjectOpen && false); // TODO
 		projectsMenu.add(renameProjectMI);
 
@@ -852,12 +852,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		projectsMenu.add(projectSettingsMI);
 		
         projectsMenu.addSeparator();
-		JMenuItem zipAndMailProjectMI = buildMenuItem(eventGraphController, AssemblyControllerImpl.ZIP_AND_MAIL_PROJECT_METHOD, "Zip and Mail Project File", KeyEvent.VK_Z, KeyStroke.getKeyStroke(KeyEvent.VK_Z, projectMenuShortcutKeyMask), true);
-        zipAndMailProjectMI.setEnabled (isProjectOpen);
-		projectsMenu.add(zipAndMailProjectMI);
+		JMenuItem mailZippedProjectFilesMI = buildMenuItem(eventGraphController, AssemblyControllerImpl.MAIL_ZIPPED_PROJECT_FILES_METHOD, "Mail Zipped Project Files", KeyEvent.VK_M, KeyStroke.getKeyStroke(KeyEvent.VK_M, projectMenuShortcutKeyMask), true);
+        mailZippedProjectFilesMI.setEnabled (isProjectOpen);
+		projectsMenu.add(mailZippedProjectFilesMI);
 		
 		// duplicate entry, also on top-level ViskitApplicationFrame Files menu
-		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, projectMenuShortcutKeyMask), isProjectOpen);
+		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_W, KeyStroke.getKeyStroke(KeyEvent.VK_W, projectMenuShortcutKeyMask), isProjectOpen);
 		closeProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(closeProjectMI);
 		
@@ -983,8 +983,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	}
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel, boolean enabled)
+	{
         Action action = ActionIntrospector.getAction(source, method);
+		if (action == null)
+		{
+			LOG.error(source.toString() + " buildMenuItem() unable to find method \"" + method + "()\" for menu item \"" + name + "\"");
+		}
         Map<String, Object> map = new HashMap<>();
         if (mn != null) {
             map.put(Action.MNEMONIC_KEY, mn);

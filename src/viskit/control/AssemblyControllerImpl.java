@@ -781,75 +781,76 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
     }
 
-    public final static String ZIP_AND_MAIL_PROJECT_METHOD = "zipAndMailProject"; // must match following method name.  Not possible to accomplish this programmatically.
+    public final static String MAIL_ZIPPED_PROJECT_FILES_METHOD = "mailZippedProjectFiles"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void zipAndMailProject () // method name must exactly match preceding string value
+    public void mailZippedProjectFiles () // method name must exactly match preceding string value
 	{
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
             File projectDirectory;
-            File projectZip;
+            File projectArchiveZip;
             File logFile;
 
             @Override
             public Void doInBackground()
 			{
+				// TODO ensure project zip has a README at top
 				if (ViskitGlobals.instance().getCurrentViskitProject() == null)
 					return null;
-                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
-                projectZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
+                projectDirectory  = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
+                projectArchiveZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
 
-                if (projectZip.exists())
-                    projectZip.delete();
+                if (projectArchiveZip.exists())
+                    projectArchiveZip.delete();
 
-                if (logFile.exists())
-                    logFile.delete();
+//                if (logFile.exists())
+//                    logFile.delete(); // cleanup for next time
 
                 try {
-
                     // First, copy the debug.log to the project dir
                     Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ZipUtils.zipFolder(projectDirectory, projectZip);
-                } catch (IOException e) {
+                    ZipUtils.zipFolder(projectDirectory, projectArchiveZip);
+                } 
+				catch (IOException e)
+				{
                     LOG.error(e);
                 }
-
                 return null;
             }
 
             @Override
-            public void done() {
-                try {
+            public void done()
+			{
+                try 
+				{       
+                    get(); // Waits for the zip process to finish
 
-                    // Waits for the zip process to finish
-                    get();
-
+                    try // open directory holding the .zip so that use can select, drag and mail it
+					{
+                        Desktop.getDesktop().open(projectArchiveZip.getParentFile());
+                    } 
+					catch (IOException e) {
+                        LOG.error(e);
+                    }
+                    get(); // Waits for the directory launch process to finish
+					
                     URL url = null;
 					String urlString = "[not found]";
-                    try {
+                    try // launch email
+					{
                         url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
-                                + "?subject=Viskit%20Project%20Submission%20for%20"
-                                + projectDirectory.getName() + "&body=see%20attachment");
+                                + "?subject=Viskit%20Project%20Archive%20for%20"
+                                + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached");
 						urlString =  url.toString();
                     } catch (MalformedURLException e) {
                         LOG.error(e);
                     }
 
-                    String message = "Please navigate to<br/>"
-                            + projectZip.getParent()
-                            + "<br/>and email the " + projectZip.getName()
-                            + " file to "
-                            + "<i><a href=\"" + urlString + "\">"
-                            + ViskitStatics.VISKIT_MAILING_LIST + "</a></i>"
-                            + "<br/><br/>Click the link to open up an email "
-                            + "form, then attach the zip file";
-
-                    try {
-                        Desktop.getDesktop().open(projectZip.getParentFile());
-                    } catch (IOException e) {
-                        LOG.error(e);
-                    }
+                    String message = "<html><p align='center'>Select <a href=\"" + urlString + "\">email link</a> to attach and send project zip archive </p>" 
+							+ "<p align='center'><i>" + projectArchiveZip.getParent() + File.separatorChar + projectArchiveZip.getName() + "</i> </p>"
+                            + "<p align='center'> to mailing list <i>"
+                            + ViskitStatics.VISKIT_MAILING_LIST + "</i> or whomever you want.</p>";
 
                     ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, message, false);
 

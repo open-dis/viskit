@@ -98,11 +98,11 @@ public class EventGraphAssemblyComboMain
             LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(e);
 
 			// A corrupted viskitProject can cause an InvocationTargetException.
-			// Check the log output.  Try clean all and rebuilding.
+			// Check the log output.  Common fix: clean all and rebuild.
 			
-			// The Apache Commons config files have behaved rather well and don't
-			// need to be nuked as of late: 03 DEC 2014.
-            // nukeDotViskit(); moved to user preferences
+			// The Apache Commons configuration/*.xml files have behaved rather well
+			// and don't need to be nuked as of late: 03 DEC 2014.
+            // User cleanup method nukeDotViskit(); moved to user preferences
 			
 			ViskitStatics.sendErrorReport ("Visual Simkit (Viskit) has experienced a significant startup problem.", e);
         }

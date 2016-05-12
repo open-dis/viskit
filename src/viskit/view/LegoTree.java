@@ -482,7 +482,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
 
         List<Class<?>> interfacesClassList = FindClassesForInterface.findClasses(jarFile, targetClass);
-        for (Class<?> interfaceClass : interfacesClassList) {
+        for (Class<?> interfaceClass : interfacesClassList)
+		{
             ViskitStatics.resolveParameters(interfaceClass);
         }
 

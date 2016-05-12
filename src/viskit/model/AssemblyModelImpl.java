@@ -1062,7 +1062,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
         multiParameter.setType(vicon.getTypeName());
-        for (Object vi : vicon.getArgs()) {
+        for (Object vi : vicon.getParametersList()) {
             multiParameter.getParameters().add(buildParameter(vi));
         }
         return multiParameter;
