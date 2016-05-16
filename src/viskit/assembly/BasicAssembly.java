@@ -626,16 +626,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             URL url = null;
 			String path = "mailto:"; // avoid warning
             try {
-                url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
+                url = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:");
 				path = url.getPath();
             } catch (MalformedURLException ex) {
                 LOG.error(ex);
             }
             String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfiguration.V_DEBUG_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfiguration.VISKIT_DEBUG_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + path + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + path + "\">" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
             ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);

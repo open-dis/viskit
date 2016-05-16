@@ -49,15 +49,20 @@ public class EventGraphNodeInspectorDialog extends JDialog
     public static boolean showDialog(JFrame parent, EventGraphNode eventGraphNode)
 	{
         try {
-            if (dialog == null) {
+            if (dialog == null)
+			{
                 dialog = new EventGraphNodeInspectorDialog(parent, eventGraphNode);
-            } else {
+            } 
+			else 
+			{
                 dialog.setParameterWidgets(parent, eventGraphNode);
             }
-        } catch (ClassNotFoundException e) {
+        } 
+		catch (ClassNotFoundException e) 
+		{
             String message = "An object type specified in this element (probably " + eventGraphNode.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            JOptionPane.showMessageDialog(parent, message, "Event Graph Definition Not Found", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent, message, "Event Graph definition not found", JOptionPane.ERROR_MESSAGE);
             dialog = null;
             return false; // unmodified
         }
@@ -165,7 +170,7 @@ public class EventGraphNodeInspectorDialog extends JDialog
         instantiationPanel = new InstantiationPanel(this, listener, true);
         instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
                     /* Event Graph Parameter initialization*/ 
-				    "initialize parameters", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+				    "Initialize Event Graph parameters", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
 
         instantiationPanel.setToolTipText("initialize Event Graph parameters");
         instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
@@ -180,7 +185,7 @@ public class EventGraphNodeInspectorDialog extends JDialog
 		{
                   handleNameTF.setText    (eventGraphNode.getName());
                  descriptionTF.setText    (eventGraphNode.getDescription());
-        detailedOutputCheckBox.setSelected(eventGraphNode.isOutputMarked());
+        detailedOutputCheckBox.setSelected(eventGraphNode.isVerboseMarked());
             instantiationPanel.setData    (eventGraphNode.getInstantiator());
         } 
 		else
@@ -200,7 +205,7 @@ public class EventGraphNodeInspectorDialog extends JDialog
 		{
             eventGraphNode.setName(name);
             eventGraphNode.setDescription(descriptionTF.getText().trim());
-            eventGraphNode.setOutputMarked(detailedOutputCheckBox.isSelected());
+            eventGraphNode.setVerboseMarked(detailedOutputCheckBox.isSelected());
             eventGraphNode.setInstantiator(instantiationPanel.getData());
         } 
 		else
@@ -295,8 +300,8 @@ public class EventGraphNodeInspectorDialog extends JDialog
                 "Question",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-        return returnValue != JOptionPane.YES_OPTION; // don't cancel
-        // cancel close
+		boolean cancellation = (returnValue != JOptionPane.YES_OPTION); // whether or not to cancel
+        return  cancellation;
     }
 
     class myCloseListener extends WindowAdapter 

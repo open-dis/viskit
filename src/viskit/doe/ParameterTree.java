@@ -55,17 +55,24 @@ import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
 
-public class ParamTree extends JTree {
+public final class ParameterTree extends JTree {
 
-    public ParamTree(List list) {
+    public ParameterTree(List list) 
+	{
+        if (list != null) 
+		{
+            setParameters(list);
+        }
+		initialize ();
+    }
+	public void initialize ()
+	{
         getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         setCellRenderer(new pRenderer());
-        if (list != null) {
-            setParams(list);
-        }
-    }
+	}
 
-    public void setParams(List lis) {
+    public final void setParameters(List lis)
+	{
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Parameter tree");
 
         for (Iterator iterator = lis.iterator(); iterator.hasNext();) {
@@ -81,34 +88,39 @@ public class ParamTree extends JTree {
         setModel(new DefaultTreeModel(root));
     }
 
-    private void addChildren(Element elm, DefaultMutableTreeNode node) {
+    private void addChildren(Element elm, DefaultMutableTreeNode node) 
+	{
         List lis = elm.getChildren();
-        for (Iterator iterator = lis.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = lis.iterator(); iterator.hasNext(); ) 
+		{
             Element e = (Element) iterator.next();
             DefaultMutableTreeNode n = new DefaultMutableTreeNode(e);
             String nm = e.getName();
-            if (nm.equalsIgnoreCase("MultiParameter")) {
+            if (nm.equalsIgnoreCase("MultiParameter")) 
+			{
                 addChildren(e, n); // recurse
             } // recurse
-            else {
+            else
+			{
                 // assert nm.equalsIgnoreCase("TerminalParameter");
-                if (!nm.equalsIgnoreCase("TerminalParameter")) {
+                if (!nm.equalsIgnoreCase("TerminalParameter"))
+				{
                     System.err.println("ParamTree.addChildren, unknown element type: " + nm);
                 }
-
             }
             node.add(n);
         }
     }
 
-    class pRenderer extends JPanel implements TreeCellRenderer {
-
+    class pRenderer extends JPanel implements TreeCellRenderer
+	{
         JCheckBox cb = new JCheckBox("Name: ");
         JTextField nmFld = new JTextField();
         JLabel tLab = new JLabel("  type: ");
         JLabel tyField = new JLabel();
 
-        public pRenderer() {
+        public pRenderer()
+		{
             setOpaque(false);
             cb.setOpaque(false);
             nmFld.setBackground(Color.lightGray);
@@ -119,8 +131,10 @@ public class ParamTree extends JTree {
             add(tyField);
         }
 
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (viskit.ViskitStatics.debug) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus)
+		{
+            if (viskit.ViskitStatics.debug)
+			{
                 System.out.println("gettcr selected=" + selected);
             }
             Object o = ((DefaultMutableTreeNode) value).getUserObject();

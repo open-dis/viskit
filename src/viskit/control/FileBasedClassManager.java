@@ -144,9 +144,9 @@ public class FileBasedClassManager {
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = ViskitStatics.resolveParameters(fclass);
+                List<Object>[] pMap = ViskitStatics.resolveParametersUsingReflection(fclass);
                 if (pMap != null && pMap.length > 0)
-                    ViskitStatics.putParameterList(fclass.getName(), pMap);
+                    ViskitStatics.putParameterListInHashMap(fclass.getName(), pMap);
             }
 
         // TODO: Check if this is really necessary and should be dealt with
@@ -185,7 +185,7 @@ public class FileBasedClassManager {
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
-            ViskitStatics.putParameterList(fclass.getName(), pa);
+            ViskitStatics.putParameterListInHashMap(fclass.getName(), pa);
 
             LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 

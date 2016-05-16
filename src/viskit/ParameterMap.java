@@ -26,9 +26,12 @@ import java.lang.annotation.Target;
  * @author Rick Goldberg
  * @version $Id$
  */
+
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR})
-public @interface ParameterMap {
+
+public @interface ParameterMap 
+{
       String[] names();
       String[] types();
       String[] descriptions();

@@ -66,7 +66,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 
         JLabel         nameLabel = new JLabel("name");
         JLabel         typeLabel = new JLabel("type");
-        JLabel initialValueLabel = new JLabel("initialization value");
+        JLabel initialValueLabel = new JLabel("initial value");
         JLabel  descriptionLabel = new JLabel("description");
         arraySizeLabel = new JLabel("array size");
 

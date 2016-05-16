@@ -10,6 +10,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.apache.log4j.Logger;
+import viskit.model.EventGraphNode;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -22,7 +24,9 @@ import java.lang.reflect.Method;
  *
  * Based on code posted by Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
  */
-public class SplashScreenFrame2 extends JFrame {
+public class SplashScreenFrame2 extends JFrame
+{
+    static final Logger LOG = LogUtilities.getLogger(SplashScreenFrame2.class);
 
     Robot robot;
     BufferedImage screenImage;
@@ -146,7 +150,7 @@ public class SplashScreenFrame2 extends JFrame {
 
         // This is for the launch4j executable for Win & executable jar for Unix
         if (args.length == 0) {
-            args = new String[] {"viskit.EventGraphAssemblyComboMain"};
+            args = new String[] {"viskit.ViskitEventGraphAssemblyComboMain"};
         }
 
         // First argument is main class
@@ -190,7 +194,7 @@ public class SplashScreenFrame2 extends JFrame {
     static public class DefaultEntry {
 
         public static void main(String[] args) {
-            SplashScreenFrame2.main(new String[] {"viskit.EventGraphAssemblyComboMain"});
+            SplashScreenFrame2.main(new String[] {"viskit.ViskitEventGraphAssemblyComboMain"});
         }
     }
 

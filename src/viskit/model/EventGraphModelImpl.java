@@ -255,12 +255,12 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbSimEntity.setName(nullIfEmpty(graphMetadata.name));
-            jaxbSimEntity.setVersion(nullIfEmpty(graphMetadata.revision));
-            jaxbSimEntity.setAuthor(nullIfEmpty(graphMetadata.author));
-            jaxbSimEntity.setPackage(nullIfEmpty(graphMetadata.packageName));
-            jaxbSimEntity.setExtend(nullIfEmpty(graphMetadata.extendsPackageName));
-            jaxbSimEntity.setImplement(nullIfEmpty(graphMetadata.implementsPackageName));
+            jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(graphMetadata.name));
+            jaxbSimEntity.setVersion(ViskitGlobals.nullIfEmpty(graphMetadata.revision));
+            jaxbSimEntity.setAuthor(ViskitGlobals.nullIfEmpty(graphMetadata.author));
+            jaxbSimEntity.setPackage(ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
+            jaxbSimEntity.setExtend(ViskitGlobals.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbSimEntity.setImplement(ViskitGlobals.nullIfEmpty(graphMetadata.implementsPackageName));
 			jaxbSimEntity.setDescription(graphMetadata.description);
 
             jaxbMarshaller.marshal(jaxbSimEntity, fileWriter);
@@ -760,9 +760,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
 
         Parameter jaxbParameter = jaxbObjectFactory.createParameter();
-        jaxbParameter.setName(nullIfEmpty(name));
-        jaxbParameter.setType(nullIfEmpty(type));
-        jaxbParameter.setDescription(nullIfEmpty(description));
+        jaxbParameter.setName(ViskitGlobals.nullIfEmpty(name));
+        jaxbParameter.setType(ViskitGlobals.nullIfEmpty(type));
+        jaxbParameter.setDescription(ViskitGlobals.nullIfEmpty(description));
 
         vp.opaqueModelObject = jaxbParameter;
 
@@ -801,9 +801,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
         // fill out jaxb variable
         Parameter parameter = (Parameter) vp.opaqueModelObject;
-        parameter.setName(nullIfEmpty(vp.getName()));
+        parameter.setName(ViskitGlobals.nullIfEmpty(vp.getName()));
         //p.setShortName(vp.getName());
-        parameter.setType(nullIfEmpty(vp.getType()));
+        parameter.setType(ViskitGlobals.nullIfEmpty(vp.getType()));
         parameter.setDescription(vp.getDescription());
 
         setDirty(true);
@@ -825,9 +825,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             mangleName(viskitStateVariable);
         }
         StateVariable stateVariable = jaxbObjectFactory.createStateVariable();
-        stateVariable.setName(nullIfEmpty(name));
-        stateVariable.setType(nullIfEmpty(type));
-        stateVariable.setValue(nullIfEmpty(initialValue));
+        stateVariable.setName(ViskitGlobals.nullIfEmpty(name));
+        stateVariable.setType(ViskitGlobals.nullIfEmpty(type));
+        stateVariable.setValue(ViskitGlobals.nullIfEmpty(initialValue));
         stateVariable.setDescription(description);
 
         viskitStateVariable.opaqueModelObject = stateVariable;
@@ -861,10 +861,10 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         }
         // fill out jaxb variable
         StateVariable jaxbStateVariable = (StateVariable) vsv.opaqueModelObject;
-        jaxbStateVariable.setName(nullIfEmpty(vsv.getName()));
-        jaxbStateVariable.setType(nullIfEmpty(vsv.getType()));
-        jaxbStateVariable.setValue(nullIfEmpty(vsv.getValue()));
-        jaxbStateVariable.setDescription(nullIfEmpty(vsv.getDescription()));
+        jaxbStateVariable.setName(ViskitGlobals.nullIfEmpty(vsv.getName()));
+        jaxbStateVariable.setType(ViskitGlobals.nullIfEmpty(vsv.getType()));
+        jaxbStateVariable.setValue(ViskitGlobals.nullIfEmpty(vsv.getValue()));
+        jaxbStateVariable.setDescription(ViskitGlobals.nullIfEmpty(vsv.getDescription()));
 
         setDirty(true);
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_CHANGED, "State variable changed: " + vsv.getName()));
@@ -891,9 +891,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             mangleName(eventNode);
         }
 
-        jaxbEvent.setName(nullIfEmpty(eventNode.name));
+        jaxbEvent.setName(ViskitGlobals.nullIfEmpty(eventNode.name));
 
-        if ("Run".equals(nullIfEmpty(nodeName))) {
+        if ("Run".equals(ViskitGlobals.nullIfEmpty(nodeName))) {
             jaxbEvent.setDescription("The Run event is fired first to support initialization of all simulation state variables");
         }
         eventNode.opaqueModelObject = jaxbEvent;
@@ -1091,9 +1091,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         for (ViskitElement eventArguments : local)
 		{
             Argument jaxbArgument = jaxbObjectFactory.createArgument();
-            jaxbArgument.setName(nullIfEmpty(eventArguments.getName()));
-            jaxbArgument.setType(nullIfEmpty(eventArguments.getType()));
-            jaxbArgument.setDescription(nullIfEmpty(eventArguments.getDescription()));
+            jaxbArgument.setName(ViskitGlobals.nullIfEmpty(eventArguments.getName()));
+            jaxbArgument.setType(ViskitGlobals.nullIfEmpty(eventArguments.getType()));
+            jaxbArgument.setDescription(ViskitGlobals.nullIfEmpty(eventArguments.getDescription()));
             eventArguments.opaqueModelObject = jaxbArgument; // replace
             jaxbArgumentList.add(jaxbArgument);
         }
@@ -1103,9 +1103,9 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         jaxbLocalVariableList.clear();
         for (ViskitElement eventLocalVariables : local) {
             LocalVariable jaxbLocalVariable = jaxbObjectFactory.createLocalVariable();
-            jaxbLocalVariable.setName(nullIfEmpty(eventLocalVariables.getName()));
-            jaxbLocalVariable.setType(nullIfEmpty(eventLocalVariables.getType()));
-            jaxbLocalVariable.setValue(nullIfEmpty(eventLocalVariables.getValue()));
+            jaxbLocalVariable.setName(ViskitGlobals.nullIfEmpty(eventLocalVariables.getName()));
+            jaxbLocalVariable.setType(ViskitGlobals.nullIfEmpty(eventLocalVariables.getType()));
+            jaxbLocalVariable.setValue(ViskitGlobals.nullIfEmpty(eventLocalVariables.getValue()));
             jaxbLocalVariable.setDescription(eventLocalVariables.getDescription());
             eventLocalVariables.opaqueModelObject = jaxbLocalVariable; //replace
             jaxbLocalVariableList.add(jaxbLocalVariable);
@@ -1308,7 +1308,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         for (ViskitElement edgeParameter : schedulingEdge.parametersList)
 		{
             EdgeParameter jaxbEdgeParameter = jaxbObjectFactory.createEdgeParameter();
-            jaxbEdgeParameter.setValue(nullIfEmpty(edgeParameter.getValue()));
+            jaxbEdgeParameter.setValue(ViskitGlobals.nullIfEmpty(edgeParameter.getValue()));
             jaxbSchedule.getEdgeParameter().add(jaxbEdgeParameter);
         }
 
@@ -1328,24 +1328,10 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         for (ViskitElement edgeParameter : cancellingEdge.parametersList)
 		{
             EdgeParameter jaxbEdgeParameter = jaxbObjectFactory.createEdgeParameter();
-            jaxbEdgeParameter.setValue(nullIfEmpty(edgeParameter.getValue()));
+            jaxbEdgeParameter.setValue(ViskitGlobals.nullIfEmpty(edgeParameter.getValue()));
             jaxbCancel.getEdgeParameter().add(jaxbEdgeParameter);
         }
         setDirty(true);
         notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_CHANGED, "Cancelling edge changed: " + cancellingEdge.name));
-    }
-
-    /**
-     * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s the string toEventNode evaluate for nullity
-     * @return the passed string if non-zero length, else null
-     */
-    private String nullIfEmpty(String s) {
-        if (s != null) {
-            if (s.isEmpty()) {
-                s = null;
-            }
-        }
-        return s;
     }
 }

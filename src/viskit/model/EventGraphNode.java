@@ -1,5 +1,8 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
+import viskit.view.dialog.UserPreferencesDialog;
 import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
@@ -14,16 +17,18 @@ import viskit.xsd.bindings.assembly.SimEntity;
 
  An event as seen by the model (not the view)
  */
-public class EventGraphNode extends AssemblyNode {
-
+public class EventGraphNode extends AssemblyNode 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventGraphNode.class);
+	
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
     private   boolean operation;
-    private   String operationOrAssignment;
-    private   String indexingExpression;
-    private   String value;
-    private   String comment;
-    private   String description = new String();
+    private   String  operationOrAssignment;
+    private   String  indexingExpression;
+    private   String  value;
+    private   String  comment;
+    private   String  description = new String();
 
     EventGraphNode(String name, String type, String description) // package access on constructor
     {
@@ -43,8 +48,7 @@ public class EventGraphNode extends AssemblyNode {
         this.outputMarked = outputMarked;
     }
 
-    /** NOT USED
-     *
+    /** 
      * @return indication of the verbose checkbox selected for the entity
      * on the EventGraphNodeInspectorDialog
      */
@@ -54,34 +58,40 @@ public class EventGraphNode extends AssemblyNode {
 
     public void setVerboseMarked(boolean verboseMarked) {
         this.verboseMarked = verboseMarked;
+		// TODO set XML attribute
     }
 
     @Override
-    public void setName(String s) {
-        if (this.opaqueModelObject != null) {
-            ((SimEntity) opaqueModelObject).setName(s);
+    public void setName(String newName) 
+	{
+        if (this.opaqueModelObject != null) 
+		{
+            ((SimEntity) opaqueModelObject).setName(newName);
         }
-
-        super.setName(s);
+        super.setName(newName);
     }
 
     @Override
-    public String getIndexingExpression() {
+    public String getIndexingExpression() 
+	{
         return indexingExpression;
     }
 
     @Override
-    public String getValue() {
+    public String getValue() 
+	{
         return value;
     }
 
     @Override
-    public String getOperationOrAssignment() {
+    public String getOperationOrAssignment() 
+	{
         return operationOrAssignment;
     }
 
     @Override
-    public boolean isOperation() {
+    public boolean isOperation() 
+	{
         return operation;
     }
 

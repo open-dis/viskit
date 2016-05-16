@@ -35,6 +35,7 @@ package viskit.doe;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
+import edu.nps.util.LogUtilities;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
 
@@ -43,6 +44,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
+import org.apache.log4j.Logger;
+import viskit.model.EventGraphModelImpl;
 
 /**
  * Naval Postgraduate School, Monterey, CA
@@ -52,7 +55,13 @@ import javax.xml.bind.JAXBElement;
  * @since 4:13:25 PM
  * @version $Id$
  */
-public class ParameterTableModel extends DefaultTableModel implements TableModelListener {
+public class ParameterTableModel extends DefaultTableModel implements TableModelListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(ParameterTableModel.class);
+
+    Interpreter interpreter;
+    Map<String, Integer> terminalParameterHashMap = new HashMap<>();
+    List<Object> elementsByRow = new ArrayList<>();
 
     public static final int NUM_COLS = 6;
     public static String[] columnNames = {
@@ -78,28 +87,32 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
     /**
      *
      * @param simEntitiesJaxb
-     * @param designParamsJaxb
+     * @param terminalParametersJaxb
      */
-    public ParameterTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParamsJaxb) {
+    public ParameterTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> terminalParametersJaxb) 
+	{
         super(0, 0);
 
         initBeanShell();
         rows = new Vector<>();
 
         int i = 0;
-        for (SimEntity se : simEntitiesJaxb) {
-            if (!(se instanceof SimEntity)) {
-                System.err.println("Error ParamTableModel(), element not SimEntity");
+        for (SimEntity jaxbSimEntity : simEntitiesJaxb) 
+		{
+            if (!(jaxbSimEntity instanceof SimEntity)) 
+			{
+                LOG.error("Error ParameterTableModel(), element not SimEntity");
             }
-            processRow(se, "SimEntity_" + i++);
+            processRow(jaxbSimEntity, "SimEntity_" + i++);
         }
         mydata = rows.toArray(mydata);
-        if (designParamsJaxb != null) {
-            for (TerminalParameter tp : designParamsJaxb) {
-                if (!(tp instanceof TerminalParameter)) {
-                    System.err.println("Error ParamTableModel(), element not TerminalParameter");
+        if (terminalParametersJaxb != null) {
+            for (TerminalParameter terminalParameter : terminalParametersJaxb)
+			{
+                if (!(terminalParameter instanceof TerminalParameter)) {
+                    LOG.error("Error ParameterTableModel(), element not TerminalParameter");
                 }
-                processDesignParam(tp);
+                processDesignParam(terminalParameter);
             }
         }
         dirty = false;
@@ -107,37 +120,38 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
     }
 
     @Override
-    public void tableChanged(TableModelEvent e) {
-        if (viskit.ViskitStatics.debug) {
-            System.out.println("Sending paramlocally editted from ParamTableModel");
+    public void tableChanged(TableModelEvent e) 
+	{
+        if (viskit.ViskitStatics.debug)
+		{
+            LOG.info("Sending parameter locally edited from ParameterTableModel");
         }
         OpenAssembly.getInstance().doParamLocallyEdited(dummyListener);
     }
 
-    private void processDesignParam(TerminalParameter tp) {
+    private void processDesignParam(TerminalParameter terminalParameter) {
 
-        String nm = tp.getName();
-        if (nm.isEmpty()) {
-            System.err.println("Terminal param w/out name ref!");
+        String name = terminalParameter.getName();
+        if (name.isEmpty())
+		{
+            LOG.error("TerminalParameter without name!");
         }
 
-        if (termHashMap.get(nm) == null) {return;}
+        if (terminalParameterHashMap.get(name) == null) {return;}
         
-        int row = termHashMap.get(nm);
+        int row = terminalParameterHashMap.get(name);
 
-        String val = tp.getValue();
-        val = (val == null) ? "" : val;
-        setValueAt(val, row, VALUE_COLUMN);
+        String value = terminalParameter.getValue();
+        value = (value == null) ? "" : value;
+        setValueAt(value, row, VALUE_COLUMN);
 
-        JAXBElement<ValueRange> vr = tp.getValueRange();
+        JAXBElement<ValueRange> valueRange = terminalParameter.getValueRange();
 
-        setValueAt(vr.getValue().getLowValue(), row, MIN_COLUMN);
-        setValueAt(vr.getValue().getHighValue(), row, MAX_COLUMN);
+        setValueAt(valueRange.getValue().getLowValue(),  row, MIN_COLUMN);
+        setValueAt(valueRange.getValue().getHighValue(), row, MAX_COLUMN);
 
         setValueAt(true, row, FACTOR_COLUMN); //cb
     }
-
-    Interpreter interpreter;
 
     private void initBeanShell() {
         interpreter = new Interpreter();
@@ -150,154 +164,186 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
         ns.importPackage("simkit.util.*");
         ns.importPackage("diskit.*");         // 17 Nov 2004
     }
-    Map<String, Integer> termHashMap = new HashMap<>();
-    List<Object> elementsByRow = new ArrayList<>();
 
-    private void processRow(Object obj, String defaultName) {
-        Object[] oa = new Object[6];
+    private void processRow(Object object, String defaultName) 
+	{
+        Object[] objectArray = new Object[6];
 
-        if (obj instanceof SimEntity) {
-            SimEntity se = (SimEntity) obj;
-            String SEname = se.getName();
-            if (SEname == null || SEname.length() <= 0) {
-                SEname = defaultName;
+        if (object instanceof SimEntity) 
+		{
+            SimEntity simEntity = (SimEntity) object;
+            String SimEntityName = simEntity.getName();
+            if (SimEntityName == null || SimEntityName.length() <= 0) {
+                SimEntityName = defaultName;
             }
 
-            oa[NAME_COLUMN] = "<html><b>" + SEname;
+            objectArray[NAME_COLUMN] = "<html><b>" + SimEntityName;
 
-            String typ = se.getType();
-            typ = (typ == null ? "" : typ);
-            oa[TYPE_COLUMN] = "<html><b>" + loseDots(typ);
-            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
-            oa[FACTOR_COLUMN] = false;
-            rows.add(oa);
-            elementsByRow.add(obj);
+            String typeName = simEntity.getType();
+            typeName = (typeName == null ? "" : typeName);
+            objectArray[TYPE_COLUMN] = "<html><b>" + loseDots(typeName);
+            objectArray[VALUE_COLUMN] = objectArray[MIN_COLUMN] = objectArray[MAX_COLUMN] = "";
+            objectArray[FACTOR_COLUMN] = false;
+            rows.add(objectArray);
+            elementsByRow.add(object);
 
             noEditRows.add(rows.size() - 1);
 
-            List<Object> children = se.getParameters();
+            List<Object> simEntityParameters = simEntity.getParameters();
             int i = 1;
-            for (Object o : children) {
-                processRow(o, SEname + "_" + i++);
+            for (Object o : simEntityParameters)
+			{
+                processRow(o, SimEntityName + "_" + i++);
             }
-        } else if (obj instanceof TerminalParameter) {
-            TerminalParameter tp = (TerminalParameter) obj;
-            Object nameRefObj = tp.getLinkRef();
-            String tpname = defaultName;
-            if (nameRefObj != null) {
-                if (nameRefObj instanceof String) {
-                    tpname = (String) nameRefObj;
-                } else if (nameRefObj instanceof TerminalParameter) {
-                    tpname = ((TerminalParameter) nameRefObj).getName();
+        } 
+		else if (object instanceof TerminalParameter) 
+		{
+            TerminalParameter terminalParameter = (TerminalParameter) object;
+            Object objectReferenceName = terminalParameter.getLinkRef();
+            String terminalParameterName = defaultName;
+            if (objectReferenceName != null) 
+			{
+                if (objectReferenceName instanceof String) 
+				{
+                    terminalParameterName = (String) objectReferenceName;
+                } 
+				else if (objectReferenceName instanceof TerminalParameter) 
+				{
+                    terminalParameterName = ((TerminalParameter) objectReferenceName).getName();
                 }
-            } else if (tp.getName() != null && tp.getName().length() > 0) {
-                tpname = tp.getName();
+            } 
+			else if (terminalParameter.getName() != null && terminalParameter.getName().length() > 0) 
+			{
+                terminalParameterName = terminalParameter.getName();
             }
-            if (tpname == null) {
-                tpname = defaultName;
-            }
-
-            oa[NAME_COLUMN] = tpname;
-            String typ = tp.getType();
-            typ = (typ == null ? "" : typ);
-            oa[TYPE_COLUMN] = loseDots(typ);
-            String value = tp.getValue();
-            oa[VALUE_COLUMN] = (value == null ? "" : value);
-            oa[MIN_COLUMN] = oa[MAX_COLUMN] = ""; // will be editted or filled in from existing file
-            oa[FACTOR_COLUMN] = false;
-            rows.add(oa);
-            elementsByRow.add(obj);
-
-            termHashMap.put(tpname, rows.size() - 1);
-        } else if (obj instanceof MultiParameter) {
-            MultiParameter mp = (MultiParameter) obj;
-            String MPname = mp.getName();
-            if (MPname == null || MPname.length() <= 0) {
-                MPname = defaultName;
-            }
-            oa[NAME_COLUMN] = MPname;
-            String typ = mp.getType();
-            oa[TYPE_COLUMN] = loseDots(typ == null ? "" : typ);
-            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
-            oa[FACTOR_COLUMN] = false;
-            rows.add(oa);
-            elementsByRow.add(obj);
-
-            multiRows.add(rows.size() - 1);
-            List<Object> children = mp.getParameters();
-            int i = 1;
-            for (Object o : children) {
-                processRow(o, MPname + "_" + i++);
-            }
-        } else if (obj instanceof FactoryParameter) {
-            FactoryParameter fp = (FactoryParameter) obj;
-            String FPname = fp.getName();
-            if (FPname == null || FPname.length() <= 0) {
-                FPname = defaultName;
+            if (terminalParameterName == null) 
+			{
+                terminalParameterName = defaultName;
             }
 
-            oa[NAME_COLUMN] = FPname;
-            String typ = fp.getType();
-            oa[TYPE_COLUMN] = typ; //loseDots(typ)
-            oa[VALUE_COLUMN] = oa[MIN_COLUMN] = oa[MAX_COLUMN] = "";
-            oa[FACTOR_COLUMN] = false;
-            rows.add(oa);
-            elementsByRow.add(obj);
+            objectArray[NAME_COLUMN]   = terminalParameterName;
+            String typeName = terminalParameter.getType();
+            typeName = (typeName == null ? "" : typeName);
+            objectArray[TYPE_COLUMN]   = loseDots(typeName);
+            String value = terminalParameter.getValue();
+            objectArray[VALUE_COLUMN]  = (value == null ? "" : value);
+            objectArray[MIN_COLUMN]    = objectArray[MAX_COLUMN] = ""; // will be edited or filled in from existing file
+            objectArray[FACTOR_COLUMN] = false;
+            rows.add(objectArray);
+            elementsByRow.add(object);
+
+            terminalParameterHashMap.put(terminalParameterName, rows.size() - 1);
+        } 
+		else if (object instanceof MultiParameter) 
+		{
+            MultiParameter multiParameter = (MultiParameter) object;
+            String multiParameterName = multiParameter.getName();
+            if (multiParameterName == null || multiParameterName.length() <= 0) 
+			{
+                multiParameterName = defaultName;
+            }
+            objectArray[NAME_COLUMN] = multiParameterName;
+            String typeName = multiParameter.getType();
+            objectArray[TYPE_COLUMN]  = loseDots(typeName == null ? "" : typeName);
+            objectArray[VALUE_COLUMN]  = objectArray[MIN_COLUMN] = objectArray[MAX_COLUMN] = "";
+            objectArray[FACTOR_COLUMN] = false;
+            rows.add(objectArray);
+            elementsByRow.add(object);
 
             multiRows.add(rows.size() - 1);
-
-            List<Object> children = fp.getParameters();
+            List<Object> children = multiParameter.getParameters();
             int i = 1;
-            for (Object o : children) {
-                processRow(o, FPname + "_" + i++);
+            for (Object o : children) 
+			{
+                processRow(o, multiParameterName + "_" + i++);
             }
-        } else if (obj instanceof Coordinate) {
+        } 
+		else if (object instanceof FactoryParameter)
+		{
+            FactoryParameter factoryParameter = (FactoryParameter) object;
+            String factoryParameterName = factoryParameter.getName();
+            if (factoryParameterName == null || factoryParameterName.length() <= 0)
+			{
+                factoryParameterName  = defaultName;
+            }
+
+            objectArray[NAME_COLUMN]   = factoryParameterName;
+            String typeName            = factoryParameter.getType();
+            objectArray[TYPE_COLUMN]   = typeName; //loseDots(typ)
+            objectArray[VALUE_COLUMN]  = objectArray[MIN_COLUMN] = objectArray[MAX_COLUMN] = "";
+            objectArray[FACTOR_COLUMN] = false;
+            rows.add(objectArray);
+            elementsByRow.add(object);
+
+            multiRows.add(rows.size() - 1);
+
+            List<Object> children = factoryParameter.getParameters();
+            int i = 1;
+            for (Object o : children) 
+			{
+                processRow(o, factoryParameterName + "_" + i++);
+            }
+        } 
+		else if (object instanceof Coordinate) 
+		{
             // Do nothing
-        } else {
-            System.err.println("Error ParamTableModel.processRow, unknown type: " + obj);
+        } 
+		else 
+		{
+            LOG.error("Error ParameterTableModel.processRow, unknown type: " + object);
         }
     }
 
-    public Object getElementAtRow(int r) {
+    public Object getElementAtRow(int r) 
+	{
         return elementsByRow.get(r);
     }
 
-    public Object[] getRowData(int r) {
+    public Object[] getRowData(int r) 
+	{
         return mydata[r];
     }
 
-    private String loseDots(String typ) {
-        int dot = typ.lastIndexOf('.');
-        if (dot != -1) {
-            typ = typ.substring(dot + 1);
+    private String loseDots(String typeName) 
+	{
+        int dotIndex = typeName.lastIndexOf('.');
+        if (dotIndex != -1) 
+		{
+            typeName = typeName.substring(dotIndex + 1);
         }
-        return typ;
+        return typeName;
     }
 
     @Override
-    public int getColumnCount() {
+    public int getColumnCount() 
+	{
         return columnNames.length;
     }
 
     @Override
-    public int getRowCount() {
+    public int getRowCount() 
+	{
         return mydata == null ? 0 : mydata.length;
     }
 
     @Override
-    public String getColumnName(int col) {
+    public String getColumnName(int col) 
+	{
         return columnNames[col];
     }
 
     @Override
-    public Object getValueAt(int row, int col) {
+    public Object getValueAt(int row, int col) 
+	{
         return mydata[row][col];
     }
 
     @Override
-    public Class getColumnClass(int c) {
+    public Class getColumnClass(int classConstant)
+	{
         //return getValueAt(0, c).getClass();
-        switch (c) {
+        switch (classConstant)
+		{
             case NAME_COLUMN:
             case TYPE_COLUMN:
             case VALUE_COLUMN:
@@ -308,7 +354,7 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
                 return Boolean.class;
             default:
                 //assert false:"Column error in ParameterTableModel";
-                System.err.println("Column error in ParamTableModel");
+                LOG.error("Column error in ParameterTableModel");
         }
         return null;
     }
@@ -318,15 +364,18 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
      * editable.
      */
     @Override
-    public boolean isCellEditable(int row, int col) {
-        if (col == TYPE_COLUMN) {
+    public boolean isCellEditable(int row, int column)
+	{
+        if (column == TYPE_COLUMN)
+		{
             return false;
         }
         Integer rowKey = row;
-        if (noEditRows.contains(rowKey)) {
+        if (noEditRows.contains(rowKey))
+		{
             return false;
         }
-        return col <= TYPE_COLUMN || !multiRows.contains(rowKey);
+        return column <= TYPE_COLUMN || !multiRows.contains(rowKey);
     }
 
     /*
@@ -334,21 +383,25 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
      * data can change.
      */
     @Override
-    public void setValueAt(Object value, int row, int col) {
+    public void setValueAt(Object value, int row, int col)
+	{
         mydata[row][col] = value;
         dirty = true;
 
         fireTableCellUpdated(row, col);
     }
-    OpenAssembly.AssemblyChangeListener dummyListener = new OpenAssembly.AssemblyChangeListener() {
+    OpenAssembly.AssemblyChangeListener dummyListener = new OpenAssembly.AssemblyChangeListener() 
+	{
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) 
+		{
         }
 
         @Override
-        public String getHandle() {
-            return "Design of Experiments";
+        public String getHandle() 
+		{
+            return "Design of Experiments"; // TODO seems incorrect
         }
     };
 }

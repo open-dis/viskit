@@ -32,7 +32,6 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
-import static viskit.ViskitStatics.sendErrorReport;
 import viskit.jgraph.JGraphGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -43,133 +42,6 @@ import viskit.view.EventGraphView;
 import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.view.AssemblyEditView;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
-import static viskit.ViskitStatics.sendErrorReport;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -980,27 +852,42 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void remove () // method name must exactly match preceding string value
 	{
-        if (!selectionVector.isEmpty()) {
-            // first ask:
-            String msg = "";
-            int localNodeCount = 0;  // different msg for edge delete
-            for (Object o : selectionVector) {
-                if (o instanceof EventNode) {
-                    localNodeCount++;
+        if (!selectionVector.isEmpty())  // first ask:
+		{
+            String title   = "Remove element";
+			if (selectionVector.size() > 1)
+				   title += "s";
+			title += "?";
+			
+            String message = "<html><p>Confirm removal, please:</p>" + "<ul>";
+            int localNodeCount = 0;  // different message for edge delete
+			
+            for (Object o : selectionVector)
+			{
+				message += "<li>";
+                if (o instanceof EventNode)
+				{
+                     localNodeCount++;
+					 message += ((EventNode)o).getName() + " event";
                 }
-                String s = o.toString();
-                s = s.replace('\n', ' ');
-                msg += ", \n" + s;
+				else 
+				{
+					if      (o instanceof SchedulingEdge)
+						message +=       "SchedulingEdge ";
+					else if (o instanceof CancellingEdge)
+						message +=       "CancellingEdge ";
+					
+					message += "(" + o.toString().replace('\n', ' ')  + ")";
+				}
+				message += "</li>";
             }
-            if (msg.length() > 3) {
-                msg = msg.substring(3);
-            } // remove leading stuff
+			message += "</ul>";
+            String specialNodeMessage = (localNodeCount > 0) ? "<p>All unselected but attached edges will also be removed.</p>" : "";
 
-            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected/sattached edges are permanently removed.)" : "");
-            doRemove = ((EventGraphView) getView()).genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
-            if (doRemove) {
-                // do edges first?
-                delete();
+            doRemove = ((EventGraphView) getView()).genericAskYN(title, message + specialNodeMessage) == JOptionPane.YES_OPTION;
+            if (doRemove)
+			{
+                delete(); // do edges first?
             }
         }
     }
@@ -1542,10 +1429,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     XMLConfiguration historyXMLConfiguration;
 
     /** This is the very first caller for getViskitApplicationXMLConfiguration() upon Viskit startup */
-    private void initializeViskitConfiguration() {
+    private void initializeViskitConfiguration()
+	{
         try {
             historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
-        } catch (Exception e) {
+        } 
+		catch (Exception e) 
+		{
             LOG.error("Error loading history file: " + e.getMessage());
             LOG.warn ("Recent file saving disabled");
             historyXMLConfiguration = null;

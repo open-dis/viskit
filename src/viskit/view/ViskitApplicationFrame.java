@@ -48,7 +48,7 @@ import edu.nps.util.SystemExitHandler;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import viskit.EventGraphAssemblyComboMain;
+import viskit.ViskitEventGraphAssemblyComboMain;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
@@ -194,7 +194,7 @@ public class ViskitApplicationFrame extends JFrame {
 		// =============================================================================================
         // Event graph editor
 		
-        eventGraphViewFrame = (EventGraphViewFrame) ViskitGlobals.instance().buildEventGraphViewFrame();
+        eventGraphViewFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
         if (UserPreferencesDialog.isEventGraphEditorVisible())
 		{
             mainTabbedPane.add(eventGraphViewFrame.getContent());
@@ -212,7 +212,9 @@ public class ViskitApplicationFrame extends JFrame {
             mainMenuBar.add(eventGraphEditMenu);  // top level
 			
             tabIndices[TAB_EVENTGRAPH_EDITOR] = newTabIndex;
-        } else {
+        } 
+		else 
+		{
             tabIndices[TAB_EVENTGRAPH_EDITOR] = -1;
         }
 
@@ -322,10 +324,11 @@ public class ViskitApplicationFrame extends JFrame {
 		// duplicate entry, also on Projects submenu
 //		fileMenu.add(closeProjectMI); 
 		
-		final String QUIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically.
-		quitMenuItem = buildMenuItem(eventGraphController, QUIT_METHOD, "Exit", KeyEvent.VK_F4, KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcutKeyMask)); // do not change "quit"
+		final String QUIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically. // do not change "quit" !!
+		quitMenuItem = buildMenuItem(eventGraphController, QUIT_METHOD, "Exit Exit Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+		// TODO track down overriding quitMenuItem
+        jamQuitHandler(quitMenuItem, myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
         fileMenu.add(quitMenuItem); // TODO omit hotkey
-        jamQuitHandler(getQuitMenuItem(), myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
 
         // Now that we have an assemblyEditViewFrame reference, set the recent open project's file listener for the eventGraphFrame
         if (recentProjectFileSetListener == null) // remember rather than re-instantiate
@@ -563,34 +566,37 @@ public class ViskitApplicationFrame extends JFrame {
 //        }
 //    }
 
-    ActionListener myUserPreferencesHandler = new ActionListener() {
-
+    ActionListener myUserPreferencesHandler = new ActionListener() 
+	{
         @Override
         public void actionPerformed(ActionEvent e) {
             UserPreferencesDialog.showDialog(ViskitApplicationFrame.this);
         }
     };
 
-    private void jamQuitHandler(JMenuItem mi, Action quitAction, JMenuBar menuBar) {
-        if (mi == null) {
-            JMenu menu = menuBar.getMenu(0); // first menu
-            if (menu == null)
-			{
-                menu = new JMenu("File");
-                menuBar.add(menu);
-            }
-            menu.addSeparator();
-            mi = new JMenuItem("Exit");
-            mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-            menu.add(mi);
+    private void jamQuitHandler(JMenuItem quitMenuItem, Action quitAction, JMenuBar menuBar)
+	{
+        if (quitMenuItem == null)
+		{
+//            JMenu menu = menuBar.getMenu(0); // first menu
+//            if (menu == null)
+//			{
+//                menu = new JMenu("File");
+//                menuBar.add(menu);
+//            }
+//            menu.addSeparator();
+            quitMenuItem = new JMenuItem("Exit");
+//            menu.add(quitMenuItem);
         }
+		quitMenuItem.setMnemonic('x');
+		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
 
-        ActionListener[] actionListeners = mi.getActionListeners();
+        ActionListener[] actionListeners = quitMenuItem.getActionListeners();
         for (ActionListener actionListener : actionListeners)
 		{
-            mi.removeActionListener(actionListener);
+            quitMenuItem.removeActionListener(actionListener);
         }
-        mi.setAction(quitAction);
+        quitMenuItem.setAction(quitAction);
     }
 
     class ExitAction extends AbstractAction {
@@ -735,25 +741,29 @@ public class ViskitApplicationFrame extends JFrame {
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
-        Action a = ActionIntrospector.getAction(source, method);
+    private JMenuItem buildMenuItem(Object source, String methodName, String displayedName, Integer mnemonic, KeyStroke accelerator)
+	{
+        Action a = ActionIntrospector.getAction(source, methodName);
         Map<String, Object> map = new HashMap<>();
-        if (mn != null) {
-            map.put(Action.MNEMONIC_KEY, mn);
+        if (mnemonic != null)
+		{
+            map.put(Action.MNEMONIC_KEY, mnemonic);
         }
-        if (accel != null) {
-            map.put(Action.ACCELERATOR_KEY, accel);
+        if (accelerator != null) 
+		{
+            map.put(Action.ACCELERATOR_KEY, accelerator);
         }
-        if (name != null) {
-            map.put(Action.NAME, name);
+        if (displayedName != null)
+		{
+            map.put(Action.NAME, displayedName);
         }
-        if (!map.isEmpty()) {
+        if (!map.isEmpty())
+		{
             ActionUtilities.decorateAction(a, map);
         }
 		JMenuItem menuItem = ActionUtilities.createMenuItem(a);
 		// TODO get accelerator key to show :(
 		// menuItem.setAccelerator(KeyStroke.getKeyStroke(mn, accel));
-		
 
         return menuItem;
     }
@@ -846,7 +856,7 @@ public class ViskitApplicationFrame extends JFrame {
 	 * TODO expose this functionality on User Preferences
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfiguration.VISKIT_CONFIGURATION_DIR;
+        File dotViskit = ViskitConfiguration.USER_CONFIGURATION_DIRECTORY;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
@@ -855,9 +865,9 @@ public class ViskitApplicationFrame extends JFrame {
                 file.delete();
             }
             if (dotViskit.delete())
-                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
+                LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
 
-            LogUtilities.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+            LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
     }
 

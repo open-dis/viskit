@@ -864,8 +864,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setRecommendations(conRecRecsTA.getText());
     }
 
-    private void buildMenus() {
-
+    private void buildMenus()
+	{
         AnalystReportController analystReportController = (AnalystReportController) getController();
 
         int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -875,13 +875,13 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         analystReportMenu.setMnemonic(KeyEvent.VK_N);
 
         analystReportMenu.add(buildMenuItem(analystReportController,
-                "openAnalystReport",
+                AnalystReportController.OPEN_ANALYST_REPORT_METHOD,
                 "Open Previous Analyst Report",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
 
         JMenuItem saveMI = buildMenuItem(analystReportController,
-                "saveAnalystReport",
+                AnalystReportController.SAVE_ANALYST_REPORT_METHOD,
                 "Save Analyst Report",
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask));
@@ -890,24 +890,28 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
 		
         JMenuItem generateMI = buildMenuItem(analystReportController,
-                "generateHtmlReport",
+                AnalystReportController.GENERATE_ANALYST_REPORT_METHOD,
                 "Display Analyst Report",
                 KeyEvent.VK_D,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask));
         saveMI.setToolTipText("Save Analyst Report as HTML page");
         analystReportMenu.add(generateMI);
 
-        JMenuItem viewMI = new JMenuItem("View analyst report XML");
-        viewMI.setMnemonic(KeyEvent.VK_V);
-        viewMI.setToolTipText("Currently not implemented");
-        viewMI.setEnabled(false); // TODO:  implement listener and view functionality
-        analystReportMenu.add(viewMI);
+        JMenuItem viewAnalystReportXmlMI = buildMenuItem(analystReportController,
+                AnalystReportController.VIEW_ANALYST_REPORT_XML_METHOD,
+				"View analyst report XML",
+                KeyEvent.VK_X,
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask));
+        viewAnalystReportXmlMI.setEnabled(false); // TODO:  implement listener and view functionality
+        viewAnalystReportXmlMI.setToolTipText("TODO future capability");
+        analystReportMenu.add(viewAnalystReportXmlMI);
 
         myMenuBar.add(analystReportMenu);
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel)
+	{
         Action a = ActionIntrospector.getAction(source, method);
         Map<String, Object> map = new HashMap<>();
         if (mn != null) {

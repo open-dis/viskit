@@ -89,15 +89,14 @@ public class ViskitStatics
     public static boolean debug = true; // TODO expose?
 
     /* Commonly used class names */
-    public static final String RANDOM_NUMBER_CLASS = "simkit.random.RandomNumber";
+    public static final String RANDOM_NUMBER_CLASS  = "simkit.random.RandomNumber";
     public static final String RANDOM_VARIATE_CLASS = "simkit.random.RandomVariate";
     public static final String RANDOM_VARIATE_FACTORY_CLASS = RANDOM_VARIATE_CLASS + "Factory";
     public static final String RANDOM_VARIATE_FACTORY_DEFAULT_METHOD = "getInstance";
     public static final String SIMPLE_PROPERTY_DUMPER = "simkit.util.SimplePropertyDumper";
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
-    public static final String JAVA_LANG_STRING = "java.lang.String";
-    public static final String JAVA_LANG_OBJECT = "java.lang.Object";
-    public static final String VISKIT_MAILING_LIST = "viskit@www.movesinstitute.org";
+    public static final String JAVA_LANG_STRING  = "java.lang.String";
+    public static final String JAVA_LANG_OBJECT  = "java.lang.Object";
 	
     public static final String TOOLTIP_EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success, red = modifications need saving or compile failure";
     public static final String DEFAULT_DESCRIPTION       = "TODO add description"; // better to nag than ignore
@@ -288,55 +287,72 @@ public class ViskitStatics
     /**
      * Call this method to instantiate a class representation of an entity.  We'll try first
      * the "standard" classpath-classloader, then try to instantiate any that were loaded by file.
-     * @param s the name of the class to instantiate
+     * @param className the name of the class to instantiate
      * @return an instantiated class given by s if available from the loader
      */
-    public static Class<?> classForName(String s) {
+    public static Class<?> classForName(String className)
+	{
+        Class<?> classRetrieved = classFromName(className, ViskitGlobals.instance().getWorkClassLoader());
 
-        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkClassLoader());
-
-        if (c == null) {
-            c = tryUnqualifiedName(s);
+        if (classRetrieved == null) // check if found, retry if needed
+		{
+            classRetrieved = tryUnqualifiedName(className);
         }
-
-        if (c == null) {
-            c = FileBasedClassManager.instance().getFileClass(s);
+        if (classRetrieved == null)  // check if found, retry if needed
+		{
+            classRetrieved = FileBasedClassManager.instance().getFileClass(className);
         }
-
-        return c;
+        if (classRetrieved == null)  // check if found, report if not
+		{
+            LOG.error("classForName(" + className + ") unsuccessful");
+        }
+        return classRetrieved;
     }
 
     /** Convenience method in a series of chains for resolving a class that is
      * hopefully on the classpath
      *
-     * @param s the name of the class to search for
-     * @param clsLoader the class loader to search
+     * @param className the name of the class to search for
+     * @param classLoader the class loader to search
      * @return an instantiated class object from the given name
      */
-    static Class<?> cForName(String s, ClassLoader clsLoader) {
-        Class<?> c = null;
+    static Class<?> classFromName(String className, ClassLoader classLoader) 
+	{
+        Class<?> classRetrieved = null;
         try {
-            c = Class.forName(s, false, clsLoader);
-        } catch (ClassNotFoundException e) {
-            c = tryPrimsAndArrays(s, clsLoader);
-            if (c == null) {
-                c = tryCommonClasses(s, clsLoader);
-                if (c == null) {
+            classRetrieved = Class.forName(className, false, classLoader);
+        } 
+		catch (ClassNotFoundException e) 
+		{
+            classRetrieved = tryPrimsAndArrays(className, classLoader);
+            if (classRetrieved == null) 
+			{
+                classRetrieved = tryCommonClasses(className, classLoader);
+                if (classRetrieved == null) 
+				{
                     try {
-                        c = ViskitGlobals.instance().getWorkClassLoader().loadClass(s);
-                    } catch (ClassNotFoundException cnfe) {
+                        classRetrieved = ViskitGlobals.instance().getWorkClassLoader().loadClass(className);
+                    } 
+					catch (ClassNotFoundException cnfe) 
+					{
                         // sometimes happens, ignore
                     }
                 }
             }
-        } catch (NoClassDefFoundError e) {
+        } 
+		catch (NoClassDefFoundError e) 
+		{
+			String title   = "Missing: " + e.getMessage();
+			String message = "Please make sure that the library for: " + className
+                            + "\nis in the project classpath, then restart Viskit";
+			
             ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageToUser(
                     JOptionPane.ERROR_MESSAGE,
-                    "Missng: " + e.getMessage(),
-                    "Please make sure that the library for: " + s
-                            + "\nis in the project classpath, then restart Viskit");
+                    title, message);
+			LOG.error (title);
+			LOG.error (message);
         }
-        return c;
+        return classRetrieved;
     }
 
     static class retrnChar {
@@ -547,20 +563,20 @@ public class ViskitStatics
         return System.getProperty("file.separator");
     }
 
-    static Map<String, List<Object>[]> parameterMap = new HashMap<>();
+    static Map<String, List<Object>[]> parameterHashMap = new HashMap<>();
 
     /**
      * For the given class type Event Graph, record its specific ParameterMap
      * @param typeName the Event Graph class name
      * @param parameterMapObjectArray a List of parameter map object arrays
      */
-    static public void putParameterList(String typeName, List<Object>[] parameterMapObjectArray)
+    static public void putParameterListInHashMap(String typeName, List<Object>[] parameterMapObjectArray)
 	{
         if (debug) {
-            System.out.println("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
+            LOG.info("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
         }
-        parameterMap.remove(typeName); // ensure correct
-        parameterMap.put(typeName, parameterMapObjectArray);
+        parameterHashMap.remove(typeName); // ensure correct
+        parameterHashMap.put(typeName, parameterMapObjectArray);
     }
 
     /** Checks for and return a varargs type as an array, or the original type
@@ -579,72 +595,73 @@ public class ViskitStatics
     }
 
     /**
-     * For the given Event Graph class type, return its specific ParameterMap contents
+     * For the given Event Graph class type, return its specific ParameterMap contents using reflection techniques.
      *
-     * @param type the Event Graph class type to resolve
+     * @param eventGraphType the Event Graph class type to resolve
      * @return a List of parameter map object arrays
      */
-    static public List<Object>[] resolveParameters(Class<?> type)
+    static public List<Object>[] resolveParametersUsingReflection(Class<?> eventGraphType)
 	{
-		if (type == null)
+		if (eventGraphType == null)
 			return null;
 		
         List<Object>[] resolvedParameterList = null;
 		
 		// test
-		if ((parameterMap != null) && (type.getName() != null) && (parameterMap.get(type.getName()) != null))
+		if ((parameterHashMap != null) && (eventGraphType.getName() != null) && (parameterHashMap.get(eventGraphType.getName()) != null))
 		{
-			resolvedParameterList = parameterMap.get(type.getName());
-			System.out.println("parameters already resolved");
-			// TODO confirm OK, are we all done?
+			resolvedParameterList = parameterHashMap.get(eventGraphType.getName());
+			LOG.info("parameters already resolved"); // TODO confirm OK, are we all done?
 		}
 		
         if (resolvedParameterList == null)
 		{
-            Constructor<?>[] constructors = type.getConstructors(); // reflection
-            Annotation[] parameterAnnotations;
-            List<Object>[] parameterList = GenericConversion.newListObjectTypeArray(List.class, constructors.length);
-            ObjectFactory objectFactory = new ObjectFactory();
-            Field field = null;
+            Constructor<?>[] reflectionConstructors  = eventGraphType.getConstructors(); // reflection
+            List<Object>[]   reflectionParameterList = GenericConversion.newListObjectTypeArray(List.class, reflectionConstructors.length);
+            Annotation[]     reflectionParameterAnnotations;
+			
+            ObjectFactory jaxbObjectFactory = new ObjectFactory();
+            Field jaxbField = null;
 
             try {
-                field = type.getField("parameterMap");
+                jaxbField = eventGraphType.getField("parameterMap"); // TODO confirm correct name, are we finding it?
             } 
 			catch (SecurityException ex)
 			{
-                LOG.error(ex);
+                LOG.error("SecurityException when accessing parameterMap: " + ex);
             }
 			catch (NoSuchFieldException ex)
 			{
-				// null result for creating field
+				// null result for creating field; keep looknig
 			}
 
             if (viskit.ViskitStatics.debug)
 			{
-                System.out.println("adding " + type.getName());
-                System.out.println("\t # constructors: " + constructors.length);
+                LOG.info("adding " + eventGraphType.getName());
+                LOG.info("\t # constructors: " + reflectionConstructors.length);
             }
 
-            for (int i = 0; i < constructors.length; i++)
+            for (int i = 0; i < reflectionConstructors.length; i++)
 			{
-                Class<?>[] parameterTypes = constructors[i].getParameterTypes();
-                parameterAnnotations      = constructors[i].getDeclaredAnnotations();
-                parameterList[i] = new ArrayList<>();
-                if (viskit.ViskitStatics.debug) {
-                    LOG.info("\tparameter count=" + parameterTypes.length + " in constructor " + i);
+                Class<?>[] reflectionParameterClassTypes  = reflectionConstructors[i].getParameterTypes();
+                           reflectionParameterAnnotations = reflectionConstructors[i].getDeclaredAnnotations();
+                reflectionParameterList[i] = new ArrayList<>();
+                if (viskit.ViskitStatics.debug) 
+				{
+                    LOG.info("\tparameter count=" + reflectionParameterClassTypes.length + " in constructor " + i);
                 }
 
-                // possible that a class inherited an annotated parameterMap, check that first
-                if (parameterAnnotations != null && parameterAnnotations.length > 0)
+                // possible that a class inherited an annotated parameterHashMap, check that first
+                if (    reflectionParameterAnnotations != null &&     reflectionParameterAnnotations.length > 0)
 				{
-                    if (parameterAnnotations.length > 1)
+                    if (    reflectionParameterAnnotations.length > 1)
 					{
-						String message = "Only one Annotation allowed per constructor, found " + parameterAnnotations.length;
+						String message = "Only one Annotation allowed per constructor, found " +     reflectionParameterAnnotations.length;
 						LOG.error (message);
                         throw new RuntimeException(message);
                     }
 
-                    ParameterMap annotationParameterMap = constructors[i].getAnnotation(viskit.ParameterMap.class);
+                    ParameterMap annotationParameterMap = reflectionConstructors[i].getAnnotation(viskit.ParameterMap.class);
                     if (annotationParameterMap != null)
 					{
                         String[] names        = annotationParameterMap.names();
@@ -656,20 +673,21 @@ public class ViskitStatics
                         }
                         for (int k = 0; k < names.length; k++)
 						{
-                            Parameter parameter = objectFactory.createParameter();
+                            Parameter parameter = jaxbObjectFactory.createParameter();
                             parameter.setName(names[k]);
                             parameter.setType(types[k]);
                             parameter.setDescription(descriptions[k]);
 
-                            parameterList[i].add(parameter);
+                            reflectionParameterList[i].add(parameter);
                         }
                     }
 
                 } 
-				else if (field != null) // known
+				else if (jaxbField != null) // known field
 				{
-                    if (viskit.ViskitStatics.debug) {
-                        System.out.println(field + " is a parameterMap");
+                    if (viskit.ViskitStatics.debug)
+					{
+                        LOG.info(jaxbField + " is a parameterMap");
                     }
                     try {
                         // parameters are in the following order
@@ -678,7 +696,7 @@ public class ViskitStatics
                         //  { "type0","name0", ... }
                         //  ...
                         // }
-                        String[][] parameterMap = (String[][]) (field.get(new String[0][0]));
+                        String[][] parameterMap = (String[][]) (jaxbField.get(new String[0][0]));
                         int constructorCount = parameterMap.length;
 						// TODO check that constructorCount == constr.length
 
@@ -686,11 +704,11 @@ public class ViskitStatics
 						{
                             String[] parameterValueArray = parameterMap[n];
                             if (parameterValueArray != null) {
-                                parameterList[n] = new ArrayList<>();
+                                reflectionParameterList[n] = new ArrayList<>();
                                 for (int k = 0; k < parameterValueArray.length; k += 2)
 								{
                                     try {
-                                        Parameter parameter = objectFactory.createParameter();
+                                        Parameter parameter = jaxbObjectFactory.createParameter();
                                         String parameterTypeName    = parameterValueArray[k];
                                         String parameterName        = parameterValueArray[k + 1];
                                         String parameterDescription = DEFAULT_DESCRIPTION; // TODO fix
@@ -699,10 +717,10 @@ public class ViskitStatics
                                         parameter.setType       (parameterTypeName);
                                         parameter.setDescription(parameterDescription);
 
-                                        parameterList[n].add(parameter);
+                                        reflectionParameterList[n].add(parameter);
                                         if (viskit.ViskitStatics.debug)
 										{
-                                            System.out.println("\tfrom compiled parameterMap: " + parameter.getName() + " " + parameter.getType());
+                                            LOG.info("\tfrom compiled parameterMap: " + parameter.getName() + " " + parameter.getType());
                                         }
                                     } catch (Exception ex) {
                                         LOG.error(ex);
@@ -717,14 +735,14 @@ public class ViskitStatics
                         LOG.error(ex);
                     }
                 } 
-				else // unknowns
+				else // unknown field
 				{
                     int k = 0;
-                    for (Class<?> parameterType : parameterTypes)
+                    for (Class<?> reflectionParameterClassType : reflectionParameterClassTypes)
 					{
                         try {
-                            Parameter newParameter = objectFactory.createParameter();
-                            String newParameterTypeName = ViskitStatics.convertClassName(parameterType.getName());
+                            Parameter newParameter = jaxbObjectFactory.createParameter();
+                            String newParameterTypeName = ViskitStatics.convertClassName(reflectionParameterClassType.getName());
                             if (newParameterTypeName.indexOf(".class") > 0)
 							{
                                 newParameterTypeName = newParameterTypeName.substring(0,newParameterTypeName.indexOf(".class")); // omit .class from type name
@@ -733,14 +751,14 @@ public class ViskitStatics
 							String newParameterDescription = DEFAULT_DESCRIPTION; // better to nag than ignore
 
                             // Not sure what use a name like this is for PCLs
-                            newParameter.setName("parameter[" + k++ + "]");
+                            newParameter.setName("parameter[" + k++ + "]"); // TODO can't reflection get method name?
                             newParameter.setType(newParameterTypeName);
                             newParameter.setDescription(newParameterDescription);
 							
-                            parameterList[i].add(newParameter);
+                            reflectionParameterList[i].add(newParameter);
                             if (viskit.ViskitStatics.debug)
 							{
-                                System.out.println("\t " + newParameter.getName() + newParameter.getType());
+                                LOG.info("\t " + newParameter.getType() + " " + newParameter.getName());
                             }
                         } 
 						catch (Exception ex)
@@ -750,8 +768,8 @@ public class ViskitStatics
                     }
                 }
             }
-            putParameterList(type.getName(), parameterList);
-            resolvedParameterList = parameterList;
+            putParameterListInHashMap(eventGraphType.getName(), reflectionParameterList);
+            resolvedParameterList = reflectionParameterList;
         }
         return resolvedParameterList;
     }
@@ -769,11 +787,11 @@ public class ViskitStatics
     }
 
     /**
-     * Strips out the array brackets and replaces with ...
-     * @param s the string to make varargs
-     * @return a varargs type
+     * Strips out the array brackets [] and replaces with vararg ellipsis ...
+     * @param s the string to make into varargs form, if applicable
+     * @return original or modified string
      */
-    public static String makeVarArgs(String s) {
+    public static String applyVarArgSymbol(String s) {
 
         // Show varargs symbol vice []
         if (s.contains("[]")) {
@@ -819,7 +837,7 @@ public class ViskitStatics
                     return 0;
                 } else {
                     if (debug) {
-                        System.out.println(constrs.length);
+                        LOG.info(constrs.length);
                     }
                     return constrs.length;
                 }
@@ -865,7 +883,7 @@ public class ViskitStatics
                     if (event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED))
 					{
                         if (showLog)
-                            Desktop.getDesktop().browse(ViskitConfiguration.V_DEBUG_LOG.toURI());
+                            Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_DEBUG_LOG.toURI());
 
                         Desktop.getDesktop().mail(url.toURI()); // mail invoked second, thus goes on top
                     }
@@ -903,22 +921,22 @@ public class ViskitStatics
 			String mailtoString = new String();
             try {
 				// http://stackoverflow.com/questions/326390/how-do-i-create-a-java-string-from-the-contents-of-a-file
-				byte[] encoded = Files.readAllBytes(Paths.get(ViskitConfiguration.V_DEBUG_LOG.getPath()));
+				byte[] encoded = Files.readAllBytes(Paths.get(ViskitConfiguration.VISKIT_DEBUG_LOG.getPath()));
 				String logText = new String (encoded);
-                mailtoUrl = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
+                mailtoUrl = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20execution%20trouble%20report&body=Please%20describe%20what%20happened:%0D%0A%0D%0ATo%20help%20debug,%20also%20please%20copy%20and%20paste%20log%20output:%0D%0A%0D%0A"
 //						+ logText // not working, probably clobbers mailer
 				);
 				
-				mailtoString = "<a href=\"" + mailtoUrl.toString()+ "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a>";
+				mailtoString = "<a href=\"" + mailtoUrl.toString()+ "\">" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a>";
             } 
 			catch (Exception ex) 
 			{
-                LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(ex);
+                LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).error(ex);
 			}
             String message = "<html>"
 					+ "<p align='center'>" + preamble + ViskitStatics.RECENTER_SPACING + "</p>"
-//                  + "<p align='center'>Execution LOG details are available at " + ViskitConfiguration.V_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
+//                  + "<p align='center'>Execution LOG details are available at " + ViskitConfiguration.VISKIT_DEBUG_LOG.getPath() + ViskitStatics.RECENTER_SPACING + "</p>"
                     + "<p align='center'>Please view and email the session log to " 
 					  + "<i>" + mailtoString  + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
 					+ "<p align='center'>Click the link above to draft an email, then copy &amp; paste the log's contents." + ViskitStatics.RECENTER_SPACING + "</p>"

@@ -66,7 +66,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.view.AssemblyEditView;
-import static viskit.ViskitConfiguration.VISKIT_CONFIGURATION_DIR;
+import static viskit.ViskitConfiguration.USER_CONFIGURATION_DIRECTORY;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -126,7 +126,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		// check if prior project was open, if so then open it
 		String projectStatus = "false";
 		if (ViskitConfiguration.instance() != null)
-			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY);
+			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY); // might return null if not found
 		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
 		{
 			String projectName = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
@@ -135,27 +135,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
 			File projectDirectory = new File (projectPath);
 			if (projectDirectory.isDirectory())
-				openProjectDirectory (projectDirectory);
-		
-			// TODO there are two variations of this block, refactor/combine
-			if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
 			{
-				// TODO re-open previously open assemblies and event graphs, otherwise:
-			
-				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p align='center'>&nbsp;</p>" +
-							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING + "</p>"  +
-							"<p align='center'>&nbsp;</p></html>");
+				openProjectDirectory (projectDirectory);
+				reportProjectOpenResult (projectName);
 			}
 			else
 			{
-				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
-					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>" + 
-					"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
+				LOG.error ("No known project path to open");
 				return;
 			}
 		}
@@ -184,6 +170,35 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
         updateAssemblyFileLists();
     }
+	
+	/**
+	 * Report on success or failure of Project Open to user
+	 * @param projectName name of original attempt, used in case of failure to open
+	 */
+	public void reportProjectOpenResult (String projectName)
+	{
+			// TODO there are two variations of this block, refactor/combine
+			if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+			{
+				// TODO re-open previously open assemblies and event graphs, otherwise:
+			
+				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
+					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
+							"<p align='center'>&nbsp;</p>" +
+							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING + "</p>"  +
+							"<p align='center'>&nbsp;</p></html>");
+			}
+			else
+			{
+				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
+					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p>&nbsp</p>" + 
+					"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p>&nbsp</p>");
+				return;
+			}
+	}
 	
     public List<File> getOpenAssemblyFileList()
 	{
@@ -515,7 +530,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         recentProjectListeners.remove(listener);
     }
 
-    private void notifyRecentProjectFileListeners() {
+    private void notifyRecentProjectFileListeners()
+	{
         for (mvcRecentFileListener listener : recentProjectListeners)
 		{
             listener.listChanged();
@@ -810,11 +826,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 try {
                     // First, copy the README.txt file to the project dir
-                    Files.copy(ViskitConfiguration.VISKIT_README_FILE.toPath(), 
-							   (new File (logFile.getParentFile().getPath() + File.separatorChar + ViskitConfiguration.VISKIT_README_FILE.getName())).toPath(), 
+                    Files.copy(ViskitConfiguration.USER_README_FILE.toPath(), 
+							   (new File (logFile.getParentFile().getPath() + File.separatorChar + ViskitConfiguration.USER_README_FILE.getName())).toPath(), 
 							   StandardCopyOption.REPLACE_EXISTING);
                     // Next, copy the debug.LOG to the project dir
-                    Files.copy(ViskitConfiguration.V_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(ViskitConfiguration.VISKIT_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projectDirectory, projectArchiveZip);
 
                     try // open directory holding the .zip so that use can select, drag and mail it
@@ -844,7 +860,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					String urlString = "[not found]";
                     try // launch email
 					{
-                        url = new URL("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
+                        url = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Archive%20for%20"
                                 + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached...");
 						urlString =  url.toString();
@@ -852,10 +868,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         LOG.error(e);
                     }
 
-                    String message = "<html><p align='center'>Select <a href=\"" + urlString + "\">email link</a> to attach and send project zip archive </p>" 
+                    String message = "<html><p align='center'>Select this <a href=\"" + urlString + "\">email link</a> to attach and send the project zip archive </p>" 
 							+ "<p align='center'><i>" + projectArchiveZip.getParent() + File.separatorChar + projectArchiveZip.getName() + "</i> </p>"
                             + "<p align='center'> to mailing list <i>"
-                            + ViskitStatics.VISKIT_MAILING_LIST + "</i> or whomever you want.</p>";
+                            + ViskitConfiguration.VISKIT_MAILING_LIST + "</i> (or whomever you want).</p>";
 
                     ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, message, false);
 
@@ -1481,23 +1497,32 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void remove () // method name must exactly match preceding string value
 	{
-        if (!selectionVector.isEmpty()) {
-            // first ask:
-            String msg = "";
-            int nodeCount = 0;  // different msg for edge delete
-            for (Object o : selectionVector) {
-                if (o instanceof AssemblyNode) {
-                    nodeCount++;
+        if (!selectionVector.isEmpty()) // first ask:
+		{
+            String title   = "Remove element";
+			if (selectionVector.size() > 1)
+				   title += "s";
+			title += "?";
+			
+            String message = "<html><p>Confirm removal, please:</p>" + "<ul>";
+            int localNodeCount = 0;  // different message for edge delete
+            for (Object o : selectionVector)
+			{
+				message += "<li>";
+                if (o instanceof AssemblyNode)
+				{
+                     localNodeCount++;
+					 message += ((AssemblyNode)o).getName() + " (" + o.toString().replace('\n', ' ')  + ")";
                 }
-                String s = o.toString();
-                s = s.replace('\n', ' ');
-                msg += ", \n" + s;
+                else message +=                                "(" + o.toString().replace('\n', ' ')  + ")"; // any other element types?
+				message += "</li>";
             }
-            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
-            doRemove = ((AssemblyEditView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
-            if (doRemove) {
-                // do edges first?
-                delete();
+			message += "</ul>";
+            String specialNodeMessage = (localNodeCount > 0) ? "<p>All unselected but attached edges will also be removed.</p>" : "";
+            doRemove = ((AssemblyEditView) getView()).genericAskYN(title, message + specialNodeMessage) == JOptionPane.YES_OPTION;
+            if (doRemove) 
+			{
+                delete(); // TODO edges first?
             }
         }
     }
@@ -1831,14 +1856,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if (!xmlValidationTool.isValidXML())
 		{
-			String message = simkitXML2Java.getEventGraphFile().getName() + " is not valid XML, see log console";
+			String message = simkitXML2Java.getEventGraphFile().getName() + " event graph is not schema-valid XML. View model, view source and compile to debug.";
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					" Invalid Event Graph XML", 
 					message);
 			LOG.error(message);
             return null;
-        } else {
-            LOG.info(simkitXML2Java.getEventGraphFile() + " is valid XML");
+        } 
+		else 
+		{
+            LOG.info(simkitXML2Java.getEventGraphFile().getName() + " event graph is schema-valid XML");
         }
 
         try {
@@ -1846,8 +1873,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         } 
 		catch (Exception e)
 		{
-			String message = "Error building Java from " + simkitXML2Java.getFileBaseName() +
-                             ":\n" + e.getMessage() + ", erroneous event-graph XML found";
+			String message = "Error building Java source code from " + simkitXML2Java.getFileBaseName() +
+                             " model:\n" + e.getMessage() + ", erroneous event-graph XML found." + 
+							 "Review the XML model, view Java source, and view the source compilation to debug.";
 			messageToUser(JOptionPane.ERROR_MESSAGE, 
 					"Failed Event Graph conversion to Java",
 					message);
@@ -1958,22 +1986,24 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    public PackageAndFile createTemporaryEventGraphClass(File xmlFile) {
-        PackageAndFile paf = null;
+    public PackageAndFile createTemporaryEventGraphClass(File xmlFile)
+	{
+        PackageAndFile packageAndFile = null;
         try {
-            SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
-            x2j.unmarshal();
+            SimkitXML2Java xml2java = new SimkitXML2Java(xmlFile);
+            xml2java.unmarshal();
 
-            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
+            boolean isEventGraph = xml2java.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph)
 			{
-                LOG.debug("Is an Assembly: " + !isEventGraph);
+                LOG.debug(xmlFile.getName() + "is an Assembly: " + !isEventGraph);
                 return null;
             }
-            String sourceCode = buildJavaEventGraphSource(x2j);
+            String sourceCode = buildJavaEventGraphSource(xml2java);
 
             /* Warn that we may have forgotten a parameter required for a super class */
-            if (sourceCode == null) {
+            if (sourceCode == null)
+			{
                 String message = xmlFile + " did not compile.\n" +
                         "Please check that you have provided initialization parameters in the \n" +
                         "identical order declared by any super classes";
@@ -1986,29 +2016,35 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
 
             // If using plain Vanilla Viskit, don't compile diskit extended EGs
-            // as diskit.jar won't be available
+            // as diskit.jar won't be available  TODO confirm
             String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader()).getClassPath();
             boolean foundDiskit = false;
-            for (String path : classPath) {
+            for (String path : classPath)
+			{
                 if (path.contains("diskit.jar")) {
                     foundDiskit = !foundDiskit;
                     break;
                 }
             }
 
-            if (sourceCode.contains("diskit") && !foundDiskit) {
+            if (sourceCode.contains("diskit") && !foundDiskit) 
+			{
                 FileBasedClassManager.instance().addCacheMiss(xmlFile);
 
                 // TODO: Need to announce/recommend to the user to place
                 // diskit.jar in the classpath, then restart Viskit
-            } else {
-                paf = compileJavaClassAndSetPackage(sourceCode);
+            } 
+			else 
+			{
+                packageAndFile = compileJavaClassAndSetPackage(sourceCode);
             }
-        } catch (FileNotFoundException e) {
-            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage());
+        } 
+		catch (FileNotFoundException e) 
+		{
+            LOG.error("Error creating Java class file from " + xmlFile + "\n" + e.getMessage());
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
-        return paf;
+        return packageAndFile;
     }
 
     /** Path for EventGraph and Assembly compilation
@@ -2016,19 +2052,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param sourceCode the raw source to write to file
      * @return a package and file pair
      */
-    private PackageAndFile compileJavaClassAndSetPackage(String sourceCode) {
+    private PackageAndFile compileJavaClassAndSetPackage(String sourceCode) 
+	{
         String packageName = new String();
-        if (sourceCode != null && !sourceCode.isEmpty()) {
+        if (sourceCode != null && !sourceCode.isEmpty())
+		{
             Pattern p = Pattern.compile("package.*;");
             Matcher m = p.matcher(sourceCode);
-            if (m.find()) {
+            if (m.find()) 
+			{
                 String nuts = m.group();
                 if (nuts.endsWith(";")) {
                     nuts = nuts.substring(0, nuts.length() - 1);
                 }
-
                 String[] sa = nuts.split("\\s");
-                packageName = sa[1];
+                packageName = sa[1]; // TODO confirm
             }
             File f = compileJavaClassFromString(sourceCode);
             if (f != null)
@@ -2062,7 +2100,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         String sourceCode = produceJavaAssemblyClass(); // asks to save
 
         PackageAndFile packageAndFile = compileJavaClassAndSetPackage(sourceCode);
-        if (packageAndFile != null) {
+        if (packageAndFile != null) 
+		{
             File f = packageAndFile.file;
             String className = f.getName().substring(0, f.getName().indexOf('.'));
             className = packageAndFile.pkg + "." + className;
@@ -2070,7 +2109,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String classPath = ""; // no longer necessary since we don't invoke Runtime.exec to compile anymore
 
             executionParameters = buildExecutionParameterArray(className, classPath);
-        } else {
+        }
+		else
+		{
             executionParameters = null;
         }
     }
@@ -2085,7 +2126,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void compileAssemblyAndPrepareSimulationRunner () // method name must exactly match preceding string value
 	{
-
         // Prevent multiple pushes of the initialize Simulation Run button
         mutex++;
         if (mutex > 1) {
@@ -2119,11 +2159,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 if (executionParameters == null) 
 				{
-                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
+                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
+					{
                         messageToUser(JOptionPane.WARNING_MESSAGE,
                             "No Assembly file is active",
                             "Please open an Assembly file before running a simulation");
-                    } else {
+                    } 
+					else 
+					{
                         String message = "<html>" + 
 								         "<p align='center'>Runtime error: no executionParameters found." + ViskitStatics.RECENTER_SPACING + "</p>" + 
 								         "<p>&nbsp</p>" +

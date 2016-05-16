@@ -85,7 +85,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public final static int SELF_REF_CANCEL_MODE = 5;
 
     private static final String FRAME_DEFAULT_TITLE = "Event Graph Editor";
-    private static final String LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel();;
+    private static       String LOOK_AND_FEEL;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar      toolBar;    // Mode buttons on the toolbar
@@ -129,6 +129,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public EventGraphViewFrame(mvcController controller)
 	{
         super(FRAME_DEFAULT_TITLE);
+		LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel(); // don't initialize until run time
         initializeMVC(controller); // set up mvc linkages
         initializeUserInterface(); // build widgets
     }
@@ -428,7 +429,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel, BoxLayout.X_AXIS));
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
 
-        JLabel titleLabel = new JLabel("Event Graph Parameters");
+        JLabel titleLabel = new JLabel("Event Graph Initialization Parameters");
+		titleLabel.setToolTipText("Event Graph instances get initialized when configured in an Assembly");
 
         eventGraphParametersSubpanel.add(titleLabel);
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
@@ -808,12 +810,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		boolean isProjectOpen = false;
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null) // viskit may be starting with no project open
 			isProjectOpen = ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen();
-		
 		if (ViskitGlobals.instance().getViskitApplicationFrame() != null)
 			ViskitGlobals.instance().getViskitApplicationFrame().refreshCloseProjectMI (isProjectOpen);
 		
         projectsMenu.add(buildMenuItem(eventGraphController, AssemblyControllerImpl.NEWPROJECT_METHOD, "New Project", KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, projectMenuShortcutKeyMask), true));
-        
 		projectsMenu.add(buildMenuItem(this, OPENPROJECT_METHOD, "Open Project", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, projectMenuShortcutKeyMask), true));
 		if (openRecentProjectsMenu == null) // don't wipe it out if already there!
 		{
@@ -835,16 +835,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		 // ensures selected before allowing deletion
         JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
 		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && false); // TODO
+		deleteEventGraphFromProjectMI.setToolTipText("TODO future capability");
 		projectsMenu.add(deleteEventGraphFromProjectMI);
 
 		 // ensures selected before allowing deletion
         JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, "deleteAssemblyFromProject",   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (assemblyVisible && hasActiveAssembly()));
 		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && false); // TODO
+		deleteAssemblyFromProjectMI.setToolTipText("TODO future capability");
 		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
 		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
         JMenuItem renameProjectMI               = buildMenuItem(this, "renameProject",                "Rename Project",                   KeyEvent.VK_R, null /* dangerous operation, no hotkey */, isProjectOpen);
 		renameProjectMI.setEnabled (isProjectOpen && false); // TODO
+		renameProjectMI.setToolTipText("TODO future capability");
 		projectsMenu.add(renameProjectMI);
 
         JMenuItem projectSettingsMI = buildMenuItem(this, EDIT_PROJECT_PROPERTIES_METHOD, "Edit Project Properties",      KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, projectMenuShortcutKeyMask), isProjectOpen);
@@ -856,7 +859,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         mailZippedProjectFilesMI.setEnabled (isProjectOpen);
 		projectsMenu.add(mailZippedProjectFilesMI);
 		
-		// duplicate entry, also on top-level ViskitApplicationFrame Files menu
 		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_W, KeyStroke.getKeyStroke(KeyEvent.VK_W, projectMenuShortcutKeyMask), isProjectOpen);
 		closeProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(closeProjectMI);
@@ -896,11 +898,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.CUT_METHOD,    "Cut Events",   KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, eventGraphMenuShortcutKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.CUT_METHOD,    "Cut Events",       KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, eventGraphMenuShortcutKeyMask), eventGraphVisible));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText(EventGraphControllerImpl.CUT_METHOD + " is not supported in Viskit.");
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.COPY_METHOD,   "Copy Events",  KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, eventGraphMenuShortcutKeyMask), eventGraphVisible));
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.PASTE_METHOD,  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, eventGraphMenuShortcutKeyMask), eventGraphVisible));
-        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.REMOVE_METHOD, "Delete",       KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, eventGraphMenuShortcutKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.COPY_METHOD,   "Copy Events",      KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C, eventGraphMenuShortcutKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.PASTE_METHOD,  "Paste Events",     KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V, eventGraphMenuShortcutKeyMask), eventGraphVisible));
+        editMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.REMOVE_METHOD, "Delete Selection", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, eventGraphMenuShortcutKeyMask), eventGraphVisible));
 
         // Initialization: these start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, EventGraphControllerImpl.CUT_METHOD).setEnabled(false);

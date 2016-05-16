@@ -25,18 +25,29 @@ import viskit.doe.FileHandler;
  * @since 11:09:07 AM
  * @version $Id$
  */
-public class ViskitConfiguration {
-
+public class ViskitConfiguration
+{
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
+    public static final String VISKIT_WEBSITE_URL            = "https://eos.nps.edu/Viskit (TODO)";
+    public static final String VISKIT_MAILING_LIST           = "viskit@www.movesinstitute.org";
 	
-    public static final File VISKIT_CONFIGURATION_DIR      = new File(System.getProperty("user.home"), ".viskit");
-    public static final File VISKIT_CONFIGURATION_FILE_OLD = new File(VISKIT_CONFIGURATION_DIR, "vconfig.xml");
-    public static final File VISKIT_CONFIGURATION_FILE     = new File(VISKIT_CONFIGURATION_DIR, "viskitConfiguration.xml");
-    public static final File VISKIT_README_FILE            = new File(VISKIT_CONFIGURATION_DIR, "README.txt");
-    public static final File C_APP_FILE                    = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
-    public static final File C_GUI_FILE                    = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
-    public static final File V_DEBUG_LOG                   = new File(VISKIT_CONFIGURATION_DIR, "debug.log");
+    public static final File USER_CONFIGURATION_DIRECTORY= new File(System.getProperty("user.home"), ".viskit");
+    public static final File USER_CONFIGURATION_FILE     = new File(USER_CONFIGURATION_DIRECTORY, "viskitConfiguration.xml");
+    public static final File USER_CONFIGURATION_FILE_OLD = new File(USER_CONFIGURATION_DIRECTORY, "vconfig.xml");
+    public static final File USER_README_FILE            = new File(USER_CONFIGURATION_DIRECTORY, "README.txt");
+    public static final File USER_DEBUG_LOG              = new File(USER_CONFIGURATION_DIRECTORY, "debug.log");
+    public static final File USER_C_APP_FILE             = new File(USER_CONFIGURATION_DIRECTORY, "c_app.xml");
+    public static final File USER_C_GUI_FILE             = new File(USER_CONFIGURATION_DIRECTORY, "c_gui.xml");
+    public static final File USER_C_GUI_MAC_FILE         = new File(USER_CONFIGURATION_DIRECTORY, "c_gui_mac.xml");
+	
+	// these directory instantiations don't work somehow, reinitialized in constructor
+    public static       File VISKIT_CONFIGURATION_DIRECTORY = new File("configuration");
+    public static       File VISKIT_CONFIGURATION_FILE      = new File("configuration", "viskitConfiguration.xml");
+    public static       File VISKIT_README_FILE             = new File("configuration", "README.txt");
+    public static       File VISKIT_DEBUG_LOG               = new File("configuration", "debug.log");
+    public static       File VISKIT_C_APP_FILE              = new File("configuration", "c_app.xml");
+    public static       File VISKIT_C_GUI_FILE              = new File("configuration", "c_gui.xml");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE               = GUI_BEANSHELL_ERROR_DIALOG + ".title";
@@ -87,7 +98,7 @@ public class ViskitConfiguration {
     public static final String LOOK_AND_FEEL_DEFAULT  = "default";
     public static final String LOOK_AND_FEEL_PLATFORM = "platform";
 
-    private static ViskitConfiguration me;
+    private static ViskitConfiguration singletonViskitConfiguration;
 
     static final Logger LOG = LogUtilities.getLogger(ViskitConfiguration.class);
 
@@ -97,16 +108,13 @@ public class ViskitConfiguration {
     private DefaultConfigurationBuilder   defaultConfigurationBuilder;
     private XMLConfiguration              projectXMLConfiguration = null;
 
-    static {
-        LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
-        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIGURATION_DIR + " (exists=" + VISKIT_CONFIGURATION_DIR.exists() + ")");
-    }
-
-    public static synchronized ViskitConfiguration instance() {
-        if (me == null) {
-            me = new ViskitConfiguration();
+    public static synchronized ViskitConfiguration instance() 
+	{
+        if (singletonViskitConfiguration == null) // singleton design pattern
+		{
+            singletonViskitConfiguration = new ViskitConfiguration();
         }
-        return me;
+        return singletonViskitConfiguration;
     }
 
 	/** 
@@ -115,47 +123,67 @@ public class ViskitConfiguration {
     private ViskitConfiguration()
 	{
         try {
-            if (!VISKIT_CONFIGURATION_DIR.exists()) {
-                 VISKIT_CONFIGURATION_DIR.mkdirs();
-                 LOG.info("Created dir: " + VISKIT_CONFIGURATION_DIR);
-            }
-            File viskitConfigurationFile = new File("configuration" + File.separator + VISKIT_CONFIGURATION_FILE.getName());
-			
-			// clear out corrupted files, if found
-			if (VISKIT_CONFIGURATION_FILE.length() == 0L)
-				VISKIT_CONFIGURATION_FILE.delete();
-			if (C_APP_FILE.length() == 0L)
-				C_APP_FILE.delete();
-			if (C_GUI_FILE.length() == 0L)
-				C_GUI_FILE.delete();
-			
-			// create configuration files, if needed
-            if (VISKIT_CONFIGURATION_FILE_OLD.exists() && !VISKIT_CONFIGURATION_FILE.exists())
+            if (!USER_CONFIGURATION_DIRECTORY.exists())
 			{
-				LOG.info ("copying original-style " + VISKIT_CONFIGURATION_FILE_OLD + " to " + VISKIT_CONFIGURATION_FILE.toPath());
-				Files.copy(VISKIT_CONFIGURATION_FILE_OLD.toPath(), VISKIT_CONFIGURATION_FILE.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                USER_CONFIGURATION_DIRECTORY.mkdirs();
+				LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
+				LOG.info(VISKIT_WEBSITE_URL);
+                LOG.info("Created USER_CONFIGURATION_DIRECTORY: " + USER_CONFIGURATION_DIRECTORY + " (exists=" + USER_CONFIGURATION_DIRECTORY.exists() + ")");
+            }
+			else
+			{
+				LOG.info("Welcome to the " + VISKIT_FULL_APPLICATION_NAME);
+				LOG.info(VISKIT_WEBSITE_URL);
+				LOG.info("Checked USER_CONFIGURATION_DIRECTORY: " + USER_CONFIGURATION_DIRECTORY + " (exists=" + USER_CONFIGURATION_DIRECTORY.exists() + ")");
 			}
-            if (!VISKIT_CONFIGURATION_FILE.exists())
-			{
-                Files.copy(viskitConfigurationFile.toPath(), VISKIT_CONFIGURATION_FILE.toPath());
-            }
-            File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
-            if (!VISKIT_README_FILE.exists())
-			{
-                Files.copy(VISKIT_README_FILE.toPath(), VISKIT_CONFIGURATION_DIR.toPath());
-            }
-            File cGuiSrc;
-            if (ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
-                cGuiSrc = new File("configuration/c_gui_mac.xml");
-            else
-                cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
+			
+			// clear out corrupted files (if found) since they can be problematic
+			if (USER_CONFIGURATION_FILE.exists() && USER_CONFIGURATION_FILE.length() == 0L)
+				USER_CONFIGURATION_FILE.delete();
+			if (USER_CONFIGURATION_FILE_OLD.exists() && USER_CONFIGURATION_FILE_OLD.length() == 0L) // otherwise left alone
+				USER_CONFIGURATION_FILE_OLD.delete();
+			if (USER_C_APP_FILE.exists() && USER_C_APP_FILE.length() == 0L)
+				USER_C_APP_FILE.delete();
+			if (USER_C_GUI_FILE.exists() && USER_C_GUI_FILE.length() == 0L)
+				USER_C_GUI_FILE.delete();
+			if (VISKIT_DEBUG_LOG.exists() && VISKIT_DEBUG_LOG.length() == 0L)
+				VISKIT_DEBUG_LOG.delete();
+			
+			// keep original approach for comparison purposes
+            File c_app_SourceFile = new File("configuration" + File.separator + USER_C_APP_FILE.getName());
+            File c_gui_SourceFile;
+            if  (ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
+                 c_gui_SourceFile = new File("configuration" + File.separator + USER_C_GUI_MAC_FILE.getName());
+			else c_gui_SourceFile = new File("configuration" + File.separator + USER_C_GUI_FILE.getName());
 
-            if (!C_GUI_FILE.exists()) {
-                Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
-            }
-            if (!C_APP_FILE.exists())
+            if (!USER_C_GUI_FILE.exists() && c_gui_SourceFile.exists())
 			{
-                Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
+                Files.copy(c_gui_SourceFile.toPath(), USER_C_GUI_FILE.toPath());
+            }
+            if (!USER_C_APP_FILE.exists() && c_app_SourceFile.exists())
+			{
+                Files.copy(c_app_SourceFile.toPath(), USER_C_APP_FILE.toPath());
+            }
+			
+			// create user configuration files, if needed
+            if (USER_CONFIGURATION_FILE_OLD.exists() && !USER_CONFIGURATION_FILE.exists())
+			{
+				LOG.info ("copying original-style " + USER_CONFIGURATION_FILE_OLD + " to " + USER_CONFIGURATION_FILE.toPath());
+				Files.copy(USER_CONFIGURATION_FILE_OLD.toPath(), USER_CONFIGURATION_FILE.toPath());
+			}
+            if (!USER_CONFIGURATION_FILE.exists())
+			{
+				if (VISKIT_CONFIGURATION_FILE.exists()) // TODO fix directory
+					Files.copy(VISKIT_CONFIGURATION_FILE.toPath(), USER_CONFIGURATION_FILE.toPath());
+				else
+					LOG.error ("Configuration file not found:" + VISKIT_CONFIGURATION_FILE.toPath());
+            }
+            if (!USER_README_FILE.exists())
+			{
+				if (VISKIT_README_FILE.exists())
+					Files.copy(VISKIT_README_FILE.toPath(),        USER_README_FILE.toPath());
+				else
+					LOG.error ("Configuration file not found:" + VISKIT_README_FILE.toPath());
             }
         } 
 		catch (IOException ex) {
@@ -167,10 +195,11 @@ public class ViskitConfiguration {
     }
 
     /** Builds (or rebuilds) a default configuration */
-    private void setDefaultConfiguration() {
+    private void setDefaultConfiguration()
+	{
         try {
             defaultConfigurationBuilder = new DefaultConfigurationBuilder();
-            defaultConfigurationBuilder.setFile(VISKIT_CONFIGURATION_FILE);
+            defaultConfigurationBuilder.setFile(USER_CONFIGURATION_FILE);
             try {
                 combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true); // TODO silence unhelpful verbose output
             }
@@ -178,23 +207,26 @@ public class ViskitConfiguration {
 			{
                 LOG.error(e);
             }
-
             // Save off the individual XML configurations for each prefix so we can write back
             int numberOfConfigurations = combinedConfiguration.getNumberOfConfigurations();
             for (int i = 0; i < numberOfConfigurations; i++)
 			{
                 Configuration configuration = combinedConfiguration.getConfiguration(i);
-                if (!(configuration instanceof XMLConfiguration)) {
-                    continue;
+                if (!(configuration instanceof XMLConfiguration)) // safety check
+				{
+                    continue; // looping
                 }
                 XMLConfiguration xmlConfiguration = (XMLConfiguration) configuration;
                 xmlConfiguration.setAutoSave(true);
                 HierarchicalConfiguration.Node n = xmlConfiguration.getRoot();
-                for (Object childObject : n.getChildren()) {
+                for (Object childObject : n.getChildren()) 
+				{
                     xmlConfigurations.put(((HierarchicalConfiguration.Node) childObject).getName(), xmlConfiguration);
                 }
             }
-        } catch (Exception e) {
+        } 
+		catch (Exception e) 
+		{
             LOG.error(e);
         }
     }
@@ -261,7 +293,8 @@ public class ViskitConfiguration {
     }
 
     /** @return the XMLConfiguration for Viskit application */
-    public XMLConfiguration getViskitApplicationXMLConfiguration() {
+    public XMLConfiguration getViskitApplicationXMLConfiguration()
+	{
         return (XMLConfiguration) combinedConfiguration.getConfiguration("app");
     }
 
@@ -295,7 +328,7 @@ public class ViskitConfiguration {
     }
 
     public void resetViskitConfiguration() {
-        me = null;
+        singletonViskitConfiguration = null;
     }
 
     public void cleanup() {
@@ -306,16 +339,16 @@ public class ViskitConfiguration {
         try {
 
             // For c_app.xml
-            document = FileHandler.unmarshallJdom(C_APP_FILE);
-            xout.output(document,  new FileWriter(C_APP_FILE));
+            document = FileHandler.unmarshallJdom(USER_C_APP_FILE);
+            xout.output(document,  new FileWriter(USER_C_APP_FILE));
 
             // For c_gui.xml
-            document = FileHandler.unmarshallJdom(C_GUI_FILE);
-            xout.output(document,  new FileWriter(C_GUI_FILE));
+            document = FileHandler.unmarshallJdom(USER_C_GUI_FILE);
+            xout.output(document,  new FileWriter(USER_C_GUI_FILE));
 
             // For vconfig.xml
-            document = FileHandler.unmarshallJdom(VISKIT_CONFIGURATION_FILE);
-            xout.output(document,  new FileWriter(VISKIT_CONFIGURATION_FILE));
+            document = FileHandler.unmarshallJdom(USER_CONFIGURATION_FILE);
+            xout.output(document,  new FileWriter(USER_CONFIGURATION_FILE));
 
             // For the current Viskit project file
             document = FileHandler.unmarshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile());

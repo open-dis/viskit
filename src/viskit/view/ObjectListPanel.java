@@ -65,7 +65,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
         int numberOfParameters = parameterObjectList.size();
         typeLabelArray = new JLabel[numberOfParameters];
         nameLabelArray = (numberOfParameters <= 0 ? null : new JLabel[numberOfParameters]);
-          entryTFArray = new JTextField[numberOfParameters]; // user enters initialization value here
+          entryTFArray = new JTextField[numberOfParameters]; // user enters initial value here
             panelArray = new JComponent[numberOfParameters];
         shadowInstantiatorArray = new ViskitInstantiator[numberOfParameters];
 
@@ -107,12 +107,12 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
 				{
                     ViskitInstantiator.FreeForm viff = (ViskitInstantiator.FreeForm) vif.getParametersList().get(0);
                     parameterInitializationValue = viff.getValue();
-					parameterInitializationHint = "enter " + parameterTypeName + " initialization value(s) using Java syntax (quoted strings, comma-separated values, etc.)";
+					parameterInitializationHint = "enter " + parameterTypeName + " initial value(s) using Java syntax (quoted strings, comma-separated values, etc.)";
                 }
             }
 			else if (instantiator instanceof ViskitInstantiator.FreeForm) {
 				parameterInitializationValue = ((ViskitInstantiator.FreeForm) instantiator).getValue();
-				parameterInitializationHint = "enter initialization value";
+				parameterInitializationHint = "enter initial value";
 			}
 			String traceMessage = "parameter name=" + parameterName + ", type=" + parameterTypeName + ", value=" + parameterInitializationValue + ", description=" + parameterDescription;
             if (viskit.ViskitStatics.debug) {

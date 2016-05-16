@@ -465,18 +465,18 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     @SuppressWarnings("unchecked")
-    private void jarFileCommon(JarFile jarFile) {
-
+    private void jarFileCommon(JarFile jarFile)
+	{
         // Prevent a case where we have simkit.jar in both the working classpath
         // and in a project's /lib directory.  We don't need to expose multiple
-        // libs of the same name because they happen to be in two different
-        // places
+        // libs of the same name because they happen to be in two different places
         Enumeration<DefaultMutableTreeNode> e = rootTreeNode.children();
         String jarName = jarFile.getName().substring(jarFile.getName().lastIndexOf(File.separator) + 1);
-        DefaultMutableTreeNode tn;
-        while (e.hasMoreElements()) {
-            tn = e.nextElement();
-            if (tn.getUserObject().toString().contains(jarName)) {
+        DefaultMutableTreeNode defaultMutableTreeNode;
+        while (e.hasMoreElements())
+		{
+            defaultMutableTreeNode = e.nextElement();
+            if (defaultMutableTreeNode.getUserObject().toString().contains(jarName)) {
                 return;
             }
         }
@@ -484,7 +484,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         List<Class<?>> interfacesClassList = FindClassesForInterface.findClasses(jarFile, targetClass);
         for (Class<?> interfaceClass : interfacesClassList)
 		{
-            ViskitStatics.resolveParameters(interfaceClass);
+            ViskitStatics.resolveParametersUsingReflection(interfaceClass);
         }
 
         // Shorten long path names

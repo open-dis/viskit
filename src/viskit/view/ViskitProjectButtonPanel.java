@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
-import viskit.control.AssemblyController;
 import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
@@ -54,8 +53,8 @@ import viskit.view.dialog.ViskitProjectGenerationDialog3;
  * @since Aug 2008
  * @version $Id$
  */
-public class ViskitProjectButtonPanel extends javax.swing.JPanel {
-	
+public class ViskitProjectButtonPanel extends javax.swing.JPanel 
+{
     static final Logger LOG = LogUtilities.getLogger(ViskitProjectButtonPanel.class);
 
     private static JDialog dialog;

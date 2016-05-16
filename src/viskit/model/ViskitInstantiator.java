@@ -27,30 +27,36 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 9:43:42 AM
  * @version $Id$
  */
-public abstract class ViskitInstantiator {
-
+public abstract class ViskitInstantiator
+{
     static final Logger LOG = LogUtilities.getLogger(ViskitInstantiator.class);
-    private String type;
+	
     private String name = "";
+    private String type;
     private String description = "";
 
-    public ViskitInstantiator(String definedType) {
+    public ViskitInstantiator(String definedType) 
+	{
         type = definedType;
     }
 
-    public String getTypeName() {
+    public String getTypeName() 
+	{
         return type;
     }
 
-    public void setName(String name) {
+    public void setName(String name) 
+	{
         this.name = name;
     }
 
-    public String getName() {
+    public String getName() 
+	{
         return name;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description) 
+	{
         this.description = description;
     }
 
@@ -60,31 +66,59 @@ public abstract class ViskitInstantiator {
 			description = "";
         return description;
     }
-
-    abstract public ViskitInstantiator vcopy();
+	
+	public ViskitInstantiator vcopy() // need full copy for each implementing class
+	{
+		if (this instanceof ViskitInstantiator.Array)
+			 return ((ViskitInstantiator.Array)this).vcopy();
+		else if (this instanceof ViskitInstantiator.Construct)
+			 return ((ViskitInstantiator.Construct)this).vcopy();
+		else if (this instanceof ViskitInstantiator.Factory)
+			 return ((ViskitInstantiator.Factory)this).vcopy();
+		else if  (this instanceof ViskitInstantiator.FreeForm)
+			 return ((ViskitInstantiator.FreeForm)this).vcopy();
+		else
+		{
+			LOG.error ("Erroneous vcopy invocation");
+			return null;
+		}
+	}
 
     abstract public boolean isValid();
 
-    public static Vector<Object> buildDummyInstantiators(Executable exe) {
-
-        Vector<Object> v = new Vector<>();
-        Class<?>[] cs = exe.getParameterTypes();
-        String args;
-        for (Class<?> c : cs) {
-            args = ViskitStatics.convertClassName(c.getName());
-
-            // Strip out java.lang
-            args = ViskitStatics.stripOutJavaDotLang(args);
-
-            // Show varargs symbol vice []
-            args = ViskitStatics.makeVarArgs(args);
-
-            if (c.isArray())
-                v.add(new ViskitInstantiator.Array(args, new ArrayList<>()));
-            else
-                v.add(new ViskitInstantiator.FreeForm(args, ""));
-        }
-        return v;
+    public static Vector<Object> buildInstantiatorsFromReflection(Executable[] reflectionExecutables) 
+	{
+        Vector<Object> viskitInstantiatorVector = new Vector<>();
+		
+		for (Executable reflectionExecutable : reflectionExecutables)
+		{
+			Class<?>[] reflectionParameterClasses = reflectionExecutable.getParameterTypes();
+			String className, parameterName;
+			for (Class<?> reflectionParameterClass : reflectionParameterClasses) 
+			{
+				className = ViskitStatics.convertClassName(reflectionParameterClass.getName());
+				className = ViskitStatics.stripOutJavaDotLang(className); // Strip out java.lang
+				className = ViskitStatics.applyVarArgSymbol(className);   // Show varargs ellipsis symbol ... vice []
+				parameterName = "parameterNameTODO";
+				if (reflectionParameterClass.isArray())
+				{
+					viskitInstantiatorVector.add(new ViskitInstantiator.Array(className, new ArrayList<>()));	  // TODO how to add name?
+				}
+				else if (true) // reflectionParameterClass.???)
+				{
+					viskitInstantiatorVector.add(new ViskitInstantiator.Construct(className, new ArrayList<>())); // TODO how to add name?
+				}
+				else 	
+				{
+					viskitInstantiatorVector.add(new ViskitInstantiator.FreeForm(className, parameterName)); // TODO fix name
+				}
+			}
+			if (viskitInstantiatorVector.size() > 0) // reflection found parameters during preceding iteration
+			{
+				return viskitInstantiatorVector;
+			}
+		}
+		return viskitInstantiatorVector; // return empty
     }
 
     /***********************************************************************/
@@ -92,10 +126,10 @@ public abstract class ViskitInstantiator {
 	{
         private String value;
 
-        public FreeForm(String type, String value) 
+        public FreeForm(String type, String name) 
 		{
             super(type);
-            setValue(value);
+            setName(name);
         }
 
         public String getValue() 
@@ -114,11 +148,10 @@ public abstract class ViskitInstantiator {
             return value;
         }
 
-        @Override
-        public ViskitInstantiator vcopy()
+        public ViskitInstantiator.FreeForm vcopy()
 		{
-            ViskitInstantiator resultViskitInstantiator = new ViskitInstantiator.FreeForm(getTypeName(), getValue());
-            resultViskitInstantiator.setName(getName());
+            ViskitInstantiator.FreeForm resultViskitInstantiator = new ViskitInstantiator.FreeForm(getTypeName(), getName());
+            resultViskitInstantiator.setValue(getValue());
             resultViskitInstantiator.setDescription(getDescription());
             return resultViskitInstantiator;
         }
@@ -126,9 +159,11 @@ public abstract class ViskitInstantiator {
         @Override
         public boolean isValid() 
 		{
-            String typeName = getTypeName();
-            String value = getValue();
-            return typeName != null & value != null & !typeName.isEmpty() & !value.isEmpty();
+            String  name     = getName();
+            String  typeName = getTypeName();
+            String  value    = getValue();
+			boolean valid    = (name != null) & (typeName != null) & (value != null) & !name.isEmpty() & !typeName.isEmpty() & !value.isEmpty();
+            return  valid;
         }
     }
 
@@ -148,63 +183,85 @@ public abstract class ViskitInstantiator {
 
             if (viskit.ViskitStatics.debug) 
 			{
-                LOG.info("Building Constructor for " + typeName);
+                LOG.info("Constructor for " + typeName + ". Required Parameters:");
             }
-            if (viskit.ViskitStatics.debug) // TODO confirm
+
+			int index = 0;
+			for (Object assemblyParameter : assemblyParametersList) // inspect for debugging purposes
 			{
-                LOG.info("Required Parameters:");
-
-                for (Object assemblyParameter : assemblyParametersList)
-				{
-                    String assemblyParameterType = "null";
-                    if (assemblyParameter instanceof TerminalParameter) // simple type
-					{ 
-                        assemblyParameterType = ((TerminalParameter) assemblyParameter).getType();
-                        if (viskit.ViskitStatics.debug) 
-						{
-                            LOG.info("Assembly TerminalParameter " + assemblyParameterType);
-                        }
-                    } 
-					else if (assemblyParameter instanceof MultiParameter) // TODO object array type?
+				String assemblyParameterName        = "notFound";
+				String assemblyParameterType        = "null";
+				String assemblyParameterValue       = "";
+				String assemblyParameterDescription = "";
+				if (assemblyParameter instanceof TerminalParameter) // simple type
+				{ 
+					assemblyParameterName        = ((TerminalParameter) assemblyParameter).getName();
+					assemblyParameterType        = ((TerminalParameter) assemblyParameter).getType();
+					assemblyParameterValue       = ((TerminalParameter) assemblyParameter).getValue();
+					assemblyParameterDescription = ((TerminalParameter) assemblyParameter).getDescription();
+					if (viskit.ViskitStatics.debug) 
 					{
-                        assemblyParameterType = ((MultiParameter) assemblyParameter).getType();
-                        if (viskit.ViskitStatics.debug) 
-						{
-                            LOG.info("Assembly MultiParameter " + assemblyParameterType);
-                        }
-                    } 
-					else if (assemblyParameter instanceof FactoryParameter) 
-					{
-                        assemblyParameterType = ((FactoryParameter) assemblyParameter).getType(); // object type
-                        if (viskit.ViskitStatics.debug) 
-						{
-                            LOG.info("Assembly FactoryParameter " + assemblyParameterType);
-                        }
-                    } 
-					else if (assemblyParameter instanceof Parameter) // from InstantiationPanel, this could also be an eventgraph param type?
-					{
-                        assemblyParameterType = ((Parameter) assemblyParameter).getType();
-                        if (viskit.ViskitStatics.debug) 
-						{
-                            LOG.info("EventGraph Parameter " + assemblyParameterType);
-                        }
-                    }
-					else
-					{
-						LOG.error ("Assembly parameter Unexpected type");
+						LOG.info("Assembly TerminalParameter " + assemblyParameterType + " " + assemblyParameterName + " " + assemblyParameterValue);
 					}
-                }
-            }
-
+				} 
+				else if (assemblyParameter instanceof MultiParameter) // TODO object array type?
+				{
+					assemblyParameterName        = ((MultiParameter) assemblyParameter).getName();
+					assemblyParameterType        = ((MultiParameter) assemblyParameter).getType();
+					assemblyParameterValue       = ""; // no value attribute for Parameter element
+					assemblyParameterDescription = ((MultiParameter) assemblyParameter).getDescription();
+					if (viskit.ViskitStatics.debug) 
+					{
+						LOG.info("Assembly MultiParameter " + assemblyParameterType + " " + assemblyParameterName);
+					}
+				} 
+				else if (assemblyParameter instanceof FactoryParameter) 
+				{
+					assemblyParameterName        = ((FactoryParameter) assemblyParameter).getName();
+					assemblyParameterType        = ((FactoryParameter) assemblyParameter).getType(); // object type
+					assemblyParameterValue       = // no value attribute for Parameter element
+					assemblyParameterDescription = ((FactoryParameter) assemblyParameter).getDescription();
+					if (viskit.ViskitStatics.debug) 
+					{
+						LOG.info("Assembly FactoryParameter " + assemblyParameterType + " " + assemblyParameterName);
+					}
+				} 
+				else if (assemblyParameter instanceof Parameter) // from InstantiationPanel, this could also be an eventgraph param type?
+				{
+					assemblyParameterName        = ((Parameter) assemblyParameter).getName();
+					assemblyParameterType        = ((Parameter) assemblyParameter).getType();
+					assemblyParameterValue       = ""; // no value attribute for Parameter element
+					assemblyParameterDescription = ((Parameter) assemblyParameter).getDescription();
+					if (viskit.ViskitStatics.debug) 
+					{
+						LOG.info("EventGraph Parameter " + assemblyParameterType + " " + assemblyParameterName);
+					}
+				}
+				else
+				{
+					LOG.error ("Assembly parameter Unexpected type");
+					break;
+				}
+//				((ViskitInstantiator) viskitParametersFactoryList.get(index)).setName       (assemblyParameterName);
+//				((ViskitInstantiator) viskitParametersFactoryList.get(index)).setDescription(assemblyParameterDescription);
+				index++;
+			}
+			// preceding was mostly informational, the next call does the work
+            viskitParametersFactoryList = buildInstantiators(assemblyParametersList);
+			
+			if (!assemblyParametersList.isEmpty() && !viskitParametersFactoryList.isEmpty())
+				return; // constructor complete
+			
+			// When XML-based instantiation is unsuccessful, then we are apparently working with compiled .class code
+			
             // Gets lists of EventGraph parameters for type, if top-level,
             // otherwise null if type is a basic class i.e., java.lang.Double
-            List<Object>[] eventGraphParametersList = ViskitStatics.resolveParameters(ViskitStatics.classForName(typeName));
-            int index = 0;
-
-            viskitParametersFactoryList = buildInstantiators(assemblyParametersList);
+            List<Object>[] eventGraphParametersList = ViskitStatics.resolveParametersUsingReflection(ViskitStatics.classForName(typeName));
+			
             // pick the EventGraph list that matches the Assembly arguments
             if (eventGraphParametersList != null)
 			{
+				index = 0;
                 while (index < eventGraphParametersList.length)
 				{
                     if (parametersListsMatch(assemblyParametersList, eventGraphParametersList[index]))
@@ -213,12 +270,13 @@ public abstract class ViskitInstantiator {
                     }
 					else
 					{
-                        index++; // continue
+                        index++; // continue looping
                     }
-					if (index == eventGraphParametersList.length)
+					if (index == eventGraphParametersList.length) // end of loop
 					{
 						// TODO if not found prior to end of loop, warn of model inconsistency, probably should not continue
-						LOG.error("Model inconsistency: no matching eventGraphParameter found to match assemblyPrameter[" + index + "]"); // TODO
+						LOG.error("Model inconsistency: no matching eventGraphParameter found to match assemblyParameter[" + index + "]"); // TODO
+						return; // constructor complete
 					}
                 }
                 if (viskit.ViskitStatics.debug)
@@ -230,7 +288,8 @@ public abstract class ViskitInstantiator {
                 if (assemblyParametersList.size() != eventGraphParametersList[index].size())
 				{
                     viskitParametersFactoryList = buildInstantiators(eventGraphParametersList[index]);
-                    if (viskit.ViskitStatics.debug) {
+                    if (viskit.ViskitStatics.debug)
+					{
                         LOG.info("Warning: VInstantiator.Constructor assembly had different expected parameters length than event graph");
                     }
                 }
@@ -240,9 +299,9 @@ public abstract class ViskitInstantiator {
                     if (viskit.ViskitStatics.debug)
 					{
                         LOG.info("args came back from buildInstantiators as: ");
-                        for (Object arg : viskitParametersFactoryList)
+                        for (Object initializationArgument : viskitParametersFactoryList)
 						{
-                            LOG.info(arg);
+                            LOG.info(initializationArgument);
                         }
                     }
                     if (viskitParametersFactoryList != null)
@@ -259,11 +318,14 @@ public abstract class ViskitInstantiator {
 							if (parameterDescription == null)
 							{
 								parameterDescription = listToString(((Parameter)eventGraphParametersList[index].get(j)).getComment());
-											
-								if (parameterDescription == null) // if still not there, punt (safely)
-								{
-									parameterDescription = ""; // TODO ensure this value got set when initially loaded
-								}
+							}
+							if (parameterDescription == null)
+							{
+								parameterDescription = ((TerminalParameter)assemblyParametersList.get(j)).getDescription();
+							}		
+							if (parameterDescription == null) // if still not there, punt (safely)
+							{
+								parameterDescription = ViskitStatics.DEFAULT_DESCRIPTION; // TODO ensure this value got set when initially loaded
 							}
                             ((ViskitInstantiator) viskitParametersFactoryList.get(j)).setDescription(parameterDescription);
                         }
@@ -275,8 +337,8 @@ public abstract class ViskitInstantiator {
         public Construct(String typeName, List<Object> args)
 		{
             super(typeName);
-            setArgs(args);
-            findArgNames(typeName, args);
+            setArguments(args);
+            findArgumentNames(typeName, args);
         }
 
         public Construct(String type, List<Object> args, List<String> names)
@@ -296,27 +358,35 @@ public abstract class ViskitInstantiator {
         }
 
         /**
-         * @param assemblyParameters used to build the instantiators
-         * @return a List of VInstantiators given a List of Assembly Parameters
+         * @param jaxbAssemblyParameters used to build the instantiators
+         * @return a List of ViskitInstantiators given a List of Assembly Parameters
          */
-        final List<Object> buildInstantiators(List<Object> assemblyParameters) {
-
+        final List<Object> buildInstantiators(List<Object> jaxbAssemblyParameters) // TODO type Object to ViskitInstantiator
+		{
             List<Object> instantiatorList = new ArrayList<>();
-            for (Object o : assemblyParameters) {
-                if (o instanceof TerminalParameter) {
-                    instantiatorList.add(buildTerminalParameter((TerminalParameter) o));
-                } else if (o instanceof MultiParameter) {
-                    instantiatorList.add(buildMultiParameter((MultiParameter) o));
-                } else if (o instanceof FactoryParameter) {
-                    instantiatorList.add(buildFactoryParameter((FactoryParameter) o));
-                } else if (o instanceof Parameter) { // from InstantiationPanel Const getter
-                    if (viskit.ViskitStatics.debug) {
-                        LOG.info("Conversion from " + ((Parameter) o).getType());
+            for (Object jaxbAssemblyParameter : jaxbAssemblyParameters)
+			{
+                if (jaxbAssemblyParameter instanceof TerminalParameter)
+				{
+                    instantiatorList.add(buildTerminalParameter((TerminalParameter) jaxbAssemblyParameter));
+                } 
+				else if (jaxbAssemblyParameter instanceof MultiParameter) 
+				{
+                    instantiatorList.add(buildMultiParameter((MultiParameter) jaxbAssemblyParameter));
+                } 
+				else if (jaxbAssemblyParameter instanceof FactoryParameter) 
+				{
+                    instantiatorList.add(buildFactoryParameter((FactoryParameter) jaxbAssemblyParameter));
+                } 
+				else if (jaxbAssemblyParameter instanceof Parameter) 
+				{ // from InstantiationPanel Const getter
+                    if (viskit.ViskitStatics.debug) 
+					{
+                        LOG.info("Conversion from " + ((Parameter) jaxbAssemblyParameter).getType());
                     }
-
-                    String name         = ((Parameter) o).getName();
-                    String typeName     = ((Parameter) o).getType();
-                    String description  = ((Parameter) o).getDescription();
+                    String name         = ((Parameter) jaxbAssemblyParameter).getName();
+                    String typeName     = ((Parameter) jaxbAssemblyParameter).getType();
+                    String description  = ((Parameter) jaxbAssemblyParameter).getDescription();
                     ObjectFactory objectFactory = new ObjectFactory();
 
                     // TerminalParameter w/ special case for Object... (varargs)
@@ -326,13 +396,13 @@ public abstract class ViskitInstantiator {
                         terminalParameter.setName(name);
                         terminalParameter.setType(typeName);
                         terminalParameter.setDescription(description);
-                        terminalParameter.setValue("");
+						if (jaxbAssemblyParameter instanceof TerminalParameter)
+                            terminalParameter.setValue(((TerminalParameter) jaxbAssemblyParameter).getValue());
 
                         instantiatorList.add(buildTerminalParameter(terminalParameter));
                     } 
 					else if (ViskitStatics.numConstructors(typeName) > 0) // MultiParameter
 					{
-
                         MultiParameter multiParameter = objectFactory.createMultiParameter();
                         multiParameter.setName(name);
                         multiParameter.setType(typeName);
@@ -368,16 +438,24 @@ public abstract class ViskitInstantiator {
             return instantiatorList;
         }
 
-        ViskitInstantiator.FreeForm buildTerminalParameter(TerminalParameter terminalParameter) {
-            return new ViskitInstantiator.FreeForm(terminalParameter.getType(), terminalParameter.getValue());
+        ViskitInstantiator.FreeForm buildTerminalParameter(TerminalParameter terminalParameter)
+		{
+			ViskitInstantiator.FreeForm viskitInstantiator =  new ViskitInstantiator.FreeForm(terminalParameter.getType(), terminalParameter.getName());
+			viskitInstantiator.setValue      (terminalParameter.getValue());
+			viskitInstantiator.setDescription(terminalParameter.getDescription());
+			if ((viskitInstantiator.getDescription() == null) || viskitInstantiator.getDescription().isEmpty())
+				viskitInstantiator.setDescription(ViskitStatics.DEFAULT_DESCRIPTION);
+            return viskitInstantiator;
         }
 
-        ViskitInstantiator.Array buildMultiParameter(MultiParameter multiParameter, boolean dummy) {
+        ViskitInstantiator.Array buildMultiParameter(MultiParameter multiParameter, boolean dummy)
+		{
             List<Object> instantiatorList = multiParameter.getParameters();
             return new ViskitInstantiator.Array(multiParameter.getType(), buildInstantiators(instantiatorList));
         }
 
-        ViskitInstantiator buildMultiParameter(MultiParameter multiParameter) {
+        ViskitInstantiator buildMultiParameter(MultiParameter multiParameter)
+		{
             ViskitInstantiator vInstantiatorAorC;
 
             // Check for special case of varargs
@@ -393,10 +471,10 @@ public abstract class ViskitInstantiator {
                 if (parameterList.isEmpty()) {
 
                     // Likely, Diskit, or another library is not on the classpath
-                    if (ViskitStatics.resolveParameters(ViskitStatics.classForName(multiParameter.getType())) == null) {
+                    if (ViskitStatics.resolveParametersUsingReflection(ViskitStatics.classForName(multiParameter.getType())) == null) {
                         return null;
                     } else {
-                        parameterList = ViskitStatics.resolveParameters(ViskitStatics.classForName(multiParameter.getType()))[0];
+                        parameterList = ViskitStatics.resolveParametersUsingReflection(ViskitStatics.classForName(multiParameter.getType()))[0];
                     }
                 }
                 Iterator<Object> parameterListIterator = parameterList.iterator();
@@ -411,43 +489,83 @@ public abstract class ViskitInstantiator {
             return vInstantiatorAorC;
         }
 
-        ViskitInstantiator.Factory buildFactoryParameter(FactoryParameter factoryParameter) {
+        ViskitInstantiator.Factory buildFactoryParameter(FactoryParameter factoryParameter) 
+		{
+			String methodName = "";
             List<Object> objectList = factoryParameter.getParameters();
+			
+			if ((objectList != null) && (objectList.size() > 0) && (objectList.get(0) != null))
+			{
+				Object jaxbObject = objectList.get(0);
+                if (jaxbObject instanceof TerminalParameter)
+				{
+					methodName = ((TerminalParameter)jaxbObject).getName();
+                } 
+				else if (jaxbObject instanceof MultiParameter) 
+				{
+					methodName = ((MultiParameter)jaxbObject).getName();
+                } 
+				else if (jaxbObject instanceof FactoryParameter) 
+				{
+					methodName = ((FactoryParameter)jaxbObject).getName();
+                } 
+				else if (jaxbObject instanceof Parameter)  // from InstantiationPanel Const getter
+				{
+					methodName = ((Parameter)jaxbObject).getName();
+				}
+				if ((methodName == null) || methodName.isEmpty())
+				{
+					methodName = "notFound";
+				}
+			}
+				
             return new ViskitInstantiator.Factory(
-                    factoryParameter.getType(), factoryParameter.getFactory(), factoryParameter.getMethod(),
-                    buildInstantiators(objectList));
+                    factoryParameter.getType(),      // typeName
+					factoryParameter.getFactory(),   // factoryClassName
+					methodName,                      // methodName
+                    buildInstantiators(objectList)); // parametersList
         }
 
         final boolean parametersListsMatch(List<Object> assemblyParameters, List<Object> eventGraphParameters)
 		{
+            if (assemblyParameters.isEmpty() && eventGraphParameters.isEmpty())
+			{
+                if (viskit.ViskitStatics.debug)
+				{
+                    LOG.info("Match: zero parameters.");
+                }
+                return true;
+            }
             if (assemblyParameters.size() != eventGraphParameters.size())
 			{
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.ViskitStatics.debug)
+				{
                     LOG.info("No match.");
                 }
                 return false;
             }
-
-            for (int i = 0; i < assemblyParameters.size(); i++)
+			
+            for (int i = 0; i < assemblyParameters.size(); i++) // check each pair for type match
 			{
-                Object o = assemblyParameters.get(i);
                 String eventGraphTypeName = ((Parameter)eventGraphParameters.get(i)).getType();
+				
+                Object jaxbObject = assemblyParameters.get(i);
                 String assemblyTypeName;
-                if (o instanceof TerminalParameter) // check if caller is sending assembly parameter types
+                if (jaxbObject instanceof TerminalParameter) // check if caller is sending assembly parameter types
 				{
-                    assemblyTypeName = ((TerminalParameter) o).getType();
+                    assemblyTypeName = ((TerminalParameter) jaxbObject).getType();
                 } 
-				else if (o instanceof MultiParameter) 
+				else if (jaxbObject instanceof MultiParameter) 
 				{
-                    assemblyTypeName = ((MultiParameter) o).getType();
+                    assemblyTypeName = ((MultiParameter) jaxbObject).getType();
                 } 
-				else if (o instanceof FactoryParameter) 
+				else if (jaxbObject instanceof FactoryParameter) 
 				{
-                    assemblyTypeName = ((FactoryParameter) o).getType();
+                    assemblyTypeName = ((FactoryParameter) jaxbObject).getType();
                 } 
-				else if (o instanceof Parameter) // from InstantiationPanel, this could also be an eventgraph parameter type
+				else if (jaxbObject instanceof Parameter) // from InstantiationPanel, this could also be an eventgraph parameter type
 				{
-                    assemblyTypeName = ((Parameter) o).getType();
+                    assemblyTypeName = ((Parameter) jaxbObject).getType();
                 } 
 				else 
 				{
@@ -455,7 +573,7 @@ public abstract class ViskitInstantiator {
                 }
                 if (viskit.ViskitStatics.debug)
 				{
-                    LOG.info("Type match " + assemblyTypeName + " to " + eventGraphTypeName);
+                    LOG.info("Single type match, parameter " + i + ": " + assemblyTypeName + " to " + eventGraphTypeName);
                 }
 
                 // check if vType was assignable from pType.
@@ -468,7 +586,7 @@ public abstract class ViskitInstantiator {
                     //interfz |= vInterfz[k].isAssignableFrom(eClazz);
                     interfaceMatch |= eventGraphClass.isAssignableFrom(vInterface);
                 }
-                boolean match = (eventGraphClass.isAssignableFrom( assemblyClass) | interfaceMatch);
+                boolean match = (eventGraphClass.isAssignableFrom(assemblyClass) | interfaceMatch);
                 if (!match)
 				{
                     if (viskit.ViskitStatics.debug) {
@@ -479,37 +597,37 @@ public abstract class ViskitInstantiator {
             }
             if (viskit.ViskitStatics.debug)
 			{
-                LOG.info("Match.");
+                LOG.info("Overall match.");
             }
             return true; // no problems found, each list of parameters matches the other
         }
 
         /**
          * Find the names of the arguments
-         * @param type
-         * @param args List of VInstantiators
-         * @return true if arg names have been found
+         * @param typeName
+         * @param arguments List of ViskitInstantiators
+         * @return true if argument names have been found
          */
-        private boolean findArgNames(String type, List<Object> args)
+        private boolean findArgumentNames(String typeName, List<Object> arguments)
 		{
-            if (args == null)
+            if (arguments == null)
 			{
-                setArgs(getDefaultParameters(type));
-                args = getParametersList();
+                setArguments(getDefaultParameters(typeName));
+                arguments = getParametersList();
             }
-            return (indexOfArgNames(type, args) < 0);
+            return (indexOfArgumentNames(typeName, arguments) >= 0); // true if index found
         }
 
         /** Find a typeName match in the ClassLoader of the given EventGraph's parameters
          *
          * @param typeName the EventGraph parameter to check
-         * @param args a list of EG parameters
+         * @param arguments a list of EG parameters
          * @return the index into the found matching constructor
          */
-        public int indexOfArgNames(String typeName, List<Object> args)
+        public int indexOfArgumentNames(String typeName, List<Object> arguments)
 		{
             int constructorIndex = -1;
-            List<Object>[] parameterArrayList = ViskitStatics.resolveParameters(ViskitStatics.classForName(typeName));
+            List<Object>[] parameterArrayList = ViskitStatics.resolveParametersUsingReflection(ViskitStatics.classForName(typeName));
 
             if (parameterArrayList == null)
 			{
@@ -519,34 +637,35 @@ public abstract class ViskitInstantiator {
 
             if (viskit.ViskitStatics.debug)
 			{
-                LOG.info("args length " + args.size());
-                LOG.info("indexOfArgNames " + typeName + " parameters list length is " + parameterArrayList.length);
+                LOG.info("arguments length " + arguments.size());
+                LOG.info("indexOfArgumentNames " + typeName + " parameterArrayList.length is " + parameterArrayList.length);
             }
             for (List<Object> parameter : parameterArrayList)
 			{
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.ViskitStatics.debug)
+				{
                     LOG.info("parameter.size() " + parameter.size());
                 }
-                if (parameter.size() == args.size())
+                if (parameter.size() == arguments.size())
 				{
                     boolean match = true;
-                    for (int j = 0; j < args.size(); j++) {
+                    for (int j = 0; j < arguments.size(); j++) {
 
                         if (viskit.ViskitStatics.debug) {
                             LOG.info("touching " +
                                     ViskitStatics.convertClassName(
                                             ((Parameter)parameter.get(j)).getType())
                                     + " "
-                                    + ((ViskitInstantiator) args.get(j)).getTypeName());
+                                    + ((ViskitInstantiator) arguments.get(j)).getTypeName());
                         }
                         String parameterTypeName     = ViskitStatics.convertClassName(((Parameter)parameter.get(j)).getType());
-                        String vInstantiatorTypeName = ((ViskitInstantiator) args.get(j)).getTypeName();
+                        String vInstantiatorTypeName = ((ViskitInstantiator) arguments.get(j)).getTypeName();
 
                         // check if vType was assignable from pType.
 
-                        Class<?> parameterClassName = ViskitStatics.classForName(parameterTypeName);
+                        Class<?> parameterClass = ViskitStatics.classForName(parameterTypeName);
 
-                        if (parameterClassName == null) {
+                        if (parameterClass == null) {
                             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
                                     "Please check Event Graph <b>" + typeName + "</b> parameter(s) for compliance using" +
                                     " fully qualified Java class names.  " + parameterTypeName + " should be a " +
@@ -563,21 +682,24 @@ public abstract class ViskitInstantiator {
                             for (Class<?> vInstantiatorInterfaceClass : vInstantiatorInterfaces) 
 							{
                                 //interfz |= vInterfz[k].isAssignableFrom(pClazz);
-                                interfaceMatch |= parameterClassName.isAssignableFrom(vInstantiatorInterfaceClass);
+                                interfaceMatch |= parameterClass.isAssignableFrom(vInstantiatorInterfaceClass);
                             }
 
-                            match &= (parameterClassName.isAssignableFrom(vInstantiatorClass) | interfaceMatch);
+                            match &= (parameterClass.isAssignableFrom(vInstantiatorClass) | interfaceMatch);
 
                             // set the names, the final iteration of while cleans up
-                            if (!((ViskitInstantiator) (args.get(j))).getName().equals(((Parameter)parameter.get(j)).getName()))
-                                 ((ViskitInstantiator) (args.get(j))).setName(((Parameter)parameter.get(j)).getName());
-                            if (viskit.ViskitStatics.debug)
+                            if (!((ViskitInstantiator) (arguments.get(j))).getName().equals(((Parameter)parameter.get(j)).getName()))
 							{
-                                LOG.info(" to " + ((Parameter)parameter.get(j)).getName());
-                            }
+								((ViskitInstantiator) (arguments.get(j))).setName(((Parameter)parameter.get(j)).getName());
+								if (viskit.ViskitStatics.debug)
+								{
+									LOG.info(" to " + ((Parameter)parameter.get(j)).getName());
+								}
+							}
                         }
                     }
-                    if (match) {
+                    if (match)
+					{
                         constructorIndex = index;
                         break;
                     }
@@ -599,12 +721,12 @@ public abstract class ViskitInstantiator {
             Class<?> inputClass = ViskitStatics.classForName(typeName);
             if (inputClass != null)
 			{
-                Constructor[] constructors = inputClass.getConstructors();
-                if (constructors != null && constructors.length > 0)
+                Constructor[] reflectionConstructors = inputClass.getConstructors();
+                if (reflectionConstructors != null && reflectionConstructors.length > 0)
 				{
-                    // TODO: May need to revisit why we are just concerned with
-                    // the default zero param constructor
-                    return ViskitInstantiator.buildDummyInstantiators(constructors[0]);
+                    // TODO: May need to revisit why we are just concerned with 
+                    // the default zero-parameter constructor
+                    return ViskitInstantiator.buildInstantiatorsFromReflection(reflectionConstructors);
                 }
             }
             return new Vector<>(); // null
@@ -615,7 +737,7 @@ public abstract class ViskitInstantiator {
             return viskitParametersFactoryList;
         }
 
-        public final void setArgs(List<Object> args) {
+        public final void setArguments(List<Object> args) {
             this.viskitParametersFactoryList = args;
         }
 
@@ -626,27 +748,34 @@ public abstract class ViskitInstantiator {
             return result + ")";
         }
 
-        @Override
-        public ViskitInstantiator vcopy() {
+        public ViskitInstantiator.Construct vcopy()
+		{
             Vector<Object> objectVector = new Vector<>();
-            for (Object o : viskitParametersFactoryList) {
-                ViskitInstantiator vInstantiator = (ViskitInstantiator) o;
-                objectVector.add(vInstantiator.vcopy());
+            for (Object viskitObject : viskitParametersFactoryList)
+			{
+				if (viskitObject instanceof ViskitInstantiator)
+                    objectVector.add(((ViskitInstantiator)viskitObject).vcopy()); // type-aware copy
+				else
+					LOG.error ("Unknown type during ViskitInstantiator.Construct.vcopy of viskitParametersFactoryList");
             }
-            ViskitInstantiator resultVInstantiator = new ViskitInstantiator.Construct(getTypeName(), objectVector);
-            resultVInstantiator.setName(this.getName());
-            resultVInstantiator.setDescription(this.getDescription());
-            return resultVInstantiator;
+            ViskitInstantiator.Construct resultViskitInstantiator = new ViskitInstantiator.Construct(getTypeName(), objectVector);
+            resultViskitInstantiator.setName(this.getName()); // TODO not finding anything - never originally set?
+            resultViskitInstantiator.setDescription(this.getDescription());
+            return resultViskitInstantiator;
         }
-
+		
         @Override
-        public boolean isValid() {
-            if (getTypeName() == null || getTypeName().isEmpty()) {
+        public boolean isValid()
+		{
+            if (getTypeName() == null || getTypeName().isEmpty())
+			{
                 return false;
             }
-            for (Object o : viskitParametersFactoryList) {
-                ViskitInstantiator vInstantiator = (ViskitInstantiator) o;
-                if (!vInstantiator.isValid()) {
+            for (Object viskitObject : viskitParametersFactoryList)
+			{
+                ViskitInstantiator viskitInstantiator = (ViskitInstantiator) viskitObject;
+                if (!viskitInstantiator.isValid())
+				{
                     return false;
                 }
             }
@@ -664,16 +793,20 @@ public abstract class ViskitInstantiator {
             setInstantiators(instantiatorsList);
         }
 
-        @Override
-        public ViskitInstantiator vcopy() {
+        public ViskitInstantiator.Array vcopy()
+		{
             Vector<Object> objectVector = new Vector<>();
-            for (Object vi : instantiators) {
-                objectVector.add(((ViskitInstantiator) vi).vcopy());
+            for (Object vi : instantiators)
+			{
+				if (vi instanceof ViskitInstantiator.Array)
+					objectVector.add(((ViskitInstantiator.Array) vi).vcopy());
+				else
+					LOG.error ("Unknown type during ViskitInstantiator.Array.vcopy of instantiators");
             }
-            ViskitInstantiator rv = new ViskitInstantiator.Array(getTypeName(), objectVector);
-            rv.setName(getName());
-            rv.setDescription(getDescription());
-            return rv;
+            ViskitInstantiator.Array resultViskitInstantiator = new ViskitInstantiator.Array(getTypeName(), objectVector);
+            resultViskitInstantiator.setName(getName());
+            resultViskitInstantiator.setDescription(getDescription());
+            return resultViskitInstantiator;
         }
 
         public List<Object> getInstantiators() {
@@ -699,12 +832,16 @@ public abstract class ViskitInstantiator {
         }
 
         @Override
-        public boolean isValid() {
-            if (getTypeName() == null || getTypeName().isEmpty()) {
+        public boolean isValid()
+		{
+            if (getTypeName() == null || getTypeName().isEmpty())
+			{
                 return false;
             }
-            for (Object vi : instantiators) {
-                if (!((ViskitInstantiator) vi).isValid()) {
+            for (Object viskitInstantiator : instantiators)
+			{
+                if (!((ViskitInstantiator) viskitInstantiator).isValid())
+				{
                     return false;
                 }
             }
@@ -788,7 +925,7 @@ public abstract class ViskitInstantiator {
 
                 // Show varargs symbol vice []
                 if (ViskitGlobals.instance().isArray(args)) {
-                    args = ViskitStatics.makeVarArgs(args);
+                    args = ViskitStatics.applyVarArgSymbol(args);
                     buffer.append(args);
                 } else {
                     buffer.append(args);
@@ -800,28 +937,34 @@ public abstract class ViskitInstantiator {
 
             return buffer.toString(); // TODO show examples
         }
-
-        @Override
-        public ViskitInstantiator vcopy() {
+		
+        public ViskitInstantiator.Factory vcopy()
+		{
             Vector<Object> objectList = new Vector<>();
-            ViskitInstantiator vi;
+            ViskitInstantiator.Factory vi;
             for (Object o : parametersList) {
 
-                if (o instanceof ViskitInstantiator) {
-                    vi = (ViskitInstantiator) o;
+                if (o instanceof ViskitInstantiator.Factory)
+				{
+                    vi = (ViskitInstantiator.Factory) o;
                     objectList.add(vi.vcopy());
-                } else if (o instanceof String) {
+                } 
+				else if (o instanceof String) 
+				{
                     objectList.add((String) o);
                 }
+				else
+					LOG.error ("Unknown type during ViskitInstantiator.Factory.vcopy of parametersList");
             }
-            ViskitInstantiator resultVInstantiator = new ViskitInstantiator.Factory(getTypeName(), getFactoryClass(), getMethodName(), objectList);
+            ViskitInstantiator.Factory resultVInstantiator = new ViskitInstantiator.Factory(getTypeName(), getFactoryClass(), getMethodName(), objectList);
             resultVInstantiator.setName(getName());
             resultVInstantiator.setDescription(getDescription());
             return resultVInstantiator;
         }
 
         @Override
-        public boolean isValid() {
+        public boolean isValid()
+		{
             String typeName = getTypeName(), factoryClassName = getFactoryClass(), methodName = getMethodName();
             if (typeName == null   || factoryClassName == null   || methodName == null ||
                 typeName.isEmpty() || factoryClassName.isEmpty() || methodName.isEmpty())
@@ -830,13 +973,18 @@ public abstract class ViskitInstantiator {
             }
             for (Object o : parametersList) {
 
-                if (o instanceof ViskitInstantiator) {
+                if (o instanceof ViskitInstantiator) 
+				{
                     ViskitInstantiator v = (ViskitInstantiator) o;
-                    if (!v.isValid()) {
+                    if (!v.isValid())
+					{
                         return false;
                     }
-                } else if (o instanceof String) {
-                    if (((String) o).isEmpty()) {
+                } 
+				else if (o instanceof String)
+				{
+                    if (((String) o).isEmpty())
+					{
                         return false;
                     }
                 }

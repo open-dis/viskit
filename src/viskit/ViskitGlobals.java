@@ -87,8 +87,8 @@ import viskit.view.ViskitApplicationFrame;
  * @since 3:20:33 PM
  * @version $Id$
  */
-public class ViskitGlobals {
-
+public class ViskitGlobals
+{
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     static final Logger LOG = LogUtilities.getLogger(ViskitGlobals.class);
     private static ViskitGlobals me;
@@ -173,7 +173,7 @@ public class ViskitGlobals {
         return (AssemblyEditViewFrame) assemblyEditViewFrame;
     }
 
-    /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
+    /** Called from the ViskitEventGraphAssemblyComboMain to initialize at UI startup
      *
      * @return the component AssemblyEditViewFrame
      */
@@ -300,11 +300,12 @@ public class ViskitGlobals {
      * Get a reference to the analyst report view.
      * @return a reference to the analyst report view or null if yet unbuilt.
      */
-    public AnalystReportFrame getAnalystReportEditor() {
-        return (AnalystReportFrame) AnalystReportFrame;
+    public AnalystReportFrame getAnalystReportEditor()
+	{
+        return AnalystReportFrame;
     }
 
-    /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
+    /** Called from the ViskitEventGraphAssemblyComboMain to initialize at UI startup
      *
      * @return the component AnalystReportFrame
      */
@@ -1036,7 +1037,7 @@ public class ViskitGlobals {
 	}
 
 	/**
-	 * @param currentViskitProject the currentViskitProject to set
+	 * @param newViskitProject the currentViskitProject to set
 	 */
 	public static void setCurrentViskitProject(ViskitProject newViskitProject) {
 		currentViskitProject = newViskitProject;
@@ -1162,5 +1163,34 @@ public class ViskitGlobals {
 				                 Math.round((point.getY() + roundOff) / (ViskitStatics.DEFAULT_GRID_SIZE)) * (ViskitStatics.DEFAULT_GRID_SIZE));
 		return snappedPoint;
 	}
+
+    /**
+     * "nullIfEmpty" Return the passed string if non-zero length, else null
+     * @param s the string to check for non-zero length
+     * @return the passed string if non-zero length, else null
+     */
+    public static String nullIfEmpty(String s)
+	{
+        if (s != null) {
+            if (s.length() == 0) {
+                s = null;
+            }
+        }
+        return s;
+    }
+
+    /**
+     * "emptyIfNull" Return the passed string if non-zero length, else empty string
+     * @param s the string to check for being null
+     * @return the passed string if non-zero length, else empty string
+     */
+    public String emptyIfNull(String s)
+	{
+        if (s == null)
+		{
+            s = "";
+        }
+        return s;
+    }
 
 } // end class file ViskitGlobals.java

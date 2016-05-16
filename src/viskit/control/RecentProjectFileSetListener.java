@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
+import edu.nps.util.LogUtilities;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -43,10 +44,10 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.mvc.mvcRecentFileListener;
-import viskit.view.AssemblyEditViewFrame;
 
 /** Utility class to help facilitate menu actions for recently opened Viskit
  * projects.
@@ -54,7 +55,9 @@ import viskit.view.AssemblyEditViewFrame;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.ParameterizedProjectAction">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class RecentProjectFileSetListener implements mvcRecentFileListener {
+public class RecentProjectFileSetListener implements mvcRecentFileListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(RecentProjectFileSetListener.class);
 
     private List<JMenu> recentProjectMenuList;
 
@@ -123,17 +126,21 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
         @Override
         public void actionPerformed(ActionEvent ev)
 		{
-            AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+            AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 
             File projectDirectory;
-            Object obj = getValue(ViskitStatics.FULL_PATH);
-            if (obj instanceof String)
-                projectDirectory = new File((String) obj);
-            else
-                projectDirectory = (File) obj;
+            Object   projectPathObject = getValue(ViskitStatics.FULL_PATH);
+            if      (projectPathObject instanceof String)
+                     projectDirectory = new File((String) projectPathObject);
+			else if (projectPathObject instanceof File)
+                     projectDirectory = (File) projectPathObject;
+			else
+			{
+				LOG.error ("Erroneous projectPathObject=" + projectPathObject);
+				return;
+			}
 
-            if ( projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG) ||
-				(getValue(NAME) == "clear"))
+            if ( projectDirectory.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG) || (getValue(NAME) == "clear"))
 			{
                 assemblyController.clearRecentProjectFileSet();
             } 
@@ -141,6 +148,7 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener {
 			{
                 assemblyController.doProjectCleanup();
                 assemblyController.openProjectDirectory(projectDirectory);
+				assemblyController.reportProjectOpenResult (projectDirectory.getName()); // pass original name in case of failure
             }
         }
     }

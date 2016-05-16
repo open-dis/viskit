@@ -58,13 +58,13 @@ import javax.xml.bind.JAXBElement;
 public class DoeFileModel {
 
     public File userFile;
-    public ParamTable paramTable;
+    public ParameterTable paramTable;
     public List<TerminalParameter> designParmeters;
     public Document jdomDocument;
     public boolean dirty = false;
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
 
-    private List<SimEntity> simEntities;
+    private List<SimEntity> jaxbSimEntities;
     private Map<String, Integer> nameSpace = new HashMap<>();
 
     public File marshallJaxb() throws Exception {
@@ -195,11 +195,12 @@ public class DoeFileModel {
 
     /** @return a List of SimEntities for this experiment */
     public List<SimEntity> getSimEntities() {
-        return simEntities;
+        return jaxbSimEntities;
     }
 
-    public void setSimEntities(List<SimEntity> se) {
-        simEntities = se;   //jdom
-        seTerminalParamsHM = new HashMap<>(se.size());
+    public void setSimEntities(List<SimEntity> newSimEntitiesList)
+	{
+        jaxbSimEntities = newSimEntitiesList; 
+        seTerminalParamsHM = new HashMap<>(newSimEntitiesList.size());
     }
 }

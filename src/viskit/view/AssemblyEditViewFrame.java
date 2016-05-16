@@ -57,6 +57,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.apache.log4j.Logger;
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
@@ -97,7 +98,9 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
  * @since 2:07:37 PM
  * @version $Id$
  */
-public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements AssemblyEditView, DragStartListener {
+public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements AssemblyEditView, DragStartListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(AssemblyEditViewFrame.class);
 
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int                   SELECT_MODE = 0;
@@ -423,7 +426,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         assembliesMenu.add(buildMenuItem(assemblyController, AssemblyControllerImpl.CLOSEALL_METHOD, "Close All Assemblies",                     KeyEvent.VK_L, KeyStroke.getKeyStroke(KeyEvent.VK_L, assemblyMenuShortcutKeyMask), assemblyVisible));
 
         // TODO: Unknown as to what this does exactly
-          assembliesMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null, false));
+		JMenuItem exportClusterFormatMI = buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_E, null, false);
+		exportClusterFormatMI.setEnabled (isProjectOpen && false); // TODO
+		exportClusterFormatMI.setToolTipText("TODO future capability");
+        assembliesMenu.add(exportClusterFormatMI);
+		  
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
 
         // Set up edit menu
@@ -440,11 +447,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
         editMenu.addSeparator();
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.CUT_METHOD,    "Cut",          KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X,      assemblyMenuShortcutKeyMask), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.CUT_METHOD,    "Cut",              KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X,      assemblyMenuShortcutKeyMask), assemblyVisible));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText(AssemblyControllerImpl.CUT_METHOD + " is not supported in Viskit.");
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.COPY_METHOD,   "Copy",         KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C,      assemblyMenuShortcutKeyMask), assemblyVisible));
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PASTE_METHOD,  "Paste Events", KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V,      assemblyMenuShortcutKeyMask), assemblyVisible));
-        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.REMOVE_METHOD, "Delete",  KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, assemblyMenuShortcutKeyMask), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.COPY_METHOD,   "Copy",             KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_C,      assemblyMenuShortcutKeyMask), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.PASTE_METHOD,  "Paste Events",     KeyEvent.VK_V, KeyStroke.getKeyStroke(KeyEvent.VK_V,      assemblyMenuShortcutKeyMask), assemblyVisible));
+        editMenu.add(buildMenuItem(  assemblyController, AssemblyControllerImpl.REMOVE_METHOD, "Delete Selection", KeyEvent.VK_DELETE, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, assemblyMenuShortcutKeyMask), assemblyVisible));
 
         // These start off being disabled, until something is selected
         ActionIntrospector.getAction(assemblyController, AssemblyControllerImpl.CUT_METHOD   ).setEnabled(false);
@@ -1194,35 +1201,37 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		if (file != null) 
 		{
             assemblyController.openProjectDirectory(file);
+			assemblyController.reportProjectOpenResult (file.getName());
         }
 		else
 		{
-			return; // cancelled by user
+			LOG.error ("No known project path to open");
+			return;
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
         showProjectName();
 		
-		// TODO there are two variations of this block, refactor/combine
-		
-		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-		{
-			// TODO re-open previously open assemblies and event graphs, otherwise:
-			
-			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p align='center'>&nbsp;</p>" +
-							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING +  "</p>" +
-							"<p>&nbsp</p>");
-		}
-		else
-		{
-			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, 
-				"<html><p>Selected project <i>" +  file.getName() + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p align='center'>&nbsp;</p>" +
-							"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" + 
-							"<p>&nbsp</p>");
-		}
+////		// TODO there are two variations of this block, refactor/combine
+////		
+////		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+////			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+////		{
+////			// TODO re-open previously open assemblies and event graphs, otherwise:
+////			
+////			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
+////					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
+////							"<p align='center'>&nbsp;</p>" +
+////							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING +  "</p>" +
+////							"<p>&nbsp</p>");
+////		}
+////		else
+////		{
+////			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, 
+////				"<html><p>Selected project <i>" +  file.getName() + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
+////							"<p align='center'>&nbsp;</p>" +
+////							"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" + 
+////							"<p>&nbsp</p>");
+////		}
 		
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
 		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())

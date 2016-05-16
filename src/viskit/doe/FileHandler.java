@@ -93,7 +93,7 @@ public class FileHandler {
         doeFileModel.jdomDocument = doc;
         doeFileModel.designParmeters = getDesignParameters(doc);
         doeFileModel.setSimEntities(getSimEntities(doc));
-        doeFileModel.paramTable = new ParamTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
+        doeFileModel.paramTable = new ParameterTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
 
         return doeFileModel;
     }
@@ -105,7 +105,7 @@ public class FileHandler {
         // todo dfm.jaxbRoot = assembly;
         doeFileModel.designParmeters = assembly.getDesignParameters();
         doeFileModel.setSimEntities(assembly.getSimEntity());
-        doeFileModel.paramTable = new ParamTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
+        doeFileModel.paramTable = new ParameterTable(doeFileModel.getSimEntities(), doeFileModel.designParmeters);
 
         return doeFileModel;
     }

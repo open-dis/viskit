@@ -677,7 +677,7 @@ public class Launcher extends Thread implements Runnable
         try {
             Class<?> viskitz = classLoader.loadClass("viskit.SplashScreenFrame2");
             Method m = viskitz.getDeclaredMethod("main", new Class<?>[]{String[].class});
-            m.invoke(null, new Object[]{new String[]{"viskit.EventGraphAssemblyComboMain"}});
+            m.invoke(null, new Object[]{new String[]{"viskit.ViskitEventGraphAssemblyComboMain"}});
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             LOG.error(e);
             System.exit(1);

@@ -51,6 +51,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
@@ -58,6 +59,7 @@ import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 import viskit.view.ViskitApplicationFrame;
+import viskit.view.ViskitProjectButtonPanel;
 
 /**
  * <p>MOVES Institute
@@ -68,7 +70,9 @@ import viskit.view.ViskitApplicationFrame;
  * @since 11:24:06 AM
  * @version $Id$
  */
-public class UserPreferencesDialog extends JDialog {
+public class UserPreferencesDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(UserPreferencesDialog.class);
 
     private static UserPreferencesDialog projectSettingsDialog;
     private static boolean modified = false;
@@ -84,9 +88,9 @@ public class UserPreferencesDialog extends JDialog {
     private JCheckBox analystReportPreferenceCB;
     private JCheckBox verboseDebugMessagesPreferenceCB;
 
-    private JRadioButton defaultLafRB;
-    private JRadioButton platformLafRB;
-    private JRadioButton otherLafRB;
+    private JRadioButton defaultLookAndFeelRB;
+    private JRadioButton platformLookAndFeelRB;
+    private JRadioButton otherLookAndFeelRB;
     private JTextField otherTF;
 	
 	public final String PREFERENCE_CHANGE_MESSAGE = "Changes are applied when Visual Simkit (Viskit) launches";
@@ -258,16 +262,16 @@ public class UserPreferencesDialog extends JDialog {
         JPanel lAndFeelInnerP = new JPanel();
         lAndFeelInnerP.setLayout(new BoxLayout(lAndFeelInnerP, BoxLayout.Y_AXIS));
         lAndFeelInnerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        defaultLafRB = new JRadioButton("Default");
-        defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lAndFeelInnerP.add(defaultLafRB);
-        platformLafRB = new JRadioButton("Platform");
-        platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lAndFeelInnerP.add(platformLafRB);
-        otherLafRB = new JRadioButton("Other");
+        defaultLookAndFeelRB = new JRadioButton("Default");
+        defaultLookAndFeelRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        lAndFeelInnerP.add(defaultLookAndFeelRB);
+        platformLookAndFeelRB = new JRadioButton("Platform");
+        platformLookAndFeelRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        lAndFeelInnerP.add(platformLookAndFeelRB);
+        otherLookAndFeelRB = new JRadioButton("Other");
         JPanel otherPan = new JPanel();
         otherPan.setLayout(new BoxLayout(otherPan,BoxLayout.X_AXIS));
-        otherPan.add(otherLafRB);
+        otherPan.add(otherLookAndFeelRB);
         otherPan.add(Box.createHorizontalStrut(5));
         otherTF = new JTextField();
         ViskitStatics.clampHeight(otherTF);
@@ -283,17 +287,17 @@ public class UserPreferencesDialog extends JDialog {
         lookAndFeelPanel.add(preferenceChangeLabel);
         lookAndFeelPanel.add(Box.createVerticalGlue());
 
-        ButtonGroup bg = new ButtonGroup();
-        defaultLafRB.setSelected(true);
+        ButtonGroup buttonGroup = new ButtonGroup();
+        defaultLookAndFeelRB.setSelected(true);
         otherTF.setEnabled(false);
-        bg.add(defaultLafRB);
-        bg.add(platformLafRB);
-        bg.add(otherLafRB);
-        ActionListener lis = new lafListener();
-        platformLafRB.addActionListener(lis);
-        defaultLafRB.addActionListener(lis);
-        otherLafRB.addActionListener(lis);
-        otherTF.addActionListener(lis);
+        buttonGroup.add (defaultLookAndFeelRB);
+        buttonGroup.add(platformLookAndFeelRB);
+        buttonGroup.add(   otherLookAndFeelRB);
+        ActionListener listener = new lookAndFeelListener();
+        platformLookAndFeelRB.addActionListener(listener);
+         defaultLookAndFeelRB.addActionListener(listener);
+           otherLookAndFeelRB.addActionListener(listener);
+                      otherTF.addActionListener(listener);
 
         tabbedPane.addTab("Look and Feel",lookAndFeelPanel);
 		
@@ -331,20 +335,20 @@ public class UserPreferencesDialog extends JDialog {
         tabbedPane.addTab("Recent Files", recentP);
      }
 
-    class lafListener implements ActionListener {
+    class lookAndFeelListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == otherTF) {
                 guiConfiguration.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
             } else {
-                if (defaultLafRB.isSelected()) {
+                if (defaultLookAndFeelRB.isSelected()) {
                     guiConfiguration.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LOOK_AND_FEEL_DEFAULT);
                     otherTF.setEnabled(false);
-                } else if (platformLafRB.isSelected()) {
+                } else if (platformLookAndFeelRB.isSelected()) {
                     guiConfiguration.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LOOK_AND_FEEL_PLATFORM);
                     otherTF.setEnabled(false);
-                } else if (otherLafRB.isSelected()) {
+                } else if (otherLookAndFeelRB.isSelected()) {
                     guiConfiguration.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
                     otherTF.setEnabled(true);
                 }
@@ -379,10 +383,13 @@ public class UserPreferencesDialog extends JDialog {
                     } // reenter here
                 }
                 applicationConfiguration.setProperty(ViskitConfiguration.SIMULATION_RUN_VISIBLE_KEY, runAssemblyPreferenceCB.isSelected());
-            } else if (src == verboseDebugMessagesPreferenceCB) {
+            } 
+			else if (src == verboseDebugMessagesPreferenceCB) 
+			{
                 applicationConfiguration.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, verboseDebugMessagesPreferenceCB.isSelected());
                 ViskitStatics.debug = verboseDebugMessagesPreferenceCB.isSelected();
-            } else if (src == analystReportPreferenceCB) {
+            } 
+			else if (src == analystReportPreferenceCB) {
                 applicationConfiguration.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportPreferenceCB.isSelected());
             } else if (src == designOfExperimentsPreferenceCB) {
                 applicationConfiguration.setProperty(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY, designOfExperimentsPreferenceCB.isSelected());
@@ -494,7 +501,8 @@ public class UserPreferencesDialog extends JDialog {
         }
     }
 
-    private void fillWidgets() {
+    private void fillWidgets() 
+	{
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathAdditionsJlist.getModel();
         mod.clear();
         if (getExtraClassPath() != null) {
@@ -516,21 +524,26 @@ public class UserPreferencesDialog extends JDialog {
         analystReportPreferenceCB.setSelected(isAnalystReportVisible());
         verboseDebugMessagesPreferenceCB.setSelected(ViskitStatics.debug = isVerboseDebug());
 
-        String laf = getLookAndFeel();
-        if(laf == null || laf.equals(ViskitConfiguration.LOOK_AND_FEEL_PLATFORM)) {
-            platformLafRB.setSelected(true);
-        } else if(laf.equals(ViskitConfiguration.LOOK_AND_FEEL_DEFAULT)) {
-            defaultLafRB.setSelected(true);
-        } else {
-          otherLafRB.setSelected(true);
-          otherTF.setEnabled(true);
-          otherTF.setText(laf);
+        String lookAndFeelName = getLookAndFeel();
+        if(lookAndFeelName == null || lookAndFeelName.equals(ViskitConfiguration.LOOK_AND_FEEL_PLATFORM)) 
+		{
+            platformLookAndFeelRB.setSelected(true);
+        } 
+		else if(lookAndFeelName.equals(ViskitConfiguration.LOOK_AND_FEEL_DEFAULT)) 
+		{
+            defaultLookAndFeelRB.setSelected(true);
+        } 
+		else 
+		{
+			otherLookAndFeelRB.setSelected(true);
+			otherTF.setEnabled(true);
+			otherTF.setText(lookAndFeelName);
         }
     }
 
     private void unloadWidgets() {
       // most everything gets instantly updated;  check for pending text entry
-      if(otherLafRB.isSelected()) {
+      if(otherLookAndFeelRB.isSelected()) {
           guiConfiguration.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
       }
     }
@@ -722,7 +735,8 @@ public class UserPreferencesDialog extends JDialog {
      * Return the value for the platform look and feel
      * @return the value for the platform look and feel
      */
-    public static String getLookAndFeel() {
+    public static String getLookAndFeel() 
+	{
         return ViskitConfiguration.instance().getValue(ViskitConfiguration.LOOK_AND_FEEL_KEY);
     }
 
@@ -731,7 +745,8 @@ public class UserPreferencesDialog extends JDialog {
      * @param tabProperty the tab of interest
      * @return the value for tab visibility
      */
-    public static boolean getVisibilitySense(String tabProperty) {
+    public static boolean getVisibilitySense(String tabProperty)
+	{
         return applicationConfiguration.getBoolean(tabProperty);
     }
 

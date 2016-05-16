@@ -6,6 +6,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -99,7 +100,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         methodLabel = new JLabel("method", JLabel.TRAILING);
         methodCB    = new JComboBox<>(new String[]{"free form", "constructor", "factory"});
-        //or
+        // or
         JTextField constructorTF = new JTextField("Constructor");
         constructorTF.setEditable(false);
 
@@ -355,7 +356,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         public void setType(String className) throws ClassNotFoundException
 		{
             LOG.debug("ConstrPanel constructor for class " + className);
-            List<Object>[] parameters = ViskitStatics.resolveParameters(ViskitStatics.classForName(className));
+            List<Object>[] parameters = ViskitStatics.resolveParametersUsingReflection(ViskitStatics.classForName(className));
 
             typeName = className;
             removeAll();
@@ -472,20 +473,25 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        public void setData(ViskitInstantiator.Construct vi) {
-            if (vi == null) {
+        public void setData(ViskitInstantiator.Construct viskitInstantiatorConstructor)
+		{
+            if (viskitInstantiatorConstructor == null)
+			{
                 return;
             }
-            if (viskit.ViskitStatics.debug) {
-                System.out.println("setting data for " + vi.getTypeName());
+            if (viskit.ViskitStatics.debug)
+			{
+                System.out.println("setting data for " + viskitInstantiatorConstructor.getTypeName());
             }
 
-            int argumentIndex = vi.indexOfArgNames(vi.getTypeName(), vi.getParametersList());
-            if (viskit.ViskitStatics.debug) {
+            int argumentIndex = viskitInstantiatorConstructor.indexOfArgumentNames(viskitInstantiatorConstructor.getTypeName(), viskitInstantiatorConstructor.getParametersList());
+            if (viskit.ViskitStatics.debug)
+			{
                 System.out.println("found a matching constructor at " + argumentIndex);
             }
-            if (argumentIndex != -1) {
-                constructorPanels[argumentIndex].setData(vi.getParametersList());
+            if (argumentIndex != -1)
+			{
+                constructorPanels[argumentIndex].setData(viskitInstantiatorConstructor.getParametersList());
                 tabbedPane.setSelectedIndex(argumentIndex);
             }
             actionPerformed(null);
@@ -596,7 +602,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        private void addObjectListPanel(Vector<Object> params, boolean showLabels) {
+        private void addObjectListPanel(Vector<Object> params, boolean showLabels)
+		{
             objectListPanel = new ObjectListPanel(instantiationPanel);
             objectListPanel.setBorder(BorderFactory.createTitledBorder (
                     BorderFactory.createLineBorder(Color.black),
@@ -612,7 +619,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             revalidate();
         }
 
-        public ViskitInstantiator getData() {
+        public ViskitInstantiator getData()
+		{
             String factoryClassName = (String) factoryClassCB.getSelectedItem();
             factoryClassName = (factoryClassName == null) ? ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS : factoryClassName.trim();
             String methodName = ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD;
@@ -683,7 +691,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             methodSignature = ViskitStatics.stripOutJavaDotLang(methodSignature);
 
                             // Show varargs symbol vice []
-                            methodSignature = ViskitStatics.makeVarArgs(methodSignature);
+                            methodSignature = ViskitStatics.applyVarArgSymbol(methodSignature);
 
                             // We only want to promote the RVF.getInstance(String, Object...) static method
                             if (method.getParameterCount() == 2 && methodSignature.contains("String") && methodSignature.contains("Object...")) {
@@ -693,8 +701,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         }
                     }
                 }
-                if (randomVariateFactoryStringObjectMethodVector.isEmpty()) {
-                    JOptionPane.showMessageDialog(instantiationPanel, "<html><center>" + factoryClassName + " contains no static methods<br>returning " + typeName + ".");
+                if (randomVariateFactoryStringObjectMethodVector.isEmpty()) 
+				{
+                    JOptionPane.showMessageDialog(instantiationPanel, "<html><center>" + factoryClassName + " contains no static methods <br/> returning " + typeName + ".");
                     factoryClassCB.requestFocus();
                     return;
                 }
@@ -724,8 +733,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 					}
 				}
 
-                Method randomVariateFactorySelectedMethod = methodsHashMap.get((String) returnValue);
-                Vector<Object> vInstantiatorVector = ViskitInstantiator.buildDummyInstantiators(randomVariateFactorySelectedMethod);
+                Method   randomVariateFactorySelectedMethod  = methodsHashMap.get((String) returnValue);
+				Method[] randomVariateFactorySelectedMethods = { randomVariateFactorySelectedMethod };
+                Vector<Object> vInstantiatorVector = ViskitInstantiator.buildInstantiatorsFromReflection(randomVariateFactorySelectedMethods);
                 addObjectListPanel(vInstantiatorVector, true);
 
                 if (instantiationPanel.modifiedListener != null) {

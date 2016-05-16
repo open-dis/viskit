@@ -228,10 +228,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbSimkitAssembly.setName(nullIfEmpty(graphMetadata.name));
-            jaxbSimkitAssembly.setVersion(nullIfEmpty(graphMetadata.revision));
-            jaxbSimkitAssembly.setPackage(nullIfEmpty(graphMetadata.packageName));
-            jaxbSimkitAssembly.setDescription(nullIfEmpty(graphMetadata.description));
+            jaxbSimkitAssembly.setName(ViskitGlobals.nullIfEmpty(graphMetadata.name));
+            jaxbSimkitAssembly.setVersion(ViskitGlobals.nullIfEmpty(graphMetadata.revision));
+            jaxbSimkitAssembly.setPackage(ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
+            jaxbSimkitAssembly.setDescription(ViskitGlobals.nullIfEmpty(graphMetadata.description));
 
             if (jaxbSimkitAssembly.getSchedule() == null)
 			{
@@ -331,10 +331,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 		{
             node.setName(mangleName(node.getName()));
         } 
-		while (!nameCheck());
+		while (!nameCheckSatisfactory());
     }
 
-    private boolean nameCheck()
+    private boolean nameCheckSatisfactory()
 	{
         Set<String> hashSet = new HashSet<>(10);
         for (AssemblyNode assemblyNode : getNodeCache().values())
@@ -384,15 +384,16 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         SimEntity jaxbSimEntity = jaxbObjectFactory.createSimEntity();
 
-        jaxbSimEntity.setName(nullIfEmpty(widgetName));
+        jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(widgetName));
         jaxbSimEntity.setType(className);
         jaxbSimEntity.setDescription(description);
         eventGraphNode.opaqueModelObject = jaxbSimEntity;
 
         ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(jaxbSimEntity.getType(), null);  // null means undefined
         eventGraphNode.setInstantiator(viskitConstructor);
+        eventGraphNode.setVerboseMarked(true); // default for new SimEntity.  TODO use user preference
 
-        if (!nameCheck())
+        if (!nameCheckSatisfactory())
 		{
             mangleName(eventGraphNode);
         }
@@ -408,15 +409,15 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public void redoEventGraph(EventGraphNode eventGraphNode) 
 	{
-        SimEntity simEntity = jaxbObjectFactory.createSimEntity();
+        SimEntity jaxbSimEntity = jaxbObjectFactory.createSimEntity();
 
-        simEntity.setName(eventGraphNode.getName());
-        eventGraphNode.opaqueModelObject = simEntity;
-        simEntity.setType(eventGraphNode.getType());
+        jaxbSimEntity.setName(eventGraphNode.getName());
+        eventGraphNode.opaqueModelObject = jaxbSimEntity;
+        jaxbSimEntity.setType(eventGraphNode.getType());
 
         getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = ev
 
-        jaxbSimkitAssembly.getSimEntity().add(simEntity);
+        jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
 
         modelDirty = true;
         notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
@@ -455,7 +456,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         PropertyChangeListener pcl = jaxbObjectFactory.createPropertyChangeListener();
 
-        pcl.setName(nullIfEmpty(widgetName));
+        pcl.setName(ViskitGlobals.nullIfEmpty(widgetName));
         pcl.setType(className);
         pcNode.opaqueModelObject = pcl;
 
@@ -464,7 +465,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         ViskitInstantiator vc = new ViskitInstantiator.Construct(pcl.getType(), lis);
         pcNode.setInstantiator(vc);
 
-        if (!nameCheck()) 
+        if (!nameCheckSatisfactory()) 
 		{
             mangleName(pcNode);
         }
@@ -734,7 +735,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changePclNode(PropertyChangeListenerNode pclNode) 
 	{
         boolean returnValue = true;
-        if (!nameCheck())
+        if (!nameCheckSatisfactory())
 		{
             mangleName(pclNode);
             returnValue = false;
@@ -801,7 +802,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public boolean changeEventGraphNode(EventGraphNode eventNode)
 	{
         boolean returnValue = true;
-        if (!nameCheck())
+        if (!nameCheckSatisfactory())
 		{
             mangleName(eventNode);
             returnValue = false;
@@ -865,12 +866,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return returnValue;
     }
 
-    private void removeFromOutputList(SimEntity simEntity) 
+    private void removeFromOutputList(SimEntity jaxbSimEntity) 
 	{
         List<Output> outTL = jaxbSimkitAssembly.getOutput();
         for (Output o : outTL) 
 		{
-            if (o.getEntity().equals(simEntity.getName())) 
+            if (o.getEntity().equals(jaxbSimEntity.getName())) 
 			{
                 outTL.remove(o);
                 return;
@@ -878,12 +879,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void removeFromVerboseList(SimEntity simEntity)
+    private void removeFromVerboseList(SimEntity jaxbSimEntity)
 	{
         List<Verbose> vTL = jaxbSimkitAssembly.getVerbose();
         for (Verbose v : vTL)
 		{
-            if (v.getEntity().equals(simEntity.getName()))
+            if (v.getEntity().equals(jaxbSimEntity.getName()))
 			{
                 vTL.remove(v);
                 return;
@@ -891,33 +892,33 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void addToOutputList(SimEntity simEntity)
+    private void addToOutputList(SimEntity jaxbSimEntity)
 	{
         List<Output> jaxbOutputList = jaxbSimkitAssembly.getOutput();
         for (Output o : jaxbOutputList)
 		{
-            if (o.getEntity().equals(simEntity.getName()))
+            if (o.getEntity().equals(jaxbSimEntity.getName()))
 			{
                 return; // found it
             }
         }
         Output jaxbOutputObject = jaxbObjectFactory.createOutput();
-        jaxbOutputObject.setEntity(simEntity.getName());
+        jaxbOutputObject.setEntity(jaxbSimEntity.getName());
         jaxbOutputList.add(jaxbOutputObject);
     }
 
-    private void addToVerboseList(SimEntity simEntity)
+    private void addToVerboseList(SimEntity jaxbSimEntity)
 	{
         List<Verbose> verboseList = jaxbSimkitAssembly.getVerbose();
         for (Verbose v : verboseList)
 		{
-            if (v.getEntity().equals(simEntity.getName()))
+            if (v.getEntity().equals(jaxbSimEntity.getName()))
 			{
                 return; // found it already there
             }
         }
         Verbose jaxbVerboseObject = jaxbObjectFactory.createVerbose();
-        jaxbVerboseObject.setEntity(simEntity.getName());
+        jaxbVerboseObject.setEntity(jaxbSimEntity.getName());
         verboseList.add(jaxbVerboseObject);
     }
 
@@ -927,18 +928,18 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         Vector<String> v = new Vector<>();
         for (Output jaxbOutputObject : jaxbSimkitAssembly.getOutput())
 		{
-            Object entity = jaxbOutputObject.getEntity();
-            if (entity instanceof SimEntity)
+            Object jaxbEntity = jaxbOutputObject.getEntity();
+            if (jaxbEntity instanceof SimEntity)
 			{
-                v.add(((SimEntity) entity).getName());
+                v.add(((SimEntity) jaxbEntity).getName());
             } 
-			else if (entity instanceof PropertyChangeListener)
+			else if (jaxbEntity instanceof PropertyChangeListener)
 			{
-                v.add(((PropertyChangeListener) entity).getName());
+                v.add(((PropertyChangeListener) jaxbEntity).getName());
             }
 			else // added missing case, getEntity produces a string
 			{
-				v.add(entity.toString()); // TODO confirm OK
+				v.add(jaxbEntity.toString()); // TODO confirm OK
 			}
         }
         return v;
@@ -948,11 +949,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public Vector<String> getVerboseOutputEntityNames() {
         Vector<String> v = new Vector<>();
         for (Verbose ot : jaxbSimkitAssembly.getVerbose()) {
-            Object entity = ot.getEntity();
-            if (entity instanceof SimEntity) {
-                v.add(((SimEntity) entity).getName());
-            } else if (entity instanceof PropertyChangeListener) {
-                v.add(((PropertyChangeListener) entity).getName());
+            Object jaxbEntity = ot.getEntity();
+            if (jaxbEntity instanceof SimEntity) {
+                v.add(((SimEntity) jaxbEntity).getName());
+            } else if (jaxbEntity instanceof PropertyChangeListener) {
+                v.add(((PropertyChangeListener) jaxbEntity).getName());
             }
         }
         return v;
@@ -984,7 +985,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private ViskitInstantiator.FreeForm buildFreeFormFromTerminalParameter(TerminalParameter terminalParameter)
 	{
-        return new ViskitInstantiator.FreeForm(terminalParameter.getType(), terminalParameter.getValue());
+		ViskitInstantiator.FreeForm viskitInstantiator = new ViskitInstantiator.FreeForm(terminalParameter.getType(), terminalParameter.getName());
+		viskitInstantiator.setValue      (terminalParameter.getValue());
+		viskitInstantiator.setDescription(terminalParameter.getDescription());
+        return viskitInstantiator;
     }
 
     private ViskitInstantiator.Array buildArrayFromMultiParameter(MultiParameter multiParameter)
@@ -1264,7 +1268,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         getNodeCache().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode);   // key = se
 
-        if (!nameCheck())
+        if (!nameCheckSatisfactory())
 		{
             mangleName(propertyChangeListenerNode);
         }
@@ -1272,16 +1276,16 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return propertyChangeListenerNode;
     }
 
-    private EventGraphNode buildEventGraphNodeFromJaxbSimEntity(SimEntity simEntity, boolean isOutputNode, boolean isVerboseNode)
+    private EventGraphNode buildEventGraphNodeFromJaxbSimEntity(SimEntity jaxbSimEntity, boolean isOutputNode, boolean isVerboseNode)
 	{
-        EventGraphNode eventGraphNode = (EventGraphNode) getNodeCache().get(simEntity.getName());
+        EventGraphNode eventGraphNode = (EventGraphNode) getNodeCache().get(jaxbSimEntity.getName());
         if (eventGraphNode != null)
 		{
             return eventGraphNode;
         }
-        eventGraphNode = new EventGraphNode(simEntity.getName(), simEntity.getType(), ViskitStatics.DEFAULT_DESCRIPTION);
+        eventGraphNode = new EventGraphNode(jaxbSimEntity.getName(), jaxbSimEntity.getType(), ViskitStatics.DEFAULT_DESCRIPTION);
 
-        Coordinate coordinate = simEntity.getCoordinate();
+        Coordinate coordinate = jaxbSimEntity.getCoordinate();
         if (coordinate == null) 
 		{
             eventGraphNode.setPosition(pointLess);
@@ -1293,41 +1297,29 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                                                           Double.parseDouble(coordinate.getY())));
         }
 
-        eventGraphNode.setDescription(simEntity.getDescription());
+        eventGraphNode.setDescription(jaxbSimEntity.getDescription());
         eventGraphNode.setOutputMarked(isOutputNode);
-        eventGraphNode.setVerboseMarked(isVerboseNode);
+		boolean verbose = false;
+		if ((jaxbSimEntity.isVerbose() != null) && (jaxbSimEntity.isVerbose()))
+			    verbose = true;
+        eventGraphNode.setVerboseMarked(isVerboseNode || verbose);
 
-        List<Object> parameterList = simEntity.getParameters();
+        List<Object> parameterList = jaxbSimEntity.getParameters();
 
-        ViskitInstantiator viskitInstantiatorConstructor = new ViskitInstantiator.Construct(parameterList, simEntity.getType());
+        ViskitInstantiator viskitInstantiatorConstructor = new ViskitInstantiator.Construct(parameterList, jaxbSimEntity.getType());
         eventGraphNode.setInstantiator(viskitInstantiatorConstructor);
 
-        eventGraphNode.opaqueModelObject = simEntity;
+        eventGraphNode.opaqueModelObject = jaxbSimEntity;
 
         getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = se
 
-        if (!nameCheck())
+        if (!nameCheckSatisfactory())
 		{
             mangleName(eventGraphNode);
         }
         notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "Event added"));
 
         return eventGraphNode;
-    }
-
-    /**
-     * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s the string to check for non-zero length
-     * @return the passed string if non-zero length, else null
-     */
-    private String nullIfEmpty(String s)
-	{
-        if (s != null) {
-            if (s.length() == 0) {
-                s = null;
-            }
-        }
-        return s;
     }
 
     public Map<String, AssemblyNode> getNodeCache() {

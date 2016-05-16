@@ -65,11 +65,17 @@ public class SimkitXML2Java
     public final static String JDO = "/**";
 	/** javadoc close */
     public final static String JDC = "*/";
+	/** java comment open */
+    public final static String JCO = "/*";
+	/** java comment close */
+    public final static String JCC = "*/";
+	
     public final static String PUBLIC = "public";
     public final static String PROTECTED = "protected";
     public final static String PRIVATE = "private";
     public final static String SIM_ENTITY_BASE = "SimEntityBase";
     public final static String EVENT_GRAPH_BINDINGS = "viskit.xsd.bindings.eventgraph";
+	public final static String SPACER_BAR = "======";
 
     private SimEntity root;
     InputStream fileInputStream;
@@ -83,9 +89,9 @@ public class SimkitXML2Java
     private String packageName = "";
     private File eventGraphFile;
 
-    private List<Parameter> superParams;
-    private List<Parameter> liParams;
-    private List<StateVariable> liStateV;
+    private List<Parameter>   superParametersList;
+    private List<Parameter>        parametersList;
+    private List<StateVariable> stateVariableList;
 
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
@@ -169,8 +175,8 @@ public class SimkitXML2Java
     }
 
     /** @return the XML to Java translated source as a string */
-    public String translate() {
-
+    public String translate()
+	{
         StringBuilder sourceStringBuilder = new StringBuilder();
 		
         StringWriter           headStringWriter = new StringWriter();
@@ -185,9 +191,9 @@ public class SimkitXML2Java
         StringWriter      codeBlockStringWriter = new StringWriter();
 
         buildHead          (headStringWriter);
-        buildParameters    (parametersStringWriter,     accessorBlockStringWriter);
         buildStateVariables(stateVariablesStringWriter, accessorBlockStringWriter);
-        buildParameterMap  (parameterMapStringWriter);
+        buildParameters    (parametersStringWriter,     accessorBlockStringWriter);
+        buildParameterMap  (parameterMapStringWriter); // immediately following parameter definitions
         buildConstructors  (constructorsStringWriter);
         buildEventBlock    (runBlockStringWriter, eventBlockStringWriter);
         buildToString      (toStringBlockStringWriter);
@@ -195,8 +201,8 @@ public class SimkitXML2Java
 
         buildSource(sourceStringBuilder, 
 				    headStringWriter, 
-					parametersStringWriter, 
-					stateVariablesStringWriter, 
+					stateVariablesStringWriter,
+					parametersStringWriter,
 					parameterMapStringWriter,
 					constructorsStringWriter, 
 					runBlockStringWriter, 
@@ -234,13 +240,13 @@ public class SimkitXML2Java
         eventGraphFile = f;
     }
 
-    void buildHead(StringWriter head) {
-
+    void buildHead(StringWriter head) 
+	{
         PrintWriter pw = new PrintWriter(head);
 
-        className = root.getName();
+          className = root.getName();
         packageName = root.getPackage();
-        extendz = root.getExtend();
+            extendz = root.getExtend();
         String implementz = root.getImplement();
 
         // TBD: should be checking the class definitions
@@ -262,105 +268,129 @@ public class SimkitXML2Java
 //        pw.println("import org.apache.log4j.Logger;");
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
-        pw.println();
-        pw.println("public class " + className + SP + "extends" + SP + extendz + SP + OB);
-        pw.println();
+        pw.println();            
+		String description = root.getDescription().trim();
+		if (!description.isEmpty())
+		{
+			pw.println(JDO + SP + description);
+			pw.println(SP + SP + JDC);
+		}
+        pw.println(PUBLIC + " class " + className + SP + "extends" + SP + extendz);
+        pw.println(OB);
     }
 
-    void buildParameters(StringWriter vars, StringWriter accessorBlock) {
+    void buildParameters(StringWriter parametersStringWriterHolder, StringWriter accessorBlockStringWriterHolder)
+	{
+        PrintWriter pw = new PrintWriter(parametersStringWriterHolder);
 
-        PrintWriter pw = new PrintWriter(vars);
-
-        liParams = root.getParameter();
-        superParams = resolveSuperParams(liParams);
+             parametersList = root.getParameter();
+        superParametersList = resolveSuperParams(parametersList);
 
         // Logger instantiation (for debugging only)
 //        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
-        pw.println(SP_4 + "/* Simulation Parameters */");
-        pw.println();
-        for (Parameter p : liParams) {
 
-            if (!superParams.contains(p)) {
-                if (!p.getComment().isEmpty()) { // TODO fix description
-                    pw.print(SP_4 + JDO + SP);
-                    for (String comment : p.getComment()) {
-                        pw.print(comment);
-                    }
-                    pw.println(SP + JDC);
-                }
+        pw.print(SP_4 + "/* " + SPACER_BAR + " Event Graph Initialization Parameters");
+        if (parametersList.isEmpty()) 
+		{
+            pw.println(": none " + SPACER_BAR + " */");
+        }
+		else
+		{
+			pw.println(" " + SPACER_BAR + " */");
+        }
+        pw.println();
+		
+		// this output carefully directed to precede accessor block for initialization parameters
+		PrintWriter abpw = new PrintWriter (accessorBlockStringWriterHolder);
+		abpw.print(SP_4 + JCO + SP + SPACER_BAR + SP + "Initialization Parameter accessors: ");
+		if (superParametersList.isEmpty() && parametersList.isEmpty()) 
+		{
+			abpw.println("none" + SP + SPACER_BAR + SP + JCC);
+		}
+		else
+		{
+			abpw.println("read and write methods to set values" + SP + SPACER_BAR + SP + JCC);
+		}
+		abpw.println();
+		
+        for (Parameter p : parametersList) 
+		{
+            if (!superParametersList.contains(p)) 
+			{
+				String description = p.getDescription().trim();
+				if (!description.isEmpty()) 
+				{
+					pw.println(SP_4 + JDO + SP + description + SP + JDC);
+				}
                 pw.println(SP_4 + PRIVATE + SP + p.getType() + SP + p.getName() + SC);
-            } else {
+            } 
+			else 
+			{
                 pw.println(SP_4 + "/* inherited parameter " + p.getType() + SP + p.getName() + " */");
             }
             pw.println();
 
-            if (extendz.contains(SIM_ENTITY_BASE)) {
-                buildParameterModifierAndAccessor(p, accessorBlock);
-            } else if (!superParams.contains(p)) {
-                buildParameterModifierAndAccessor(p, accessorBlock);
+            if (extendz.contains(SIM_ENTITY_BASE)) 
+			{
+                buildParameterModifierAndAccessor(p, accessorBlockStringWriterHolder);
+            } 
+			else if (!superParametersList.contains(p)) 
+			{
+                buildParameterModifierAndAccessor(p, accessorBlockStringWriterHolder);
             }
-        }
-        if (liParams.isEmpty()) {
-            pw.println(SP_4 + "/* None */");
-            pw.println();
         }
     }
 
-    void buildStateVariables(StringWriter vars, StringWriter accessorBlock) {
+    void buildStateVariables(StringWriter stateVariableWriterHolder, StringWriter accessorBlockWriterHolder)
+	{
+        PrintWriter pw = new PrintWriter(stateVariableWriterHolder);
 
-        PrintWriter pw = new PrintWriter(vars);
+        stateVariableList = root.getStateVariable();
 
-        liStateV = root.getStateVariable();
-
-        pw.println(SP_4 + "/* Simulation State Variables */");
+        pw.print(SP_4 + JCO + SP + SPACER_BAR + SP + "Event Graph State Variables");
+        if (stateVariableList.isEmpty())
+		{
+            pw.println(": none " + SPACER_BAR + SP + JDC);
+        }
+		else
+		{
+            pw.println(" " + SPACER_BAR + SP + JDC);
+        }
         pw.println();
 
         Class<?> c;
         Constructor<?> cst;
-        for (StateVariable s : liStateV) {
-
+        for (StateVariable stateVariable : stateVariableList)
+		{
+			String description = stateVariable.getDescription().trim();
+			if (!description.isEmpty()) 
+			{
+				pw.println(SP_4 + JDO + SP + description + SP + JDC);
+			}
+				
             // Non array type generics
-            if (isGeneric(s.getType())) {
-                if (!s.getComment().isEmpty()) { // TODO fix description
-                    pw.print(SP_4 + JDO + SP);
-                    for (String comment : s.getComment()) {
-                        pw.print(comment);
-                    }
-                    pw.println(SP + JDC);
-                }
-                if (!isArray(s.getType()))
-                    pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + stripType(s.getType()) + LP + RP + SC);
+            if (isGeneric(stateVariable.getType()))
+			{
+                if (!isArray(stateVariable.getType()))
+                    pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stripType(stateVariable.getType()) + LP + RP + SC);
                 else
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
-            } else {
-
-                c = ViskitStatics.classForName(s.getType());
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+            } 
+			else 
+			{
+				pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+					
+                c = ViskitStatics.classForName(stateVariable.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
-                if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
-
-                    if (!s.getComment().isEmpty()) { // TODO fix description
-                        pw.print(SP_4 + JDO + SP);
-                        for (String comment : s.getComment()) {
-                            pw.print(comment);
-                        }
-                        pw.println(SP + JDC);
-                    }
-
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
-
-                } else if (!isArray(s.getType())) {
-
-                    if (!s.getComment().isEmpty()) { // TODO fix description
-                        pw.print(SP_4 + JDO + SP);
-                        for (String comment : s.getComment()) {
-                            pw.print(comment);
-                        }
-                        pw.println(SP + JDC);
-                    }
-
+                if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(stateVariable.getType())) 
+				{
+					// TODO previously javadoc here; anything else still needed?
+                } 
+				else if (!isArray(stateVariable.getType())) 
+				{
                     // NOTE: not the best way to do this, but functions for now
                     try {
                         cst = c.getConstructor(new Class<?>[]{});
@@ -372,19 +402,30 @@ public class SimkitXML2Java
                     }
 
                     if (cst != null) {
-                        pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "new" + SP + s.getType() + LP + RP + SC);
+                        pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stateVariable.getType() + LP + RP + SC);
                     } else { // really not a bad case, most likely will be set by the reset()
-                        pw.println(SP_4 + PROTECTED + SP + s.getType() + SP + s.getName() + SP + EQ + SP + "null" + SC);
+                        pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "null" + SC);
                     }
                 } else
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
             }
-
-            buildStateVariableAccessor(s, accessorBlock);
-            pw.println();
-        }
-        if (liStateV.isEmpty()) {
-            pw.println(SP_4 + "/* None */");
+			if (stateVariableList.indexOf(stateVariable) == 0)
+			{
+				// this output carefully directed to precede accessor block for state variables
+				PrintWriter abpw = new PrintWriter(accessorBlockWriterHolder);
+				abpw.print(SP_4 + JCO + SP + SPACER_BAR + SP + "Event Graph State Variables");
+				if (stateVariableList.isEmpty())
+				{
+					abpw.println(" accessors: none" + SP + SPACER_BAR + SP + JCC);
+				}
+				else
+				{
+					abpw.println(": only read accessor methods provided" + SP + SPACER_BAR + SP + JCC);
+					abpw.println(SP_4 + JCO + SP + SPACER_BAR + SP  + SP + "(only Event State Transitions can change State Variable values)" + SP + SPACER_BAR + SP + JCC);
+					abpw.println();
+				}
+			}
+            buildStateVariableAccessor(stateVariable, accessorBlockWriterHolder);
             pw.println();
         }
     }
@@ -404,9 +445,9 @@ public class SimkitXML2Java
         return s.substring(0, left + 1) + s.substring(right);
     }
 
-    void buildParameterModifierAndAccessor(Parameter p, StringWriter sw) {
-
-        // Don't dup any super setters
+    void buildParameterModifierAndAccessor(Parameter p, StringWriter sw)
+	{
+        // Don't duplicate any super setters
         if (!extendz.contains(SIM_ENTITY_BASE)) {
 
             Class<?> sup = resolveExtensionClass();
@@ -421,35 +462,39 @@ public class SimkitXML2Java
 
         PrintWriter pw = new PrintWriter(sw);
 
-        pw.print(SP_4 + "public final void set" + capitalize(p.getName()) + LP);
-        pw.println(p.getType() + SP + shortinate(p.getName()) + RP + SP + OB);
+        pw.print  (SP_4 + PUBLIC + " final void set" + capitalize(p.getName()) + SP + LP);
+        pw.println(p.getType() + SP + "new" + capitalize(p.getName()) + RP);
+        pw.println(SP_4 + OB);
         pw.print(SP_8 + "this" + PD + p.getName() + SP + EQ + SP);
 
-        if (isArray(p.getType()) || isGeneric(p.getType())) {
-            pw.print(shortinate(p.getName()));
+        if (isArray(p.getType()) || isGeneric(p.getType())) 
+		{
+            pw.print  ("new" + capitalize(p.getName()));
             pw.println(PD + "clone" + LP + RP + SC);
-        } else {
-            pw.println(shortinate(p.getName()) + SC);
+        } 
+		else 
+		{
+            pw.println("new" + capitalize(p.getName()) + SC);
         }
         pw.println(SP_4 + CB);
         pw.println();
 
-        /* also provide indexed getters, may be multidimensional, however,
+        /* TODO also provide indexed getters, may be multidimensional, however,
          * not expected to actually be multidimensional
          */
-        if (isArray(p.getType())) {
+        if (isArray(p.getType())) 
+		{
             int d = dims(p.getType());
 
-            pw.print(SP_4 + PUBLIC + SP + baseOf(p.getType()) + SP + "get");
-            pw.print(capitalize(p.getName()) + LP + indxncm(d));
-            pw.println(RP + SP + OB);
+            pw.println(SP_4 + PUBLIC + SP + baseOf(p.getType()) + SP + "get" + capitalize(p.getName()) + SP + LP + indxncm(d) + RP);
+            pw.println(SP_4 + OB);
             pw.println(SP_8 + "return" + SP + p.getName() + indxbr(d) + SC);
             pw.println(SP_4 + CB);
             pw.println();
         }
 
-        pw.print(SP_4 + "public " + p.getType() + SP + "get" + capitalize(p.getName()));
-        pw.println(LP + RP + SP + OB);
+        pw.println(SP_4 + PUBLIC + SP + p.getType() + SP + "get" + capitalize(p.getName()) + SP + LP + RP);
+        pw.println(SP_4 + OB);
         pw.println(SP_8 + "return" + SP + p.getName() + SC);
         pw.println(SP_4 + CB);
         pw.println();
@@ -491,39 +536,47 @@ public class SimkitXML2Java
         return inds;
     }
 
-    void buildStateVariableAccessor(StateVariable s, StringWriter sw) {
-
+    void buildStateVariableAccessor(StateVariable stateVariable, StringWriter sw)
+	{
         PrintWriter pw = new PrintWriter(sw);
-        String clStr = "";
-        String tyStr = "";
+		
+        String cloneString = "";
+        String  typeString = "";
 
         // check for cloneable
-        if (isCloneable(s.getType())) {
-            clStr = ".clone()";
+        if (isCloneable(stateVariable.getType())) 
+		{
+            cloneString = ".clone()";
 
-            if (!isArray(s.getType()) || isGeneric(s.getType())) {
-                tyStr = LP + stripLength(s.getType()) + RP;
+            if (!isArray(stateVariable.getType()) || isGeneric(stateVariable.getType())) 
+			{
+                typeString = LP + stripLength(stateVariable.getType()) + RP;
             }
 
             // Supress warning call to unchecked cast since we return a clone
             // of Objects vice the desired type
-            if (isGeneric(s.getType())) {
+            if (isGeneric(stateVariable.getType())) 
+			{
                 pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
             }
         }
 
-        if (isArray(s.getType())) {
-            int d = dims(s.getType());
-            pw.print(SP_4 + PUBLIC + SP + baseOf(s.getType()) + SP + "get");
-            pw.print(capitalize(s.getName()) + LP + indxncm(d));
-            pw.println(RP + SP + OB);
-            pw.println(SP_8 + "return" + SP + s.getName() + indxbr(d) + SC);
+        if (isArray(stateVariable.getType()))
+		{
+            int d = dims(stateVariable.getType());
+            pw.print  (SP_4 + PUBLIC + SP + baseOf(stateVariable.getType()) + SP + "get" + capitalize(stateVariable.getName()));
+            pw.println(SP + LP + indxncm(d) + RP);
+            pw.println(SP_4 + OB);
+            pw.println(SP_8 + "return" + SP + stateVariable.getName() + indxbr(d) + SC);
             pw.println(SP_4 + CB);
             pw.println();
-        } else {
-            pw.print(SP_4 + "public " + stripLength(s.getType()) + SP + "get" + capitalize(s.getName()));
-            pw.println(LP + RP + SP + OB);
-            pw.println(SP_8 + "return" + SP + (tyStr + SP + s.getName() + clStr).trim() + SC);
+        } 
+		else 
+		{
+            pw.print  (SP_4 + PUBLIC + SP + stripLength(stateVariable.getType()) + SP + "get" + capitalize(stateVariable.getName()));
+            pw.println(SP + LP + RP);
+            pw.println(SP_4 + OB);
+            pw.println(SP_8 + "return" + SP + (typeString + SP + stateVariable.getName() + cloneString).trim() + SC);
             pw.println(SP_4 + CB);
             pw.println();
         }
@@ -534,32 +587,38 @@ public class SimkitXML2Java
 
         pw.println(SP_4 + "@viskit.ParameterMap" + SP + LP);
         pw.print(SP_8 + "names =" + SP + OB);
-        for (Parameter pt : liParams) {
-            pw.print(QU + pt.getName() + QU);
-            if (liParams.indexOf(pt) < liParams.size() - 1) {
-                pw.print(CM);
-                pw.println();
-                pw.print(SP_8 + SP_4);
+        for (Parameter parameter : parametersList)
+		{
+			pw.println();
+			pw.print(SP_8 + SP_4);
+            pw.print(QU + parameter.getName() + QU);
+            if (parametersList.indexOf(parameter) < parametersList.size() - 1) 
+			{
+				pw.print(CM);
             }
         }
         pw.println(CB + CM);
         pw.print(SP_8 + "types =" + SP + OB);
-        for (Parameter pt : liParams) {
-            pw.print(QU + pt.getType() + QU);
-            if (liParams.indexOf(pt) < liParams.size() - 1) {
+        for (Parameter parameter : parametersList) 
+		{
+			pw.println();
+			pw.print(SP_8 + SP_4);
+            pw.print(QU + parameter.getType() + QU);
+            if (parametersList.indexOf(parameter) < parametersList.size() - 1) 
+			{
                 pw.print(CM);
-                pw.println();
-                pw.print(SP_8 + SP_4);
             }
         }
         pw.println(CB + CM);
         pw.print(SP_8 + "descriptions =" + SP + OB);
-        for (Parameter pt : liParams) {
-            pw.print(QU + pt.getDescription() + QU);
-            if (liParams.indexOf(pt) < liParams.size() - 1) {
+        for (Parameter parameter : parametersList) 
+		{
+			pw.println();
+			pw.print(SP_8 + SP_4);
+            pw.print(QU + parameter.getDescription() + QU);
+            if (parametersList.indexOf(parameter) < parametersList.size() - 1) 
+			{
                 pw.print(CM);
-                pw.println();
-                pw.print(SP_8 + SP_4);
             }
         }
         pw.println(CB);
@@ -571,42 +630,56 @@ public class SimkitXML2Java
 
         PrintWriter pw = new PrintWriter(constructors);
 
+		pw.println(SP_4 + JDO + SP + "No-parameter constructor creates a new default instance of " + root.getName() + " event graph.");
+		pw.println(SP_4 + SP + JDC);
+
         // Generate a zero parameter (default) constructor in addition to a
         // parameterized constructor if we are not an extension
-        if (superParams.isEmpty()) {
-            pw.println(SP_4 + "/** Creates a new default instance of " + root.getName() + " */");
-            pw.println(SP_4 + "public " + root.getName() + LP + RP + SP + OB);
+        if (superParametersList.isEmpty()) 
+		{
+            pw.println(SP_4 + PUBLIC + SP + root.getName() + LP + RP + SP + OB);
             pw.println(SP_4 + CB);
             pw.println();
         }
 
-        if (!liParams.isEmpty()) {
-            for (StateVariable st : liStateV) {
-
+        if (!parametersList.isEmpty()) 
+		{
+            for (StateVariable stateVariable : stateVariableList)
+			{
                 // Suppress warning call to unchecked cast since we return a clone
                 // of Objects vice the desired type
-                if (isGeneric(st.getType()) && isArray(st.getType())) {
+                if (isGeneric(stateVariable.getType()) && isArray(stateVariable.getType())) 
+				{
                     pw.println(SP_4 + "@SuppressWarnings(\"unchecked\")");
                     break;
                 }
             }
+            
+			// Event graph constructor javadoc
+			pw.println(SP_4 + JDO + SP + "All-parameter constructor creates a new instance of " + root.getName() + " event graph.");
+            pw.println(SP_4 + " * Warning: if more than one parameter have compatible types, be sure to initialize them in the correct order!");
+			for (Parameter parameter : parametersList)
+			{
+				pw.print(SP_4 + " * @param " + parameter.getName() + SP + parameter.getDescription());
+				pw.println();
+			}
+			pw.println(SP_4 + SP + JDC);
 
             // Now, generate the parameterized consructor
-            pw.print(SP_4 + "public " + root.getName() + LP);
-            for (Parameter pt : liParams) {
+            pw.print(SP_4 + PUBLIC + SP + root.getName() + SP + LP);
+            for (Parameter parameter : parametersList)
+			{
+				pw.println();
+				pw.print(SP_8);
+                pw.print(parameter.getType() + SP + shortinate(parameter.getName()));
 
-                pw.print(pt.getType() + SP + shortinate(pt.getName()));
-
-                if (liParams.size() > 1) {
-                    if (liParams.indexOf(pt) < liParams.size() - 1) {
-                        pw.print(CM);
-                        pw.println();
-                        pw.print(SP_8 + SP_4);
-                    }
-                }
+                if ((parametersList.size() > 1) && (parametersList.indexOf(parameter) < parametersList.size() - 1)) 
+				{
+					pw.print(CM);
+				}
             }
-
-            pw.println(RP + SP + OB);
+            pw.println(RP);
+			pw.println(SP_4 + OB);
 
             Method[] methods = null;
 
@@ -617,9 +690,9 @@ public class SimkitXML2Java
                 methods = sup.getMethods();
 
                 pw.print(SP_8 + "super" + LP);
-                for (Parameter pt : superParams) {
+                for (Parameter pt : superParametersList) {
                     pw.print(shortinate(pt.getName()));
-                    if ((superParams.size() > 1) && (superParams.indexOf(pt) < superParams.size() - 1)) {
+                    if ((superParametersList.size() > 1) && (superParametersList.indexOf(pt) < superParametersList.size() - 1)) {
                         pw.print(CM + SP);
                     }
                 }
@@ -630,9 +703,9 @@ public class SimkitXML2Java
 
             // skip over any sets that would get done in the superclass, or
             // call super.set*()
-            for (int l = superParams.size(); l < liParams.size(); l++) {
+            for (int l = superParametersList.size(); l < parametersList.size(); l++) {
 
-                Parameter pt = liParams.get(l);
+                Parameter pt = parametersList.get(l);
                 if (methods != null) {
                     for (Method m : methods) {
                         if (("set" + capitalize(pt.getName())).equals(m.getName())) {
@@ -651,12 +724,13 @@ public class SimkitXML2Java
                 superParam = null;
             }
 
-            for (StateVariable st : liStateV) {
-                if (isArray(st.getType())) {
-                    pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripGenerics(st.getType()) + SC);
+            for (StateVariable stateVariable : stateVariableList) 
+			{
+                if (isArray(stateVariable.getType())) 
+				{
+                    pw.println(SP_8 + stateVariable.getName() + SP + EQ + SP + "new" + SP + stripGenerics(stateVariable.getType()) + SC);
                 }
             }
-
             pw.println(SP_4 + CB);
             pw.println();
         }
@@ -668,9 +742,11 @@ public class SimkitXML2Java
      * @param type the generic type to strip
      * @return a stripped generic type, i.e. remove &lt;type&gt;
      */
-    private String stripGenerics(String type) {
+    private String stripGenerics(String type) 
+	{
         int left, right;
-        if (!isGeneric(type)) {
+        if (!isGeneric(type)) 
+		{
             return type;
         }
         left = type.indexOf(LA);
@@ -696,159 +772,207 @@ public class SimkitXML2Java
         }
     }
 
-    void doResetBlock(Event run, StringWriter runBlock) {
-
+    void doResetBlock(Event run, StringWriter runBlock) 
+	{
         PrintWriter pw = new PrintWriter(runBlock);
-        List<LocalVariable> liLocalV = run.getLocalVariable();
-        List<StateTransition> liStateT = run.getStateTransition();
+        List<LocalVariable>     localVariableList = run.getLocalVariable();
+        List<StateTransition> stateTransitionList = run.getStateTransition();
 
+		pw.println(SP_4 + JDO + SP + "Reset state variables back to initial values for " + root.getName() + " event graph.");
+		pw.println(SP_4 + SP + JDC);
         pw.println(SP_4 + "@Override");
-        pw.println(SP_4 + "public void reset() " + OB);
+        pw.println(SP_4 + PUBLIC + " void reset ()");
+        pw.println(SP_4 + OB);
         pw.println(SP_8 + "super.reset()" + SC);
 
-        if (!liLocalV.isEmpty()) {
+        if (!localVariableList.isEmpty()) 
+		{
             pw.println();
-            pw.println(SP_8 + "/* local variable decarlations */");
+            pw.println(SP_8 + "/* local variable declarations */");
         }
 
-        for (LocalVariable local : liLocalV) {
-            pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
+        for (LocalVariable localVariable : localVariableList) 
+		{
+            pw.println(SP_8 + localVariable.getType() + SP + localVariable.getName() + SC);
         }
 
-        if (!liLocalV.isEmpty()) {pw.println();}
+        if (!localVariableList.isEmpty()) 
+		{
+			pw.println();
+		}
 
-        for (StateTransition st : liStateT) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
+        for (StateTransition stateTransition : stateTransitionList)
+		{
+            StateVariable stateVariable = (StateVariable) stateTransition.getState();
+            Assignment    assignment    = stateTransition.getAssignment();
+            Operation     operation     = stateTransition.getOperation();
+ 
+            boolean isArray = isArray(stateVariable.getType());
+            String spaces = isArray ? SP_12 : SP_8;
+            String in = indexFrom(stateTransition);
 
-            boolean isar = isArray(sv.getType());
-            String sps = isar ? SP_12 : SP_8;
-            String in = indexFrom(st);
-
-            if (isar) {
-                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
-                pw.print(sps + sv.getName() + LB + in + RB);
-            } else {
-                pw.print(sps + sv.getName());
+            if (isArray) {
+                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + stateVariable.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
+                pw.print(spaces + stateVariable.getName() + LB + in + RB);
+            } 
+			else 
+			{
+                pw.print(spaces + stateVariable.getName());
             }
 
-            if (ops != null) {
-                pw.println(PD + ops.getMethod() + SC);
-            } else if (asg != null) {
-                pw.println(SP + EQ + SP + asg.getValue() + SC);
+            if (operation != null) 
+			{
+                pw.println(PD + operation.getMethod() + SC);
+            } 
+			else if (assignment != null) 
+			{
+                pw.println(SP + EQ + SP + assignment.getValue() + SC);
             }
 
-            if (isar) {
+            if (isArray) 
+			{
                 pw.println(SP_8 + CB);
             }
         }
-
         pw.println(SP_4 + CB);
         pw.println();
     }
 
-    void doRunBlock(Event run, StringWriter runBlock) {
-
+    void doRunBlock(Event run, StringWriter runBlock) 
+	{
         PrintWriter pw = new PrintWriter(runBlock);
-        List<LocalVariable> liLocalV = run.getLocalVariable();
-        List<Object> liSchedCanc = run.getScheduleOrCancel();
-
-        String doRun = null;
+        List<LocalVariable>    localVariableList = run.getLocalVariable();
+        List<Object> scheduleOrCancelingEdgeList = run.getScheduleOrCancel();
+		
+		pw.println(SP_4 + JDO + SP + "The Run event bootstraps the first simulation event in the event graph.");
+		pw.println(SP_4 + SP + JDC);
 
         // check if any super has a doRun()
-        if (!extendz.contains(SIM_ENTITY_BASE)) {
-
-            Class<?> sup = resolveExtensionClass();
-            Method[] methods = sup.getMethods();
-            for (Method m : methods) {
-                if ("doRun".equals(m.getName()) && m.getParameterCount() == 0) {
-                    doRun = m.getName();
-                    break;
+        String doRun = null;
+        if (!extendz.contains(SIM_ENTITY_BASE))
+		{
+            Class<?> superClass = resolveExtensionClass();
+            Method[] superClassMethods = superClass.getMethods();
+            for (Method superClassMethod : superClassMethods) 
+			{
+                if ("doRun".equals(superClassMethod.getName()) && superClassMethod.getParameterCount() == 0) 
+				{
+                     doRun = superClassMethod.getName(); // found doRun method, save that same name here
+                     break;
                 }
             }
         }
-
-        if (doRun != null) {
-            pw.println(SP_4 + "@Override");
-            pw.println(SP_4 + "public void " + doRun + LP + RP + SP + OB);
-            pw.println(SP_8 + "super." + doRun + LP + RP + SC);
-        } else {
-            pw.println(SP_4 + JDO + SP + "Bootstraps the first simulation event" + SP + JDC);
-            pw.println(SP_4 + "public void doRun" + LP + RP + SP + OB);
-        }
-
-        pw.println();
-
-        if (!liLocalV.isEmpty()) {
-            pw.println(SP_8 + "/* local variable decarlations */");
-        }
-        for (LocalVariable local : liLocalV) {
-            pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
-        }
-
-        if (!liLocalV.isEmpty()) {pw.println();}
-
-        if (run.getCode() != null && !run.getCode().isEmpty()) // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
+        if (doRun != null)
 		{
-            pw.println(SP_8 + "/* Code Block insertion for Event " + run.getName() + " */");
-            String[] lines = run.getCode().split("\\n"); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
-            for (String line : lines) {
+            pw.println(SP_4 + "@Override");
+            pw.println(SP_4 + PUBLIC + " void " + doRun + LP + RP + SP + OB);
+            pw.println(SP_8 + "super." + doRun + LP + RP + SC);
+        }
+		else 
+		{
+            pw.println(SP_4 + PUBLIC + " void doRun" + LP + RP);
+			pw.println(SP_4 + OB);
+        }
+        if (!localVariableList.isEmpty())
+		{
+            pw.println(SP_8 + "/* local variable declarations (for this event only) */");
+			
+			for (LocalVariable local : localVariableList) 
+			{
+				pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
+			}
+        }
+
+		// cannot rename jaxb method name for run.getCode() without modifying Code element name in simkit.xsd assembly.xsd schemas
+        if (run.getCode() != null && !run.getCode().isEmpty()) 
+		{
+			pw.println();
+            pw.println(SP_8 + "/* Code Block insertion for " + run.getName() + " event */");
+            String[] lines = run.getCode().split("\\n");
+            for (String line : lines)
+			{
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* End Code Block insertion */");
+            pw.println(SP_8 + "/* Code Block insertion */");
             pw.println();
         }
 
-        List<StateTransition> liStateT = run.getStateTransition();
+        List<StateTransition> stateTransitionList = run.getStateTransition();
+		
+		if (stateTransitionList.isEmpty())
+		{
+			pw.println(SP_8 + JCO + "no state transition for this event" + SP + JCC);
+		}
+        for (StateTransition stateTransition : stateTransitionList)
+		{
+            StateVariable stateVariable = (StateVariable) stateTransition.getState();
+            Assignment    assignment    = stateTransition.getAssignment();
+            Operation     operation     = stateTransition.getOperation();
 
-        for (StateTransition st : liStateT) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
+            boolean isArray = isArray(stateVariable.getType());
+            String spacing  = isArray ? SP_12 : SP_8;
+            String in = indexFrom(stateTransition);
 
-            boolean isar = isArray(sv.getType());
-            String sps = isar ? SP_12 : SP_8;
-            String in = indexFrom(st);
-
-            if (isar) {
-                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
-                pw.print(sps + "fireIndexedPropertyChange" + LP + in + CM + SP + QU + sv.getName() + QU);
-            } else {
-                pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU);
+            if (isArray)
+			{
+                pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + stateVariable.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
+                pw.print(spacing + "fireIndexedPropertyChange" + LP + in + CM + SP + QU + stateVariable.getName() + QU);
+            } 
+			else 
+			{
+                pw.print(SP_8 + "firePropertyChange" + LP + QU + stateVariable.getName() + QU);
             }
-
-            // Give these FPCs "getters" as arguments
-            String stateVariableName = capitalize(sv.getName());
+            // Provide these FPCs "getters" as arguments
+            String stateVariableName = capitalize(stateVariable.getName());
             String stateVariableGetter = "get" + stateVariableName + LP;
 
-            if (isar) {
-                if (ops != null) {
-                    stateVariableGetter += RP + PD + ops.getMethod();
-                } else if (asg != null) {
+            if (isArray)
+			{
+                if (operation != null)
+				{
+                    stateVariableGetter += RP + PD + operation.getMethod();
+                } 
+				else if (assignment != null) 
+				{
                     stateVariableGetter += in + RP;
                 }
-            } else {
+            } 
+			else 
+			{
                 stateVariableGetter += RP;
             }
+            pw.println(CM + SP + stateVariableGetter + RP + SC + SP + "// report change to listeners");
 
-            pw.println(CM + SP + stateVariableGetter + RP + SC);
-
-            if (isar) {
+            if (isArray) 
+			{
                 pw.println(SP_8 + CB);
             }
+			if (!stateTransitionList.isEmpty() && 
+				(stateTransitionList.indexOf(stateTransition) < stateTransitionList.size() - 1)) 
+			{
+				pw.println();
+			}
         }
-
-        if(!liStateT.isEmpty()) {pw.println();}
-
-        for (Object o : liSchedCanc) {
-            if (o instanceof Schedule) {
-                doSchedule((Schedule) o, run, pw);
-            } else {
-                doCancel((Cancel) o, run, pw);
+		
+		if (scheduleOrCancelingEdgeList.isEmpty())
+		{
+			if (!stateTransitionList.isEmpty())
+				pw.println();
+			pw.println(SP_8 + JCO + SP + "no edges are attached to this event for event scheduling or event cancellation" + SP + JCC);
+		}
+        for (Object scheduleOrCancelingEdge : scheduleOrCancelingEdgeList)
+		{
+            if (scheduleOrCancelingEdge instanceof Schedule)
+			{
+                doSchedule((Schedule) scheduleOrCancelingEdge, run, pw);
+            } 
+			else 
+			{
+                doCancel((Cancel) scheduleOrCancelingEdge, run, pw);
             }
+			if (scheduleOrCancelingEdgeList.indexOf(scheduleOrCancelingEdge) < scheduleOrCancelingEdgeList.size() - 1)
+				pw.println();
         }
-
         pw.println(SP_4 + CB);
         pw.println();
     }
@@ -882,7 +1006,8 @@ public class SimkitXML2Java
             }
         }
 
-        if (doEvent != null) {
+        if (doEvent != null) 
+		{
             pw.println(SP_4 + "@Override");
         }
 
@@ -891,19 +1016,39 @@ public class SimkitXML2Java
         // Simkit work its magic with reflection
         String eventName = event.getName().replaceAll("_\\w+_*", "");
 
-        pw.print(SP_4 + "public void do" + eventName + LP);
+		// Produce the event javadoc
+		pw.print  (SP_4 + JDO + SP + "Perform the " + eventName + " event. ");
+		String description = event.getDescription().trim();
+		if (!description.isEmpty())
+		{
+			pw.print(description);
+			if (!description.endsWith("."))
+				pw.print(".");
+		}
+		pw.println();
+        for (Argument argument : argumentList) 
+		{
+            pw.println(SP_4 + " * param " + argument.getName() + SP + argument.getDescription().trim());
+		}
+		pw.println(SP_4 + SP + JDC);
+		
+		// Produce the event source
+        pw.print  (SP_4 + PUBLIC + " void do" + eventName + LP);
 
-        for (Argument a : argumentList) {
-            pw.print(a.getType() + SP + a.getName());
-            if (argumentList.size() > 1 && argumentList.indexOf(a) < argumentList.size() - 1) {
+        for (Argument argument : argumentList) 
+		{
+            pw.print(argument.getType() + SP + argument.getName());
+            if (argumentList.size() > 1 && argumentList.indexOf(argument) < argumentList.size() - 1)
+			{
                 pw.print(CM + SP);
             }
         }
+        // finish the method declaration
+        pw.println(RP);
+        pw.println(SP_4 + OB);
 
-        // finish the method decl
-        pw.println(RP + SP + OB);
-
-        if (doEvent != null) {
+        if (doEvent != null) 
+		{
             pw.print(SP_8 + "super." + doEvent + LP);
             for (Argument a : argumentList) {
                 pw.print(a.getName());
@@ -911,33 +1056,35 @@ public class SimkitXML2Java
                     pw.print(CM + SP);
                 }
             }
-
-            // finish the super decl
+            // finish the super declaration
             pw.println(RP + SC);
         }
 
-        pw.println();
+        if (!localVariableList.isEmpty()) 
+		{
+            pw.println(SP_8 + "/* local variable declarations */");
+			
+			for (LocalVariable local : localVariableList) 
+			{
+				String[] lines = {" "};
+				String value = local.getValue();
+				if (!("".equals(value))) 
+				{
+					lines = value.split("\\;");
+				}
+				pw.print(SP_8 + local.getType() + SP + local.getName() + SP + EQ);
 
-        if (!localVariableList.isEmpty()) {
-            pw.println(SP_8 + "/* local variable decarlations */");
-        }
-        for (LocalVariable local : localVariableList) {
-            String[] lines = {" "};
-            String value = local.getValue();
-            if (!("".equals(value))) {
-                lines = value.split("\\;");
-            }
-            pw.print(SP_8 + local.getType() + SP + local.getName() + SP + EQ);
-
-            // reduce redundant casts
-            pw.println(SP + lines[0].trim() + SC);
-            for (int i = 1; i < lines.length; i++) {
-                pw.println(SP_8 + lines[i].trim() + SC);
-            }
-        }
-
-        if (localVariableList.size() > 0) {
-            pw.println();
+				// reduce redundant casts
+				pw.println(SP + lines[0].trim() + SC);
+				for (int i = 1; i < lines.length; i++) 
+				{
+					pw.println(SP_8 + lines[i].trim() + SC);
+				}
+			}
+			if (localVariableList.size() > 0) 
+			{
+				pw.println();
+			}
         }
 
         if (event.getCode() != null && !event.getCode().isEmpty()) // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
@@ -947,31 +1094,39 @@ public class SimkitXML2Java
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* End Code Block insertion */");
+            pw.println(SP_8 + "/* Code Block insertion complete */");
             pw.println();
         }
 
         List<String> decls = new LinkedList<>();
-        for (StateTransition st : stateTransitionList) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
-            LocalVariableAssignment lva = st.getLocalVariableAssignment();
-            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
-            String change = "";
-            String olds = ""; // old decl line Bar oldFoo ...
-            String oldName = sv.getName(); // oldFoo
-            if (ops != null) {
-                change = PD + ops.getMethod() + SC;
-            } else if (asg != null) {
-                change = SP + EQ + SP + asg.getValue() + SC;
+        for (StateTransition stateTransition : stateTransitionList)
+		{
+            StateVariable stateVariable = (StateVariable) stateTransition.getState();
+            Assignment    assignment    = stateTransition.getAssignment();
+            Operation     operation     = stateTransition.getOperation();
+            LocalVariableAssignment lva = stateTransition.getLocalVariableAssignment();
+            LocalVariableInvocation lvi = stateTransition.getLocalVariableInvocation();
+            String change  = "";
+            String olds    = ""; // old decl line Bar oldFoo ...
+            String oldName = stateVariable.getName(); // oldFoo
+			
+            if (operation != null) 
+			{
+                change = PD + operation.getMethod() + SC;
+            } 
+			else if (assignment != null)  
+			{
+                change = SP + EQ + SP + assignment.getValue() + SC;
             }
-            oldName = "_old_" + capitalize(oldName);
-            if (!decls.contains(oldName)) {
-                olds = sv.getType();
+			final String PRIOR = "_prior_";
+            oldName = PRIOR + capitalize(oldName);
+            if (!decls.contains(oldName)) 
+			{
+                olds = stateVariable.getType();
                 decls.add(oldName);
 
-                if (isArray(olds)) {
+                if (isArray(olds)) 
+				{
                     String[] baseName;
                     baseName = olds.split("\\[");
                     olds = baseName[0];
@@ -982,180 +1137,205 @@ public class SimkitXML2Java
             // by now, olds is "Bar" ( not Bar[] )
             // or nothing if already Decld
             // now build up "Bar oldFoo = getFoo()"
-            String getter = oldName + SP + EQ + SP + "get" + oldName.substring(5) + LP;
-            if ("".equals(olds)) {
+            String getter = oldName + SP + EQ + SP + "get" + oldName.substring(PRIOR.length()) + LP; // PRIOR.length() restores original name
+            if ("".equals(olds))
+			{
                 olds = getter;
-            } else {
+            } 
+			else 
+			{
                 olds += getter;
             }
 
-            if (isArray(sv.getType())) {
-                olds += indexFrom(st);
+            if (isArray(stateVariable.getType())) 
+			{
+                olds += indexFrom(stateTransition);
             }
             olds += RP + SC;
 
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
-            olds += sv.getName() + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "") + change;
+            olds += stateVariable.getName() + (isArray(stateVariable.getType()) ? LB + indexFrom(stateTransition) + RB : "") + change;
             String[] lines = olds.split("\\;");
 
             // format it
-            for (int i = 0; i < lines.length; i++) {
-
-                if (i == 0) {
-                    pw.println(SP_8 + "/* StateTransition for " + sv.getName() + " */");
+            for (int i = 0; i < lines.length; i++)
+			{
+                if (i == 0) 
+				{
+                    pw.println(SP_8 + JCO + "StateTransition for state variable " + stateVariable.getName() + SP + JCC);
                     pw.println(SP_8 + lines[i] + SC);
-                } else {
-
+                }
+				else 
+				{
                     // Account for local assignment to accomodate state transition
                     if (lva != null && !lva.getValue().isEmpty())
                         pw.println(SP_8 + lva.getValue() + SP + EQ + SP + lines[i] + SC);
                     else
                         pw.println(SP_8 + lines[i] + SC);
-
                 }
             }
-
-            if (isArray(sv.getType())) {
-                pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(st));
-                pw.print(CM + SP + QU + sv.getName() + QU + CM + SP);
-                pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + indexFrom(st) + RP + RP + SC);
-            } else {
-                pw.print(SP_8 + "firePropertyChange" + LP + QU + sv.getName() + QU + CM + SP);
-                pw.println(oldName + CM + SP + "get" + oldName.substring(5) + LP + RP + RP + SC);
+            if (isArray(stateVariable.getType())) 
+			{
+                pw.print(SP_8 + "fireIndexedPropertyChange" + LP + indexFrom(stateTransition));
+                pw.print(CM + SP + QU + stateVariable.getName() + QU + CM + SP);
+                pw.println(oldName + CM + SP + "get" + oldName.substring(PRIOR.length()) + LP + indexFrom(stateTransition) + RP + RP + SC + SP + "// report change to listeners");
+            }
+			else 
+			{
+                pw.print(SP_8 + "firePropertyChange" + LP + QU + stateVariable.getName() + QU + CM + SP);
+                pw.println(oldName + CM + SP + "get" + oldName.substring(PRIOR.length()) + LP + RP + RP + SC + SP + "// report change to listeners");
             }
 
             // Now, print out any any void return type, zero parameter methods
             // as part of this state transition
-            if (lvi != null) {
+            if (lvi != null) 
+			{
                 String invoke = lvi.getMethod();
-                if (invoke != null && !invoke.isEmpty()) {
+                if (invoke != null && !invoke.isEmpty()) 
+				{
                     pw.println(SP_8 + invoke + SC);
                 }
             }
-
             pw.println();
         }
 
-        // waitDelay/interrupt
-        for (Object o : scheduleOrCancelList)
+        // schedule (waitDelay) and cancel (interrupt) invocations
+        for (Object scheduleOrCancelObject : scheduleOrCancelList)
 		{
-            if (o instanceof Schedule)
+            if (scheduleOrCancelObject instanceof Schedule)
 			{
-                doSchedule((Schedule) o, event, pw);
+                doSchedule((Schedule) scheduleOrCancelObject, event, pw);
             } 
 			else
 			{
-                doCancel((Cancel) o, event, pw);
+                doCancel((Cancel) scheduleOrCancelObject, event, pw);
             }
+			if ((scheduleOrCancelList.size() > 1) && scheduleOrCancelList.indexOf(scheduleOrCancelObject) < scheduleOrCancelList.size() - 1)
+			{
+				pw.println();
+			}
         }
-        pw.println(SP_4 + CB);
-        pw.println();
+		pw.println(SP_4 + CB);
+		pw.println();
     }
 
-    void doSchedule(Schedule s, Event e, PrintWriter pw)
+    void doSchedule(Schedule jaxbSchedule, Event e, PrintWriter pw)
 	{
-        String condent = "";
-        Event event = (Event) s.getEvent();
-
-        if (s.getCondition() != null && !s.getCondition().equals("true"))
-		{
-            condent = SP_4;
-            pw.println(SP_8 + "if" + SP + LP + s.getCondition() + RP + SP + OB);
-        }
+        String conditionalIndent = "";
+        Event event = (Event) jaxbSchedule.getEvent();
 
         // Strip out name mangling artifacts imposed by the EventGraph Model.
         // This is done to keep XML happy with no identical IDREFs, but lets
         // Simkit work its magic with reflection
         String eventName = event.getName().replaceAll("_\\w+_*", "");
 
-        pw.print(SP_8 + condent + "waitDelay" + LP + QU + eventName + QU + CM + SP);
+        if (jaxbSchedule.getCondition() != null && !jaxbSchedule.getCondition().equals("true"))
+		{
+            conditionalIndent = SP_4;
+            pw.println(SP_8 + "if" + SP + LP + jaxbSchedule.getCondition() + RP + SP + "// conditional expression");
+            pw.println(SP_8 + OB);
+        }
+		
+		pw.println(SP_8 + conditionalIndent + JCO + SP + "Schedule " + eventName + " event " + JCC);
 
-        // according to schema, to meet Priority class definition, the following
-        // tags should be permitted:
+        pw.print  (SP_8 + conditionalIndent + "waitDelay" + LP + QU + eventName + QU + CM + SP);
+
+        // according to schema, to meet Priority class definition, the following tags should be permitted:
         // HIGHEST, HIGHER, HIGH, DEFAULT, LOW, LOWER, and LOWEST
 
-        // Bugfix 1400: These should now be enumerations instead of FP values
-        pw.print(s.getDelay() + CM + " Priority" + PD + s.getPriority());
+        // use enumerations instead of numeric values
+        pw.print(jaxbSchedule.getDelay() + CM + " Priority" + PD + jaxbSchedule.getPriority());
 
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
-        for (EdgeParameter ep : s.getEdgeParameter()) {
+        for (EdgeParameter edgeParameter : jaxbSchedule.getEdgeParameter()) 
+		{
             pw.print(CM + " (Object) ");
 
-            String epValue = ep.getValue();
+            String edgeParameterValue = edgeParameter.getValue();
 
             // Cover case where there is a "+ 1" increment, or "-1" decrement on a value
-            if (epValue.contains("+") || epValue.contains("-")) {
-                pw.print(LP + ep.getValue() + RP);
-            } else {
-                pw.print(ep.getValue());
+            if (edgeParameterValue.contains("+") || edgeParameterValue.contains("-")) 
+			{
+                pw.print(LP + edgeParameter.getValue() + RP);
+            } 
+			else 
+			{
+                pw.print(edgeParameter.getValue());
             }
         }
-
         pw.println(RP + SC);
 
-        if (s.getCondition() != null && !s.getCondition().equals("true")) {
+        if (jaxbSchedule.getCondition() != null && !jaxbSchedule.getCondition().equals("true")) 
+		{
             pw.println(SP_8 + CB);
         }
     }
 
-    void doCancel(Cancel c, Event e, PrintWriter pw) {
-        List<EdgeParameter> liEdgeP = c.getEdgeParameter();
-        String condent = "";
-        Event event = (Event) c.getEvent();
-
-        if (c.getCondition() != null && !c.getCondition().equals("true")) {
-            condent = SP_4;
-            pw.println(SP_8 + "if" + SP + LP + c.getCondition() + RP + SP + OB);
-        }
+    void doCancel(Cancel cancel, Event e, PrintWriter pw)
+	{
+        List<EdgeParameter> edgeParameterList = cancel.getEdgeParameter();
+        String conditionalIndent = "";
+        Event jaxbEvent = (Event) cancel.getEvent();
 
         // Strip out name mangling artifacts imposed by the EventGraph Model.
         // This is done to keep XML happy with no identical IDREFs, but let's
         // Simkit work its magic with reflection
-        String eventName = event.getName().replaceAll("_\\w+_*", "");
+        String eventName = jaxbEvent.getName().replaceAll("_\\w+_*", "");
 
-        pw.print(SP_8 + condent + "interrupt" + LP + QU + eventName + QU);
+        if (cancel.getCondition() != null && !cancel.getCondition().equals("true")) {
+            conditionalIndent = SP_4;
+            pw.println(SP_8 + "if" + SP + LP + cancel.getCondition() + RP + SP + "// conditional expression");
+            pw.println(SP_8 + OB);
+        }
+		
+		pw.println(SP_8 + conditionalIndent + JCO + SP + "Cancel " + eventName + " event " + JCC);
+
+        pw.print  (SP_8 + conditionalIndent + "interrupt" + LP + QU + eventName + QU);
 
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
-        for (EdgeParameter ep : liEdgeP) {
-            pw.print(CM + SP + "(Object) " + ep.getValue());
+        for (EdgeParameter edgeParameter : edgeParameterList) {
+            pw.print(CM + SP + "(Object) " + edgeParameter.getValue());
         }
 
         pw.println(RP + SC);
 
-        if (c.getCondition() != null && !c.getCondition().equals("true")) {
+        if (cancel.getCondition() != null && !cancel.getCondition().equals("true")) {
             pw.println(SP_8 + CB);
         }
     }
 
-    void buildToString(StringWriter toStringBlock) {
-
+    void buildToString(StringWriter toStringBlock)
+	{
         // Assume this is a subclass of some SimEntityBase which should already
         // have a toString()
         if (!extendz.contains(SIM_ENTITY_BASE)) {return;}
 
         PrintWriter pw = new PrintWriter(toStringBlock);
         pw.println(SP_4 + "@Override");
-        pw.print(SP_4 + "public String toString");
-        pw.println(LP + RP + SP + OB);
+        pw.println(SP_4 + PUBLIC + " String toString ()");
+        pw.println(OB);
         pw.println(SP_8 + "return" + SP + "getClass().getName()" + SC);
         pw.println(SP_4 + CB);
     }
 
-    void buildCodeBlock(StringWriter t) {
+    void buildCodeBlock(StringWriter t)
+	{
         PrintWriter pw = new PrintWriter(t);
         String codeBlock = root.getCode(); // cannot rename jaxb method name without modifying simkit.xsd assembly.xsd schemas
-        if (codeBlock != null) {
-            pw.println(SP_4 + "/* Inserted Code Block for " + root.getName() + " */");
+        if ((codeBlock != null) && !codeBlock.trim().isEmpty())
+		{
+            pw.println(SP_4 + "/* Code Block for " + root.getName() + " */");
             String[] lines = codeBlock.split("\\n");
-            for (String codeLines : lines) {
+            for (String codeLines : lines) 
+			{
                 pw.println(SP_4 + codeLines);
             }
-            pw.println(SP_4 + "/* End inserted Code Block */");
+            pw.println(SP_4 + "/* Code Block insertion complete */");
         }
         pw.println(CB);
     }

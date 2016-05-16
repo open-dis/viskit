@@ -53,13 +53,13 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  * Date: Jul 20, 2005
  * Time: 4:11:55 PM
  */
-public class ParamTable extends JTable {
+public class ParameterTable extends JTable {
 
     private ParameterTableModel ptm;
 
-    ParamTable(List<SimEntity> simEntities, List<TerminalParameter> designParms) {
-        if (simEntities != null) {
-            setParams(simEntities, designParms);
+    ParameterTable(List<SimEntity> jaxbSimEntities, List<TerminalParameter> designParms) {
+        if (jaxbSimEntities != null) {
+            setParameters(jaxbSimEntities, designParms);
         } else {
             setModel(new DefaultTableModel(new Object[][]{{}}, ParameterTableModel.columnNames));
         }
@@ -70,11 +70,11 @@ public class ParamTable extends JTable {
 
     /**
      *
-     * @param simEntities
+     * @param jaxbSimEntities
      * @param designParams
      */
-    private void setParams(List<SimEntity> simEntities, List<TerminalParameter> designParams) {
-        ptm = new ParameterTableModel(simEntities, designParams);
+    private void setParameters(List<SimEntity> jaxbSimEntities, List<TerminalParameter> designParams) {
+        ptm = new ParameterTableModel(jaxbSimEntities, designParams);
         setModel(ptm);
         setColumnWidths();
     }
@@ -87,44 +87,46 @@ public class ParamTable extends JTable {
             column.setPreferredWidth(colWidths[i]);
         }
     }
-    Color defaultC;
-    Color noedit = Color.lightGray;
-    Color multiP = new Color(230, 230, 230);
+    Color defaultColor;
+    Color noeditColor       = Color.lightGray;
+    Color multipleRowsColor = new Color(230, 230, 230);
 
-    class myStringClassRenderer extends JLabel implements TableCellRenderer {
-
+    class myStringClassRenderer extends JLabel implements TableCellRenderer 
+	{
         public myStringClassRenderer() {
             setOpaque(true);
-            setFont(ParamTable.this.getFont());
-            defaultC = ParamTable.this.getBackground();
+            setFont(ParameterTable.this.getFont());
+            defaultColor = ParameterTable.this.getBackground();
             setBorder(new EmptyBorder(0, 3, 0, 0));       // keeps left from being cutoff
         }
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+		{
             Integer rowKey = row;
             if (ptm.noEditRows.contains(rowKey) || column == ParameterTableModel.TYPE_COLUMN) {
-                setBackground(noedit);
+                setBackground(noeditColor);
             } else if (ptm.multiRows.contains(rowKey)) {
                 if (column == ParameterTableModel.NAME_COLUMN) {
-                    setBackground(multiP);
+                    setBackground(multipleRowsColor);
                 } else {
-                    setBackground(noedit);
+                    setBackground(noeditColor);
                 }
             } else if (column == ParameterTableModel.VALUE_COLUMN || column == ParameterTableModel.MIN_COLUMN ||
                     column == ParameterTableModel.MAX_COLUMN) {
                 handleFactorSwitchable(row, column);
             } else {
-                setBackground(defaultC);
+                setBackground(defaultColor);
             }
 
             setText(value.toString());
-            setToolTipText(getTT(column));
+            setToolTipText(getToolTip(column));
             return this;
 
         }
 
-        private String getTT(int col) {
+        private String getToolTip(int col) 
+		{
             switch (col) {
                 case ParameterTableModel.NAME_COLUMN:
                     return "Name of variable.  Each variable used in the experiment must have a name.";
@@ -154,20 +156,20 @@ public class ParamTable extends JTable {
             if (factor) {
                 switch (col) {
                     case ParameterTableModel.VALUE_COLUMN:
-                        setBackground(noedit);
+                        setBackground(noeditColor);
                         break;
                     default:
-                        setBackground(defaultC);
+                        setBackground(defaultColor);
                         break;
                 }
             } else {
                 switch (col) {
                     case ParameterTableModel.MIN_COLUMN:
                     case ParameterTableModel.MAX_COLUMN:
-                        setBackground(noedit);
+                        setBackground(noeditColor);
                         break;
                     default:
-                        setBackground(defaultC);
+                        setBackground(defaultColor);
                         break;
                 }
             }
@@ -190,10 +192,10 @@ public class ParamTable extends JTable {
 
                 @Override
                 public void itemStateChanged(ItemEvent e) {
-                    ListSelectionModel lsm = ParamTable.this.getSelectionModel();
+                    ListSelectionModel lsm = ParameterTable.this.getSelectionModel();
                     if (!lsm.isSelectionEmpty()) {
                         int selectedRow = lsm.getMinSelectionIndex();
-                        ((DefaultTableModel) ParamTable.this.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
+                        ((DefaultTableModel) ParameterTable.this.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
                     }
                 }
             });
@@ -204,17 +206,17 @@ public class ParamTable extends JTable {
             Integer rowKey = row;
             setEnabled(true);
             if (ptm.noEditRows.contains(rowKey) || column == ParameterTableModel.TYPE_COLUMN) {
-                setBackground(noedit);
+                setBackground(noeditColor);
                 setEnabled(false);
             } else if (ptm.multiRows.contains(rowKey)) {
                 setEnabled(false);
                 if (column == ParameterTableModel.NAME_COLUMN) {
-                    setBackground(multiP);
+                    setBackground(multipleRowsColor);
                 } else {
-                    setBackground(noedit);
+                    setBackground(noeditColor);
                 }
             } else {
-                setBackground(defaultC);
+                setBackground(defaultColor);
             }
 
             setSelected((value != null && ((Boolean) value)));

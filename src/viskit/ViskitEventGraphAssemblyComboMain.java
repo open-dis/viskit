@@ -36,8 +36,6 @@ package viskit;
 import edu.nps.util.LogUtilities;
 import java.awt.EventQueue;
 import java.awt.Image;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,9 +53,9 @@ import viskit.view.dialog.UserPreferencesDialog;
  * @since Sep 22, 2005 : 3:23:52 PM
  * @version $Id$
  */
-public class EventGraphAssemblyComboMain
+public class ViskitEventGraphAssemblyComboMain
 {
-    static final org.apache.log4j.Logger LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
+	private static org.apache.log4j.Logger LOG; // create user's log directory before instantiating
 
     private static ImageIcon aboutIcon = null;
 
@@ -67,10 +65,12 @@ public class EventGraphAssemblyComboMain
      */
     public static void main(final String[] args)
 	{
-        // Launch all GUI stuff on, or within the EDT
-        try {
-//            throw new InvocationTargetException(new Throwable("mail this error"));
-
+		ViskitConfiguration initializeViskitConfigurationSingleton = ViskitConfiguration.instance (); // Create user's log directory first
+		LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
+		
+        // Launch all GUI stuff on, or within the EventDispatchThread
+        try 
+		{
             if (!EventQueue.isDispatchThread())
 			{
                 SwingUtilities.invokeAndWait(new Runnable()
@@ -87,15 +87,16 @@ public class EventGraphAssemblyComboMain
                 SwingUtilities.invokeLater(new Runnable()
 				{
                     @Override
-                    public void run() {
+                    public void run()
+					{
                         createGUI(args);
                     }
                 });
             }
         } 
-		catch (InterruptedException | InvocationTargetException e) // catch all
+		catch (Exception e) // catch all
 		{
-            LogUtilities.getLogger(EventGraphAssemblyComboMain.class).error(e);
+            LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).error(e);
 
 			// A corrupted viskitProject can cause an InvocationTargetException.
 			// Check the log output.  Common fix: clean all and rebuild.
@@ -117,8 +118,9 @@ public class EventGraphAssemblyComboMain
             initialFile = args[0];
         }
 
-        if (viskit.ViskitStatics.debug) {
-            System.out.println("***Inside EventGraphAssemblyComboMain: " + args.length);
+        if (viskit.ViskitStatics.debug)
+		{
+            System.out.println("***Inside ViskitEventGraphAssemblyComboMain: " + args.length);
         }
         setLookAndFeelAndFonts();
 
@@ -130,24 +132,25 @@ public class EventGraphAssemblyComboMain
         ViskitGlobals.instance().setMainAppWindow(viskitMainFrame);
 
         if (isMac) {
-            aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
+            aboutIcon = new ImageIcon(ViskitEventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
         viskitMainFrame.setVisible(true); // display application and commence
     }
 
-    private static void setLookAndFeelAndFonts() {
-        String s = UserPreferencesDialog.getLookAndFeel();
+    private static void setLookAndFeelAndFonts()
+	{
+        String LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel();
         try {
-            if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
+            if (LOOK_AND_FEEL == null || LOOK_AND_FEEL.isEmpty() || LOOK_AND_FEEL.equalsIgnoreCase("default")) {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            } else if (s.equalsIgnoreCase("platform")) {
+            } else if (LOOK_AND_FEEL.equalsIgnoreCase("platform")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } else {
-                UIManager.setLookAndFeel(s);
+                UIManager.setLookAndFeel(LOOK_AND_FEEL);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            System.err.println("Error setting Look and Feel to " + s);
+            LOG.error("Error setting Look and Feel to " + LOOK_AND_FEEL);
         }
     }
 
@@ -170,7 +173,7 @@ public class EventGraphAssemblyComboMain
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                System.err.println("Error showing About Box: " + ex);
+                                LOG.error("Error showing About Box: " + ex);
                             }   break;
                     }
                     return null;
@@ -188,12 +191,12 @@ public class EventGraphAssemblyComboMain
                     m = applicationClass.getMethod("setDockIconImage", Image.class);
                     m.invoke(applicationInstance, aboutIcon.getImage());
                 } catch (NoSuchMethodException ex){
-                    System.err.println("Error showing aboutIcon in dock " + ex);
+                    LOG.error("Error showing aboutIcon in dock " + ex);
                 }
             }
         } catch (IllegalArgumentException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-            System.err.println("Error defining Apple Quit & About handlers: " + ex);
+            LOG.error("Error defining Apple Quit & About handlers: " + ex);
         }
     }
 
-} // end class file EventGraphAssemblyComboMain.java
+} // end class file ViskitEventGraphAssemblyComboMain.java
