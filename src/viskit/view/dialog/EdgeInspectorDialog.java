@@ -247,7 +247,7 @@ public class EdgeInspectorDialog extends JDialog
         addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
         addButtonPanel.setBorder(new TitledBorder("add"));
         addDescriptionButton = new JButton("description"); //add description");
-        addConditionalButton = new JButton("conditional"); //add condition");
+        addConditionalButton = new JButton("condition");   //add condition");
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);

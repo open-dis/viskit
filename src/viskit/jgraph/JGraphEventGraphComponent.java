@@ -271,54 +271,49 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                     if (schedulingEdge instanceof SchedulingEdge)
 					{
                         if (edgeCell instanceof vSelfEdgeCell)
-                             sb.append("<center>Self-Scheduling Edge</center>");
-						else sb.append("<center>Scheduling Edge</center>");
+                             sb.append("<h3 align='center'>Self-Scheduling Edge</h3>");
+						else sb.append("<h3 align='center'>Scheduling Edge</h3>");
 
-                        double priority;
-                        String s;
-
-                        // Assume numeric comes in, avoid NumberFormatException via Regex check
-                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) schedulingEdge).priority))
+						// description first helps analyst get a correct initial impression, also encourages effective modeling practice
+						if (schedulingEdge.conditionDescription != null)
 						{
-                            priority = Double.parseDouble(((SchedulingEdge) schedulingEdge).priority);
-                            NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
-                            decimalFormat.setMaximumFractionDigits(3);
-                            decimalFormat.setMaximumIntegerDigits(3);
-                            if (Double.compare(priority, Double.MAX_VALUE) >= 0)
+							String description = schedulingEdge.conditionDescription.trim();
+							if (description.length() > 0)
 							{
-                                s = "MAX";
-                            }
-							else if (Double.compare(priority, -Double.MAX_VALUE) <= 0)
-							{
-                                s = "MIN";
-                            } 
-							else
-							{
-                                s = decimalFormat.format(priority);
-                            }
-                        } 
-						else // bad format
+								sb.append("<u>description</u><br />");
+								sb.append(wrapAtLineWidth(escapeLTGT(description), 60));
+								sb.append("<br />");
+							}
+						}
+						
+						if (schedulingEdge.condition != null)
 						{
-                            s = ((SchedulingEdge) schedulingEdge).priority;
-                        }
-                        sb.append("<u>priority</u><br>&nbsp;");
-                        sb.append(s);
-                        sb.append("<br>");
+							String conditionName = schedulingEdge.condition.trim();
+							if (conditionName.length() > 0)
+							{
+								sb.append("<u>condition</u><br />&nbsp;if (");
+								sb.append(escapeLTGT(conditionName));
+								sb.append(")<br />");
+							}
+						}
 
                         if (schedulingEdge.delay != null)
 						{
                             String delayValue = schedulingEdge.delay.trim();
                             if (delayValue.length() > 0) {
-                                sb.append("<u>delay</u>&nbsp;");
+                                sb.append("<u>delay</u><br />&nbsp;");
                                 sb.append(delayValue);
-                                sb.append("<br>");
+                                sb.append("<br />");
                             }
                         }
 
                         int index = 1;
                         if (!schedulingEdge.parametersList.isEmpty())
 						{
-                            sb.append("<u>edge parameters</u><br>");
+							String plural = "";
+							if (schedulingEdge.parametersList.size() > 1)
+								   plural = "s";
+                            sb.append("<u>edge parameter" + plural + "</u><br />");
                             for (ViskitElement viskitElement : schedulingEdge.parametersList)
 							{
                                 ViskitEdgeParameter edgeParameter = (ViskitEdgeParameter) viskitElement;
@@ -333,43 +328,52 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                                     sb.append(edgeParameter.getType());
                                     sb.append(")");
                                 }
-                                sb.append("<br>");
+                                sb.append("<br />");
                             }
                         }
                     }
 					else
 					{
                         if (edgeCell instanceof vSelfEdgeCell)
-                            sb.append("<center>Self-Cancelling Edge</center>");
+                            sb.append("<h3 align='center'>Self-Cancelling Edge</h3>");
                         else
-                            sb.append("<center>Cancelling Edge</center>");
+                            sb.append("<h3 align='center'>Cancelling Edge</h3>");
 
                     }
-
-                    if (schedulingEdge.conditionDescription != null)
+					
+					// Assume numeric comes in, avoid NumberFormatException via Regex check
+					String s;
+					double priority;
+					if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) schedulingEdge).priority))
 					{
-                        String description = schedulingEdge.conditionDescription.trim();
-                        if (description.length() > 0)
+						priority = Double.parseDouble(((SchedulingEdge) schedulingEdge).priority);
+						NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
+						decimalFormat.setMaximumFractionDigits(3);
+						decimalFormat.setMaximumIntegerDigits(3);
+						if (Double.compare(priority, Double.MAX_VALUE) >= 0)
 						{
-                            sb.append("<br><u>description</u><br>");
-                            sb.append(wrapAtLineWidth(escapeLTGT(description), 60));
-                            sb.append("<br>");
-                        }
-                    }
-
-                    if (schedulingEdge.condition != null)
+							s = "MAX";
+						}
+						else if (Double.compare(priority, -Double.MAX_VALUE) <= 0)
+						{
+							s = "MIN";
+						} 
+						else
+						{
+							s = decimalFormat.format(priority);
+						}
+					} 
+					else // bad format
 					{
-                        String conditionName = schedulingEdge.condition.trim();
-                        if (conditionName.length() > 0)
-						{
-                            sb.append("<u>condition</u><br>&nbsp;if (");
-                            sb.append(escapeLTGT(conditionName));
-                            sb.append(")<br>");
-                        }
-                    }
+						s = ((SchedulingEdge) schedulingEdge).priority;
+					}
+					sb.append("<u>priority</u><br />&nbsp;");
+					sb.append(s);
+					sb.append("<br />");
 
-                    // Strip out the last <br>
-                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
+                    // Strip out the last <br />
+                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br />")) 
+					{
                         sb.setLength(sb.length() - 4);
                     }
                     sb.append("</html>");
@@ -380,39 +384,33 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 				{
                     CircleCell circleCell = (CircleCell) c;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
-                    sb.append("<center> ");
+                    sb.append("<h3 align='center'> ");
 
                     // Show event node names with corresponding parametersList if any
                     String nodeName = eventNode.getName();
                     String[] nodeNameArray = nodeName.split("_"); // TODO better algorithm including camel case for name mangling
 
-                    if (nodeNameArray.length > 1) {
+                    if (nodeNameArray.length > 1) 
+					{
                         sb.append(nodeNameArray[0]);
-                        sb.append("<br>");
+                        sb.append("<br />");
                         sb.append("(");
                         sb.append(nodeNameArray[1]);
                         sb.append(")");
-                        sb.append("<br>");
-                    } else {
+                        sb.append("<br />");
+                    } 
+					else {
                         sb.append(nodeName);
                     }
-                    sb.append(" Event </center>");
-
-                    if (!eventNode.getDescription().isEmpty())
-					{
-                        String description = eventNode.getDescription();
-                        if (description.length() > 0)
-						{
-                            sb.append("<u>description</u><br>");
-                            sb.append(wrapAtLineWidth(description, 60));
-                            sb.append("<br>");
-                        }
-                    }
+                    sb.append(" Event </h3>");
 
                     List<ViskitElement> argumentList = eventNode.getArguments();
                     if (!argumentList.isEmpty())
 					{
-                        sb.append("<u>arguments</u><br>");
+						String plural = "";
+						if (argumentList.size() > 1)
+							   plural = "s";
+                        sb.append("<u>argument" + plural + "s</u><br />");
                         int n = 0;
                         for (ViskitElement viskitElement : argumentList)
 						{
@@ -422,14 +420,28 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                             sb.append(++n);
                             sb.append(" ");
                             sb.append(eventArgumentString);
-                            sb.append("<br>");
+                            sb.append("<br />");
+                        }
+                    }
+
+                    if (!eventNode.getDescription().isEmpty())
+					{
+                        String description = eventNode.getDescription();
+                        if (description.length() > 0)
+						{
+                            sb.append("<u>description</u><br />");
+                            sb.append(wrapAtLineWidth(description, 60));
+                            sb.append("<br />");
                         }
                     }
 
                     List<ViskitElement> localVariablesList = eventNode.getLocalVariables();
                     if (!localVariablesList.isEmpty()) 
 					{
-                        sb.append("<u>local variables</u><br>");
+						String plural = "";
+						if (localVariablesList.size() > 1)
+							   plural = "s";
+                        sb.append("<u>local variable" + plural + "s</u><br />");
                         for (ViskitElement viskitElement : localVariablesList)
 						{
                             EventLocalVariable eventLocalVariable = (EventLocalVariable) viskitElement;
@@ -438,29 +450,19 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                             sb.append(" (");
                             sb.append(eventLocalVariable.getType());
                             sb.append(") = ");
-                            String val = eventLocalVariable.getValue();
-                            sb.append(val.isEmpty() ? "<i><default></i>" : val);
-                            sb.append("<br>");
-                        }
-                    }
-
-                    String codeBlock = eventNode.getCodeBlock();
-                    if (codeBlock != null && !codeBlock.isEmpty())
-					{
-                        sb.append("<u>code block</u><br>");
-                        String[] sa = codeBlock.split("\\n");
-                        for (String s : sa)
-						{
-                            sb.append("&nbsp;");
-                            sb.append(s);
-                            sb.append("<br>");
+                            String value = eventLocalVariable.getValue();
+                            sb.append(value.isEmpty() ? "<i>(default)</i>" : value);
+                            sb.append("<br />");
                         }
                     }
 
                     List<ViskitElement> stateTransitions = eventNode.getStateTransitions();
                     if (!stateTransitions.isEmpty())
 					{
-                        sb.append("<u>state transitions</u><br>");
+						String plural = "";
+						if (stateTransitions.size() > 1)
+							   plural = "s";
+                        sb.append("<u>state transition" + plural + "</u><br />");
                         for (ViskitElement viskitElement : stateTransitions)
 						{
                             EventStateTransition eventStateTransition = (EventStateTransition) viskitElement;
@@ -469,13 +471,27 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
 							{
                                 sb.append("&nbsp;");
                                 sb.append(s);
-                                sb.append("<br>");
+                                sb.append("<br />");
                             }
                         }
                     }
 
-                    // Strip out the last <br>
-                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
+                    String codeBlock = eventNode.getCodeBlock();
+                    if (codeBlock != null && !codeBlock.isEmpty())
+					{
+                        sb.append("<u>code block</u><br />");
+                        String[] sa = codeBlock.split("\\n");
+                        for (String s : sa)
+						{
+                            sb.append("&nbsp;");
+                            sb.append(s);
+                            sb.append("<br />");
+                        }
+                    }
+
+                    // Strip out the last <br />
+                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br />")) 
+					{
                         sb.setLength(sb.length() - 4);
                     }
                     sb.append("</html>");
@@ -500,12 +516,12 @@ public class JGraphEventGraphComponent extends JGraph implements GraphModelListe
                 sb.append(" ");
             }
 			while (idx < sa.length && ll < length);
-            sb.append("<br>");
+            sb.append("<br />");
         } 
 		while (idx < sa.length);
 
         String result = sb.toString().trim();
-        if (result.endsWith("<br>")) {
+        if (result.endsWith("<br />")) {
             result = result.substring(0, result.length() - 4);
         }
         return result;

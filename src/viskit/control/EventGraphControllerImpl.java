@@ -179,7 +179,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             boolean dirty = false;
             if (returnValue == JOptionPane.YES_OPTION)
 			{
-                buildNewEventNode(new Point(30, 60), "Run"); // TODO add description
+                buildNewEventNode(new Point(50, 50), "Run"); // TODO add description
                 dirty = true;
             }
             ((EventGraphModel) getModel()).setDirty(dirty);
@@ -1186,7 +1186,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     public EventNode buildNewRunNode() //--------------------------
     {
-        return buildNewEventNode(new Point(30, 60), "Run"); // TODO avoid collision
+        return buildNewEventNode(new Point(50, 50), "Run"); // TODO avoid collision
     }
 
     @Override

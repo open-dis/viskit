@@ -677,8 +677,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null)) {      // blocks here
+    public String addStateVariableDialog() 
+	{
+        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null))  // blocks here
+		{
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "TODO new value here",
