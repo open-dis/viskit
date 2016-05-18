@@ -880,7 +880,9 @@ public class ViskitStatics
             public void hyperlinkUpdate(HyperlinkEvent event)
 			{
                 try {
-                    if (event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED))
+                    if (    event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED) // never reached if tracing this line in debug mode, ENTERED occurs first
+//						|| (event.getEventType().equals(HyperlinkEvent.EventType.ENTERED) && ViskitStatics.debug)
+					   )
 					{
                         if (showLog)
                             Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_DEBUG_LOG.toURI());
@@ -905,15 +907,15 @@ public class ViskitStatics
 		sendErrorReport ("Viskit has experienced a significant execution problem.", e);
     }
 	
-	public static void sendErrorReport (String preamble, Exception e)
+	public static void sendErrorReport (String preamble, Exception exception)
 	{
-			if (e != null)
+			if (exception != null) // save exception stack trace to log as error
 			{
 				// http://stackoverflow.com/questions/1149703/how-can-i-convert-a-stack-trace-to-a-string
 				StringWriter sw = new StringWriter();
 				 PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				LOG.error (e.getMessage());
+				exception.printStackTrace(pw);
+				LOG.error (exception.getMessage());
 				LOG.error (sw.toString()); // stack trace as a string
 			}
 			
@@ -921,18 +923,22 @@ public class ViskitStatics
 			String mailtoString = new String();
             try {
 				// http://stackoverflow.com/questions/326390/how-do-i-create-a-java-string-from-the-contents-of-a-file
-				byte[] encoded = Files.readAllBytes(Paths.get(ViskitConfiguration.VISKIT_DEBUG_LOG.getPath()));
+//				byte[] encoded = Files.readAllBytes(Paths.get(ViskitConfiguration.VISKIT_DEBUG_LOG.getAbsolutePath()));
+				byte[] encoded = ViskitConfiguration.VISKIT_DEBUG_LOG.getAbsolutePath().getBytes();
 				String logText = new String (encoded);
                 mailtoUrl = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST +
-                        "?subject=Viskit%20execution%20trouble%20report&body=Please%20describe%20what%20happened:%0D%0A%0D%0ATo%20help%20debug,%20also%20please%20copy%20and%20paste%20log%20output:%0D%0A%0D%0A"
+                        "?subject=Visual%20Simkit%20(viskit)%20execution%20trouble%20report&body=Please%20describe%20what%20happened%20while%20using%20Visual%20Simkit:%0D%0A%0D%0A%0D%0A%0D%0A"
+						+ "To%20help%20debug,%20also%20please%20copy%20and%20paste%20the%20debug.log%20output:%0D%0A%0D%0A%0D%0A%0D%0A"
+						+ "Thanks%20for%20using%20Visual%20Simkit!%20%20" 
+						// http://stackoverflow.com/questions/724043/http-url-address-encoding-in-java
+						+ java.net.URLEncoder.encode(ViskitConfiguration.VISKIT_WEBSITE_URL, "ISO-8859-1") // escape url for email
 //						+ logText // not working, probably clobbers mailer
 				);
-				
-				mailtoString = "<a href=\"" + mailtoUrl.toString()+ "\">" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a>";
+				mailtoString = "<a href='" + mailtoUrl.toString()+ "'>" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a>";
             } 
 			catch (Exception ex) 
 			{
-                LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).error(ex);
+                LOG.error(ex);
 			}
             String message = "<html>"
 					+ "<p align='center'>" + preamble + ViskitStatics.RECENTER_SPACING + "</p>"
@@ -943,8 +949,8 @@ public class ViskitStatics
 					+ "<p align='center'>Thanks!" + ViskitStatics.RECENTER_SPACING + ViskitStatics.RECENTER_SPACING + "</p>";
 
 			String title = ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME;
-			if (e != null)
-				   title = e.toString();
+			if (exception != null)
+				   title = exception.toString();
             ViskitStatics.showHyperlinkedDialog(null, title, mailtoUrl, message, true); // need to debug, often caused by a method-naming problem		
 	}
 }

@@ -816,7 +816,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 projectDirectory  = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
                 projectArchiveZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
-                File readmeFile = new File(projectDirectory, "debug.log");
+                File readmeFile = new File(projectDirectory, "README.txt"); // TODO confirm
 
                 if (projectArchiveZip.exists())
                     projectArchiveZip.delete(); // delete previous version
@@ -825,7 +825,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 //                    logFile.delete(); // cleanup for next time
 
                 try {
-                    // First, copy the README.txt file to the project dir
+                    // First, copy the README.txt file to the project directory
                     Files.copy(ViskitConfiguration.USER_README_FILE.toPath(), 
 							   (new File (logFile.getParentFile().getPath() + File.separatorChar + ViskitConfiguration.USER_README_FILE.getName())).toPath(), 
 							   StandardCopyOption.REPLACE_EXISTING);
@@ -837,7 +837,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					{
                         Desktop.getDesktop().open(projectArchiveZip.getParentFile());
                     } 
-					catch (IOException e) {
+					catch (IOException e) 
+					{
                         LOG.error(e);
                     }
                 } 
@@ -864,7 +865,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                                 + "?subject=Viskit%20Project%20Archive%20for%20"
                                 + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached...");
 						urlString =  url.toString();
-                    } catch (MalformedURLException e) {
+                    } 
+					catch (MalformedURLException e) {
                         LOG.error(e);
                     }
 
@@ -874,8 +876,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             + ViskitConfiguration.VISKIT_MAILING_LIST + "</i> (or whomever you want).</p>";
 
                     ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, message, false);
-
-                } catch (InterruptedException | ExecutionException e) {
+                } 
+				catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
                 }
             }

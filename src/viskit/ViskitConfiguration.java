@@ -30,7 +30,7 @@ public class ViskitConfiguration
 	
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
-    public static final String VISKIT_WEBSITE_URL            = "https://eos.nps.edu/Viskit (TODO)";
+    public static final String VISKIT_WEBSITE_URL            = "https://eos.nps.edu/Viskit"; // TODO
     public static final String VISKIT_MAILING_LIST           = "viskit@www.movesinstitute.org";
 	
     public static final File USER_CONFIGURATION_DIRECTORY= new File(System.getProperty("user.home"), ".viskit");
@@ -41,12 +41,12 @@ public class ViskitConfiguration
     public static final File USER_C_APP_FILE             = new File(USER_CONFIGURATION_DIRECTORY, "c_app.xml");
     public static final File USER_C_GUI_FILE             = new File(USER_CONFIGURATION_DIRECTORY, "c_gui.xml");
     public static final File USER_C_GUI_MAC_FILE         = new File(USER_CONFIGURATION_DIRECTORY, "c_gui_mac.xml");
+    public static       File VISKIT_DEBUG_LOG            = new File(USER_CONFIGURATION_DIRECTORY, "debug.log");
 	
 	// these directory instantiations don't work somehow, reinitialized in constructor
     public static       File VISKIT_CONFIGURATION_DIRECTORY = new File("configuration");
     public static       File VISKIT_CONFIGURATION_FILE      = new File("configuration", "viskitConfiguration.xml");
     public static       File VISKIT_README_FILE             = new File("configuration", "README.txt");
-    public static       File VISKIT_DEBUG_LOG               = new File("configuration", "debug.log");
     public static       File VISKIT_C_APP_FILE              = new File("configuration", "c_app.xml");
     public static       File VISKIT_C_GUI_FILE              = new File("configuration", "c_gui.xml");
 

@@ -70,16 +70,24 @@ public abstract class ViskitInstantiator
 	public ViskitInstantiator vcopy() // need full copy for each implementing class
 	{
 		if (this instanceof ViskitInstantiator.Array)
-			 return ((ViskitInstantiator.Array)this).vcopy();
+		{
+			return ((ViskitInstantiator.Array)this).vcopy();
+		}
 		else if (this instanceof ViskitInstantiator.Construct)
-			 return ((ViskitInstantiator.Construct)this).vcopy();
+		{
+			return ((ViskitInstantiator.Construct)this).vcopy();
+		}
 		else if (this instanceof ViskitInstantiator.Factory)
-			 return ((ViskitInstantiator.Factory)this).vcopy();
+		{
+			return ((ViskitInstantiator.Factory)this).vcopy();
+		}
 		else if  (this instanceof ViskitInstantiator.FreeForm)
-			 return ((ViskitInstantiator.FreeForm)this).vcopy();
+		{
+			return ((ViskitInstantiator.FreeForm)this).vcopy();
+		}
 		else
 		{
-			LOG.error ("Erroneous vcopy invocation"); // do not invoke as super.vcopy() from implementing class!
+			LOG.error ("Erroneous ViskitInstantiator vcopy invocation"); // do not invoke as super.vcopy() from implementing class!
 			return null;
 		}
 	}
@@ -129,7 +137,7 @@ public abstract class ViskitInstantiator
         public FreeForm(String type, String name) 
 		{
             super(type);
-            setName(name);
+            super.name = name;
         }
 
         public String getValue() 
@@ -148,6 +156,7 @@ public abstract class ViskitInstantiator
             return value;
         }
 
+		@Override
         public ViskitInstantiator.FreeForm vcopy()
 		{
             ViskitInstantiator.FreeForm resultViskitInstantiator = new ViskitInstantiator.FreeForm(getTypeName(), getName());
@@ -193,6 +202,9 @@ public abstract class ViskitInstantiator
 				String assemblyParameterType        = "null";
 				String assemblyParameterValue       = "";
 				String assemblyParameterDescription = "";
+				String assemblyFactoryParameterFactoryName = "";
+	 TerminalParameter assemblyFactoryParameterTerminalParameter = null;
+						
 				if (assemblyParameter instanceof TerminalParameter) // simple type
 				{ 
 					assemblyParameterName        = ((TerminalParameter) assemblyParameter).getName();
@@ -215,15 +227,27 @@ public abstract class ViskitInstantiator
 						LOG.info("Assembly MultiParameter " + assemblyParameterType + " " + assemblyParameterName);
 					}
 				} 
-				else if (assemblyParameter instanceof FactoryParameter) 
+				else if (assemblyParameter instanceof FactoryParameter) // which contains a TerminalParameter
 				{
-					assemblyParameterName        = ((FactoryParameter) assemblyParameter).getName();
-					assemblyParameterType        = ((FactoryParameter) assemblyParameter).getType(); // object type
-					assemblyParameterValue       = // no value attribute for Parameter element
-					assemblyParameterDescription = ((FactoryParameter) assemblyParameter).getDescription();
-					if (viskit.ViskitStatics.debug) 
+					assemblyFactoryParameterFactoryName = ((FactoryParameter) assemblyParameter).getFactory();
+					if (((((FactoryParameter) assemblyParameter).getParameters()) != null) && 
+					    ((((FactoryParameter) assemblyParameter).getParameters()).get(0) != null) && 
+					    ((((FactoryParameter) assemblyParameter).getParameters()).get(0) instanceof TerminalParameter))
 					{
-						LOG.info("Assembly FactoryParameter " + assemblyParameterType + " " + assemblyParameterName);
+						assemblyFactoryParameterTerminalParameter = ((TerminalParameter)(((FactoryParameter) assemblyParameter).getParameters()).get(0));
+						assemblyParameterName        = assemblyFactoryParameterTerminalParameter.getName();
+						assemblyParameterType        = assemblyFactoryParameterTerminalParameter.getType(); // object type
+						assemblyParameterValue       = "";// no value attribute for Parameter element
+						assemblyParameterDescription = assemblyFactoryParameterTerminalParameter.getDescription();
+						
+						if (viskit.ViskitStatics.debug) 
+						{
+							LOG.info("Assembly FactoryParameter " + assemblyFactoryParameterFactoryName + " " + assemblyParameterType + " " + assemblyParameterName);
+						}
+					}
+					else
+					{
+						LOG.error("Assembly error, FactoryParameter factory='" + assemblyFactoryParameterFactoryName + "' contains no TerminalParameter");
 					}
 				} 
 				else if (assemblyParameter instanceof Parameter) // from InstantiationPanel, this could also be an eventgraph param type?
@@ -239,7 +263,7 @@ public abstract class ViskitInstantiator
 				}
 				else
 				{
-					LOG.error ("Assembly parameter Unexpected type");
+					LOG.error ("Assembly parameter has unexpected type");
 					break;
 				}
 //				((ViskitInstantiator) viskitParametersFactoryList.get(index)).setName       (assemblyParameterName);
@@ -374,7 +398,7 @@ public abstract class ViskitInstantiator
 				{
                     instantiatorList.add(buildMultiParameter((MultiParameter) jaxbAssemblyParameter));
                 } 
-				else if (jaxbAssemblyParameter instanceof FactoryParameter) 
+				else if (jaxbAssemblyParameter instanceof FactoryParameter)  // which contains a TerminalParameter
 				{
                     instantiatorList.add(buildFactoryParameter((FactoryParameter) jaxbAssemblyParameter));
                 } 
@@ -505,9 +529,27 @@ public abstract class ViskitInstantiator
 				{
 					methodName = ((MultiParameter)jaxbObject).getName();
                 } 
-				else if (jaxbObject instanceof FactoryParameter) 
+				else if (jaxbObject instanceof FactoryParameter) // which contains a TerminalParameter
 				{
-					methodName = ((FactoryParameter)jaxbObject).getName();
+					String assemblyFactoryParameterFactoryName = "";
+					
+					String assemblyParameterName        = "notFound";
+					String assemblyParameterType        = "null";
+					String assemblyParameterValue       = "";
+					String assemblyParameterDescription = "";
+		 TerminalParameter assemblyFactoryParameterTerminalParameter = null;
+		 
+					assemblyFactoryParameterTerminalParameter = ((TerminalParameter)(((FactoryParameter) jaxbObject).getParameters()).get(0));
+					assemblyParameterName        = assemblyFactoryParameterTerminalParameter.getName();
+					assemblyParameterType        = assemblyFactoryParameterTerminalParameter.getType(); // object type
+					assemblyParameterValue       = // no value attribute for Parameter element
+					assemblyParameterDescription = assemblyFactoryParameterTerminalParameter.getDescription();
+					
+					return new ViskitInstantiator.Factory(
+							assemblyParameterType,      // typeName
+							((FactoryParameter)jaxbObject).getName(),   // factoryClassName
+							assemblyParameterName,                      // methodName
+							buildInstantiators(((FactoryParameter) jaxbObject).getParameters())); // parametersList						
                 } 
 				else if (jaxbObject instanceof Parameter)  // from InstantiationPanel Const getter
 				{
@@ -518,12 +560,11 @@ public abstract class ViskitInstantiator
 					methodName = "notFound";
 				}
 			}
-				
             return new ViskitInstantiator.Factory(
                     factoryParameter.getType(),      // typeName
 					factoryParameter.getFactory(),   // factoryClassName
 					methodName,                      // methodName
-                    buildInstantiators(objectList)); // parametersList
+                    buildInstantiators(objectList)); // parametersList, recevies a TerminalParameter
         }
 
         final boolean parametersListsMatch(List<Object> assemblyParameters, List<Object> eventGraphParameters)
@@ -559,7 +600,7 @@ public abstract class ViskitInstantiator
 				{
                     assemblyTypeName = ((MultiParameter) jaxbObject).getType();
                 } 
-				else if (jaxbObject instanceof FactoryParameter) 
+				else if (jaxbObject instanceof FactoryParameter)  // which contains a TerminalParameter
 				{
                     assemblyTypeName = ((FactoryParameter) jaxbObject).getType();
                 } 
@@ -757,7 +798,9 @@ public abstract class ViskitInstantiator
             for (Object viskitObject : viskitParametersFactoryList)
 			{
 				if (viskitObject instanceof ViskitInstantiator)
-                    objectVector.add(((ViskitInstantiator)viskitObject).vcopy()); // type-aware copy
+				{
+					objectVector.add(((ViskitInstantiator)viskitObject).vcopy()); // type-aware copy
+				} 
 				else
 					LOG.error ("Unknown type during ViskitInstantiator.Construct.vcopy of viskitParametersFactoryList");
             }
@@ -799,10 +842,11 @@ public abstract class ViskitInstantiator
         public ViskitInstantiator.Array vcopy()
 		{
             Vector<Object> objectVector = new Vector<>();
-            for (Object vi : instantiators)
+			
+            for (Object instantiator : instantiators) // instantiator likely of a different sutype than Array
 			{
-				if (vi instanceof ViskitInstantiator.Array)
-					objectVector.add(((ViskitInstantiator.Array) vi).vcopy());
+				if (instantiator instanceof ViskitInstantiator)
+					objectVector.add(((ViskitInstantiator) instantiator).vcopy());
 				else
 					LOG.error ("Unknown type during ViskitInstantiator.Array.vcopy of instantiators");
             }
@@ -941,20 +985,21 @@ public abstract class ViskitInstantiator
             return buffer.toString(); // TODO show examples
         }
 		
+		@Override
         public ViskitInstantiator.Factory vcopy()
 		{
             Vector<Object> objectList = new Vector<>();
-            ViskitInstantiator.Factory vi;
-            for (Object o : parametersList) {
-
-                if (o instanceof ViskitInstantiator.Factory)
+            ViskitInstantiator vi;
+            for (Object parameter : parametersList) 
+			{
+                if (parameter instanceof ViskitInstantiator) // parameter may be another ViskitInstantiatortype
 				{
-                    vi = (ViskitInstantiator.Factory) o;
+                    vi = (ViskitInstantiator) parameter;
                     objectList.add(vi.vcopy());
                 } 
-				else if (o instanceof String) 
+				else if (parameter instanceof String) 
 				{
-                    objectList.add((String) o);
+                    objectList.add((String) parameter);
                 }
 				else
 					LOG.error ("Unknown type during ViskitInstantiator.Factory.vcopy of parametersList");

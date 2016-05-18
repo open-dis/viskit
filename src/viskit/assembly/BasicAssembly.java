@@ -614,7 +614,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 			return;
         }
 
-        // Incase the user input bad parameters in the XML
+        // In case the user input bad parameters in the XML
         try {
             createObjects();
             performHookups();
@@ -629,7 +629,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 url = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:");
 				path = url.getPath();
-            } catch (MalformedURLException ex) {
+            } 
+			catch (MalformedURLException ex) 
+			{
                 LOG.error(ex);
             }
             String msg = "Assembly run aborted.  <br/>Please "
@@ -638,10 +640,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     + "<b><a href=\"" + path + "\">" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-            ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
-
             // Comment in to see what the matter is
             t.printStackTrace();
+
+            ViskitStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
             return;
         }
 
