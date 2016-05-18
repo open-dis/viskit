@@ -1,7 +1,8 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
 import java.util.ArrayList;
-import java.util.List;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 
 /**
@@ -11,7 +12,9 @@ import viskit.ViskitGlobals;
  * @since 4:00:29 PM
  * @version $Id$
  */
-public class EventStateTransition extends ViskitElement {
+public class EventStateTransition extends ViskitElement 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventStateTransition.class);
 
     private String  operationOrAssignment = EMPTY;
     private String  indexingExpression = EMPTY;

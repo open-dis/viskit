@@ -55,12 +55,12 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @version $Id$
  * @author Rick Goldberg
  */
-public class SessionManager /* compliments DoeSessionDriver*/ {
+public class SessionManager /* compliments DoeSessionDriver*/ 
+{
+    static final Logger LOG = LogUtilities.getLogger(SessionManager.class);
 
     private Hashtable<String, String> sessions;
     private JAXBContext jaxbContext;
-
-    Logger LOG = LogUtilities.getLogger(SessionManager.class);
 
     private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";

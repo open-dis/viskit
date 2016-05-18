@@ -1,5 +1,7 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitElement;
 import viskit.model.ViskitStateVariable;
@@ -14,7 +16,9 @@ import viskit.model.ViskitStateVariable;
  * @since 8:49:21 AM
  * @version $Id$
  */
-public class StateVariablesPanel extends ViskitTablePanel {
+public class StateVariablesPanel extends ViskitTablePanel
+{
+    static final Logger LOG = LogUtilities.getLogger(StateVariablesPanel.class);
 
     private final String[] columnTitles = {"type", "name", "initial value", "description"};
     private final String    plusToolTip = "Add a state variable";

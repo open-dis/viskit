@@ -33,12 +33,14 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
@@ -55,7 +57,9 @@ import viskit.control.InternalAssemblyRunner;
  * @since Jul 17, 2006
  * @since 3:17:07 PM
  */
-public class SimulationRunPanel extends JPanel {
+public class SimulationRunPanel extends JPanel
+{
+    static final Logger LOG = LogUtilities.getLogger(SimulationRunPanel.class);
 
     public boolean dump = true;
     public boolean search;

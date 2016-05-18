@@ -12,8 +12,8 @@ package viskit.mvc;
  *
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class mvcAbstractController implements mvcController { // TODO rename twice, change to upper camel case
-
+public abstract class mvcAbstractController implements mvcController  // TODO rename twice, change to upper camel case
+{
     private mvcView view;
     private mvcModel model;
 

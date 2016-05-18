@@ -1,5 +1,6 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Iterator;
+import org.apache.log4j.Logger;
 
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -22,7 +24,9 @@ import viskit.ViskitStatics;
  * @since 27 Aug 2004
  * @version $Id$
  */
-public class XmlTree extends JTree {
+public class XmlTree extends JTree 
+{
+    static final Logger LOG = LogUtilities.getLogger(XmlTree.class);
 
     DefaultTreeModel mod;
 

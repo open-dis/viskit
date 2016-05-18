@@ -1,5 +1,7 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 
 /**
@@ -9,7 +11,9 @@ import viskit.ViskitGlobals;
  * @since 3:59:01 PM
  * @version $Id$
  */
-public class EventLocalVariable extends ViskitElement {
+public class EventLocalVariable extends ViskitElement 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventLocalVariable.class);
 
     private String[] arraySize;
     private String   indexingExpression;

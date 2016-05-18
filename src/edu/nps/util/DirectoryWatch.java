@@ -49,11 +49,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 
 /**
  * A class to observe a directory (tree) for changes and report them to listeners
  */
-public class DirectoryWatch {
+public class DirectoryWatch 
+{
+    static final Logger LOG = LogUtilities.getLogger(DirectoryWatch.class);
 
     private static int sequenceNum = 0;
     private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds

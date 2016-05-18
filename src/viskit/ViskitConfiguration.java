@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.configuration.*;
@@ -27,6 +26,8 @@ import viskit.doe.FileHandler;
  */
 public class ViskitConfiguration
 {
+    static final Logger LOG = LogUtilities.getLogger(ViskitConfiguration.class);
+	
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
     public static final String VISKIT_WEBSITE_URL            = "https://eos.nps.edu/Viskit (TODO)";
@@ -99,8 +100,6 @@ public class ViskitConfiguration
     public static final String LOOK_AND_FEEL_PLATFORM = "platform";
 
     private static ViskitConfiguration singletonViskitConfiguration;
-
-    static final Logger LOG = LogUtilities.getLogger(ViskitConfiguration.class);
 
     private Map<String, XMLConfiguration> xmlConfigurations;
     private Map<String, String>           sessionHashMap;

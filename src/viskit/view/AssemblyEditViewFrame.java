@@ -548,7 +548,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         if (propertyChangeConnectorModeButton.isSelected()) {
             return PROPERTY_CHANGE_LISTENER_MODE;
         }
-        LogUtilities.getLogger(AssemblyEditViewFrame.class).error("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -782,9 +782,9 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         try {
-            graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
+            graphPane.getDropTarget().addDropTargetListener(new viskitDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtilities.getLogger(AssemblyEditViewFrame.class).error(tmle);
+            LOG.error(tmle);
         }
         graphPane.setToolTipText(assemblyModel.getMetadata().description);
 
@@ -953,65 +953,72 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     {
         JOptionPane.showMessageDialog(this, msg, title, type);
     }
-    Transferable dragged;
+    Transferable transferableDragData;
 
     @Override
-    public void startingDrag(Transferable trans) {
-        dragged = trans;
+    public void startingDrag(Transferable newDragData) 
+	{
+        transferableDragData = newDragData;
     }
 
     /** Class to facilitate dragging new nodes onto the pallete */
-    class vDropTargetAdapter extends DropTargetAdapter {
-
+    class viskitDropTargetAdapter extends DropTargetAdapter 
+	{
         @Override
-        public void dragOver(DropTargetDragEvent e) {
-
-            // NOTE: this action is very critical in getting JGraph 5.14 to
-            // signal the drop method
+        public void dragOver(DropTargetDragEvent e) 
+		{
+            // NOTE: this action is very critical in getting JGraph 5.14 to signal the drop method
             e.acceptDrag(e.getDropAction());
         }
 
         @Override
-        public void drop(DropTargetDropEvent dtde)
+        public void drop(DropTargetDropEvent dropTargetDropEvent)
 		{
-            if (dragged != null)
+            if (transferableDragData != null)
 			{
                 try {
-                    Point p = dtde.getLocation();
+                    Point point = dropTargetDropEvent.getLocation();
 
-                    String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
+                    String s = transferableDragData.getTransferData(DataFlavor.stringFlavor).toString();
                     String[] sa = s.split("\t"); // two string elements: class name; file path or TODO ??
 
-                    // Check for XML-based node
+                    // Check for XML-based node first
+					String extendsFrom = sa[0];
                     FileBasedAssemblyNode xmlBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
+					
                     if (xmlBasedAssemblyNode != null)
 					{
-                        switch (sa[0]) {
+                        switch (extendsFrom) // inherits
+						{
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xmlBasedAssemblyNode, p);
+                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xmlBasedAssemblyNode, point);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xmlBasedAssemblyNode, p, ViskitStatics.DEFAULT_DESCRIPTION);
+                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xmlBasedAssemblyNode, point, ViskitStatics.DEFAULT_DESCRIPTION);
                                 break;
+							default:
+								LOG.error ("Unexpected inheritance extendsFrom=" + extendsFrom);
                         }
                     } 
 					else  // class-based node
 					{   
-                        switch (sa[0]) {
+                        switch (extendsFrom) // inherits
+						{
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
+                                ((AssemblyController) getController()).newEventGraphNode(sa[1], point);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p, ViskitStatics.DEFAULT_DESCRIPTION);
+                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], point, ViskitStatics.DEFAULT_DESCRIPTION);
                                 break;
+							default:
+								LOG.error ("Unexpected inheritance extendsFrom=" + extendsFrom);
                         }
                     }
-
-                    dragged = null;
+                    transferableDragData = null; // all done here, set up for next time by clearing the drag+drop
                 } 
 				catch (UnsupportedFlavorException | IOException e)
 				{
-                    LogUtilities.getLogger(AssemblyEditViewFrame.class).error(e);
+                    LOG.error(e);
                 }
             }
         }

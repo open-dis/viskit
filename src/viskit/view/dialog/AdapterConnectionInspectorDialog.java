@@ -35,6 +35,7 @@ package viskit.view.dialog;
 
 import edu.nps.util.SpringUtilities;
 import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
@@ -48,6 +49,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
+import org.apache.log4j.Logger;
 import viskit.model.AdapterEdge;
 import viskit.model.EventGraphNode;
 import viskit.ViskitStatics;
@@ -62,7 +64,9 @@ import viskit.ViskitStatics;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class AdapterConnectionInspectorDialog extends JDialog {
+public class AdapterConnectionInspectorDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(AdapterConnectionInspectorDialog.class);
 
     private final JLabel sourceLabel,  targetLabel,  nameLabel,  descriptionLabel;
     private final JTextField sourceTF,  targetTF,  nameTF,  descriptionTF;

@@ -31,7 +31,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class SimkitAssemblyXML2Java 
 {
-    static Logger LOG = LogUtilities.getLogger(SimkitAssemblyXML2Java.class);
+    static final Logger LOG = LogUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean debug = false;

@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.doe;
 
+import edu.nps.util.LogUtilities;
 import org.jdom.Element;
 import org.jdom.Attribute;
 
@@ -54,8 +55,11 @@ import javax.swing.tree.TreeSelectionModel;
 import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
+import org.apache.log4j.Logger;
 
-public final class ParameterTree extends JTree {
+public final class ParameterTree extends JTree 
+{
+    static final Logger LOG = LogUtilities.getLogger(ParameterTree.class);
 
     public ParameterTree(List list) 
 	{

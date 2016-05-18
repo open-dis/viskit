@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -45,6 +46,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.BasicMarqueeHandler;
 import org.jgraph.graph.CellView;
@@ -62,7 +64,9 @@ import viskit.ViskitGlobals;
  * Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class JGraphMarqueeHandler extends BasicMarqueeHandler {
+public class JGraphMarqueeHandler extends BasicMarqueeHandler
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphMarqueeHandler.class);
 
     /** Holds the Start and the Current Point */
     protected Point2D startPoint, currentPoint;

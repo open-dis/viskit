@@ -27,8 +27,8 @@ import viskit.ViskitStatics;
  * @version $Id$
  */
 @SuppressWarnings("serial")
-public class SourceWindow extends JFrame {
-
+public class SourceWindow extends JFrame
+{
     static final Logger LOGGER = LogUtilities.getLogger(SourceWindow.class);
 
     public final String sourceCode;

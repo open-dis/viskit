@@ -1,5 +1,7 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.EventLocalVariable;
 import viskit.model.ViskitElement;
@@ -16,6 +18,8 @@ import viskit.model.ViskitElement;
  */
 public class LocalVariablesPanel extends ViskitTablePanel
 {
+    static final Logger LOG = LogUtilities.getLogger(LocalVariablesPanel.class);
+	
   private String[] mytitles = {"name","type","initial value","description"};
 
   public LocalVariablesPanel(int wid)

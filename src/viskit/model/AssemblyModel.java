@@ -15,15 +15,16 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * Date: May 17, 2004
  * Time: 9:16:26 AM
  */
- public interface AssemblyModel {
-
+ public interface AssemblyModel 
+ {
     /** Places an event graph node on the assembly pallete when the user drags
      * an icon from the LEGO tree
      *
      * @param widgetName the name of the EG
-     * @param className the EG class from parsing third party libs of the current project
+     * @param className the EventGraph class from parsing third party libs of the current project
      * @param p the point on the pallete to place the node icon
      */
+	 
      void newEventGraph(String widgetName, String className, Point2D p, String description);
 
      /**
@@ -36,11 +37,13 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * an icon from the LEGO tree
      *
      * @param widgetName the name of the EG
-     * @param node the cached node from parsing the EG directory of the current project
+//   * @param node the cached node from parsing the EG directory of the current project
+     * @param className the EventGraph class from parsing third party libs of the current project
      * @param p the point on the pallete to place the node icon
 	 * @param description the value of description
+	 * @param assemblyNode XML from drag+drop
      */
-    void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description);
+    void newEventGraphFromXML(String widgetName, String className, Point2D p, String description, FileBasedAssemblyNode assemblyNode);
 
     void newPropertyChangeListener(String widgetName, String className, Point2D p, String description);
 

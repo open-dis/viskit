@@ -1,5 +1,6 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.ViskitInstantiator;
 import viskit.view.dialog.ArrayInspector;
@@ -40,7 +42,9 @@ import viskit.control.AssemblyController;
  * @since 3:03:09 PM
  * @version $Id$
  */
-public class ObjectListPanel extends JPanel implements ActionListener, CaretListener {
+public class ObjectListPanel extends JPanel implements ActionListener, CaretListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(ObjectListPanel.class);
 
     private JDialog parent;
 	private JLabel         nameLabelArray[];

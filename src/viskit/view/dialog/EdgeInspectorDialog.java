@@ -18,6 +18,7 @@ import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.LogUtilities;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import org.apache.log4j.Logger;
 import simkit.Priority;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -40,7 +41,9 @@ import viskit.view.EdgeParametersPanel;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class EdgeInspectorDialog extends JDialog {
+public class EdgeInspectorDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EdgeInspectorDialog.class);
 
     private static EdgeInspectorDialog dialog;
     private static boolean modified = false;

@@ -364,15 +364,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D point, String description)
+    public void newEventGraphFromXML(String widgetName, String className, Point2D point, String description, FileBasedAssemblyNode assemblyNode)
 	{
-        newEventGraph(widgetName, node.loadedClass, point, description);
-    }
-
-    @Override
-    public void newEventGraph(String widgetName, String className, Point2D point, String description)
-	{
-        EventGraphNode eventGraphNode = new EventGraphNode(widgetName, className, description);
+		String derivedClassName = className;
+		if (assemblyNode != null)
+			derivedClassName = assemblyNode.loadedClass;
+		
+        EventGraphNode eventGraphNode = new EventGraphNode(widgetName, derivedClassName, description);
         if (point == null)
 		{
             eventGraphNode.setPosition(pointLess);
@@ -389,7 +387,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimEntity.setDescription(description);
         eventGraphNode.opaqueModelObject = jaxbSimEntity;
 
-        ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(jaxbSimEntity.getType(), null);  // null means undefined
+        ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(jaxbSimEntity.getType(), 
+				
+				null);  // null means undefined
         eventGraphNode.setInstantiator(viskitConstructor);
         eventGraphNode.setVerboseMarked(true); // default for new SimEntity.  TODO use user preference
 
@@ -403,7 +403,20 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
 
         modelDirty = true;
+		
+		// utilize passed XML information, if any (provided via drag+drop)
+		if (assemblyNode != null)
+		{
+//			assemblyNode.
+		}
         notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + eventGraphNode.getName()));
+    }
+
+//    @Override
+    public void newEventGraph(String widgetName, String className, Point2D point, String description)
+	{
+		// re-use common code
+        newEventGraphFromXML (widgetName, className, point, description, null);
     }
 
     @Override
@@ -1066,7 +1079,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
         multiParameter.setType(vicon.getTypeName());
-        for (Object vi : vicon.getParametersList()) {
+        for (Object vi : vicon.getParametersFactoryList()) {
             multiParameter.getParameters().add(buildParameter(vi));
         }
         return multiParameter;

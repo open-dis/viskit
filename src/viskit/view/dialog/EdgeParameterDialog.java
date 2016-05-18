@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import viskit.model.ViskitEdgeParameter;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import org.apache.log4j.Logger;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -21,7 +23,9 @@ import java.awt.event.WindowEvent;
  *
  * @author DMcG
  */
-public class EdgeParameterDialog extends JDialog {
+public class EdgeParameterDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EdgeParameterDialog.class);
 
     private final JTextField valueField;       // Text field that holds the expression
     private final JLabel typeLabel;            // static type value passed in

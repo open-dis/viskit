@@ -1,5 +1,8 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * @author Mike Bailey
@@ -7,7 +10,9 @@ package viskit.model;
  * @since 3:19:43 PM
  * @version $Id$
  */
-public class ViskitEdgeParameter extends ViskitElement {
+public class ViskitEdgeParameter extends ViskitElement 
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitEdgeParameter.class);
 
     public String bogus; //todo fix
 

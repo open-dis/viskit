@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -42,6 +43,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import org.apache.log4j.Logger;
 
 import viskit.xsd.bindings.assembly.SimEntity;
 import viskit.xsd.bindings.assembly.TerminalParameter;
@@ -53,7 +55,9 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  * Date: Jul 20, 2005
  * Time: 4:11:55 PM
  */
-public class ParameterTable extends JTable {
+public class ParameterTable extends JTable 
+{
+    static final Logger LOG = LogUtilities.getLogger(ParameterTable.class);
 
     private ParameterTableModel ptm;
 

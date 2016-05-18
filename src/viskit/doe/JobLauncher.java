@@ -46,8 +46,10 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
+import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
@@ -65,7 +67,9 @@ import viskit.util.TitleListener;
  * @since 12:29:08 PM
  * @version $Id$
  */
-public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener {
+public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener
+{
+    static final Logger LOG = LogUtilities.getLogger(JobLauncher.class);
 
     String inputFileString;
     File inputFile;

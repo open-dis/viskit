@@ -4,7 +4,7 @@ import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
-import edu.nps.util.ZipUtils;
+import edu.nps.util.ZipUtilities;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -831,7 +831,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 							   StandardCopyOption.REPLACE_EXISTING);
                     // Next, copy the debug.LOG to the project dir
                     Files.copy(ViskitConfiguration.VISKIT_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ZipUtils.zipFolder(projectDirectory, projectArchiveZip);
+                    ZipUtilities.zipFolder(projectDirectory, projectArchiveZip);
 
                     try // open directory holding the .zip so that use can select, drag and mail it
 					{
@@ -1194,14 +1194,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point)
 	{
         String shortName = shortEventGraphName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, ViskitStatics.DEFAULT_DESCRIPTION);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, shortName, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
     }
 
     @Override
     public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point, String description)
 	{
         String shortName = shortEventGraphName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, xnode, point, description);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, shortName, point, description, xnode);
     }
 
 

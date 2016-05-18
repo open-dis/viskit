@@ -70,8 +70,8 @@ import viskit.model.AssemblyModelImpl;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class InternalAssemblyRunner implements PropertyChangeListener {
-
+public class InternalAssemblyRunner implements PropertyChangeListener
+{
     static final Logger LOG = LogUtilities.getLogger(InternalAssemblyRunner.class);
 
     /** The name of the basicAssembly to run */

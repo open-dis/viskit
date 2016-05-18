@@ -52,13 +52,14 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import static viskit.ViskitStatics.LOG;
 
 /** The base class for management of all Viskit Projects
  * @version $Id: ViskitProject.java 1916 2008-07-04 09:13:41Z tdnorbra $
  * @author abuss
  */
-public class ViskitProject {
+public class ViskitProject 
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitProject.class);
 
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project home space on the user's machine.  A default
@@ -95,8 +96,6 @@ public class ViskitProject {
     public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENTGRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
-
-    static Logger LOG = LogUtilities.getLogger(ViskitProject.class);
 
 	private String   projectName        = ""; // empty string if no project open
 	private String   projectAuthor      = "";

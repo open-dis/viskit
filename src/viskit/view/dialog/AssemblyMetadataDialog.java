@@ -1,8 +1,10 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import viskit.model.GraphMetadata;
 
 import javax.swing.JFrame;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -14,23 +16,29 @@ import javax.swing.JFrame;
  * @since 1:35:07 PM
  * @version $Id$
  */
-public class AssemblyMetadataDialog extends MetadataDialog {
+public class AssemblyMetadataDialog extends MetadataDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(AssemblyMetadataDialog.class);
 
     private static MetadataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) {
-        if (dialog == null) {
+    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) 
+	{
+        if (dialog == null) 
+		{
             dialog = new AssemblyMetadataDialog(f, graphMetadata);
-        } else {
+        } 
+		else 
+		{
             dialog.setGraphMetadata(f, graphMetadata);
         }
-
-        dialog.setVisible(true);
-        // above call blocks
+        dialog.setVisible(true); // this call blocks
+       
         return modified;
     }
 
-    AssemblyMetadataDialog(JFrame f, GraphMetadata graphMetadata) {
+    AssemblyMetadataDialog(JFrame f, GraphMetadata graphMetadata) 
+	{
         super(f, graphMetadata, "Assembly Properties");
     }
 }

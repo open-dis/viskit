@@ -32,7 +32,7 @@ import viskit.ViskitGlobals;
  */
 public class Boot extends URLClassLoader implements Runnable 
 {
-    static Logger LOG = LogUtilities.getLogger(Boot.class);
+    static final Logger LOG = LogUtilities.getLogger(Boot.class);
 	
     static Boot bootee;
     static Thread booter;

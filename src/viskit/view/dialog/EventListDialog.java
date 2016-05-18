@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.EtchedBorder;
@@ -10,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import org.apache.log4j.Logger;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -28,7 +30,9 @@ import java.awt.event.WindowEvent;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class EventListDialog extends JDialog {
+public class EventListDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventListDialog.class);
 
     private static EventListDialog dialog;
     private static int selection = -1;

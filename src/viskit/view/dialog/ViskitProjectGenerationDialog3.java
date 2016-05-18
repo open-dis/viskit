@@ -5,12 +5,14 @@
  */
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitProject;
 
 /** Dialog to assist in generating a new viskit project directory space
@@ -18,13 +20,16 @@ import viskit.ViskitProject;
  * @author  mike
  * @version $Id$
  */
-public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
+public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel 
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitProjectGenerationDialog3.class);
 
     public static boolean cancelled = true;  // by default
     public static String projectPath = "";
     private static JDialog dialog;
 
-    public static void showDialog() {
+    public static void showDialog()
+	{
         ViskitProjectGenerationDialog3 panel = new ViskitProjectGenerationDialog3();
         dialog = new JDialog((Dialog) null, true);  // modal
         dialog.setTitle("Create Project for Visual Simkit (Viskit)");

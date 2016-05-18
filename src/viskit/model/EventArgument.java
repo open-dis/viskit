@@ -1,7 +1,9 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +12,9 @@ import java.util.List;
  * @since 3:57:26 PM
  * @version $Id$
  */
-public class EventArgument extends ViskitElement {
+public class EventArgument extends ViskitElement 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventArgument.class);
 
     private String value;
     private boolean operation;

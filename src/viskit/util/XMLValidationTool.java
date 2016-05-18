@@ -50,7 +50,9 @@ import viskit.ViskitConfiguration;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.XMLValidationTool">Terry Norbraten</a>
  */
-public class XMLValidationTool {
+public class XMLValidationTool 
+{
+    static final Logger LOG = LogUtilities.getLogger(XMLValidationTool.class);
 
     public static final String ASSEMBLY_SCHEMA = "http://eos.nps.edu/Simkit/assembly.xsd";
     public static final String EVENT_GRAPH_SCHEMA = "http://eos.nps.edu/Simkit/simkit.xsd";
@@ -62,8 +64,6 @@ public class XMLValidationTool {
     /** The locally resolved location for simkit.xsd */
     public static final String LOCAL_EVENT_GRAPH_SCHEMA =
             System.getProperty("user.dir") + "/Schemas/simkit.xsd";
-
-    static Logger LOG = LogUtilities.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
     private File xmlFile, schemaFile;

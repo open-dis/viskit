@@ -1,8 +1,10 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -14,7 +16,9 @@ import java.util.List;
  * @since 8:33:17 AM
  * @version $Id$
  */
-public final class ConstructorPanel extends JPanel {
+public final class ConstructorPanel extends JPanel 
+{
+    static final Logger LOG = LogUtilities.getLogger(ConstructorPanel.class);
 
     private JButton selectButton;
     private final ActionListener modifiedListener;

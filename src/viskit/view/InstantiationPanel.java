@@ -376,13 +376,13 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 				{
                            constructors[i] = new ViskitInstantiator.Construct(parameters[i], className);
 					parametersSignature[i] = "";
-					if (constructors[i].getParametersList().isEmpty())
+					if (constructors[i].getParametersFactoryList().isEmpty())
 					{
 						parametersSignature[i] = noParametersString;
 					}
 					else
 					{
-						for (int j = 0; j < constructors[i].getParametersList().size(); j++)
+						for (int j = 0; j < constructors[i].getParametersFactoryList().size(); j++)
 						{
 							String typeName = ((Parameter)parameters[i].get(j)).getType();
 							if      (typeName == null)
@@ -391,10 +391,10 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 								     typeName = typeName.substring(typeName.lastIndexOf(".")+1);
 							parametersSignature[i] += typeName;
 
-							if (!((ViskitInstantiator) (constructors[i].getParametersList().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
+							if (!((ViskitInstantiator) (constructors[i].getParametersFactoryList().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
 							{
 								String name = ((Parameter)parameters[i].get(j)).getName();
-								((ViskitInstantiator) (constructors[i].getParametersList().get(j))).setName(name);
+								((ViskitInstantiator) (constructors[i].getParametersFactoryList().get(j))).setName(name);
 								parametersSignature[i] += " " + name;
 							}
 							parametersSignature[i] += ", ";
@@ -403,7 +403,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 					}
 
 					// TODO further hiding of duplicate constructors, also see below
-					if (!constructors[i].getParametersList().isEmpty() || zeroArgumentConstructorAllowed)
+					if (!constructors[i].getParametersFactoryList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorTabCount++;
 					}
@@ -411,7 +411,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 for (int i = 0; i < parameters.length; ++i) // only add tabs of interest
 				{
 					// TODO further hiding of duplicate constructors, also see above
-					if (!constructors[i].getParametersList().isEmpty() || zeroArgumentConstructorAllowed)
+					if (!constructors[i].getParametersFactoryList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
 						String constructorTabLabel;
@@ -422,7 +422,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 						}
 						else constructorTabLabel = "Constructor " + i;
 						
-						constructorPanels[i].setData(constructors[i].getParametersList());
+						constructorPanels[i].setData(constructors[i].getParametersFactoryList());
 						tabbedPane.addTab(constructorTabLabel, null, constructorPanels[i], parametersSignature[i]); // null icon
 					}
 				}
@@ -484,14 +484,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 System.out.println("setting data for " + viskitInstantiatorConstructor.getTypeName());
             }
 
-            int argumentIndex = viskitInstantiatorConstructor.indexOfArgumentNames(viskitInstantiatorConstructor.getTypeName(), viskitInstantiatorConstructor.getParametersList());
+            int argumentIndex = viskitInstantiatorConstructor.indexOfArgumentNames(viskitInstantiatorConstructor.getTypeName(), viskitInstantiatorConstructor.getParametersFactoryList());
             if (viskit.ViskitStatics.debug)
 			{
                 System.out.println("found a matching constructor at " + argumentIndex);
             }
             if (argumentIndex != -1)
 			{
-                constructorPanels[argumentIndex].setData(viskitInstantiatorConstructor.getParametersList());
+                constructorPanels[argumentIndex].setData(viskitInstantiatorConstructor.getParametersFactoryList());
                 tabbedPane.setSelectedIndex(argumentIndex);
             }
             actionPerformed(null);

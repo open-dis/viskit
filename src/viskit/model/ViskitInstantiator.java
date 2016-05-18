@@ -79,7 +79,7 @@ public abstract class ViskitInstantiator
 			 return ((ViskitInstantiator.FreeForm)this).vcopy();
 		else
 		{
-			LOG.error ("Erroneous vcopy invocation");
+			LOG.error ("Erroneous vcopy invocation"); // do not invoke as super.vcopy() from implementing class!
 			return null;
 		}
 	}
@@ -104,10 +104,10 @@ public abstract class ViskitInstantiator
 				{
 					viskitInstantiatorVector.add(new ViskitInstantiator.Array(className, new ArrayList<>()));	  // TODO how to add name?
 				}
-				else if (true) // reflectionParameterClass.???)
-				{
-					viskitInstantiatorVector.add(new ViskitInstantiator.Construct(className, new ArrayList<>())); // TODO how to add name?
-				}
+////				else if (true) // reflectionParameterClass.???) // TODO trying to construct factory type...
+////				{
+////					viskitInstantiatorVector.add(new ViskitInstantiator.Construct(className, new ArrayList<>())); // TODO how to add name?
+////				}
 				else 	
 				{
 					viskitInstantiatorVector.add(new ViskitInstantiator.FreeForm(className, parameterName)); // TODO fix name
@@ -337,7 +337,7 @@ public abstract class ViskitInstantiator
         public Construct(String typeName, List<Object> args)
 		{
             super(typeName);
-            setArguments(args);
+            setParametersFactoryList(args);
             findArgumentNames(typeName, args);
         }
 
@@ -612,10 +612,10 @@ public abstract class ViskitInstantiator
 		{
             if (arguments == null)
 			{
-                setArguments(getDefaultParameters(typeName));
-                arguments = getParametersList();
+                setParametersFactoryList(getDefaultParameters(typeName));
+                arguments = getParametersFactoryList();
             }
-            return (indexOfArgumentNames(typeName, arguments) >= 0); // true if index found
+            return (indexOfArgumentNames(typeName, arguments) >= 0); // true if index found, apparently simple type if -1
         }
 
         /** Find a typeName match in the ClassLoader of the given EventGraph's parameters
@@ -732,22 +732,25 @@ public abstract class ViskitInstantiator
             return new Vector<>(); // null
         }
 
-        public List<Object> getParametersList()
+        public List<Object> getParametersFactoryList()
 		{
             return viskitParametersFactoryList;
         }
 
-        public final void setArguments(List<Object> args) {
-            this.viskitParametersFactoryList = args;
+        public final void setParametersFactoryList(List<Object> parametersFactoryList) 
+		{
+            this.viskitParametersFactoryList = parametersFactoryList;
         }
 
         @Override
-        public String toString() {
+        public String toString() 
+		{
             String result = "new " + getTypeName() + "(";
-            result = result + (viskitParametersFactoryList.size() > 0 ? ((ViskitInstantiator) viskitParametersFactoryList.get(0)).getTypeName() + ",..." : "");
+            result += (viskitParametersFactoryList.size() > 0 ? ((ViskitInstantiator) viskitParametersFactoryList.get(0)).getTypeName() + ",..." : "");
             return result + ")";
         }
 
+		@Override
         public ViskitInstantiator.Construct vcopy()
 		{
             Vector<Object> objectVector = new Vector<>();

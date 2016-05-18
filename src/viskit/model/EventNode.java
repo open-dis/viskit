@@ -1,9 +1,11 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 import viskit.xsd.bindings.eventgraph.Event;
 
 /**
@@ -18,7 +20,9 @@ import viskit.xsd.bindings.eventgraph.Event;
  *
  * An event as seen by the model (not the view)
  */
-public class EventNode extends ViskitElement {
+public class EventNode extends ViskitElement 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventNode.class);
 
     private ArrayList<ViskitElement>          argumentsArrayList = new ArrayList<>();
     private Vector<ViskitElement>              connectionsVector = new Vector<>();

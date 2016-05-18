@@ -48,6 +48,7 @@ import edu.nps.util.SystemExitHandler;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import viskit.ViskitEventGraphAssemblyComboMain;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
@@ -76,7 +77,9 @@ import viskit.view.dialog.UserPreferencesDialog;
  * @since 3:25:11 PM
  * @version $Id$
  */
-public class ViskitApplicationFrame extends JFrame {
+public class ViskitApplicationFrame extends JFrame 
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitApplicationFrame.class);
 
     private JTabbedPane    mainTabbedPane;
     private JTabbedPane runTabbedPane;

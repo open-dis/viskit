@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 
 import viskit.model.EventGraphNode;
 import viskit.model.ViskitInstantiator;
@@ -28,6 +30,8 @@ import viskit.view.InstantiationPanel;
  */
 public class EventGraphNodeInspectorDialog extends JDialog
 {
+    static final Logger LOG = LogUtilities.getLogger(EventGraphNodeInspectorDialog.class);
+	
     public static String newName;
     public static ViskitInstantiator newInstantiator;
     private static EventGraphNodeInspectorDialog dialog;

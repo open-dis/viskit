@@ -20,7 +20,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 public class Launcher extends Thread implements Runnable
 {
-    static Logger LOG = LogUtilities.getLogger(Launcher.class);
+    static final Logger LOG = LogUtilities.getLogger(Launcher.class);
 
     static ClassLoader classLoader;
     String assembly = null;

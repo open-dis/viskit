@@ -25,7 +25,7 @@ import viskit.doe.LocalBootLoader;
 @SuppressWarnings("serial")
 public class LocalTaskQueue extends ArrayList<Object> {
 
-    static Logger LOG = LogUtilities.getLogger(LocalTaskQueue.class);
+    static final Logger LOG = LogUtilities.getLogger(LocalTaskQueue.class);
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;

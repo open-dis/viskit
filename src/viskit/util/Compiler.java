@@ -23,12 +23,12 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class Compiler {
+public class Compiler 
+{
+    static final Logger LOG = LogUtilities.getLogger(Compiler.class);
 
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
-
-    static Logger LOG = LogUtilities.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;

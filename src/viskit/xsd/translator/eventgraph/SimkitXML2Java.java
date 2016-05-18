@@ -24,7 +24,7 @@ import viskit.xsd.bindings.eventgraph.*;
  */
 public class SimkitXML2Java 
 {
-    static Logger LOG = LogUtilities.getLogger(SimkitXML2Java.class);
+    static final Logger LOG = LogUtilities.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
 	/** space character */

@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.doe;
 
+import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import org.jdom.Document;
 import viskit.util.OpenAssembly;
@@ -54,8 +55,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import org.apache.log4j.Logger;
 
-public class DoeFileModel {
+public class DoeFileModel 
+{
+    static final Logger LOG = LogUtilities.getLogger(DoeFileModel.class);
 
     public File userFile;
     public ParameterTable paramTable;

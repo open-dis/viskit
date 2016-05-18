@@ -1,5 +1,8 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -10,7 +13,9 @@ package viskit.model;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class PropertyChangeListenerEdge extends AssemblyEdge {
+public class PropertyChangeListenerEdge extends AssemblyEdge
+{
+    static final Logger LOG = LogUtilities.getLogger(PropertyChangeListenerEdge.class);
 
     protected String property; // state variable
     private boolean operation;

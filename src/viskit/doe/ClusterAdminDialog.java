@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
+import edu.nps.util.LogUtilities;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.gridlet.SessionManager;
 
@@ -54,10 +55,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 
 public class ClusterAdminDialog extends JDialog implements ActionListener
 {
+    static final Logger LOG = LogUtilities.getLogger(ClusterAdminDialog.class);
+	
   private JButton closeButt;
   private JButton addUserButt;
   private JButton delUserButt;

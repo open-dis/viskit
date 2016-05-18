@@ -1,5 +1,8 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -12,7 +15,9 @@ package viskit.model;
  *
  * Base class for the objects that get passed around between M, V and C.
  */
-abstract public class ViskitElement implements Comparable<ViskitElement> {
+abstract public class ViskitElement implements Comparable<ViskitElement>
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitElement.class);
 
     public Object opaqueViewObject;       // for private use of View
     public Object opaqueModelObject;      // for private use of Model
@@ -38,7 +43,8 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
         return newViskitElement;
     }
 
-    public Object getModelKey() {
+    public Object getModelKey()
+	{
         return modelKey;
     }
 

@@ -1,15 +1,19 @@
 package viskit.util;
 
+import edu.nps.util.LogUtilities;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
+import org.apache.log4j.Logger;
 
 /** Taken from viskit.view.SourceWindow to be more broadly used
  *
  * @author Rick Goldberg
  * @version $Id$
  */
-public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> {
+public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileObject> 
+{
+    static final Logger LOG = LogUtilities.getLogger(CompilerDiagnosticsListener.class);
 
     public long startOffset = -1;
     public long   endOffset = 0;

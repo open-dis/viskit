@@ -55,7 +55,7 @@ import viskit.view.dialog.UserPreferencesDialog;
  */
 public class ViskitEventGraphAssemblyComboMain
 {
-	private static org.apache.log4j.Logger LOG; // create user's log directory before instantiating
+	private static org.apache.log4j.Logger LOG; // create user's log directory before instantiating LOG below
 
     private static ImageIcon aboutIcon = null;
 

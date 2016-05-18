@@ -15,8 +15,8 @@ import viskit.mvc.mvcRecentFileListener;
  * @since 9:00:57 AM
  * @version $Id$
  */
-public interface EventGraphController {
-
+public interface EventGraphController 
+{
     /**
      * Start application
      */

@@ -1,5 +1,6 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.*;
@@ -9,8 +10,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
-import viskit.control.EventGraphControllerImpl;
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
 
@@ -24,7 +25,9 @@ import viskit.model.ViskitElement;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class StateTransitionsPanel extends JPanel {
+public class StateTransitionsPanel extends JPanel
+{
+    static final Logger LOG = LogUtilities.getLogger(StateTransitionsPanel.class);
 
     private JList<String> modelList;
     private JButton minusButton, plusButton;

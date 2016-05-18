@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import viskit.model.EventGraphModel;
 import viskit.model.ViskitStateVariable;
 
@@ -15,10 +16,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
-import viskit.control.EventGraphControllerImpl;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -30,6 +31,8 @@ import viskit.control.EventGraphControllerImpl;
  */
 public class StateVariableDialog extends ViskitSmallDialog 
 {
+    static final Logger LOG = LogUtilities.getLogger(StateVariableDialog.class);
+	
     private final JTextField stateVariableNameField; // Text field that holds the parameter name
     private JTextField initialValueField;            // Text field that holds the initial value
     private JTextField descriptionField;             // Text field that holds the description
@@ -42,7 +45,8 @@ public class StateVariableDialog extends ViskitSmallDialog
     private final myFocusListener focusListener;
     private final Component myTyperComponent;       // i.e., the editor of the type JComboBox
 
-    public static boolean showDialog(JFrame f, ViskitStateVariable var) {
+    public static boolean showDialog(JFrame f, ViskitStateVariable var) 
+	{
         return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var);
     }
 

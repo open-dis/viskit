@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +14,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
@@ -33,7 +35,9 @@ import viskit.view.LocalVariablesPanel;
  * @author DMcG, Mike Bailey
  * @version $Id$
  */
-public class EventStateTransitionDialog extends JDialog {
+public class EventStateTransitionDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventStateTransitionDialog.class);
 
     private static EventStateTransitionDialog dialog;
     private static boolean modified = false;

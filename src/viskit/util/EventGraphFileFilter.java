@@ -46,8 +46,10 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.util;
 
 // Standard library imports
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
+import org.apache.log4j.Logger;
 
 /**
  * Filters files whose names contain a given String, case insensitive
@@ -69,7 +71,9 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphFileFilter">Terry Norbraten</a>
  */
-public final class EventGraphFileFilter extends FileFilter {
+public final class EventGraphFileFilter extends FileFilter
+{
+    static final Logger LOG = LogUtilities.getLogger(EventGraphFileFilter.class);
 
     /** we filter to accept only files starting with the contents of this [] */
     private final String[] contents;

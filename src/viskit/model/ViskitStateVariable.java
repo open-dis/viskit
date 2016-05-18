@@ -1,5 +1,7 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
@@ -12,6 +14,8 @@ import viskit.ViskitStatics;
  */
 public class ViskitStateVariable extends ViskitElement
 {
+    static final Logger LOG = LogUtilities.getLogger(ViskitStateVariable.class);
+	
     /** array size, for (multi-dim) array */
     private String[] arraySize;
 

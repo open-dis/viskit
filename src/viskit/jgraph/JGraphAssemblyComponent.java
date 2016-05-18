@@ -1,5 +1,6 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
@@ -9,6 +10,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.undo.UndoManager;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
@@ -31,7 +33,9 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
  * @since 2:54:31 PM
  * @version $Id: JGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra$
  */
-public class JGraphAssemblyComponent extends JGraph implements GraphModelListener {
+public class JGraphAssemblyComponent extends JGraph implements GraphModelListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphAssemblyComponent.class);
 
     JGraphAssemblyModel vGAModel;
     AssemblyEditViewFrame parent;

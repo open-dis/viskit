@@ -14,8 +14,8 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id$
  */
-public interface EventGraphModel {
-
+public interface EventGraphModel 
+{
     /**
      * Separate initialization from object construction.
      */

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.LogUtilities;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+import org.apache.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -64,7 +66,9 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 11:44:06 AM
  * @version $Id$
  */
-public class FileHandler {
+public class FileHandler 
+{
+    static final Logger LOG = LogUtilities.getLogger(FileHandler.class);
 
     private static String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
 

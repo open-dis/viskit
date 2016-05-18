@@ -22,6 +22,7 @@
  */
 package viskit.gridlet;
 
+import edu.nps.util.LogUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,8 +30,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import static java.lang.Boolean.valueOf;
-import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperties;
 import static java.lang.System.setErr;
@@ -51,12 +50,16 @@ import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.cli.Boot;
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.parseInt;
+import org.apache.log4j.Logger;
 
 /**
  * @author Rick Goldberg
  * @version $Id$
  */
-public class BshGridlet extends Thread {
+public class BshGridlet extends Thread
+{
+    static final Logger LOG = LogUtilities.getLogger(BshGridlet.class);
+	
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
     int taskID;

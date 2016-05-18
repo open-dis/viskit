@@ -20,8 +20,8 @@ import viskit.mvc.mvcRecentFileListener;
  * @since 9:27:13 AM
  * @version $Id$
  */
-public interface AssemblyController {
-
+public interface AssemblyController 
+{
     /** Initialize this controller upon startup */
     void begin();
 

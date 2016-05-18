@@ -15,8 +15,8 @@ import java.util.Collection;
  * @since 12:06:11 PM
  * @version $Id$
  */
-public interface EventGraphView {
-
+public interface EventGraphView 
+{
     /**
      * Permits user to edit existing edges
      *

@@ -22,9 +22,9 @@ import viskit.ViskitGlobals;
  * @version $Id$
  * @author ahbuss
  */
-public class Version {
-
-    static Logger LOG = LogUtilities.getLogger(Version.class);
+public class Version 
+{
+    static final Logger LOG = LogUtilities.getLogger(Version.class);
 
     protected String versionString;
 

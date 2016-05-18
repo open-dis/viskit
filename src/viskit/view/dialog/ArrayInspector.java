@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -9,6 +10,7 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitInstantiator;
 import viskit.view.ObjectListPanel;
@@ -23,7 +25,9 @@ import viskit.view.ObjectListPanel;
  * @since 3:27:42 PM
  * @version $Id$
  */
-public class ArrayInspector extends JDialog {
+public class ArrayInspector extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(ArrayInspector.class);
 
     public boolean modified = false;
     private final JButton cancelButton,  okButton;

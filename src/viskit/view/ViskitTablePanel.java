@@ -1,5 +1,6 @@
 package viskit.view;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -17,6 +18,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.ViskitElement;
 
@@ -30,7 +32,9 @@ import viskit.model.ViskitElement;
  * @since 8:49:21 AM
  * @version $Id$
  */
-public abstract class ViskitTablePanel extends JPanel {
+public abstract class ViskitTablePanel extends JPanel
+{
+    static final Logger LOG = LogUtilities.getLogger(ViskitTablePanel.class);
 
     protected JTable table;
     private JScrollPane jScrollPane;

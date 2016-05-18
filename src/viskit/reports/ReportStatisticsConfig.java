@@ -43,8 +43,8 @@ import viskit.ViskitProject;
  * @author Patrick Sullivan
  * @version $Id$
  */
-public class ReportStatisticsConfig {
-
+public class ReportStatisticsConfig 
+{
     static final Logger LOG = LogUtilities.getLogger(ReportStatisticsConfig.class);
 
     /**

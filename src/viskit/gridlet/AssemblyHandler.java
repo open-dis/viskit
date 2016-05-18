@@ -41,7 +41,7 @@ import static javax.xml.bind.JAXBContext.newInstance;
  */
 public class AssemblyHandler implements XmlRpcHandler {
 
-    static Logger LOG = LogUtilities.getLogger(AssemblyHandler.class);
+    static final Logger LOG = LogUtilities.getLogger(AssemblyHandler.class);
     SessionManager sessionManager;
     Hashtable<String, GridRunner> gridRuns;
 

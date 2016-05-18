@@ -1,8 +1,10 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.Edge;
@@ -18,7 +20,9 @@ import viskit.model.SchedulingEdge;
  * @since 1:21:52 PM
  * @version $Id$
  */
-public class JGraphVisualModel extends DefaultGraphModel {
+public class JGraphVisualModel extends DefaultGraphModel 
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphVisualModel.class);
 
     Map viskitEdgeStyle, viskitCancelEdgeStyle;
     Map viskitSelfRefEdge, viskitSelfRefCancel;

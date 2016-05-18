@@ -98,9 +98,9 @@ import viskit.ViskitGlobals;
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class EventGraphCache {
-
-    static Logger LOG = LogUtilities.getLogger(EventGraphCache.class);
+public class EventGraphCache
+{
+    static final Logger LOG = LogUtilities.getLogger(EventGraphCache.class);
 
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;

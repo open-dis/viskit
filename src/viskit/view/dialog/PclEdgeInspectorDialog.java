@@ -39,7 +39,9 @@ import viskit.model.ViskitElement;
  * @version $Id$
  */
 public class PclEdgeInspectorDialog extends JDialog
-{
+{	
+    static final Logger LOG = LogUtilities.getLogger(PclEdgeInspectorDialog.class);
+	
     private JLabel  sourceLabel,  propertyLabel,  descriptionLabel,  targetLabel;
     private JTextField sourceTF,  propertyTF,     descriptionTF,     targetTF;
     private JPanel propertyTFPanel;
@@ -54,8 +56,6 @@ public class PclEdgeInspectorDialog extends JDialog
 	public static final String ALL_STATE_VARIABLES_NAME        = "(All state variables)";
 	public static final String ALL_STATE_VARIABLES_TYPE        = "(any type)";
 	public static final String ALL_STATE_VARIABLES_DESCRIPTION = "Property Change events from all state variables get heard";
-	
-    static final Logger LOG = LogUtilities.getLogger(PclEdgeInspectorDialog.class);
 
     private PclEdgeInspectorDialog(JFrame parent, PropertyChangeListenerEdge pclEdge)
 	{

@@ -13,9 +13,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.control.EventGraphControllerImpl;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
 import viskit.view.CodeBlockPanel;
@@ -32,7 +32,9 @@ import viskit.view.StateTransitionsPanel;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class EventInspectorDialog extends JDialog {
+public class EventInspectorDialog extends JDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventInspectorDialog.class);
 
     private static EventInspectorDialog dialog;
     private EventNode eventNode;

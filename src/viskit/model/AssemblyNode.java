@@ -1,9 +1,11 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -15,7 +17,9 @@ import java.util.Vector;
  * @since 9:47:55 AM
  * @version $Id$
  */
-public abstract class AssemblyNode extends ViskitElement {
+public abstract class AssemblyNode extends ViskitElement
+{
+    static final Logger LOG = LogUtilities.getLogger(AssemblyNode.class);
 
     private Vector<AssemblyEdge> connections = new Vector<>();
     private Point2D       position = new Point2D.Double(0d, 0d);
@@ -33,23 +37,28 @@ public abstract class AssemblyNode extends ViskitElement {
         return connections;
     }
 
-    public void setConnections(Vector<AssemblyEdge> connections) {
+    public void setConnections(Vector<AssemblyEdge> connections)
+	{
         this.connections = connections;
     }
 
-    public Point2D getPosition() {
+    public Point2D getPosition()
+	{
         return position;
     }
 
-    public void setPosition(Point2D position) {
+    public void setPosition(Point2D position) 
+	{
         this.position = position;
     }
 
-    public ViskitInstantiator getInstantiator() {
+    public ViskitInstantiator getInstantiator() 
+	{
         return instantiator;
     }
 
-    public void setInstantiator(ViskitInstantiator instantiator) {
+    public void setInstantiator(ViskitInstantiator instantiator) 
+	{
         this.instantiator = instantiator;
     }
 
@@ -61,7 +70,8 @@ public abstract class AssemblyNode extends ViskitElement {
     }
 
     @Override
-    public void setDescription(String newDescription) {
+    public void setDescription(String newDescription) 
+	{
         this.description = newDescription;
     }
 	

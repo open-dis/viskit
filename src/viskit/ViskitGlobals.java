@@ -89,8 +89,9 @@ import viskit.view.ViskitApplicationFrame;
  */
 public class ViskitGlobals
 {
-    private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     static final Logger LOG = LogUtilities.getLogger(ViskitGlobals.class);
+	
+    private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     private static ViskitGlobals me;
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
@@ -309,7 +310,8 @@ public class ViskitGlobals
      *
      * @return the component AnalystReportFrame
      */
-    public mvcAbstractJFrameView buildAnalystReportFrame() {
+    public mvcAbstractJFrameView buildAnalystReportFrame() 
+	{
         analystReportController = new AnalystReportController();
         AnalystReportFrame      = new AnalystReportFrame(analystReportController);
         analystReportController.setView(AnalystReportFrame);
