@@ -20,7 +20,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
 import viskit.xsd.bindings.eventgraph.SimEntity;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 /** A custom class manager to support finding EGs and PCLs in *.class form vice
  * XML.  Used to populate the LEGOs tree on the Assembly Editor.
@@ -100,7 +100,7 @@ public class FileBasedClassManager {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
-            jaxbCtx = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+            jaxbCtx = JAXBContext.newInstance(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS);
             um = jaxbCtx.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?

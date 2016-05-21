@@ -270,11 +270,11 @@ public abstract class ViskitInstantiator
 //				((ViskitInstantiator) viskitParametersFactoryList.get(index)).setDescription(assemblyParameterDescription);
 				index++;
 			}
-			// preceding was mostly informational, the next call does the work
+			// preceding was mostly informational... the next call essentially repeats the same steps and does the work!
             viskitParametersFactoryList = buildInstantiators(assemblyParametersList);
 			
 			if (!assemblyParametersList.isEmpty() && !viskitParametersFactoryList.isEmpty())
-				return; // constructor complete
+				return; // Construct constructor complete
 			
 			// When XML-based instantiation is unsuccessful, then we are apparently working with compiled .class code
 			
@@ -361,7 +361,7 @@ public abstract class ViskitInstantiator
         public Construct(String typeName, List<Object> args)
 		{
             super(typeName);
-            setParametersFactoryList(args);
+            setParametersFactoryList(args); // no arguments appear until they are initialized
             findArgumentNames(typeName, args);
         }
 
@@ -382,25 +382,26 @@ public abstract class ViskitInstantiator
         }
 
         /**
+		 * buildInstantiators 
          * @param jaxbAssemblyParameters used to build the instantiators
          * @return a List of ViskitInstantiators given a List of Assembly Parameters
          */
-        final List<Object> buildInstantiators(List<Object> jaxbAssemblyParameters) // TODO type Object to ViskitInstantiator
+        final List<Object> buildInstantiators(List<Object> jaxbAssemblyParameters)
 		{
             List<Object> instantiatorList = new ArrayList<>();
             for (Object jaxbAssemblyParameter : jaxbAssemblyParameters)
 			{
-                if (jaxbAssemblyParameter instanceof TerminalParameter)
-				{
-                    instantiatorList.add(buildTerminalParameter((TerminalParameter) jaxbAssemblyParameter));
-                } 
-				else if (jaxbAssemblyParameter instanceof MultiParameter) 
+				if (jaxbAssemblyParameter instanceof MultiParameter) 
 				{
                     instantiatorList.add(buildMultiParameter((MultiParameter) jaxbAssemblyParameter));
                 } 
 				else if (jaxbAssemblyParameter instanceof FactoryParameter)  // which contains a TerminalParameter
 				{
                     instantiatorList.add(buildFactoryParameter((FactoryParameter) jaxbAssemblyParameter));
+                }
+                else if (jaxbAssemblyParameter instanceof TerminalParameter)
+				{
+                    instantiatorList.add(buildTerminalParameter((TerminalParameter) jaxbAssemblyParameter));
                 } 
 				else if (jaxbAssemblyParameter instanceof Parameter) 
 				{ // from InstantiationPanel Const getter
@@ -425,7 +426,7 @@ public abstract class ViskitInstantiator
 
                         instantiatorList.add(buildTerminalParameter(terminalParameter));
                     } 
-					else if (ViskitStatics.numConstructors(typeName) > 0) // MultiParameter
+					else if (ViskitStatics.numberOfConstructors(typeName) > 0) // MultiParameter
 					{
                         MultiParameter multiParameter = objectFactory.createMultiParameter();
                         multiParameter.setName(name);
@@ -434,9 +435,8 @@ public abstract class ViskitInstantiator
 
                         instantiatorList.add(buildMultiParameter(multiParameter));
                     } 
-					else 
-					{ // no constructors, should be a FactoryParameter or array of them
-
+					else  // no constructors, should be a FactoryParameter or array of them
+					{
                         if (ViskitGlobals.instance().isArray(typeName))
 						{
                             MultiParameter multiParameter = objectFactory.createMultiParameter();
@@ -468,7 +468,7 @@ public abstract class ViskitInstantiator
 			viskitInstantiator.setValue      (terminalParameter.getValue());
 			viskitInstantiator.setDescription(terminalParameter.getDescription());
 			if ((viskitInstantiator.getDescription() == null) || viskitInstantiator.getDescription().isEmpty())
-				viskitInstantiator.setDescription(ViskitStatics.DEFAULT_DESCRIPTION);
+				 viskitInstantiator.setDescription(ViskitStatics.DEFAULT_DESCRIPTION);
             return viskitInstantiator;
         }
 
@@ -958,28 +958,32 @@ public abstract class ViskitInstantiator
             buffer.append(".");
             buffer.append(methodName);
             buffer.append("(");
-            String args = null;
-            for (Object o : parametersList) {
-
-                if (o instanceof ViskitInstantiator) {
-                    args = ((ViskitInstantiator)o).type;
-                } else if (o instanceof String) {
-                    args = (String) o;
+            String parameterTypes = null;
+            for (Object parameter : parametersList) 
+			{
+                if (parameter instanceof ViskitInstantiator)
+				{
+                    parameterTypes = ((ViskitInstantiator)parameter).type;
+                } 
+				else if (parameter instanceof String) 
+				{
+                    parameterTypes = (String) parameter;
                 }
 
                 // Strip out java.lang
-                args = ViskitStatics.stripOutJavaDotLang(args);
+                parameterTypes = ViskitStatics.stripOutJavaDotLang(parameterTypes);
 
                 // Show varargs symbol vice []
-                if (ViskitGlobals.instance().isArray(args)) {
-                    args = ViskitStatics.applyVarArgSymbol(args);
-                    buffer.append(args);
+                if (ViskitGlobals.instance().isArray(parameterTypes)) 
+				{
+                    parameterTypes = ViskitStatics.applyVarArgSymbol(parameterTypes);
+                    buffer.append(parameterTypes);
                 } else {
-                    buffer.append(args);
+                    buffer.append(parameterTypes);
                 }
                 buffer.append(", ");
             }
-            buffer = buffer.delete(buffer.lastIndexOf(", "), buffer.length());
+            buffer = buffer.delete(buffer.lastIndexOf(", "), buffer.length()); // clean up trailing comma
             buffer.append(")");
 
             return buffer.toString(); // TODO show examples

@@ -107,6 +107,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     public static final int                  ADAPTER_MODE = 1;
     public static final int       SIM_EVENT_LISTENER_MODE = 2;
     public static final int PROPERTY_CHANGE_LISTENER_MODE = 3;
+	
+	private String selectedAssemblyName = new String();
 
     // The view needs access to this
     public JButton compileInitializeAssemblyButton;
@@ -141,7 +143,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	private int menuShortcutAltKeyMask;
     private int assemblyMenuShortcutKeyMask;
 
-    public AssemblyEditViewFrame(mvcController controller) {
+    public AssemblyEditViewFrame(mvcController controller)
+	{
         super(FRAME_DEFAULT_TITLE);
         initializeMVC(controller);   // set up mvc linkages
         initializeUserInterface();   // build widgets
@@ -291,12 +294,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
-            if (mod.getLastFile() != null) {
-                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
+            if (mod.getLastFile() != null) 
+			{
+                ((AssemblyControllerImpl) getController()).initializeOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
             GraphMetadata graphMetadata = mod.getMetadata();
-            if (graphMetadata != null) {
+            if (graphMetadata != null) 
+			{
                 setSelectedAssemblyName   (graphMetadata.name);
 				setSelectedAssemblyTooltip(graphMetadata.description);
             } else if (viskit.ViskitStatics.debug) {
@@ -812,15 +817,17 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	}
 
     @Override
-    public void deleteTab(AssemblyModel mod)
+    public void deleteTab(AssemblyModel assemblyModelToDelete)
 	{
         Component[] ca = tabbedPane.getComponents();
 
-        for (int i = 0; i < ca.length; i++) {
+        for (int i = 0; i < ca.length; i++) 
+		{
             JSplitPane jsplt = (JSplitPane) ca[i];
             JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
             JGraphAssemblyComponentWrapper vgacw = (JGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
-            if (vgacw.assemblyModel == mod) {
+            if (vgacw.assemblyModel == assemblyModelToDelete) 
+			{
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
 
@@ -972,7 +979,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 
         @Override
-        public void drop(DropTargetDropEvent dropTargetDropEvent)
+        public void drop(DropTargetDropEvent dropTargetDropEvent) // drag and drop onto assembly edit pane starts here
 		{
             if (transferableDragData != null)
 			{
@@ -1177,17 +1184,33 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
         return null;
     }
+	
     @Override
-    public void setSelectedAssemblyName(String selectedAssemblyName) {
+    public String getSelectedAssemblyName() 
+	{
+		return selectedAssemblyName;
+    }
+	
+    @Override
+    public void setSelectedAssemblyName(String selectedAssemblyName) 
+	{
         boolean nullString = !(selectedAssemblyName != null && !selectedAssemblyName.isEmpty());
-        if (!nullString) {
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyName);
+        if (!nullString) 
+		{
+			this.selectedAssemblyName = selectedAssemblyName;
         }
+		else
+		{
+			this.selectedAssemblyName = "";
+		}
+		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), this.selectedAssemblyName);
     }
 //    @Override // TODO
-    public void setSelectedAssemblyTooltip(String selectedAssemblyDescription) {
+    public void setSelectedAssemblyTooltip(String selectedAssemblyDescription) 
+	{
         boolean nullString = !(selectedAssemblyDescription != null && !selectedAssemblyDescription.isEmpty());
-        if (!nullString) {
+        if (!nullString) 
+		{
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyDescription);
         }
     }

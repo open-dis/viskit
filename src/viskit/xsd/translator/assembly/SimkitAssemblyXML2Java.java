@@ -21,7 +21,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 /** A generator of source code from Assembly XML
  *
@@ -38,20 +38,20 @@ public class SimkitAssemblyXML2Java
 
     /* convenience Strings for formatting */
     final private String EMPTY = "";
-    final private String sp   = SimkitXML2Java.SP;
+    final private String sp   = SimkitEventGraphXML2Java.SP;
     final private String sp4  = sp+ sp+ sp+ sp;
     final private String sp8  = sp4+ sp4;
     final private String sp12 = sp8+ sp4;
     final private String sp16 = sp8+ sp8;
-    final private String ob  = SimkitXML2Java.OB;
-    final private String cb  = SimkitXML2Java.CB;
-    final private String sc  = SimkitXML2Java.SC;
-    final private String cm  = SimkitXML2Java.CM;
-    final private String lp  = SimkitXML2Java.LP;
-    final private String rp  = SimkitXML2Java.RP;
-    final private String eq  = SimkitXML2Java.EQ;
-    final private String pd  = SimkitXML2Java.PD;
-    final private String qu  = SimkitXML2Java.QU;
+    final private String ob  = SimkitEventGraphXML2Java.OB;
+    final private String cb  = SimkitEventGraphXML2Java.CB;
+    final private String sc  = SimkitEventGraphXML2Java.SC;
+    final private String cm  = SimkitEventGraphXML2Java.CM;
+    final private String lp  = SimkitEventGraphXML2Java.LP;
+    final private String rp  = SimkitEventGraphXML2Java.RP;
+    final private String eq  = SimkitEventGraphXML2Java.EQ;
+    final private String pd  = SimkitEventGraphXML2Java.PD;
+    final private String qu  = SimkitEventGraphXML2Java.QU;
     final private String nw = "new";
 
     private SimkitAssembly root;

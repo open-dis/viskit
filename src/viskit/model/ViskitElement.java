@@ -19,19 +19,21 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
 {
     static final Logger LOG = LogUtilities.getLogger(ViskitElement.class);
 
-    public Object opaqueViewObject;       // for private use of View
-    public Object opaqueModelObject;      // for private use of Model
+    /** an object provided for private use of View */
+	public Object opaqueViewObject;       
+	/** an object provided for private use of Model */
+    public Object opaqueModelObject;
 
-    /** NOT USED */
-    public Object opaqueControllerObject; // for private use of Controller
+    /** NOT USED. an object provided for private use of Controller */
+    public Object opaqueControllerObject;
 
     protected static final String EMPTY = "";
     protected String type       = EMPTY;
     protected String name       = EMPTY;
 
-    /** every node or edge has a unique key */
-    private static int seqID = 0;
-    private Object modelKey = EMPTY + (seqID++);
+    /** every node or edge instance has a unique key */
+    private static int sequenceID = 0;
+    private Object modelKey = EMPTY + (sequenceID++); // TODO placeholder, does type change?  or is it always a String?
 
     protected ViskitElement shallowCopy(ViskitElement newViskitElement)
 	{

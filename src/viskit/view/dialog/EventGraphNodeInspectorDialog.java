@@ -85,9 +85,9 @@ public class EventGraphNodeInspectorDialog extends JDialog
     private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException
 	{
         super(parent, "Assembly Editor: initialize new Event Graph", true); // instance
-        this.eventGraphNode = node;
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        EventGraphNodeInspectorDialog.this.eventGraphNode = node;
+        EventGraphNodeInspectorDialog.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        EventGraphNodeInspectorDialog.this.addWindowListener(new myCloseListener());
 
         listener = new enableApplyButtonListener();
 
@@ -134,7 +134,7 @@ public class EventGraphNodeInspectorDialog extends JDialog
         descriptionTF.addCaretListener(listener);
         detailedOutputCheckBox.addActionListener(listener);
 
-        setParameterWidgets(parent, node);
+        setParameterWidgets(parent, node); // TODO rename setEventGraphInstanceParamaters
     }
 
     public final void setParameterWidgets(Component relatedComponent, EventGraphNode currentEventGraphNode) throws ClassNotFoundException

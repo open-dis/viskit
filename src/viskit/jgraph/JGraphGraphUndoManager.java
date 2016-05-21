@@ -75,7 +75,7 @@ public class JGraphGraphUndoManager extends GraphUndoManager implements GraphSel
         if (controller instanceof EventGraphControllerImpl)
             ((EventGraphControllerImpl) controller).updateUndoRedoStatus();
         else
-            ((AssemblyControllerImpl) controller).updateUndoRedoStatus();
+            ((AssemblyControllerImpl) controller).updateJGraphUndoRedoStatus();
     }
 
     @Override

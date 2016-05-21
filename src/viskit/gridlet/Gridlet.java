@@ -69,7 +69,7 @@ import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.TerminalParameter;
 import viskit.xsd.cli.Boot;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 /**
  *
@@ -322,7 +322,7 @@ public class Gridlet extends Thread {
 
                 // generate java for the eventGraph and evaluate a loaded
                 // class
-                SimkitXML2Java sx2j = new SimkitXML2Java(bais);
+                SimkitEventGraphXML2Java sx2j = new SimkitEventGraphXML2Java(bais);
                 // first convert XML to java source
                 sx2j.unmarshal();
 

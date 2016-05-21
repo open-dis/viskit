@@ -791,57 +791,77 @@ public class ViskitStatics
      * @param s the string to make into varargs form, if applicable
      * @return original or modified string
      */
-    public static String applyVarArgSymbol(String s) {
-
-        // Show varargs symbol vice []
-        if (s.contains("[]")) {
+    public static String applyVarArgSymbol(String s) 
+	{
+        // Show varargs ellipsis symbol vice []
+        if (s.contains("[]")) 
+		{
             s = s.replaceAll("\\[\\]", "...");
         }
         return s;
     }
 
-    /** Checks if primitive type in Viskit format, i.e. not Clazz format
+    /** Checks if primitive type in Viskit format, i.e. not Class format
      * @param type the type to evaluate and determine if a primitive
      * @return true if the given string represents a primitive type
      */
-    public static boolean isPrimitive(String type) {
-        return type.equals("byte") |
+    public static boolean isPrimitive(String type) 
+	{
+        return  type.equals("byte")    |
                 type.equals("boolean") |
-                type.equals("char") |
-                type.equals("double") |
-                type.equals("float") |
-                type.equals("int") |
-                type.equals("short") |
+                type.equals("char")    |
+                type.equals("double")  |
+                type.equals("float")   |
+                type.equals("int")     |
+                type.equals("short")   |
                 type.equals("long");
     }
 
     /**
+	 * Uses reflection to count the number of constructors for the given class type
      * @param type the type class for searching constructors
      * @return number of constructors, checks is [] type
      */
-    public static int numConstructors(String type) {
+    public static int numberOfConstructors(String type) 
+	{
         //
-        if (debug) {
-            System.out.print("number of constructors for " + type + ":");
+        if (debug) 
+		{
+            LOG.info("number of constructors for " + type + ":");
         }
-        if (ViskitGlobals.instance().isArray(type)) {
-            if (debug) {
-                System.out.print("1");
+        if (ViskitGlobals.instance().isArray(type)) 
+		{
+            if (debug) 
+			{
+                LOG.info("1");
             }
             return 1;
-        } else {
-            Class<?> clz = classForName(type);
-            if (clz != null) {
-                Constructor[] constrs = clz.getConstructors();
-                if (constrs == null) {
+        } 
+		else 
+		{
+            Class<?> clazz = classForName(type);
+            if (clazz != null)
+			{
+                Constructor[] reflectionConstructors = clazz.getConstructors();
+                if (reflectionConstructors == null) 
+				{
                     return 0;
-                } else {
-                    if (debug) {
-                        LOG.info(constrs.length);
+                } 
+				else
+				{
+                    if (debug) 
+					{
+                        LOG.info(reflectionConstructors.length);
                     }
-                    return constrs.length;
+                    return reflectionConstructors.length;
                 }
-            } else {
+            } 
+			else 
+			{
+				if (debug) 
+				{
+					LOG.info("0");
+				}
                 return 0;
             }
         }

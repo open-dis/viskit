@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 public class Launcher extends Thread implements Runnable
 {
@@ -242,7 +242,7 @@ public class Launcher extends Thread implements Runnable
             ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
             Class<?> jclz = classLoader.loadClass("javax.xml.bind.JAXBContext");
             Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-            Object jco = m.invoke(null, new Object[]{SimkitXML2Java.EVENT_GRAPH_BINDINGS, classLoader});
+            Object jco = m.invoke(null, new Object[]{SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS, classLoader});
             m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
             Object umo = m.invoke(jco, new Object[]{});
 
@@ -250,7 +250,7 @@ public class Launcher extends Thread implements Runnable
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
             Object eventgraph = m.invoke(umo, new Object[]{bais});
 
-            jclz = classLoader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
+            jclz = classLoader.loadClass(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
             String eventGraphName = (String) m.invoke(eventgraph, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
@@ -544,7 +544,7 @@ public class Launcher extends Thread implements Runnable
     if (bsh.getClassManager().classExists("simkit.BasicAssembly")) System.out.println("simkit.BasicAssembly found");
     else System.out.println("simkit.BasicAssembly not found");
     try {
-    bsh.eval("debug();");
+    bsh.eval("DEBUG();");
     // load eventGraph XML as classes
     // since we've overridden the default bsh ClassLoader, need to
     // add the defined class in this ClassLoader
@@ -553,13 +553,13 @@ public class Launcher extends Thread implements Runnable
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
-    //xml2j = new SimkitXML2Java(bais);
-    xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
+    //xml2j = new SimkitEventGraphXML2Java(bais);
+    xml2j = (SimkitEventGraphXML2Java)cnstr.newInstance( new Object[] { bais } );
     xml2j.unmarshal();
     bsh.eval(xml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(xml2j.translate());
     }
@@ -568,7 +568,7 @@ public class Launcher extends Thread implements Runnable
     // and could conflict with the one beanshell last used to
     // eval the string (?)
     eventGraphs.put(eventGraphName, evgc);
-    if (debug) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
+    if (DEBUG) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
@@ -577,7 +577,7 @@ public class Launcher extends Thread implements Runnable
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();
     bsh.eval(axml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(axml2j.translate());
     }
@@ -612,7 +612,7 @@ public class Launcher extends Thread implements Runnable
     if (bsh.getClassManager().classExists("simkit.BasicAssembly")) System.out.println("simkit.BasicAssembly found");
     else System.out.println("simkit.BasicAssembly not found");
     try {
-    bsh.eval("debug();");
+    bsh.eval("DEBUG();");
     // load eventGraph XML as classes
     // since we've overridden the default bsh ClassLoader, need to
     // add the defined class in this ClassLoader
@@ -621,13 +621,13 @@ public class Launcher extends Thread implements Runnable
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+    Class clz = classLoader.loadClass("viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
-    //xml2j = new SimkitXML2Java(bais);
-    xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
+    //xml2j = new SimkitEventGraphXML2Java(bais);
+    xml2j = (SimkitEventGraphXML2Java)cnstr.newInstance( new Object[] { bais } );
     xml2j.unmarshal();
     bsh.eval(xml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(xml2j.translate());
     }
@@ -636,7 +636,7 @@ public class Launcher extends Thread implements Runnable
     // and could conflict with the one beanshell last used to
     // eval the string (?)
     eventGraphs.put(eventGraphName, evgc);
-    if (debug) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
+    if (DEBUG) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
@@ -645,7 +645,7 @@ public class Launcher extends Thread implements Runnable
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();
     bsh.eval(axml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(axml2j.translate());
     }

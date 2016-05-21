@@ -40,7 +40,7 @@ import viskit.mvc.mvcRecentFileListener;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.EventGraphView;
 import viskit.view.dialog.EventGraphMetadataDialog;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.view.AssemblyEditView;
 
 /**
@@ -1124,9 +1124,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (!checkSaveForSourceCompile() || localLastFile == null) {
             return;
         }
-        SimkitXML2Java simkitXML2Java = null;
+        SimkitEventGraphXML2Java simkitXML2Java = null;
         try {
-            simkitXML2Java = new SimkitXML2Java(localLastFile);
+            simkitXML2Java = new SimkitEventGraphXML2Java(localLastFile);
             simkitXML2Java.unmarshal();
         } 
 		catch (FileNotFoundException fnfe)

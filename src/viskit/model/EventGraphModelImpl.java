@@ -27,7 +27,7 @@ import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 /**
  * <p>
@@ -81,7 +81,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     public void initialize()
 	{
         try {
-            jaxbContext       = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+            jaxbContext       = JAXBContext.newInstance(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS);
             jaxbObjectFactory = new ObjectFactory();
             jaxbSimEntity     = jaxbObjectFactory.createSimEntity(); // toEventNode start with empty graph
         }
@@ -181,7 +181,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                     JAXBContext assemblyJaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
                     Unmarshaller unmarshaller = assemblyJaxbContext.createUnmarshaller();
                     unmarshaller.unmarshal(file);
-                    // If we get here, they've tried toEventNode load an assembly.
+                    // If we get here, likely the user has tried to load an assembly as an EventNode.
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                             "Wrong File Type", // TODO confirm
                             "File is not an Event Graph." + "\n" + 
@@ -191,15 +191,17 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 				catch (JAXBException e)
 				{
                     eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                            "XML Input/Output Error",
-                            "Exception on JAXB unmarshalling of" +
+                            "XML validation error",
+                            "XML validation error: exception on JAXB unmarshalling of" +
                             "\n" + file.getName() +
-                            "\nError is: " + e.getMessage() +
+                            "\n\nError is: " + e.getMessage() +
                             "\nin EventGraphModelImpl.newModel(File)"
                             );
 					e.printStackTrace();
+					LOG.error ("JAXB exception, likely XML validation error: " + e.getMessage(), e);
                 }
 				ee.printStackTrace();
+				LOG.error ("JAXB exception, likely incorrect XML file type error: " + ee.getMessage(), ee);
                 return false;    // fromEventNode either error case
             }
         }

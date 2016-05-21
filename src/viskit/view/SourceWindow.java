@@ -29,7 +29,7 @@ import viskit.ViskitStatics;
 @SuppressWarnings("serial")
 public class SourceWindow extends JFrame
 {
-    static final Logger LOGGER = LogUtilities.getLogger(SourceWindow.class);
+    static final Logger LOG = LogUtilities.getLogger(SourceWindow.class);
 
     public final String sourceCode;
     Thread systemOutThread;
@@ -176,7 +176,7 @@ public class SourceWindow extends JFrame
 				}
 				catch (Exception ex) 
 				{
-                    LOGGER.error(ex);
+                    LOG.error(ex);
                 }
             }
         });
@@ -218,7 +218,7 @@ public class SourceWindow extends JFrame
                 } 
 				catch (Exception ex) 
 				{
-                    LOGGER.error(ex);
+                    LOG.error(ex);
                 }
                 // Reset the message buffer for the next compilation
                 sb.setLength(0);
@@ -308,18 +308,23 @@ public class SourceWindow extends JFrame
      * Get the file name from the class statement
      * @return classname+".java"
      */
-    private String getFileName() {
-        String[] nm = sourceCode.split("\\bclass\\b"); // find the class, won't work if there is the word 'class' in top comments
-        if (nm.length >= 2) {
-            nm = nm[1].split("\\b");            // find the space after the class
-            int idx = 0;
-            while (idx < nm.length) {
-                if (nm[idx] != null && nm[idx].trim().length() > 0) {
-                    return nm[idx].trim() + ".java";
+    private String getFileName()
+	{
+        String[] sourceCodeSplit = sourceCode.split("public class "); // find the class, won't work if there is the word 'class' in top comments
+        if (sourceCodeSplit.length >= 2) 
+		{
+            sourceCodeSplit = sourceCodeSplit[1].split("\\b");            // find the space after the class
+            int index = 0;
+            while (index < sourceCodeSplit.length) 
+			{
+                if (sourceCodeSplit[index] != null && sourceCodeSplit[index].trim().length() > 0) 
+				{
+                    return sourceCodeSplit[index].trim() + ".java"; // ClassName.java
                 }
-                idx++;
+                index++;
             }
         }
+		LOG.error ("SourceWindow for compilation failed to find class name for file");
         return "unnamed.java";
     }
     private String startSearchHandle = "Find";

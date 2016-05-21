@@ -678,11 +678,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 Vector<String> randomVariateFactoryStringObjectMethodVector = new Vector<>();
                 Map<String, Method> methodsHashMap = new HashMap<>();
 
-                for (Method method : staticMethods) {
+                for (Method method : staticMethods)
+				{
                     int methodModifiers = method.getModifiers();
                     Class<?> methodReturnTypeClass = method.getReturnType();
-                    if (Modifier.isStatic(methodModifiers)) {
-                        if (methodReturnTypeClass == myObjectClass) {
+                    if (Modifier.isStatic(methodModifiers)) 
+					{
+                        if (methodReturnTypeClass == myObjectClass)
+						{
                             String methodSignature = method.toString();
                             int startColumn = methodSignature.lastIndexOf('.', methodSignature.indexOf('(')); // go to ( , back to .
                             methodSignature = methodSignature.substring(startColumn + 1, methodSignature.length());
@@ -693,8 +696,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                             // Show varargs symbol vice []
                             methodSignature = ViskitStatics.applyVarArgSymbol(methodSignature);
 
-                            // We only want to promote the RVF.getInstance(String, Object...) static method
-                            if (method.getParameterCount() == 2 && methodSignature.contains("String") && methodSignature.contains("Object...")) {
+                            // We only want to promote the randomVariateFactory getInstance(String, Object...) static method
+                            if (method.getParameterCount() == 2 && methodSignature.contains("String") && methodSignature.contains("Object...")) 
+							{
                                 methodsHashMap.put(methodSignature, method);
                                 randomVariateFactoryStringObjectMethodVector.add(methodSignature);
                             }

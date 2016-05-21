@@ -161,11 +161,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 }
 
                 setMetadata(myMetadata);
-                buildEventGraphsFromJaxb(jaxbSimkitAssembly.getSimEntity(), jaxbSimkitAssembly.getOutput(), jaxbSimkitAssembly.getVerbose());
-                buildPropertyChangeListenersFromJaxb(jaxbSimkitAssembly.getPropertyChangeListener());
+				// simEntity instances in assembly:
+                buildEventGraphsFromJaxb                      (jaxbSimkitAssembly.getSimEntity(), jaxbSimkitAssembly.getOutput(), jaxbSimkitAssembly.getVerbose());
+                buildPropertyChangeListenersFromJaxb          (jaxbSimkitAssembly.getPropertyChangeListener());
                 buildPropertyChangeListenerConnectionsFromJaxb(jaxbSimkitAssembly.getPropertyChangeListenerConnection());
-                buildSimEventListenerConnectionsFromJaxb(jaxbSimkitAssembly.getSimEventListenerConnection());
-                buildAdapterConnectionsFromJaxb(jaxbSimkitAssembly.getAdapter());
+                buildSimEventListenerConnectionsFromJaxb      (jaxbSimkitAssembly.getSimEventListenerConnection());
+                buildAdapterConnectionsFromJaxb               (jaxbSimkitAssembly.getAdapter());
             } 
 			catch (JAXBException e)
 			{
@@ -177,14 +178,15 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                             "\nin AssemblyModel.newModel(File)"
                             );
 				e.printStackTrace();
+				LOG.error ("Exception on JAXB unmarshalling of " + file.getName(), e);
 
-                return false;
+                return false; // failure
             }
         }
 
         currentFile = file;
-        setDirty(false);
-        return true;
+        setDirty(false); // just loaded
+        return true; // success
     }
 
     @Override
@@ -364,13 +366,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, String className, Point2D point, String description, FileBasedAssemblyNode assemblyNode)
+    public void newEventGraphFromXML(String instanceName, String className, Point2D point, String description, FileBasedAssemblyNode assemblyNode)
 	{
 		String derivedClassName = className;
 		if (assemblyNode != null)
 			derivedClassName = assemblyNode.loadedClass;
 		
-        EventGraphNode eventGraphNode = new EventGraphNode(widgetName, derivedClassName, description);
+        EventGraphNode eventGraphNode = new EventGraphNode(instanceName, derivedClassName, description);
         if (point == null)
 		{
             eventGraphNode.setPosition(pointLess);
@@ -381,15 +383,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
 
         SimEntity jaxbSimEntity = jaxbObjectFactory.createSimEntity();
-
-        jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(widgetName));
+        jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(instanceName));
         jaxbSimEntity.setType(className);
         jaxbSimEntity.setDescription(description);
         eventGraphNode.opaqueModelObject = jaxbSimEntity;
 
-        ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(jaxbSimEntity.getType(), 
-				
-				null);  // null means undefined
+        ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(className,
+				null);  // null means undefined // TODO ???
         eventGraphNode.setInstantiator(viskitConstructor);
         eventGraphNode.setVerboseMarked(true); // default for new SimEntity.  TODO use user preference
 
@@ -413,10 +413,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
 //    @Override
-    public void newEventGraph(String widgetName, String className, Point2D point, String description)
+    public void newEventGraph(String instanceName, String className, Point2D point, String description)
 	{
 		// re-use common code
-        newEventGraphFromXML (widgetName, className, point, description, null);
+        newEventGraphFromXML (instanceName, className, point, description, null);
     }
 
     @Override
@@ -1042,17 +1042,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         if (viskitInstantiator instanceof ViskitInstantiator.FreeForm) 
 		{
-            return buildParameterFromFreeForm((ViskitInstantiator.FreeForm) viskitInstantiator);
-        } //TerminalParm
+            return buildParameterFromFreeForm((ViskitInstantiator.FreeForm) viskitInstantiator); //TerminalParameter
+        }
 		else if (viskitInstantiator instanceof ViskitInstantiator.Construct) 
 		{
-            return buildParamFromConstr((ViskitInstantiator.Construct) viskitInstantiator);
-        } // List of Parmarameters
+            return buildParamFromConstr((ViskitInstantiator.Construct) viskitInstantiator); // List of Pararameters
+        }
         else if (viskitInstantiator instanceof ViskitInstantiator.Factory) 
 		{
-            return buildParamFromFactory((ViskitInstantiator.Factory) viskitInstantiator);
-        } // FactoryParam
-        else if (viskitInstantiator instanceof ViskitInstantiator.Array)
+            return buildParamFromFactory((ViskitInstantiator.Factory) viskitInstantiator); // FactoryParameter
+        }
+        else if (viskitInstantiator instanceof ViskitInstantiator.Array) // MultiParameter
 		{
             ViskitInstantiator.Array viskitInstantiatorArray = (ViskitInstantiator.Array) viskitInstantiator;
 
@@ -1060,49 +1060,57 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 return buildParameterFromArray(viskitInstantiatorArray);
             else if (viskitInstantiatorArray.getTypeName().contains("..."))
                 return buildParameterFromVarargs(viskitInstantiatorArray);
-        } // MultiParam
-
-        //assert false : AssemblyModelImpl.buildJaxbParameter() received null;
-        return null; // TODO error condition?
+        }
+        //TODO review/resolve.   assert false : AssemblyModelImpl.buildJaxbParameter() received null;
+		
+		LOG.debug ("buildParameter failed to find type for " + viskitInstantiator); // TODO error condition?
+        return null;
     }
 
-    private TerminalParameter buildParameterFromFreeForm(ViskitInstantiator.FreeForm viff) {
+    private TerminalParameter buildParameterFromFreeForm(ViskitInstantiator.FreeForm viskitInstantiatorFreeForm)
+	{
         TerminalParameter terminalParameter = jaxbObjectFactory.createTerminalParameter();
 
-        terminalParameter.setType(viff.getTypeName());
-        terminalParameter.setValue(viff.getValue());
-        terminalParameter.setName(viff.getName());
+        terminalParameter.setType (viskitInstantiatorFreeForm.getTypeName());
+        terminalParameter.setValue(viskitInstantiatorFreeForm.getValue());
+        terminalParameter.setName (viskitInstantiatorFreeForm.getName());
         return terminalParameter;
     }
 
-    private MultiParameter buildParamFromConstr(ViskitInstantiator.Construct vicon) {
+    private MultiParameter buildParamFromConstr(ViskitInstantiator.Construct viskitInstantiatorConstruct)
+	{
         MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
-        multiParameter.setType(vicon.getTypeName());
-        for (Object vi : vicon.getParametersFactoryList()) {
-            multiParameter.getParameters().add(buildParameter(vi));
+        multiParameter.setType(viskitInstantiatorConstruct.getTypeName());
+        for (Object viskitInstantiator : viskitInstantiatorConstruct.getParametersFactoryList()) 
+		{
+            multiParameter.getParameters().add(buildParameter(viskitInstantiator));
         }
         return multiParameter;
     }
 
-    private FactoryParameter buildParamFromFactory(ViskitInstantiator.Factory vifact) {
+    private FactoryParameter buildParamFromFactory(ViskitInstantiator.Factory viskitInstantiatorFactory)
+	{
         FactoryParameter factoryParameter = jaxbObjectFactory.createFactoryParameter();
 
-        factoryParameter.setType(vifact.getTypeName());
-        factoryParameter.setFactory(vifact.getFactoryClass());
+        factoryParameter.setType(viskitInstantiatorFactory.getTypeName());
+        factoryParameter.setFactory(viskitInstantiatorFactory.getFactoryClass());
 
-        for (Object vi : vifact.getParametersList()) {
-            factoryParameter.getParameters().add(buildParameter(vi));
+        for (Object viskitInstantiator : viskitInstantiatorFactory.getParametersList()) 
+		{
+            factoryParameter.getParameters().add(buildParameter(viskitInstantiator));
         }
         return factoryParameter;
     }
 
-    private MultiParameter buildParameterFromArray(ViskitInstantiator.Array viarr) {
+    private MultiParameter buildParameterFromArray(ViskitInstantiator.Array viskitInstantiatorArray) 
+	{
         MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
 
-        multiParameter.setType(viarr.getTypeName());
-        for (Object vi : viarr.getInstantiators()) {
-            multiParameter.getParameters().add(buildParameter(vi));
+        multiParameter.setType(viskitInstantiatorArray.getTypeName());
+        for (Object viskitInstantiator : viskitInstantiatorArray.getInstantiators()) 
+		{
+            multiParameter.getParameters().add(buildParameter(viskitInstantiator));
         }
         return multiParameter;
     }
@@ -1309,12 +1317,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             eventGraphNode.setPosition(new Point2D.Double(Double.parseDouble(coordinate.getX()),
                                                           Double.parseDouble(coordinate.getY())));
         }
-
-        eventGraphNode.setDescription(jaxbSimEntity.getDescription());
+        eventGraphNode.setDescription(jaxbSimEntity.getDescription()); // TODO get description properly, value is getting lost
         eventGraphNode.setOutputMarked(isOutputNode);
 		boolean verbose = false;
-		if ((jaxbSimEntity.isVerbose() != null) && (jaxbSimEntity.isVerbose()))
-			    verbose = true;
+		if (jaxbSimEntity.isVerbose() != null)
+			    verbose = jaxbSimEntity.isVerbose();
         eventGraphNode.setVerboseMarked(isVerboseNode || verbose);
 
         List<Object> parameterList = jaxbSimEntity.getParameters();
@@ -1322,9 +1329,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         ViskitInstantiator viskitInstantiatorConstructor = new ViskitInstantiator.Construct(parameterList, jaxbSimEntity.getType());
         eventGraphNode.setInstantiator(viskitInstantiatorConstructor);
 
-        eventGraphNode.opaqueModelObject = jaxbSimEntity;
+        eventGraphNode.opaqueModelObject = jaxbSimEntity; // TODO not clear what this is for
 
-        getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = se
+        getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = unique simEvent name
 
         if (!nameCheckSatisfactory())
 		{

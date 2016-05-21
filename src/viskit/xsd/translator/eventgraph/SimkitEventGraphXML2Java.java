@@ -22,9 +22,9 @@ import viskit.xsd.bindings.eventgraph.*;
  * @since March 23, 2004, 4:59 PM
  * @version $Id$
  */
-public class SimkitXML2Java 
+public class SimkitEventGraphXML2Java 
 {
-    static final Logger LOG = LogUtilities.getLogger(SimkitXML2Java.class);
+    static final Logger LOG = LogUtilities.getLogger(SimkitEventGraphXML2Java.class);
 
     /* convenience Strings for formatting */
 	/** space character */
@@ -94,7 +94,7 @@ public class SimkitXML2Java
     private List<StateVariable> stateVariableList;
 
     /** Default to initialize the JAXBContext only */
-    private SimkitXML2Java() {
+    private SimkitEventGraphXML2Java() {
         try {
             jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
@@ -108,7 +108,7 @@ public class SimkitXML2Java
      *
      * @param stream the file stream to generate source code from
      */
-    public SimkitXML2Java(InputStream stream) {
+    public SimkitEventGraphXML2Java(InputStream stream) {
         this();
         fileInputStream = stream;
     }
@@ -120,14 +120,13 @@ public class SimkitXML2Java
      *
      * @param xmlFile the file to generate source code from
      */
-    public SimkitXML2Java(String xmlFile) {
-        this(ViskitStatics.classForName(
-                SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+    public SimkitEventGraphXML2Java(String xmlFile) {
+        this(ViskitStatics.classForName(SimkitEventGraphXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
         setEventGraphFile(new File(xmlFile));
     }
 
-    public SimkitXML2Java(File f) throws FileNotFoundException {
+    public SimkitEventGraphXML2Java(File f) throws FileNotFoundException {
         this(new FileInputStream(f));
         setFileBaseName(baseNameOf(f.getName()));
         setEventGraphFile(f);
@@ -243,6 +242,8 @@ public class SimkitXML2Java
     void buildHead(StringWriter head) 
 	{
         PrintWriter pw = new PrintWriter(head);
+
+		// TODO license, other metadata
 
           className = root.getName();
         packageName = root.getPackage();
@@ -631,7 +632,11 @@ public class SimkitXML2Java
         PrintWriter pw = new PrintWriter(constructors);
 
 		pw.println(SP_4 + JDO + SP + "No-parameter constructor creates a new default instance of " + root.getName() + " event graph.");
-		pw.println(SP_4 + SP + JDC);
+        if (!parametersList.isEmpty() || !superParametersList.isEmpty()) 
+		{
+			pw.println(SP_4 + SP_4 + "When used, typically followed by individual setting of parameter value initializations.");
+		}
+		pw.println(SP_4 + SP  + SP + JDC);
 
         // Generate a zero parameter (default) constructor in addition to a
         // parameterized constructor if we are not an extension
@@ -657,7 +662,7 @@ public class SimkitXML2Java
             
 			// Event graph constructor javadoc
 			pw.println(SP_4 + JDO + SP + "All-parameter constructor creates a new instance of " + root.getName() + " event graph.");
-            pw.println(SP_4 + " * Warning: if more than one parameter have compatible types, be sure to initialize them in the correct order!");
+            pw.println(SP_4 + " * Warning: if more than one parameters have compatible types, be sure to invoke them in the correct order!");
 			for (Parameter parameter : parametersList)
 			{
 				pw.print(SP_4 + " * @param " + parameter.getName() + SP + parameter.getDescription());
@@ -1536,7 +1541,7 @@ public class SimkitXML2Java
             is = new FileInputStream(xmlFile);
         } catch (FileNotFoundException fnfe) {LOG.error(fnfe);}
 
-        SimkitXML2Java sx2j = new SimkitXML2Java(is);
+        SimkitEventGraphXML2Java sx2j = new SimkitEventGraphXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
         sx2j.setFileBaseName(baseName.getName());
         sx2j.setEventGraphFile(new File(xmlFile));

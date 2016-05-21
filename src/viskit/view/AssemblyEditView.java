@@ -109,6 +109,10 @@ public interface AssemblyEditView
     /** Close the current Viskit Project, if open */
     void closeProject();
 
+    /** Provide the name of the selected Assembly 
+     */
+    String getSelectedAssemblyName();
+
     /** Update the name of the Assembly in the component title bar
      * @param newAssemblyName the name of the Assembly
      */
