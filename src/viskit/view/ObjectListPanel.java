@@ -130,7 +130,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
             Class<?> parameterType = ViskitStatics.getClassForInstantiatorType(instantiator.getTypeName());
 
             if (parameterType == null) {
-                System.err.println("what to do here for " + instantiator.getTypeName());
+                LOG.error("what to do here for " + instantiator.getTypeName());
                 return;
             }
 
@@ -222,7 +222,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
 
         Class<?> classForInstantiatorType = ViskitStatics.getClassForInstantiatorType(vInstantiator.getTypeName());
         if (classForInstantiatorType == null) {
-            System.err.println("what to do here for " + vInstantiator.getTypeName());
+            LOG.error("what to do here for " + vInstantiator.getTypeName());
             return;
         }
         if (classForInstantiatorType.isArray()) {

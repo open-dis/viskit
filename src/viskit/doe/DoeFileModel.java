@@ -109,8 +109,10 @@ public class DoeFileModel
 
                 //eg.getContent().add(0,src.trim());
                 lis.add(eg);
-            } catch (Exception e) {
-                System.err.println("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
+            }
+			catch (Exception e) 
+			{
+                LOG.error("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
             }
         }
     }

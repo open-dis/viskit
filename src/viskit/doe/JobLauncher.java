@@ -376,7 +376,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     break;
                 default:
                     //assert false:"Program error JobLauncher.java";
-                    System.err.println("Program error JobLauncher.java");
+                    LOG.error("Program error JobLauncher.java");
             }
         }
     }
@@ -623,13 +623,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         res.run = Integer.parseInt(run);
         //assert res.run == nrun :"JobLauncher.doResults";
         if (res.run != nrun) {
-            System.err.println("JobLauncher.doResults");
+            LOG.error("JobLauncher.doResults");
         }
 
         res.dp = Integer.parseInt(design);
         //assert res.dp == dp : "JobLauncher.doResults1";
         if (res.dp != dp) {
-            System.err.println("JobLauncher.doResults1");
+            LOG.error("JobLauncher.doResults1");
         }
 
         res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);

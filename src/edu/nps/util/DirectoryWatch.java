@@ -194,8 +194,10 @@ public class DirectoryWatch
 
                 try {
                     Thread.sleep(sleepTimeMs);
-                } catch (InterruptedException e) {
-                    System.err.println("DirWatcher killed");
+                } 
+				catch (InterruptedException e) 
+				{
+                    LOG.error("DirectoryWatcher killed", e);
                     break;
                 }
             }

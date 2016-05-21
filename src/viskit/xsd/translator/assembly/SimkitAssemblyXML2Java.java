@@ -1002,8 +1002,8 @@ public class SimkitAssemblyXML2Java
 
     static void usage()
 	{
-        System.err.println("Check args, you need at least a port or a file in grid mode");
-        System.err.println("usage: Assembly [-p port | -port port | -f file | -file file]");
+        LOG.error("Check args, you need at least a port or a file in grid mode");
+        LOG.error("usage: Assembly [-p port | -port port | -f file | -file file]");
         System.exit(1);
     }
 }

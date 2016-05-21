@@ -121,7 +121,7 @@ public class ObjectInspector extends JDialog
     @Override
     public void actionPerformed(ActionEvent event)
     {
-      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom
+      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom // TODO check
       caretUpdate(null);
     }
   }

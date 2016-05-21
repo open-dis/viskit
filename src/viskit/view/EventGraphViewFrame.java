@@ -158,7 +158,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             return CANCEL_ARC_MODE;
         }
 
-        System.err.println("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -336,7 +336,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             } 
 			else if (viskit.ViskitStatics.debug) 
 			{
-                System.err.println("error: EventGraphViewFrame graphMetadata null..");
+                LOG.error("error: EventGraphViewFrame graphMetadata null..");
             }
         }
     }

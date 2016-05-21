@@ -101,7 +101,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     private ReportStatisticsConfig statisticsConfig;
     private int designPointID;
-    private DecimalFormat decimalFormat = new DecimalFormat("0.0000");
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.0000");
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
 	/** State variable */
@@ -179,19 +179,21 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Receives the replicationStatisticsPropertyChangeListenerArray LinkedHashMap from BasicAssembly. This
+     * <p>Receives the replicationStatisticsPropertyChangeListenerArray LinkedHashMap from BasicAssembly. This
      * method extracts the key values and passes them to ReportStatisticsConfig. The
      * key set is in the order of the replication statistics object in this class.
      * The goal of this and related methods is to aid ReportStatisticsConfig in
      * exporting statistical results sorted by SimEntity
-     * <p/>
-     * NOTE: Requires that the Listeners in the assembly use the following naming
+     * </p>
+     * <p>NOTE: Requires that the Listeners in the assembly use the following naming
      * convention SimEntityName_PropertyName (e.g. RHIB_reportedContacts).
      * ReportStatistics config uses the underscore to extract the entity name
      * from the key values of the LinkedHashMap.
-     * <p/>
+     * </p>
+     * <p>
      * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
+     * </p>
      * @param replicationStatisticsMap a map containing collected statistics on a SimEntity's state variables
      */
     protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatisticsMap) {
@@ -474,11 +476,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         // but, isFinished didn't happen for the 0th
         // replication
-        if (Schedule.getDefaultEventList().isFinished()) {
+        if (Schedule.getDefaultEventList().isFinished()) 
+		{
             try {
                 Schedule.reset();
-            } catch (java.util.ConcurrentModificationException cme) {
-                System.err.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
+            } 
+			catch (java.util.ConcurrentModificationException cme) 
+			{
+                LOG.error("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID(), cme);
             }
         }
     }
@@ -609,8 +614,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public void run()
 	{
         stopRun = false;
-        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
-            System.err.println("Assembly is already running.");
+        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run"))
+		{
+            LOG.error("run() method: Assembly is already running.");
 			return;
         }
 

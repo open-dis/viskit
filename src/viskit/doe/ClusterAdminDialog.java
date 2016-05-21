@@ -321,7 +321,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
         xmlrpc.execute("gridkit.logout",args);
       }
       catch (XmlRpcException | IOException e) {
-        System.err.println("Error logging out from cluster.");
+        LOG.error("Error logging out from cluster.");
       }
     }
     ClusterAdminDialog.this.dispose();

@@ -305,7 +305,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                 setSelectedAssemblyName   (graphMetadata.name);
 				setSelectedAssemblyTooltip(graphMetadata.description);
             } else if (viskit.ViskitStatics.debug) {
-                System.err.println("error: AssemblyViewFrame graphMetadata null..");
+                LOG.error("error: AssemblyViewFrame graphMetadata null..");
             }
         }
     }

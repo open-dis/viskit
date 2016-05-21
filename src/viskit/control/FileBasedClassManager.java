@@ -36,8 +36,8 @@ import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
  * @since 12:53:36 PM
  * @version $Id$
  */
-public class FileBasedClassManager {
-
+public class FileBasedClassManager 
+{
     static final Logger LOG = LogUtilities.getLogger(FileBasedClassManager.class);
 
     // Singleton:

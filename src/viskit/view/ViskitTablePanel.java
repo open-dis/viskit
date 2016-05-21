@@ -362,7 +362,7 @@ public abstract class ViskitTablePanel extends JPanel
             }
             if (r >= thisTableModel.getRowCount()) //assert false: "Bad table processing, ViskitTablePanel.updateRow)
             {
-                System.err.println("Bad table processing, ViskitTablePanel.updateRow");
+                LOG.error("Bad table processing, ViskitTablePanel.updateRow");
             }  // will die here
         }
         return row;

@@ -79,9 +79,10 @@ import viskit.ViskitStatics;
  * @since December 27, 2006, 11:47 AM
  * @version $Id$
  */
-public class LocalBootLoader extends URLClassLoader {
-
+public class LocalBootLoader extends URLClassLoader 
+{
     private final static Logger LOG = Logger.getLogger(LocalBootLoader.class);
+	
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
@@ -421,7 +422,7 @@ public class LocalBootLoader extends URLClassLoader {
                             isEventGraph = false;
                         }
                     } catch (ClassNotFoundException ex) {
-                        System.err.println("Check that viskit.jar has jaxb bindings, or: " + entryClass);
+                        LOG.error("Check that viskit.jar has jaxb bindings, or: " + entryClass, ex);
                         LOG.error(ex);
                     }
 

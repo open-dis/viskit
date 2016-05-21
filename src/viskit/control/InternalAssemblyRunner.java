@@ -620,7 +620,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 simulationRunPanel.vcrRewind.setEnabled(false);
                 break;
             default:
-                System.err.println("Bad event in InternalAssemblyRunner");
+                LOG.error("Bad event in InternalAssemblyRunner");
                 break;
         }
     }

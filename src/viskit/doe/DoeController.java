@@ -52,6 +52,8 @@ import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileFilterEx;
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -60,7 +62,9 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
 /**
  * Note:  The filechooser stuff is not used since the DOE panel does not expose the corresponding menu items.
  */
-public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssemblyChangeListener {
+public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssemblyChangeListener 
+{
+    static final Logger LOG = LogUtilities.getLogger(DoeController.class);
 
     private JFileChooser openSaveFileChooser;
     private DoeMainFrame doeFrame;
@@ -376,7 +380,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case CLOSE_ASSEMBLY:
                 break;
             default:
-                System.err.println("Program error DoeController.assyChanged");
+                LOG.error("Program error DoeController.assemblyChanged");
         }
 
     }

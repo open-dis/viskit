@@ -83,7 +83,7 @@ public final class ParameterTree extends JTree
             Element elm = (Element) iterator.next();
             // assert elm.getName().equalsIgnoreCase("SimEntity");
             if (!elm.getName().equalsIgnoreCase("SimEntity")) {
-                System.err.println("ParamTree.setParams, unknown element type: " + elm.getName());
+                LOG.error("ParamTree.setParams, unknown element type: " + elm.getName());
             }
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(elm);
             root.add(node);
@@ -109,7 +109,7 @@ public final class ParameterTree extends JTree
                 // assert nm.equalsIgnoreCase("TerminalParameter");
                 if (!nm.equalsIgnoreCase("TerminalParameter"))
 				{
-                    System.err.println("ParamTree.addChildren, unknown element type: " + nm);
+                    LOG.error("ParamTree.addChildren, unknown element type: " + nm);
                 }
             }
             node.add(n);

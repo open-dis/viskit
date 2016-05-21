@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import viskit.util.Compiler;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.util.FindClassesForInterface;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -375,6 +376,8 @@ public class SourceWindow extends JFrame
 
 class Searcher
 {
+    static final Logger LOG = LogUtilities.getLogger(Searcher.class);
+	
     JTextComponent jtc;
     Document doc;
     JComponent comp;
@@ -401,7 +404,7 @@ class Searcher
                 mat = null;
             }
         } catch (BadLocationException e1) {
-            System.err.println(e1.getMessage());
+            LOG.error(e1.getMessage(), e1);
         }
     }
 

@@ -357,7 +357,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
                 selection.setText(evsv.get(which));
             }
         } catch (ClassNotFoundException | SecurityException | HeadlessException t) {
-            System.err.println("Error connecting: " + t.getMessage());
+            LOG.error("Error connecting: " + t.getMessage(), t);
         }
 //    catch (ClassNotFoundException e) {
 //      e.printStackTrace();
