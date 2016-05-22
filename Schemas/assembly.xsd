@@ -37,6 +37,7 @@
         <xs:element minOccurs="0" ref="Experiment"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
+	  <xs:attribute name="created"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="package" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="author"/>
@@ -68,6 +69,7 @@
       <xs:attribute name="type" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
+      <xs:attribute name="verbose" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="TerminalParameter">

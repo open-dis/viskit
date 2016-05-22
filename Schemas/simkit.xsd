@@ -13,6 +13,7 @@
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
 			<xs:attribute name="package" default="examples"/>
+			<xs:attribute name="created"/>
 			<xs:attribute name="version" default="1.0"/>
 			<xs:attribute name="author"/>
 			<xs:attribute name="extend" default="SimEntityBase"/>
@@ -52,6 +53,7 @@
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:ID" use="required"/>
 			<xs:attribute name="type" use="required"/>
+			<xs:attribute name="value"/>
 			<xs:attribute name="description"/>
 		</xs:complexType>
 	</xs:element>
