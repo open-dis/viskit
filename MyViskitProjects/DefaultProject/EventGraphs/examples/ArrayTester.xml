@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Test Viskit's capability to create primative type arrays</Comment>
-    <Parameter name="param_0" type="int[]">
-        <Comment></Comment>
-    </Parameter>
+<SimEntity name="ArrayTester" package="examples" version="21 May 2016" author="Terry D. Norbraten" extend="SimEntityBase" description="Test Viskit's capability to create primative type arrays" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="param_0" type="int[]"/>
     <StateVariable name="state_0" type="int[param_0.length]">
         <Comment></Comment>
     </StateVariable>
-    <Event name="Run">
+    <Event name="Run" description="Begin simulation">
         <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT">
             <Comment></Comment>
             <EdgeParameter value="0"/>
@@ -15,7 +12,7 @@
         <Code></Code>
         <Coordinate x="30.0" y="30.0"/>
     </Event>
-    <Event name="Init">
+    <Event name="Init" description="Initialize">
         <Comment></Comment>
         <Argument name="i" type="int"/>
         <StateTransition state="state_0" index="i">

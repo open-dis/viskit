@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ArrayTestAssembly" version="1.0" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ArrayTestAssembly" version="21 May 2016" package="examples" description="TODO add description" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="ArrayTester_3" type="examples.ArrayTester" description="">
         <MultiParameter type="int[]">
             <TerminalParameter name="" value="17" type="int"/>
             <TerminalParameter name="" value="52" type="int"/>
         </MultiParameter>
-        <Coordinate x="160" y="60"/>
+        <Coordinate x="165.0" y="60.0"/>
     </SimEntity>
-    <PropertyChangeListener name="SimplePropertyDumper_4" type="simkit.util.SimplePropertyDumper" meanStatistics="false" countStatistics="true">
-        <Coordinate x="160.0" y="190.0"/>
+    <PropertyChangeListener name="SimplePropertyDumper_4" type="simkit.util.SimplePropertyDumper" meanStatistics="false" countStatistics="true" description="">
+        <Coordinate x="165.0" y="195.0"/>
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="SimplePropertyDumper_4" source="ArrayTester_3"/>
     <Output entity="ArrayTester_3"/>

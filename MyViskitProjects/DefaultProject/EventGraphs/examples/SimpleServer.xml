@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" description="Model of a simple server" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleServer" package="examples" version="21 May 2016" extend="SimEntityBase" description="Model of a simple server" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" description=""/>
     <Parameter name="totalNumberServers" type="int" description=""/>
     <StateVariable name="numberInQueue" type="int" description="number of arrivals waiting in queue"/>
@@ -11,7 +11,7 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>
-        <Coordinate x="20.0" y="30.0"/>
+        <Coordinate x="15.0" y="30.0"/>
     </Event>
     <Event name="Arrival" description="">
         <StateTransition state="numberInQueue">
@@ -21,7 +21,7 @@
             <Comment></Comment>
             <EdgeParameter value="numberAvailableServers"/>
         </Schedule>
-        <Coordinate x="10.0" y="120.0"/>
+        <Coordinate x="15.0" y="120.0"/>
     </Event>
     <Event name="StartService" description="">
         <Comment></Comment>
@@ -34,13 +34,13 @@
         </StateTransition>
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT"/>
         <Code>System.out.println("numberAvailableServers"+arg_0);</Code>
-        <Coordinate x="170.0" y="130.0"/>
+        <Coordinate x="165.0" y="135.0"/>
     </Event>
     <Event name="EndService" description="">
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="numberInQueue &gt; 0" priority="HIGH"/>
-        <Coordinate x="340.0" y="120.0"/>
+        <Coordinate x="345.0" y="120.0"/>
     </Event>
 </SimEntity>
