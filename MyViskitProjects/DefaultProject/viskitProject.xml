@@ -9,7 +9,6 @@
   </BuildDirectory>
   <DistDirectory name="dist" />
   <LibDirectory name="lib" />
-  <Cached>
-  </Cached>
+  <Cached />
 </ViskitProject>
 
