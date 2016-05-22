@@ -100,6 +100,7 @@ public class ViskitProject
 	private String   projectName        = ""; // empty string if no project open
 	private String   projectAuthor      = "";
 	/** date or version number */
+	private String   projectCreated     = "";
 	private String   projectRevision    = "";
 	private String   projectDescription = "";
     private boolean  projectFileExists = false;
@@ -676,15 +677,17 @@ public class ViskitProject
     private static JFileChooser projectChooser;
 
     /** When a user selects an iconized Viskit Project directory, then load it */
-    private static final PropertyChangeListener myChangeListener = new PropertyChangeListener() {
-
+    private static final PropertyChangeListener myChangeListener = new PropertyChangeListener() 
+	{
         @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(evt.getPropertyName())) {
-
+        public void propertyChange(PropertyChangeEvent evt) 
+		{
+            if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(evt.getPropertyName()))
+			{
                 File file = projectChooser.getSelectedFile();
 
-                if (((ViskitProjectFileView) projectChooser.getFileView()).isViskitProject(file)) {
+                if (((ViskitProjectFileView) projectChooser.getFileView()).isViskitProject(file)) 
+				{
                     projectChooser.approveSelection();
                 }
             }
@@ -844,6 +847,21 @@ public class ViskitProject
 	public void setProjectAuthor(String projectAuthor) {
 		this.projectAuthor = projectAuthor;
 		projectDocument.getRootElement().setAttribute("author", projectAuthor);
+	}
+
+	/**
+	 * @return the projectCreated
+	 */
+	public String getProjectCreated() {
+		return projectCreated;
+	}
+
+	/**
+	 * @param projectCreated the projectCreated to set
+	 */
+	public void setProjectCreated(String projectCreated) {
+		this.projectCreated = projectCreated;
+		projectDocument.getRootElement().setAttribute("created", projectCreated);
 	}
 
 	/**

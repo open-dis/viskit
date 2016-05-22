@@ -23,43 +23,54 @@ import viskit.model.*;
 public class JGraphAssemblyUI extends BasicGraphUI 
 {
 
-    public JGraphAssemblyUI() {
+    public JGraphAssemblyUI()
+	{
         super();
     }
 
     @Override
-    protected boolean startEditing(Object cell, MouseEvent event) {
-
+    protected boolean startEditing(Object cell, MouseEvent event)
+	{
         // We're not concerned with the MouseEvent here
 
         completeEditing();
 
         // We'll use our own editors here
-        if (graph.isCellEditable(cell)) {
+        if (graph.isCellEditable(cell))
+		{
             createEditDialog(cell);
         }
-
         return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
-    private void createEditDialog(Object cell)
+    private void createEditDialog(Object jGraphCell)
 	{
-        AssemblyController cntl = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-        if (cell instanceof vAssemblyEdgeCell) {
-            Object edgeObj = ((vAssemblyEdgeCell) cell).getUserObject();
-            if (edgeObj instanceof AdapterEdge) {
-                cntl.adapterEdgeEdit((AdapterEdge) edgeObj);
-            } else if (edgeObj instanceof PropertyChangeListenerEdge) {
-                cntl.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) edgeObj);
-            } else {
-                cntl.simEventListenerEdgeEdit((SimEventListenerEdge) edgeObj);
+        AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        if (jGraphCell instanceof vAssemblyEdgeCell) 
+		{
+            Object assemblyEdgeCell = ((vAssemblyEdgeCell) jGraphCell).getUserObject();
+            if (assemblyEdgeCell instanceof AdapterEdge) 
+			{
+                assemblyController.adapterEdgeEdit((AdapterEdge) assemblyEdgeCell);
+            } 
+			else if (assemblyEdgeCell instanceof PropertyChangeListenerEdge) 
+			{
+                assemblyController.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) assemblyEdgeCell);
+            } 
+			else 
+			{
+                assemblyController.simEventListenerEdgeEdit((SimEventListenerEdge) assemblyEdgeCell);
             }
-        } else if (cell instanceof AssemblyCircleCell) {
-            Object nodeObj = ((AssemblyCircleCell) cell).getUserObject();
-            cntl.eventGraphEdit((EventGraphNode) nodeObj);
-        } else if (cell instanceof AssemblyPropertyListCell) {
-            Object nodeObj = ((AssemblyPropertyListCell) cell).getUserObject();
-            cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) nodeObj);
+        } 
+		else if (jGraphCell instanceof AssemblyCircleCell) 
+		{
+            Object nodeObj = ((AssemblyCircleCell) jGraphCell).getUserObject();
+            assemblyController.eventGraphEdit((EventGraphNode) nodeObj);
+        } 
+		else if (jGraphCell instanceof AssemblyPropertyListCell) 
+		{
+            Object nodeObj = ((AssemblyPropertyListCell) jGraphCell).getUserObject();
+            assemblyController.propertyChangeListenerEdit((PropertyChangeListenerNode) nodeObj);
         }
     }
 }

@@ -373,7 +373,8 @@ public abstract class ViskitInstantiator
             }
         }
 
-        private String listToString(List<String> stringList) {
+        private String listToString(List<String> stringList) 
+		{
             StringBuilder sb = new StringBuilder("");
             for (String s : stringList) {
                 sb.append(s);
@@ -653,7 +654,7 @@ public abstract class ViskitInstantiator
 		{
             if (arguments == null)
 			{
-                setParametersFactoryList(getDefaultParameters(typeName));
+                setParametersFactoryList(getDefaultParametersFromReflection(typeName));
                 arguments = getParametersFactoryList();
             }
             return (indexOfArgumentNames(typeName, arguments) >= 0); // true if index found, apparently simple type if -1
@@ -757,7 +758,7 @@ public abstract class ViskitInstantiator
             return constructorIndex;
         }
 
-        private List<Object> getDefaultParameters(String typeName)
+        private List<Object> getDefaultParametersFromReflection(String typeName)
 		{
             Class<?> inputClass = ViskitStatics.classForName(typeName);
             if (inputClass != null)

@@ -276,10 +276,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	}
 
     /** Tab switch: this will come in with the newly selected tab in place */
-    class TabSelectionHandler implements ChangeListener {
-
+    class TabSelectionHandler implements ChangeListener
+	{
         @Override
-        public void stateChanged(ChangeEvent e) {
+        public void stateChanged(ChangeEvent e) 
+		{
             JGraphAssemblyComponentWrapper myVgacw = getCurrentJGraphAssemblyComponentWrapper();
 
             if (myVgacw == null) {     // last tab has been closed
@@ -304,14 +305,16 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			{
                 setSelectedAssemblyName   (graphMetadata.name);
 				setSelectedAssemblyTooltip(graphMetadata.description);
-            } else if (viskit.ViskitStatics.debug) {
-                LOG.error("error: AssemblyViewFrame graphMetadata null..");
+            }
+			else if (viskit.ViskitStatics.debug) 
+			{
+                LOG.error("error: AssemblyViewFrame graphMetadata is null for selected tab");
             }
         }
     }
 
-    class RecentAssemblyFileListener implements mvcRecentFileListener {
-
+    class RecentAssemblyFileListener implements mvcRecentFileListener 
+	{
         @Override
         public void listChanged()
 		{
@@ -828,7 +831,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
             JGraphAssemblyComponentWrapper vgacw = (JGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgacw.assemblyModel == assemblyModelToDelete) 
 			{
-                tabbedPane.remove(i);
+				if (tabbedPane.getTabCount() > i)
+				{
+					tabbedPane.remove(i);
+				}
+				else
+				{
+					LOG.error ("Incorrect pane index " + i + " is greater than allowed for tabCount " + tabbedPane.getTabCount());
+				}
                 vgacw.isActive = false;
 
                 // Don't allow operation of tools with no Assembly tab in view (NPEs)
@@ -850,7 +860,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     public boolean hasOpenAssemblies() {
-		return (tabbedPane != null) && (tabbedPane.getComponentCount() > 0) && (nextTabIndex > 0);
+		return (tabbedPane != null) && (tabbedPane.getTabCount() > 0) && (nextTabIndex > 0);
     }
 
     public boolean hasActiveAssembly() {
@@ -1201,9 +1211,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
 		else
 		{
-			this.selectedAssemblyName = "";
+			this.selectedAssemblyName = ""; // can occur when deleting pane
 		}
-		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), this.selectedAssemblyName);
+		if (tabbedPane.getTabCount() > tabbedPane.getSelectedIndex())
+			tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), this.selectedAssemblyName);
     }
 //    @Override // TODO
     public void setSelectedAssemblyTooltip(String selectedAssemblyDescription) 

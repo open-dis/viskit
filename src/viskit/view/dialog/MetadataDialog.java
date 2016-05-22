@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import viskit.model.GraphMetadata;
 
 import edu.nps.util.SpringUtilities;
@@ -9,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
@@ -24,12 +26,14 @@ import viskit.ViskitStatics;
  */
 abstract public class MetadataDialog extends JDialog // TODO add clear, update buttons
 {
+    static final Logger LOG = LogUtilities.getLogger(MetadataDialog.class);
+	
     protected static boolean modified = false;
     protected JComponent runtimePanel;
     private   JButton    cancelButton;
     private   JButton    okButton;
     private   GraphMetadata graphMetadata;
-    private   JTextField nameTF, packageTF, authorTF, revisionTF, extendsTF, implementsTF, pathTF;
+    private   JTextField nameTF, packageTF, authorTF, createdTF, revisionTF, extendsTF, implementsTF, pathTF;
     private   JTextField stopTimeTF;
     private   JCheckBox  verboseCB;
     private   JTextArea  descriptionTextArea;
@@ -46,10 +50,10 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         this.addWindowListener(new myCloseListener());
 
         //Create and populate the panel.
-        JPanel metaDataDialogPanel = new JPanel();
-        setContentPane(metaDataDialogPanel);
-        metaDataDialogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        metaDataDialogPanel.setLayout(new BoxLayout(metaDataDialogPanel, BoxLayout.Y_AXIS));
+        JPanel metadataDialogPanel = new JPanel();
+        setContentPane(metadataDialogPanel);
+        metadataDialogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        metadataDialogPanel.setLayout(new BoxLayout(metadataDialogPanel, BoxLayout.Y_AXIS));
 
         JPanel textFieldPanel = new JPanel(new SpringLayout());
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -66,6 +70,12 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         authorLabel.setLabelFor(authorTF);
         textFieldPanel.add(authorLabel);
         textFieldPanel.add(authorTF);
+
+        JLabel createdLabel = new JLabel("created", JLabel.TRAILING);
+        createdTF = new JTextField(20);
+        createdLabel.setLabelFor(createdTF);
+        textFieldPanel.add(createdLabel);
+        textFieldPanel.add(createdTF);
 
         JLabel revisionLabel = new JLabel("revision", JLabel.TRAILING);
         revisionTF = new JTextField(20);
@@ -96,7 +106,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		textFieldPanel.add(descriptionLabel);
 		textFieldPanel.add(descriptionScrollPane);
 		
-		int rowCount = 5;
+		int rowCount = 6;
 
 		if (graphMetadata.isProject())
 		{
@@ -131,7 +141,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			textFieldPanel.add(implementsLabel);
 			textFieldPanel.add(implementsTF);
 			
-			rowCount = 8;
+			rowCount = 9;
 		}
 		
         // Lay out the panel
@@ -142,7 +152,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
         Dimension d = textFieldPanel.getPreferredSize();
         textFieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
-        metaDataDialogPanel.add(textFieldPanel);
+        metadataDialogPanel.add(textFieldPanel);
 
         runtimePanel = new JPanel(new SpringLayout());
         runtimePanel.setBorder(BorderFactory.createTitledBorder("Runtime defaults"));
@@ -165,7 +175,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         runtimePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
         runtimePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        metaDataDialogPanel.add(runtimePanel);
+        metadataDialogPanel.add(runtimePanel);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -177,7 +187,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
-        metaDataDialogPanel.add(buttonPanel);
+        metadataDialogPanel.add(buttonPanel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
@@ -200,6 +210,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		if (graphMetadata == null)
 		{
 			graphMetadata = new GraphMetadata(); // unexpected error condition
+			LOG.error ("MetadataDialog invoked with null graphMetadata");
 		} 
 		 
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
@@ -221,6 +232,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			
                      nameTF.setText(graphMetadata.name);
                    authorTF.setText(graphMetadata.author);
+                  createdTF.setText(graphMetadata.created);
                  revisionTF.setText(graphMetadata.revision);
                      pathTF.setText       (path);
                      pathTF.setToolTipText(path);
@@ -264,6 +276,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
             graphMetadata.name = nameTF.getText().trim();
         }
         graphMetadata.author      =            authorTF.getText().trim();
+        graphMetadata.created     =           createdTF.getText().trim();
         graphMetadata.revision    =          revisionTF.getText().trim();
         graphMetadata.description = descriptionTextArea.getText().trim();
 		

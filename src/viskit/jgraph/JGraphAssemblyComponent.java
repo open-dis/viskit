@@ -299,7 +299,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 					{
                         Object   toEvent = ((AdapterEdge) assemblyEdge).getTargetEvent();
                         Object fromEvent = ((AdapterEdge) assemblyEdge).getSourceEvent();
-                        sb.append("<center>Adapter<br><u>");// +
+                        sb.append("<center>Adapter<br /><u>");// +
                         sb.append(fromObject);
                         sb.append(".");
                         sb.append(fromEvent);
@@ -309,7 +309,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append(toEvent);
                     }
 					else if (assemblyEdge instanceof SimEventListenerEdge) {
-                        sb.append("<center>SimEvent Listener<br><u>");
+                        sb.append("<center>SimEvent Listener<br /><u>");
                         sb.append(toObject);
                         sb.append("</u> listening to <u>");
                         sb.append(fromObject);
@@ -318,7 +318,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 					{
                         String property = ((PropertyChangeListenerEdge) assemblyEdge).getProperty();
                         property = (property != null && property.length() > 0) ? property : PclEdgeInspectorDialog.ALL_STATE_VARIABLES_NAME;
-                        sb.append("<center>Property Change Listener<br><u>");
+                        sb.append("<center>Property Change Listener<br /><u>");
 						String    className = ((PropertyChangeListenerNode) toObject).getType();
 						if (className.contains("."))
 							className = className.substring(className.lastIndexOf(".")+1);
@@ -341,7 +341,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 					{
                         description = description.trim();
                         if (description.length() > 0) {
-                            sb.append("<br>");
+                            sb.append("<br />");
                             sb.append("<i>description:</i> ");
                             sb.append(wrapAtPosition(description, 60));
                         }
@@ -355,13 +355,16 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     String type;
                     String name;
                     String description;
-                    if (c instanceof AssemblyCircleCell) {
+                    if (c instanceof AssemblyCircleCell) 
+					{
                         AssemblyCircleCell cc = (AssemblyCircleCell) c;
                         EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         type = en.getType();
                         name = en.getName();
                         description = en.getDescription();
-                    } else /*if (c instanceof AssemblyPropertyListCell)*/ {
+                    } 
+					else /*if (c instanceof AssemblyPropertyListCell)*/ 
+					{
                         AssemblyPropertyListCell cc = (AssemblyPropertyListCell) c;
                         PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
                         type = pcln.getType();
@@ -369,14 +372,16 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                         description = pcln.getDescription();
                     }
 
-                    sb.append("<center><u>");
+                    sb.append("<center><u> SimEntity ");
                     sb.append(type);
-                    sb.append("</u> Assembly <br>");
+                    sb.append("</u> <br />");
+                    sb.append("(Event Graph instance ");
                     sb.append(name);
+                    sb.append(") <br />");
                     if (description != null) {
                         description = description.trim();
                         if (description.length() > 0) {
-                            sb.append("<br>");
+                            sb.append("<br />");
                             sb.append("<i>description:</i> ");
                             sb.append(wrapAtPosition(escapeLTGT(description), 60));
                         }
@@ -402,11 +407,11 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 sb.append(sa[idx++]);
                 sb.append(" ");
             } while (idx < sa.length && ll < len);
-            sb.append("<br>");
+            sb.append("<br />");
         } while (idx < sa.length);
 
         String st = sb.toString();
-        if (st.endsWith("<br>")) {
+        if (st.endsWith("<br />")) {
             st = st.substring(0, st.length() - 4);
         }
         return st.trim();

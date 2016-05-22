@@ -631,7 +631,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     public boolean hasOpenEventGraphs() {
-		return (tabbedPane != null) && (tabbedPane.getComponentCount() > 0) && (nextTabIndex > 0);
+		return (tabbedPane != null) && (tabbedPane.getTabCount() > 0) && (nextTabIndex > 0);
     }
 
     public boolean hasActiveEventGraph() {
@@ -1509,9 +1509,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		else projectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // starting point;
 		
         GraphMetadata graphMetadata = new GraphMetadata (
-				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY), // name
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY),     // name
 				"", // packageName not used by project, TODO remember latest value?
-				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY), // author
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY),   // author
+				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_CREATED_KEY),  // created
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY), // revision
 				"", // extendsPackageName 
 				"", // implementsPackageName
@@ -1526,6 +1527,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		{
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        graphMetadata.name);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
+            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_CREATED_KEY,     graphMetadata.created);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, graphMetadata.description);
 			

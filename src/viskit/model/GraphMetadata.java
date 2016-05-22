@@ -1,5 +1,7 @@
 package viskit.model;
 
+import edu.nps.util.LogUtilities;
+import org.apache.log4j.Logger;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
@@ -13,12 +15,15 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  * @since 3:50:28 PM
  * @version $Id$
  */
-public class GraphMetadata {
+public class GraphMetadata
+{
+    static final Logger LOG = LogUtilities.getLogger(GraphMetadata.class);
 
     public String name        = "";
     public String packageName = "";
     public String author      = "";
-    public String revision    = "";  // TODO originally version, make XML consistent
+    public String created     = "";
+    public String revision    = "";  // TODO originally "version", make XML consistent
     public String path        = "";
     public String description = ""; // originally captured in "Comment" element(s), now is description attribute
     public String stopTime    = "100.0";    
@@ -74,10 +79,11 @@ public class GraphMetadata {
             extendsPackageName      = ""; // unused
             implementsPackageName   = ""; // unused
         }
+		this.created = ""; // do not insert date into legacy models
 		this.updated = false;
     }
 
-    public GraphMetadata(String name, String packageName, String author, String revision, String extendsPackageName, String implementsPackageName, 
+    public GraphMetadata(String name, String packageName, String author, String created, String revision, String extendsPackageName, String implementsPackageName, 
 			             String path, String description, boolean isProject)
 	{
         initialize ();
@@ -85,6 +91,7 @@ public class GraphMetadata {
         this.name                  = name;
         this.packageName           = packageName;
         this.author                = author;
+        this.created               = created;
         this.revision              = revision;
         this.extendsPackageName    = extendsPackageName;
         this.implementsPackageName = implementsPackageName;

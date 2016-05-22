@@ -778,6 +778,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        newProjectRoot.getName()); // "*Enter new project name*");
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      System.getProperty("user.name")); // TODO user preference, default author name
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_CREATED_KEY,     simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "*Enter new project description*");
 		
@@ -808,6 +809,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		viskitProject.setProjectName       (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY));
 		viskitProject.setProjectOpen(true);
 		viskitProject.setProjectAuthor     (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY));
+		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_CREATED_KEY));
 		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY));
 		viskitProject.setProjectDescription(viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY));
 		viskitProject.saveProjectFile ();
@@ -998,7 +1000,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         GraphMetadata priorAssemblyMetadata = null;
         AssemblyModelImpl priorAssemblyModel = (AssemblyModelImpl) getModel();
-        if (priorAssemblyModel != null) {
+        if (priorAssemblyModel != null)
+		{
             priorAssemblyMetadata = priorAssemblyModel.getMetadata();
         }
 
@@ -1020,7 +1023,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
 			newAssemblyMetadata.author = System.getProperty("user.name"); // TODO user preference
 		}
-		newAssemblyMetadata.description = "TODO: enter a description for this new assembly";
+		newAssemblyMetadata.description   = ViskitStatics.DEFAULT_DESCRIPTION + " for this new assembly";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+		newAssemblyMetadata.created       = simpleDateFormat.format(new Date());
 
         boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
         if (modified)

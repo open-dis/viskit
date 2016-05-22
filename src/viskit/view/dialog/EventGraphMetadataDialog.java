@@ -1,8 +1,10 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import viskit.model.GraphMetadata;
 
 import javax.swing.JFrame;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -14,15 +16,20 @@ import javax.swing.JFrame;
  * @since 1:35:07 PM
  * @version $Id$
  */
-public class EventGraphMetadataDialog extends MetadataDialog {
+public class EventGraphMetadataDialog extends MetadataDialog 
+{
+    static final Logger LOG = LogUtilities.getLogger(EventGraphMetadataDialog.class);
 
     private static MetadataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) {
+    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata)
+	{
         if (dialog == null)
 		{
             dialog = new EventGraphMetadataDialog(f, graphMetadata);
-        } else {
+        } 
+		else 
+		{
             dialog.setGraphMetadata(f, graphMetadata);
         }
         dialog.setVisible(true); // this call blocks
@@ -33,7 +40,7 @@ public class EventGraphMetadataDialog extends MetadataDialog {
     EventGraphMetadataDialog(JFrame f, GraphMetadata graphMetadata)
 	{
         super(f, graphMetadata, "Event Graph Properties");
-        remove(this.runtimePanel);  // only for assembly
+        remove(this.runtimePanel);  // panel is only used by assembly
         pack();
     }
 }

@@ -63,6 +63,7 @@ public class ViskitConfiguration
     public static final String PROJECT_NAME_KEY        = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
     public static final String PROJECT_OPEN_KEY        = PROJECT_HOME_CLEAR_KEY + ".open[@value]";
     public static final String PROJECT_AUTHOR_KEY      = PROJECT_HOME_CLEAR_KEY + ".author[@value]";
+    public static final String PROJECT_CREATED_KEY     = PROJECT_HOME_CLEAR_KEY + ".created[@value]";
     public static final String PROJECT_REVISION_KEY    = PROJECT_HOME_CLEAR_KEY + ".revision[@value]";
     public static final String PROJECT_DESCRIPTION_KEY = PROJECT_HOME_CLEAR_KEY + ".description[@value]";
     public static final String PROJECT_PROPERTIES_EDIT_COMPLETED_KEY = PROJECT_HOME_CLEAR_KEY + ".propertiesEditCancelled[@value]";
@@ -310,14 +311,14 @@ public class ViskitConfiguration
 		String projectHomeDirectory = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY);
 		if (!projectHomeDirectory.isEmpty())
 		{
-			File parentFile = new File (projectHomeDirectory);
-			setValue(ViskitConfiguration.PROJECT_PATH_KEY,  parentFile.getParent()); // remember something, current parent is good
+			setValue(ViskitConfiguration.PROJECT_PATH_KEY, projectHomeDirectory); // remembers parent directory
 		}
 		else setValue(ViskitConfiguration.PROJECT_PATH_KEY, "");
 		
         setValue(ViskitConfiguration.PROJECT_NAME_KEY, "");
         setValue(ViskitConfiguration.PROJECT_OPEN_KEY, "false");
         setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY, "");
+        setValue(ViskitConfiguration.PROJECT_CREATED_KEY, "");
         setValue(ViskitConfiguration.PROJECT_REVISION_KEY, "");
         setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "");
         getViskitApplicationXMLConfiguration().clearTree(ViskitConfiguration.RECENT_EVENT_GRAPH_CLEAR_KEY);

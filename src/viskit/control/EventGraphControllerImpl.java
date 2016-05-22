@@ -158,7 +158,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
 			newEventGraphMetadata.revision = simpleDateFormat.format(new Date()); // TODO user preference
 		}
-		newEventGraphMetadata.description = "TODO: enter a description for this new event graph";
+		newEventGraphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION + " for this new event graph";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
+		newEventGraphMetadata.created     = simpleDateFormat.format(new Date());
 
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), newEventGraphMetadata);
 		

@@ -142,13 +142,16 @@ public class ViskitStatics
 		if (projectHistoryList == null)
 			projectHistoryList = new ArrayList<>();
         boolean match = false;
-        for (String s : projectHistoryList) {
-            if (s.equals(projectDirectory.getPath())) {
+        for (String priorProjectDirectory : projectHistoryList) 
+		{
+            if (priorProjectDirectory.equals(projectDirectory.getPath()))
+			{
                 match = true;
                 break;
             }
         }
-        if (!match) {
+        if (!match) 
+		{
             projectHistoryConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + projectHistoryList.size() + ")[@value]", projectDirectory.getPath());
             projectHistoryConfiguration.getDocument().normalize();
         }
