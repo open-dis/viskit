@@ -558,11 +558,13 @@ public class ViskitStatics
         return c;
     }
 
-    static public String getPathSeparator() {
+    static public String getPathSeparator() 
+	{
         return System.getProperty("path.separator");
     }
 
-    static public String getFileSeparator() {
+    static public String getFileSeparator() 
+	{
         return System.getProperty("file.separator");
     }
 

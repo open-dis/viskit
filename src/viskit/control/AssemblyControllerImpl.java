@@ -851,7 +851,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 projectDirectory  = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
                 projectArchiveZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
-                File readmeFile = new File(projectDirectory, "README.txt"); // TODO confirm
+                File readmeFile = new File(projectDirectory, "README.txt"); // TODO copy/create if missing
 
                 if (projectArchiveZip.exists())
                     projectArchiveZip.delete(); // delete previous version
@@ -862,7 +862,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 try {
                     // First, copy the README.txt file to the project directory
                     Files.copy(ViskitConfiguration.USER_README_FILE.toPath(), 
-							   (new File (logFile.getParentFile().getPath() + File.separatorChar + ViskitConfiguration.USER_README_FILE.getName())).toPath(), 
+							   (new File (logFile.getParentFile().getPath() + "/" + ViskitConfiguration.USER_README_FILE.getName())).toPath(), 
 							   StandardCopyOption.REPLACE_EXISTING);
                     // Next, copy the debug.LOG to the project dir
                     Files.copy(ViskitConfiguration.VISKIT_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -1964,9 +1964,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String s = sourceCode.substring(st, end);
             packageName = sourceCode.substring(st, end - 1);
             packageName = packageName.substring("package".length(), packageName.length()).trim();
-            s = s.replace(';', File.separatorChar);
+            s = s.replace(';', '/');
             String[] sa = s.split("\\s");
-            sa[1] = sa[1].replace('.', File.separatorChar);
+            sa[1] = sa[1].replace('.', '/');
             packagePath = sa[1].trim();
         }
 
