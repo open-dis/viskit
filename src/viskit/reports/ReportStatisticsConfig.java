@@ -226,9 +226,9 @@ public class ReportStatisticsConfig
 
         FileWriter writer = null;
         try {
-            XMLOutputter outputter = new XMLOutputter();
-            Format fmt = Format.getPrettyFormat();
-            outputter.setFormat(fmt);
+			Format jdomFormat = Format.getPrettyFormat();
+			jdomFormat.setOmitDeclaration(false);
+			XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
 
             // Create a unique file name for each DTG/Location Pair
             ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
@@ -238,7 +238,7 @@ public class ReportStatisticsConfig
             File f = new File(anStatDir, outputFile);
             writer = new FileWriter(f);
 
-            outputter.output(report, writer);
+            xmlOutputter.output(report, writer);
 
             return f.getAbsolutePath();
 

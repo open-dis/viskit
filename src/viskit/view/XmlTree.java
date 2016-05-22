@@ -39,23 +39,27 @@ public class XmlTree extends JTree
         super();
         setFile(xmlFile);
     }
-    XMLOutputter xmlOut;
+    XMLOutputter xmlOutputter;
     Document doc = null;
 
-    public final void setFile(File xmlF) throws Exception {
+    public final void setFile(File xmlF) throws Exception 
+	{
         SAXBuilder builder;
-        Format form;
-        try {
+		Format jdomFormat = Format.getPrettyFormat();
+		jdomFormat.setOmitDeclaration(false);
+		xmlOutputter = new XMLOutputter(jdomFormat);
+		
+        try {	
             builder = new SAXBuilder();
             doc = builder.build(xmlF);
-            xmlOut = new XMLOutputter();
-            form = Format.getPrettyFormat();
-            xmlOut.setFormat(form);
-        } catch (JDOMException | IOException e) {
+        } 
+		catch (JDOMException | IOException e) 
+		{
             doc = null;
-            xmlOut = null;
-
-            throw new Exception("Error parsing or finding file " + xmlF.getAbsolutePath());
+            xmlOutputter = null;
+			String message = "Error parsing or finding file " + xmlF.getAbsolutePath();
+			LOG.error (message);
+            throw new Exception(message);
         }
 
         // throw existing away here?
@@ -82,8 +86,8 @@ public class XmlTree extends JTree
     }
 
     public String getXML() {
-        if (xmlOut != null) {
-            return xmlOut.outputString(doc);
+        if (xmlOutputter != null) {
+            return xmlOutputter.outputString(doc);
         }
         return "";
     }
@@ -382,7 +386,7 @@ class XTreePanel extends JPanel {
         Object o = dmt.getUserObject();
         if (o instanceof XmlTree.nElement) {
             Element elm = ((XmlTree.nElement) o).elem;
-            return xmlTree.xmlOut.outputString(elm);
+            return xmlTree.xmlOutputter.outputString(elm);
         } else {
             return "";
         }

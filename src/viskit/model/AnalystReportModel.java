@@ -202,13 +202,15 @@ public final class AnalystReportModel extends mvcAbstractModel {
         return fil;
     }
 
-    private void _writeCommon(File fil) throws Exception {
-        XMLOutputter outputter = new XMLOutputter();
-        Format form = Format.getPrettyFormat();
-        outputter.setFormat(form);
+    private void _writeCommon(File file) throws Exception 
+	{
+		Format jdomFormat = Format.getPrettyFormat();
+		jdomFormat.setOmitDeclaration(false);
+        XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
 
-        try (FileWriter writer = new FileWriter(fil)) {
-            outputter.output(reportJdomDocument, writer);
+        try (FileWriter writer = new FileWriter(file)) 
+		{
+            xmlOutputter.output(reportJdomDocument, writer);
         }
     }
 

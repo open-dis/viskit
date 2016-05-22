@@ -331,29 +331,33 @@ public class ViskitConfiguration
         singletonViskitConfiguration = null;
     }
 
-    public void cleanup() {
+    public void cleanup() 
+	{
         // Lot of hoops to pretty-fy config xml files
+		// http://www.jdom.org/docs/apidocs/org/jdom2/output/XMLOutputter.html
         Document document;
-        Format format = Format.getPrettyFormat();
-        XMLOutputter xout = new XMLOutputter(format);
+        Format jdomFormat = Format.getPrettyFormat();
+		jdomFormat.setOmitDeclaration(false);
+        XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
         try {
-
             // For c_app.xml
             document = FileHandler.unmarshallJdom(USER_C_APP_FILE);
-            xout.output(document,  new FileWriter(USER_C_APP_FILE));
+            xmlOutputter.output(document,  new FileWriter(USER_C_APP_FILE));
 
             // For c_gui.xml
             document = FileHandler.unmarshallJdom(USER_C_GUI_FILE);
-            xout.output(document,  new FileWriter(USER_C_GUI_FILE));
+            xmlOutputter.output(document,  new FileWriter(USER_C_GUI_FILE));
 
-            // For vconfig.xml
+            // For viskitConfiguration.xml
             document = FileHandler.unmarshallJdom(USER_CONFIGURATION_FILE);
-            xout.output(document,  new FileWriter(USER_CONFIGURATION_FILE));
+            xmlOutputter.output(document,  new FileWriter(USER_CONFIGURATION_FILE));
 
-            // For the current Viskit project file
+            // For the current viskitProject.xml file
             document = FileHandler.unmarshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile());
-            xout.output(document,  new FileWriter(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile()));
-        } catch (Exception e) {
+            xmlOutputter.output(document,  new FileWriter(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile()));
+        } 
+		catch (Exception e) 
+		{
             LOG.error("Bad jdom cleanup() operation: " + e.getMessage());
         }
     }

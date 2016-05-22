@@ -119,14 +119,14 @@ public class FileHandler
         return builder.build(f);
     }
 
-    public static void marshallJdom(File of, Document doc) throws Exception {
-        XMLOutputter xmlOut = new XMLOutputter();
-        Format form = Format.getPrettyFormat();
-        form.setOmitDeclaration(true); // lose the <?xml at the top
-        xmlOut.setFormat(form);
+    public static void marshallJdom(File of, Document doc) throws Exception 
+	{
+		Format jdomFormat = Format.getPrettyFormat();
+		jdomFormat.setOmitDeclaration(false);
+        XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
 
         FileOutputStream fow = new FileOutputStream(of);
-        xmlOut.output(doc, fow);
+        xmlOutputter.output(doc, fow);
     }
 
     public static void marshallJaxb(File of) throws Exception

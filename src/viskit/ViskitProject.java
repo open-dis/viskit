@@ -285,17 +285,25 @@ public class ViskitProject
 	{
         FileOutputStream fileOutputStream = null;
         try {
-            XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+			Format jdomFormat = Format.getPrettyFormat();
+			jdomFormat.setOmitDeclaration(false);
+            XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
             fileOutputStream = new FileOutputStream(getProjectFile());
             xmlOutputter.output(projectDocument, fileOutputStream);
             projectFileExists = true;
-        } catch (IOException ex) {
+        } 
+		catch (IOException ex) 
+		{
             LOG.error(ex);
-        } finally {
+        } 
+		finally 
+		{
             try {
                 if (fileOutputStream != null)
                     fileOutputStream.close();
-            } catch (IOException ex) {
+            } 
+			catch (IOException ex) 
+			{
                 LOG.error(ex);
             }
         }
@@ -662,8 +670,11 @@ public class ViskitProject
     }
 
     @Override
-    public String toString() {
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+    public String toString() 
+	{
+		Format jdomFormat = Format.getPrettyFormat();
+		jdomFormat.setOmitDeclaration(false);
+        XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
         StringWriter stringWriter = new StringWriter();
         try {
             xmlOutputter.output(projectDocument, stringWriter);
