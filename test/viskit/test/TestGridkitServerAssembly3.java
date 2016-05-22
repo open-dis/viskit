@@ -33,8 +33,10 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id: TestGridkitServerAssembly3.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class TestGridkitServerAssembly3 extends Thread {
+public class TestGridkitServerAssembly3 extends Thread 
+{
     static Logger log = LogUtilities.getLogger(TestGridkitServerAssembly3.class);
+	
     XmlRpcClientLite xmlrpc;
     Vector<Object> args;
     String usid;
@@ -52,8 +54,8 @@ public class TestGridkitServerAssembly3 extends Thread {
         // calculate the base directory, hack, know examples is next to lib
         // this of course only works in a development workspace
 
-        // get the jarurl path to viskit.EventGraphAssemblyComboMain
-        URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
+        // get the jar url path to viskit.ViskitEventGraphAssemblyComboMain
+        URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/ViskitEventGraphAssemblyComboMain.class");
         // strip the injar path
         log.info(u);
 

@@ -7,7 +7,7 @@
 package viskit.test;
 
 import viskit.xsd.bindings.eventgraph.*;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
@@ -28,7 +28,7 @@ public class TestCodeFormat extends Thread {
 
     String testFile;
     JAXBContext jaxbCtx;
-    SimkitXML2Java sx2j;
+    SimkitEventGraphXML2Java sx2j;
     SimEntity root;
     InputStream inputStream;
     ByteArrayOutputStream bufferOut;
@@ -106,7 +106,7 @@ public class TestCodeFormat extends Thread {
     }
 
     void showJava(InputStream is) throws Exception {
-        sx2j = new SimkitXML2Java(is);
+        sx2j = new SimkitEventGraphXML2Java(is);
         sx2j.unmarshal();
         System.out.println( sx2j.translate() );
     }
