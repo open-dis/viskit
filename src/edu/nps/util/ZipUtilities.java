@@ -49,12 +49,19 @@ public final class ZipUtilities
             processFolder(folder, zipOutputStream, folder.getPath().length() + 1);
         }
     }
+	private static String canonicalizeFileSeparators (String directoryPath)
+	{
+		return directoryPath.replace('\\', '/');
+	}
 
     private static void processFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
-            throws IOException {
-        for (final File file : folder.listFiles()) {
-            if (file.isFile()) {
-                final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
+            throws IOException 
+	{
+        for (final File file : folder.listFiles()) 
+		{
+            if (file.isFile()) 
+			{
+                final ZipEntry zipEntry = new ZipEntry(canonicalizeFileSeparators(file.getPath().substring(prefixLength)));
                 zipOutputStream.putNextEntry(zipEntry);
                 Files.copy(file.toPath(), zipOutputStream);
                 zipOutputStream.closeEntry();
