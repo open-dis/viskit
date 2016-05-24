@@ -1242,6 +1242,10 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		if (file != null) 
 		{
             assemblyController.openProjectDirectory(file);
+			ViskitGlobals.instance().getCurrentViskitProject().setProjectName(file.getName());
+			ViskitGlobals.setProjectOpen(true);
+			ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
+			showProjectName();
 			assemblyController.reportProjectOpenResult (file.getName());
         }
 		else
@@ -1249,30 +1253,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			LOG.error ("No known project path to open");
 			return;
 		}
-		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();
-        showProjectName();
-		
-////		// TODO there are two variations of this block, refactor/combine
-////		
-////		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-////			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-////		{
-////			// TODO re-open previously open assemblies and event graphs, otherwise:
-////			
-////			assemblyController.messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-////					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
-////							"<p align='center'>&nbsp;</p>" +
-////							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING +  "</p>" +
-////							"<p>&nbsp</p>");
-////		}
-////		else
-////		{
-////			assemblyController.messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, 
-////				"<html><p>Selected project <i>" +  file.getName() + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
-////							"<p align='center'>&nbsp;</p>" +
-////							"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" + 
-////							"<p>&nbsp</p>");
-////		}
 		
 		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
 		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && !viskitApplicationFrame.isAssemblyEditorTabSelected())
@@ -1300,6 +1280,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			if (assemblyController.confirmProjectClosing()) // user confirmation
 			{		
 				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+			}
+			else 
+			{
+				LOG.info ("User cancelled request to close project");
+				// Note: invoking method can test whether project was actually closed by using isProjectOpen() method
 			}
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus();

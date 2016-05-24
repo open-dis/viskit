@@ -206,7 +206,7 @@ public class ViskitApplicationFrame extends JFrame
             mainTabbedPane.setToolTipTextAt(newTabIndex, "Visual editor for object class definitions");
 			
 
-			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, cleanup
+			      projectsMenu = eventGraphViewFrame.getProjectsMenu(); // TODO move into this class, saveConfigurationFiles
 			eventGraphFileMenu = eventGraphViewFrame.getFileMenu();
 			eventGraphEditMenu = eventGraphViewFrame.getEditMenu();
 			eventGraphEditMenu.setEnabled(false); // activated when corresponding tabbed pane selected and event graph present
@@ -680,7 +680,7 @@ public class ViskitApplicationFrame extends JFrame
                 ViskitConfiguration.instance().setValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
-                ViskitConfiguration.instance().cleanup();
+                ViskitConfiguration.instance().saveConfigurationFiles();
 
                 ViskitGlobals.instance().systemExit(0);  // quit application
             } //outer
@@ -879,7 +879,8 @@ public class ViskitApplicationFrame extends JFrame
      * @param listener the title listener to set
      * @param key the key for this frame's title
      */
-    public void setTitleListener(TitleListener listener, int key) {
+    public void setTitleListener(TitleListener listener, int key)
+	{
         titleListener = listener;
         titleKey      = key;
 

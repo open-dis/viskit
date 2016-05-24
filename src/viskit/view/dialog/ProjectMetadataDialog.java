@@ -24,13 +24,15 @@ public class ProjectMetadataDialog extends MetadataDialog
     
     public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) 
 	{
-        if (dialog == null) {
+        if (dialog == null) 
+		{
             dialog = new ProjectMetadataDialog(f, graphMetadata);
         } 
 		else 
 		{
             dialog.setGraphMetadata(f, graphMetadata);
         }
+		dialog.fillWidgets();
         dialog.setVisible(true); // this call blocks
        
         return modified;

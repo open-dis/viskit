@@ -3,7 +3,6 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 import edu.nps.util.LogUtilities;
-import edu.nps.util.TempFileManager;
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
@@ -12,6 +11,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.ViskitConfiguration;
@@ -829,38 +830,45 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			assemblyController.updateProjectFileLists();
 		openRecentProjectsMenu.setEnabled(openRecentProjectsMenu.getItemCount() > 0);
 		projectsMenu.add(openRecentProjectsMenu);
-        projectsMenu.addSeparator();
 
 		boolean eventGraphVisible = hasOpenEventGraphs() && ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected();
 		boolean   assemblyVisible = hasOpenAssemblies()  && ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected();
 
-		 // ensures selected before allowing deletion
-        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, "deleteEventGraphFromProject", "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
-		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && false); // TODO
+        JMenuItem copyProjectMI               = buildMenuItem(this, COPY_PROJECT_METHOD,                "Copy Project",                   KeyEvent.VK_C, null /* dangerous operation, no hotkey */, isProjectOpen);
+		copyProjectMI.setEnabled (isProjectOpen);
+		copyProjectMI.setToolTipText("Copy project to new project directory, re-open project");
+		projectsMenu.add(copyProjectMI);
+		
+        projectsMenu.addSeparator();
+		
+		// ensure selected before allowing deletion
+        JMenuItem deleteProjectMI               = buildMenuItem(this, DELETE_PROJECT_METHOD,                "Delete Project",   KeyEvent.VK_D, null /* dangerous operation, no hotkey */, isProjectOpen);
+		deleteProjectMI.setEnabled (isProjectOpen && false); // TODO
+		deleteProjectMI.setToolTipText("TODO future capability");
+		projectsMenu.add(deleteProjectMI);
+
+		// ensure selected before allowing deletion
+        JMenuItem deleteEventGraphFromProjectMI = buildMenuItem(this, DELETE_EVENT_GRAPH_FROM_PROJECT_METHOD, "Delete Event Graph from Project",   KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (eventGraphVisible && hasActiveEventGraph()));
+		deleteEventGraphFromProjectMI.setEnabled (isProjectOpen && eventGraphVisible && false); // TODO
 		deleteEventGraphFromProjectMI.setToolTipText("TODO future capability");
 		projectsMenu.add(deleteEventGraphFromProjectMI);
 
-		 // ensures selected before allowing deletion
-        JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, "deleteAssemblyFromProject",   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (assemblyVisible && hasActiveAssembly()));
-		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && false); // TODO
+		// ensure selected before allowing deletion
+        JMenuItem deleteAssemblyFromProjectMI   = buildMenuItem(this, DELETE_ASSEMBLY_FROM_PROJECT_METHOD,   "Delete Assembly from Project",      KeyEvent.VK_D, null /* dangerous operation, no hotkey */, (assemblyVisible && hasActiveAssembly()));
+		deleteAssemblyFromProjectMI.setEnabled (isProjectOpen && assemblyVisible && false); // TODO
 		deleteAssemblyFromProjectMI.setToolTipText("TODO future capability");
 		projectsMenu.add(deleteAssemblyFromProjectMI);
 		
-		// TODO Rename Project - change name included as a setting; leave file manipulation to OS?
-        JMenuItem renameProjectMI               = buildMenuItem(this, "renameProject",                "Rename Project",                   KeyEvent.VK_R, null /* dangerous operation, no hotkey */, isProjectOpen);
-		renameProjectMI.setEnabled (isProjectOpen && false); // TODO
-		renameProjectMI.setToolTipText("TODO future capability");
-		projectsMenu.add(renameProjectMI);
+        projectsMenu.addSeparator();
 
         JMenuItem projectSettingsMI = buildMenuItem(this, EDIT_PROJECT_PROPERTIES_METHOD, "Edit Project Properties",      KeyEvent.VK_P, KeyStroke.getKeyStroke(KeyEvent.VK_P, projectMenuShortcutKeyMask), isProjectOpen);
 		projectSettingsMI.setEnabled (isProjectOpen);
 		projectsMenu.add(projectSettingsMI);
 		
-        projectsMenu.addSeparator();
 		JMenuItem mailZippedProjectFilesMI = buildMenuItem(eventGraphController, AssemblyControllerImpl.MAIL_ZIPPED_PROJECT_FILES_METHOD, "Mail Zipped Project Files", KeyEvent.VK_M, KeyStroke.getKeyStroke(KeyEvent.VK_M, projectMenuShortcutKeyMask), true);
         mailZippedProjectFilesMI.setEnabled (isProjectOpen);
 		projectsMenu.add(mailZippedProjectFilesMI);
-		
+        
 		closeProjectMI = buildMenuItem(this, AssemblyEditViewFrame.CLOSE_PROJECT_METHOD, "Close Project", KeyEvent.VK_W, KeyStroke.getKeyStroke(KeyEvent.VK_W, projectMenuShortcutKeyMask), isProjectOpen);
 		closeProjectMI.setEnabled (isProjectOpen);
 		projectsMenu.add(closeProjectMI);
@@ -1496,17 +1504,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	}
 	
     public final static String EDIT_PROJECT_PROPERTIES_METHOD = "editProjectProperties"; // must match following method name.  Not possible to accomplish this programmatically.
-    /** Edit current project settings.
-     */
+    /** Edit current project settings. */
     public void editProjectProperties () // method name must exactly match preceding string value
 	{
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
 		
-		String projectPath;
+		String projectFullPath;
 		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
 			(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory() != null))
-			 projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
-		else projectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // starting point;
+			 projectFullPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
+		else projectFullPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // starting point;
 		
         GraphMetadata graphMetadata = new GraphMetadata (
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY),     // name
@@ -1516,7 +1523,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY), // revision
 				"", // extendsPackageName 
 				"", // implementsPackageName
-				projectPath, // project path
+				projectFullPath, // project path, including project name
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY), // description
 				true); // isProject
 		
@@ -1525,35 +1532,171 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata); // display user panel, report if values were modified
         if (modified)
 		{
-            viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        graphMetadata.name);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_CREATED_KEY,     graphMetadata.created);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, graphMetadata.description);
 			
 			if (pathEditable) // project path is only saved if creating a new project
+			{
+				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,    graphMetadata.name);
 				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,    graphMetadata.path);
+			}
         }
+		this.pathEditable = false; // protect next time through
 		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY, (new Boolean(modified)).toString());
     }
 	
-    /** Remove an Event Graph from current Project.
-     */
-    public void deleteEventGraphFromProject ()
+    public final static String COPY_PROJECT_METHOD = "copyProject"; // must match following method name.  Not possible to accomplish this programmatically.
+    /** Rename the current Project. */
+    public void copyProject () // method name must exactly match preceding string value
+	{
+        String title = "Project copy failed";
+		String message;
+		ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+		EventGraphController eventGraphController = (EventGraphController)ViskitGlobals.instance().getEventGraphController();
+		
+		String originalProjectName = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+		String originalProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // parent directory
+		String  currentProjectPath = originalProjectPath;
+		
+		if (!originalProjectPath.endsWith(originalProjectName))
+			  currentProjectPath = currentProjectPath + '/' + originalProjectName;
+		
+		editProjectProperties (true); // pathEditable true.  must be careful, this widget can change project properties.
+		
+		// check if user cancelled, if so then skip and return
+		if (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY).equalsIgnoreCase("true")) 
+		{
+			String  changedProjectName = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+			String  changedProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // parent directory
+			
+			// restore name and path changes
+			viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY, originalProjectName); // restore
+			viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY, originalProjectPath); // restore
+			ViskitGlobals.instance().getCurrentViskitProject().setProjectName (originalProjectName); // restore
+			
+			if (changedProjectPath.endsWith(originalProjectName))
+			{
+				changedProjectPath = changedProjectPath.substring(0,changedProjectPath.lastIndexOf(originalProjectName)) + changedProjectName;
+				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY, changedProjectPath);
+			}
+			
+			if (originalProjectName.equalsIgnoreCase(changedProjectName)) // same name won't work
+			{
+				message = "<html><p align='center'>Project name <i>" + originalProjectName + "</i> unchanged, no action taken to copy project directory " + ViskitStatics.RECENTER_SPACING + "</p>";
+
+				eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE, title, message);
+				LOG.error (title + ".  " + message);
+				return;
+			}
+			File originalProjectDirectory = new File(currentProjectPath);
+			File  changedProjectDirectory = new File(changedProjectPath);
+
+			if (changedProjectDirectory.exists() && (changedProjectDirectory.list().length > 0)) // don't clobber an existing directory that has files
+			{
+				message = "<html><p align='center'>Output directory already exists and contains files, so it cannot be a new project directory." + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p align='center'>Project name <i>" + originalProjectName + "</i> unchanged, no action taken to copy project directory " + ViskitStatics.RECENTER_SPACING + "</p>";
+
+				eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE, title, message);
+				LOG.error (title + ".  " + message);
+				return;
+			}
+			
+			LOG.info ("Ready to copy... first closing current project " + originalProjectName);
+			closeProject();
+			
+			if (ViskitGlobals.isProjectOpen()) // check if user cancelled closing project, if so then restore and return
+			{				
+				message = "<html><p align='center'>Project name <i>" + originalProjectName + "</i> unchanged, no action taken to copy project directory " + ViskitStatics.RECENTER_SPACING + "</p>";
+
+				eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE, title, message);
+				return;
+			}
+
+			// continuing...
+			LOG.info ("Copying project " + originalProjectPath + " to " 
+										 +  changedProjectPath);
+				
+			viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,  changedProjectName); // reset
+			viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,  changedProjectPath); // reset
+			ViskitGlobals.instance().getCurrentViskitProject().setProjectName  (changedProjectName); // reset
+			
+			boolean fileCopySucceeded = false;
+			Exception moveException   = null;
+			try {
+				FileUtils.copyDirectory(originalProjectDirectory, changedProjectDirectory); // apache commons.io
+				
+				fileCopySucceeded = true;
+			} 
+			catch (IOException ex) 
+			{
+				// Check results (sometimes Files.move works even though throwing an exception, perhaps File.copy also)
+				if (changedProjectDirectory.exists() && (changedProjectDirectory.list().length > 0))
+				{
+					fileCopySucceeded = true;
+					moveException = ex;
+				}
+				else
+				{
+					moveException = ex;
+				}
+			}
+			if (fileCopySucceeded)
+			{
+				  title = "Project copy succeeded";
+				message = "<html><p align='center'>Project <i>" + originalProjectName + "</i> copied to " + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p align='center'><i>" + changedProjectDirectory + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>";
+				eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE, title, message);
+			}
+			else // failed
+			{
+				title = "Project copy failed";
+				message = "<html><p align='center'>A file access problem occurred.</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p align='center'>Project <i>" + originalProjectName + "</i> was not copied to " + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p align='center'><i>" + changedProjectDirectory + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
+						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>";
+				eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE, title, message);
+				LOG.error(title + ". " + moveException.toString(), moveException);
+				LOG.error(title + ". " + message);
+				
+				// restore any name or path changes
+				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY, originalProjectName); // restore
+				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY, originalProjectPath); // restore
+				ViskitGlobals.instance().getCurrentViskitProject().setProjectName (originalProjectName); // restore
+				return;
+			}
+
+			LOG.info ("Opening copied project " + changedProjectPath + File.separator + changedProjectName);
+			openProject(); // uses PROJECT_PATH_KEY
+		}
+		// log final results
+		LOG.info ("Project status: " + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + " open=" 
+								     + ViskitGlobals.isProjectOpen());
+    }
+	
+    public final static String DELETE_PROJECT_METHOD = "deleteProject"; // must match following method name.  Not possible to accomplish this programmatically.
+    /** Remove the current Project. */
+    public void deleteProject () // method name must exactly match preceding string value
 	{
 		// TODO
     }
 	
-    /** Remove an Assembly from current Project.
-     */
-    public void deleteAssemblyFromProject ()
+    public final static String DELETE_EVENT_GRAPH_FROM_PROJECT_METHOD = "deleteEventGraphFromProject"; // must match following method name.  Not possible to accomplish this programmatically.
+    /** Remove an Event Graph from current Project. */
+    public void deleteEventGraphFromProject () // method name must exactly match preceding string value
 	{
 		// TODO
     }
 	
-    /** Rename the current Project.
-     */
-    public void renameProject ()
+    public final static String DELETE_ASSEMBLY_FROM_PROJECT_METHOD = "deleteAssemblyFromProject"; // must match following method name.  Not possible to accomplish this programmatically.
+    /** Remove an Assembly from current Project. */
+    public void deleteAssemblyFromProject () // method name must exactly match preceding string value
 	{
 		// TODO
     }
@@ -1587,13 +1730,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName)
+    public File saveEventGraphFileAsk(String suggestedName, boolean showUniqueName)
 	{
-		 return saveFileAsk(suggestedName,  showUniqueName, "Save Event Graph File");
+		 return saveEventGraphFileAsk(suggestedName,  showUniqueName, "Save Event Graph File");
     }
 
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
+    public File saveEventGraphFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
 	{
         if (eventGraphFileChooser == null) {
             eventGraphFileChooser = buildOpenSaveChooser();

@@ -103,7 +103,7 @@ public class ViskitEventGraphAssemblyComboMain
 			
 			// The Apache Commons configuration/*.xml files have behaved rather well
 			// and don't need to be nuked as of late: 03 DEC 2014.
-            // User cleanup method nukeDotViskit(); moved to user preferences
+            // User saveConfigurationFiles method nukeDotViskit(); moved to user preferences
 			
 			ViskitStatics.sendErrorReport ("Visual Simkit (Viskit) has experienced a significant startup problem.", e);
         }

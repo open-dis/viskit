@@ -210,11 +210,14 @@ public class ViskitProject
 
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectRootDirectory, PROJECT_FILE_NAME));
-        if (!projectFile.exists())
+		projectFileExists = projectFile.exists();
+        if (!projectFileExists)
 		{
             try {
                 getProjectFile().createNewFile();
-            } catch (IOException e) {
+            } 
+			catch (IOException e) 
+			{
                 LOG.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
@@ -226,8 +229,8 @@ public class ViskitProject
         }
         ViskitConfiguration.instance().setProjectXMLConfigurationPath(getProjectFile().getAbsolutePath());
 		
-        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
         setProjectOpen(projectFileExists);
+        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
         return projectFileExists;
     }
 
@@ -464,7 +467,7 @@ public class ViskitProject
 	{
         ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
         viskitConfiguration.getViskitGuiXMLConfiguration().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
-        viskitConfiguration.cleanup();
+        viskitConfiguration.saveConfigurationFiles();
         viskitConfiguration.removeProjectXMLConfiguration(viskitConfiguration.getProjectXMLConfiguration());
         setProjectOpen(false);
 		projectName        = "";
@@ -472,10 +475,12 @@ public class ViskitProject
 		projectRevision    = "";
 		projectDescription = "";
 		ViskitGlobals.instance().getViskitApplicationFrame().setTitle(projectName); // update
+		ViskitGlobals.setProjectOpen(false);
     }
 	
     /** @return the root directory of this ViskitProject */
-    public File getProjectRootDirectory() {
+    public File getProjectRootDirectory() 
+	{
         return projectRootDirectory;
     }
 
@@ -517,6 +522,11 @@ public class ViskitProject
      */
     public boolean isProjectOpen()
 	{
+		if (projectOpen && ((projectName == null) || projectName.isEmpty()))
+		{
+			projectOpen = false;
+			LOG.error ("Internal error: projectName='" + projectName +"' so project is now closed");
+		}	
         return projectOpen;
     }
 
@@ -709,7 +719,11 @@ public class ViskitProject
 	{
         if (projectChooser == null)
 		{
-            projectChooser = new JFileChooser(startPath);
+			File newDirectory = new File(startPath);
+			if  (newDirectory.isDirectory() && (newDirectory.list().length == 0))
+				 newDirectory = newDirectory.getParentFile();
+		
+            projectChooser = new JFileChooser(newDirectory.getAbsolutePath());
 		    projectChooser.setDialogTitle("Open Project");
 
             projectChooser.addPropertyChangeListener(myChangeListener);
@@ -757,7 +771,8 @@ public class ViskitProject
      * @param startingDirectoryPath a path to start looking from in the chooser
      * @return a path to a valid project directory
      */
-    public static File openProjectDirectory(JFrame parentFrame, String startingDirectoryPath) {
+    public static File openProjectDirectory(JFrame parentFrame, String startingDirectoryPath) 
+	{
         File projectDirectory;
         initializeProjectChooser(startingDirectoryPath);
 
@@ -813,14 +828,17 @@ public class ViskitProject
 						TRY_AGAIN, // title
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-                if (returnValue != 0) {
+                if (returnValue != 0) 
+				{
                     // 0th choice (Select project)
                     return null; // cancelled
                 } // cancelled
             }
 			else  found = true;
-			
-        } while (!found);
+        } 
+		while (!found);
+		
+		ViskitGlobals.setProjectOpen(true);
 
         return projectDirectory;
     }
@@ -840,7 +858,8 @@ public class ViskitProject
 	/**
 	 * @param newProjectName the projectName to set
 	 */
-	public void setProjectName(String newProjectName) { // TODO check impact on file naming
+	public void setProjectName(String newProjectName) // TODO check impact on file naming
+	{
 		this.projectName = newProjectName;
 		projectDocument.getRootElement().setAttribute("name", projectName);
 	}

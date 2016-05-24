@@ -155,13 +155,22 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			if (projectDirectory.isDirectory())
 			{
 				openProjectDirectory (projectDirectory);
-				reportProjectOpenResult (projectName);
 			}
-			else
+			else // keep trying to find a useful project directory, or project-selection directory
 			{
-				LOG.error ("No known project path to open");
-				return;
+				projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY); // pop up one level
+				projectDirectory = new File (projectPath);
+				if (projectDirectory.isDirectory())
+				{
+					openProjectDirectory (projectDirectory);
+				}
+				else
+				{
+					LOG.error ("No known project path to open: " + projectPath);
+					return;
+				}
 			}
+			reportProjectOpenResult (projectName);
 		}
 		else
 		{
@@ -195,25 +204,32 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	 */
 	public void reportProjectOpenResult (String projectName)
 	{
-			// TODO there are two variations of this block, refactor/combine
 			if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
+				!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() &&
+				 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().equalsIgnoreCase(projectName))
 			{
 				// TODO re-open previously open assemblies and event graphs, otherwise:
+				
+				String phrasing = new String();
+				if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().toLowerCase().contains("project"))
+					phrasing = " project";
 			
 				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i> project is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + phrasing + " is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p align='center'>&nbsp;</p>" +
 							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING + "</p>"  +
 							"<p align='center'>&nbsp;</p></html>");
 			}
 			else
 			{
+				LOG.error ("Project " + projectName + " did not open as expected.  Ensuring active project is closed.");
 				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
-					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>" + 
-					"<p align='center'>Open or create another project" + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p align='center'>Please open or create another project to continue." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p>&nbsp</p>");
+				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
 			}
 	}
 	
@@ -315,7 +331,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 							"<p align='center'>Open assemblies must be within the currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
 							"<p>Current project name: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>Current project path: <i>"    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
+							"<p>Current project path: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
 							"<p align='center'>Please choose an assembly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					// TODO offer to copy?
@@ -857,7 +873,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     projectArchiveZip.delete(); // delete previous version
 
 //                if (logFile.exists())
-//                    logFile.delete(); // cleanup for next time
+//                    logFile.delete(); // saveConfigurationFiles for next time
 
                 try {
                     // First, copy the README.txt file to the project directory
@@ -930,6 +946,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		
 		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
 		{
+			ViskitGlobals.setProjectOpen(false); // cleanup if needed
+			return continueClosing; // project is closed already
+		}
+		else if (ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty())
+		{
+			ViskitGlobals.setProjectOpen(false); // cleanup if needed
 			return continueClosing; // project is closed already
 		}
 		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
@@ -979,6 +1001,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() && 
 			!viskitApplicationFrame.isAssemblyEditorTabSelected()) 
 			 viskitApplicationFrame.displayAssemblyEditorTab(); // select relevant tab
+		if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty())
+		     ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(true);
+		else
+		{
+			LOG.error ("Project has no name, cannot be opened.");
+		    ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(false);
+		}
     }
 
     public final static String NEWASSEMBLY_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.

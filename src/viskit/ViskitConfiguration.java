@@ -331,10 +331,10 @@ public class ViskitConfiguration
         singletonViskitConfiguration = null;
     }
 
-    public void cleanup() 
+    public void saveConfigurationFiles() 
 	{
         // Lot of hoops to pretty-fy config xml files
-		// http://www.jdom.org/docs/apidocs/org/jdom2/output/XMLOutputter.html
+		// http://www.jdom.org/docs/apidocs.1.1/org/jdom/output/XMLOutputter.html
         Document document;
         Format jdomFormat = Format.getPrettyFormat();
 		jdomFormat.setOmitDeclaration(false);
@@ -358,7 +358,7 @@ public class ViskitConfiguration
         } 
 		catch (Exception e) 
 		{
-            LOG.error("Bad jdom cleanup() operation: " + e.getMessage());
+            LOG.error("Bad jdom cleanup() operation when saving configuration files: " + e.getMessage());
         }
     }
 }

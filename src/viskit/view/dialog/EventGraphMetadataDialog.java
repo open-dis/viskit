@@ -32,6 +32,7 @@ public class EventGraphMetadataDialog extends MetadataDialog
 		{
             dialog.setGraphMetadata(f, graphMetadata);
         }
+		dialog.fillWidgets();
         dialog.setVisible(true); // this call blocks
        
         return modified;

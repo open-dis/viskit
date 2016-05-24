@@ -81,7 +81,7 @@ public interface EventGraphView
      * @param showUniqueName show EG name only
      * @return a File object of the saved Event Graph
      */
-    File saveFileAsk(String suggestedName, boolean showUniqueName);
+    File saveEventGraphFileAsk(String suggestedName, boolean showUniqueName);
 
     /** Saves the current Event Graph "as" desired by the user
      *
@@ -90,7 +90,7 @@ public interface EventGraphView
 	 * @param dialogTitle File chooser title
      * @return a File object of the saved Event Graph
      */
-    File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle);
+    File saveEventGraphFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle);
 
     /**
      * Update the name of the EventGraph in the component title bar

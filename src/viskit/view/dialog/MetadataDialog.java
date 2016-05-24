@@ -110,7 +110,8 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
 		if (graphMetadata.isProject())
 		{
-			nameTF.setEditable(false);
+			nameTF.setEditable(false); // graphMetadata.pathEditable can change this at run time
+			pathTF.setEditable(false);
 		}
 		else // Event Graph or Assembly
 		{
@@ -198,6 +199,8 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
     public final void setGraphMetadata(Component c, GraphMetadata graphMetadata) 
 	{
+		this.graphMetadata = graphMetadata;
+		
         fillWidgets();
 
         modified = (graphMetadata == null);
@@ -205,14 +208,17 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() 
+    protected void fillWidgets() 
 	{
 		if (graphMetadata == null)
 		{
 			graphMetadata = new GraphMetadata(); // unexpected error condition
 			LOG.error ("MetadataDialog invoked with null graphMetadata");
 		} 
-		 
+		
+		nameTF.setEditable(graphMetadata.pathEditable);
+		pathTF.setEditable(graphMetadata.pathEditable);
+		
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 		
@@ -236,12 +242,11 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
                  revisionTF.setText(graphMetadata.revision);
                      pathTF.setText       (path);
                      pathTF.setToolTipText(path);
-					 pathTF.setEditable(graphMetadata.pathEditable);
         descriptionTextArea.setText(graphMetadata.description);
         descriptionTextArea.setToolTipText(graphMetadata.description);
                  stopTimeTF.setText(graphMetadata.stopTime);
                   verboseCB.setSelected(graphMetadata.verbose);
-                     nameTF.selectAll();
+                     nameTF.selectAll(); // highlight, usually not editable
 					 
 		if (!graphMetadata.isProject())
 		{
@@ -271,7 +276,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
             else
                 graphMetadata.name = nameTF.getText().trim();
         } 
-		else
+		else if (this instanceof EventGraphMetadataDialog)
 		{
             graphMetadata.name = nameTF.getText().trim();
         }
@@ -283,7 +288,10 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		if (graphMetadata.isProject())
 		{
 			if (graphMetadata.pathEditable)
-			    graphMetadata.path =            pathTF.getText().trim();
+			{
+				graphMetadata.name = nameTF.getText().trim();
+				graphMetadata.path = pathTF.getText().trim();
+			}
 		}
 		else // Event Graph or Assembly
 		{			
@@ -298,36 +306,42 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			graphMetadata.stopTime = stopTimeTF.getText().trim();
 			graphMetadata.verbose  =  verboseCB.isSelected();
 		}
+		nameTF.setEditable(false); // reset; graphMetadata.pathEditable can change this at run time
+		pathTF.setEditable(false); // reset; graphMetadata.pathEditable can change this at run time
+		
 		graphMetadata.updated = true;
 		modified = true;
     }
 
-    class cancelButtonListener implements ActionListener {
-
+    class cancelButtonListener implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+		{
             modified = false;
             dispose();
         }
     }
 
-    class applyButtonListener implements ActionListener {
-
+    class applyButtonListener implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+		{
             // In this class, if the user hits the apply button, it is assumed that the data has been changed,
             // so the model is marked dirty.  A different, more controlled scheme would be to have change listeners
             // for all the widgets, and only mark dirty if data has been changed.  Else do a string compare between
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
-            if (modified) {
-                if (nameTF.getText().trim().isEmpty()) {
+            if (modified) 
+			{
+                if (nameTF.getText().trim().isEmpty())
+				{
                     JOptionPane.showMessageDialog(MetadataDialog.this, "Must have a non-zero-length name.",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     nameTF.requestFocus();
                     return;
                 }
-
                 // OK, we're good....
                 unloadWidgets();
             }
@@ -338,16 +352,23 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
     class myCloseListener extends WindowAdapter {
 
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (modified) {
+        public void windowClosing(WindowEvent e) 
+		{
+            if (modified) 
+			{
                 int returnValue = JOptionPane.showConfirmDialog(MetadataDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) 
+				{
                     okButton.doClick();
-                } else {
+                } 
+				else 
+				{
                     cancelButton.doClick();
                 }
-            } else {
+            } 
+			else 
+			{
                 cancelButton.doClick();
             }
         }

@@ -180,7 +180,8 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
 		{
             AssemblyEditView assemblyView = (AssemblyEditView) assemblyController.getView();
 
-            if (assemblyView != null) {
+            if (assemblyView != null) 
+			{
                 assemblyView.openProject();
             }
         }
