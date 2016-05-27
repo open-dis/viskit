@@ -1260,6 +1260,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			// show relevant pane for new project
 			viskitApplicationFrame.displayEventGraphEditorTab();
 		}
+		// TODO report open
     }
 
 	public final static String CLOSE_PROJECT_METHOD = "closeProject"; // must match following method name.  Not possible to accomplish this programmatically.

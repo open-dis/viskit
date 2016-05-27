@@ -47,6 +47,7 @@ import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
+import static viskit.ViskitProject.MY_VISKIT_PROJECTS_NAME;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.doe.LocalBootLoader;
@@ -152,7 +153,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				projectName = "";
 			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
 			File projectDirectory = new File (projectPath);
-			if (projectDirectory.isDirectory())
+			if ( projectDirectory.isDirectory() &&
+				!projectDirectory.getName().toLowerCase().endsWith(ViskitProject.MY_VISKIT_PROJECTS_NAME.toLowerCase()))
 			{
 				openProjectDirectory (projectDirectory);
 			}
@@ -1005,7 +1007,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		     ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(true);
 		else
 		{
-			LOG.error ("Project has no name, cannot be opened.");
+			LOG.error ("Project has no name, cannot be opened." + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
 		    ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(false);
 		}
     }

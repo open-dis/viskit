@@ -61,12 +61,14 @@ public class ViskitProject
 {
     static final Logger LOG = LogUtilities.getLogger(ViskitProject.class);
 
+    public static final String MY_VISKIT_PROJECTS_NAME = "MyViskitProjects";
+	
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project home space on the user's machine.  A default
      * home will be the user's working directory where Viskit is installed.
      */
     public static final String DEFAULT_VISKIT_PROJECTS_DIR =
-            System.getProperty("user.home").replaceAll("\\\\", "/") + "/.viskit/MyViskitProjects";
+            System.getProperty("user.home").replaceAll("\\\\", "/") + "/.viskit/" + MY_VISKIT_PROJECTS_NAME;
 
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
@@ -525,7 +527,8 @@ public class ViskitProject
 		if (projectOpen && ((projectName == null) || projectName.isEmpty()))
 		{
 			projectOpen = false;
-			LOG.error ("Internal error: projectName='" + projectName +"' so project is now closed");
+			LOG.error ("Internal error: projectName='" + projectName +"' is empty, so current project is now closed: " + 
+					    ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
 		}	
         return projectOpen;
     }
@@ -936,34 +939,42 @@ public class ViskitProject
         }
 
         @Override
-        public Icon getIcon(File f) {
+        public Icon getIcon(File f) 
+		{
             return isViskitProject(f) ? viskitProjIcon : null;
         }
 
         /**
          * Report if given directory holds a Viskit Project
          *
-         * @param fDir the project directory to test
+         * @param candidateDirectory the project directory to test
          * @return true when a viskitProject.xml file is found
          */
-        public boolean isViskitProject(File fDir) {
-
-            if ((fDir == null) || !fDir.exists() || !fDir.isDirectory()) {
+        public boolean isViskitProject(File candidateDirectory)
+		{
+            if ((candidateDirectory == null) || !candidateDirectory.exists() || !candidateDirectory.isDirectory())
+			{
                 return false;
             }
+			if (candidateDirectory.getName().toLowerCase().endsWith(MY_VISKIT_PROJECTS_NAME.toLowerCase())) 
+			{
+				return false; // never allow MyViskitProjects directory to avoid blocking user projects
+			}
 
             // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
-            File[] files = fDir.listFiles(new java.io.FilenameFilter() {
-
+            File[] files = candidateDirectory.listFiles(new java.io.FilenameFilter() 
+			{
                 @Override
-                public boolean accept(File dir, String name) {
-
+                public boolean accept(File dir, String name)
+				{
                     // configuration/ contains the template viskitProject.xml file
                     // so, don't show this directory as a potential Viskit project
-                    if (dir.getName().equals(VISKIT_CONFIGURATION_SUBDIR)) {
+                    if (dir.getName().equals(VISKIT_CONFIGURATION_SUBDIR))
+					{
                         return false;
                     }
-					if (name.startsWith(".")) {
+					if (name.startsWith(".")) 
+					{
                         return false; // no hidden files
                     }
 
