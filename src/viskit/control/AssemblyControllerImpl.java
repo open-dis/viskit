@@ -1059,6 +1059,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		newAssemblyMetadata.description   = ViskitStatics.DEFAULT_DESCRIPTION + " for this new assembly";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
 		newAssemblyMetadata.created       = simpleDateFormat.format(new Date());
+		newAssemblyMetadata.pathEditable  = true;
 
         boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
         if (modified)

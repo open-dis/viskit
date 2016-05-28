@@ -10,6 +10,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -28,6 +30,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 {
     static final Logger LOG = LogUtilities.getLogger(MetadataDialog.class);
 	
+	private final JPanel metadataDialogPanel = new JPanel();
     protected static boolean modified = false;
     protected JComponent runtimePanel;
     private   JButton    cancelButton;
@@ -37,6 +40,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
     private   JTextField stopTimeTF;
     private   JCheckBox  verboseCB;
     private   JTextArea  descriptionTextArea;
+	private   String	 currentPath = "";
 
     public MetadataDialog(JFrame f, GraphMetadata graphMetadata) {
         this(f, graphMetadata, "");
@@ -49,8 +53,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        //Create and populate the panel.
-        JPanel metadataDialogPanel = new JPanel();
+        // Populate the panel.
         setContentPane(metadataDialogPanel);
         metadataDialogPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         metadataDialogPanel.setLayout(new BoxLayout(metadataDialogPanel, BoxLayout.Y_AXIS));
@@ -85,7 +88,7 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
         JLabel pathLabel = new JLabel("path", JLabel.TRAILING);
         pathTF = new JTextField(60);
-		pathTF.setEditable (graphMetadata.pathEditable);
+		pathTF.setEditable(false); // usually do not allow editing in this field, since it is derived from project path and package
         pathLabel.setLabelFor(pathTF);
         textFieldPanel.add(pathLabel);
         textFieldPanel.add(pathTF);
@@ -111,7 +114,6 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		if (graphMetadata.isProject())
 		{
 			nameTF.setEditable(false); // graphMetadata.pathEditable can change this at run time
-			pathTF.setEditable(false);
 		}
 		else // Event Graph or Assembly
 		{
@@ -120,6 +122,37 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			String packageTooltip = "Use standard Java dot notation for package naming";
 			packageLabel.setToolTipText(packageTooltip);
 			   packageTF.setToolTipText(packageTooltip);
+			// Listen for changes in the text http://stackoverflow.com/questions/3953208/value-change-listener-to-jtextfield
+			packageTF.getDocument().addDocumentListener(new DocumentListener() 
+			{
+				@Override
+				public void changedUpdate(DocumentEvent e) 
+				{
+					computePathValue();
+					refreshPathTF();
+				}
+
+				@Override
+				public void removeUpdate(DocumentEvent e) 
+				{
+					computePathValue();
+					refreshPathTF();
+				}
+
+				@Override
+				public void insertUpdate(DocumentEvent e) 
+				{
+					computePathValue();
+					refreshPathTF();
+				}
+				private void refreshPathTF()
+				{
+                     pathTF.setText       (currentPath);
+                     pathTF.setToolTipText(currentPath); // readability for long value
+					 metadataDialogPanel.validate(); // repaint TODO not working :(
+					 metadataDialogPanel.repaint();
+				}
+			});
 			packageLabel.setLabelFor(packageTF);
 			textFieldPanel.add(packageLabel);
 			textFieldPanel.add(packageTF);
@@ -207,6 +240,26 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         pack();
         setLocationRelativeTo(c);
     }
+	
+	private void computePathValue()
+	{
+		if (ViskitGlobals.instance().getCurrentViskitProject() == null) // safety net
+			currentPath = graphMetadata.path;
+		else if (this instanceof AssemblyMetadataDialog)
+			 currentPath = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
+		else if (this instanceof EventGraphMetadataDialog)
+			 currentPath = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().getPath();
+		else if ((this instanceof ProjectMetadataDialog) && (ViskitGlobals.instance().getCurrentViskitProject() != null))
+			 currentPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
+		else if ( this instanceof ProjectMetadataDialog)
+			 currentPath = graphMetadata.path;
+		// else error
+		
+		if ((graphMetadata.packageName != null) && (!graphMetadata.packageName.isEmpty()))
+		{
+			currentPath = currentPath + ViskitStatics.getFileSeparator() + graphMetadata.packageName;
+		}
+	}
 
     protected void fillWidgets() 
 	{
@@ -217,31 +270,19 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		} 
 		
 		nameTF.setEditable(graphMetadata.pathEditable);
-		pathTF.setEditable(graphMetadata.pathEditable);
+		pathTF.setEditable(graphMetadata.pathEditable && (this instanceof ProjectMetadataDialog));
 		
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 		
-		String path = "";
-		
-		if (ViskitGlobals.instance().getCurrentViskitProject() == null) // safety net
-			path = graphMetadata.path;
-		else if (this instanceof AssemblyMetadataDialog)
-			 path = ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory().getPath();
-		else if (this instanceof EventGraphMetadataDialog)
-			 path = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().getPath();
-		else if ((this instanceof ProjectMetadataDialog) && (ViskitGlobals.instance().getCurrentViskitProject() != null))
-			 path = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
-		else if ( this instanceof ProjectMetadataDialog)
-			 path = graphMetadata.path;
-		// else error
+		computePathValue();
 			
                      nameTF.setText(graphMetadata.name);
                    authorTF.setText(graphMetadata.author);
                   createdTF.setText(graphMetadata.created);
                  revisionTF.setText(graphMetadata.revision);
-                     pathTF.setText       (path);
-                     pathTF.setToolTipText(path);
+                     pathTF.setText       (currentPath);
+                     pathTF.setToolTipText(currentPath); // readability for long value
         descriptionTextArea.setText(graphMetadata.description);
         descriptionTextArea.setToolTipText(graphMetadata.description);
                  stopTimeTF.setText(graphMetadata.stopTime);
@@ -307,7 +348,6 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 			graphMetadata.verbose  =  verboseCB.isSelected();
 		}
 		nameTF.setEditable(false); // reset; graphMetadata.pathEditable can change this at run time
-		pathTF.setEditable(false); // reset; graphMetadata.pathEditable can change this at run time
 		
 		graphMetadata.updated = true;
 		modified = true;

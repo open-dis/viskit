@@ -828,7 +828,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 		if (assemblyController != null)
 			assemblyController.updateProjectFileLists();
-		// if active, don't list current project on recent projects list
+		// if active, don't list current project on Recent Projects list
 		if (isProjectOpen && (openRecentProjectsMenu != null))
 		{
 			for (int index = 0; index < openRecentProjectsMenu.getItemCount(); index++)
@@ -1552,7 +1552,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			if (pathEditable) // project path is only saved if creating a new project
 			{
 				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,    graphMetadata.name);
-				viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,    graphMetadata.path);
+				if (graphMetadata.path.endsWith(graphMetadata.name))
+				{
+					viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,graphMetadata.path);
+				}
+				else
+				{
+					viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,graphMetadata.path + ViskitStatics.getFileSeparator() + graphMetadata.name);
+				}
 			}
         }
 		this.pathEditable = false; // protect next time through
@@ -1897,4 +1904,4 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         toggleEventGraphStatusIndicators();
     }
 
-} // end class file EventGraphViewFrame.java
+} // end class file EventGraphViewFrame.jav

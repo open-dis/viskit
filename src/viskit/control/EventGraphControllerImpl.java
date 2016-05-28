@@ -161,6 +161,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		newEventGraphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION + " for this new event graph";
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
 		newEventGraphMetadata.created     = simpleDateFormat.format(new Date());
+		newEventGraphMetadata.pathEditable  = true;
 
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), newEventGraphMetadata);
 		
