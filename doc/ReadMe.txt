@@ -18,4 +18,4 @@ A search on the above comments will expose where in the source these are.
 
 2014 MAY 12
 
-Cool vid on the anatomy of an Arrival Process: http://youtu.be/7zqFlCnrmbE
+Cool video on the anatomy of an Arrival Process: http://youtu.be/7zqFlCnrmbE
