@@ -24,7 +24,13 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
     <label>Table Of Contents</label>
     <type>javax.help.TOCView</type>
     <data>vHelpTOC.xml</data>
-<!--<size width="400" height="600" /> -->
+  </view>
+  
+  <view mergetype="javax.help.UniteAppendMerge">
+    <name>Tutorial</name>
+    <label>Tutorial</label>
+    <type>javax.help.TOCView</type>
+    <data>vHelpTOC.xml</data>
   </view>
 
   <!-- TODO don't include this until we've built VisKitHelpIndex.xml

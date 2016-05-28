@@ -133,7 +133,8 @@
     </tocitem>
 
     <tocitem text="Developers" expand="true">
-        <tocitem text="Adding JavaHelp for Viskit" target="addHelp" />
+        <tocitem text="JavaHelp Authoring for Viskit"  target="addHelp" />
+        <tocitem text="Software Development Resources" target="softwareDevelopment" />
     </tocitem>
     
     <tocitem text="Additional Resources" expand="true">

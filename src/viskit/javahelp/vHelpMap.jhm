@@ -9,8 +9,9 @@
   <mapID target="Overview"      url="Pages/empty.html"/>
   <mapID target="Terms"         url="Pages/Terms.html"/>
 
-  <mapID target="addHelp"       url="Pages/AddingHelp.html"/>
-  <mapID target="references"    url="Pages/References.html"/>
+  <mapID target="addHelp"                      url="Pages/AuthoringJavaHelpForViskit.html"/>
+  <mapID target="softwareDevelopment"          url="Pages/SoftwareDevelopment.html"/>
+  <mapID target="references"                   url="Pages/References.html"/>
 
 <!-- Tutorial items -->
 
@@ -30,7 +31,7 @@
 
   <mapID target="TabEventGraph"     url="Pages/Tabs/eventGraph.html"/>
   <mapID target="TabAssemblyEdit"   url="Pages/Tabs/assemblyEdit.html"/>
-  <mapID target="TabSimulationRun"    url="Pages/Tabs/simulationRun.html"/>
+  <mapID target="TabSimulationRun"  url="Pages/Tabs/simulationRun.html"/>
   <mapID target="TabAnalystReport"  url="Pages/Tabs/analystReport.html"/>
 
 <!-- Menu items -->
