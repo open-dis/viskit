@@ -308,7 +308,7 @@ public class LocalBootLoader extends URLClassLoader
         while (loop) {
             try {
                 if (reloadSimkit) {
-                    stage1.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS);
+                    stage1.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS_NAME);
                 } else {
                     stage1.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 }

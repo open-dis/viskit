@@ -83,7 +83,7 @@ public class SimkitAssemblyXML2Java
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
-        this(ViskitStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(ViskitStatics.ClassForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
     }
 

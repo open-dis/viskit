@@ -316,7 +316,7 @@ public class EventStateTransitionDialog extends JDialog
             }
 
             // Beware of qualified types here
-            type = ViskitStatics.classForName(typ);
+            type = ViskitStatics.ClassForName(typ);
             methods = Arrays.asList(type.getMethods());
 
             // Filter out methods of Object, and any
@@ -368,7 +368,7 @@ public class EventStateTransitionDialog extends JDialog
             if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = ViskitStatics.classForName(typ);
+            type = ViskitStatics.ClassForName(typ);
 
             if (type == null) {
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageToUser(

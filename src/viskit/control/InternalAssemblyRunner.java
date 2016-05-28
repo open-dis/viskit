@@ -187,7 +187,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
     private void fillSimulationRunPanelWidgetsFromPreRunAssembly(boolean verbose, double stopTime) throws Throwable {
 
-        assemblyClass = ViskitStatics.classForName(assemblyClassName);
+        assemblyClass = ViskitStatics.ClassForName(assemblyClassName);
         if (assemblyClass == null) {
             throw new ClassNotFoundException();
         }
@@ -282,7 +282,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 Method getSeeds = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeeds.invoke(rn);
 
-                Class<?> rNClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
+                Class<?> rNClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS_NAME);
                 Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
                 setSeeds.invoke(rn, seeds);
 

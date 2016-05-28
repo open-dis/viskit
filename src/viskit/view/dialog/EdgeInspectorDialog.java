@@ -337,7 +337,7 @@ public class EdgeInspectorDialog extends JDialog
         JComboBox<String> jcb = new JComboBox<>(priorityNames);
         priorityList = new ArrayList<>(10);
         try {
-            Class<?> c = ViskitStatics.classForName("simkit.Priority");
+            Class<?> c = ViskitStatics.ClassForName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
@@ -400,7 +400,7 @@ public class EdgeInspectorDialog extends JDialog
             if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = ViskitStatics.classForName(typ);
+            type = ViskitStatics.ClassForName(typ);
 
             if (type == null) {
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageToUser(

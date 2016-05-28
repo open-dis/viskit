@@ -103,7 +103,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         targetClassName        = className;
         genericTableToolTip    = tooltip;
 
-        targetClass = ViskitStatics.classForName(targetClassName);
+        targetClass = ViskitStatics.ClassForName(targetClassName);
 		
 		initialize ();
     }

@@ -173,7 +173,7 @@ public class SplashScreenFrame2 extends JFrame
             Object[] arguments = new Object[] {newArgs};
             Class[] parameterTypes = new Class[] {newArgs.getClass()};
 
-            Class<?> mainClass = ViskitStatics.classForName(target);
+            Class<?> mainClass = ViskitStatics.ClassForName(target);
 
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);

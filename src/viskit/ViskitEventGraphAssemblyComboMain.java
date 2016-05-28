@@ -156,7 +156,7 @@ public class ViskitEventGraphAssemblyComboMain
 
     private static void setupMacGUI() {
         try {
-            Class<?> applicationListener = ViskitStatics.classForName("com.apple.eawt.ApplicationListener");
+            Class<?> applicationListener = ViskitStatics.ClassForName("com.apple.eawt.ApplicationListener");
             Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
 
                 @Override
@@ -169,7 +169,7 @@ public class ViskitEventGraphAssemblyComboMain
                             try {
                                 Help help = ViskitGlobals.instance().getHelp();
                                 help.aboutEventGraphEditor();
-                                Class<?> applicationEventClass = ViskitStatics.classForName("com.apple.eawt.ApplicationEvent");
+                                Class<?> applicationEventClass = ViskitStatics.ClassForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
                             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
@@ -180,7 +180,7 @@ public class ViskitEventGraphAssemblyComboMain
                 }
             });
 
-            Class<?> applicationClass = ViskitStatics.classForName("com.apple.eawt.Application");
+            Class<?> applicationClass = ViskitStatics.ClassForName("com.apple.eawt.Application");
             Object applicationInstance = applicationClass.newInstance();
 
             Method m = applicationClass.getMethod("addApplicationListener", applicationListener);

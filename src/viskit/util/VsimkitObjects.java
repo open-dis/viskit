@@ -35,7 +35,7 @@ public class VsimkitObjects {
 
     static {
         try {
-            Class<?> c = ViskitStatics.classForName("viskit.VsimkitObjects");
+            Class<?> c = ViskitStatics.ClassForName("viskit.VsimkitObjects");
             Method[] meths = c.getDeclaredMethods();
             for (Method method : meths) {
                 String name = method.getName();

@@ -1004,7 +1004,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			!viskitApplicationFrame.isAssemblyEditorTabSelected()) 
 			 viskitApplicationFrame.displayAssemblyEditorTab(); // select relevant tab
 		if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty())
-		     ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(true);
+		{
+			ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(true);
+		}
 		else
 		{
 			LOG.error ("Project has no name, cannot be opened." + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
@@ -1437,7 +1439,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     Class<?> findClass(AssemblyNode o) {
-        return ViskitStatics.classForName(o.getType());
+        return ViskitStatics.ClassForName(o.getType());
     }
 
     AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
@@ -1446,10 +1448,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // we don't know if the workClassLoader is the same instance
         // as it used to be when these were originally loaded
         // the tbd here is to see if there can be a shared root loader
-        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = ViskitStatics.ClassForName("simkit.SimEventSource");
+        simEvLisClass = ViskitStatics.ClassForName("simkit.SimEventListener");
+        propChgSrcClass = ViskitStatics.ClassForName("simkit.PropertyChangeSource");
+        propChgLisClass = ViskitStatics.ClassForName("java.beans.PropertyChangeListener");
         if (propChgSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (propChgSrcClass.isAssignableFrom(cb)) {
@@ -1469,10 +1471,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
         AssemblyNode[] obArr = new AssemblyNode[2];
-        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = ViskitStatics.ClassForName("simkit.SimEventSource");
+        simEvLisClass = ViskitStatics.ClassForName("simkit.SimEventListener");
+        propChgSrcClass = ViskitStatics.ClassForName("simkit.PropertyChangeSource");
+        propChgLisClass = ViskitStatics.ClassForName("java.beans.PropertyChangeListener");
         if (simEvSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (simEvSrcClass.isAssignableFrom(cb)) {
@@ -2520,7 +2522,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         notifyRecentAssemblyFileListeners();
         saveAssemblyHistoryXML(recentAssemblyFileSet);
     }
-
+	
     /**
      * If passed directory is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE

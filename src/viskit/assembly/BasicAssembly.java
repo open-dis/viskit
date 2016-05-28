@@ -738,11 +738,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //                }
 //                System.out.println();
             }
-            if (stopRun) {
+            if (stopRun) 
+			{
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
-            } else {
-                if (Schedule.isRunning()) {
+            } 
+			else 
+			{
+                if (Schedule.isRunning()) 
+				{
                     System.out.println("Already running.");
                 }
 				// TODO keep track of seed RNG value for each replication in order to support readability

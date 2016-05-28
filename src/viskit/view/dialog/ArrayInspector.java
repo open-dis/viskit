@@ -145,7 +145,7 @@ public class ArrayInspector extends JDialog
         }
 
         Vector<Object> v = new Vector<>(sz);
-        if (myTyp.equals(ViskitStatics.RANDOM_VARIATE_CLASS)) {
+        if (myTyp.equals(ViskitStatics.RANDOM_VARIATE_CLASS_NAME)) {
             for (int i = 0; i < sz; i++) {
                 v.add(new ViskitInstantiator.Factory(myTyp,
                         ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS,

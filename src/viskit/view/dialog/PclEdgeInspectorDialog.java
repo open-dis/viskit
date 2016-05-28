@@ -327,7 +327,7 @@ public class PclEdgeInspectorDialog extends JDialog
                 objectClassName = ((ViskitElement) objectFromEdge).getType();
             }
             try {
-                Class<?> objectBaseClass = ViskitStatics.classForName(objectClassName);
+                Class<?> objectBaseClass = ViskitStatics.ClassForName(objectClassName);
                 if (objectBaseClass == null)
 				{
                     throw new ClassNotFoundException(objectClassName + " not found");
@@ -336,7 +336,7 @@ public class PclEdgeInspectorDialog extends JDialog
 				{
 					objectClassName = objectClassName.substring(objectClassName.lastIndexOf(".")+1);
 				}
-                Class<?> stopClass = ViskitStatics.classForName("simkit.BasicSimEntity");
+                Class<?> stopClass = ViskitStatics.ClassForName("simkit.BasicSimEntity");
                 BeanInfo beanInfo = Introspector.getBeanInfo(objectBaseClass, stopClass);
                 PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
                 if (propertyDescriptors == null || propertyDescriptors.length <= 0)

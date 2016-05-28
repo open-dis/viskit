@@ -1031,7 +1031,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 								LOG.error ("Unexpected inheritance extendsFrom=" + extendsFrom);
                         }
                     }
-                    transferableDragData = null; // all done here, set up for next time by clearing the drag+drop
+                    transferableDragData = null; // all done here, set up for next time by clearing this drag+drop
                 } 
 				catch (UnsupportedFlavorException | IOException e)
 				{
@@ -1260,7 +1260,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			// show relevant pane for new project
 			viskitApplicationFrame.displayEventGraphEditorTab();
 		}
-		// TODO report open
+		// TODO report open?
     }
 
 	public final static String CLOSE_PROJECT_METHOD = "closeProject"; // must match following method name.  Not possible to accomplish this programmatically.

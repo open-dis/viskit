@@ -89,9 +89,9 @@ public class ViskitStatics
     public static boolean debug = true; // TODO expose?
 
     /* Commonly used class names */
-    public static final String RANDOM_NUMBER_CLASS  = "simkit.random.RandomNumber";
-    public static final String RANDOM_VARIATE_CLASS = "simkit.random.RandomVariate";
-    public static final String RANDOM_VARIATE_FACTORY_CLASS = RANDOM_VARIATE_CLASS + "Factory";
+    public static final String RANDOM_NUMBER_CLASS_NAME  = "simkit.random.RandomNumber";
+    public static final String RANDOM_VARIATE_CLASS_NAME = "simkit.random.RandomVariate";
+    public static final String RANDOM_VARIATE_FACTORY_CLASS = RANDOM_VARIATE_CLASS_NAME + "Factory";
     public static final String RANDOM_VARIATE_FACTORY_DEFAULT_METHOD = "getInstance";
     public static final String SIMPLE_PROPERTY_DUMPER = "simkit.util.SimplePropertyDumper";
     public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
@@ -293,9 +293,9 @@ public class ViskitStatics
      * @param className the name of the class to instantiate
      * @return an instantiated class given by s if available from the loader
      */
-    public static Class<?> classForName(String className)
+    public static Class<?> ClassForName(String className)
 	{
-        Class<?> classRetrieved = classFromName(className, ViskitGlobals.instance().getWorkClassLoader());
+        Class<?> classRetrieved = ClassFromName(className, ViskitGlobals.instance().getWorkClassLoader());
 
         if (classRetrieved == null) // check if found, retry if needed
 		{
@@ -307,7 +307,7 @@ public class ViskitStatics
         }
         if (classRetrieved == null)  // check if found, report if not
 		{
-            LOG.error("classForName(" + className + ") unsuccessful");
+            LOG.error("ClassForName(" + className + ") unsuccessful");
         }
         return classRetrieved;
     }
@@ -319,7 +319,7 @@ public class ViskitStatics
      * @param classLoader the class loader to search
      * @return an instantiated class object from the given name
      */
-    static Class<?> classFromName(String className, ClassLoader classLoader) 
+    static Class<?> ClassFromName(String className, ClassLoader classLoader) 
 	{
         Class<?> classRetrieved = null;
         try {
@@ -339,6 +339,7 @@ public class ViskitStatics
 					catch (ClassNotFoundException cnfe) 
 					{
                         // sometimes happens, ignore
+						LOG.error ("ClassNotFoundException", cnfe);
                     }
                 }
             }
@@ -358,17 +359,18 @@ public class ViskitStatics
         return classRetrieved;
     }
 
-    static class retrnChar {
+    static class ReturnChar {
         char c;
     }
 
-    static Class<?> tryCommonClasses(String s, ClassLoader cLdr) {
+    static Class<?> tryCommonClasses(String s, ClassLoader classLoader) 
+	{
         String conv = commonExpansions(s);
         if (conv == null) {
             return null;
         }
         try {
-            return Class.forName(conv, false, cLdr); // test 26JUL04 true,cLdr);
+            return Class.forName(conv, false, classLoader); // test 26JUL04 true,cLdr);
         } catch (ClassNotFoundException e) {
             return null;
         }
@@ -379,48 +381,50 @@ public class ViskitStatics
      * @param s the string of the unqualified type
      * @return the qualified type
      */
-    static String commonExpansions(String s) {
-        String retVal;
+    static String commonExpansions(String s)
+	{
+        String returnValue;
 
-        switch (s) {
-
+        switch (s) 
+		{
             case "String":
-                retVal = JAVA_LANG_STRING;
+                returnValue = JAVA_LANG_STRING;
                 break;
 
             case "Object":
-                retVal = JAVA_LANG_OBJECT;
+                returnValue = JAVA_LANG_OBJECT;
                 break;
 
             case "Queue":
-                retVal = "java.util.Queue";
+                returnValue = "java.util.Queue";
                 break;
 
             case "TreeSet":
-                retVal = "java.util.TreeSet";
+                returnValue = "java.util.TreeSet";
                 break;
 
             case "RandomNumber":
-                retVal = RANDOM_NUMBER_CLASS;
+                returnValue = RANDOM_NUMBER_CLASS_NAME;
                 break;
 
             case "RandomVariate":
-                retVal = RANDOM_VARIATE_CLASS;
+                returnValue = RANDOM_VARIATE_CLASS_NAME;
                 break;
 
             default:
-                retVal = null;
+                returnValue = null;
         }
-
-        return retVal;
+        return returnValue;
     }
 
     static Class<?> tryPrimitive(String s) {
-        return tryPrimitive(s, new retrnChar());
+        return tryPrimitive(s, new ReturnChar());
     }
 
-    static Class<?> tryPrimitive(String s, retrnChar rc) {
-        switch (s) {
+    static Class<?> tryPrimitive(String s, ReturnChar rc)
+	{
+        switch (s) 
+		{
             case "long":
                 rc.c = 'J';
                 return long.class;
@@ -450,23 +454,24 @@ public class ViskitStatics
         }
     }
 
-    static Class<?> tryPrimsAndArrays(String s, ClassLoader cLdr) {
-        String[] spl = s.split("\\[");
-        boolean isArray = spl.length > 1;
+    static Class<?> tryPrimsAndArrays(String s, ClassLoader classLoader) 
+	{
+        String[] splittee = s.split("\\[");
+        boolean isArray = splittee.length > 1;
         char prefix = ' ';
         String name = "";
         char suffix = ' ';
-        retrnChar rc = new retrnChar();
-        Class<?> c = tryPrimitive(spl[0], rc);
+        ReturnChar returnChar = new ReturnChar();
+        Class<?> c = tryPrimitive(splittee[0], returnChar);
 
         if (c != null) {   // primitive
             if (isArray) {
-                prefix = rc.c;
+                prefix = returnChar.c;
             } else {
                 return c;
             }
         } else {        // object
-            name = spl[0];
+            name = splittee[0];
             if (isArray) {
                 prefix = 'L';
                 suffix = ';';
@@ -475,7 +480,7 @@ public class ViskitStatics
         }
         StringBuilder sb = new StringBuilder();
         if (isArray) {
-            for (int i = 0; i < (spl.length - 1); i++) {
+            for (int i = 0; i < (splittee.length - 1); i++) {
                 sb.append('[');
             }
         }
@@ -486,12 +491,15 @@ public class ViskitStatics
         String ns = sb.toString().trim();
 
         try {
-            c = Class.forName(ns, false, cLdr);
+            c = Class.forName(ns, false, classLoader);
             return c;
-        } catch (ClassNotFoundException e) {
+        } 
+		catch (ClassNotFoundException e) 
+		{
             // one last check
-            if (commonExpansions(name) != null) {
-                return tryPrimsAndArrays(s.replaceFirst(name, commonExpansions(name)), cLdr);
+            if (commonExpansions(name) != null) 
+			{
+                return tryPrimsAndArrays(s.replaceFirst(name, commonExpansions(name)), classLoader);
             }
             return null;
         }
@@ -504,35 +512,38 @@ public class ViskitStatics
      * @param name the unqualified class name to resolve
      * @return a fully resolved class on the classpath
      */
-    static Class<?> tryUnqualifiedName(String name) {
-
+    static Class<?> tryUnqualifiedName(String name) 
+	{
         String userDir  = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
         String workDir  = ViskitGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
-        Path startingDir;
+        Path startingDirectory;
         String pattern = name + "\\.class";
         Class<?> c = null;
         LocalBootLoader loader = (LocalBootLoader)ViskitGlobals.instance().getWorkClassLoader();
         String[] classpaths = loader.getClassPath();
 
-        for (String cpath : classpaths) {
-
+        for (String classpath : classpaths) 
+		{
             // We can deal with jars w/the SimpleDirectoriesAndJarsClassLoader
-            if (cpath.contains(".jar")) {continue;}
+            if (classpath.contains(".jar")) {continue;}
 
-            startingDir = Paths.get(cpath);
+            startingDirectory = Paths.get(classpath);
             finder = new FindFile(pattern);
 
             try {
-                Files.walkFileTree(startingDir, finder);
-            } catch (IOException e) {
-                LOG.error(e);
+                Files.walkFileTree(startingDirectory, finder);
+            } 
+			catch (IOException e) 
+			{
+                LOG.error("Files.walkFileTree(startingDirectory, finder)", e);
             }
 
             try {
-                if (finder.getPath() != null) {
+                if (finder.getPath() != null) 
+				{
                     String clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
@@ -577,7 +588,8 @@ public class ViskitStatics
      */
     static public void putParameterListInHashMap(String typeName, List<Object>[] parameterMapObjectArray)
 	{
-        if (debug) {
+        if (debug) 
+		{
             LOG.info("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
         }
         parameterHashMap.remove(typeName); // ensure correct
@@ -592,9 +604,9 @@ public class ViskitStatics
     static public Class<?> getClassForInstantiatorType(String type) {
         Class<?> c;
         if (type.contains("Object...")) {
-            c = classForName("java.lang.Object[]");
+            c = ClassForName("java.lang.Object[]");
         } else {
-            c = classForName(type);
+            c = ClassForName(type);
         }
         return c;
     }
@@ -844,7 +856,7 @@ public class ViskitStatics
         } 
 		else 
 		{
-            Class<?> clazz = classForName(type);
+            Class<?> clazz = ClassForName(type);
             if (clazz != null)
 			{
                 Constructor[] reflectionConstructors = clazz.getConstructors();

@@ -36,9 +36,9 @@ public class PropertyChangeListenerNode extends AssemblyNode {
     public final void setType(String newType) {
         super.setType(newType);
 
-        Class<?> myClass = ViskitStatics.classForName(newType);
+        Class<?> myClass = ViskitStatics.ClassForName(newType);
         if (myClass != null) {
-            Class<?> sampleStatisticsClass = ViskitStatics.classForName("simkit.stat.SampleStatistics");
+            Class<?> sampleStatisticsClass = ViskitStatics.ClassForName("simkit.stat.SampleStatistics");
             if (sampleStatisticsClass != null) {
                 if (sampleStatisticsClass.isAssignableFrom(myClass)) {
                     isSampleStatistics = true;

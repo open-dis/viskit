@@ -121,7 +121,7 @@ public class SimkitEventGraphXML2Java
      * @param xmlFile the file to generate source code from
      */
     public SimkitEventGraphXML2Java(String xmlFile) {
-        this(ViskitStatics.classForName(SimkitEventGraphXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(ViskitStatics.ClassForName(SimkitEventGraphXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
         setEventGraphFile(new File(xmlFile));
     }
@@ -383,7 +383,7 @@ public class SimkitEventGraphXML2Java
 			{
 				pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
 					
-                c = ViskitStatics.classForName(stateVariable.getType());
+                c = ViskitStatics.ClassForName(stateVariable.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
                 if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(stateVariable.getType())) 
@@ -1401,9 +1401,9 @@ public class SimkitEventGraphXML2Java
         Class<?> c;
         if (!extendz.contains(".")) {
             unqualifiedExtends = packageName + "." + extendz;
-            c = ViskitStatics.classForName(unqualifiedExtends.split("\\s")[0]);
+            c = ViskitStatics.ClassForName(unqualifiedExtends.split("\\s")[0]);
         } else {
-            c = ViskitStatics.classForName(extendz.split("\\s")[0]);
+            c = ViskitStatics.ClassForName(extendz.split("\\s")[0]);
         }
         return c;
     }

@@ -318,7 +318,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
         Class<?> c;
         String classname = node.getType();
         try {
-            c = ViskitStatics.classForName(classname);
+            c = ViskitStatics.ClassForName(classname);
             if (c == null) {
                 throw new ClassNotFoundException("classname not found");
             }

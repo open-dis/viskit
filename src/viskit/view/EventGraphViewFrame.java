@@ -828,6 +828,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 		if (assemblyController != null)
 			assemblyController.updateProjectFileLists();
+		// if active, don't list current project on recent projects list
+		if (isProjectOpen && (openRecentProjectsMenu != null))
+		{
+			for (int index = 0; index < openRecentProjectsMenu.getItemCount(); index++)
+			{
+				if (openRecentProjectsMenu.getItem(index).getText().equals(ViskitGlobals.instance().getCurrentViskitProject().getProjectName()))
+				{
+					openRecentProjectsMenu.remove(index);
+					break;
+				}
+			}
+		}
 		openRecentProjectsMenu.setEnabled(openRecentProjectsMenu.getItemCount() > 0);
 		projectsMenu.add(openRecentProjectsMenu);
 
@@ -1662,7 +1674,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 						+ "<p align='center'><i>" + changedProjectDirectory + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>"
 						+ "<p>&nbsp;" + ViskitStatics.RECENTER_SPACING + "</p>";
 				eventGraphController.messageToUser(JOptionPane.INFORMATION_MESSAGE, title, message);
-				LOG.error(title + ". " + moveException.toString(), moveException);
+				String moveExceptionTitle = new String();
+				if (moveException != null)
+					moveExceptionTitle = moveException.toString();
+				LOG.error(title + ". " + moveExceptionTitle, moveException);
 				LOG.error(title + ". " + message);
 				
 				// restore any name or path changes
@@ -1868,7 +1883,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 stateVariablesPanel.setData(null);
                 parametersPanel.setData(null);
 
-                // Deliberate fallthrough here
+                // Deliberate matching to default: option here; avoids warning
+                eventGraphComponentWrapper.viskitModelChanged((ModelEvent) event);
+                break;
 
             // Changes the jGraph needs to know about
             default:

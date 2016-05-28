@@ -564,7 +564,7 @@ public class ViskitGlobals
             isArr = true;
         }
         try {
-            Class<?> c = ViskitStatics.classForName(type);
+            Class<?> c = ViskitStatics.ClassForName(type);
             if (c != null) {
 
                 Constructor<?>[] constructors = c.getConstructors();

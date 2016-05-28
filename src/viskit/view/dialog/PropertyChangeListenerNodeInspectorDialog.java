@@ -146,7 +146,7 @@ public class PropertyChangeListenerNodeInspectorDialog extends JDialog {
 	{
         if (propertyChangeListenerNode != null)
 		{
-            myClass = ViskitStatics.classForName(propertyChangeListenerNode.getType());
+            myClass = ViskitStatics.ClassForName(propertyChangeListenerNode.getType());
             if (myClass == null) {
                 JOptionPane.showMessageDialog(this, "Class " + propertyChangeListenerNode.getType() + " not found.");
                 return;
