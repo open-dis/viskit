@@ -38,7 +38,7 @@
       <tocitem text="Analyst Report"		target="TabAnalystReport"/>
     </tocitem>
 
-    <tocitem text="Menus and Menu Items" expand="true">
+    <tocitem text="Menus and Menu Items" expand="false">
       <tocitem text="Event Graph Editor" expand="false">
         <tocitem text="File" expand="false">
           <tocitem text="New Event Graph" target="NewEventGraph" />
