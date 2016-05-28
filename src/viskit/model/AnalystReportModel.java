@@ -67,8 +67,8 @@ import viskit.reports.LinearRegressionChart;
  * @since July 18, 2006, 7:04 PM
  * @version $Id$
  */
-public final class AnalystReportModel extends mvcAbstractModel {
-
+public final class AnalystReportModel extends mvcAbstractModel 
+{
     static final Logger LOG = LogUtilities.getLogger(AnalystReportModel.class);
 
     private boolean debug = false;

@@ -141,6 +141,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 	
     private int menuShortcutCtrlKeyMask;
 	private int menuShortcutAltKeyMask;
+    private int projectMenuShortcutKeyMask; // duplicated in EventGraphViewFrame
     private int assemblyMenuShortcutKeyMask;
 
     public AssemblyEditViewFrame(mvcController controller)
@@ -180,10 +181,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			assemblyController = (AssemblyControllerImpl) getController();
 			assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
 			
-			menuShortcutCtrlKeyMask     = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			menuShortcutAltKeyMask      = InputEvent.ALT_MASK;
+			menuShortcutCtrlKeyMask       = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+			menuShortcutAltKeyMask        = InputEvent.ALT_MASK;
+			projectMenuShortcutKeyMask    = menuShortcutCtrlKeyMask; 
 			
-			assemblyMenuShortcutKeyMask = menuShortcutAltKeyMask; // Assembly menu hotkey: <alt>
+			assemblyMenuShortcutKeyMask   = menuShortcutAltKeyMask; // Assembly menu hotkey: <alt>
 		}
 		assembliesMenu = new JMenu("Assemblies");
         assembliesMenu.setMnemonic(KeyEvent.VK_A);
@@ -191,6 +193,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		helpMenu = new JMenu("Help");
 
         buildMenus();
+		
         buildToolbar();
 		
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null)// viskit might open with no project
@@ -490,22 +493,22 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			myMenuBar.add(assembliesMenu);
 			myMenuBar.add(editMenu);
 			
-			try 
+			try // TODO why does this block also exist in EventGraphViewFrame? need to refactor...
 			{
 				help = ViskitGlobals.instance().getHelp();
 				helpMenu.setMnemonic(KeyEvent.VK_H);
 
-				helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null, true));
-				helpMenu.add(buildMenuItem(help, "doSearch",   "Search", KeyEvent.VK_S, null, true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
 				helpMenu.addSeparator();
 
-				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null, true));
-				helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null, true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
 				myMenuBar.add(helpMenu);
 			}
 			catch (Exception e)
 			{
-				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu, ignored");
+				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu", e);
 			}
 		}
     }

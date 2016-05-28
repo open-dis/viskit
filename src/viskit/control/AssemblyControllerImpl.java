@@ -169,7 +169,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				else
 				{
 					LOG.error ("No known project path to open: " + projectPath);
-					return;
 				}
 			}
 			reportProjectOpenResult (projectName);
@@ -198,6 +197,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
         updateAssemblyFileLists();
+		ViskitGlobals.instance().getEventGraphViewFrame().checkHelpWindowBounds (); // initialize Help window sizing
     }
 	
 	/**
@@ -982,11 +982,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void doProjectCleanup()
 	{
         closeAll();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
+        ViskitGlobals.instance().getEventGraphController().closeAll();
+		if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
         ViskitConfiguration.instance().clearViskitConfiguration();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
-        ViskitGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override

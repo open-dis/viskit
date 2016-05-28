@@ -2,30 +2,32 @@
 <!DOCTYPE helpset
 PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
          "http://java.sun.com/products/javahelp/helpset_2_0.dtd">
+		 
+<!-- Reference: https://docs.oracle.com/cd/E19253-01/819-0913/author/helpset.html -->
 
 <helpset version="2.0">
 
   <!-- title -->
-  <title>Viskit - Help</title>
-    <size width="400" height="600" />
-    <location x="200" y="300" />
+  <title>Help Documentation for Visual Simkit (Viskit)</title>
+  <size width="1200" height="700" /> 
+  <location x="200" y="300" />
 
   <!-- maps -->
   <maps>
-     <homeID></homeID>
+     <homeID>Introduction</homeID>
      <mapref location="vHelpMap.jhm"/>
   </maps>
 
   <!-- views -->
   <view mergetype="javax.help.UniteAppendMerge">
-    <name>TOC</name>
+    <name>Introduction</name>
     <label>Table Of Contents</label>
     <type>javax.help.TOCView</type>
     <data>vHelpTOC.xml</data>
-    <size width="400" height="600" />
+<!--<size width="400" height="600" /> -->
   </view>
 
-  <!-- don't include this until we've built VisKitHelpIndex.xml
+  <!-- TODO don't include this until we've built VisKitHelpIndex.xml
   <view mergetype="javax.help.SortMerge">
     <name>Index</name>
     <label>Index</label>
@@ -48,7 +50,7 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
     <name>main window</name>
     <size width="400" height="600" />
     <location x="200" y="300" />
-    <title>Viskit</title>
+    <title>Help Documentation for Visual Simkit (Viskit)</title>
     <toolbar>
         <helpaction>javax.help.BackAction</helpaction>
         <helpaction>javax.help.ForwardAction</helpaction>

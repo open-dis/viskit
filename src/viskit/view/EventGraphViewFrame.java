@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import viskit.Help;
 import viskit.control.EventGraphController;
 import viskit.ViskitConfiguration;
 import viskit.model.ModelEvent;
@@ -116,12 +117,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	
     private EventGraphControllerImpl eventGraphController;
 	private boolean pathEditable = false;
-	private boolean boundsInitialized = false;
+	private boolean helpWindowBoundsInitialized = false;
 	private double  currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
 	
     private int     menuShortcutCtrlKeyMask;
 	private int     menuShortcutAltKeyMask;
-    private int     projectMenuShortcutKeyMask;
+    private int     projectMenuShortcutKeyMask; // duplicated in AssemblyEditViewFrame
     private int     eventGraphMenuShortcutKeyMask;
     /**
      * Constructor; lays out initial GUI objects
@@ -962,46 +963,49 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			myMenuBar.add(eventGraphsMenu);
 			myMenuBar.add(editMenu);
 			
-			try 
+			try  // TODO why does this block also exist in AssemblyViewFrame? need to refactor...
 			{
 				help = new viskit.Help(this);
-				if ((this.getBounds().height > 0)  && (this.getBounds().getBounds().width > 0))
-				{
-					help.mainFrameLocated(this.getBounds());
-				}
+				checkHelpWindowBounds (); // likely too early during initialization sequence to take effect, parent windows not yet available
 				ViskitGlobals.instance().setHelp(help);
 
-				// TODO method enumerations for reliability
-				
-				helpMenu.add(buildMenuItem(help, "doContents", "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_H, projectMenuShortcutKeyMask), true));
-				helpMenu.add(buildMenuItem(help, "doSearch",   "Search",        KeyEvent.VK_S, null, true));
-				
-				helpMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.SEND_ERROR_REPORT_METHOD, "Trouble Report", KeyEvent.VK_T, KeyStroke.getKeyStroke(KeyEvent.VK_T, projectMenuShortcutKeyMask), true));
-				
-				helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial",      KeyEvent.VK_U, KeyStroke.getKeyStroke(KeyEvent.VK_U, projectMenuShortcutKeyMask), true));
-				
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
 				helpMenu.addSeparator();
 
-				helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null, true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
+				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
 				myMenuBar.add(helpMenu);
 			}
 			catch (Exception e)
 			{
-				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating help menu, ignored. " + e);
+				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating EventGraphViewFrame help menu: ", e);
 			}
 		}
-		else checkHelpBounds ();
+		else if (!helpWindowBoundsInitialized)
+		         checkHelpWindowBounds ();
     }
 	
-	private void checkHelpBounds ()
+	/** Set proper initial Help window size and location */
+	@SuppressWarnings("UnnecessaryReturnStatement")
+	public void checkHelpWindowBounds ()
 	{
-		if (!boundsInitialized && (ViskitGlobals.instance().getViskitApplicationFrame() != null))
+		if  (helpWindowBoundsInitialized)
+		{
+			return; // no action required
+		}
+		else if ((this.getBounds().height > 0)  && (this.getBounds().getBounds().width > 0))
+		{
+			help.mainFrameLocated(this.getBounds());
+			helpWindowBoundsInitialized = true;
+		}
+		else if (!helpWindowBoundsInitialized && (ViskitGlobals.instance().getViskitApplicationFrame() != null))
 		{
 			Rectangle applicationFrameBounds = ViskitGlobals.instance().getViskitApplicationFrame().getBounds();
 			if ((applicationFrameBounds.height > 0)  && (applicationFrameBounds.getBounds().width > 0))
 			{
 				help.mainFrameLocated(applicationFrameBounds.getBounds());
-				boundsInitialized = true;
+				helpWindowBoundsInitialized = true;
 			}
 		}
 	}
@@ -1074,9 +1078,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return button;
     }
 
-    private JLabel makeJLabel(String icPath, String tt) {
-        JLabel newLabel = new JLabel(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(icPath)));
-        newLabel.setToolTipText(tt);
+    private JLabel makeJLabel(String imageIconPath, String tooltip) 
+	{
+        JLabel newLabel = new JLabel(new ImageIcon(ViskitGlobals.instance().getWorkClassLoader().getResource(imageIconPath)));
+        newLabel.setToolTipText(tooltip);
         return newLabel;
     }
 
