@@ -178,8 +178,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		else
 		{
 			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.VISKIT_READY_MESSAGE, "<html>" +
-					"<p align='center'>Open or create a project to begin" + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
+					"<p align='center'>Open or create a project to begin." + ViskitStatics.RECENTER_SPACING + "</p>" +
+					"<p>&nbsp;</p>");
 		}
 		
         // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
@@ -235,9 +235,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			LOG.error (message);
 			messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
 				"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp</p>" + 
+				"<p>&nbsp;</p>" + 
 				"<p align='center'>Please open or create another project to continue." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp</p>");
+				"<p>&nbsp;</p>");
 			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
 		}
 	}
@@ -327,7 +327,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Assembly file", "<html>" +
 							"<p align='center'>Assembly models always end with .xml file extensions." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>Please choose an assemly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					break;
 				}
@@ -341,10 +341,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", "<html>" +
 							"<p align='center'>Open assemblies must be within the currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p>Current project name: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>Current project path: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>Please choose an assembly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					// TODO offer to copy?
 					break;
@@ -363,21 +363,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			LOG.error (message + " " + assemblyFile.getAbsolutePath());
 			messageToUser (JOptionPane.WARNING_MESSAGE, "Cannot find requested Assembly file", "<html>" +
 					"<p align='center'>" + message + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>" +
+					"<p>&nbsp;</p>" +
 					"<p align='center'><i>" + assemblyFile.getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
+					"<p>&nbsp;</p>");
             return;
         }
         AssemblyEditView  assemblyEditView = (AssemblyEditView) getView();
-        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
-        assemblyModel.initialize();
+        if (assemblyEditView == null)
+		{
+			LOG.error ("Viskit initialization problem: when opening assembly " + assemblyFile.getName() + ", unexpectedly found assemblyEditView == null");
+			return;
+		}	
 
         // these may initialize to null on startup, check before doing any openAlready lookups
-        AssemblyModel[] openAssemblyModelArray = null;
-        if (assemblyEditView != null)
-		{
-            openAssemblyModelArray = assemblyEditView.getOpenAssemblyModelArray();
-        }
+        AssemblyModel[] openAssemblyModelArray = assemblyEditView.getOpenAssemblyModelArray();
+        
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel.initialize();
+		
+		// figure out if assembly is open already
         boolean isAssemblyOpenAlready = false;
         if (openAssemblyModelArray != null)
 		{
@@ -394,37 +398,31 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 }
             }
         }
-		if (assemblyEditView == null)
+        if (isAssemblyOpenAlready)
 		{
-			LOG.error ("when opening assembly " + assemblyFile.getName() + ", assemblyEditView == null");
-			return;
-		}	
-
-        if (!isAssemblyOpenAlready)
+			assemblyEditView.deleteTab(assemblyModel); // ? TODO confirm.  Seems like it should stay open.
+        } 
+		else 
 		{
-			if (assemblyModel.newModel(assemblyFile))
-			{
-				assemblyEditView.addTab(assemblyModel);
-			}
-			else
+			assemblyEditView.addTab(assemblyModel); // must addTab before reading model or else no listener hears events for jGraph
+			
+			if (!assemblyModel.newModel(assemblyFile)) // open assemblyFile, returns true if successful
 			{
 				LOG.error ("assemblyModel " + assemblyModel + " did not open from " + assemblyFile.getName());
+				return;
 			}
 			
             assemblyEditView.setSelectedAssemblyName(assemblyModel.getMetadata().name);
             // TODO: Implement an Assembly description block set here
+			// TODO simplify the following invocation
 			ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(assemblyModel.getMetadata().description);
 
             adjustRecentAssemblyFileSet(assemblyFile);
             markAssemblyFilesOpened();
 
-            // replaces old fileWatchOpen(file);
-            initializeOpenAssemblyWatch(assemblyFile, assemblyModel.getJaxbRoot());
+            // Order is important.  Tab must be open first, otherwise no listener present.
+            initializeOpenAssemblyWatch(assemblyFile, assemblyModel.getJaxbRoot()); // replaces old fileWatchOpen(file);
             openEventGraphs(assemblyFile);
-        } 
-		else 
-		{
-			assemblyEditView.deleteTab(assemblyModel);
         }
 
         resetJGraphRedoUndoStatus();
@@ -782,11 +780,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", 
 							"<html>" + 
 							"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> cannot be created here!" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>You do not have permissions to create a new directory at that location" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>");
+							"<p>&nbsp;</p>");
 				}
 				continue;
 			}
@@ -798,9 +796,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here", 
 						"<html>" + 
 						"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> is not empty!" + ViskitStatics.RECENTER_SPACING + "</p>" +
-						"<p>&nbsp</p>" +
+						"<p>&nbsp;</p>" +
 						"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
-						"<p>&nbsp</p>");
+						"<p>&nbsp;</p>");
 				continue;
 			}
 		}
@@ -976,9 +974,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
              String title   = "Close Project";
              String message = "<html><p align='center'>Are you sure you want to close the current project?" + ViskitStatics.RECENTER_SPACING + "</p>";
 			 if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-			 	 message += "<p>&nbsp</p>" + 
+			 	 message += "<p>&nbsp;</p>" + 
 						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" + 
-						    "<p>&nbsp</p>";
+						    "<p>&nbsp;</p>";
              int responseValue = ((AssemblyEditView) getView()).genericAskYN(title, message);
              if (responseValue == JOptionPane.YES_OPTION)
 			 {
@@ -1040,9 +1038,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory",  "<html>" +
 					"<p align='center'>New assemblies are only created within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>" +
+					"<p>&nbsp;</p>" +
 					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
+					"<p>&nbsp;</p>");
 			return;
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // prerequisite to possible menu
@@ -1105,7 +1103,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     @Override
     public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
-    {   AssemblyEditView view = (AssemblyEditView) getView();
+    {   
+		AssemblyEditView view = (AssemblyEditView) getView();
         if (view != null)
 		{
 			((AssemblyEditView) getView()).genericReport(dialogType, title, message);
@@ -1115,22 +1114,27 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             JOptionPane.showMessageDialog(null, message, title, dialogType);
         }
 		
-		// clean up message HTML for logs
+		// now clean up message HTML for logs
 		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
 		message = message.replaceAll("&nbsp;", " ");                    // non-breaking space character
 		message = message.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " "); // elements and attributes
 		message = message.replaceAll("(\\s)+", " ").trim();             // normalize whitespace
 		
-		switch (dialogType)
+		title = title.trim();
+		String spacer = ": ";
+		if (title.endsWith(",") || title.endsWith(".") || title.endsWith("!") || title.endsWith("-") || title.endsWith(":") || title.endsWith(";"))
+			   spacer = " ";
+		
+		switch (dialogType) // use appropriate LOG setting
 		{
 			case JOptionPane.ERROR_MESSAGE:
-				LOG.error (title + ": " + message);
+				LOG.error (title + spacer + message);
 				break;
 			case JOptionPane.WARNING_MESSAGE:
-				LOG.warn (title + ": " + message);
+				LOG.warn (title + spacer + message);
 				break;
 			default:
-				LOG.info (title + ": " + message);
+				LOG.info (title + spacer + message);
 				break;
 		}
     }
@@ -1276,7 +1280,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         messageToUser(JOptionPane.ERROR_MESSAGE, 
 				"Can't create a new Event Graph instance", 
 				"<html><p>You must first open and build an Event Graph before adding a new node." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp</p>");
+				"<p>&nbsp;</p>");
     }
 
     @Override
@@ -1337,7 +1341,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         messageToUser(JOptionPane.ERROR_MESSAGE, 
 				"Can't create", 
 				"<html><p>You must first select a Property Change Listener from the panel on the left." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp</p>");
+				"<p>&nbsp;</p>");
     }
 
     @Override
@@ -1640,7 +1644,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             doRemove = ((AssemblyEditView) getView()).genericAskYN(title, message + specialNodeMessage) == JOptionPane.YES_OPTION;
             if (doRemove) 
 			{
-                delete(); // TODO edges first?
+                delete(); // TODO edges first?  also include Verbose list
             }
         }
     }
@@ -1718,28 +1722,35 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void delete() 
 	{
-        Vector<Object> v = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
-        for (Object elem : v) {
-            if (elem instanceof AssemblyEdge) {
-                removeEdge((AssemblyEdge) elem);
-            } else if (elem instanceof EventGraphNode) {
-                EventGraphNode eventGraphNode = (EventGraphNode) elem;
-                for (AssemblyEdge assemblyEdge : eventGraphNode.getConnections()) {
+        Vector<Object> selectedObjects = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
+        for (Object selectedObject : selectedObjects) 
+		{
+            if (selectedObject instanceof AssemblyEdge) 
+			{
+                removeEdge((AssemblyEdge) selectedObject);
+            } 
+			else if (selectedObject instanceof EventGraphNode) 
+			{
+                EventGraphNode eventGraphNode = (EventGraphNode) selectedObject;
+                for (AssemblyEdge assemblyEdge : eventGraphNode.getConnections()) 
+				{
                     removeEdge(assemblyEdge);
                 }
-                ((AssemblyModel) getModel()).deleteEventGraphNode(eventGraphNode);
-            } else if (elem instanceof PropertyChangeListenerNode) {
-                PropertyChangeListenerNode en = (PropertyChangeListenerNode) elem;
-                for (AssemblyEdge ed : en.getConnections()) {
+                ((AssemblyModelImpl) getModel()).deleteEventGraphNode(eventGraphNode); // TODO Verbose ?
+            } 
+			else if (selectedObject instanceof PropertyChangeListenerNode) 
+			{
+                PropertyChangeListenerNode en = (PropertyChangeListenerNode) selectedObject;
+                for (AssemblyEdge ed : en.getConnections())
+				{
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePropertyChangeListener(en);
+                ((AssemblyModelImpl) getModel()).deletePropertyChangeListener(en);
             }
         }
-
         // Clear the cache after a delete to prevent unnecessary buildup
         if (!selectionVector.isEmpty())
-            selectionVector.clear();
+             selectionVector.clear();
     }
 
     private void removeEdge(AssemblyEdge e) {
@@ -2291,9 +2302,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					{
                         String message = "<html>" + 
 								         "<p align='center'>Runtime error: no executionParameters found." + ViskitStatics.RECENTER_SPACING + "</p>" + 
-								         "<p>&nbsp</p>" +
+								         "<p>&nbsp;</p>" +
 										 "<p align='center'>Please locate and correct the source error in assembly XML for proper compilation." + ViskitStatics.RECENTER_SPACING + "</p>" + 
-								         "<p>&nbsp</p>";
+								         "<p>&nbsp;</p>";
                         messageToUser(JOptionPane.WARNING_MESSAGE, "Failed Assembly source generation/compilation", message);
                     }
                 } 

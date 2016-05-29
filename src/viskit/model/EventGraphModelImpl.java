@@ -917,7 +917,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         jaxbSimEntity.getEvent().add(jaxbEvent);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone: " + node.getName()));
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node action redone: " + node.getName()));
     }
 
     @Override
@@ -931,7 +931,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(node, ModelEvent.EVENT_DELETED,   "Event deleted: " + node.getName()));
         else
-            notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone: " + node.getName()));
+            notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event action undone: " + node.getName()));
     }
 
     private StateVariable findStateVariable(String name)
@@ -1204,7 +1204,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         sourceEvent.getScheduleOrCancel().add(jaxbSchedule);
         edgeCache.put(jaxbSchedule, jaxbEdge);
         setDirty(true);
-        notifyChanged(new ModelEvent(jaxbEdge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone: " + 
+        notifyChanged(new ModelEvent(jaxbEdge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge action redone: " + 
 		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
@@ -1255,7 +1255,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         sourceEvent.getScheduleOrCancel().add(cancel);
         edgeCache.put(cancel, edge);
         setDirty(true);
-        notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELLING_EDGE, "Cancelling Edge redone: " +
+        notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELLING_EDGE, "Cancelling Edge action redone: " +
 		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
@@ -1267,7 +1267,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(edge, ModelEvent.EDGE_DELETED, "Scheduling Edge deleted: " + edge.getName()));
         else
-            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Scheduling Edge undone: " + edge.getName()));
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Scheduling Edge action undone: " + edge.getName()));
     }
 
     @Override
@@ -1278,7 +1278,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLING_EDGE_DELETED, "Cancelling edge deleted: " + edge.getName()));
         else
-            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELLING_EDGE, "Cancelling edge undone: " + edge.getName()));
+            notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELLING_EDGE, "Cancelling edge action undone: " + edge.getName()));
     }
 
     private void _commonEdgeDelete(Edge edge)

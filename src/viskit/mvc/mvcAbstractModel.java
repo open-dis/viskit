@@ -57,13 +57,13 @@ public abstract class mvcAbstractModel implements mvcModel
         if (!listenersList.contains(modelListener)) 
 		{
             listenersList.add(modelListener);
-			LOG.info  ("MVC " + this.toString() + " addModelListener " + modelListener);
+			LOG.info  ("MVC " + this.getClass() +    ".addModelListener(" + modelListener.getClass() + ")");
         }
     }
 
     public void removeModelListener(mvcModelListener modelListener)
 	{
         listenersList.remove(modelListener);
-		LOG.info  ("MVC " + this.toString() + " removeModelListener " + modelListener);
+		LOG.info      ("MVC " + this.getClass() + ".removeModelListener(" + modelListener.getClass() + ")");
     }
 }

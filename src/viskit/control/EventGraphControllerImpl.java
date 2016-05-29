@@ -123,7 +123,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory found", 
 					"<html><p align='center'>New event graphs are only created within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
 					"<p align='center'>Please open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
+					"<p>&nbsp;</p>");
 			return;
 		}
 		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // prerequisite to possible file menu dialog
@@ -174,7 +174,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             String message =
                     "<html><body><p align='center'>Do you want " + newEventGraphMetadata.name + 
 					" execution to start with a <i>\"Run\"</i> Event?" + ViskitStatics.RECENTER_SPACING + "</p>"  +
-				    "<p>&nbsp</p>" +
+				    "<p>&nbsp;</p>" +
 					"<p><i>\"Run\"</i> Event is needed for initializing state variables and scheduling edges." + ViskitStatics.RECENTER_SPACING + "</p></body></html>";
             String title = "Confirm Run Event";
 
@@ -253,9 +253,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Event Graph file", "<html>" +
 							"<p align='center'>Event graph files always end with .xml" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>");
+							"<p>&nbsp;</p>");
 					break;
 				}
 				else if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
@@ -269,12 +269,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project",  "<html>" +
 							"<p align='center'>Event graphs must be within a currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p>Current project name: <b>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</b>" + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>Current project path: "    + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>" +
+							"<p>&nbsp;</p>" +
 							"<p align='center'>Please choose an event graph in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp</p>");
+							"<p>&nbsp;</p>");
 					// TODO offer to copy?
 					break;
 				}

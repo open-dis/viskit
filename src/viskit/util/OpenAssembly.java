@@ -78,7 +78,7 @@ public class OpenAssembly
     public SimkitAssembly jaxbRoot;
     public ObjectFactory jaxbFactory;
 
-    /** Singleton class */
+    /** Singleton class, thus private and inaccessible */
     private OpenAssembly() {}
 
     /** @param f the Assembly XML file to announce to all the Assembly Listeners

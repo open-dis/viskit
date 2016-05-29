@@ -78,56 +78,69 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
-        getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
-
-            // To use circles, from the tutorial
+        getGraphLayoutCache().setFactory(new DefaultCellViewFactory() 
+		{
+            // How to use circles, from the jGraph tutorial
             @Override
-            protected VertexView createVertexView(Object v) {
-                VertexView view;
-                if (v instanceof AssemblyCircleCell) {
-                    view = new AssemblyCircleView(v);
-                } else if (v instanceof AssemblyPropertyListCell) {
-                    view = new AssemblyPropertyListView(v);
-                } else {
-                    view = super.createVertexView(v);
+            protected VertexView createVertexView(Object v) 
+			{
+                VertexView vertexView;
+                if (v instanceof AssemblyCircleCell) 
+				{
+                    vertexView = new AssemblyCircleView(v);
+                } 
+				else if (v instanceof AssemblyPropertyListCell) 
+				{
+                    vertexView = new AssemblyPropertyListView(v);
+                } 
+				else 
+				{
+                    vertexView = super.createVertexView(v);
                 }
-                return view;
+                return vertexView;
             }
 
             // To customize my edges
             @Override
-            protected EdgeView createEdgeView(Object e) {
-                EdgeView view = null;
-                if (e instanceof vAssemblyEdgeCell) {
+            protected EdgeView createEdgeView(Object e)
+			{
+                EdgeView edgeView = null;
+                if (e instanceof vAssemblyEdgeCell) 
+				{
                     Object o = ((vAssemblyEdgeCell) e).getUserObject();
-                    if (o instanceof PropertyChangeListenerEdge) {
-                        view = new vAssyPclEdgeView(e);
+                    if (o instanceof PropertyChangeListenerEdge) 
+					{
+                        edgeView = new vAssyPclEdgeView(e);
                     }
-                    if (o instanceof AdapterEdge) {
-                        view = new vAssyAdapterEdgeView(e);
+                    if (o instanceof AdapterEdge) 
+					{
+                        edgeView = new vAssyAdapterEdgeView(e);
                     }
-                    if (o instanceof SimEventListenerEdge) {
-                        view = new vAssySelEdgeView(e);
+                    if (o instanceof SimEventListenerEdge) 
+					{
+                        edgeView = new vAssySelEdgeView(e);
                     }
-                } else {
-                    view = super.createEdgeView(e);
+                } 
+				else 
+				{
+                    edgeView = super.createEdgeView(e);
                 }
-                return view;
+                return edgeView;
             }
 
             @Override
             protected PortView createPortView(Object p) 
 			{
-                PortView view;
+                PortView portView;
                 if (p instanceof vAssemblyPortCell) 
 				{
-                    view = new vAssemblyPortView(p);
+                    portView = new vAssemblyPortView(p);
                 }
 				else 
 				{
-                    view = super.createPortView(p);
+                    portView = super.createPortView(p);
                 }
-                return view;
+                return portView;
             }
         });
     }
@@ -223,12 +236,12 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 break;
             default:
             //System.out.println("duh");
+				LOG.error ("viskitModelChanged() illegal event ID=" + modelEvent.getID() + " encountered");
         }
-        currentModelEvent = null;
+        currentModelEvent = null; // reset value now that it is handled
     }
 
-    // TODO: This version JGraph does not support generics
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked") // JGraph does not support generics
     @Override
     public void graphChanged(GraphModelEvent graphModelEvent)
 	{
@@ -278,10 +291,12 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         }
     }
 
-    private String escapeLTGT(String s) {
-        s = s.replaceAll("<", "&lt;");
-        s = s.replaceAll(">", "&gt;");
-        return s;
+	/* support creation of HTML source */
+    private String escapeLTGT(String htmlText) 
+	{
+        htmlText = htmlText.replaceAll("<", "&lt;");
+        htmlText = htmlText.replaceAll(">", "&gt;");
+        return htmlText;
     }
 
     @Override

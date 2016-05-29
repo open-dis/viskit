@@ -116,8 +116,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean newModel(File file)
 	{
+		// important: tab must be created first, or else JGraph listener isn't yet created to draw changes
+		
         getAssemblyNodeCacheMap().clear();
         pointLess = new Point2D.Double(30, 60);
+
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEW_ASSEMBLY_MODEL, "New empty assembly model"));
 
         if (file == null)
@@ -178,7 +181,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                             "\n" + e.getMessage() +
                             "\nin AssemblyModel.newModel(File)"
                             );
-				e.printStackTrace();
 				LOG.error ("Exception on JAXB unmarshalling of " + file.getName(), e);
 
                 return false; // failure
@@ -434,7 +436,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
+        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.REDO_EVENT_GRAPH, "Event Graph action redone"));
     }
 
     @Override
@@ -449,7 +451,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENTGRAPH_DELETED, "Event Graph deleted"));
         else
-            notifyChanged(new ModelEvent(eventNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
+            notifyChanged(new ModelEvent(eventNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph action undone"));
     }
 
     @Override
@@ -505,7 +507,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getPropertyChangeListener().add(jaxbPCL);
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(node, ModelEvent.REDO_PCL, "Property Change Node redone"));
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_PCL, "Property Change Node action redone"));
     }
 
     @Override
@@ -520,7 +522,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pclNode, ModelEvent.PCL_DELETED, "Property Change Listener deleted"));
         else
-            notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL, "Property Change Listener undone"));
+            notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL,    "Property Change Listener action undone"));
     }
 
     @Override
@@ -651,7 +653,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getSimEventListenerConnection().add(simEventListenerConnection);
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.REDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge redone"));
+        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.REDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge action redone"));
     }
 
     @Override
@@ -666,7 +668,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_DELETED, "PCL edge deleted"));
         else
-            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
+            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.UNDO_PCL_EDGE, "PCL edge action undone"));
     }
 
     @Override
@@ -681,7 +683,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_DELETED, "SimEventListenerEdge deleted"));
         else
-            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.UNDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge undone"));
+            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.UNDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge action undone"));
     }
 
     @Override
@@ -695,7 +697,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_DELETED, "Adapter edge deleted"));
         else
-            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
+            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge action undone"));
     }
 
     @Override
@@ -1341,7 +1343,6 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         assemblyModelDirty = true; // this now-modified assembly is not yet saved, so mark as dirty
 		
-		// TODO is this notification being caught??
         notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + jaxbSimEntity.getName()));
 
         return eventGraphNode;

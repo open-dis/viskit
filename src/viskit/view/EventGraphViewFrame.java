@@ -304,24 +304,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     class TabSelectionHandler implements ChangeListener {
 
         @Override
-        public void stateChanged(ChangeEvent e) {
+        public void stateChanged(ChangeEvent e) 
+		{
+            EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentJGraphEventGraphComponentWrapper();
 
-            EventGraphComponentWrapper myVgcw = getCurrentJGraphEventGraphComponentWrapper();
-
-            if (myVgcw == null) {     // last tab has been closed
+            if (eventGraphComponentWrapper == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
                 return;
             }
 
             // NOTE: Although a somewhat good idea, perhaps the user does not
             // wish to have work saved when merely switching between tabs on
-            // the EG pallete.  However, when switching to the Assembly pallete, we
-            // will save all EGs that have been modified
+            // the EventGraph palette.  However, when switching to the Assembly palette, we
+            // will save all EventGraphs that have been modified
 //            if (((EventGraphModel)getModel()).isDirty()) {
 //                ((EventGraphController)getController()).save();
 //            }
 
-            setModel((EventGraphModelImpl) myVgcw.eventGraphModel);    // hold on locally
+            setModel((EventGraphModelImpl) eventGraphComponentWrapper.eventGraphModel);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
             adjustMenus((EventGraphModel) getModel()); // enable/disable menu items based on new EG
@@ -338,7 +338,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             } 
 			else if (viskit.ViskitStatics.debug) 
 			{
-                LOG.error("error: EventGraphViewFrame graphMetadata null..");
+                LOG.error("error: EventGraphViewFrame graphMetadata is null..");
             }
         }
     }
