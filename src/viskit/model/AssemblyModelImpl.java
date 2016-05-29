@@ -49,7 +49,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private GraphMetadata  graphMetadata;
 
     /** We require specific order on this Map's contents */
-    private final Map<String, AssemblyNode> nodeCacheMap;
+    private final Map<String, AssemblyNode> assemblyNodeCacheMap;
     private final String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl assemblyController;
@@ -61,7 +61,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         graphMetadata = new GraphMetadata(this);
 		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
 			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
-        nodeCacheMap  = new LinkedHashMap<>();
+        assemblyNodeCacheMap  = new LinkedHashMap<>();
     }
 
     public void initialize() 
@@ -70,6 +70,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             jaxbObjectFactory = new ObjectFactory();
             jaxbSimkitAssembly = jaxbObjectFactory.createSimkitAssembly(); // to start with empty graph
+			assemblyModelDirty = true; // unsaved when new
         } 
 		catch (JAXBException e) {
             assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
@@ -115,9 +116,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean newModel(File file)
 	{
-        getNodeCache().clear();
+        getAssemblyNodeCacheMap().clear();
         pointLess = new Point2D.Double(30, 60);
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEW_ASSEMBLY_MODEL, "New empty assembly model"));
 
         if (file == null)
 		{
@@ -185,7 +186,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
 
         currentFile = file;
-        setDirty(false); // just loaded
+        setDirty(false); // just loaded, as yet unmodified
         return true; // success
     }
 
@@ -203,13 +204,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         File tempFile;
         FileWriter fileWriter = null;
         try {
-            tempFile = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
+            tempFile = TempFileManager.createTempFile("tempAssemblyMarshalOutput", ".xml");
         } 
 		catch (IOException e) 
 		{
             assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "Input/Output (I/O) Error",
-                    "Exception creating temporary file, AssemblyModel.saveModel():" +
+                    "Exception creating temporary file tempAssemblyMarshalOutput.xml , AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
                     );
             return;
@@ -339,7 +340,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private boolean nameCheckSatisfactory()
 	{
         Set<String> hashSet = new HashSet<>(10);
-        for (AssemblyNode assemblyNode : getNodeCache().values())
+        for (AssemblyNode assemblyNode : getAssemblyNodeCacheMap().values())
 		{
             if (!hashSet.add(assemblyNode.getName()))
 			{
@@ -355,7 +356,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean nameExists(String name)
 	{
-        for (AssemblyNode assemblyNode : getNodeCache().values())
+        for (AssemblyNode assemblyNode : getAssemblyNodeCacheMap().values())
 		{
             if (assemblyNode.getName().equals(name))
 			{
@@ -363,6 +364,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             }
         }
         return false;
+    }
+
+	@Override
+    public void newEventGraph(String instanceName, String className, Point2D point, String description)
+	{
+		// re-use common code
+        newEventGraphFromXML (instanceName, className, point, description, null);
     }
 
     @Override
@@ -382,11 +390,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             eventGraphNode.setPosition(point);
         }
 
-        SimEntity jaxbSimEntity = jaxbObjectFactory.createSimEntity();
-        jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(instanceName));
-        jaxbSimEntity.setType(className);
-        jaxbSimEntity.setDescription(description);
-        eventGraphNode.opaqueModelObject = jaxbSimEntity;
+        SimEntity newJaxbSimEntity = jaxbObjectFactory.createSimEntity();
+        newJaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(instanceName));
+        newJaxbSimEntity.setType(className);
+        newJaxbSimEntity.setDescription(description);
+        eventGraphNode.opaqueModelObject = newJaxbSimEntity;
 
         ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(className,
 				null);  // null means undefined argument list // TODO ???
@@ -398,25 +406,18 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             mangleName(eventGraphNode);
         }
 
-        getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = event graph name
+        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
 
-        jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
+        jaxbSimkitAssembly.getSimEntity().add(newJaxbSimEntity); // add the jaxbSimEntity to SimEntity List 
 
         assemblyModelDirty = true; // this now-modified assembly is not yet saved, so mark as dirty
 		
 		// utilize passed XML information, if any (provided via drag+drop) - speculative code block, not in original codebase
 		if (assemblyNode != null)
 		{
-//			assemblyNode. // TODO whassup?
+//			assemblyNode._ // TODO whassup?
 		}
         notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + eventGraphNode.getName()));
-    }
-
-	@Override
-    public void newEventGraph(String instanceName, String className, Point2D point, String description)
-	{
-		// re-use common code
-        newEventGraphFromXML (instanceName, className, point, description, null);
     }
 
     @Override
@@ -428,7 +429,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         eventGraphNode.opaqueModelObject = jaxbSimEntity;
         jaxbSimEntity.setType(eventGraphNode.getType());
 
-        getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = ev
+        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
 
         jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
 
@@ -440,7 +441,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void deleteEventGraphNode(EventGraphNode eventNode) 
 	{
         SimEntity simEntity = (SimEntity) eventNode.opaqueModelObject;
-        getNodeCache().remove(simEntity.getName());
+        getAssemblyNodeCacheMap().remove(simEntity.getName());
         jaxbSimkitAssembly.getSimEntity().remove(simEntity);
 
         assemblyModelDirty = true;
@@ -460,35 +461,35 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public void newPropertyChangeListener(String widgetName, String className, Point2D point, String description)
 	{
-        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className, description);
+        PropertyChangeListenerNode propertyChangeListenerNode = new PropertyChangeListenerNode(widgetName, className, description);
         if (point == null) {
-            pcNode.setPosition(pointLess);
+            propertyChangeListenerNode.setPosition(pointLess);
         } else {
-            pcNode.setPosition(point);
+            propertyChangeListenerNode.setPosition(point);
         }
 
-        PropertyChangeListener pcl = jaxbObjectFactory.createPropertyChangeListener();
+        PropertyChangeListener propertyChangeListener = jaxbObjectFactory.createPropertyChangeListener();
 
-        pcl.setName(ViskitGlobals.nullIfEmpty(widgetName));
-        pcl.setType(className);
-        pcNode.opaqueModelObject = pcl;
+        propertyChangeListener.setName(ViskitGlobals.nullIfEmpty(widgetName));
+        propertyChangeListener.setType(className);
+        propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
 
-        List<Object> lis = pcl.getParameters();
+        List<Object> parametersList = propertyChangeListener.getParameters();
 
-        ViskitInstantiator vc = new ViskitInstantiator.Construct(pcl.getType(), lis);
-        pcNode.setInstantiator(vc);
+        ViskitInstantiator viskitInstantiator = new ViskitInstantiator.Construct(propertyChangeListener.getType(), parametersList);
+        propertyChangeListenerNode.setInstantiator(viskitInstantiator);
 
         if (!nameCheckSatisfactory()) 
 		{
-            mangleName(pcNode);
+            mangleName(propertyChangeListenerNode);
         }
 
-        getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
+        getAssemblyNodeCacheMap().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode); // key = PCL node name
 
-        jaxbSimkitAssembly.getPropertyChangeListener().add(pcl);
+        jaxbSimkitAssembly.getPropertyChangeListener().add(propertyChangeListener);
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(pcNode, ModelEvent.PCL_ADDED, "Property Change Node added to assembly"));
+        notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.PCL_ADDED, "Property Change Node added to assembly"));
     }
 
     @Override
@@ -511,7 +512,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void deletePropertyChangeListener(PropertyChangeListenerNode pclNode) 
 	{
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
-        getNodeCache().remove(pclNode.getName());
+        getAssemblyNodeCacheMap().remove(pclNode.getName());
         jaxbSimkitAssembly.getPropertyChangeListener().remove(jaxbPcNode);
 
         assemblyModelDirty = true;
@@ -543,7 +544,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         jaxbSimkitAssembly.getAdapter().add(jaxbAdapter);
         assemblyModelDirty = true;
-        this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTEREDGE_ADDED, "new Adapter edge added"));
+        this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_ADDED, "new Adapter edge added"));
         return adapterEdge;
     }
 
@@ -588,7 +589,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getPropertyChangeListenerConnection().add(propertyChangeListenerConnection);
         assemblyModelDirty = true;
 
-        this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_ADDED, "PCL edge added"));
+        this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
         return propertyChangeListenerEdge;
     }
 
@@ -631,7 +632,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbSimkitAssembly.getSimEventListenerConnection().add(simEventListenerConnection);
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENTLISTEDGE_ADDED, "SimEventListenerEdge added"));
+        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED, "SimEventListenerEdge added"));
     }
 
     @Override
@@ -663,7 +664,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         assemblyModelDirty = true;
 
         if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_DELETED, "PCL edge deleted"));
+            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_DELETED, "PCL edge deleted"));
         else
             notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
     }
@@ -678,7 +679,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         assemblyModelDirty = true;
 
         if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENTLISTEDGE_DELETED, "SimEventListenerEdge deleted"));
+            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_DELETED, "SimEventListenerEdge deleted"));
         else
             notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.UNDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge undone"));
     }
@@ -692,7 +693,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         assemblyModelDirty = true;
 
         if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTEREDGE_DELETED, "Adapter edge deleted"));
+            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_DELETED, "Adapter edge deleted"));
         else
             notifyChanged(new ModelEvent(adapterEdge, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
     }
@@ -705,7 +706,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         PropertyChangeListenerConnection.setDescription(propertyChangeListenerEdge.getDescription());
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_CHANGED, "PCL edge changed"));
+        notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_CHANGED, "PCL edge changed"));
     }
 
     @Override
@@ -726,7 +727,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         jaxbAE.setDescription(adapterEdge.getDescription());
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTEREDGE_CHANGED, "Adapter edge changed"));
+        notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_CHANGED, "Adapter edge changed"));
     }
 
     @Override
@@ -741,7 +742,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         simEventListenerConnection.setDescription(simEventListenerEdge.getDescription());
 
         assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENTLISTEDGE_CHANGED, "SimEvListener edge changed"));
+        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_CHANGED, "SimEvListener edge changed"));
     }
 
     @Override
@@ -1127,8 +1128,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
             propertyChangeListenerEdge.setProperty(propertyChangeListenerConnection.getProperty());
             propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription());
-            AssemblyNode   toNode = getNodeCache().get(propertyChangeListenerConnection.getListener());
-            AssemblyNode fromNode = getNodeCache().get(propertyChangeListenerConnection.getSource());
+            AssemblyNode   toNode = getAssemblyNodeCacheMap().get(propertyChangeListenerConnection.getListener());
+            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(propertyChangeListenerConnection.getSource());
             propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
             propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription()); // TODO check
 			
@@ -1142,7 +1143,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 				propertyChangeListenerEdge.setFrom(fromNode);
 				fromNode.getConnections().add(propertyChangeListenerEdge);
 			}
-            this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCLEDGE_ADDED, "PCL edge added"));
+            this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
         }
     }
 
@@ -1151,8 +1152,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         for (SimEventListenerConnection simEventListenerConnection : simEventListenerConnectionsList)
 		{
             SimEventListenerEdge simEventListenerEdge = new SimEventListenerEdge();
-            AssemblyNode toNode = getNodeCache().get(simEventListenerConnection.getListener());
-            AssemblyNode fromNode = getNodeCache().get(simEventListenerConnection.getSource());
+            AssemblyNode toNode = getAssemblyNodeCacheMap().get(simEventListenerConnection.getListener());
+            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(simEventListenerConnection.getSource());
             simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
             simEventListenerEdge.setDescription(simEventListenerConnection.getDescription());
 			
@@ -1166,7 +1167,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 				simEventListenerEdge.setFrom(fromNode);
 				fromNode.getConnections().add(simEventListenerEdge);
 			}
-            this.notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENTLISTEDGE_ADDED, "Sim event listener connection added"));
+            this.notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED, "Sim event listener connection added"));
         }
     }
 
@@ -1174,8 +1175,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         for (Adapter jaxbAdapter : adaptersList) {
             AdapterEdge adapterEdge = new AdapterEdge();
-            AssemblyNode   toNode = getNodeCache().get(jaxbAdapter.getTo());
-            AssemblyNode fromNode = getNodeCache().get(jaxbAdapter.getFrom());
+            AssemblyNode   toNode = getAssemblyNodeCacheMap().get(jaxbAdapter.getTo());
+            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(jaxbAdapter.getFrom());
 			
 			if (toNode != null)
 			{
@@ -1209,7 +1210,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                   toNode.getConnections().add(adapterEdge);
 			if (fromNode != null)
                 fromNode.getConnections().add(adapterEdge);
-            this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTEREDGE_ADDED, "Adapter connection added"));
+            this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_ADDED, "Adapter connection added"));
         }
     }
 
@@ -1253,7 +1254,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private PropertyChangeListenerNode buildPropertyChangeListenerNodeFromJaxbPCL(PropertyChangeListener propertyChangeListener)
 	{
-        PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) getNodeCache().get(propertyChangeListener.getName());
+        PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) getAssemblyNodeCacheMap().get(propertyChangeListener.getName());
         if (propertyChangeListenerNode != null)
 		{
             return propertyChangeListenerNode;
@@ -1287,7 +1288,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
         LogUtilities.getLogger(AssemblyModelImpl.class).debug("propertyChangeListenerNode name: " + propertyChangeListenerNode.getName());
 
-        getNodeCache().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode);   // key = se
+        getAssemblyNodeCacheMap().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode); // key = PCL name
 
         if (!nameCheckSatisfactory())
 		{
@@ -1299,7 +1300,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     private EventGraphNode buildEventGraphNodeFromJaxbSimEntity(SimEntity jaxbSimEntity, boolean isOutputNode, boolean isVerboseNode)
 	{
-        EventGraphNode eventGraphNode = (EventGraphNode) getNodeCache().get(jaxbSimEntity.getName());
+        EventGraphNode eventGraphNode = (EventGraphNode) getAssemblyNodeCacheMap().get(jaxbSimEntity.getName());
         if (eventGraphNode != null)
 		{
             return eventGraphNode;
@@ -1331,18 +1332,22 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         eventGraphNode.opaqueModelObject = jaxbSimEntity; // TODO not clear what this is for
 
-        getNodeCache().put(eventGraphNode.getName(), eventGraphNode);   // key = unique simEvent name
-
         if (!nameCheckSatisfactory())
 		{
             mangleName(eventGraphNode);
         }
-        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "Event added"));
+
+        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
+
+        assemblyModelDirty = true; // this now-modified assembly is not yet saved, so mark as dirty
+		
+		// TODO is this notification being caught??
+        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + jaxbSimEntity.getName()));
 
         return eventGraphNode;
     }
 
-    public Map<String, AssemblyNode> getNodeCache() {
-        return nodeCacheMap;
+    public Map<String, AssemblyNode> getAssemblyNodeCacheMap() {
+        return assemblyNodeCacheMap;
     }
 }

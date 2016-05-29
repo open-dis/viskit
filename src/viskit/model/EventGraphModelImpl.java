@@ -54,7 +54,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     ObjectFactory jaxbObjectFactory;
     SimEntity     jaxbSimEntity;
     File          currentFile;
-    Map<Event, EventNode> eventNodeCache        = new HashMap<>();
+    Map<Event, EventNode> eventGraphNodeCacheMap= new HashMap<>();
     Map<Object, Edge>     edgeCache             = new HashMap<>();
 	
     Vector<ViskitElement> stateTransitions      = new Vector<>(); // TODO
@@ -124,7 +124,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 	{
               stateVariables.removeAllElements();
         simulationParameters.removeAllElements();
-              eventNodeCache.clear();
+              eventGraphNodeCacheMap.clear();
                    edgeCache.clear();
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New event graph model"));
 
@@ -230,13 +230,13 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         File tempFile;
         FileWriter fileWriter = null;
         try {
-            tempFile = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
+            tempFile = TempFileManager.createTempFile("tempEventGraphMarshalOutput", ".xml");
         } 
 		catch (IOException e)
 		{
             eventGraphController.messageToUser(JOptionPane.ERROR_MESSAGE,
                     "Input/Output (I/O) Error",
-                    "Exception creating temporary file, EventGraphModelImpl.saveModel():" +
+                    "Exception creating temporary file tempEventGraphMarshalOutput.xml, EventGraphModelImpl.saveModel():" +
                     "\n" + e.getMessage()
                     );
             return false;
@@ -321,7 +321,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
     private EventNode buildEventNodeFromJaxbEvent(Event jaxbEvent)
 	{
-        EventNode eventNode = eventNodeCache.get(jaxbEvent);
+        EventNode eventNode = eventGraphNodeCacheMap.get(jaxbEvent);
         if (eventNode != null) {
             return eventNode;
         }
@@ -329,7 +329,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         jaxbEventToEventNode(jaxbEvent, eventNode);
         eventNode.opaqueModelObject = jaxbEvent;
 
-        eventNodeCache.put(jaxbEvent, eventNode);   // key = event
+        eventGraphNodeCacheMap.put(jaxbEvent, eventNode);   // key = event
 
         // Ensure a unique Event name for XML IDREFs
         if (!nameCheck()) {
@@ -387,7 +387,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     private boolean nameCheck()
 	{
         Set<String> stringHashSet = new HashSet<>(10);
-        for (EventNode eventNode : eventNodeCache.values())
+        for (EventNode eventNode : eventGraphNodeCacheMap.values())
 		{
             if (!stringHashSet.add(eventNode.getName()))
 			{
@@ -525,6 +525,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         schedulingEdge.fromEventNode = src;
         EventNode target = buildEventNodeFromJaxbEvent((Event) jaxbSchedule.getEvent());
         schedulingEdge.toEventNode = target;
+        schedulingEdge.name = "from_" + schedulingEdge.fromEventNode.name + "_TO_" + schedulingEdge.toEventNode.name;
 
         src.getConnections().add(schedulingEdge);
         target.getConnections().add(schedulingEdge);
@@ -577,7 +578,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
         setDirty(true);
 
-        this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Schedule Edge added: " + schedulingEdge.name));
+        this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Scheduling Edge added: " + schedulingEdge.name));
     }
 
     private void buildCancellingEdgeFromJaxb(EventNode jaxbSourceNode, Cancel jaxbCancel) {
@@ -608,7 +609,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         edgeCache.put(jaxbCancel, cancellingEdge);
         setDirty(true);
 
-        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_ADDED, "Cancelling edge added: " + cancellingEdge.name));
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLING_EDGE_ADDED, "Cancelling edge added: " + cancellingEdge.name));
     }
 
     private List<ViskitElement> buildEdgeParametersFromJaxb(List<EdgeParameter> lis) {
@@ -732,7 +733,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
     @Override
     public Vector<ViskitElement> getAllNodes() {
-        return new Vector<ViskitElement>(eventNodeCache.values());
+        return new Vector<ViskitElement>(eventGraphNodeCacheMap.values());
     }
 
     @SuppressWarnings("unchecked") // TODO: Known unchecked cast toEventNode ViskitElement
@@ -886,7 +887,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         eventNode.setPosition(point);
         Event jaxbEvent = jaxbObjectFactory.createEvent();
 
-        eventNodeCache.put(jaxbEvent, eventNode);   // key = ev
+        eventGraphNodeCacheMap.put(jaxbEvent, eventNode);   // key = ev
 
         // Ensure a unique Event name
         if (!nameCheck()) {
@@ -910,7 +911,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     @Override
     public void redoEvent(EventNode node) {
         Event jaxbEvent = jaxbObjectFactory.createEvent();
-        eventNodeCache.put(jaxbEvent, node);   // key = evnode.opaqueModelObject = jaxbEv;
+        eventGraphNodeCacheMap.put(jaxbEvent, node);   // key = evnode.opaqueModelObject = jaxbEv;
         jaxbEvent.setName(node.getName());
         node.opaqueModelObject = jaxbEvent;
         jaxbSimEntity.getEvent().add(jaxbEvent);
@@ -922,7 +923,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     @Override
     public void deleteEvent(EventNode node) {
         Event jaxbEvent = (Event) node.opaqueModelObject;
-        eventNodeCache.remove(jaxbEvent);
+        eventGraphNodeCacheMap.remove(jaxbEvent);
         jaxbSimEntity.getEvent().remove(jaxbEvent);
 
         setDirty(true);
@@ -979,7 +980,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
     private boolean isUniqueLocalVariableOrIndexVname(String name)
 	{
-        for (EventNode event : eventNodeCache.values())
+        for (EventNode event : eventGraphNodeCacheMap.values())
 		{
             for (ViskitElement localVariable : event.getLocalVariables()) {
                 if (localVariable.getName().equals(name)) {
@@ -1236,7 +1237,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
         edgeCache.put(cancel, cancellingEdge);
         setDirty(true);
-        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_ADDED, "Cancelling Edge added: " + 
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLING_EDGE_ADDED, "Cancelling Edge added: " + 
 		              sourceNode.getName() + " to " + targetNode.getName()));
     }
 
@@ -1275,7 +1276,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         _commonEdgeDelete(edge);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLINGEDGE_DELETED, "Cancelling edge deleted: " + edge.getName()));
+            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELLING_EDGE_DELETED, "Cancelling edge deleted: " + edge.getName()));
         else
             notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELLING_EDGE, "Cancelling edge undone: " + edge.getName()));
     }
@@ -1334,6 +1335,6 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             jaxbCancel.getEdgeParameter().add(jaxbEdgeParameter);
         }
         setDirty(true);
-        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLINGEDGE_CHANGED, "Cancelling edge changed: " + cancellingEdge.name));
+        notifyChanged(new ModelEvent(cancellingEdge, ModelEvent.CANCELLING_EDGE_CHANGED, "Cancelling edge changed: " + cancellingEdge.name));
     }
 }

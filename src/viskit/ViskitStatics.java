@@ -121,7 +121,7 @@ public class ViskitStatics
 	public final static String         VISKIT_READY_MESSAGE = "Visual Simkit is ready to go!";
 	public final static String PROJECT_OPEN_SUCCESS_MESSAGE = "Project opened successfully!";
 	public final static String PROJECT_OPEN_FAILURE_MESSAGE = "Project failed to open...";
-	public final static String             RECENTER_SPACING = " &nbsp &nbsp &nbsp &nbsp ";
+	public final static String             RECENTER_SPACING = " &nbsp; &nbsp; &nbsp; &nbsp; ";
 
     /** Utility method to configure a Viskit project
      *
@@ -327,7 +327,7 @@ public class ViskitStatics
         } 
 		catch (ClassNotFoundException e) 
 		{
-            classRetrieved = tryPrimsAndArrays(className, classLoader);
+            classRetrieved = tryPrimitiveTypesAndArrays(className, classLoader);
             if (classRetrieved == null) 
 			{
                 classRetrieved = tryCommonClasses(className, classLoader);
@@ -338,8 +338,7 @@ public class ViskitStatics
                     } 
 					catch (ClassNotFoundException cnfe) 
 					{
-                        // sometimes happens, ignore
-						LOG.error ("ClassNotFoundException", cnfe);
+						LOG.error ("allowed ClassNotFoundException", cnfe); // sometimes happens, ignore
                     }
                 }
             }
@@ -363,29 +362,31 @@ public class ViskitStatics
         char c;
     }
 
-    static Class<?> tryCommonClasses(String s, ClassLoader classLoader) 
+    static Class<?> tryCommonClasses(String typeName, ClassLoader classLoader) 
 	{
-        String conv = commonExpansions(s);
-        if (conv == null) {
+        String expandedTypeName = commonExpansions(typeName);
+        if (expandedTypeName == null) 
+		{
             return null;
         }
         try {
-            return Class.forName(conv, false, classLoader); // test 26JUL04 true,cLdr);
-        } catch (ClassNotFoundException e) {
+            return Class.forName(expandedTypeName, false, classLoader); // test 26JUL04 true,cLdr);
+        } 
+		catch (ClassNotFoundException e) {
             return null;
         }
     }
 
     /** Convenience method for expanding unqualified (common) types used in Viskit
      *
-     * @param s the string of the unqualified type
+     * @param typeName the string of the unqualified type
      * @return the qualified type
      */
-    static String commonExpansions(String s)
+    static String commonExpansions(String typeName)
 	{
         String returnValue;
 
-        switch (s) 
+        switch (typeName) 
 		{
             case "String":
                 returnValue = JAVA_LANG_STRING;
@@ -417,52 +418,53 @@ public class ViskitStatics
         return returnValue;
     }
 
-    static Class<?> tryPrimitive(String s) {
-        return tryPrimitive(s, new ReturnChar());
+    static Class<?> tryPrimitiveType(String typeName) 
+	{
+        return tryPrimitiveType(typeName, new ReturnChar());
     }
 
-    static Class<?> tryPrimitive(String s, ReturnChar rc)
+    static Class<?> tryPrimitiveType(String typeName, ReturnChar returnChar)
 	{
-        switch (s) 
+        switch (typeName) 
 		{
             case "long":
-                rc.c = 'J';
+                returnChar.c = 'J';
                 return long.class;
             case "float":
-                rc.c = 'F';
+                returnChar.c = 'F';
                 return float.class;
             case "char":
-                rc.c = 'C';
+                returnChar.c = 'C';
                 return char.class;
             case "int":
-                rc.c = 'I';
+                returnChar.c = 'I';
                 return int.class;
             case "short":
-                rc.c = 'S';
+                returnChar.c = 'S';
                 return short.class;
             case "double":
-                rc.c = 'D';
+                returnChar.c = 'D';
                 return double.class;
             case "byte":
-                rc.c = 'B';
+                returnChar.c = 'B';
                 return byte.class;
             case "boolean":
-                rc.c = 'Z';
+                returnChar.c = 'Z';
                 return boolean.class;
             default:
                 return null;
         }
     }
 
-    static Class<?> tryPrimsAndArrays(String s, ClassLoader classLoader) 
+    static Class<?> tryPrimitiveTypesAndArrays(String typeName, ClassLoader classLoader) 
 	{
-        String[] splittee = s.split("\\[");
+        String[] splittee = typeName.split("\\[");
         boolean isArray = splittee.length > 1;
         char prefix = ' ';
         String name = "";
         char suffix = ' ';
         ReturnChar returnChar = new ReturnChar();
-        Class<?> c = tryPrimitive(splittee[0], returnChar);
+        Class<?> c = tryPrimitiveType(splittee[0], returnChar);
 
         if (c != null) {   // primitive
             if (isArray) {
@@ -499,7 +501,7 @@ public class ViskitStatics
             // one last check
             if (commonExpansions(name) != null) 
 			{
-                return tryPrimsAndArrays(s.replaceFirst(name, commonExpansions(name)), classLoader);
+                return tryPrimitiveTypesAndArrays(typeName.replaceFirst(name, commonExpansions(name)), classLoader);
             }
             return null;
         }
@@ -514,16 +516,16 @@ public class ViskitStatics
      */
     static Class<?> tryUnqualifiedName(String name) 
 	{
-        String userDir  = System.getProperty("user.dir");
-        String userHome = System.getProperty("user.home");
-        String workDir  = ViskitGlobals.instance().getWorkDirectory().getPath();
+        String     userDirectoryName = System.getProperty("user.dir");
+        String userHomeDirectoryName = System.getProperty("user.home");
+        String     workDirectoryName = ViskitGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
         Path startingDirectory;
-        String pattern = name + "\\.class";
-        Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader)ViskitGlobals.instance().getWorkClassLoader();
-        String[] classpaths = loader.getClassPath();
+        String      pattern = name + "\\.class";
+        Class<?> foundClass = null;
+        LocalBootLoader       localBootLoader = (LocalBootLoader)ViskitGlobals.instance().getWorkClassLoader();
+        String[] classpaths = localBootLoader.getClassPath();
 
         for (String classpath : classpaths) 
 		{
@@ -547,26 +549,33 @@ public class ViskitStatics
                     String clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
-                    if (clazz.contains(userHome)) {
-                        clazz = clazz.substring(userHome.length() + 1, clazz.length());
-                    } else if (clazz.contains(userDir)) {
-                        clazz = clazz.substring(userDir.length() + 1, clazz.length());
-                    } else if (clazz.contains(workDir)) {
-                        clazz = clazz.substring(workDir.length() + 1, clazz.length());
+                    if (clazz.contains(userHomeDirectoryName))
+					{
+                        clazz = clazz.substring(userHomeDirectoryName.length() + 1, clazz.length());
+                    } 
+					else if (clazz.contains(userDirectoryName)) 
+					{
+                        clazz = clazz.substring(userDirectoryName.length() + 1, clazz.length());
+                    } 
+					else if (clazz.contains(workDirectoryName)) 
+					{
+                        clazz = clazz.substring(workDirectoryName.length() + 1, clazz.length());
                     }
 
                     // Strip off .class and replace File.separatorChar w/ a "."
                     clazz = clazz.substring(0, clazz.lastIndexOf(".class"));
                     clazz = clazz.replace(File.separatorChar, '.');
 
-                    c = Class.forName(clazz, false, loader);
+                    foundClass = Class.forName(clazz, false, localBootLoader);
                     break;
                 }
-            } catch (ClassNotFoundException e) {}
-
+            } 
+			catch (ClassNotFoundException e) 
+			{
+				// no action if search testing is unsuccessful
+			}
         }
-
-        return c;
+        return foundClass;
     }
 
     static public String getPathSeparator() 
@@ -590,7 +599,7 @@ public class ViskitStatics
 	{
         if (debug) 
 		{
-            LOG.info("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
+//            LOG.info("ViskitStatics putting " + typeName + " " + Arrays.toString(parameterMapObjectArray));
         }
         parameterHashMap.remove(typeName); // ensure correct
         parameterHashMap.put(typeName, parameterMapObjectArray);
@@ -628,7 +637,7 @@ public class ViskitStatics
 		if ((parameterHashMap != null) && (eventGraphType.getName() != null) && (parameterHashMap.get(eventGraphType.getName()) != null))
 		{
 			resolvedParameterList = parameterHashMap.get(eventGraphType.getName());
-			LOG.info("parameters already resolved"); // TODO confirm OK, are we all done?
+//			LOG.info("parameters already resolved"); // TODO confirm OK, are we all done?
 		}
 		
         if (resolvedParameterList == null)
@@ -654,8 +663,7 @@ public class ViskitStatics
 
             if (viskit.ViskitStatics.debug)
 			{
-                LOG.info("adding " + eventGraphType.getName());
-                LOG.info("\t # constructors: " + reflectionConstructors.length);
+//                LOG.info("adding " + eventGraphType.getName() + ", # constructors: " + reflectionConstructors.length);
             }
 
             for (int i = 0; i < reflectionConstructors.length; i++)
@@ -665,7 +673,7 @@ public class ViskitStatics
                 reflectionParameterList[i] = new ArrayList<>();
                 if (viskit.ViskitStatics.debug) 
 				{
-                    LOG.info("\tparameter count=" + reflectionParameterClassTypes.length + " in constructor " + i);
+//                    LOG.info("\tparameter count=" + reflectionParameterClassTypes.length + " in constructor " + i);
                 }
 
                 // possible that a class inherited an annotated parameterHashMap, check that first
@@ -704,7 +712,7 @@ public class ViskitStatics
 				{
                     if (viskit.ViskitStatics.debug)
 					{
-                        LOG.info(jaxbField + " is a parameterMap");
+//                        LOG.info(jaxbField + " is a parameterMap");
                     }
                     try {
                         // parameters are in the following order
@@ -737,7 +745,7 @@ public class ViskitStatics
                                         reflectionParameterList[n].add(parameter);
                                         if (viskit.ViskitStatics.debug)
 										{
-                                            LOG.info("\tfrom compiled parameterMap: " + parameter.getName() + " " + parameter.getType());
+//                                            LOG.info("\tfrom compiled parameterMap: " + parameter.getName() + " " + parameter.getType());
                                         }
                                     } catch (Exception ex) {
                                         LOG.error(ex);
@@ -775,7 +783,7 @@ public class ViskitStatics
                             reflectionParameterList[i].add(newParameter);
                             if (viskit.ViskitStatics.debug)
 							{
-                                LOG.info("\t " + newParameter.getType() + " " + newParameter.getName());
+//                                LOG.info("\t " + newParameter.getType() + " " + newParameter.getName());
                             }
                         } 
 						catch (Exception ex)
@@ -844,13 +852,13 @@ public class ViskitStatics
         //
         if (debug) 
 		{
-            LOG.info("number of constructors for " + type + ":");
+//            LOG.info("number of constructors for " + type + ":");
         }
         if (ViskitGlobals.instance().isArray(type)) 
 		{
             if (debug) 
 			{
-                LOG.info("1");
+//                LOG.info("1");
             }
             return 1;
         } 
@@ -868,7 +876,7 @@ public class ViskitStatics
 				{
                     if (debug) 
 					{
-                        LOG.info(reflectionConstructors.length);
+//                        LOG.info(reflectionConstructors.length);
                     }
                     return reflectionConstructors.length;
                 }
@@ -877,7 +885,7 @@ public class ViskitStatics
 			{
 				if (debug) 
 				{
-					LOG.info("0");
+//					LOG.info("0");
 				}
                 return 0;
             }

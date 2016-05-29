@@ -214,31 +214,35 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public JGraphAssemblyComponentWrapper getCurrentJGraphAssemblyComponentWrapper() {
-        JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
-        if (jsplt == null) {
+    public JGraphAssemblyComponentWrapper getCurrentJGraphAssemblyComponentWrapper()
+	{
+        JSplitPane jSplitPane = (JSplitPane) tabbedPane.getSelectedComponent();
+        if (jSplitPane == null)
+		{
             return null;
         }
-
-        JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
-        return (JGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
+        JScrollPane jScrollPane = (JScrollPane) jSplitPane.getRightComponent();
+        return (JGraphAssemblyComponentWrapper) jScrollPane.getViewport().getComponent(0);
     }
 
-    public Component getCurrentJgraphComponent() {
+    public Component getCurrentJgraphComponent()
+	{
         JGraphAssemblyComponentWrapper vcw = getCurrentJGraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
 
-    public JToolBar getToolBar() {
+    public JToolBar getToolBar()
+	{
         return toolBar;
     }
 
-    public void setToolBar(JToolBar toolBar) {
+    public void setToolBar(JToolBar toolBar)
+	{
         this.toolBar = toolBar;
     }
 	
-	public Component getSelectedAssembly () // TODO stricter typing
+	public Component getSelectedAssembly () // TODO stricter typing, if possible
 	{
 		return tabbedPane.getSelectedComponent();
 	}
@@ -246,35 +250,40 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     /**
      * @return the recentProjectFileSetListener
      */
-    public RecentProjectFileSetListener getRecentProjectFileSetListener() {
+    public RecentProjectFileSetListener getRecentProjectFileSetListener()
+	{
         return recentProjectFileSetListener;
     }
 
 	/**
 	 * @return the assembliesMenu
 	 */
-	public JMenu getFileMenu() {
+	public JMenu getFileMenu()
+	{
 		return assembliesMenu;
 	}
 
 	/**
 	 * @return the editMenu
 	 */
-	public JMenu getEditMenu() {
+	public JMenu getEditMenu() 
+	{
 		return editMenu;
 	}
 
 	/**
 	 * @return the currentZoomFactor
 	 */
-	public double getCurrentZoomFactor() {
+	public double getCurrentZoomFactor() 
+	{
 		return currentZoomFactor;
 	}
 
 	/**
 	 * @param currentZoomFactor the currentZoomFactor to set
 	 */
-	public void setCurrentZoomFactor(double currentZoomFactor) {
+	public void setCurrentZoomFactor(double currentZoomFactor)
+	{
 		this.currentZoomFactor = currentZoomFactor;
 	}
 
@@ -296,14 +305,14 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
             setModel((AssemblyModelImpl) myVgacw.assemblyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
-            AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
+            AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
 
-            if (mod.getLastFile() != null) 
+            if (assemblyModel.getLastFile() != null) 
 			{
-                ((AssemblyControllerImpl) getController()).initializeOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
+                ((AssemblyControllerImpl) getController()).initializeOpenAssemblyWatch(assemblyModel.getLastFile(), assemblyModel.getJaxbRoot());
             }
 
-            GraphMetadata graphMetadata = mod.getMetadata();
+            GraphMetadata graphMetadata = assemblyModel.getMetadata();
             if (graphMetadata != null) 
 			{
                 setSelectedAssemblyName   (graphMetadata.name);
@@ -500,7 +509,6 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
-				helpMenu.addSeparator();
 
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
@@ -513,7 +521,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		}
     }
 
-    private JMenu buildMenu(String name) {
+    private JMenu buildMenu(String name) 
+	{
         return new JMenu(name);
     }
 
@@ -543,27 +552,32 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     /**
      * @return the current mode--select, add, arc, cancelArc
      */
-    public int getCurrentMode() {
-        // Use the button's selected status to figure out what mode
-        // we are in.
+    public int getCurrentMode() 
+	{
+        // Use the button's selected status to figure out what mode we are in.
 
-        if (selectModeButton.isSelected()) {
+        if (selectModeButton.isSelected())
+		{
             return SELECT_MODE;
         }
-        if (adapterModeButton.isSelected()) {
+        if (adapterModeButton.isSelected())
+		{
             return ADAPTER_MODE;
         }
-        if (simEventListenerModeButton.isSelected()) {
+        if (simEventListenerModeButton.isSelected())
+		{
             return SIM_EVENT_LISTENER_MODE;
         }
-        if (propertyChangeConnectorModeButton.isSelected()) {
+        if (propertyChangeConnectorModeButton.isSelected()) 
+		{
             return PROPERTY_CHANGE_LISTENER_MODE;
         }
-        LOG.error("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\" since no button selected");
         return 0;
     }
 
-    private void buildToolbar() {
+    private void buildToolbar() 
+	{
         ButtonGroup modeButtonGroup = new ButtonGroup();
         setToolBar(new JToolBar());
 
@@ -769,42 +783,45 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public void addTab(AssemblyModel assemblyModel)
 	{
-        JGraphAssemblyModel vGAmod = new JGraphAssemblyModel();
-        JGraphAssemblyComponentWrapper graphPane = new JGraphAssemblyComponentWrapper(vGAmod, this);
-        vGAmod.setjGraph(graphPane);                               // todo fix this
+        JGraphAssemblyModel            jGraphAssemblyModel            = new JGraphAssemblyModel();
+        JGraphAssemblyComponentWrapper jGraphAssemblyComponentWrapper = new JGraphAssemblyComponentWrapper(jGraphAssemblyModel, this);
+        jGraphAssemblyModel.setjGraph (jGraphAssemblyComponentWrapper);   // TODO legacy comment - fix this?
 
 		if (treePanels == null) // viskit opened with no active project
 			buildTreePanels();
-        graphPane.assemblyModel = assemblyModel;
-        graphPane.trees = treePanels;
-        graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        graphPane.trees.setMinimumSize(new Dimension(20, 20));
-        graphPane.trees.setDividerLocation(250);
+        jGraphAssemblyComponentWrapper.assemblyModel = assemblyModel;
+        jGraphAssemblyComponentWrapper.trees = treePanels;
+        jGraphAssemblyComponentWrapper.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jGraphAssemblyComponentWrapper.trees.setMinimumSize(new Dimension(20, 20));
+        jGraphAssemblyComponentWrapper.trees.setDividerLocation(250);
 
         // Split pane with the canvas on the right and a split pane with LEGO tree and PCLs on the left.
-        JScrollPane scrollPane = new JScrollPane(graphPane);
+        JScrollPane scrollPane = new JScrollPane(jGraphAssemblyComponentWrapper);
 
-        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, graphPane.trees, scrollPane);
+        jGraphAssemblyComponentWrapper.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jGraphAssemblyComponentWrapper.trees, scrollPane);
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the right component (JGraph side) most of the usable
         // extra space in this SplitPlane -> 25%
-        graphPane.drawingSplitPane.setResizeWeight(0.25);
-        graphPane.drawingSplitPane.setOneTouchExpandable(true);
+        jGraphAssemblyComponentWrapper.drawingSplitPane.setResizeWeight(0.25);
+        jGraphAssemblyComponentWrapper.drawingSplitPane.setOneTouchExpandable(true); // adds widget
 
         try {
-            graphPane.getDropTarget().addDropTargetListener(new viskitDropTargetAdapter());
-        } catch (TooManyListenersException tmle) {
+            jGraphAssemblyComponentWrapper.getDropTarget().addDropTargetListener(new ViskitDropTargetAdapter());
+			
+			// TODO critical missing piece?? do we need to add listener for opening event graph simentities when opening an assembly file?
+        } 
+		catch (TooManyListenersException tmle) {
             LOG.error(tmle);
         }
-        graphPane.setToolTipText(assemblyModel.getMetadata().description);
+        jGraphAssemblyComponentWrapper.setToolTipText(assemblyModel.getMetadata().description);
 
         // the view holds only one assemblyModel, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed assemblyModel
         // by virtue of calling stateChanged()
-        tabbedPane.add("AssemblyTab" + nextTabIndex, graphPane.drawingSplitPane);
+        tabbedPane.add("AssemblyTab" + nextTabIndex, jGraphAssemblyComponentWrapper.drawingSplitPane);
         tabbedPane.setToolTipTextAt(tabbedPane.getTabCount()-1, assemblyModel.getMetadata().description);
-        tabbedPane.setSelectedComponent(graphPane.drawingSplitPane); // bring to front
+        tabbedPane.setSelectedComponent(jGraphAssemblyComponentWrapper.drawingSplitPane); // bring to front
 		nextTabIndex++; // increment in preparation for next tab
 
         // Now expose the Assembly toolbar
@@ -982,13 +999,12 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     /** Class to facilitate dragging new nodes onto the pallete */
-    class viskitDropTargetAdapter extends DropTargetAdapter 
+    class ViskitDropTargetAdapter extends DropTargetAdapter 
 	{
         @Override
-        public void dragOver(DropTargetDragEvent e) 
+        public void dragOver(DropTargetDragEvent dropTargetDragEvent) 
 		{
-            // NOTE: this action is very critical in getting JGraph 5.14 to signal the drop method
-            e.acceptDrag(e.getDropAction());
+            dropTargetDragEvent.acceptDrag(dropTargetDragEvent.getDropAction()); // NOTE: this action is very critical in getting JGraph 5.14 to signal the drop method
         }
 
         @Override
@@ -1004,17 +1020,17 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
                     // Check for XML-based node first
 					String extendsFrom = sa[0];
-                    FileBasedAssemblyNode xmlBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
+                    FileBasedAssemblyNode fileBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
 					
-                    if (xmlBasedAssemblyNode != null)
+                    if (fileBasedAssemblyNode != null)
 					{
                         switch (extendsFrom) // inherits
 						{
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xmlBasedAssemblyNode, point);
+                                ((AssemblyController) getController()).newFileBasedEventGraphNode(fileBasedAssemblyNode, point);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xmlBasedAssemblyNode, point, ViskitStatics.DEFAULT_DESCRIPTION);
+                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(fileBasedAssemblyNode, point, ViskitStatics.DEFAULT_DESCRIPTION);
                                 break;
 							default:
 								LOG.error ("Unexpected inheritance extendsFrom=" + extendsFrom);
@@ -1054,7 +1070,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     @Override
     public void modelChanged(mvcModelEvent event) {
-        switch (event.getID()) {
+        switch (event.getID()) 
+		{
             default:
                 getCurrentJGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
                 break;
@@ -1216,16 +1233,20 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
 			this.selectedAssemblyName = ""; // can occur when deleting pane
 		}
-		if (tabbedPane.getTabCount() > tabbedPane.getSelectedIndex())
-			tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), this.selectedAssemblyName);
+		if ((tabbedPane.getTabCount() > tabbedPane.getSelectedIndex()) && (tabbedPane.getSelectedIndex() >= 0)) // -1 means no tabs
+			 tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), this.selectedAssemblyName);
     }
-//    @Override // TODO
+	
     public void setSelectedAssemblyTooltip(String selectedAssemblyDescription) 
 	{
         boolean nullString = !(selectedAssemblyDescription != null && !selectedAssemblyDescription.isEmpty());
-        if (!nullString) 
+        if (!nullString)
 		{
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), selectedAssemblyDescription);
+            tabbedPane.setToolTipTextAt(tabbedPane.getSelectedIndex(), selectedAssemblyDescription);
+        }
+		else
+		{
+            tabbedPane.setToolTipTextAt(tabbedPane.getSelectedIndex(), "");
         }
     }
 
@@ -1319,11 +1340,26 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         return fil;
     }
 
+
+	/**
+	 * Chooser for user to save a file
+	 * @param suggestedName  suggested name for saved file, user can override
+	 * @param showUniqueName whether or not a unique name is suggested for this file
+	 * @return saved file if successful, null otherwise
+	 */
     @Override
-    public File saveFileAsk(String suggestedName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName) 
+	{
 		 return saveFileAsk(suggestedName,  showUniqueName, "Save Assembly File");
     }
 
+	/**
+	 * Chooser for user to save a file
+	 * @param suggestedName  suggested name for saved file, user can override
+	 * @param showUniqueName whether or not a unique name is suggested for this file
+	 * @param dialogTitle title for file-selection chooser
+	 * @return saved file if successful, null otherwise
+	 */
     @Override
     public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
 	{
@@ -1349,17 +1385,18 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 		{
             if (assemblyFileChooser.getSelectedFile().exists())
 			{
-                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
-                    return null;
+                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) 
+				{
+                    return null; // cancel, no save
                 }
             }
-            return assemblyFileChooser.getSelectedFile();
+            return assemblyFileChooser.getSelectedFile(); // saved
         }
 
-        // We canceled
+        // if we get here, the user cancelled
         deleteCanceledSave(file.getParentFile());
         assemblyFileChooser = null;
-        return null;
+        return null; // no save
     }
 
     /** Handles a canceled new EG file creation

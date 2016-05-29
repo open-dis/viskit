@@ -29,11 +29,11 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
     private JGraph jGraph;
 
     public JGraphAssemblyModel() {
-        initViskitStyle();
+        initializeViskitStyle();
     }
 
     @SuppressWarnings("unchecked") // JGraph not genericized
-    private void initViskitStyle() {
+    private void initializeViskitStyle() {
 
         viskitAssemblyAdapterEdgeStyle = new AttributeMap();
 
@@ -83,15 +83,16 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
         jGraph.refresh();
     }
 
-    public void changeEGNode(AssemblyNode egn) {
-        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
-        c.setUserObject(egn);
+    public void changeEventGraphNode(AssemblyNode eventGraphNode)
+	{
+        DefaultGraphCell c = (DefaultGraphCell) eventGraphNode.opaqueViewObject;
+        c.setUserObject(eventGraphNode);
 
         reDrawNodes();
     }
 
     public void changePCLNode(AssemblyNode pcln) {
-        changeEGNode(pcln);
+        changeEventGraphNode(pcln);
     }
 
     /** Ensures a clean JGraph tab for a new model */

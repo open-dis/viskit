@@ -85,7 +85,7 @@ public class LocalBootLoader extends URLClassLoader
 	
     String[] classPath;
     LocalBootLoader stage1;
-    File workDir;
+    File workDirectory;
     URL[] externalClasspathUrls;
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
@@ -93,13 +93,14 @@ public class LocalBootLoader extends URLClassLoader
     /** Creates a new instance of LocalBootLoader
      * @param classes external classpath urls
      * @param parent the parent Classloader to this one
-     * @param workDir the current project working directory
+     * @param workDirectory the current project working directory
      */
-    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
+    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDirectory)
+	{
         super(new URL[] {}, parent);
         externalClasspathUrls = classes;
-        this.workDir = workDir;
-        LogUtilities.getLogger(LocalBootLoader.class).debug(ViskitGlobals.instance().printCallerLog());
+        this.workDirectory = workDirectory;
+//        LOG.debug(ViskitGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with the generated
@@ -111,7 +112,8 @@ public class LocalBootLoader extends URLClassLoader
      * @param allowAssembly
      * @return an isolated Context Class Loader instance
      */
-    public LocalBootLoader init(boolean allowAssembly) {
+    public LocalBootLoader init(boolean allowAssembly) 
+	{
         this.allowAssembly = allowAssembly;
         return init();
     }
@@ -155,14 +157,14 @@ public class LocalBootLoader extends URLClassLoader
 			// to reopen this issue when we need strict design points for DOE.
 
 			// Now add our project's working directory, i.e. build/classes
-			if (getWorkDir() != null)
+			if (getWorkDirectory() != null)
 			{
 				try {
-					stage1.addURL(getWorkDir().toURI().toURL());
+					stage1.addURL(getWorkDirectory().toURI().toURL());
 					String[] tmp = new String[getClassPath().length + 1];
 					System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
 					try {
-						tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
+						tmp[tmp.length - 1] = getWorkDirectory().getCanonicalPath();
 						classPath = tmp;
 					} catch (IOException ex) {
 						LOG.error(ex);
@@ -177,9 +179,9 @@ public class LocalBootLoader extends URLClassLoader
 
         // stage1 gets dirty during bring up of clean jar <-- Why?
         // reboot it with cleanWorkJar
-        LOG.debug("Stage1 reinit");
+//        LOG.debug("Stage1 reinit");
 //        initStage1();
-        LOG.debug("Adding cleaned jar " + jar);
+//        LOG.debug("Adding cleaned jar " + jar);
 
         // Now add our tmp jars containing compiled EGs and Assemblies
 //        try {
@@ -241,8 +243,8 @@ public class LocalBootLoader extends URLClassLoader
     }
 
     /** @return the working class directory for this project */
-    public File getWorkDir() {
-        return workDir;
+    public File getWorkDirectory() {
+        return workDirectory;
     }
 
     /** @return an indication for allowing an Assembly to be jarred up */
@@ -297,7 +299,7 @@ public class LocalBootLoader extends URLClassLoader
 
         ClassLoader parentClassLoader = getParent();
 
-        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
+        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -314,7 +316,7 @@ public class LocalBootLoader extends URLClassLoader
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
+                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
@@ -339,15 +341,15 @@ public class LocalBootLoader extends URLClassLoader
         try {
 
             // Don't jar up an empty build/classes directory
-            if (getWorkDir().listFiles().length == 0) {return null;}
+            if (getWorkDirectory().listFiles().length == 0) {return null;}
 
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
-            stage1.addURL(getWorkDir().toURI().toURL());
+            stage1.addURL(getWorkDirectory().toURI().toURL());
 
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
-            newJar = makeJarFileFromDir(getWorkDir());
+            newJar = makeJarFileFromDir(getWorkDirectory());
 
         } catch (MalformedURLException ex) {
             LOG.error(ex);

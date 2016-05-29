@@ -82,9 +82,9 @@ import viskit.view.AssemblyEditViewFrame;
 public class JGraphAssemblyComponentWrapper extends JGraphAssemblyComponent {
 
     public AssemblyModel assemblyModel;
-    public JSplitPane drawingSplitPane;
-    public JSplitPane trees;
-    public boolean isActive = true;
+    public JSplitPane    drawingSplitPane;
+    public JSplitPane    trees;
+    public boolean       isActive = true;
 
     public JGraphAssemblyComponentWrapper(JGraphAssemblyModel model, AssemblyEditViewFrame frame) {
         super(model, frame);

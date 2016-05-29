@@ -120,7 +120,7 @@ public class ViskitEventGraphAssemblyComboMain
 
         if (viskit.ViskitStatics.debug)
 		{
-            System.out.println("***Inside ViskitEventGraphAssemblyComboMain: " + args.length);
+//            LOG.debug("Inside ViskitEventGraphAssemblyComboMain with " + args.length + " arguments");
         }
         setLookAndFeelAndFonts();
 

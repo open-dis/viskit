@@ -437,8 +437,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         setFile(file.getAbsolutePath(), file.getName());
     }
 
-    public void closeAssemblyFile(File file) {
-    //todo do something here to put up a "no-file" banner or equivalent
+    public void closeAssemblyFile(File file)
+	{
+		// TODO do something here to put up a "no-file" banner or equivalent
     }
 
     public void refreshAssemblyFile(File file) {

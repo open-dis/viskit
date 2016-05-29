@@ -118,9 +118,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * command line
      * @param assemblyPath the assembly file to immediately open upon startup
      */
-    public void setInitialFile(String assemblyPath) {
-        if (viskit.ViskitStatics.debug) {
-            System.out.println("Initial file set: " + assemblyPath);
+    public void setInitialFile(String assemblyPath)
+	{
+        if (viskit.ViskitStatics.debug) 
+		{
+            LOG.debug("Initial assembly path: " + assemblyPath);
         }
         initialFilePath = assemblyPath;
     }
@@ -135,7 +137,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         LOG.debug("Compiling assembly: " + assemblyPath);
         File f = new File(assemblyPath);
         initialFilePath = assemblyPath;
-        _doOpen(f);
+        _doOpenAssembly(f);
         compileAssemblyAndPrepareSimulationRunner();
     }
 
@@ -193,7 +195,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             for (File f : openAssemblyFileList)
 			{
-                _doOpen(f);
+                _doOpenAssembly(f);
             }
         }
         updateAssemblyFileLists();
@@ -206,33 +208,37 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	 */
 	public void reportProjectOpenResult (String projectName)
 	{
-			if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-				 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
-				!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() &&
-				 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().equalsIgnoreCase(projectName))
-			{
-				// TODO re-open previously open assemblies and event graphs, otherwise:
-				
-				String phrasing = new String();
-				if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().toLowerCase().contains("project"))
-					phrasing = " project";
-			
-				messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-					"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + phrasing + " is open" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p align='center'>&nbsp;</p>" +
-							"<p align='center'>Open or create either an Assembly or an Event Graph" + ViskitStatics.RECENTER_SPACING + "</p>"  +
-							"<p align='center'>&nbsp;</p></html>");
-			}
-			else
-			{
-				LOG.error ("Project " + projectName + " did not open as expected.  Ensuring active project is closed.");
-				messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
-					"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>" + 
-					"<p align='center'>Please open or create another project to continue." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp</p>");
-				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
-			}
+		String message, phrasing = new String();
+		
+		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
+			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
+			!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() &&
+			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().equalsIgnoreCase(projectName))
+		{
+			// TODO re-open previously open assemblies and event graphs, otherwise:
+
+			if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().toLowerCase().contains("project"))
+				phrasing = " project";
+
+			message = ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + phrasing + " is open.";
+			LOG.info (message);
+			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
+				"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + phrasing + " is open." + ViskitStatics.RECENTER_SPACING + "</p>" +
+						"<p align='center'>&nbsp;</p>" +
+						"<p align='center'>Open or create either an Assembly or an Event Graph." + ViskitStatics.RECENTER_SPACING + "</p>"  +
+						"<p align='center'>&nbsp;</p></html>");
+		}
+		else
+		{
+			message = "Selected project " + projectName + " did not open as expected, see error log for details.  Ensuring current project is closed.";
+			LOG.error (message);
+			messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" + 
+				"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details." + ViskitStatics.RECENTER_SPACING + "</p>" +
+				"<p>&nbsp</p>" + 
+				"<p align='center'>Please open or create another project to continue." + ViskitStatics.RECENTER_SPACING + "</p>" +
+				"<p>&nbsp</p>");
+			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+		}
 	}
 	
     public List<File> getOpenAssemblyFileList()
@@ -279,8 +285,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
         boolean returnValue = true;
         AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (assemblyModel != null) {
-            if (((AssemblyModel) getModel()).isDirty()) {
+        if (assemblyModel != null) 
+		{
+            if (((AssemblyModel) getModel()).isDirty()) 
+			{
                 return askToSaveAndContinue();
             }
         }
@@ -305,29 +313,30 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>");
 			return;
 		}
-        File[] files = ((AssemblyEditView) getView()).openFilesAsk();
-        if (files == null)
+        File[] assemblyFiles = ((AssemblyEditView) getView()).openFilesAsk();
+        if (assemblyFiles == null)
 		{
             return;
         }
-        for (File file : files) 
+        for (File assemblyFile : assemblyFiles) 
 		{
-            if (file != null)
+            if (assemblyFile != null)
 			{
-				if (!file.getName().endsWith(".xml"))
+				if (!assemblyFile.getName().endsWith(".xml"))
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Assembly file", "<html>" +
-							"<p align='center'>Assembly files always end with .xml" + ViskitStatics.RECENTER_SPACING + "</p>" +
+							"<p align='center'>Assembly models always end with .xml file extensions." + ViskitStatics.RECENTER_SPACING + "</p>" +
 							"<p>&nbsp</p>" +
 							"<p align='center'>Please choose an assemly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
 					break;
 				}
-				else if (file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
+				// check that path is contained within project
+				else if (assemblyFile.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
 				{
-					_doOpen(file);
+					_doOpenAssembly(assemblyFile);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab();
 				}
-				else 
+				else // path is outside project
 				{
 					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", "<html>" +
 							"<p align='center'>Open assemblies must be within the currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
@@ -341,15 +350,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				}
 			}
         }
-//		updateAssemblyFileLists(); // update file lists
+//		updateAssemblyFileLists(); // update file lists  TODO verify
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
-    private void _doOpen(File assemblyFile) 
+    private void _doOpenAssembly(File assemblyFile) 
 	{
         if (!assemblyFile.exists())
 		{
-			String message = "Assembly file does not exist, cannot open it";
+			String message = "Assembly file does not exist, cannot open it.";
 			LOG.error (message + " " + assemblyFile.getAbsolutePath());
 			messageToUser (JOptionPane.WARNING_MESSAGE, "Cannot find requested Assembly file", "<html>" +
 					"<p align='center'>" + message + ViskitStatics.RECENTER_SPACING + "</p>" +
@@ -368,7 +377,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
             openAssemblyModelArray = assemblyEditView.getOpenAssemblyModelArray();
         }
-        boolean isOpenAlready = false;
+        boolean isAssemblyOpenAlready = false;
         if (openAssemblyModelArray != null)
 		{
             for (AssemblyModel openAssemblyModel : openAssemblyModelArray)
@@ -378,7 +387,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     String path = openAssemblyModel.getLastFile().getAbsolutePath();
                     if (path.equals(assemblyFile.getAbsolutePath()))
 					{
-                        isOpenAlready = true;
+                        isAssemblyOpenAlready = true;
 						break;
                     }
                 }
@@ -390,12 +399,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			return;
 		}	
 
-        if (!isOpenAlready)
+        if (!isAssemblyOpenAlready)
 		{
-			assemblyModel.newModel(assemblyFile);
-					
-			assemblyEditView.addTab(assemblyModel);
-		
+			if (assemblyModel.newModel(assemblyFile))
+			{
+				assemblyEditView.addTab(assemblyModel);
+			}
+			else
+			{
+				LOG.error ("assemblyModel " + assemblyModel + " did not open from " + assemblyFile.getName());
+			}
+			
             assemblyEditView.setSelectedAssemblyName(assemblyModel.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 			ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(assemblyModel.getMetadata().description);
@@ -447,7 +461,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void openRecentAssembly(File path)
 	{
-        _doOpen(path);
+        _doOpenAssembly(path);
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
@@ -614,7 +628,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void save () // method name must exactly match preceding string value 
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel.getLastFile() == null)
 		{
             saveAs ();
@@ -629,25 +643,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void saveAs () // method name must exactly match preceding string value
 	{
-        AssemblyModel model         = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         AssemblyEditView  view          = (AssemblyEditView) getView();
-        GraphMetadata graphMetadata = model.getMetadata();
-		String    fileName = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
+        GraphMetadata     graphMetadata = assemblyModel.getMetadata();
+		String            fileName      = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
         File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + fileName + ".xml", false, "Save Assembly File As");
 
-        if (saveFile != null) {
-
+        if (saveFile != null) // save successful if file returned
+		{
             String n = saveFile.getName();
             if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
             graphMetadata.name = n;
-            model.setMetadata(graphMetadata); // might have renamed
+            assemblyModel.setMetadata(graphMetadata); // might have renamed
 
-            model.saveModel(saveFile);
+            assemblyModel.saveModel(saveFile);
             view.setSelectedAssemblyName(graphMetadata.name);
             adjustRecentAssemblyFileSet(saveFile);
             markAssemblyFilesOpened();
@@ -1065,7 +1079,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
         if (modified)
 		{
-            ((AssemblyModel) getModel()).setMetadata(newAssemblyMetadata);
+            assemblyModel.setMetadata(newAssemblyMetadata);
 
             // update title bar
             ((AssemblyEditView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
@@ -1099,6 +1113,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
             JOptionPane.showMessageDialog(null, message, title, dialogType);
         }
+		
+		// clean up message HTML for logs
+		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
+		message = message.replaceAll("&nbsp;", " ");                    // non-breaking space character
+		message = message.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " "); // elements and attributes
+		message = message.replaceAll("(\\s)+", " ").trim();             // normalize whitespace
 		
 		switch (dialogType)
 		{
@@ -1166,10 +1186,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void close () // method name must exactly match preceding string value
 	{
-        if (preClose()) {
+        if (preClose())
+		{
             postClose();
         }
 //		updateAssemblyFileLists(); // save for next time
+		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // ensure focus isn't lost
 		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
@@ -1180,7 +1202,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             return false;
         }
 		openAssembliesFileList.remove(assemblyModel.getLastFile());
-        if (assemblyModel.isDirty()) {
+        if (assemblyModel.isDirty()) 
+		{
             return checkSaveIfDirty();
         }
         return true;
@@ -1235,11 +1258,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     {
         Object o = ((AssemblyEditView) getView()).getSelectedEventGraph();
 
-        if (o != null) {
-            if (o instanceof Class<?>) {
+        if (o != null) 
+		{
+            if (o instanceof Class<?>) 
+			{
                 newEventGraphNode(((Class<?>) o).getName(), getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
                 return;
-            } else if (o instanceof FileBasedAssemblyNode) {
+            } 
+			else if (o instanceof FileBasedAssemblyNode) 
+			{
                 newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
                 return;
             }
@@ -1352,13 +1379,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 // TODO: Can't remember why this is here after a save?
                 if (((AssemblyModel) getModel()).isDirty()) 
 				{
-                    return false;
-                } // we cancelled
+                    return false; // we cancelled
+                }
                 return true;
 				
             case JOptionPane.NO_OPTION:
                 // No need to recompile
-                if (((AssemblyModel) getModel()).isDirty()) {
+                if (((AssemblyModel) getModel()).isDirty()) 
+				{
                     ((AssemblyModel) getModel()).setDirty(false);
                 }
                 return true;
@@ -2171,8 +2199,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     // From menu
     @Override
-    public void export2grid() {
-        AssemblyModel model = (AssemblyModel) getModel();
+    public void export2grid() 
+	{
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
         File tFile;
         try {
             tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
@@ -2180,7 +2209,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             messageToUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
-        model.saveModel(tFile);
+        assemblyModel.saveModel(tFile);
     //todo switch to DOE
     }
     private String[] executionParameters;
@@ -2481,8 +2510,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			{
                 tempFile = file;
 
-                // _doOpen includes checks whether a tab is already opened
-                ViskitGlobals.instance().getEventGraphController()._doOpen(file);
+                // _doOpenEventGraph includes checks whether a tab is already opened
+                ViskitGlobals.instance().getEventGraphController()._doOpenEventGraph(file);
             }
 			ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab(); // ensure correct context when building menus
 			ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset

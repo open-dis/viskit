@@ -2,7 +2,6 @@ package viskit;
 
 import edu.nps.util.LogUtilities;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,7 +68,7 @@ public class Help
 
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
     private final Component      TUTORIAL_COMPONENT;
-	private final String         TUTORIAL_COMPONENT_ID = "helpTutorial";
+	private final String         TUTORIAL_COMPONENT_ID = "Tutorial"; // must match help TOC identifier
     private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     private       Component   parent;
@@ -146,22 +145,24 @@ public class Help
     public final static String SHOW_HELP_CONTENTS_METHOD = "showHelpContents"; // must match following method name.  not possible to accomplish this programmatically.
     public void showHelpContents() // method name must exactly match preceding string value
 	{
-        helpBroker.setDisplayed(true);
         helpBroker.setCurrentView("Introduction"); // initial page to view
+        helpBroker.setDisplayed(true);
     }
 
     public final static String SHOW_HELP_SEARCH_METHOD = "showHelpSearch"; // must match following method name.  not possible to accomplish this programmatically.
     public void showHelpSearch() // method name must exactly match preceding string value
 	{
-        helpBroker.setDisplayed(true);
         helpBroker.setCurrentView("Search");
+        helpBroker.setDisplayed(true);
     }
 
     public final static String SHOW_HELP_TUTORIAL_METHOD = "showHelpTutorial"; // must match following method name.  not possible to accomplish this programmatically.
     public void showHelpTutorial() // method name must exactly match preceding string value
 	{
-        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
-        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(actionEvent);
+//        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "Tutorial");
+//        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(actionEvent);
+        helpBroker.setCurrentView("Tutorial"); // initial page to view (not tree directory)
+        helpBroker.setDisplayed(true);
     }
 
     public void mainFrameLocated(Rectangle bounds)

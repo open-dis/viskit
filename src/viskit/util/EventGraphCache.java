@@ -212,25 +212,26 @@ public class EventGraphCache
      * in the project's EGs directory, and adds it to the list of event graphs
      * with the proper formatting of the file's path
      *
-     * @param egFile the EG file type and name to save
+     * @param eventGraphFile the EG file type and name to save
      */
-    private void saveEventGraphReferences(File egFile) {
-        LOG.debug("EG: " + egFile);
+    private void saveEventGraphReferences(File eventGraphFile)
+	{
+//        LOG.debug("Event graph: " + eventGraphFile);
 
         // find the package seperator
-        int lastSlash = egFile.getPath().lastIndexOf(File.separator);
-        int pos = egFile.getPath().lastIndexOf(".");
+        int   lastSlash = eventGraphFile.getPath().lastIndexOf(File.separator);
+        int dotPosition = eventGraphFile.getPath().lastIndexOf(".");
 
-        String pkg = egFile.getParentFile().getName();
-        String egName = egFile.getPath().substring(lastSlash + 1, pos);
-        eventGraphNamesList.add(pkg + "." + egName);
+        String    packageName = eventGraphFile.getParentFile().getName();
+        String eventGraphName = eventGraphFile.getPath().substring(lastSlash + 1, dotPosition);
+        eventGraphNamesList.add(packageName + "." + eventGraphName);
 
-        LOG.debug("EventGraph Name: " + egName);
+//        LOG.debug("EventGraph Name: " + eventGraphName);
 
-        File imgFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + pkg + "/" + egName + ".xml.png");
-        LOG.debug("Event Graph Image location: " + imgFile);
+        File imageFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + packageName + "/" + eventGraphName + ".xml.png");
+//        LOG.debug("Event Graph image file location: " + imageFile);
 
-        eventGraphImageFilesList.add(imgFile);
+        eventGraphImageFilesList.add(imageFile);
     }
 
     /** Use recursion to find EventGraph XML files

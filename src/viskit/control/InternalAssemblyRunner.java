@@ -309,7 +309,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             setVerbose.invoke(assemblyInstance, getVerbose());
 
             setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)ViskitGlobals.instance().getActiveAssemblyModel()).getAssemblyNodeCacheMap());
             addPropertyChangeListener.invoke(assemblyInstance, this);
             assemblyRunnable = (Runnable) assemblyInstance;
 

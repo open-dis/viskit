@@ -100,6 +100,8 @@ public class ViskitGlobals
     private ViskitApplicationFrame mainApplicationWindow;
 
     private static ViskitProject currentViskitProject;
+	
+	public static boolean LOG_EVENT_NOTIFICATIONS = true; // super verbose, helpful for debugging
 
     private static boolean projectOpen;
 	/**
@@ -912,7 +914,7 @@ public class ViskitGlobals
     public String printCallerLog() {
         StringBuilder sb = new StringBuilder();
         sb.append("Calling class: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
-        sb.append("\nCalling method: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
+        sb.append(", Calling method: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
         return sb.toString();
     }
 

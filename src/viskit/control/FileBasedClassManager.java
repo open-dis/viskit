@@ -187,7 +187,7 @@ public class FileBasedClassManager
             pa[0].addAll(simEntity.getParameter());
             ViskitStatics.putParameterListInHashMap(fclass.getName(), pa);
 
-            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
+//            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
         } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
             LOG.error(e);
@@ -248,7 +248,7 @@ public class FileBasedClassManager
      */
     public String createMessageDigest(File... files) {
 
-        String retVal = "";
+        String returnValue = "";
 
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -268,23 +268,23 @@ public class FileBasedClassManager
                 }
             }
             byte[] hash = md.digest();
-            if (viskit.ViskitStatics.debug) {
-                LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
+            if (viskit.ViskitStatics.debug)
+			{
+//                LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
-            retVal = new BigInteger(hash).toString(16);
+            returnValue = new BigInteger(hash).toString(16);
         } catch (NoSuchAlgorithmException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
-        return retVal;
+        return returnValue;
     }
 
     public boolean isCached(File file) {
         List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
-            LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
-            LOG.debug("cached " + cacheXML.contains(filePath));
+//            LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size() + ", cached " + cacheXML.contains(filePath));
             if (cacheXML.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);
@@ -312,9 +312,9 @@ public class FileBasedClassManager
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.ViskitStatics.debug) {
-                LOG.debug("getCached index at " + index);
-                LOG.debug("will return " + cacheClass.get(index));
+            if (viskit.ViskitStatics.debug) 
+			{
+//                LOG.debug("getCached index at " + index + ", will return " + cacheClass.get(index));
             }
         } catch (IOException ex) {
             LOG.error(ex);
@@ -322,8 +322,7 @@ public class FileBasedClassManager
         }
         File cachedFile = new File(cacheClass.get(index));
         if (viskit.ViskitStatics.debug) {
-            LOG.debug("cachedFile index at " + index);
-            LOG.debug("will return " + cachedFile);
+//            LOG.debug("cachedFile index at " + index + ", will return " + cachedFile);
         }
         return cachedFile;
     }
@@ -338,18 +337,18 @@ public class FileBasedClassManager
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.ViskitStatics.debug) {
-                LOG.debug("getCachedXml index at " + index);
-                LOG.debug("will return " + cacheXML.get(index));
+            if (viskit.ViskitStatics.debug) 
+			{
+//                LOG.debug("getCachedXml index at " + index + ", will return " + cacheXML.get(index));
             }
         } catch (IOException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheXML.get(index));
-        if (viskit.ViskitStatics.debug) {
-            LOG.debug("cachedFile index at " + index);
-            LOG.debug("will return " + cachedFile);
+        if (viskit.ViskitStatics.debug) 
+		{
+//            LOG.debug("cachedFile index at " + index + ", will return " + cachedFile);
         }
         return cachedFile;
     }

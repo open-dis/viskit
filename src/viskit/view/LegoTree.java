@@ -544,13 +544,13 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 className = className.substring(className.lastIndexOf('.') + 1); // short form
                 if (xmlFileBasedAssemblyNode.isXML)
 				{
-                    setToolTipText(className + " (loaded from Viskit XML)");
-                    className += " (XML)";
+                    className += " (from XML)";
+                    setToolTipText(className + " (loaded from Viskit XML model)");
                 } 
 				else
 				{
-                    setToolTipText(className + " (loaded from Viskit-compiled .class)");
-                    className += " (compiled)";
+                    className += " (from source)";
+                    setToolTipText(className + " (loaded from compiled Java source)");
                 }
                 value = className;
             } 

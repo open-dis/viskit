@@ -43,7 +43,7 @@ public class LocalDriverImpl implements DoeRunDriver {
             try {
                 Class<?> loaderz = loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 Constructor lconstr = loaderz.getConstructor(URL[].class, ClassLoader.class, File.class);
-                Object rloader = lconstr.newInstance(loader.getExternalClasspathUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDir());
+                Object rloader = lconstr.newInstance(loader.getExternalClasspathUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDirectory());
                 Method initr = loaderz.getMethod("init");
                 rloader = initr.invoke(rloader);
                 Constructor constr = gridRunnerz.getConstructor(loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER)); //yep

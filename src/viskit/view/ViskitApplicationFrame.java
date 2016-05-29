@@ -441,8 +441,8 @@ public class ViskitApplicationFrame extends JFrame
     }
 
     /** Utility class to handle tab selections on the main frame */
-    class myTabChangeListener implements ChangeListener {
-
+    class myTabChangeListener implements ChangeListener 
+	{
         @Override
         public void stateChanged(ChangeEvent e) {
 
@@ -512,7 +512,7 @@ public class ViskitApplicationFrame extends JFrame
 //            setJMenuBar(newMB);
 			if (titles[i].isEmpty())
 			{
-				System.out.println ("No title for tab " + i); // TODO fix improper setup
+				LOG.error ("No title for tab " + i + " TODO fix improper setup");
 			}
 			else myTitleListener.setTitle(titles[i], i);
         }

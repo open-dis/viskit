@@ -58,7 +58,7 @@ public class ObjectInspector extends JDialog
         okButton.addActionListener(new ApplyButtonListener());
   }
 
-  public void setType(String typ)
+  public void setType(String typeName)
   {
     contentPanel.removeAll();
 
@@ -121,7 +121,8 @@ public class ObjectInspector extends JDialog
     @Override
     public void actionPerformed(ActionEvent event)
     {
-      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom // TODO check
+//      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom // TODO check
+      pack();
       caretUpdate(null);
     }
   }

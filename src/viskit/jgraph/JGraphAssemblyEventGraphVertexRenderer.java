@@ -74,7 +74,7 @@ import viskit.model.AssemblyNode;
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
  */
-public class JGraphAssemblyEgVertexRenderer
+public class JGraphAssemblyEventGraphVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
@@ -102,7 +102,7 @@ public class JGraphAssemblyEgVertexRenderer
     /**
      * Constructs a renderer that may be used to render vertices.
      */
-    public JGraphAssemblyEgVertexRenderer() {
+    public JGraphAssemblyEventGraphVertexRenderer() {
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
@@ -120,7 +120,7 @@ public class JGraphAssemblyEgVertexRenderer
      * Constructs a renderer that may be used to render vertices.
      * @param hideGroups whether or not to hide groups
      */
-    public JGraphAssemblyEgVertexRenderer(boolean hideGroups) {
+    public JGraphAssemblyEventGraphVertexRenderer(boolean hideGroups) {
         this();
         this.hideGroups = hideGroups;
     }
@@ -282,10 +282,10 @@ public class JGraphAssemblyEgVertexRenderer
                 Image ii = j.createImage(500, 500); //"viskit/images/eventNode.png");
                 Graphics gr = ii.getGraphics();
                 FontMetrics fm = gr.getFontMetrics();
-                new JGraphAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia", 50, fm);
-                new JGraphAssemblyEgVertexRenderer().splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA", 50, fm);
-                new JGraphAssemblyEgVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia", 50, fm);
-                new JGraphAssemblyEgVertexRenderer().splitIfNeeded("mynameismikebaileyandiliveincalifornia", 50, fm);
+                new JGraphAssemblyEventGraphVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyAndILiveInCalifornia", 50, fm);
+                new JGraphAssemblyEventGraphVertexRenderer().splitIfNeeded("MYNAMEISMIKEBAILEYANDILIVEINCALIFORNIA", 50, fm);
+                new JGraphAssemblyEventGraphVertexRenderer().splitIfNeeded("MyNameIsMikeBaileyandiliveincalifornia", 50, fm);
+                new JGraphAssemblyEventGraphVertexRenderer().splitIfNeeded("mynameismikebaileyandiliveincalifornia", 50, fm);
             }
         });
     }

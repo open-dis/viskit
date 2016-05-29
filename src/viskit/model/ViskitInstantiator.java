@@ -201,7 +201,10 @@ public abstract class ViskitInstantiator
 
             if (viskit.ViskitStatics.debug) 
 			{
-                LOG.info("Constructor for " + typeName + ". Required Parameters:");
+				String noParameters = "";
+				if ((assemblyParametersList == null) || assemblyParametersList.isEmpty())
+					   noParameters = ": none";
+                LOG.info("Construct constructor for " + typeName + ", required parameters" + noParameters);
             }
 
 			int index = 0;

@@ -41,7 +41,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     AssemblyEditViewFrame parent;
     private UndoManager undoManager;
 
-    public JGraphAssemblyComponent(JGraphAssemblyModel model, AssemblyEditViewFrame frame) {
+    public JGraphAssemblyComponent(JGraphAssemblyModel model, AssemblyEditViewFrame frame)
+	{
         super(model);
         parent = frame;
 
@@ -137,7 +138,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 
     private ModelEvent currentModelEvent = null;
 
-    public void viskitModelChanged(ModelEvent modelEvent) {
+    public void viskitModelChanged(ModelEvent modelEvent)
+	{
         currentModelEvent = modelEvent;
 
         switch (modelEvent.getID())
@@ -148,12 +150,11 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 vGAModel.deleteAll();
                 break;
             case ModelEvent.EVENTGRAPH_ADDED:
-
                 // Reclaimed from the vGAModel to here
                 insert((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENTGRAPH_CHANGED:
-                vGAModel.changeEGNode((AssemblyNode) modelEvent.getSource());
+                vGAModel.changeEventGraphNode((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENTGRAPH_DELETED:
                 vGAModel.deleteEGNode((AssemblyNode) modelEvent.getSource());
@@ -646,7 +647,7 @@ class AssemblyCircleCell extends DefaultGraphCell {
  */
 class AssemblyCircleView extends VertexView {
 
-    static JGraphAssemblyEgVertexRenderer vaevr = new JGraphAssemblyEgVertexRenderer();
+    static JGraphAssemblyEventGraphVertexRenderer vaevr = new JGraphAssemblyEventGraphVertexRenderer();
 
     public AssemblyCircleView(Object cell) {
         super(cell);

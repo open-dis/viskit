@@ -78,7 +78,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // Open whatever Event Graphs were marked open on last closing
             for (File f : fileList) {
-                _doOpen(f);
+                _doOpenEventGraph(f);
             }
 
         } 
@@ -262,7 +262,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 						 file.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
 				{
 					// Event graph found within current project directory
-					_doOpen(file);
+					_doOpenEventGraph(file);
 					ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab();
 				}
 				else 
@@ -286,11 +286,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void openRecentEventGraph(File path) {
-        _doOpen(path);
+        _doOpenEventGraph(path);
     }
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
-    void _doOpen(File file)
+    void _doOpenEventGraph(File file)
 	{
         EventGraphView eventGraphView = (EventGraphView) getView();
         EventGraphModelImpl eventGraphModel = new EventGraphModelImpl(this);
@@ -300,7 +300,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
 		// determine whether this eventGraphModel isOpenAlready
         EventGraphModel[] eventGraphViewOpenModelsList = eventGraphView.getOpenModels();
-        boolean isOpenAlready = false;
+        boolean isEventGraphOpenAlready = false;
         if (eventGraphViewOpenModelsList != null) // TODO needed?
 		{
             for (EventGraphModel openModel : eventGraphViewOpenModelsList)
@@ -310,13 +310,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                     String path = openModel.getCurrentFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath()))
 					{
-                        isOpenAlready = true;
+                        isEventGraphOpenAlready = true;
 						break;
                     }
                 }
             }
         }
-        if (eventGraphModel.newModel(file) && !isOpenAlready)
+        if (eventGraphModel.newModel(file) && !isEventGraphOpenAlready)
 		{
             // We may find one or more simkit.Priority(s) with numeric values vice
             // eneumerations in the EG XML.  Modify and save the EG XML silently
@@ -367,17 +367,17 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     // Support for informing listeners about open eventgraphs
     // Methods to implement a scheme where other modules will be informed of file changes
     // (Would Java Beans do this with more or less effort?
-    private DirectoryWatch dirWatch;
-    private File watchDir;
+    private DirectoryWatch directoryWatch;
+    private File watchDirectory;
 
     private void initializeOpenEventGraphWatch() {
         try { // TBD this may be obsolete
-            watchDir = TempFileManager.createTempFile("egs", "current");   // actually creates
-            watchDir = TempFileManager.createTempDir(watchDir);
+            watchDirectory = TempFileManager.createTempFile("egs", "current");   // actually creates
+            watchDirectory = TempFileManager.createTempDir(watchDirectory);
 
-            dirWatch = new DirectoryWatch(watchDir);
-            dirWatch.setLoopSleepTime(1_000); // 1 sec
-            dirWatch.startWatcher();
+            directoryWatch = new DirectoryWatch(watchDirectory);
+            directoryWatch.setLoopSleepTime(1_000); // 1 sec
+            directoryWatch.startWatcher();
         } catch (IOException e) {
             LOG.error(e);
         }
@@ -394,36 +394,41 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** A temporary location to store copies of EventGraphs in XML form.
      * This is to compare against any changes to and whether to re-cache the
      * MD5 hash generated for this EG.
-     * @param f the EventGraph file to generate MD5 hash for
+     * @param file the EventGraph file to generate MD5 hash for
      */
-    private void fileWatchOpen(File f) {
-        String nm = f.getName();
-        File ofile = new File(watchDir, nm);
-        LOG.debug("f is: " + f + " and ofile is: " + ofile);
+    private void fileWatchOpen(File file) 
+	{
+        String fileName = file.getName();
+        File temporaryFile = new File(watchDirectory, fileName);
+//        LOG.debug("fileWatchOpen event graph file is: " + file);
+//        LOG.debug("fileWatchOpen    temporaryFile is: " + temporaryFile);
         try {
-            Files.copy(f.toPath(), ofile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+            Files.copy(file.toPath(), temporaryFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } 
+		catch (IOException e) 
+		{
             LOG.error(e);
-//            e.printStackTrace();
         }
     }
 
-    private void fileWatchClose(File f) {
-        String nm = f.getName();
-        File ofile = new File(watchDir, nm);
-        ofile.delete();
+    private void fileWatchClose(File file) 
+	{
+        String fileName = file.getName();
+        File temporaryFile = new File(watchDirectory, fileName);
+        temporaryFile.delete();
         AssemblyEditView view = (AssemblyEditView) ViskitGlobals.instance().getAssemblyController().getView();
-        view.removeEventGraphFromLEGOTree(f);
+        view.removeEventGraphFromLEGOTree(file);
     }
 
     @Override
-    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener) {
-        dirWatch.addListener(listener);
+    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener) 
+	{
+        directoryWatch.addListener(listener);
     }
 
     @Override
     public void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener) {
-        dirWatch.removeListener(listener);
+        directoryWatch.removeListener(listener);
     }
 
     Set<mvcRecentFileListener> recentListeners = new HashSet<>();
@@ -624,10 +629,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void close () // method name must exactly match preceding string value
 	{
-        if (preClose()) {
+        if (preClose())
+		{
             postClose();
         }
 //		updateEventGraphFileLists (); // save for next time
+		ViskitGlobals.instance().getViskitApplicationFrame().displayEventGraphEditorTab(); // ensure focus isn't lost
 		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
     }
 
@@ -1347,7 +1354,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) {
-            _doOpen(eventGraph);
+            _doOpenEventGraph(eventGraph);
             LOG.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images

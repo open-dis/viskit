@@ -402,7 +402,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 						parametersSignature[i] = parametersSignature[i].substring(0, parametersSignature[i].length() - 2); // strip trailing comma from set
 					}
 
-					// TODO further hiding of duplicate constructors, also see below
+					// this performs further hiding of duplicate constructors, also see below
 					if (!constructors[i].getParameterTypesList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorTabCount++;
@@ -410,20 +410,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
                 for (int i = 0; i < parameters.length; ++i) // only add tabs of interest
 				{
-					// TODO further hiding of duplicate constructors, also see above
+					// this performs further hiding of duplicate constructors, also see above
 					if (!constructors[i].getParameterTypesList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
-						String constructorTabLabel;
+						String constructorTabName;
 						if (constructorTabCount <= 1) 
 						{
-							constructorTabLabel = "Constructor";
+							constructorTabName = "Parameter List";
 							constructorPanels[i].hideSelectConstructorButton();
 						}
-						else constructorTabLabel = "Constructor " + i;
+						else constructorTabName = "Constructor " + i;
 						
 						constructorPanels[i].setData(constructors[i].getParameterTypesList());
-						tabbedPane.addTab(constructorTabLabel, null, constructorPanels[i], parametersSignature[i]); // null icon
+						tabbedPane.addTab(constructorTabName, null, constructorPanels[i], parametersSignature[i]); // null icon
 					}
 				}
             }

@@ -971,7 +971,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
-				helpMenu.addSeparator();
 
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));

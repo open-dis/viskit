@@ -198,15 +198,17 @@ public class ViskitConfiguration
     private void setDefaultConfiguration()
 	{
         try {
-            defaultConfigurationBuilder = new DefaultConfigurationBuilder();
-            defaultConfigurationBuilder.setFile(USER_CONFIGURATION_FILE);
+			// https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/index.html?org/apache/commons/configuration/DefaultConfigurationBuilder.html
+            defaultConfigurationBuilder = new DefaultConfigurationBuilder(USER_CONFIGURATION_FILE); // TODO silence unhelpful verbose output
+			LOG.info ("========================================================================================================================"); // set off verbose output
             try {
-                combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true); // TODO silence unhelpful verbose output
+                combinedConfiguration = defaultConfigurationBuilder.getConfiguration(true);
             }
-			catch (ConfigurationException e)
+			catch (ConfigurationException configurationException)
 			{
-                LOG.error(e);
+                LOG.error(configurationException);
             }
+			LOG.info ("========================================================================================================================"); // set off verbose output
             // Save off the individual XML configurations for each prefix so we can write back
             int numberOfConfigurations = combinedConfiguration.getNumberOfConfigurations();
             for (int i = 0; i < numberOfConfigurations; i++)

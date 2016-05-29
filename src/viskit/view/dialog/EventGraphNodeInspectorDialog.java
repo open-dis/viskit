@@ -300,11 +300,11 @@ public class EventGraphNodeInspectorDialog extends JDialog
         // Here if we found a problem
         int returnValue = JOptionPane.showConfirmDialog(
                 EventGraphNodeInspectorDialog.this,
-                "All fields need to be completed. Close anyway?",
-                "Question",
+                "All fields will need to be completed. Close anyway?",
+                "Only partially complete...",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-		boolean cancellation = (returnValue != JOptionPane.YES_OPTION); // whether or not to cancel
+		boolean cancellation = (returnValue != JOptionPane.YES_OPTION); // whether or not user cancelled
         return  cancellation;
     }
 
