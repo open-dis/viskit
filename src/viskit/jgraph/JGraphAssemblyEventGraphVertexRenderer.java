@@ -1,5 +1,6 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -7,6 +8,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.*;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.AssemblyNode;
@@ -74,9 +76,9 @@ import viskit.model.AssemblyNode;
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
  */
-public class JGraphAssemblyEventGraphVertexRenderer
-        extends JComponent // JLabel jmb
-        implements CellViewRenderer, Serializable {
+public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implements CellViewRenderer, Serializable 
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphAssemblyEventGraphVertexRenderer.class);
 
     /** Use this flag to control if groups should appear transparent. */
     protected boolean hideGroups = true;

@@ -527,8 +527,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public AdapterEdge newAdapterEdge(String adapterName, AssemblyNode sourceNode, AssemblyNode targetNode)
 	{
         AdapterEdge adapterEdge = new AdapterEdge();
-        adapterEdge.setFrom(sourceNode);
-        adapterEdge.setTo(targetNode);
+        adapterEdge.setFromObject(sourceNode);
+        adapterEdge.setToObject(targetNode);
         adapterEdge.setName(adapterName);
 
         sourceNode.getConnections().add(adapterEdge);
@@ -553,8 +553,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         AssemblyNode sourceNode, targetNode;
 
-        sourceNode = (AssemblyNode) adapterEdge.getFrom();
-        targetNode = (AssemblyNode) adapterEdge.getTo();
+        sourceNode = (AssemblyNode) adapterEdge.getFromObject();
+        targetNode = (AssemblyNode) adapterEdge.getToObject();
 
         Adapter jaxbAdapter = jaxbObjectFactory.createAdapter();
         adapterEdge.opaqueModelObject = jaxbAdapter;
@@ -573,8 +573,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode sourceNode, AssemblyNode targetNode)
 	{
         PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
-        propertyChangeListenerEdge.setFrom(sourceNode);
-        propertyChangeListenerEdge.setTo(targetNode);
+        propertyChangeListenerEdge.setFromObject(sourceNode);
+        propertyChangeListenerEdge.setToObject(targetNode);
 
         sourceNode.getConnections().add(propertyChangeListenerEdge);
         targetNode.getConnections().add(propertyChangeListenerEdge);
@@ -598,8 +598,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         AssemblyNode sourceNode, targetNode;
 
-        sourceNode = (AssemblyNode) propertyChangeListenerEdge.getFrom();
-        targetNode = (AssemblyNode) propertyChangeListenerEdge.getTo();
+        sourceNode = (AssemblyNode) propertyChangeListenerEdge.getFromObject();
+        targetNode = (AssemblyNode) propertyChangeListenerEdge.getToObject();
 
         PropertyChangeListenerConnection propertyChangeListenerConnection = jaxbObjectFactory.createPropertyChangeListenerConnection();
         propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
@@ -616,8 +616,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void newSimEventListenerEdge(AssemblyNode sourceNode, AssemblyNode targetNode)
 	{
         SimEventListenerEdge simEventListenerEdge = new SimEventListenerEdge();
-        simEventListenerEdge.setFrom(sourceNode);
-        simEventListenerEdge.setTo(targetNode);
+        simEventListenerEdge.setFromObject(sourceNode);
+        simEventListenerEdge.setToObject(targetNode);
 
         sourceNode.getConnections().add(simEventListenerEdge);
         targetNode.getConnections().add(simEventListenerEdge);
@@ -640,8 +640,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 	{
         AssemblyNode sourceNode, targetNode;
 
-        sourceNode = (AssemblyNode) simEventListenerEdge.getFrom();
-        targetNode = (AssemblyNode) simEventListenerEdge.getTo();
+        sourceNode = (AssemblyNode) simEventListenerEdge.getFromObject();
+        targetNode = (AssemblyNode) simEventListenerEdge.getToObject();
 
         SimEventListenerConnection simEventListenerConnection = jaxbObjectFactory.createSimEventListenerConnection();
         simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
@@ -712,8 +712,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public void changeAdapterEdge(AdapterEdge adapterEdge)
 	{
-        EventGraphNode sourceEvent = (EventGraphNode) adapterEdge.getFrom();
-        EventGraphNode targetEvent = (EventGraphNode) adapterEdge.getTo();
+        EventGraphNode sourceEvent = (EventGraphNode) adapterEdge.getFromObject();
+        EventGraphNode targetEvent = (EventGraphNode) adapterEdge.getToObject();
 
         Adapter jaxbAE = (Adapter) adapterEdge.opaqueModelObject;
 
@@ -733,8 +733,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public void changeSimEventListenerEdge(SimEventListenerEdge simEventListenerEdge)
 	{
-        EventGraphNode sourceEvent = (EventGraphNode) simEventListenerEdge.getFrom();
-        EventGraphNode targetEvent = (EventGraphNode) simEventListenerEdge.getTo();
+        EventGraphNode sourceEvent = (EventGraphNode) simEventListenerEdge.getFromObject();
+        EventGraphNode targetEvent = (EventGraphNode) simEventListenerEdge.getToObject();
         SimEventListenerConnection simEventListenerConnection = (SimEventListenerConnection) simEventListenerEdge.opaqueModelObject;
 
         simEventListenerConnection.setListener(targetEvent.getName());
@@ -1135,12 +1135,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 			
 			if (toNode != null)
 			{
-				propertyChangeListenerEdge.setTo(toNode);
+				propertyChangeListenerEdge.setToObject(toNode);
                 toNode.getConnections().add(propertyChangeListenerEdge);
 			}
             if (fromNode != null)
 			{
-				propertyChangeListenerEdge.setFrom(fromNode);
+				propertyChangeListenerEdge.setFromObject(fromNode);
 				fromNode.getConnections().add(propertyChangeListenerEdge);
 			}
             this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
@@ -1159,12 +1159,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 			
 			if (toNode != null)
 			{
-				simEventListenerEdge.setTo(toNode);
+				simEventListenerEdge.setToObject(toNode);
 				toNode.getConnections().add(simEventListenerEdge);
 			}
             if (fromNode != null)
 			{
-				simEventListenerEdge.setFrom(fromNode);
+				simEventListenerEdge.setFromObject(fromNode);
 				fromNode.getConnections().add(simEventListenerEdge);
 			}
             this.notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED, "Sim event listener connection added"));
@@ -1180,11 +1180,11 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 			
 			if (toNode != null)
 			{
-				adapterEdge.setTo  (  toNode);
+				adapterEdge.setToObject  (  toNode);
 			}
             if (fromNode != null)
 			{
-				adapterEdge.setFrom(fromNode);
+				adapterEdge.setFromObject(fromNode);
 			}
             // Handle XML names with underscores (note XML IDREF issue)
             String event = jaxbAdapter.getEventHeard();

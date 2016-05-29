@@ -449,7 +449,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     {
       for (mvcRecentFileListener listener : recentListeners)
 	  {
-            listener.listChanged();
+            listener.recentFileListChanged();
       }
     }
 

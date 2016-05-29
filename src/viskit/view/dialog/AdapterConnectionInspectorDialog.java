@@ -205,10 +205,10 @@ public class AdapterConnectionInspectorDialog extends JDialog
     private void fillWidgets() {
         if (adapterEdge != null) {
             nameTF.setText(adapterEdge.getName());
-            sourceEVG = (EventGraphNode) adapterEdge.getFrom();
+            sourceEVG = (EventGraphNode) adapterEdge.getFromObject();
             sourceTF.setText(sourceEVG.getName() + " (" + sourceEVG.getType() + ")");
             sourceEventTF.setText(adapterEdge.getSourceEvent());
-            targetEVG = (EventGraphNode) adapterEdge.getTo();
+            targetEVG = (EventGraphNode) adapterEdge.getToObject();
             targetTF.setText(targetEVG.getName() + " (" + targetEVG.getType() + ")");
             targetEventTF.setText(adapterEdge.getTargetEvent());
             descriptionTF.setText(adapterEdge.getDescription());

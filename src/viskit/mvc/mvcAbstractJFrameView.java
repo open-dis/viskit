@@ -1,6 +1,8 @@
 package viskit.mvc;
 
+import edu.nps.util.LogUtilities;
 import javax.swing.JFrame;
+import org.apache.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -17,6 +19,8 @@ import javax.swing.JFrame;
  */
 public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, mvcModelListener
 {
+    static final Logger LOG = LogUtilities.getLogger(mvcAbstractJFrameView.class);
+	
     private mvcModel model;
     private mvcController controller;
 

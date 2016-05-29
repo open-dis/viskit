@@ -191,12 +191,12 @@ public class PclEdgeInspectorDialog extends JDialog
 			String fromText, toText;
 			try
 			{
-				String fromClassName    = ((EventGraphNode) pclEdge.getFrom()).getType();
+				String fromClassName    = ((EventGraphNode) pclEdge.getFromObject()).getType();
 				if    (fromClassName == null)
 					   fromClassName    = "";
 				if    (fromClassName.contains("."))
 					   fromClassName    = fromClassName.substring(fromClassName.lastIndexOf(".")+1);
-				String fromInstanceName = ((EventGraphNode) pclEdge.getFrom()).getName();
+				String fromInstanceName = ((EventGraphNode) pclEdge.getFromObject()).getName();
 				if    (fromInstanceName == null)
 					   fromInstanceName = "";
 				if   (!fromInstanceName.toLowerCase().contains(fromClassName.toLowerCase()))
@@ -207,17 +207,17 @@ public class PclEdgeInspectorDialog extends JDialog
 			}
 			catch (Exception e)
 			{
-				fromText = pclEdge.getFrom().toString();
+				fromText = pclEdge.getFromObject().toString();
 			}
 			
 			try
 			{
-				String toClassName    = ((PropertyChangeListenerNode) pclEdge.getTo()).getType();
+				String toClassName    = ((PropertyChangeListenerNode) pclEdge.getToObject()).getType();
 				if    (toClassName == null)
 					   toClassName    = "";
 				if    (toClassName.contains("."))
 					   toClassName    = toClassName.substring(toClassName.lastIndexOf(".")+1);
-				String toInstanceName = ((PropertyChangeListenerNode) pclEdge.getTo()).getName();
+				String toInstanceName = ((PropertyChangeListenerNode) pclEdge.getToObject()).getName();
 				if    (toInstanceName == null)
 					   toInstanceName = "";
 				if   (!toInstanceName.toLowerCase().contains(toClassName.toLowerCase()))
@@ -228,7 +228,7 @@ public class PclEdgeInspectorDialog extends JDialog
 			}
 			catch (Exception e)
 			{
-				toText = pclEdge.getFrom().toString();
+				toText = pclEdge.getFromObject().toString();
 			}
 			
 			     sourceTF.setText(fromText);
@@ -316,7 +316,7 @@ public class PclEdgeInspectorDialog extends JDialog
         @Override
         public void actionPerformed(ActionEvent e)
 		{
-            Object objectFromEdge = pclEdge.getFrom();
+            Object objectFromEdge = pclEdge.getFromObject();
             String objectClassName = "";
             if (objectFromEdge instanceof EventGraphNode)
 			{

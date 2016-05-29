@@ -229,7 +229,7 @@ public class JGraphMarqueeHandler extends BasicMarqueeHandler
             }
 			else
 			{
-                ((JGraphAssemblyModel)graphModel).reDrawNodes();
+                ((JGraphAssemblyModel)graphModel).redrawJGraphNodes();
             }
         }
         // Reset Global Vars

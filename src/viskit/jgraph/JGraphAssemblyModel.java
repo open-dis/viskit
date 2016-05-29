@@ -1,8 +1,10 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
+import org.apache.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.AttributeMap;
 import org.jgraph.graph.ConnectionSet;
@@ -21,7 +23,9 @@ import viskit.model.*;
  * @since 1:21:52 PM
  * @version $Id$
  */
-public class JGraphAssemblyModel extends DefaultGraphModel {
+public class JGraphAssemblyModel extends DefaultGraphModel 
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphAssemblyModel.class);
 
     Map viskitAssemblyAdapterEdgeStyle;
     Map viskitAssemblyPclEdgeStyle;
@@ -33,8 +37,8 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
     }
 
     @SuppressWarnings("unchecked") // JGraph not genericized
-    private void initializeViskitStyle() {
-
+    private void initializeViskitStyle()
+	{
         viskitAssemblyAdapterEdgeStyle = new AttributeMap();
 
         // common to 3 types
@@ -71,35 +75,41 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
         GraphConstants.setLineColor(viskitAssemblySimEventListenerEdgeStyle, Color.black);
     }
 
-    public void changeEvent(AssemblyNode en) {
-        DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
-        c.setUserObject(en);
+    public void changeEvent(AssemblyNode simEntityNode) 
+	{
+        DefaultGraphCell c = (DefaultGraphCell) simEntityNode.opaqueViewObject;
+        c.setUserObject(simEntityNode);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
-    public void reDrawNodes() {
+    public void redrawJGraphNodes() 
+	{
         jGraph.getUI().stopEditing(jGraph);
         jGraph.refresh();
     }
 
     public void changeEventGraphNode(AssemblyNode eventGraphNode)
 	{
-        DefaultGraphCell c = (DefaultGraphCell) eventGraphNode.opaqueViewObject;
-        c.setUserObject(eventGraphNode);
+        DefaultGraphCell graphCell = (DefaultGraphCell) eventGraphNode.opaqueViewObject;
+        graphCell.setUserObject(eventGraphNode);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
-    public void changePCLNode(AssemblyNode pcln) {
-        changeEventGraphNode(pcln);
+    public void changePCLNode(AssemblyNode propertyChangeListenerNode) 
+	{
+        changeEventGraphNode(propertyChangeListenerNode);
     }
 
     /** Ensures a clean JGraph tab for a new model */
-    public void deleteAll() {
+    public void deleteAllJGraphNodes() 
+	{
         Object[] localRoots = getRoots(this);
-        for (Object localRoot : localRoots) {
-            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropertyListCell) {
+        for (Object localRoot : localRoots) 
+		{
+            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropertyListCell) 
+			{
                 Object[] child = new Object[1];
                 child[0] = ((DefaultGraphCell) localRoot).getFirstChild();
                 jGraph.getGraphLayoutCache().remove(child);
@@ -107,33 +117,36 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
         }
         jGraph.getGraphLayoutCache().remove(localRoots);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
-    public void deleteEGNode(AssemblyNode egn) {
-        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
-        c.removeAllChildren();
-        jGraph.getGraphLayoutCache().remove(new Object[]{c});
+    public void deleteEventGraphNode(AssemblyNode eventGraphNode) 
+	{
+        DefaultGraphCell graphCell = (DefaultGraphCell) eventGraphNode.opaqueViewObject;
+        graphCell.removeAllChildren();
+        jGraph.getGraphLayoutCache().remove(new Object[]{graphCell});
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
-    public void deletePCLNode(AssemblyNode pcln) {
-        deleteEGNode(pcln);
+    public void deletePCLNode(AssemblyNode propertyChangeListenerNode)
+	{
+        deleteEventGraphNode(propertyChangeListenerNode);
     }
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    public void addAdapterEdge(AssemblyEdge ae) {
-        Object frO = ae.getFrom();
-        Object toO = ae.getTo();
+    public void addAdapterEdge(AssemblyEdge adapterEdge) 
+	{
+        Object fromObject = adapterEdge.getFromObject();
+        Object   toObject = adapterEdge.getToObject();
         DefaultGraphCell from, to;
-        from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
-        to   = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
+        from = (DefaultGraphCell) ((AssemblyNode) fromObject).opaqueViewObject;
+        to   = (DefaultGraphCell) ((AssemblyNode) toObject).opaqueViewObject;
 
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
-        ae.opaqueViewObject = edge;
-        edge.setUserObject(ae);
+        adapterEdge.opaqueViewObject = edge;
+        edge.setUserObject(adapterEdge);
 
         ConnectionSet cs = new ConnectionSet();
         cs.connect(edge, from.getFirstChild(), to.getFirstChild());
@@ -143,7 +156,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
 
         jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
     public void changeAdapterEdge(AssemblyEdge ae) {
@@ -154,14 +167,14 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
         DefaultEdge c = (DefaultEdge) ae.opaqueViewObject;
         jGraph.getGraphLayoutCache().remove(new Object[]{c});
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
     public void changeAnyEdge(AssemblyEdge asEd) {
         DefaultGraphCell c = (DefaultGraphCell) asEd.opaqueViewObject;
         c.setUserObject(asEd);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
     public void deleteSimEvListEdge(AssemblyEdge sele) {
@@ -175,8 +188,8 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     public void addSimEvListEdge(AssemblyEdge sele) {
-        Object frO = sele.getFrom();
-        Object toO = sele.getTo();
+        Object frO = sele.getFromObject();
+        Object toO = sele.getToObject();
         DefaultGraphCell from, to;
         from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
         to = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
@@ -193,7 +206,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
 
         jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
     public void deletePclEdge(AssemblyEdge pce) {
@@ -207,9 +220,9 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     public void addPclEdge(AssemblyEdge pce) {
-        AssemblyNode egn = (AssemblyNode) pce.getFrom();
-        //PropertyChangeListenerNode pcln = (PropertyChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
-        AssemblyNode pcln = (AssemblyNode) pce.getTo();
+        AssemblyNode egn = (AssemblyNode) pce.getFromObject();
+        //PropertyChangeListenerNode pcln = (PropertyChangeListenerNode)pce.getToObject();         //todo uncomment after xml fixed
+        AssemblyNode pcln = (AssemblyNode) pce.getToObject();
         DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;
         DefaultGraphCell to = (DefaultGraphCell) pcln.opaqueViewObject;
         vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
@@ -224,7 +237,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel {
 
         jGraph.getGraphLayoutCache().insert(new Object[] {edge}, atts, cs, null, null);
 
-        reDrawNodes();
+        redrawJGraphNodes();
     }
 
     /**

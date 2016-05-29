@@ -525,7 +525,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
         schedulingEdge.fromEventNode = src;
         EventNode target = buildEventNodeFromJaxbEvent((Event) jaxbSchedule.getEvent());
         schedulingEdge.toEventNode = target;
-        schedulingEdge.name = "from_" + schedulingEdge.fromEventNode.name + "_TO_" + schedulingEdge.toEventNode.name;
+        schedulingEdge.name = "FROM_" + schedulingEdge.fromEventNode.name + "_TO_" + schedulingEdge.toEventNode.name;
 
         src.getConnections().add(schedulingEdge);
         target.getConnections().add(schedulingEdge);

@@ -191,7 +191,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		else 
 		{
             List<File> openAssemblyFileList = getOpenAssemblyFileList(false);
-            LOG.debug("Inside AssemblyControllerImpl begin() and openAssemblyFileList.size()=" + openAssemblyFileList.size());
+			if ((openAssemblyFileList != null) && (openAssemblyFileList.size() > 1))
+				LOG.debug("begin: openAssemblyFileList.size()=" + openAssemblyFileList.size());
 
             for (File f : openAssemblyFileList)
 			{
@@ -218,12 +219,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 			// TODO re-open previously open assemblies and event graphs, otherwise:
 
 			if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().toLowerCase().contains("project"))
-				phrasing = " project";
+				phrasing = "Project ";
 
-			message = ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + phrasing + " is open.";
+			message = phrasing + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + " is open.";
 			LOG.info (message);
 			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE, 
-				"<html><p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + phrasing + " is open." + ViskitStatics.RECENTER_SPACING + "</p>" +
+				"<html><p align='center'>" + phrasing + "<i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + " is open." + ViskitStatics.RECENTER_SPACING + "</p>" +
 						"<p align='center'>&nbsp;</p>" +
 						"<p align='center'>Open or create either an Assembly or an Event Graph." + ViskitStatics.RECENTER_SPACING + "</p>"  +
 						"<p align='center'>&nbsp;</p></html>");
@@ -584,7 +585,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private void notifyRecentAssemblyFileListeners() {
         for (mvcRecentFileListener listener : recentAssemblyListeners) {
-            listener.listChanged();
+            listener.recentFileListChanged();
         }
     }
 
@@ -605,7 +606,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 	{
         for (mvcRecentFileListener listener : recentProjectListeners)
 		{
-            listener.listChanged();
+            listener.recentFileListChanged();
         }
     }
 

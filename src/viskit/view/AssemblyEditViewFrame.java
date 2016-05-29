@@ -293,17 +293,17 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         @Override
         public void stateChanged(ChangeEvent e) 
 		{
-            JGraphAssemblyComponentWrapper myVgacw = getCurrentJGraphAssemblyComponentWrapper();
+            JGraphAssemblyComponentWrapper jGraphAssemblyComponentWrapper = getCurrentJGraphAssemblyComponentWrapper();
 
-            if (myVgacw == null) {     // last tab has been closed
+            if (jGraphAssemblyComponentWrapper == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
                 return;
             }
 
             // Key to getting the LEGOs tree panel in each tab view
-            myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
+            jGraphAssemblyComponentWrapper.drawingSplitPane.setLeftComponent(jGraphAssemblyComponentWrapper.trees);
 
-            setModel((AssemblyModelImpl) myVgacw.assemblyModel); // hold on locally
+            setModel((AssemblyModelImpl) jGraphAssemblyComponentWrapper.assemblyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
 
@@ -328,7 +328,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     class RecentAssemblyFileListener implements mvcRecentFileListener 
 	{
         @Override
-        public void listChanged()
+        public void recentFileListChanged()
 		{
             AssemblyControllerImpl assemblyController = (AssemblyControllerImpl) getController();
 			if ((assemblyController == null) || (openRecentAssemblyMenu == null))

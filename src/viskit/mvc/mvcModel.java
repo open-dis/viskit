@@ -19,5 +19,5 @@ package viskit.mvc;
  */
 public interface mvcModel
 {
-   void notifyChanged(mvcModelEvent ev);
+   void notifyChanged(mvcModelEvent modelEvent);
 }

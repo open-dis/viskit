@@ -444,8 +444,8 @@ public class ViskitApplicationFrame extends JFrame
     class myTabChangeListener implements ChangeListener 
 	{
         @Override
-        public void stateChanged(ChangeEvent e) {
-
+        public void stateChanged(ChangeEvent e) 
+		{
             EventGraphModel[] eventGraphModels = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
             EventGraphModel dirtyEventGraphModel = null;
 
@@ -514,7 +514,11 @@ public class ViskitApplicationFrame extends JFrame
 			{
 				LOG.error ("No title for tab " + i + " TODO fix improper setup");
 			}
-			else myTitleListener.setTitle(titles[i], i);
+			else 
+			{
+				myTitleListener.setTitle(titles[i], i);
+				LOG.info ("Tab " + i + " title: " + titles[i]);
+			}
         }
     }
 	

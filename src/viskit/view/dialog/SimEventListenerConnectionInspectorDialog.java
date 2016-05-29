@@ -122,8 +122,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if(simEvEdge != null) {
-      EventGraphNode egnS = (EventGraphNode)simEvEdge.getFrom();
-      EventGraphNode egnT = (EventGraphNode)simEvEdge.getTo();
+      EventGraphNode egnS = (EventGraphNode)simEvEdge.getFromObject();
+      EventGraphNode egnT = (EventGraphNode)simEvEdge.getToObject();
       sourceTF.setText(egnS.getName() + " (" + egnS.getType()+")");
       targetTF.setText(egnT.getName() + " (" + egnT.getType()+")");
       descriptionTF  .setText(simEvEdge.getDescription());

@@ -37,19 +37,19 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 {
     static final Logger LOG = LogUtilities.getLogger(JGraphAssemblyComponent.class);
 
-    JGraphAssemblyModel vGAModel;
-    AssemblyEditViewFrame parent;
+    JGraphAssemblyModel jGraphAssemblyModel;
+    AssemblyEditViewFrame parentAssemblyEditViewFrame;
     private UndoManager undoManager;
 
     public JGraphAssemblyComponent(JGraphAssemblyModel model, AssemblyEditViewFrame frame)
 	{
         super(model);
-        parent = frame;
+        parentAssemblyEditViewFrame = frame;
 
         JGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
 		// jGraph initializations
-        this.vGAModel = model;
+        this.jGraphAssemblyModel = model;
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
@@ -71,7 +71,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new JGraphGraphUndoManager(parent.getController());
+        undoManager = new JGraphGraphUndoManager(parentAssemblyEditViewFrame.getController());
         addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
@@ -87,7 +87,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 if (v instanceof AssemblyCircleCell) {
                     view = new AssemblyCircleView(v);
                 } else if (v instanceof AssemblyPropertyListCell) {
-                    view = new AssemblyPropListView(v);
+                    view = new AssemblyPropertyListView(v);
                 } else {
                     view = super.createVertexView(v);
                 }
@@ -116,11 +116,15 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             }
 
             @Override
-            protected PortView createPortView(Object p) {
+            protected PortView createPortView(Object p) 
+			{
                 PortView view;
-                if (p instanceof vAssemblyPortCell) {
+                if (p instanceof vAssemblyPortCell) 
+				{
                     view = new vAssemblyPortView(p);
-                } else {
+                }
+				else 
+				{
                     view = super.createPortView(p);
                 }
                 return view;
@@ -129,9 +133,10 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     }
 
     @Override
-    public void updateUI() {
+    public void updateUI()
+	{
         // Install a new UI
-        setUI(new JGraphAssemblyUI());    // we use our own for node/edge inspector editting
+        setUI(new JGraphAssemblyUI());    // we use our own for node/edge inspector editing
         //setUI(new BasicGraphUI());   // test
         invalidate();
     }
@@ -144,62 +149,62 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         switch (modelEvent.getID())
 		{
-            case ModelEvent.NEWASSEMBLYMODEL:
+            case ModelEvent.NEW_ASSEMBLY_MODEL:
 
                 // Ensure we start fresh
-                vGAModel.deleteAll();
+                jGraphAssemblyModel.deleteAllJGraphNodes();
                 break;
             case ModelEvent.EVENTGRAPH_ADDED:
-                // Reclaimed from the vGAModel to here
+                // Reclaimed from the jGraphAssemblyModel to here
                 insert((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENTGRAPH_CHANGED:
-                vGAModel.changeEventGraphNode((AssemblyNode) modelEvent.getSource());
+                jGraphAssemblyModel.changeEventGraphNode((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENTGRAPH_DELETED:
-                vGAModel.deleteEGNode((AssemblyNode) modelEvent.getSource());
+                jGraphAssemblyModel.deleteEventGraphNode((AssemblyNode) modelEvent.getSource());
                 break;
 
             case ModelEvent.PCL_ADDED:
 
-                // Reclaimed from the vGAModel to here
+                // Reclaimed from the jGraphAssemblyModel to here
                 insert((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_CHANGED:
-                vGAModel.changePCLNode((AssemblyNode) modelEvent.getSource());
+                jGraphAssemblyModel.changePCLNode((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_DELETED:
-                vGAModel.deletePCLNode((AssemblyNode) modelEvent.getSource());
+                jGraphAssemblyModel.deletePCLNode((AssemblyNode) modelEvent.getSource());
                 break;
 
-            case ModelEvent.ADAPTEREDGE_ADDED:
-                vGAModel.addAdapterEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.ADAPTER_EDGE_ADDED:
+                jGraphAssemblyModel.addAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGE_CHANGED:
-                vGAModel.changeAdapterEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.ADAPTER_EDGE_CHANGED:
+                jGraphAssemblyModel.changeAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGE_DELETED:
-                vGAModel.deleteAdapterEdge((AssemblyEdge) modelEvent.getSource());
-                break;
-
-            case ModelEvent.SIMEVENTLISTEDGE_ADDED:
-                vGAModel.addSimEvListEdge((AssemblyEdge) modelEvent.getSource());
-                break;
-            case ModelEvent.SIMEVENTLISTEDGE_CHANGED:
-                vGAModel.changeSimEvListEdge((AssemblyEdge) modelEvent.getSource());
-                break;
-            case ModelEvent.SIMEVENTLISTEDGE_DELETED:
-                vGAModel.deleteSimEvListEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.ADAPTER_EDGE_DELETED:
+                jGraphAssemblyModel.deleteAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
 
-            case ModelEvent.PCLEDGE_ADDED:
-                vGAModel.addPclEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED:
+                jGraphAssemblyModel.addSimEvListEdge((AssemblyEdge) modelEvent.getSource());
                 break;
-            case ModelEvent.PCLEDGE_DELETED:
-                vGAModel.deletePclEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.SIMEVENT_LISTENER_EDGE_CHANGED:
+                jGraphAssemblyModel.changeSimEvListEdge((AssemblyEdge) modelEvent.getSource());
                 break;
-            case ModelEvent.PCLEDGE_CHANGED:
-                vGAModel.changePclEdge((AssemblyEdge) modelEvent.getSource());
+            case ModelEvent.SIMEVENT_LISTENER_EDGE_DELETED:
+                jGraphAssemblyModel.deleteSimEvListEdge((AssemblyEdge) modelEvent.getSource());
+                break;
+
+            case ModelEvent.PCL_EDGE_ADDED:
+                jGraphAssemblyModel.addPclEdge((AssemblyEdge) modelEvent.getSource());
+                break;
+            case ModelEvent.PCL_EDGE_DELETED:
+                jGraphAssemblyModel.deletePclEdge((AssemblyEdge) modelEvent.getSource());
+                break;
+            case ModelEvent.PCL_EDGE_CHANGED:
+                jGraphAssemblyModel.changePclEdge((AssemblyEdge) modelEvent.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
@@ -214,7 +219,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             case ModelEvent.REDO_SIMEVENT_LISTENER_EDGE:
             case ModelEvent.UNDO_PCL_EDGE:
             case ModelEvent.REDO_PCL_EDGE:
-                vGAModel.reDrawNodes();
+                jGraphAssemblyModel.redrawJGraphNodes();
                 break;
             default:
             //System.out.println("duh");
@@ -227,7 +232,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     @Override
     public void graphChanged(GraphModelEvent graphModelEvent)
 	{
-        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWASSEMBLYMODEL) // bail if this came from outside
+        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEW_ASSEMBLY_MODEL) // bail if this came from outside
         {
             return; // this came in from outside, we don't have to inform anybody.. prevent reentry
         }
@@ -251,7 +256,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 					{
                         EventGraphNode eventGraphNode = (EventGraphNode) assemblyCircleCell.getUserObject();
                         eventGraphNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)),assemblyZoomFactor));
-                        ((AssemblyModel) parent.getModel()).changeEventGraphNode(eventGraphNode);
+                        ((AssemblyModel) parentAssemblyEditViewFrame.getModel()).changeEventGraphNode(eventGraphNode);
                         attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 } 
@@ -265,7 +270,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 					{
                         PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) assemblyPropertyListCell.getUserObject();
                         propertyChangeListenerNode.setPosition(ViskitGlobals.snapToGrid(snap(new Point2D.Double(rectangle2D.x, rectangle2D.y)),assemblyZoomFactor));
-                        ((AssemblyModel) parent. getModel()).changePclNode(propertyChangeListenerNode);
+                        ((AssemblyModel) parentAssemblyEditViewFrame. getModel()).changePclNode(propertyChangeListenerNode);
                         attributeMap.put("bounds", attributeMap.createRect(propertyChangeListenerNode.getPosition().getX(), propertyChangeListenerNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 }
@@ -280,11 +285,11 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     }
 
     @Override
-    public String getToolTipText(MouseEvent event)
+    public String getToolTipText(MouseEvent mouseEvent)
 	{
-        if (event != null)
+        if (mouseEvent != null)
 		{
-            Object c = this.getFirstCellForLocation(event.getX(), event.getY());
+            Object c = this.getFirstCellForLocation(mouseEvent.getX(), mouseEvent.getY());
             if (c != null)
 			{
                 StringBuilder sb = new StringBuilder("<html>");
@@ -293,8 +298,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
                     AssemblyEdge assemblyEdge = (AssemblyEdge) vc.getUserObject();
 					// events flow out of fromObject into toObject
-                    Object   toObject = assemblyEdge.getTo();
-                    Object fromObject = assemblyEdge.getFrom();
+                    Object   toObject = assemblyEdge.getToObject();
+                    Object fromObject = assemblyEdge.getFromObject();
 
                     if (assemblyEdge instanceof AdapterEdge)
 					{
@@ -396,26 +401,33 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         return null;
     }
 
-    private String wrapAtPosition(String s, int len) {
-        String[] sa = s.split(" ");
+	/** returns someText with <br /> elements inserted at length intervals 
+	 */
+    private String wrapAtPosition(String someText, int length) 
+	{
+		String BREAK = "<br />";
+        String[] sa = someText.split(" ");
         StringBuilder sb = new StringBuilder();
-        int idx = 0;
+        int index = 0;
         do {
             int ll = 0;
             sb.append("&nbsp;");
             do {
-                ll += sa[idx].length() + 1;
-                sb.append(sa[idx++]);
+                ll += sa[index].length() + 1;
+                sb.append(sa[index++]);
                 sb.append(" ");
-            } while (idx < sa.length && ll < len);
-            sb.append("<br />");
-        } while (idx < sa.length);
+            } 
+			while (index < sa.length && ll < length);
+            sb.append(BREAK);
+        } 
+		while (index < sa.length);
 
-        String st = sb.toString();
-        if (st.endsWith("<br />")) {
-            st = st.substring(0, st.length() - 4);
+        String brokenText = sb.toString();
+        if (brokenText.endsWith(BREAK)) 
+		{
+            brokenText = brokenText.substring(0, brokenText.length() - BREAK.length()); // remove final <br />
         }
-        return st.trim();
+        return brokenText.trim();
     }
 
     @Override
@@ -425,10 +437,12 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        if (view instanceof AssemblyCircleView) {
+        if (view instanceof AssemblyCircleView) 
+		{
             AssemblyCircleCell cc = (AssemblyCircleCell) view.getCell();
             Object en = cc.getUserObject();
-            if (en instanceof EventGraphNode) {
+            if (en instanceof EventGraphNode) 
+			{
                 return ((EventGraphNode) en).getName();
             }    // label name is actually gotten in paintComponent
         }
@@ -438,7 +452,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
     /**
      * @return the undoManager
      */
-    public UndoManager getUndoManager() {
+    public UndoManager getUndoManager() 
+	{
         return undoManager;
     }
 
@@ -446,13 +461,15 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
      * @param source the "from" of the connection
      * @param target the "to" of the connection
      */
-    public void connect(Port source, Port target) {
+    public void connect(Port source, Port target) 
+	{
         DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
         DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
         Object[] oa = new Object[]{src, tar};
-        AssemblyController controller = (AssemblyController) parent.getController();
+        AssemblyController controller = (AssemblyController) parentAssemblyEditViewFrame.getController();
 
-        switch (parent.getCurrentMode()) {
+        switch (parentAssemblyEditViewFrame.getCurrentMode()) 
+		{
             case AssemblyEditViewFrame.ADAPTER_MODE:
                 controller.newAdapterArc(oa);
                 break;
@@ -469,8 +486,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 
     final static double DEFAULT_CELL_SIZE = 54.0d;
 
-    /** Create the cells attributes before rendering on the graph.  The
- edge attributes are set in the JGraphAssemblyModel
+    /** Create the cells attributes before rendering on the graph.  
+	 * The edge attributes are set in the JGraphAssemblyModel.
      *
      * @param node the named AssemblyNode to create attributes for
      * @return the cells attributes before rendering on the graph
@@ -482,9 +499,12 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 		double assemblyZoomFactor = ViskitGlobals.instance().getAssemblyEditViewFrame().getCurrentZoomFactor();
 
         // Snap the Point to the Grid
-        if (this != null) {
+        if (this != null) 
+		{
             point = snap((Point2D) point.clone());
-        } else {
+        } 
+		else 
+		{
             point = (Point2D) point.clone();
         }
 		point = ViskitGlobals.snapToGrid (point, assemblyZoomFactor); // utilize Viskit grid size rather that faulty jGraph snap
@@ -522,12 +542,15 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
      * @param node the named AssemblyNode
      * @return a DefaultGraphCell with a given name
      */
-    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
-
+    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) 
+	{
         DefaultGraphCell cell;
-        if (node instanceof EventGraphNode) {
+        if (node instanceof EventGraphNode) 
+		{
             cell = new AssemblyCircleCell(node);
-        } else {
+        } 
+		else 
+		{
             cell = new AssemblyPropertyListCell(node);
         }
 
@@ -542,7 +565,8 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
      *
      * @param node the AssemblyNode to insert
      */
-    public void insert(AssemblyNode node) {
+    public void insert(AssemblyNode node) 
+	{
         DefaultGraphCell vertex = createDefaultGraphCell(node);
 
         // Create a Map that holds the attributes for the Vertex
@@ -551,7 +575,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);
 
-        vGAModel.reDrawNodes();
+        jGraphAssemblyModel.redrawJGraphNodes();
     }
 }
 
@@ -562,37 +586,44 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 /**
  * To mark our edges.
  */
-class vAssemblyEdgeCell extends DefaultEdge {
-
-    public vAssemblyEdgeCell() {
+class vAssemblyEdgeCell extends DefaultEdge 
+{
+    public vAssemblyEdgeCell() 
+	{
         this(null);
     }
 
-    public vAssemblyEdgeCell(Object userObject) {
+    public vAssemblyEdgeCell(Object userObject) 
+	{
         super(userObject);
     }
 }
 
-class vAssemblyPortCell extends DefaultPort {
-
-    public vAssemblyPortCell() {
+class vAssemblyPortCell extends DefaultPort 
+{
+    public vAssemblyPortCell() 
+	{
         this(null);
     }
 
-    public vAssemblyPortCell(Object o) {
+    public vAssemblyPortCell(Object o)
+	{
         this(o, null);
     }
 
-    public vAssemblyPortCell(Object o, Port port) {
+    public vAssemblyPortCell(Object o, Port port) 
+	{
         super(o, port);
     }
 }
 
-class vAssemblyPortView extends PortView {
+class vAssemblyPortView extends PortView 
+{
 
     static int mysize = 10;   // smaller than the circle
 
-    public vAssemblyPortView(Object o) {
+    public vAssemblyPortView(Object o) 
+	{
         super(o);
         setPortSize(mysize);
     }
@@ -603,65 +634,72 @@ class vAssemblyPortView extends PortView {
 /**
  * To mark our nodes.
  */
-class AssemblyPropertyListCell extends DefaultGraphCell {
-
-    AssemblyPropertyListCell() {
+class AssemblyPropertyListCell extends DefaultGraphCell
+{
+    AssemblyPropertyListCell() 
+	{
         this(null);
     }
 
-    public AssemblyPropertyListCell(Object userObject) {
+    public AssemblyPropertyListCell(Object userObject) 
+	{
         super(userObject);
     }
 }
 
 /**
- * Sub class VertexView to install our own vapvr.
+ * Sub class VertexView to install our own jJGraphAssemblyPclVertexRenderer.
  */
-class AssemblyPropListView extends VertexView {
+class AssemblyPropertyListView extends VertexView 
+{
+    static JGraphAssemblyPclVertexRenderer jJGraphAssemblyPclVertexRenderer = new JGraphAssemblyPclVertexRenderer();
 
-    static JGraphAssemblyPclVertexRenderer vapvr = new JGraphAssemblyPclVertexRenderer();
-
-    public AssemblyPropListView(Object cell) {
+    public AssemblyPropertyListView(Object cell) 
+	{
         super(cell);
     }
 
     @Override
-    public CellViewRenderer getRenderer() {
-        return vapvr;
+    public CellViewRenderer getRenderer() 
+	{
+        return jJGraphAssemblyPclVertexRenderer;
     }
 }
 
-class AssemblyCircleCell extends DefaultGraphCell {
-
+class AssemblyCircleCell extends DefaultGraphCell
+{
     AssemblyCircleCell() {
         this(null);
     }
 
-    public AssemblyCircleCell(Object userObject) {
+    public AssemblyCircleCell(Object userObject) 
+	{
         super(userObject);
     }
 }
 
 /**
- * Sub class VertexView to install our own vapvr.
+ * Sub class VertexView to install our own jJGraphAssemblyPclVertexRenderer.
  */
-class AssemblyCircleView extends VertexView {
+class AssemblyCircleView extends VertexView 
+{
+    static JGraphAssemblyEventGraphVertexRenderer jGraphAssemblyEventGraphVertexRenderer = new JGraphAssemblyEventGraphVertexRenderer();
 
-    static JGraphAssemblyEventGraphVertexRenderer vaevr = new JGraphAssemblyEventGraphVertexRenderer();
-
-    public AssemblyCircleView(Object cell) {
+    public AssemblyCircleView(Object cell) 
+	{
         super(cell);
     }
 
     @Override
-    public CellViewRenderer getRenderer() {
-        return vaevr;
+    public CellViewRenderer getRenderer()
+	{
+        return jGraphAssemblyEventGraphVertexRenderer;
     }
 }
 
 // Begin support for custom line ends and double line (adapter) on assembly edges
-class vAssyAdapterEdgeView extends vEdgeView {
-
+class vAssyAdapterEdgeView extends vEdgeView 
+{
     static vAssyAdapterEdgeRenderer vaaer = new vAssyAdapterEdgeRenderer();
 
     public vAssyAdapterEdgeView(Object cell) {

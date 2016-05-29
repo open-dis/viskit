@@ -188,8 +188,8 @@ public class JGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
             AssemblyCircleCell cc = (AssemblyCircleCell) cv.getCell();
             EventGraphNode egn = (EventGraphNode) cc.getUserObject();
             return egn.getModelKey();
-        } else if (o instanceof AssemblyPropListView) {
-            AssemblyPropListView apv = (AssemblyPropListView) o;
+        } else if (o instanceof AssemblyPropertyListView) {
+            AssemblyPropertyListView apv = (AssemblyPropertyListView) o;
             AssemblyPropertyListCell apc = (AssemblyPropertyListCell) apv.getCell();
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();

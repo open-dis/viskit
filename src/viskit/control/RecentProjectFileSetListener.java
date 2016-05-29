@@ -70,7 +70,7 @@ public class RecentProjectFileSetListener implements mvcRecentFileListener
     }
 
     @Override
-    public void listChanged()
+    public void recentFileListChanged()
 	{
         AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Set<File> recentProjectFileSet = assemblyController.getRecentProjectFileSet();

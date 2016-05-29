@@ -38,9 +38,9 @@ package viskit.mvc;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.mvc.mvcRecentFileListener">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public interface mvcRecentFileListener {
-
+public interface mvcRecentFileListener 
+{
     /** Each of the view frames will handle recent file openings */
-    void listChanged();
+    void recentFileListChanged();
 
-} // end class file mvcRecentFileListener.java
+}

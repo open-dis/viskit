@@ -705,7 +705,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     class RecentEventGraphFileListener implements mvcRecentFileListener
 	{
         @Override
-        public void listChanged()
+        public void recentFileListChanged()
 		{
             EventGraphControllerImpl eventGraphController = (EventGraphControllerImpl) getController();
 			if ((eventGraphController == null) || (openRecentEventGraphMenu == null))

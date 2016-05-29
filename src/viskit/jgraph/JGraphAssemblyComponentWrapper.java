@@ -58,7 +58,9 @@
  */
 package viskit.jgraph;
 
+import edu.nps.util.LogUtilities;
 import javax.swing.JSplitPane;
+import org.apache.log4j.Logger;
 import viskit.model.AssemblyModel;
 import viskit.view.AssemblyEditViewFrame;
 
@@ -79,15 +81,17 @@ import viskit.view.AssemblyEditViewFrame;
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class JGraphAssemblyComponentWrapper extends JGraphAssemblyComponent {
-
+public class JGraphAssemblyComponentWrapper extends JGraphAssemblyComponent 
+{
+    static final Logger LOG = LogUtilities.getLogger(JGraphAssemblyComponentWrapper.class);
+	
     public AssemblyModel assemblyModel;
     public JSplitPane    drawingSplitPane;
     public JSplitPane    trees;
     public boolean       isActive = true;
 
-    public JGraphAssemblyComponentWrapper(JGraphAssemblyModel model, AssemblyEditViewFrame frame) {
-        super(model, frame);
+    public JGraphAssemblyComponentWrapper(JGraphAssemblyModel jGraphAssemblyModel, AssemblyEditViewFrame assemblyEditViewFrame) 
+	{
+        super(jGraphAssemblyModel, assemblyEditViewFrame);
     }
-
-} // end class file JGraphAssemblyComponentWrapper.java
+}
