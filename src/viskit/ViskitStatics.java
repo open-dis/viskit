@@ -86,7 +86,7 @@ public class ViskitStatics
 {
     static final Logger LOG = LogUtilities.getLogger(ViskitStatics.class);
 
-    public static boolean debug = true; // TODO expose?
+    public static boolean debug = true; // updated from current preferences, exposed via UserPreferencesDialog
 
     /* Commonly used class names */
     public static final String RANDOM_NUMBER_CLASS_NAME  = "simkit.random.RandomNumber";
@@ -98,7 +98,7 @@ public class ViskitStatics
     public static final String JAVA_LANG_STRING  = "java.lang.String";
     public static final String JAVA_LANG_OBJECT  = "java.lang.Object";
 	
-    public static final String TOOLTIP_EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success, red = modifications need saving or compile failure";
+    public static final String TOOLTIP_EVENTGRAPH_ASSEMBLY_EDITOR_TAB_COLORS = "green = saved with compile success; red = modifications need saving or else compile failed";
     public static final String DEFAULT_DESCRIPTION       = "TODO add description"; // better to nag than ignore
     public static final String TOOLTIP_EVENT_ARGUMENTS   = "Define initialization arguments for this Event, passed by a Schedulng Edge";
     public static final String TOOLTIP_LOCAL_VARIABLES   = "Define local variables for this Event, persistent and usable in State Transition computations and code block";
@@ -130,7 +130,7 @@ public class ViskitStatics
     @SuppressWarnings("unchecked")
     public static void setViskitProjectDirectory (File projectDirectory)
 	{
-		// must be parent directory!! combination of values results in actual directorn 
+		// must be parent directory!! combination of values results in actual directory location 
         ViskitProject.MY_VISKIT_PROJECTS_DIR = projectDirectory.getParent().replaceAll("\\\\", "/"); // normalize
 		// ViskitConfiguration.instance() creates configuration (if needed) before saving values
         ViskitConfiguration.instance().setValue(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -297,7 +297,7 @@ public class ViskitStatics
 	{
         Class<?> classRetrieved = ClassFromName(className, ViskitGlobals.instance().getWorkClassLoader());
 
-        if (classRetrieved == null) // check if found, retry if needed
+        if (classRetrieved == null)  // check if found, retry if needed
 		{
             classRetrieved = tryUnqualifiedName(className);
         }
@@ -305,7 +305,7 @@ public class ViskitStatics
 		{
             classRetrieved = FileBasedClassManager.instance().getFileClass(className);
         }
-        if (classRetrieved == null)  // check if found, report if not
+        if (classRetrieved == null)  // not found, report
 		{
             LOG.error("ClassForName(" + className + ") unsuccessful");
         }
@@ -321,6 +321,9 @@ public class ViskitStatics
      */
     static Class<?> ClassFromName(String className, ClassLoader classLoader) 
 	{
+		if ((className == null) || className.isEmpty())
+			return null;
+		
         Class<?> classRetrieved = null;
         try {
             classRetrieved = Class.forName(className, false, classLoader);
@@ -338,7 +341,7 @@ public class ViskitStatics
                     } 
 					catch (ClassNotFoundException cnfe) 
 					{
-						LOG.error ("allowed ClassNotFoundException", cnfe); // sometimes happens, ignore
+						LOG.info ("allowed ClassNotFoundException", cnfe); // sometimes happens, ignore
                     }
                 }
             }

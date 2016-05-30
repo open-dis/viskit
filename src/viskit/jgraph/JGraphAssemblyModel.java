@@ -108,7 +108,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) 
 		{
-            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropertyListCell) 
+            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropertyChangeListenerCell) 
 			{
                 Object[] child = new Object[1];
                 child[0] = ((DefaultGraphCell) localRoot).getFirstChild();
@@ -144,7 +144,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel
         from = (DefaultGraphCell) ((AssemblyNode) fromObject).opaqueViewObject;
         to   = (DefaultGraphCell) ((AssemblyNode) toObject).opaqueViewObject;
 
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        JGraphAssemblyEdgeCell edge = new JGraphAssemblyEdgeCell();
         adapterEdge.opaqueViewObject = edge;
         edge.setUserObject(adapterEdge);
 
@@ -194,7 +194,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel
         from = (DefaultGraphCell) ((AssemblyNode) frO).opaqueViewObject;
         to = (DefaultGraphCell) ((AssemblyNode) toO).opaqueViewObject;
 
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        JGraphAssemblyEdgeCell edge = new JGraphAssemblyEdgeCell();
         sele.opaqueViewObject = edge;
         edge.setUserObject(sele);
 
@@ -225,7 +225,7 @@ public class JGraphAssemblyModel extends DefaultGraphModel
         AssemblyNode pcln = (AssemblyNode) pce.getToObject();
         DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;
         DefaultGraphCell to = (DefaultGraphCell) pcln.opaqueViewObject;
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        JGraphAssemblyEdgeCell edge = new JGraphAssemblyEdgeCell();
         pce.opaqueViewObject = edge;
         edge.setUserObject(pce);
 

@@ -363,7 +363,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
         }
     }
 
-    class ParameterizedAssemblyAction extends javax.swing.AbstractAction {
+    class ParameterizedAssemblyAction extends javax.swing.AbstractAction 
+	{
 		private String action;
 
         ParameterizedAssemblyAction(String s) {
@@ -502,22 +503,25 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			myMenuBar.add(assembliesMenu);
 			myMenuBar.add(editMenu);
 			
-			try // TODO why does this block also exist in EventGraphViewFrame? need to refactor...
-			{
-				help = ViskitGlobals.instance().getHelp();
-				helpMenu.setMnemonic(KeyEvent.VK_H);
-
-				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
-				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
-
-				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
-				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
-				myMenuBar.add(helpMenu);
-			}
-			catch (Exception e)
-			{
-				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu", e);
-			}
+//			try
+//			{
+//				help = ViskitGlobals.instance().getHelp();
+//				helpMenu.setMnemonic(KeyEvent.VK_H);
+//
+//				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
+//				
+//				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
+//
+////				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true)); // TODO
+//				
+//				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
+//				
+//				myMenuBar.add(helpMenu); // TODO why does this block also exist in EventGraphViewFrame? need to refactor...
+//			}
+//			catch (Exception e)
+//			{
+//				LogUtilities.getLogger(EventGraphViewFrame.class).error("Error creating AssemblyEditViewFrame help menu", e);
+//			}
 		}
     }
 
@@ -1020,6 +1024,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
                     // Check for XML-based node first
 					String extendsFrom = sa[0];
+					/** a single node within the Assembly */
                     FileBasedAssemblyNode fileBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
 					
                     if (fileBasedAssemblyNode != null)
@@ -1033,7 +1038,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
                                 ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(fileBasedAssemblyNode, point, ViskitStatics.DEFAULT_DESCRIPTION);
                                 break;
 							default:
-								LOG.error ("Unexpected inheritance extendsFrom=" + extendsFrom);
+								LOG.error ("Unexpected inheritance, extendsFrom=" + extendsFrom);
                         }
                     } 
 					else  // class-based node
@@ -1079,35 +1084,42 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public boolean doEditEventGraphNode(EventGraphNode eventNode) {
-        return EventGraphNodeInspectorDialog.showDialog(this, eventNode);
+    public boolean doEditEventGraphNode(EventGraphNode eventNode) 
+	{
+        return EventGraphNodeInspectorDialog.showDialog(this, eventNode); // blocks
     }
 
     @Override
-    public boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode propertyChangeListenerNode) {
+    public boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode propertyChangeListenerNode) 
+	{
         return PropertyChangeListenerNodeInspectorDialog.showDialog(this, propertyChangeListenerNode); // blocks
     }
 
     @Override
-    public boolean doEditPropertyChangeListenerEdge(PropertyChangeListenerEdge propertyChangeListenerEdge) {
-        return PclEdgeInspectorDialog.showDialog(this, propertyChangeListenerEdge);
+    public boolean doEditPropertyChangeListenerEdge(PropertyChangeListenerEdge propertyChangeListenerEdge) 
+	{
+        return PclEdgeInspectorDialog.showDialog(this, propertyChangeListenerEdge); // blocks
     }
 
     @Override
-    public boolean doEditAdapterEdge(AdapterEdge aEdge) {
-        return AdapterConnectionInspectorDialog.showDialog(this, aEdge);
+    public boolean doEditAdapterEdge(AdapterEdge aEdge) 
+	{
+        return AdapterConnectionInspectorDialog.showDialog(this, aEdge); // blocks
     }
 
     @Override
-    public boolean doEditSimEventListEdge(SimEventListenerEdge seEdge) {
-        return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
+    public boolean doEditSimEventListEdge(SimEventListenerEdge seEdge) 
+	{
+        return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge); // blocks
     }
 
-    private Object getLeafUO(JTree tree) {
+    private Object getLeafUO(JTree tree) 
+	{
         TreePath[] oa = tree.getSelectionPaths();
-        if (oa != null) {
-            DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) oa[0].getLastPathComponent();
-            return dmtn.getUserObject();
+        if (oa != null) 
+		{
+            DefaultMutableTreeNode defaultMutableTreeNode = (DefaultMutableTreeNode) oa[0].getLastPathComponent();
+            return defaultMutableTreeNode.getUserObject();
         }
         return null;
     }
@@ -1132,7 +1144,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public void addPropertyChangeListenersToLegoTree(File f, boolean b) {
+    public void addPropertyChangeListenersToLegoTree(File f, boolean b) 
+	{
         propertyChangeListenerTree.addContentRoot(f, b);
     }
 
@@ -1145,40 +1158,48 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 
     // Not used
     @Override
-    public void removePropertyChangeListenerFromLEGOTree(File f) {
+    public void removePropertyChangeListenerFromLEGOTree(File f)
+	{
         propertyChangeListenerTree.removeContentRoot(f);
     }
 
     @Override
-    public int genericAsk(String title, String message) {
+    public int genericAsk(String title, String message) 
+	{
         return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
     @Override
-    public int genericAskYN(String title, String message) {
+    public int genericAskYN(String title, String message)
+	{
         return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
     }
 
     @Override
-    public int genericAsk2Buttons(String title, String message, String button1, String button2) {
+    public int genericAsk2Buttons(String title, String message, String button1, String button2) 
+	{
         return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
                 new String[]{button1, button2}, button1);
     }
 
     @Override
-    public String promptForStringOrCancel(String title, String message, String initval) {
+    public String promptForStringOrCancel(String title, String message, String initialValue) 
+	{
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
-                null, null, initval);
-    }    // ViskitView-required methods:
+                null, null, initialValue);
+    }
 
     private JFileChooser assemblyFileChooser;
-    private JFileChooser buildOpenSaveChooser() {
-
+    private JFileChooser buildOpenSaveChooser() 
+	{
         // Try to open in the current project directory for Assemblies
-        if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null) 
+		{
             return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory());
-        } else {
+        } 
+		else 
+		{
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
         }
     }
@@ -1202,14 +1223,19 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     @Override
-    public File openRecentFilesAsk(Collection<String> lis) {
+    public File openRecentFilesAsk(Collection<String> lis)
+	{
         String fn = RecentFilesDialog.showDialog(this, lis);
-        if (fn != null) {
-            File f = new File(fn);
-            if (f.exists()) {
-                return f;
-            } else {
-                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
+        if (fn != null) 
+		{
+            File file = new File(fn);
+            if (file.exists()) 
+			{
+                return file;
+            } 
+			else 
+			{
+                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", file + " does not exist");
             }
         }
         return null;
@@ -1284,7 +1310,7 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			// show relevant pane for new project
 			viskitApplicationFrame.displayEventGraphEditorTab();
 		}
-		// TODO report open?
+		// TODO open metadata
     }
 
 	public final static String CLOSE_PROJECT_METHOD = "closeProject"; // must match following method name.  Not possible to accomplish this programmatically.

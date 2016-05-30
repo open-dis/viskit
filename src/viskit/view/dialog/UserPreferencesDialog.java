@@ -76,41 +76,50 @@ public class UserPreferencesDialog extends JDialog
 
     private static UserPreferencesDialog projectSettingsDialog;
     private static boolean modified = false;
-    private final JButton cancelButton;
-    private final JButton okButton;
-    private final JTabbedPane tabbedPane;
+    private final JTabbedPane tabbedPane = new JTabbedPane();
+    private final JButton cancelButton   = new JButton("Cancel");
+    private final JButton     okButton   = new JButton("Close");
     private JList<String> classpathAdditionsJlist;
-    private JCheckBox eventGraphEditorPreferenceCB;
-    private JCheckBox assemblyEditorPreferenceCB;
-    private JCheckBox runAssemblyPreferenceCB;
-    private JCheckBox designOfExperimentsPreferenceCB;
-    private JCheckBox clusterRunPreferenceCB;
-    private JCheckBox analystReportPreferenceCB;
-    private JCheckBox verboseDebugMessagesPreferenceCB;
+    private JCheckBox     eventGraphEditorPreferenceCheckBox;
+    private JCheckBox       assemblyEditorPreferenceCheckBox;
+    private JCheckBox          runAssemblyPreferenceCheckBox;
+    private JCheckBox  designOfExperimentsPreferenceCheckBox;
+    private JCheckBox           clusterRunPreferenceCheckBox;
+    private JCheckBox        analystReportPreferenceCheckBox;
+    private JCheckBox verboseDebugMessagesPreferenceCheckBox;
 
     private JRadioButton defaultLookAndFeelRB;
     private JRadioButton platformLookAndFeelRB;
     private JRadioButton otherLookAndFeelRB;
     private JTextField otherTF;
 	
-	public final String PREFERENCE_CHANGE_MESSAGE = "Changes are applied when Visual Simkit (Viskit) launches";
+	public final String PREFERENCE_CHANGE_MESSAGE = "Panel visibility changes are applied when Visual Simkit launches";
 
-    public static boolean showDialog(JFrame mother) {
-        if (projectSettingsDialog == null) {
+    public static boolean showDialog(JFrame mother) 
+	{
+        if (projectSettingsDialog == null) 
+		{
             projectSettingsDialog = new UserPreferencesDialog(mother);
-        } else {
-            projectSettingsDialog.setParams();
+        } 
+		else 
+		{
+            projectSettingsDialog.setParameters();
         }
-        projectSettingsDialog.setVisible(true);
-        // above call blocks
+        projectSettingsDialog.setVisible(true); // this call blocks for user interaction
+       
         return modified;
     }
 
-    private UserPreferencesDialog(JFrame parent) {
+    private UserPreferencesDialog(JFrame parent) 
+	{
         super(parent, "User Preferences", true);
-
+		
+		initialize ();
+	}
+	public void initialize ()
+	{
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        this.addWindowListener(new MyCloseListener());
         initializeConfigurations();
 
         JPanel contentPane = new JPanel();
@@ -129,13 +138,11 @@ public class UserPreferencesDialog extends JDialog
 //        contentPane.add(headerPanel);
 				
 
-        tabbedPane = new JTabbedPane();
+        
         buildWidgets();
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        cancelButton = new JButton("Cancel");
-        okButton = new JButton("Close");
         buttonPanel.add(Box.createHorizontalGlue());
         //buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
@@ -146,21 +153,23 @@ public class UserPreferencesDialog extends JDialog
         contentPane.add(buttonPanel);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
-        VisibilityHandler vis = new VisibilityHandler();
-        eventGraphEditorPreferenceCB.addActionListener(vis);
-        assemblyEditorPreferenceCB.addActionListener(vis);
-        runAssemblyPreferenceCB.addActionListener(vis);
-        designOfExperimentsPreferenceCB.addActionListener(vis);
-        clusterRunPreferenceCB.addActionListener(vis);
-        analystReportPreferenceCB.addActionListener(vis);
-        verboseDebugMessagesPreferenceCB.addActionListener(vis);
+        cancelButton.addActionListener(new CancelButtonListener());
+            okButton.addActionListener(new ApplyButtonListener());
+			
+        CapabilitiesHandler capabilitiesHandler = new CapabilitiesHandler();
+             eventGraphEditorPreferenceCheckBox.addActionListener(capabilitiesHandler);
+               assemblyEditorPreferenceCheckBox.addActionListener(capabilitiesHandler);
+                  runAssemblyPreferenceCheckBox.addActionListener(capabilitiesHandler);
+          designOfExperimentsPreferenceCheckBox.addActionListener(capabilitiesHandler);
+                   clusterRunPreferenceCheckBox.addActionListener(capabilitiesHandler);
+                analystReportPreferenceCheckBox.addActionListener(capabilitiesHandler);
+         verboseDebugMessagesPreferenceCheckBox.addActionListener(capabilitiesHandler);
 
-        setParams();
+        setParameters();
     }
 
-    private void setParams() {
+    private void setParameters() 
+	{
         fillWidgets();
         getRootPane().setDefaultButton(cancelButton);
 
@@ -177,44 +186,49 @@ public class UserPreferencesDialog extends JDialog
 	{
         JPanel visibilityPreferencesPanel = new JPanel();
         visibilityPreferencesPanel.setLayout(new BoxLayout(visibilityPreferencesPanel, BoxLayout.Y_AXIS));
+        visibilityPreferencesPanel.add(Box.createVerticalStrut(5));
         visibilityPreferencesPanel.add(Box.createVerticalGlue());
 		
 		// ================================================================
 		// Capabilities
 		
-        JPanel innerCheckBoxPanel= new JPanel();
+        JPanel innerCheckBoxPanel = new JPanel();
         innerCheckBoxPanel.setLayout(new BoxLayout(innerCheckBoxPanel, BoxLayout.Y_AXIS));
         innerCheckBoxPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         innerCheckBoxPanel.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3, 3, 3, 3)));
 		
-        eventGraphEditorPreferenceCB = new JCheckBox("Event Graph Editor");
-        innerCheckBoxPanel.add(eventGraphEditorPreferenceCB);
-        assemblyEditorPreferenceCB = new JCheckBox("Assembly Editor");
-        innerCheckBoxPanel.add(assemblyEditorPreferenceCB);
-        runAssemblyPreferenceCB = new JCheckBox("Simulation Run");
-        innerCheckBoxPanel.add(runAssemblyPreferenceCB);
-        analystReportPreferenceCB = new JCheckBox("Analyst Report");
-        innerCheckBoxPanel.add(analystReportPreferenceCB);
+        eventGraphEditorPreferenceCheckBox = new JCheckBox("Event Graph Editor");
+        innerCheckBoxPanel.add(eventGraphEditorPreferenceCheckBox);
+        assemblyEditorPreferenceCheckBox = new JCheckBox("Assembly Editor");
+        innerCheckBoxPanel.add(assemblyEditorPreferenceCheckBox);
+        runAssemblyPreferenceCheckBox = new JCheckBox("Simulation Run");
+        innerCheckBoxPanel.add(runAssemblyPreferenceCheckBox);
+        analystReportPreferenceCheckBox = new JCheckBox("Analyst Report");
+        innerCheckBoxPanel.add(analystReportPreferenceCheckBox);
 		
-        designOfExperimentsPreferenceCB = new JCheckBox("Design Of Experiments (DOE)");
-		designOfExperimentsPreferenceCB.setEnabled(false); // TODO implement
-		designOfExperimentsPreferenceCB.setToolTipText("Future restoration planned"); // TODO implement
-        innerCheckBoxPanel.add(designOfExperimentsPreferenceCB);
+        designOfExperimentsPreferenceCheckBox = new JCheckBox("Design Of Experiments (DOE)");
+		designOfExperimentsPreferenceCheckBox.setEnabled(false); // TODO implement
+		designOfExperimentsPreferenceCheckBox.setToolTipText("Future restoration planned"); // TODO implement
+        innerCheckBoxPanel.add(designOfExperimentsPreferenceCheckBox);
 		
-        clusterRunPreferenceCB = new JCheckBox("Cluster Computation");
-		clusterRunPreferenceCB.setEnabled(false); // TODO implement
-		clusterRunPreferenceCB.setToolTipText("Future restoration planned"); // TODO implement
-        innerCheckBoxPanel.add(clusterRunPreferenceCB);
+        clusterRunPreferenceCheckBox = new JCheckBox("Cluster Computation");
+		clusterRunPreferenceCheckBox.setEnabled(false); // TODO implement
+		clusterRunPreferenceCheckBox.setToolTipText("Future restoration planned"); // TODO implement
+        innerCheckBoxPanel.add(clusterRunPreferenceCheckBox);
 		
-        verboseDebugMessagesPreferenceCB = new JCheckBox("Verbose debug messages");
-        innerCheckBoxPanel.add(verboseDebugMessagesPreferenceCB);
+        verboseDebugMessagesPreferenceCheckBox = new JCheckBox("Verbose debug messages");
+		verboseDebugMessagesPreferenceCheckBox.setSelected(ViskitStatics.debug); // start with source code initialization; TODO remember preference
+        innerCheckBoxPanel.add(verboseDebugMessagesPreferenceCheckBox);
 
         visibilityPreferencesPanel.add(innerCheckBoxPanel, BorderLayout.CENTER);
-        visibilityPreferencesPanel.add(Box.createVerticalStrut(3));
+		
+        visibilityPreferencesPanel.add(Box.createVerticalStrut(8));
+        visibilityPreferencesPanel.add(Box.createVerticalGlue());
         JLabel preferenceChangeLabel = new JLabel(PREFERENCE_CHANGE_MESSAGE, JLabel.CENTER);
         preferenceChangeLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         visibilityPreferencesPanel.add(preferenceChangeLabel);
         visibilityPreferencesPanel.add(Box.createVerticalGlue());
+        visibilityPreferencesPanel.add(Box.createVerticalStrut(8));
 
         tabbedPane.addTab("Capabilities", visibilityPreferencesPanel);
 		
@@ -235,11 +249,11 @@ public class UserPreferencesDialog extends JDialog
 		
         JButton upClasspathButton     = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/upArrow.png")));
         upClasspathButton.setBorder(null);
-        upClasspathButton.addActionListener(new upCPhandler());
+        upClasspathButton.addActionListener(new UpClasspathHandler());
         JButton addClasspathButton    = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
-        addClasspathButton.addActionListener(new addCPhandler());
+        addClasspathButton.addActionListener(new AddClasspathHandler());
         JButton removeClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
-        removeClasspathButton.addActionListener(new delCPhandler());
+        removeClasspathButton.addActionListener(new DeleteClasspathHandler());
         JButton downClasspathButton   = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/downArrow.png")));
         downClasspathButton.setBorder(null);
         downClasspathButton.addActionListener(new downCPhandler());
@@ -293,7 +307,7 @@ public class UserPreferencesDialog extends JDialog
         buttonGroup.add (defaultLookAndFeelRB);
         buttonGroup.add(platformLookAndFeelRB);
         buttonGroup.add(   otherLookAndFeelRB);
-        ActionListener listener = new lookAndFeelListener();
+        ActionListener listener = new LookAndFeelListener();
         platformLookAndFeelRB.addActionListener(listener);
          defaultLookAndFeelRB.addActionListener(listener);
            otherLookAndFeelRB.addActionListener(listener);
@@ -335,7 +349,7 @@ public class UserPreferencesDialog extends JDialog
         tabbedPane.addTab("Recent Files", recentP);
      }
 
-    class lookAndFeelListener implements ActionListener {
+    class LookAndFeelListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -366,35 +380,48 @@ public class UserPreferencesDialog extends JDialog
               guiConfiguration = ViskitConfiguration.instance().getViskitGuiXMLConfiguration();
     }
 
-    class VisibilityHandler implements ActionListener {
+    class CapabilitiesHandler implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            JCheckBox src = (JCheckBox) e.getSource();
-            if (src == eventGraphEditorPreferenceCB) {
-                applicationConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, eventGraphEditorPreferenceCB.isSelected());
-            } else if (src == assemblyEditorPreferenceCB) {
-                applicationConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assemblyEditorPreferenceCB.isSelected());
-            } else if (src == runAssemblyPreferenceCB) {
-                if (runAssemblyPreferenceCB.isSelected()) {
+        public void actionPerformed(ActionEvent e) 
+		{
+            JCheckBox originatingCheckBox = (JCheckBox) e.getSource();
+            if      (originatingCheckBox == eventGraphEditorPreferenceCheckBox) 
+			{
+                applicationConfiguration.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, eventGraphEditorPreferenceCheckBox.isSelected());
+            } 
+			else if (originatingCheckBox == assemblyEditorPreferenceCheckBox) 
+			{
+                applicationConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assemblyEditorPreferenceCheckBox.isSelected());
+            }
+			else if (originatingCheckBox == runAssemblyPreferenceCheckBox)
+			{
+                if (runAssemblyPreferenceCheckBox.isSelected()) 
+				{
                     // if we turn on the Simulation Run, we also need the Assembly editor
-                    if (!assemblyEditorPreferenceCB.isSelected()) {
-                        assemblyEditorPreferenceCB.doClick();
+                    if (!assemblyEditorPreferenceCheckBox.isSelected()) 
+					{
+                        assemblyEditorPreferenceCheckBox.doClick();
                     } // reenter here
                 }
-                applicationConfiguration.setProperty(ViskitConfiguration.SIMULATION_RUN_VISIBLE_KEY, runAssemblyPreferenceCB.isSelected());
+                applicationConfiguration.setProperty(ViskitConfiguration.SIMULATION_RUN_VISIBLE_KEY, runAssemblyPreferenceCheckBox.isSelected());
             } 
-			else if (src == verboseDebugMessagesPreferenceCB) 
+			else if (originatingCheckBox == verboseDebugMessagesPreferenceCheckBox) 
 			{
-                applicationConfiguration.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, verboseDebugMessagesPreferenceCB.isSelected());
-                ViskitStatics.debug = verboseDebugMessagesPreferenceCB.isSelected();
+                applicationConfiguration.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, verboseDebugMessagesPreferenceCheckBox.isSelected());
+                ViskitStatics.debug = verboseDebugMessagesPreferenceCheckBox.isSelected();
             } 
-			else if (src == analystReportPreferenceCB) {
-                applicationConfiguration.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportPreferenceCB.isSelected());
-            } else if (src == designOfExperimentsPreferenceCB) {
-                applicationConfiguration.setProperty(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY, designOfExperimentsPreferenceCB.isSelected());
-            } else if (src == clusterRunPreferenceCB) {
-                applicationConfiguration.setProperty(ViskitConfiguration.CLUSTER_RUN_VISIBLE_KEY, clusterRunPreferenceCB.isSelected());
+			else if (originatingCheckBox == analystReportPreferenceCheckBox)
+			{
+                applicationConfiguration.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportPreferenceCheckBox.isSelected());
+            }
+			else if (originatingCheckBox == designOfExperimentsPreferenceCheckBox)
+			{
+                applicationConfiguration.setProperty(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY, designOfExperimentsPreferenceCheckBox.isSelected());
+            } 
+			else if (originatingCheckBox == clusterRunPreferenceCheckBox)
+			{
+                applicationConfiguration.setProperty(ViskitConfiguration.CLUSTER_RUN_VISIBLE_KEY, clusterRunPreferenceCheckBox.isSelected());
             }
         }
     }
@@ -516,13 +543,13 @@ public class UserPreferencesDialog extends JDialog
             classpathAdditionsJlist.setModel(mod);
         }
 
-        eventGraphEditorPreferenceCB.setSelected(isEventGraphEditorVisible());
-        assemblyEditorPreferenceCB.setSelected(isAssemblyEditorVisible());
-        runAssemblyPreferenceCB.setSelected(isSimulationRunVisible());
-        designOfExperimentsPreferenceCB.setSelected(isDOEVisible());
-        clusterRunPreferenceCB.setSelected(isClusterRunVisible());
-        analystReportPreferenceCB.setSelected(isAnalystReportVisible());
-        verboseDebugMessagesPreferenceCB.setSelected(ViskitStatics.debug = isVerboseDebug());
+        eventGraphEditorPreferenceCheckBox.setSelected(isEventGraphEditorVisible());
+        assemblyEditorPreferenceCheckBox.setSelected(isAssemblyEditorVisible());
+        runAssemblyPreferenceCheckBox.setSelected(isSimulationRunVisible());
+        designOfExperimentsPreferenceCheckBox.setSelected(isDOEVisible());
+        clusterRunPreferenceCheckBox.setSelected(isClusterRunVisible());
+        analystReportPreferenceCheckBox.setSelected(isAnalystReportVisible());
+        verboseDebugMessagesPreferenceCheckBox.setSelected(ViskitStatics.debug = isVerboseDebug());
 
         String lookAndFeelName = getLookAndFeel();
         if(lookAndFeelName == null || lookAndFeelName.equals(ViskitConfiguration.LOOK_AND_FEEL_PLATFORM)) 
@@ -548,7 +575,7 @@ public class UserPreferencesDialog extends JDialog
       }
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -557,38 +584,47 @@ public class UserPreferencesDialog extends JDialog
         }
     }
 
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+		{
             unloadWidgets();
             dispose();
         }
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class MyCloseListener extends WindowAdapter 
+	{
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (modified) {
+        public void windowClosing(WindowEvent e) 
+		{
+            if (modified) 
+			{
                 int returnValue = JOptionPane.showConfirmDialog(UserPreferencesDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) 
+				{
                     okButton.doClick();
-                } else {
+                }
+				else 
+				{
                     cancelButton.doClick();
                 }
-            } else {
+            } 
+			else 
+			{
                 cancelButton.doClick();
             }
         }
     }
     JFileChooser addChooser;
 
-    class addCPhandler implements ActionListener {
+    class AddClasspathHandler implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+		{
             if (addChooser == null) {
                 addChooser = new JFileChooser(ViskitProject.MY_VISKIT_PROJECTS_DIR);
 				addChooser.setDialogTitle("Open Project Settings");
@@ -640,7 +676,7 @@ public class UserPreferencesDialog extends JDialog
         saveExtraClassPathEntries(sa);
     }
 
-    class delCPhandler implements ActionListener {
+    class DeleteClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -655,7 +691,7 @@ public class UserPreferencesDialog extends JDialog
         }
     }
 
-    class upCPhandler implements ActionListener {
+    class UpClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -754,7 +790,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if the EVENT GRAPH Editor is to be visible
      * @return if the EVENT GRAPH Editor is to be visible
      */
-    public static boolean isEventGraphEditorVisible() {
+    public static boolean isEventGraphEditorVisible() 
+	{
         return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY);
     }
 
@@ -762,7 +799,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if the Assembly Editor is to be visible
      * @return if the Assembly Editor is to be visible
      */
-    public static boolean isAssemblyEditorVisible() {
+    public static boolean isAssemblyEditorVisible()
+	{
         return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY);
     }
 
@@ -787,7 +825,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if the Analyst Report Editor is to be visible
      * @return if the Analyst Report Editor is to be visible
      */
-    public static boolean isAnalystReportVisible() {
+    public static boolean isAnalystReportVisible() 
+	{
         return getVisibilitySense(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY);
     }
 
@@ -795,7 +834,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if verbose debug message are to be printed
      * @return if verbose debug message are to be printed
      */
-    public static boolean isVerboseDebug() {
+    public static boolean isVerboseDebug() 
+	{
         return getVisibilitySense(ViskitConfiguration.DEBUG_MESSAGES_KEY);
     }
 
@@ -803,7 +843,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if the Design of Experiments Editor is to be visible
      * @return if the Design of Experiments Editor is to be visible
      */
-    public static boolean isDOEVisible() {
+    public static boolean isDOEVisible() 
+	{
         return getVisibilitySense(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY);
     }
 
@@ -811,7 +852,8 @@ public class UserPreferencesDialog extends JDialog
      * Return if the Cluster Runner is to be visible
      * @return if the Cluster Runner is to be visible
      */
-    public static boolean isClusterRunVisible() {
+    public static boolean isClusterRunVisible() 
+	{
         return getVisibilitySense(ViskitConfiguration.CLUSTER_RUN_VISIBLE_KEY);
     }
 }

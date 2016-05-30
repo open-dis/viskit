@@ -190,7 +190,7 @@ public class JGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
             return egn.getModelKey();
         } else if (o instanceof AssemblyPropertyListView) {
             AssemblyPropertyListView apv = (AssemblyPropertyListView) o;
-            AssemblyPropertyListCell apc = (AssemblyPropertyListCell) apv.getCell();
+            AssemblyPropertyChangeListenerCell apc = (AssemblyPropertyChangeListenerCell) apv.getCell();
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
@@ -235,8 +235,8 @@ public class JGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
         if (ev.getCell() instanceof vEdgeCell) {
             vec = (vEdgeCell) ev.getCell();
             edg = (Edge) vec.getUserObject();
-        } else if (ev.getCell() instanceof vAssemblyEdgeCell) {
-            vec = (vAssemblyEdgeCell) ev.getCell();
+        } else if (ev.getCell() instanceof JGraphAssemblyEdgeCell) {
+            vec = (JGraphAssemblyEdgeCell) ev.getCell();
             edg = (AssemblyEdge) vec.getUserObject();
         }
         return edg;

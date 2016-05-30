@@ -95,7 +95,7 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
     /** Cached default foreground and default background. */
     transient protected Color defaultForeground,  defaultBackground,  bordercolor;
 
-    /** Cached borderwidth. */
+    /** Cached borderWidth. */
     transient protected int borderWidth;
 
     /** Cached value of the double buffered state */
@@ -253,12 +253,16 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
         }
     }
 
-    private String breakName(String name, int maxW, FontMetrics metrics) {
+	/** Mangle name for display readability */
+    private String breakName(String name, int maxWidth, FontMetrics fontMetrics)
+	{
         StringBuilder sb = new StringBuilder();
-        String[] n = name.split("\n");
-        for (String n1 : n) {
-            String[] nn = splitIfNeeded(n1, maxW, metrics);
-            for (String nn1 : nn) {
+        String[] nameSplitArray = name.split("(\n)|(_)"); // split on line feeds or underscores
+        for (String nameSegment : nameSplitArray) 
+		{
+            String[] nameSegmentSplit = splitNameIfNeeded(nameSegment, maxWidth, fontMetrics);
+            for (String nn1 : nameSegmentSplit) 
+			{
                 sb.append(nn1);
                 sb.append("\n");
             }
@@ -293,15 +297,16 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
     }
      */
 
-    private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) // TODO review
+    private String[] splitNameIfNeeded(String name, int maxWidth, FontMetrics metrics) // TODO review
 	{
         String[] nuts = new String[2];
-        nuts[1] = s;
+        nuts[1] = name;
         Vector<String> v = new Vector<>();
         do {
-            nuts = splitOnce(nuts[1], maxW, metrics);
+            nuts = splitOnce(nuts[1], maxWidth, metrics);
             v.add(nuts[0]);
-        } while (nuts[1] != null);
+        } 
+		while (nuts[1] != null);
         String[] ra = new String[v.size()];
         ra = v.toArray(ra);
         return ra;

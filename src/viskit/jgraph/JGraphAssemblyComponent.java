@@ -82,20 +82,20 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 		{
             // How to use circles, from the jGraph tutorial
             @Override
-            protected VertexView createVertexView(Object v) 
+            protected VertexView createVertexView(Object viskitModelNode) 
 			{
                 VertexView vertexView;
-                if (v instanceof AssemblyCircleCell) 
+                if (viskitModelNode instanceof AssemblyCircleCell) 
 				{
-                    vertexView = new AssemblyCircleView(v);
+                    vertexView = new AssemblyCircleView(viskitModelNode);
                 } 
-				else if (v instanceof AssemblyPropertyListCell) 
+				else if (viskitModelNode instanceof AssemblyPropertyChangeListenerCell) 
 				{
-                    vertexView = new AssemblyPropertyListView(v);
+                    vertexView = new AssemblyPropertyListView(viskitModelNode);
                 } 
 				else 
 				{
-                    vertexView = super.createVertexView(v);
+                    vertexView = super.createVertexView(viskitModelNode);
                 }
                 return vertexView;
             }
@@ -104,23 +104,28 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             @Override
             protected EdgeView createEdgeView(Object e)
 			{
-                EdgeView edgeView = null;
-                if (e instanceof vAssemblyEdgeCell) 
+                EdgeView edgeView;
+                if (e instanceof JGraphAssemblyEdgeCell) 
 				{
-                    Object o = ((vAssemblyEdgeCell) e).getUserObject();
+                    Object o = ((JGraphAssemblyEdgeCell) e).getUserObject();
                     if (o instanceof PropertyChangeListenerEdge) 
 					{
-                        edgeView = new vAssyPclEdgeView(e);
+                        edgeView = new JGraphAssemblyPclEdgeView(e);
                     }
-                    if (o instanceof AdapterEdge) 
+					else if (o instanceof AdapterEdge) 
 					{
-                        edgeView = new vAssyAdapterEdgeView(e);
+                        edgeView = new JGraphAssemblyAdapterEdgeView(e);
                     }
-                    if (o instanceof SimEventListenerEdge) 
+                    else if (o instanceof SimEventListenerEdge) 
 					{
-                        edgeView = new vAssySelEdgeView(e);
+                        edgeView = new JGraphAssemblySelectedEdgeView(e);
                     }
-                } 
+					else 
+					{
+						edgeView = null;
+						LOG.error ("unexpected object class " + o.getClass());
+					}
+				}
 				else 
 				{
                     edgeView = super.createEdgeView(e);
@@ -129,16 +134,16 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             }
 
             @Override
-            protected PortView createPortView(Object p) 
+            protected PortView createPortView(Object jGraphPort) 
 			{
                 PortView portView;
-                if (p instanceof vAssemblyPortCell) 
+                if (jGraphPort instanceof JGraphAssemblyPortCell) 
 				{
-                    portView = new vAssemblyPortView(p);
+                    portView = new JGraphAssemblyPortView(jGraphPort);
                 }
 				else 
 				{
-                    portView = super.createPortView(p);
+                    portView = super.createPortView(jGraphPort);
                 }
                 return portView;
             }
@@ -273,9 +278,9 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                         attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), rectangle2D.width, rectangle2D.height));
                     }
                 } 
-				else if (cell instanceof AssemblyPropertyListCell)
+				else if (cell instanceof AssemblyPropertyChangeListenerCell)
 				{
-                    AssemblyPropertyListCell assemblyPropertyListCell = (AssemblyPropertyListCell) cell;
+                    AssemblyPropertyChangeListenerCell assemblyPropertyListCell = (AssemblyPropertyChangeListenerCell) cell;
 
                     AttributeMap attributeMap = assemblyPropertyListCell.getAttributes();
                     Rectangle2D.Double rectangle2D = (Rectangle2D.Double) attributeMap.get("bounds");
@@ -308,9 +313,9 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
             if (c != null)
 			{
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vAssemblyEdgeCell)
+                if (c instanceof JGraphAssemblyEdgeCell)
 				{
-                    vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
+                    JGraphAssemblyEdgeCell vc = (JGraphAssemblyEdgeCell) c;
                     AssemblyEdge assemblyEdge = (AssemblyEdge) vc.getUserObject();
 					// events flow out of fromObject into toObject
                     Object   toObject = assemblyEdge.getToObject();
@@ -371,7 +376,7 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                     sb.append("</html>");
                     return sb.toString();
                 } 
-				else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropertyListCell)
+				else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropertyChangeListenerCell)
 				{
                     String type;
                     String name;
@@ -384,16 +389,16 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
                         name = en.getName();
                         description = en.getDescription();
                     } 
-					else /*if (c instanceof AssemblyPropertyListCell)*/ 
+					else /*if (c instanceof AssemblyPropertyChangeListenerCell)*/ 
 					{
-                        AssemblyPropertyListCell cc = (AssemblyPropertyListCell) c;
+                        AssemblyPropertyChangeListenerCell cc = (AssemblyPropertyChangeListenerCell) c;
                         PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
                         type = pcln.getType();
                         name = pcln.getName();
                         description = pcln.getDescription();
                     }
 
-                    sb.append("<center><u> SimEntity ");
+                    sb.append("<center><u>SimEntity ");
                     sb.append(type);
                     sb.append("</u> <br />");
                     sb.append("(Event Graph instance ");
@@ -566,13 +571,13 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
         } 
 		else 
 		{
-            cell = new AssemblyPropertyListCell(node);
+            cell = new AssemblyPropertyChangeListenerCell(node);
         }
 
         node.opaqueViewObject = cell;
 
         // Add one Floating Port
-        cell.add(new vAssemblyPortCell(node.getName() + "/Center"));
+        cell.add(new JGraphAssemblyPortCell(node.getName() + "/Center"));
         return cell;
     }
 
@@ -601,43 +606,43 @@ public class JGraphAssemblyComponent extends JGraph implements GraphModelListene
 /**
  * To mark our edges.
  */
-class vAssemblyEdgeCell extends DefaultEdge 
+class JGraphAssemblyEdgeCell extends DefaultEdge 
 {
-    public vAssemblyEdgeCell() 
+    public JGraphAssemblyEdgeCell() 
 	{
         this(null);
     }
 
-    public vAssemblyEdgeCell(Object userObject) 
+    public JGraphAssemblyEdgeCell(Object userObject) 
 	{
         super(userObject);
     }
 }
 
-class vAssemblyPortCell extends DefaultPort 
+class JGraphAssemblyPortCell extends DefaultPort 
 {
-    public vAssemblyPortCell() 
+    public JGraphAssemblyPortCell() 
 	{
         this(null);
     }
 
-    public vAssemblyPortCell(Object o)
+    public JGraphAssemblyPortCell(Object o)
 	{
         this(o, null);
     }
 
-    public vAssemblyPortCell(Object o, Port port) 
+    public JGraphAssemblyPortCell(Object o, Port port) 
 	{
         super(o, port);
     }
 }
 
-class vAssemblyPortView extends PortView 
+class JGraphAssemblyPortView extends PortView 
 {
 
     static int mysize = 10;   // smaller than the circle
 
-    public vAssemblyPortView(Object o) 
+    public JGraphAssemblyPortView(Object o) 
 	{
         super(o);
         setPortSize(mysize);
@@ -649,14 +654,14 @@ class vAssemblyPortView extends PortView
 /**
  * To mark our nodes.
  */
-class AssemblyPropertyListCell extends DefaultGraphCell
+class AssemblyPropertyChangeListenerCell extends DefaultGraphCell
 {
-    AssemblyPropertyListCell() 
+    AssemblyPropertyChangeListenerCell() 
 	{
         this(null);
     }
 
-    public AssemblyPropertyListCell(Object userObject) 
+    public AssemblyPropertyChangeListenerCell(Object userObject) 
 	{
         super(userObject);
     }
@@ -713,11 +718,11 @@ class AssemblyCircleView extends VertexView
 }
 
 // Begin support for custom line ends and double line (adapter) on assembly edges
-class vAssyAdapterEdgeView extends vEdgeView 
+class JGraphAssemblyAdapterEdgeView extends vEdgeView 
 {
-    static vAssyAdapterEdgeRenderer vaaer = new vAssyAdapterEdgeRenderer();
+    static JGraphAssemblyAdapterEdgeRenderer vaaer = new JGraphAssemblyAdapterEdgeRenderer();
 
-    public vAssyAdapterEdgeView(Object cell) {
+    public JGraphAssemblyAdapterEdgeView(Object cell) {
         super(cell);
     }
 
@@ -727,11 +732,11 @@ class vAssyAdapterEdgeView extends vEdgeView
     }
 }
 
-class vAssySelEdgeView extends vEdgeView {
+class JGraphAssemblySelectedEdgeView extends vEdgeView {
 
     static JGraphAssemblySelectedEdgeRenderer vaser = new JGraphAssemblySelectedEdgeRenderer();
 
-    public vAssySelEdgeView(Object cell) {
+    public JGraphAssemblySelectedEdgeView(Object cell) {
         super(cell);
     }
 
@@ -741,11 +746,11 @@ class vAssySelEdgeView extends vEdgeView {
     }
 }
 
-class vAssyPclEdgeView extends vEdgeView {
+class JGraphAssemblyPclEdgeView extends vEdgeView {
 
-    static vAssyPclEdgeRenderer vaper = new vAssyPclEdgeRenderer();
+    static JGraphAssemblyPclEdgeRenderer vaper = new JGraphAssemblyPclEdgeRenderer();
 
-    public vAssyPclEdgeView(Object cell) {
+    public JGraphAssemblyPclEdgeView(Object cell) {
         super(cell);
     }
 
@@ -755,10 +760,10 @@ class vAssyPclEdgeView extends vEdgeView {
     }
 }
 
-class vAssyAdapterEdgeRenderer extends JGraphEdgeRenderer {
+class JGraphAssemblyAdapterEdgeRenderer extends JGraphEdgeRenderer {
 
     /**
-     * Paint the vaaer. Overridden to do a double line and paint over the end
+     * Paint the AssemblyAdapterEdgeRenderer. Overridden to do a double line and paint over the end
      * shape
      */
     @Override
@@ -861,8 +866,8 @@ class JGraphAssemblySelectedEdgeRenderer extends JGraphEdgeRenderer {
     }
 }
 
-class vAssyPclEdgeRenderer extends JGraphEdgeRenderer {
-
+class JGraphAssemblyPclEdgeRenderer extends JGraphEdgeRenderer 
+{
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
         double d = Math.max(1, dst.distance(src));

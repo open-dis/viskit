@@ -348,7 +348,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
         stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel, BoxLayout.Y_AXIS));
-        stateVariablesPanel.add(Box.createVerticalStrut(5));
+        stateVariablesPanel.add(Box.createVerticalStrut(10));
 
         JPanel eventGraphParametersSubpanel = new JPanel();
         eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel, BoxLayout.X_AXIS));
@@ -363,7 +363,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         StateVariablesPanel stateVariablesPanel0 = new StateVariablesPanel(300, 5);
         stateVariablesPanel.add(stateVariablesPanel0);
-        stateVariablesPanel.add(Box.createVerticalStrut(5));
+        stateVariablesPanel.add(Box.createVerticalStrut(10));
         stateVariablesPanel.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
@@ -390,7 +390,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Event jGraph parameters area
         JPanel parametersPanel = new JPanel();
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
-        parametersPanel.add(Box.createVerticalStrut(5));
+        parametersPanel.add(Box.createVerticalStrut(10));
 		
 		String usageHint = "To modify this field, use menu item \"Event Graph Editor > Edit Event Graph Properties...\" (Control-Shift-P)";
 		
@@ -401,14 +401,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 //		implementsLabel.setEnabled(false); // TODO callback
 //
 //        parametersPanel.add(implementsLabel);
-//        parametersPanel.add(Box.createVerticalStrut(5));
+//        parametersPanel.add(Box.createVerticalStrut(10));
 
         JLabel descriptionLabel = new JLabel("Event Graph Description");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText(usageHint);
 
         parametersPanel.add(descriptionLabel);
-        parametersPanel.add(Box.createVerticalStrut(5));
+        parametersPanel.add(Box.createVerticalStrut(10));
 
         JTextArea descriptionTextArea = new JTextArea();
         descriptionTextArea.setEditable(false);
@@ -424,7 +424,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // This works, you just have to have several lines of typed text to cause the etched scrollbar to appear
         parametersPanel.add(descriptionScrollPane);
-        parametersPanel.add(Box.createVerticalStrut(5));
+        parametersPanel.add(Box.createVerticalStrut(10));
         parametersPanel.setMinimumSize(new Dimension(20, 20));
 
         eventGraphParametersSubpanel = new JPanel();
@@ -462,7 +462,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         });
 
         parametersPanel.add(parametersPanel0);
-        parametersPanel.add(Box.createVerticalStrut(5));
+        parametersPanel.add(Box.createVerticalStrut(10));
 
         CodeBlockPanel codeblockPan = buildCodeBlockPanel();
 
@@ -963,17 +963,20 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			myMenuBar.add(eventGraphsMenu);
 			myMenuBar.add(editMenu);
 			
-			try  // TODO why does this block also exist in AssemblyViewFrame? need to refactor...
+			try  // previously this block also existed in AssemblyViewFrame, refactored.  TODO still seeing 2 icon tabs within Help display.
 			{
 				help = new viskit.Help(this);
 				checkHelpWindowBounds (); // likely too early during initialization sequence to take effect, parent windows not yet available
 				ViskitGlobals.instance().setHelp(help);
 
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_CONTENTS_METHOD,       "Help Contents", KeyEvent.VK_H, KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0 /* no mask */), true));
+				
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_SEARCH_METHOD,         "Search Help",   KeyEvent.VK_S, null, true));
 
-				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true));
+//				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_TUTORIAL_METHOD,       "Tutorial", KeyEvent.VK_T, null, true)); // TODO
+				
 				helpMenu.add(buildMenuItem(help, Help.SHOW_HELP_ABOUT_ASSEMBLY_METHOD, "About...", KeyEvent.VK_A, null, true));
+				
 				myMenuBar.add(helpMenu);
 			}
 			catch (Exception e)
@@ -1531,7 +1534,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			 projectFullPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getPath();
 		else projectFullPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY); // starting point;
 		
-        GraphMetadata graphMetadata = new GraphMetadata (
+        GraphMetadata graphMetadata = new GraphMetadata (                               // must match order of constructor
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY),     // name
 				"", // packageName not used by project, TODO remember latest value?
 				viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY),   // author
@@ -1548,6 +1551,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         boolean modified = ProjectMetadataDialog.showDialog(this, graphMetadata); // display user panel, report if values were modified
         if (modified)
 		{
+			graphMetadata = ProjectMetadataDialog.getGraphMetadata(); // get updated metadata and save it to project
+			
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      graphMetadata.author);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_CREATED_KEY,     graphMetadata.created);
             viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    graphMetadata.revision);
@@ -1566,8 +1571,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 				}
 			}
         }
-		this.pathEditable = false; // protect next time through
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY, (new Boolean(modified)).toString());
+		this.pathEditable = false; // reset value for next time through
+		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY, Boolean.toString(modified));
     }
 	
     public final static String COPY_PROJECT_METHOD = "copyProject"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -1586,7 +1591,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		if (!originalProjectPath.endsWith(originalProjectName))
 			  currentProjectPath = currentProjectPath + '/' + originalProjectName;
 		
-		editProjectProperties (true); // pathEditable true.  must be careful, this widget can change project properties.
+		editProjectProperties (true); // pathEditable=true.  must be careful, this widget can change project properties.
 		
 		// check if user cancelled, if so then skip and return
 		if (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY).equalsIgnoreCase("true")) 

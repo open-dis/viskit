@@ -145,13 +145,17 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetadata myMetadata = new GraphMetadata(this);
-                myMetadata.revision      = jaxbSimkitAssembly.getVersion();
-                myMetadata.name          = jaxbSimkitAssembly.getName();
-                myMetadata.packageName   = jaxbSimkitAssembly.getPackage();
-                myMetadata.description   = jaxbSimkitAssembly.getDescription(); // TODO salvage Comment entries in older versions
-				if ((myMetadata.description == null) || myMetadata.description.trim().isEmpty())
-					 myMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
+                GraphMetadata newMetadata         = new GraphMetadata(this);
+                newMetadata.name                  = jaxbSimkitAssembly.getName();
+                newMetadata.author                = jaxbSimkitAssembly.getAuthor();
+                newMetadata.created               = jaxbSimkitAssembly.getCreated();
+                newMetadata.revision              = jaxbSimkitAssembly.getVersion();
+                newMetadata.extendsPackageName    = jaxbSimkitAssembly.getExtend();
+                newMetadata.implementsPackageName = jaxbSimkitAssembly.getImplement();
+                newMetadata.packageName           = jaxbSimkitAssembly.getPackage();
+                newMetadata.description           = jaxbSimkitAssembly.getDescription(); // TODO salvage Comment entries in older versions
+				if ((newMetadata.description == null) || newMetadata.description.trim().isEmpty())
+					 newMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
 
                 Schedule schedule = jaxbSimkitAssembly.getSchedule();
                 if (schedule != null) 
@@ -159,12 +163,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     String stopTime = schedule.getStopTime();
                     if (stopTime != null && stopTime.trim().length() > 0)
 					{
-                        myMetadata.stopTime = stopTime.trim();
+                        newMetadata.stopTime = stopTime.trim();
                     }
-                    myMetadata.verbose = schedule.getVerbose().equalsIgnoreCase("true");
+                    newMetadata.verbose = schedule.getVerbose().equalsIgnoreCase("true");
                 }
 
-                setMetadata(myMetadata);
+                setMetadata(newMetadata);
 				// simEntity instances in assembly:
                 buildEventGraphsFromJaxb                      (jaxbSimkitAssembly.getSimEntity(), jaxbSimkitAssembly.getOutput(), jaxbSimkitAssembly.getVerbose());
                 buildPropertyChangeListenersFromJaxb          (jaxbSimkitAssembly.getPropertyChangeListener());
@@ -233,9 +237,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbSimkitAssembly.setName(ViskitGlobals.nullIfEmpty(graphMetadata.name));
-            jaxbSimkitAssembly.setVersion(ViskitGlobals.nullIfEmpty(graphMetadata.revision));
-            jaxbSimkitAssembly.setPackage(ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
+            jaxbSimkitAssembly.setName       (ViskitGlobals.nullIfEmpty(graphMetadata.name));
+            jaxbSimkitAssembly.setAuthor     (ViskitGlobals.nullIfEmpty(graphMetadata.author));
+            jaxbSimkitAssembly.setCreated    (ViskitGlobals.nullIfEmpty(graphMetadata.created));
+            jaxbSimkitAssembly.setVersion    (ViskitGlobals.nullIfEmpty(graphMetadata.revision));
+            jaxbSimkitAssembly.setExtend     (ViskitGlobals.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbSimkitAssembly.setImplement  (ViskitGlobals.nullIfEmpty(graphMetadata.implementsPackageName));
+            jaxbSimkitAssembly.setPackage    (ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
             jaxbSimkitAssembly.setDescription(ViskitGlobals.nullIfEmpty(graphMetadata.description));
 
             if (jaxbSimkitAssembly.getSchedule() == null)
@@ -412,7 +420,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         jaxbSimkitAssembly.getSimEntity().add(newJaxbSimEntity); // add the jaxbSimEntity to SimEntity List 
 
-        assemblyModelDirty = true; // this now-modified assembly is not yet saved, so mark as dirty
+        assemblyModelDirty = true; // the now-modified parent assembly is not yet saved, so mark as dirty
 		
 		// utilize passed XML information, if any (provided via drag+drop) - speculative code block, not in original codebase
 		if (assemblyNode != null)

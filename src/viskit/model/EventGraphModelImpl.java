@@ -140,11 +140,13 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 
                 GraphMetadata newMetadata = new GraphMetadata(this);
                 newMetadata.author                = jaxbSimEntity.getAuthor();
-                newMetadata.revision              = // Previous jaxbSimEntity.getVersion();
+                newMetadata.created               = jaxbSimEntity.getCreated();
+                newMetadata.revision              = jaxbSimEntity.getVersion();
                 newMetadata.name                  = jaxbSimEntity.getName();
                 newMetadata.packageName           = jaxbSimEntity.getPackage();
                 newMetadata.extendsPackageName    = jaxbSimEntity.getExtend();
                 newMetadata.implementsPackageName = jaxbSimEntity.getImplement();
+				// description follows below
 				
                 // move <Comment> elements to EventNode description attribute
 				List<String> commentList = jaxbSimEntity.getComment();
@@ -257,13 +259,14 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(graphMetadata.name));
-            jaxbSimEntity.setVersion(ViskitGlobals.nullIfEmpty(graphMetadata.revision));
-            jaxbSimEntity.setAuthor(ViskitGlobals.nullIfEmpty(graphMetadata.author));
-            jaxbSimEntity.setPackage(ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
-            jaxbSimEntity.setExtend(ViskitGlobals.nullIfEmpty(graphMetadata.extendsPackageName));
-            jaxbSimEntity.setImplement(ViskitGlobals.nullIfEmpty(graphMetadata.implementsPackageName));
-			jaxbSimEntity.setDescription(graphMetadata.description);
+            jaxbSimEntity.setName       (ViskitGlobals.nullIfEmpty(graphMetadata.name));
+            jaxbSimEntity.setCreated    (ViskitGlobals.nullIfEmpty(graphMetadata.created));
+            jaxbSimEntity.setVersion    (ViskitGlobals.nullIfEmpty(graphMetadata.revision));
+            jaxbSimEntity.setAuthor     (ViskitGlobals.nullIfEmpty(graphMetadata.author));
+            jaxbSimEntity.setPackage    (ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
+            jaxbSimEntity.setExtend     (ViskitGlobals.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbSimEntity.setImplement  (ViskitGlobals.nullIfEmpty(graphMetadata.implementsPackageName));
+			jaxbSimEntity.setDescription(ViskitGlobals.nullIfEmpty(graphMetadata.description));
 
             jaxbMarshaller.marshal(jaxbSimEntity, fileWriter);
 

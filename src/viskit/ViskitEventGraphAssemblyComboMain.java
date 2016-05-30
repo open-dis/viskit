@@ -157,13 +157,14 @@ public class ViskitEventGraphAssemblyComboMain
     private static void setupMacGUI() {
         try {
             Class<?> applicationListener = ViskitStatics.ClassForName("com.apple.eawt.ApplicationListener");
-            Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() {
-
+            Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() 
+			{
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) {
-                    switch (method.getName()) {
+                    switch (method.getName()) 
+					{
                         case "handleQuit":
-                            ((ViskitApplicationFrame)ViskitGlobals.instance().getViskitApplicationFrame()).myExitAction.actionPerformed(null);
+                            ViskitGlobals.instance().getViskitApplicationFrame().myExitAction.actionPerformed(null);
                             break;
                         case "handleAbout":
                             try {
@@ -172,8 +173,9 @@ public class ViskitEventGraphAssemblyComboMain
                                 Class<?> applicationEventClass = ViskitStatics.ClassForName("com.apple.eawt.ApplicationEvent");
                                 Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
                                 setHandled.invoke(args[0], true);
-                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                LOG.error("Error showing About Box: " + ex);
+                            } 
+							catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                LOG.error("Error showing About display: " + ex);
                             }   break;
                     }
                     return null;

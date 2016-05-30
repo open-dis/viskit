@@ -1,11 +1,13 @@
 package viskit.view.dialog;
 
+import edu.nps.util.LogUtilities;
 import java.awt.Point;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.apache.log4j.Logger;
 import viskit.model.ViskitInstantiator;
 import viskit.view.InstantiationPanel;
 
@@ -22,11 +24,13 @@ import viskit.view.InstantiationPanel;
  */
 public class ObjectInspector extends JDialog
 {
+    static final Logger LOG = LogUtilities.getLogger(ObjectInspector.class);
+	
   public boolean modified = false;
   private final JButton     okButton = new JButton("Apply changes");
   private final JButton cancelButton = new JButton("Cancel");
-  private final JPanel contentPanel = new JPanel();
-  private final JPanel  buttonPanel = new JPanel();
+  private final JPanel  contentPanel = new JPanel();
+  private final JPanel   buttonPanel = new JPanel();
   private final JDialog parent;
   private final Point newLocation = new Point();
   private InstantiationPanel instantiationPanel;
@@ -71,16 +75,17 @@ public class ObjectInspector extends JDialog
     contentPanel.add(buttonPanel);
 
     pack();     // do this prior to next
+
 //    setLocationRelativeTo(getParent());
-		
+    this.setSize(parent.getWidth(), this.getHeight()); // same width as parent
 	newLocation.x = parent.getLocation().x - ((this.getWidth() - parent.getWidth()) / 2); // shift left, center sub-panel
-	newLocation.y = parent.getLocation().y + (parent.getHeight() * 3/4); // TODO only moving by 3/4 since panel isn't packing...
+	newLocation.y = parent.getLocation().y + (parent.getHeight()); // shift below parent panel
 	this.setLocation(newLocation);
   }
 
-  public void setData(ViskitInstantiator vi) throws ClassNotFoundException
+  public void setData(ViskitInstantiator viskitInstantiator) throws ClassNotFoundException
   {
-    instantiationPanel.setData(vi);
+    instantiationPanel.setData(viskitInstantiator);
     pack();
   }
 
@@ -122,7 +127,6 @@ public class ObjectInspector extends JDialog
     public void actionPerformed(ActionEvent event)
     {
 //      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom // TODO check
-      pack();
       caretUpdate(null);
     }
   }

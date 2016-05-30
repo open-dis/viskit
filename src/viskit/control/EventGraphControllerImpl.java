@@ -130,7 +130,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         GraphMetadata priorEventGraphMetadata = null;
         EventGraphModelImpl priorEventGraphModel = (EventGraphModelImpl) getModel();
-        if (priorEventGraphModel != null) {
+        if (priorEventGraphModel != null) 
+		{
             priorEventGraphMetadata = priorEventGraphModel.getMetadata();
         }
 
@@ -167,6 +168,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		
         if (modified)
 		{
+            eventGraphModel.setMetadata(newEventGraphMetadata);
+			
             ((EventGraphView) getView()).setSelectedEventGraphName(newEventGraphMetadata.name); // update title bar
 			
             ((EventGraphView) getView()).setSelectedEventGraphDescription(newEventGraphMetadata.description);
@@ -185,7 +188,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 buildNewEventNode(new Point(50, 50), "Run"); // TODO add description
                 dirty = true;
             }
-            ((EventGraphModel) getModel()).setDirty(dirty);
+            ((EventGraphModelImpl) getModel()).setDirty(dirty);
         } 
 		else
 		{
@@ -201,7 +204,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      */
     private boolean askToSaveAndContinue()
 	{
-		String eventGraphName = ((EventGraphModel) getModel()).getMetadata().name;
+		String eventGraphName = ((EventGraphModelImpl) getModel()).getMetadata().name;
 		if ((eventGraphName == null) || eventGraphName.trim().isEmpty())
 			 eventGraphName = "NoNameFound";				
         int yesNo = (((EventGraphView) getView()).genericAsk("Closing " + eventGraphName, "Save modified event graph?"));
@@ -216,8 +219,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             case JOptionPane.NO_OPTION:
 
                 // No need to recompile
-                if (((EventGraphModel) getModel()).isDirty()) {
-                    ((EventGraphModel) getModel()).setDirty(false);
+                if (((EventGraphModelImpl) getModel()).isDirty()) {
+                    ((EventGraphModelImpl) getModel()).setDirty(false);
                 }
                 returnValue = true;
                 break;
@@ -320,7 +323,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		{
             // We may find one or more simkit.Priority(s) with numeric values vice
             // eneumerations in the EG XML.  Modify and save the EG XML silently
-            if (eventGraphModel.isNumericPriority()) {
+            if (eventGraphModel.isNumericPriority()) 
+			{
                 save();
                 eventGraphModel.setNumericPriority(false);
             }
@@ -332,7 +336,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
             // Check for good compilation
             handleCompileAndSave(eventGraphModel, file);
-        } else {
+        }
+		else 
+		{
             eventGraphView.deleteTab(eventGraphModel);   // Not a good open, tell view
         }
 
@@ -341,24 +347,27 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
-    private void resetRedoUndoStatus() {
-
+    private void resetRedoUndoStatus() 
+	{
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
-        if (eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper() != null) {
-            JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
-            undoMgr.discardAllEdits();
+        if (eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper() != null)
+		{
+            JGraphGraphUndoManager undoManager = (JGraphGraphUndoManager) eventGraphViewFrame.getCurrentJGraphEventGraphComponentWrapper().getUndoManager();
+            undoManager.discardAllEdits();
             updateUndoRedoStatus();
         }
     }
 
-    /** Mark every EG file opened as "open" in the app config file */
+    /** Mark every EventGraph file opened as "open" in the app config file */
     private void markEventGraphFilesAsOpened() {
 
-        EventGraphModel[] openAlready = ((EventGraphView) getView()).getOpenModels();
-        for (EventGraphModel vMod : openAlready) {
-            if (vMod.getCurrentFile() != null) {
-                String modelPath = vMod.getCurrentFile().getAbsolutePath().replaceAll("\\\\", "/");
+        EventGraphModel[] openModels = ((EventGraphView) getView()).getOpenModels();
+        for (EventGraphModel eventGraphModel : openModels) 
+		{
+            if (eventGraphModel.getCurrentFile() != null)
+			{
+                String modelPath = eventGraphModel.getCurrentFile().getAbsolutePath().replaceAll("\\\\", "/");
                 markXMLConfigurationOpen(modelPath);
             }
         }
@@ -639,20 +648,23 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public boolean preClose() {
+    public boolean preClose() 
+	{
         EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
-        if (eventGraphModel == null) {
+        if (eventGraphModel == null) 
+		{
             return false;
         }
-        if (eventGraphModel.isDirty()) {
+        if (eventGraphModel.isDirty()) 
+		{
             return askToSaveAndContinue();
         }
         return true;
     }
 
     @Override
-    public void postClose() {
-
+    public void postClose() 
+	{
         EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
         if (eventGraphModel.getCurrentFile() != null)
 		{
@@ -693,7 +705,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void save () // method name must exactly match preceding string value
 	{
-        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphModel eventGraphModel = (EventGraphModelImpl) getModel();
         File localLastFile = eventGraphModel.getCurrentFile();
         if (localLastFile == null)
 		{
@@ -709,7 +721,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void saveAs () // method name must exactly match preceding string value
 	{
-        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphModel eventGraphModel = (EventGraphModelImpl) getModel();
         EventGraphView  eventGraphView  = (EventGraphView) getView();
         GraphMetadata   graphMetadata   =  eventGraphModel.getMetadata();
 
@@ -730,7 +742,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
             graphMetadata.name = n;
             eventGraphView.setSelectedEventGraphName(graphMetadata.name);
-            eventGraphModel.setMetadata(graphMetadata); // might have renamed
+            eventGraphModel.setMetadata(graphMetadata); // might have been renamed
 
             handleCompileAndSave(eventGraphModel, saveFile);
             adjustRecentEventGraphFileSet(saveFile);
@@ -770,7 +782,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void buildNewSimParameter(String name, String type, String initialValue, String description) {
-        ((EventGraphModel) getModel()).newSimParameter(name, type, initialValue, description);
+        ((EventGraphModelImpl) getModel()).newSimParameter(name, type, initialValue, description);
     }
 
     @Override
@@ -968,15 +980,20 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 	{
         // Prevent concurrent modification
         Vector<Object> v = (Vector<Object>) selectionVector.clone();
-        for (Object elem : v) {
-            if (elem instanceof Edge) {
+        for (Object elem : v) 
+		{
+            if (elem instanceof Edge) 
+			{
                 removeEdge((Edge) elem);
-            } else if (elem instanceof EventNode) {
+            } 
+			else if (elem instanceof EventNode) 
+			{
                 EventNode en = (EventNode) elem;
-                for (ViskitElement ed : en.getConnections()) {
+                for (ViskitElement ed : en.getConnections()) 
+				{
                     removeEdge((Edge) ed);
                 }
-                ((EventGraphModel) getModel()).deleteEvent(en);
+                ((EventGraphModelImpl) getModel()).deleteEvent(en);
             }
         }
 
@@ -989,11 +1006,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      *
      * @param edge the edge to remove
      */
-    private void removeEdge(Edge edge) {
-        if (edge instanceof SchedulingEdge) {
-            ((EventGraphModel) getModel()).deleteSchedulingEdge((SchedulingEdge) edge);
-        } else {
-            ((EventGraphModel) getModel()).deleteCancellingEdge((CancellingEdge) edge);
+    private void removeEdge(Edge edge) 
+	{
+        if (edge instanceof SchedulingEdge) 
+		{
+            ((EventGraphModelImpl) getModel()).deleteSchedulingEdge((SchedulingEdge) edge);
+        } 
+		else 
+		{
+            ((EventGraphModelImpl) getModel()).deleteCancellingEdge((CancellingEdge) edge);
         }
     }
 
@@ -1054,19 +1075,24 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void redo() // method name must exactly match preceding string value
 	{
         // Recreate the JAXB (XML) bindings since the paste function only does nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
-
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) // TODO fix
+		{
             // Handles both arcs and self-referential arcs
-            if (redoGraphCell.getUserObject() instanceof SchedulingEdge) {
+            if (redoGraphCell.getUserObject() instanceof SchedulingEdge) 
+			{
                 SchedulingEdge ed = (SchedulingEdge) redoGraphCell.getUserObject();
-                ((EventGraphModel) getModel()).redoSchedulingEdge(ed);
-            } else {
+                ((EventGraphModelImpl) getModel()).redoSchedulingEdge(ed);
+            } 
+			else
+			{
                 CancellingEdge ed = (CancellingEdge) redoGraphCell.getUserObject();
-                ((EventGraphModel) getModel()).redoCancellingEdge(ed);
+                ((EventGraphModelImpl) getModel()).redoCancellingEdge(ed);
             }
-        } else {
+        } 
+		else 
+		{
             EventNode node = (EventNode) redoGraphCell.getUserObject();
-            ((EventGraphModel) getModel()).redoEvent(node);
+            ((EventGraphModelImpl) getModel()).redoEvent(node);
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
@@ -1092,20 +1118,21 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void deleteSimParameter(vParameter p) {
-        ((EventGraphModel) getModel()).deleteSimParameter(p);
+    public void deleteSimParameter(vParameter p) 
+	{
+        ((EventGraphModelImpl) getModel()).deleteSimParameter(p);
     }
 
     @Override
     public void deleteStateVariable(ViskitStateVariable var)
 	{
-        ((EventGraphModel) getModel()).deleteStateVariable(var);
+        ((EventGraphModelImpl) getModel()).deleteStateVariable(var);
 		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
     }
 
     private boolean checkSaveForSourceCompile()
 	{
-        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
         if (eventGraphModel == null) {return false;}
         if (eventGraphModel.isDirty() || eventGraphModel.getCurrentFile() == null)
 		{
@@ -1125,7 +1152,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void generateJavaSource () // method name must exactly match preceding string value
 	{
-        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
         if (eventGraphModel == null) 
 		{
 			return;
@@ -1150,7 +1177,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (source != null && source.length() > 0)
 		{
             String className = eventGraphModel.getMetadata().packageName + "." +
-                    eventGraphModel.getMetadata().name;
+                               eventGraphModel.getMetadata().name;
             ViskitGlobals.instance().getAssemblyEditViewFrame().showSource(className, source, localLastFile.getName());
         }
     }
@@ -1159,11 +1186,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void showXML () // method name must exactly match preceding string value
 	{
-        if (!checkSaveForSourceCompile() || ((EventGraphModel) getModel()).getCurrentFile() == null)
+        if (!checkSaveForSourceCompile() || ((EventGraphModelImpl) getModel()).getCurrentFile() == null)
 		{
             return;
         }
-        ViskitGlobals.instance().getAssemblyEditViewFrame().displayXML(((EventGraphModel) getModel()).getCurrentFile());
+        ViskitGlobals.instance().getAssemblyEditViewFrame().displayXML(((EventGraphModelImpl) getModel()).getCurrentFile());
     }
 
     @Override
@@ -1215,7 +1242,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
-        ((EventGraphModel) getModel()).newSchedulingEdge(src, tar);
+        ((EventGraphModelImpl) getModel()).newSchedulingEdge(src, tar);
     }
 
     @Override
@@ -1224,7 +1251,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
-        ((EventGraphModel) getModel()).newCancellingEdge(src, tar);
+        ((EventGraphModelImpl) getModel()).newCancellingEdge(src, tar);
     }
 
     public final static String NEWSELFSCHEDULINGEDGE_METHOD = "newSelfSchedulingEdge"; // must match following method name.  not possible to accomplish this programmatically.
@@ -1234,7 +1261,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (selectionVector != null) {
             for (Object o : selectionVector) {
                 if (o instanceof EventNode) {
-                    ((EventGraphModel) getModel()).newSchedulingEdge((EventNode) o, (EventNode) o);
+                    ((EventGraphModelImpl) getModel()).newSchedulingEdge((EventNode) o, (EventNode) o);
                 }
             }
         }
@@ -1244,10 +1271,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Handles the menu selection for a new self-referential cancelling edge */
     public void newSelfCancellingEdge() // method name must exactly match preceding string value
 	{
-        if (selectionVector != null) {
-            for (Object o : selectionVector) {
-                if (o instanceof EventNode) {
-                    ((EventGraphModel) getModel()).newCancellingEdge((EventNode) o, (EventNode) o);
+        if (selectionVector != null) 
+		{
+            for (Object o : selectionVector) 
+			{
+                if (o instanceof EventNode) 
+				{
+                    ((EventGraphModelImpl) getModel()).newCancellingEdge((EventNode) o, (EventNode) o);
                 }
             }
         }
@@ -1257,15 +1287,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void editEventGraphMetadata () // method name must exactly match preceding string value
 	{
-        EventGraphModel eventGraphModel = (EventGraphModel) getModel();
+        EventGraphModelImpl eventGraphModel = (EventGraphModelImpl) getModel();
         if (eventGraphModel == null) {return;}
         GraphMetadata graphMetadata = eventGraphModel.getMetadata();
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
-        if (modified) {
-            ((EventGraphModel) getModel()).setMetadata(graphMetadata);
-
-            // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
+        if (modified) 
+		{
+            eventGraphModel.setMetadata(EventGraphMetadataDialog.getGraphMetadata());
+			
+            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name); // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
         }
     }
@@ -1315,7 +1345,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // Get only the jgraph part
         Component component = egvf.getCurrentJgraphComponent();
         if (component == null) {return;}
-        File localLastFile = ((EventGraphModel) getModel()).getCurrentFile();
+        File localLastFile = ((EventGraphModelImpl) getModel()).getCurrentFile();
         if (localLastFile != null) {
             fileName = localLastFile.getName();
 			if (fileName.endsWith(".xml"))

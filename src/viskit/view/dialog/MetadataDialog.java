@@ -32,10 +32,11 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 	
 	private final JPanel metadataDialogPanel = new JPanel();
     protected static boolean modified = false;
+    protected static GraphMetadata graphMetadata;
+	
     protected JComponent runtimePanel;
     private   JButton    cancelButton;
     private   JButton    okButton;
-    private   GraphMetadata graphMetadata;
     private   JTextField nameTF, packageTF, authorTF, createdTF, revisionTF, extendsTF, implementsTF, pathTF;
     private   JTextField stopTimeTF;
     private   JCheckBox  verboseCB;
@@ -46,10 +47,21 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         this(f, graphMetadata, "");
     }
 
-    public MetadataDialog(JFrame f, GraphMetadata graphMetadata, String title)
+    public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title)
 	{
-        super(f, title, true);
+        super(frame, title, true);
         this.graphMetadata = graphMetadata;
+
+        setGraphMetadata(frame, graphMetadata);
+		
+		initialize ();
+		
+        modified = (graphMetadata == null);
+        pack();
+        setLocationRelativeTo(frame);
+	}
+	private void initialize()
+	{
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -217,7 +229,6 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
             okButton = new JButton("Apply changes");
         cancelButton = new JButton("Cancel");
-        getRootPane().setDefaultButton(okButton);
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
@@ -226,19 +237,17 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
-
-        setGraphMetadata(f, graphMetadata);
     }
 
     public final void setGraphMetadata(Component c, GraphMetadata graphMetadata) 
 	{
 		this.graphMetadata = graphMetadata;
 		
-        fillWidgets();
-
-        modified = (graphMetadata == null);
-        pack();
-        setLocationRelativeTo(c);
+//        fillWidgets();
+//
+//        modified = (graphMetadata == null);
+//        pack();
+//        setLocationRelativeTo(c);
     }
 	
 	private void computePathValue()
@@ -263,11 +272,13 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 
     protected void fillWidgets() 
 	{
+        getRootPane().setDefaultButton(okButton);
+		
 		if (graphMetadata == null)
 		{
 			graphMetadata = new GraphMetadata(); // unexpected error condition
 			LOG.error ("MetadataDialog invoked with null graphMetadata");
-		} 
+		}
 		
 		nameTF.setEditable(graphMetadata.pathEditable);
 		pathTF.setEditable(graphMetadata.pathEditable && (this instanceof ProjectMetadataDialog));
@@ -277,16 +288,16 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		
 		computePathValue();
 			
-                     nameTF.setText(graphMetadata.name);
-                   authorTF.setText(graphMetadata.author);
-                  createdTF.setText(graphMetadata.created);
-                 revisionTF.setText(graphMetadata.revision);
+                     nameTF.setText       (graphMetadata.name);
+                   authorTF.setText       (graphMetadata.author);
+                  createdTF.setText       (graphMetadata.created);
+                 revisionTF.setText       (graphMetadata.revision);
                      pathTF.setText       (currentPath);
                      pathTF.setToolTipText(currentPath); // readability for long value
-        descriptionTextArea.setText(graphMetadata.description);
+        descriptionTextArea.setText       (graphMetadata.description);
         descriptionTextArea.setToolTipText(graphMetadata.description);
-                 stopTimeTF.setText(graphMetadata.stopTime);
-                  verboseCB.setSelected(graphMetadata.verbose);
+                 stopTimeTF.setText       (graphMetadata.stopTime);
+                  verboseCB.setSelected   (graphMetadata.verbose);
                      nameTF.selectAll(); // highlight, usually not editable
 					 
 		if (!graphMetadata.isProject())
@@ -352,6 +363,14 @@ abstract public class MetadataDialog extends JDialog // TODO add clear, update b
 		graphMetadata.updated = true;
 		modified = true;
     }
+
+	/**
+	 * @return the graphMetadata
+	 */
+	public static GraphMetadata getGraphMetadata() 
+	{
+		return graphMetadata;
+	}
 
     class cancelButtonListener implements ActionListener 
 	{

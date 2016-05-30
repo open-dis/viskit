@@ -71,17 +71,19 @@ public final class ConstructorPanel extends JPanel
 
         objectListPanel = new ObjectListPanel(modifiedListener); // may have to intercept
         objectListPanel.setDialogInfo(parent);
-        objectListPanel.setData(args, true);
-        if (args.size() > 0) {
-            add(objectListPanel);
-        } 
-		else
+        if ((args == null) || (args.isEmpty()))
 		{
             JLabel label = new JLabel("zero argument constructor");
             label.setAlignmentX(Box.CENTER_ALIGNMENT);
             add(label);
+        } 
+		else
+		{
+			objectListPanel.setData(args, true);
+            add(objectListPanel);
         }
-        if (showButton) {
+        if (showButton)
+		{
             add(Box.createVerticalStrut(5));
             add(Box.createVerticalGlue());
 
@@ -93,7 +95,9 @@ public final class ConstructorPanel extends JPanel
             }
 
             setSelected(false);
-        } else {
+        }
+		else 
+		{
             add(Box.createVerticalGlue());
             setSelected(true);
         }

@@ -53,6 +53,7 @@ import viskit.ViskitEventGraphAssemblyComboMain;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
+import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
@@ -90,7 +91,7 @@ public class ViskitApplicationFrame extends JFrame
     mvcAbstractJFrameView analystReportFrame;
     public Action myExitAction;
     private DoeMain designOfExperimentsMain;
-    private JMenuItem quitMenuItem;
+    private JMenuItem exitMenuItem;
     protected TitleListener titleListener;
     protected int titleKey;
 	
@@ -108,7 +109,8 @@ public class ViskitApplicationFrame extends JFrame
         TAB_ASSEMBLY_EDITOR,
         TAB_SIMULATION_RUN,
         TAB_ANALYST_REPORT,
-//		TAB_DESIGN_OF_EXPERIMENTS
+//		TAB_DESIGN_OF_EXPERIMENTS,
+//		TAB_GRID_CLUSTER_JOBS
 	};
     private final int SUBTAB_LOCALRUN_INDEX  = 0;
     private final int SUBTAB_DOE_INDEX       = 1;
@@ -121,8 +123,6 @@ public class ViskitApplicationFrame extends JFrame
 
 	private RecentProjectFileSetListener recentProjectFileSetListener;
 	
-	private String title = new String();
-	
 	private JMenuItem closeProjectMI = new JMenuItem();
 	
     public ViskitApplicationFrame(String initialFile)
@@ -132,21 +132,27 @@ public class ViskitApplicationFrame extends JFrame
         this.initialFile = initialFile;
 		
 		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		
+        initialize();
+		
         initializeUserInterface();
+	}
+	public final void initialize()
+	{
+        int width  = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int height = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
-        int w = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation((d.width - w) / 2, (d.height - h) / 2);
-        this.setSize(w, h);
+        Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation((screenDimension.width - width) / 2, (screenDimension.height - height) / 2);
+        this.setSize(width, height);
 
         // Let the quit handler take care of an exit initiation
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new WindowAdapter() {
-
+        this.addWindowListener(new WindowAdapter()
+		{
             @Override
-            public void windowClosing(WindowEvent e) {
+            public void windowClosing(WindowEvent e) 
+			{
                 myExitAction.actionPerformed(null);
             }
         });
@@ -157,7 +163,8 @@ public class ViskitApplicationFrame extends JFrame
     }
 
     /** @return the quit action class for Viskit */
-    public Action getMyQuitAction() {
+    public Action getMyQuitAction() 
+	{
         return myExitAction;
     }
 
@@ -177,7 +184,7 @@ public class ViskitApplicationFrame extends JFrame
         fileMenu.setMnemonic(KeyEvent.VK_F);
 		mainMenuBar.add(fileMenu); // initialize
 		
-        myExitAction = new ExitAction("Exit"); // TODO
+        myExitAction = new ExitAction("Exit");
 
         mainTabbedPane = new JTabbedPane();
         mainTabbedPane.setFont(mainTabbedPane.getFont().deriveFont(Font.BOLD));
@@ -190,9 +197,9 @@ public class ViskitApplicationFrame extends JFrame
         mainTabbedPane.add(infoPanel);
 		
 		int newTabIndex = mainTabbedPane.indexOfComponent(infoPanel);
-		mainTabbedPane.setTitleAt(newTabIndex, "Info");
-		mainTabbedPane.setToolTipTextAt(newTabIndex, "TODO");
-		mainTabbedPane.setEnabledAt(newTabIndex, false); // TODO remove when tab becomes useful
+		mainTabbedPane.setTitleAt(newTabIndex, "<html> &nbsp; &nbsp; &nbsp; &nbsp; "); // "Info" (TODO currently inactive)
+		mainTabbedPane.setToolTipTextAt(newTabIndex, ""); // TODO
+		mainTabbedPane.setEnabledAt(newTabIndex, false); // TODO leave enabled when tab becomes useful
 
 		// =============================================================================================
         // Event graph editor
@@ -319,19 +326,25 @@ public class ViskitApplicationFrame extends JFrame
         fileMenu.addSeparator();
 		JMenuItem userPreferencesMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
 		userPreferencesMenuItem.setMnemonic(KeyEvent.VK_U);
-        userPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.ALT_MASK));
+        userPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_MASK));
         fileMenu.add(userPreferencesMenuItem);
         userPreferencesMenuItem.addActionListener(myUserPreferencesHandler);
+		
+		
+		if  (ViskitConfiguration.instance().getValue(ViskitConfiguration.DEBUG_MESSAGES_KEY).equalsIgnoreCase("false"))
+			 ViskitStatics.debug = false;
+		else ViskitStatics.debug = true; // default
 		
 		closeProjectMI = eventGraphViewFrame.getCloseProjectMI();
 		// duplicate entry, also on Projects submenu
 //		fileMenu.add(closeProjectMI); 
 		
-		final String QUIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically. // do not change "quit" !!
-		quitMenuItem = buildMenuItem(eventGraphController, QUIT_METHOD, "Exit Exit Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-		// TODO track down overriding quitMenuItem
-        jamQuitHandler(quitMenuItem, myExitAction, mainMenuBar); // TODO investigate, apparently necessary for exit
-        fileMenu.add(quitMenuItem); // TODO omit hotkey
+		final String EXIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically. // do not change "quit" !!
+		exitMenuItem = buildMenuItem(eventGraphController, EXIT_METHOD, "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+        addExitHandler(exitMenuItem, myExitAction);
+		exitMenuItem.setMnemonic(KeyEvent.VK_X);
+        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+        fileMenu.add(exitMenuItem);
 
         // Now that we have an assemblyEditViewFrame reference, set the recent open project's file listener for the eventGraphFrame
         if (recentProjectFileSetListener == null) // remember rather than re-instantiate
@@ -403,16 +416,20 @@ public class ViskitApplicationFrame extends JFrame
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
-        runLater(0L, new Runnable() {
+        runLater(0L, new Runnable() 
+		{
             @Override
-            public void run() {
+            public void run() 
+			{
                 eventGraphController.begin();
             }
         });
 
-        runLater(500L, new Runnable() {
+        runLater(500L, new Runnable() 
+		{
             @Override
-            public void run() {
+            public void run() 
+			{
                 assemblyController.begin();
             }
         });
@@ -581,45 +598,38 @@ public class ViskitApplicationFrame extends JFrame
         }
     };
 
-    private void jamQuitHandler(JMenuItem quitMenuItem, Action quitAction, JMenuBar menuBar)
+    private void addExitHandler(JMenuItem quitMenuItem, Action exitAction)
 	{
         if (quitMenuItem == null)
 		{
-//            JMenu menu = menuBar.getMenu(0); // first menu
-//            if (menu == null)
-//			{
-//                menu = new JMenu("File");
-//                menuBar.add(menu);
-//            }
-//            menu.addSeparator();
             quitMenuItem = new JMenuItem("Exit");
-//            menu.add(quitMenuItem);
         }
-		quitMenuItem.setMnemonic('x');
-		quitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
-
         ActionListener[] actionListeners = quitMenuItem.getActionListeners();
         for (ActionListener actionListener : actionListeners)
 		{
             quitMenuItem.removeActionListener(actionListener);
         }
-        quitMenuItem.setAction(quitAction);
+        quitMenuItem.setAction(exitAction);
     }
 
-    class ExitAction extends AbstractAction {
-
-        public ExitAction(String s) {
+    class ExitAction extends AbstractAction
+	{
+        public ExitAction(String s)
+		{
             super(s);
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(ActionEvent e) // system exit handler
 		{
             SystemExitHandler defaultHandler = ViskitGlobals.instance().getSystemExitHandler();
             ViskitGlobals.instance().setSystemExitHandler(nullSystemExitHandler);
 
             // Tell Viskit to not recompile open Event Graphs from any remaining open Assemblies when we perform a Viskit exit
             ViskitGlobals.instance().getAssemblyController().setCloseAll(true);
+				
+			if (ViskitGlobals.instance().getAssemblyController() != null)
+				ViskitGlobals.instance().getAssemblyController().doProjectCleanup(); // closes assemlies, event graphs and project
 
             outer:
             {
@@ -776,7 +786,7 @@ public class ViskitApplicationFrame extends JFrame
     }
 
     public JMenuItem getQuitMenuItem() {
-        return quitMenuItem;
+        return exitMenuItem;
     }
 	
 	public boolean isEventGraphEditorTabSelected ()

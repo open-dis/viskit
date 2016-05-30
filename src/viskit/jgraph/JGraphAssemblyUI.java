@@ -43,34 +43,38 @@ public class JGraphAssemblyUI extends BasicGraphUI
         return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
+	/** 
+	 * Choose appropriate editor based on widget selected by user 
+	 */
     private void createEditDialog(Object jGraphCell)
 	{
         AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-        if (jGraphCell instanceof vAssemblyEdgeCell) 
+        if (jGraphCell instanceof JGraphAssemblyEdgeCell) 
 		{
-            Object assemblyEdgeCell = ((vAssemblyEdgeCell) jGraphCell).getUserObject();
-            if (assemblyEdgeCell instanceof AdapterEdge) 
+            Object assemblyEdgeCell = ((JGraphAssemblyEdgeCell) jGraphCell).getUserObject();
+			
+            if (assemblyEdgeCell instanceof AdapterEdge)
 			{
-                assemblyController.adapterEdgeEdit((AdapterEdge) assemblyEdgeCell);
+                assemblyController.adapterEdgeEdit((AdapterEdge) assemblyEdgeCell); // adapter
             } 
-			else if (assemblyEdgeCell instanceof PropertyChangeListenerEdge) 
+			else if (assemblyEdgeCell instanceof PropertyChangeListenerEdge)
 			{
-                assemblyController.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) assemblyEdgeCell);
+                assemblyController.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) assemblyEdgeCell); // PCL Edge
             } 
 			else 
 			{
-                assemblyController.simEventListenerEdgeEdit((SimEventListenerEdge) assemblyEdgeCell);
+                assemblyController.simEventListenerEdgeEdit((SimEventListenerEdge) assemblyEdgeCell); // simEventListener
             }
         } 
-		else if (jGraphCell instanceof AssemblyCircleCell) 
+		else if (jGraphCell instanceof AssemblyCircleCell)
 		{
-            Object nodeObj = ((AssemblyCircleCell) jGraphCell).getUserObject();
-            assemblyController.eventGraphEdit((EventGraphNode) nodeObj);
+            Object simEntityNodeObject = ((AssemblyCircleCell) jGraphCell).getUserObject();
+            assemblyController.eventGraphEdit((EventGraphNode) simEntityNodeObject); // SimEntity event graph instance
         } 
-		else if (jGraphCell instanceof AssemblyPropertyListCell) 
+		else if (jGraphCell instanceof AssemblyPropertyChangeListenerCell) 
 		{
-            Object nodeObj = ((AssemblyPropertyListCell) jGraphCell).getUserObject();
-            assemblyController.propertyChangeListenerEdit((PropertyChangeListenerNode) nodeObj);
+            Object nodeObj = ((AssemblyPropertyChangeListenerCell) jGraphCell).getUserObject();
+            assemblyController.propertyChangeListenerEdit((PropertyChangeListenerNode) nodeObj); // PCL
         }
     }
 }

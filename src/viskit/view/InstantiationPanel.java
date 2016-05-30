@@ -46,31 +46,53 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 {
     static final Logger LOG = LogUtilities.getLogger(InstantiationPanel.class);
 
-    private static final int FREEFORM = 0, CONSTRUCTOR = 1, FACTORY = 2;
-    private JLabel typeLabel, methodLabel;
-    private JTextField typeTF;
-    private JComboBox<String> methodCB;
-    private JPanel instantiationPane;
     private CardLayout instantiationPaneLayoutManager;
-    private FreeFormPanel freeFormPanel;
-    private ConstrPanel constructorPanel;
+    private JPanel    instantiationPanel = new JPanel();
+    private JPanel              topPanel = new JPanel(new SpringLayout());
+    private FreeFormPanel   freeFormPanel;
+    private ConstrPanel  constructorPanel;
     private FactoryPanel     factoryPanel;
+    private JLabel     typeLabel = new JLabel("type",   JLabel.TRAILING);
+	private JLabel   methodLabel = new JLabel("method", JLabel.TRAILING);
+    private JTextField typeTF    = new JTextField();
+	
+    private static final int FREEFORM    = 0, 
+			                 CONSTRUCTOR = 1, 
+			                 FACTORY     = 2;
+    private JComboBox<String>     methodCB    = new JComboBox<>(new String[]{"free form", "constructor", "factory"});
+    // alternate display: one or the other
+    private JTextField constructorTF = new JTextField("Constructor");
+	
     private ActionListener modifiedListener;
     private JDialog packMeOwnerDialog;
+    private ViskitInstantiator copiedViskitInstantiator;
 
     private boolean constructorOnly = false;
-	private boolean typeEditable                   = false;
+	private boolean typeEditable    = false;
+	
 
+	/** Constructor
+	 * @param ownerDialog
+	 * @param changedListener */
     public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener) 
 	{
         this(ownerDialog, changedListener, false);
     }
 
+	/** Constructor
+	 * @param ownerDialog
+	 * @param changedListener
+	 * @param onlyConstructor */
     public InstantiationPanel(JDialog ownerDialog, ActionListener changedListener, boolean onlyConstructor) 
 	{
         this(ownerDialog, changedListener, onlyConstructor, false);
     }
 
+	/** Constructor
+	 * @param ownerDialog
+	 * @param changedListener
+	 * @param onlyConstructor
+	 * @param typeEditable */
     public InstantiationPanel(final JDialog ownerDialog, ActionListener changedListener, boolean onlyConstructor, boolean typeEditable)
 	{
         packMeOwnerDialog    = ownerDialog;
@@ -84,9 +106,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 	{
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JPanel topPanel = new JPanel(new SpringLayout());
-        typeLabel = new JLabel("type", JLabel.TRAILING);
-        typeTF    = new JTextField();
         typeTF.setEditable(typeEditable);
         typeTF.addActionListener(new ActionListener() 
 		{
@@ -98,10 +117,6 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         });
         typeLabel.setLabelFor(typeTF);
 
-        methodLabel = new JLabel("method", JLabel.TRAILING);
-        methodCB    = new JComboBox<>(new String[]{"free form", "constructor", "factory"});
-        // or
-        JTextField constructorTF = new JTextField("Constructor");
         constructorTF.setEditable(false);
 
         topPanel.add(typeLabel);
@@ -117,28 +132,23 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             methodLabel.setLabelFor(methodCB);
             topPanel.add(methodCB);
         }
-        SpringUtilities.makeCompactGrid(topPanel, 2, 2, 10, 10, 5, 5);
+        SpringUtilities.makeCompactGrid(topPanel, 2, 2, 10, 10, 5, 7); // 7: add a little extra space between rows
         add(topPanel);
 
-        instantiationPane = new JPanel();
         instantiationPaneLayoutManager = new CardLayout();
-        instantiationPane.setLayout(instantiationPaneLayoutManager);
-
-        instantiationPane.setBorder(BorderFactory.createEtchedBorder());
-        instantiationPane.setAlignmentX(Box.CENTER_ALIGNMENT);
+        instantiationPanel.setLayout(instantiationPaneLayoutManager);
+        instantiationPanel.setBorder(BorderFactory.createEtchedBorder());
+        instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
 
            freeFormPanel = new FreeFormPanel(this);
         constructorPanel = new   ConstrPanel(this); // don't try to rename this
             factoryPanel = new  FactoryPanel(this);
 
-        instantiationPane.add(   freeFormPanel,    "freeFormPanel");
-        instantiationPane.add(constructorPanel, "constructorPanel");
-        instantiationPane.add(    factoryPanel,     "factoryPanel");
-
+        instantiationPanel.add(   freeFormPanel,    "freeFormPanel");
+        instantiationPanel.add(constructorPanel, "constructorPanel");
+        instantiationPanel.add(    factoryPanel,     "factoryPanel");
         add(Box.createVerticalStrut(5));
-        add(instantiationPane);
-		
-		packMeOwnerDialog.pack(); // TODO doesn't appear to be working
+        add(instantiationPanel);
 
         methodCB.addActionListener(new ActionListener()
 		{
@@ -147,7 +157,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             @Override
             public void actionPerformed(ActionEvent e)
 			{
-                if (!typeTF.getText().trim().equals(myViskitInstantiator.getTypeName())) 
+                if (!typeTF.getText().trim().equals(copiedViskitInstantiator.getTypeName())) 
 				{
                     String newType = typeTF.getText().trim();
                     // update the panels
@@ -159,6 +169,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 					catch (ClassNotFoundException cnfe) 
 					{
                         JOptionPane.showMessageDialog(InstantiationPanel.this, "Unknown type: " + cnfe );
+						LOG.error ("type problem #1 in methodCB ActionListener", cnfe);
                         return;
                     }
                        freeFormPanel.setData(new ViskitInstantiator.FreeForm(newType, "")); // no value
@@ -179,20 +190,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 switch (selectedIndex) 
 				{
                     case FREEFORM:
-                        instantiationPaneLayoutManager.show(instantiationPane, "freeFormPanel");
+                        instantiationPaneLayoutManager.show(instantiationPanel, "freeFormPanel");
                         freeFormPanel.valueTF.requestFocus();
                         freeFormPanel.valueTF.selectAll();
                         break;
                     case CONSTRUCTOR:
-                        instantiationPaneLayoutManager.show(instantiationPane, "constructorPanel");
+                        instantiationPaneLayoutManager.show(instantiationPanel, "constructorPanel");
 						constructorPanel.requestFocus();
                         break;
                     case FACTORY:
-                        instantiationPaneLayoutManager.show(instantiationPane, "factoryPanel");
+                        instantiationPaneLayoutManager.show(instantiationPanel, "factoryPanel");
                         factoryPanel.factoryClassCB.requestFocus();
                         break;
                     default:
-                        LOG.error("problem in Instantiation panel");
+                        LOG.error("type problem #2 in methodCB ActionListener");
                 }
             }
         });
@@ -209,17 +220,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             case FACTORY:
                 return     factoryPanel.getData();
             default:
-				LOG.error("Instantiation panel has bad invocation for getData()");
+				LOG.error("Instantiation panel has bad type-related invocation for getData()");
                 return null;
         }
     }
 
-    ViskitInstantiator myViskitInstantiator;
-
-    public void setData(ViskitInstantiator vi) throws ClassNotFoundException
+    public void setData(ViskitInstantiator passedViskitInstantiator) throws ClassNotFoundException
 	{
-        myViskitInstantiator = vi.vcopy();
-        String typeName = myViskitInstantiator.getTypeName();
+        copiedViskitInstantiator = passedViskitInstantiator.vcopy(); // TODO why is this going to Construct?
+        String typeName = copiedViskitInstantiator.getTypeName();
         typeTF.setText(typeName);
 
         // inform all panels of the type of the object
@@ -227,20 +236,20 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             factoryPanel.setType(typeName);
            freeFormPanel.setType(typeName);
 
-        if (vi instanceof ViskitInstantiator.Construct)
+        if (passedViskitInstantiator instanceof ViskitInstantiator.Construct)
 		{
-            constructorPanel.setData((ViskitInstantiator.Construct) myViskitInstantiator);
             methodCB.setSelectedIndex(CONSTRUCTOR);
+            constructorPanel.setData((ViskitInstantiator.Construct) copiedViskitInstantiator);
         } 
-		else if (vi instanceof ViskitInstantiator.Factory)
+		else if (passedViskitInstantiator instanceof ViskitInstantiator.Factory)
 		{
-            factoryPanel.setData((ViskitInstantiator.Factory) myViskitInstantiator);
             methodCB.setSelectedIndex(FACTORY);
+            factoryPanel.setData((ViskitInstantiator.Factory) copiedViskitInstantiator);
         }
-		else if (vi instanceof ViskitInstantiator.FreeForm)
+		else if (passedViskitInstantiator instanceof ViskitInstantiator.FreeForm)
 		{
-            freeFormPanel.setData((ViskitInstantiator.FreeForm) myViskitInstantiator);
             methodCB.setSelectedIndex(FREEFORM);
+            freeFormPanel.setData((ViskitInstantiator.FreeForm) copiedViskitInstantiator);
         }
 		else
 		{
@@ -323,8 +332,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
     /**
      * ********************************************************************
      */
-    class ConstrPanel extends JPanel implements ActionListener, CaretListener {
-
+    class ConstrPanel extends JPanel implements ActionListener, CaretListener 
+	{
         private final JTabbedPane tabbedPane;
 
         private ConstructorPanel[]        constructorPanels;
@@ -355,14 +364,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         public void setType(String className) throws ClassNotFoundException
 		{
-            LOG.debug("ConstrPanel constructor for class " + className);
+            LOG.debug("ConstrPanel setType for class " + className);
             List<Object>[] parameters = ViskitStatics.resolveParametersUsingReflection(ViskitStatics.ClassForName(className));
 
             typeName = className;
             removeAll();
             tabbedPane.removeAll();
 
-            if (parameters == null)
+            if (parameters == null) // no longer how we approach this
 			{
                 tabbedPane.addTab("No-parameter Constructor", null, new JLabel("No-parameter constructor. Factory, Abstract or Interface"));
             } 
@@ -414,6 +423,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 					if (!constructors[i].getParameterTypesList().isEmpty() || zeroArgumentConstructorAllowed)
 					{
 						constructorPanels[i] = new ConstructorPanel(this, parameters.length != 1, this, packMeOwnerDialog);
+						packMeOwnerDialog.pack(); // TODO check OK
 						String constructorTabName;
 						if (constructorTabCount <= 1) 
 						{
@@ -542,15 +552,17 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
             topPanel = new JPanel(new SpringLayout());
             factoryClassLabel = new JLabel("Factory class", JLabel.TRAILING);
-            factoryClassCB = new JComboBox<>(new Object[]{ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS});
+            factoryClassCB = new JComboBox<>(new Object[]{ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS}); // TODO support more, depending on class chosen
             ViskitStatics.clampHeight(factoryClassCB);
             factoryClassLabel.setLabelFor(factoryClassCB);
 
             JLabel dummyLabel = new JLabel("");
-            JLabel classHelpLabel = new JLabel("(Press return after selecting "
-                    + "factory class to start a new RandomVariate)", JLabel.LEADING);
+            JLabel classHelpLabel = new JLabel(
+					"(Apply changes after selecting factory class" + 
+                    " to create a new RandomVariate)", JLabel.LEADING);
             classHelpLabel.setFont(factoryClassCB.getFont());
             dummyLabel.setLabelFor(classHelpLabel);
+			classHelpLabel.setVisible (factoryClassCB.getItemCount() > 1); // only shown if more than one factory class is present
 
             topPanel.add(factoryClassLabel);
             topPanel.add(factoryClassCB);
@@ -586,18 +598,22 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             add(topPanel);
 
             boolean foundString = false;
-            for (Object o : vi.getParametersList()) {
-                if (o instanceof String) {
+            for (Object o : vi.getParametersList()) 
+			{
+                if (o instanceof String) 
+				{
                     foundString = true;
                     break;
                 }
             }
-
-            if (foundString) {
+            if (foundString) 
+			{
                 Vector<Object> v = new Vector<>();
                 v.add(vi);
                 addObjectListPanel(v, foundString);
-            } else {
+            } 
+			else 
+			{
                 addObjectListPanel((Vector<Object>) vi.getParametersList(), !foundString);
             }
         }
@@ -622,27 +638,31 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         public ViskitInstantiator getData()
 		{
             String factoryClassName = (String) factoryClassCB.getSelectedItem();
-            factoryClassName = (factoryClassName == null) ? ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS : factoryClassName.trim();
+             factoryClassName = (factoryClassName == null) ? ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS : factoryClassName.trim();
             String methodName = ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD;
             List<Object> objectList = (objectListPanel != null) ? objectListPanel.getData() : new Vector<>();
             return new ViskitInstantiator.Factory(typeName, factoryClassName, methodName, objectList);
         }
 
-        class MyChangedListener implements ActionListener {
-
+        class MyChangedListener implements ActionListener 
+		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (instantiationPanel.modifiedListener != null) {
+            public void actionPerformed(ActionEvent e) 
+			{
+                if (instantiationPanel.modifiedListener != null)
+				{
                     instantiationPanel.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Button pressed"));
                 }
             }
         }
 
-        class MyCaretListener implements CaretListener {
-
+        class MyCaretListener implements CaretListener 
+		{
             @Override
-            public void caretUpdate(CaretEvent e) {
-                if (instantiationPanel.modifiedListener != null) {
+            public void caretUpdate(CaretEvent e) 
+			{
+                if (instantiationPanel.modifiedListener != null)
+				{
                     instantiationPanel.modifiedListener.actionPerformed(new ActionEvent(this, 0, "TF edited pressed"));
                 }
             }
@@ -651,26 +671,33 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         class MyClassListener implements ActionListener 
 		{
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (noClassAction) {
+            public void actionPerformed(ActionEvent e)
+			{
+                if (noClassAction) 
+				{
                     return;
                 }
-
                 Class<?> factoryClass;
                 String factoryClassName = factoryClassCB.getSelectedItem().toString();
                 try {
                     factoryClass = ViskitStatics.ClassForName(factoryClassName);
-                    if (factoryClass == null) {
+                    if (factoryClass == null) 
+					{
                         throw new ClassNotFoundException();
                     }
-                } catch (ClassNotFoundException e1) {
+                } 
+				catch (ClassNotFoundException e1) 
+				{
+					// TODO dialog, log message
                     JOptionPane.showMessageDialog(instantiationPanel, factoryClassName + " not found on the classpath");
                     factoryClassCB.requestFocus();
                     return;
                 }
 
                 Method[] staticMethods = factoryClass.getMethods();
-                if (staticMethods == null || staticMethods.length <= 0) {
+                if (staticMethods == null || staticMethods.length <= 0) 
+				{
+					// TODO dialog, log message
                     JOptionPane.showMessageDialog(instantiationPanel, factoryClassName + " contains no methods");
                     factoryClassCB.requestFocus();
                     return;
@@ -707,6 +734,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
                 if (randomVariateFactoryStringObjectMethodVector.isEmpty()) 
 				{
+					// TODO dialog, log message
                     JOptionPane.showMessageDialog(instantiationPanel, "<html><center>" + factoryClassName + " contains no static methods <br/> returning " + typeName + ".");
                     factoryClassCB.requestFocus();
                     return;
@@ -724,6 +752,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 				}
 				else // user selects
 				{
+					// TODO dialog, log message
 					returnValue = JOptionPane.showInputDialog(packMeOwnerDialog,
 							"Choose method",
 							"Factory methods",
@@ -731,7 +760,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 							null,
 							methodNames,
 							methodNames[0]);
-					if (returnValue == null) {
+					if (returnValue == null) 
+					{
 						factoryClassCB.requestFocus();
 						return;
 					}
@@ -742,7 +772,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 Vector<Object> vInstantiatorVector = ViskitInstantiator.buildDummyInstantiatorsFromReflection(randomVariateFactorySelectedMethods);
                 addObjectListPanel(vInstantiatorVector, true);
 
-                if (instantiationPanel.modifiedListener != null) {
+                if (instantiationPanel.modifiedListener != null) 
+				{
                     instantiationPanel.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Factory method chosen"));
                 }
             }

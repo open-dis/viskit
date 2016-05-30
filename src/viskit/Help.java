@@ -159,7 +159,7 @@ public class Help
     public final static String SHOW_HELP_TUTORIAL_METHOD = "showHelpTutorial"; // must match following method name.  not possible to accomplish this programmatically.
     public void showHelpTutorial() // method name must exactly match preceding string value
 	{
-//        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "Tutorial");
+//        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "Tutorial"); // TODO
 //        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(actionEvent);
         helpBroker.setCurrentView("Tutorial"); // initial page to view (not tree directory)
         helpBroker.setDisplayed(true);

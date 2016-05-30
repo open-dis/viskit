@@ -288,7 +288,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel != null) 
 		{
-            if (((AssemblyModel) getModel()).isDirty()) 
+            if (((AssemblyModelImpl) getModel()).isDirty()) 
 			{
                 return askToSaveAndContinue();
             }
@@ -492,7 +492,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         localDirty = false;
                     }
 
-                    ((AssemblyModel) getModel()).setDirty(true);
+                    ((AssemblyModelImpl) getModel()).setDirty(true);
                     break;
 
                 case NEW_ASSEMBLY:
@@ -513,11 +513,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
-                    AssemblyModel vAMod = (AssemblyModel) getModel();
-                    markAssemblyConfigurationClosed(vAMod.getLastFile());
+                    AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+                    markAssemblyConfigurationClosed(assemblyModel.getLastFile());
 
                     AssemblyEditView view = (AssemblyEditView) getView();
-                    view.deleteTab(vAMod);
+                    view.deleteTab(assemblyModel);
 
                     // NOTE: This doesn't work quite right.  If no Assembly is open,
                     // then any non-associated EGs that were also open will
@@ -528,7 +528,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                         AssemblyModel[] modAr = view.getOpenAssemblyModelArray();
                         for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(vAMod)) {
+                            if (!mod.equals(assemblyModel)) {
                                 openEventGraphs(mod.getLastFile());
                             }
                         }
@@ -658,7 +658,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 n = n.substring(0, n.length() - 4);
             }
             graphMetadata.name = n;
-            assemblyModel.setMetadata(graphMetadata); // might have renamed
+            assemblyModel.setMetadata(graphMetadata); // might have been renamed
 
             assemblyModel.saveModel(saveFile);
             view.setSelectedAssemblyName(graphMetadata.name);
@@ -671,13 +671,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void editGraphMetadata () // method name must exactly match preceding string value
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel == null) {return;}
         GraphMetadata graphMetadata = assemblyModel.getMetadata();
-        boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditViewFrame(), graphMetadata);
-        if (modified) {
-            ((AssemblyModel) getModel()).setMetadata(graphMetadata);
+		
+        boolean modified = AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditViewFrame(), graphMetadata);
+        if     (modified) 
+		{
+            assemblyModel.setMetadata(AssemblyMetadataDialog.getGraphMetadata());
 
             // update title bar
             ((AssemblyEditView) getView()).setSelectedAssemblyName(graphMetadata.name);
@@ -716,7 +717,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             int count = intField.getInt(this);
             // Find a unique name
-            AssemblyModel assemblyModel = (AssemblyModel) getModel();
+            AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
             do 
 			{
                 shortUniqueName = shortname + count++;
@@ -994,8 +995,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void doProjectCleanup()
 	{
-        closeAll();
-        ViskitGlobals.instance().getEventGraphController().closeAll();
+        closeAll(); // assemblies
+        ViskitGlobals.instance().getEventGraphController().closeAll(); // event graphs
 		if (ViskitGlobals.instance().getCurrentViskitProject() != null)
 			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
         ViskitConfiguration.instance().clearViskitConfiguration();
@@ -1178,7 +1179,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void closeAll () // method name must exactly match preceding string value
 	{
         AssemblyModel[] assemblyModelArray = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
-        for (AssemblyModel assemblyModel : assemblyModelArray) {
+        for (AssemblyModel assemblyModel : assemblyModelArray) 
+		{
             setModel((mvcModel) assemblyModel);
 			setCloseAll(true);
             close();
@@ -1201,9 +1203,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public boolean preClose() {
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
-        if (assemblyModel == null) {
+    public boolean preClose() 
+	{
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+        if (assemblyModel == null) 
+		{
             return false;
         }
 		openAssembliesFileList.remove(assemblyModel.getLastFile());
@@ -1287,14 +1291,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void newEventGraphNode(String typeName, Point point)
 	{
         String instanceName = shortUniqueEventGraphName(typeName);
-        ((AssemblyModel) getModel()).newEventGraph(instanceName, typeName, point, ViskitStatics.DEFAULT_DESCRIPTION);
+        ((AssemblyModelImpl) getModel()).newEventGraph(instanceName, typeName, point, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
     public void newEventGraphNode(String typeName, Point point, String description)
 	{
         String instanceName = shortUniqueEventGraphName(typeName);
-        ((AssemblyModel) getModel()).newEventGraph(instanceName, typeName, point, description);
+        ((AssemblyModelImpl) getModel()).newEventGraph(instanceName, typeName, point, description);
     }
 
     @Override
@@ -1306,7 +1310,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 //		String  packageName = fullName.substring(0, fullName.lastIndexOf("."));
 		// if description is available, the follow-on method should be used
 
-        ((AssemblyModel) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
+        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
     }
 
     @Override
@@ -1317,8 +1321,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		String    className = fullName.substring(fullName.lastIndexOf(".") + 1);
 		
 //        String shortName = shortUniqueEventGraphName(xnode.loadedClass);
-//        ((AssemblyModel) getModel()).newEventGraphFromXML(shortName, shortName, point, description, xnode); broken
-        ((AssemblyModel) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
+//        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(shortName, shortName, point, description, xnode); broken
+        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
     }
 
 
@@ -1345,27 +1349,31 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newPropertyChangeListenerNode(String name, Point p) {
+    public void newPropertyChangeListenerNode(String name, Point p) 
+	{
         String shortName = shortUniqueInstancePropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, ViskitStatics.DEFAULT_DESCRIPTION);
+        ((AssemblyModelImpl) getModel()).newPropertyChangeListener(shortName, name, p, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
-    public void newPropertyChangeListenerNode(String name, Point p, String description) {
+    public void newPropertyChangeListenerNode(String name, Point p, String description)
+	{
         String shortName = shortUniqueInstancePropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropertyChangeListener(shortName, name, p, description);
+        ((AssemblyModelImpl) getModel()).newPropertyChangeListener(shortName, name, p, description);
     }
 
     @Override
-    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
+    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) 
+	{
         String shortName = shortUniqueInstancePropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, ViskitStatics.DEFAULT_DESCRIPTION);
+        ((AssemblyModelImpl) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, ViskitStatics.DEFAULT_DESCRIPTION);
     }
 
     @Override
-    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description) {
+    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description) 
+	{
         String shortName = shortUniqueInstancePropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, description);
+        ((AssemblyModelImpl) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, description);
     }
 
     /**
@@ -1382,7 +1390,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             case JOptionPane.YES_OPTION:
                 save();
                 // TODO: Can't remember why this is here after a save?
-                if (((AssemblyModel) getModel()).isDirty()) 
+                if (((AssemblyModelImpl) getModel()).isDirty()) 
 				{
                     return false; // we cancelled
                 }
@@ -1390,9 +1398,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				
             case JOptionPane.NO_OPTION:
                 // No need to recompile
-                if (((AssemblyModel) getModel()).isDirty()) 
+                if (((AssemblyModelImpl) getModel()).isDirty()) 
 				{
-                    ((AssemblyModel) getModel()).setDirty(false);
+                    ((AssemblyModelImpl) getModel()).setDirty(false);
                 }
                 return true;
 				
@@ -1425,7 +1433,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortUniqueInstanceAdapterName(""), oArr[0], oArr[1]));
+        adapterEdgeEdit(((AssemblyModelImpl) getModel()).newAdapterEdge(shortUniqueInstanceAdapterName(""), oArr[0], oArr[1]));
     }
 
     @Override
@@ -1441,7 +1449,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"The node connection must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        ((AssemblyModel) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
+        ((AssemblyModelImpl) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
     }
 
     @Override
@@ -1458,7 +1466,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 					"The node connection must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        propertyChangeListenerEdgeEdit(((AssemblyModelImpl) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
     AssemblyNode[] checkLegalForSimEventListenerArc(AssemblyNode a, AssemblyNode b) {
@@ -1538,7 +1546,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             done = true;
             boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerNode(pclNode);
             if (modified) {
-                done = ((AssemblyModel) getModel()).changePclNode(pclNode);
+                done = ((AssemblyModelImpl) getModel()).changePclNode(pclNode);
             }
         } while (!done);
     }
@@ -1550,7 +1558,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             done = true;
             boolean modified = ((AssemblyEditView) getView()).doEditEventGraphNode(eventNode);
             if (modified) {
-                done = ((AssemblyModel) getModel()).changeEventGraphNode(eventNode);
+                done = ((AssemblyModelImpl) getModel()).changeEventGraphNode(eventNode);
             }
         } while (!done);
     }
@@ -1559,7 +1567,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
         boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
         if (modified) {
-            ((AssemblyModel) getModel()).changePclEdge(pclEdge);
+            ((AssemblyModelImpl) getModel()).changePclEdge(pclEdge);
         }
     }
 
@@ -1567,7 +1575,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void adapterEdgeEdit(AdapterEdge aEdge) {
         boolean modified = ((AssemblyEditView) getView()).doEditAdapterEdge(aEdge);
         if (modified) {
-            ((AssemblyModel) getModel()).changeAdapterEdge(aEdge);
+            ((AssemblyModelImpl) getModel()).changeAdapterEdge(aEdge);
         }
     }
 
@@ -1575,7 +1583,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
         boolean modified = ((AssemblyEditView) getView()).doEditSimEventListEdge(seEdge);
         if (modified) {
-            ((AssemblyModel) getModel()).changeSimEventListenerEdge(seEdge);
+            ((AssemblyModelImpl) getModel()).changeSimEventListenerEdge(seEdge);
         }
     }
 
@@ -1705,14 +1713,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 String eventGraphName        = ((ViskitElement) copiedObject).getName();
                 String eventGraphType        = ((ViskitElement) copiedObject).getType();
                 String eventGraphDescription = ((ViskitElement) copiedObject).getDescription();
-                ((AssemblyModel) getModel()).newEventGraph(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
+                ((AssemblyModelImpl) getModel()).newEventGraph(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
             } 
 			else if (copiedObject instanceof PropertyChangeListenerNode)
 			{
                 String eventGraphName        = ((ViskitElement) copiedObject).getName();
                 String eventGraphType        = ((ViskitElement) copiedObject).getType();
                 String eventGraphDescription = ((ViskitElement) copiedObject).getDescription();
-                ((AssemblyModel) getModel()).newPropertyChangeListener(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
+                ((AssemblyModelImpl) getModel()).newPropertyChangeListener(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
             }
             copyCount++;
         }
@@ -1755,11 +1763,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
-            ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
+            ((AssemblyModelImpl) getModel()).deleteAdapterEdge((AdapterEdge) e);
         } else if (e instanceof PropertyChangeListenerEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
+            ((AssemblyModelImpl) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
         } else if (e instanceof SimEventListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
+            ((AssemblyModelImpl) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
         }
     }
 
@@ -1818,29 +1826,37 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void redo () // method name must exactly match preceding string value
 	{
-        // Recreate the JAXB (XML) bindings since the paste function only does
-        // nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) { // TODO fix
-
+        // Recreate the JAXB (XML) bindings since the paste function only does nodes and not edges
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) // TODO fix
+		{
             // Handles both arcs and self-referential arcs
-            if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
+            if (redoGraphCell.getUserObject() instanceof AdapterEdge) 
+			{
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge) {
+                ((AssemblyModelImpl) getModel()).redoAdapterEdge(ed);
+            } 
+			else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge) 
+			{
                 PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropertyChangeListenerEdge(ed);
-            } else {
+                ((AssemblyModelImpl) getModel()).redoPropertyChangeListenerEdge(ed);
+            } 
+			else 
+			{
                 SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoSimEventListenerEdge(ed);
+                ((AssemblyModelImpl) getModel()).redoSimEventListenerEdge(ed);
             }
-        } else {
-
-            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
+        } 
+		else 
+		{
+            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode)
+			{
                 PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropertyChangeListener(node);
-            } else {
+                ((AssemblyModelImpl) getModel()).redoPropertyChangeListener(node);
+            } 
+			else 
+			{
                 EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoEventGraph(node);
+                ((AssemblyModelImpl) getModel()).redoEventGraph(node);
             }
         }
 
@@ -1870,7 +1886,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void showXML () // method name must exactly match preceding string value
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
 		
         if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
             return;
@@ -1881,7 +1897,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private boolean checkSaveForSourceCompile()
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
 
         // Perhaps a cached file is no longer present in the path
         if (assemblyModel == null) {return false;}
@@ -1902,16 +1918,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void generateJavaSource () // method name must exactly match preceding string value
 	{
         String source = produceJavaAssemblyClass();
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (source != null && !source.isEmpty()) {
-            String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
-            ((AssemblyEditView) getView()).showSource(className, source, vmod.getLastFile().getName());
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+        if (source != null && !source.isEmpty()) 
+		{
+            String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
+            ((AssemblyEditView) getView()).showSource(className, source, assemblyModel.getLastFile().getName());
         }
     }
 
     private String produceJavaAssemblyClass()
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
 			// TODO error notification needed, or is it already getting handled?
             return null;
@@ -2213,7 +2230,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void export2grid() 
 	{
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         File tFile;
         try {
             tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
@@ -2312,7 +2329,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 				{
                     // Ensure a cleared Simulation Run panel upon every Assembly compile
                     SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
-					simulationRunPanel.setTitle( ((AssemblyModel) getModel()).getMetadata().name );
+					simulationRunPanel.setTitle( ((AssemblyModelImpl) getModel()).getMetadata().name );
 					simulationRunPanel.initializeRunWidgetsSimulationOutputTA ();
 
                     save(); // Ensure changes to the Assembly Properties dialog get saved
@@ -2384,11 +2401,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         v.add(classPath);                                               // 5
         v.add(className);                                               // 6
 
-        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 7
-        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 8
+        v.add("" + ((AssemblyModelImpl) getModel()).getMetadata().verbose);  // 7
+        v.add(     ((AssemblyModelImpl) getModel()).getMetadata().stopTime); // 8
 
-        Vector<String> detailedOutputEntityNames = ((AssemblyModel) getModel()).getDetailedOutputEntityNames();
-        for (String entityName : detailedOutputEntityNames) {
+        Vector<String> detailedOutputEntityNames = ((AssemblyModelImpl) getModel()).getDetailedOutputEntityNames();
+        for (String entityName : detailedOutputEntityNames) 
+		{
             v.add(entityName);                                          // 9+
         }
         String[] returnStringArray = new String[v.size()];
@@ -2401,11 +2419,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void windowImageCapture () // method name must exactly match preceding string value
 	{
-        AssemblyModel vmod = (AssemblyModel) getModel();
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         String assemblyDiagramfileName = "AssemblyDiagram"; // default, replaced by filename
-        if (vmod.getLastFile() != null)
+        if (assemblyModel.getLastFile() != null)
 		{
-            assemblyDiagramfileName = vmod.getLastFile().getName();
+            assemblyDiagramfileName = assemblyModel.getLastFile().getName();
             assemblyDiagramfileName = assemblyDiagramfileName.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
 			if (assemblyDiagramfileName.endsWith(".xml"))
 				assemblyDiagramfileName = assemblyDiagramfileName.substring (0, assemblyDiagramfileName.indexOf(".xml"));

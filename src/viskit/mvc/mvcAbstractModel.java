@@ -44,11 +44,14 @@ public abstract class mvcAbstractModel implements mvcModel
         }
 		if (listenersList.isEmpty())
 		{
-			LOG.error ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " ignored, listeners list is empty (\""                    + modelEvent.getActionCommand() + "\")");
+			LOG.error ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " ignored, listeners list is empty (\""                                + modelEvent.getActionCommand() + "\")");
 		}
 		else if (ViskitGlobals.LOG_EVENT_NOTIFICATIONS == true)
 		{
-			LOG.info  ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " received by " + listenersList.size() + " listeners (\"" + modelEvent.getActionCommand() + "\")");
+			String plural = "";
+			if (listenersList.size() > 1)
+				   plural = "s";
+			LOG.info  ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " received by " + listenersList.size() + " listener" + plural + " (\"" + modelEvent.getActionCommand() + "\")");
 		}
     }
 
