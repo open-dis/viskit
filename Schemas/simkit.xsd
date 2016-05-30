@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2016 rel. 2 sp1 (x64) (http://www.altova.com) by Don Brutzman (Naval Postgraduate School) -->
 <!-- SVN ID: $Id$ -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:element name="SimEntity">
@@ -55,6 +54,7 @@
 			<xs:attribute name="name" type="xs:ID" use="required"/>
 			<xs:attribute name="type" use="required"/>
 			<xs:attribute name="value"/>
+			<xs:attribute name="implicit" type="xs:boolean" default="false"/>
 			<xs:attribute name="description"/>
 		</xs:complexType>
 	</xs:element>
