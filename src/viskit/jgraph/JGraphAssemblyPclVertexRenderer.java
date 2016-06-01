@@ -256,10 +256,10 @@ public class JGraphAssemblyPclVertexRenderer
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
 
         // Use the getName method instead of toString
-        String nm = ((AssemblyNode) cell.getUserObject()).getName();
+        String cellName = ((AssemblyNode) cell.getUserObject()).getName();
         FontMetrics metrics = g2.getFontMetrics();
-        nm = breakName(nm, 50, metrics);
-        String[] lns = nm.split("\n");       // handle multi-line titles
+        cellName = JGraphAssemblyEventGraphVertexRenderer.breakName(cellName, 50, metrics);
+        String[] lns = cellName.split("\n");       // handle multi-line titles
 
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord
@@ -271,71 +271,71 @@ public class JGraphAssemblyPclVertexRenderer
         }
     }
 
-    private String breakName(String name, int maxW, FontMetrics metrics) {
-        StringBuilder sb = new StringBuilder();
-        String[] n = name.split("\n");
-        for (String n1 : n) {
-            String[] nn = splitIfNeeded(n1, maxW, metrics);
-            for (String nn1 : nn) {
-                sb.append(nn1);
-                sb.append("\n");
-            }
-        }
-        sb.setLength(sb.length() - 1);
-        return sb.toString();
-    }
-
-    private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
-        String[] nuts = new String[2];
-        nuts[1] = s;
-        Vector<String> v = new Vector<>();
-        do {
-            nuts = splitOnce(nuts[1], maxW, metrics);
-            v.add(nuts[0]);
-        } while (nuts[1] != null);
-        String[] ra = new String[v.size()];
-        ra = v.toArray(ra);
-        return ra;
-    }
-
-    private String[] splitOnce(String s, int maxW, FontMetrics metrics) {
-        String[] ra = new String[2];
-        ra[0] = s;
-
-        int w = metrics.stringWidth(s);
-        if (w < maxW) {
-            return ra;
-        }
-
-        String ws = s;
-        int fw;
-        int i;
-        for (i = s.length() - 1; i > 0; i--) {
-            ws = s.substring(0, i);
-            fw = metrics.stringWidth(ws);
-            if (fw <= maxW) {
-                break;
-            }
-        }
-        if (i <= 0) {
-            return ra;    // couldn't get small enough...?
-        }
-        // ws is now a small piece of string less than our max
-
-        int j;
-        for (j = ws.length() - 1; j > 0; j--) {
-
-            if (Character.isUpperCase(s.charAt(j + 1))) {
-                break;
-            }
-        }
-        if (j <= 0) {
-            return ra; // couldn't find a break
-        }
-        ra[0] = ws.substring(0, j + 1);
-        ra[1] = ws.substring(j + 1) + s.substring(i);
-        return ra;
-    }
+//    private String breakName(String name, int maxW, FontMetrics metrics) {
+//        StringBuilder sb = new StringBuilder();
+//        String[] n = name.split("\n");
+//        for (String n1 : n) {
+//            String[] nn = splitIfNeeded(n1, maxW, metrics);
+//            for (String nn1 : nn) {
+//                sb.append(nn1);
+//                sb.append("\n");
+//            }
+//        }
+//        sb.setLength(sb.length() - 1);
+//        return sb.toString();
+//    }
+//
+//    private String[] splitIfNeeded(String s, int maxW, FontMetrics metrics) {
+//        String[] nuts = new String[2];
+//        nuts[1] = s;
+//        Vector<String> v = new Vector<>();
+//        do {
+//            nuts = splitOnce(nuts[1], maxW, metrics);
+//            v.add(nuts[0]);
+//        } while (nuts[1] != null);
+//        String[] ra = new String[v.size()];
+//        ra = v.toArray(ra);
+//        return ra;
+//    }
+//
+//    private String[] splitOnce(String s, int maxW, FontMetrics metrics) {
+//        String[] ra = new String[2];
+//        ra[0] = s;
+//
+//        int w = metrics.stringWidth(s);
+//        if (w < maxW) {
+//            return ra;
+//        }
+//
+//        String ws = s;
+//        int fw;
+//        int i;
+//        for (i = s.length() - 1; i > 0; i--) {
+//            ws = s.substring(0, i);
+//            fw = metrics.stringWidth(ws);
+//            if (fw <= maxW) {
+//                break;
+//            }
+//        }
+//        if (i <= 0) {
+//            return ra;    // couldn't get small enough...?
+//        }
+//        // ws is now a small piece of string less than our max
+//
+//        int j;
+//        for (j = ws.length() - 1; j > 0; j--) {
+//
+//            if (Character.isUpperCase(s.charAt(j + 1))) {
+//                break;
+//            }
+//        }
+//        if (j <= 0) {
+//            return ra; // couldn't find a break
+//        }
+//        ra[0] = ws.substring(0, j + 1);
+//        ra[1] = ws.substring(j + 1) + s.substring(i);
+//        return ra;
+//    }
 
     @Override
     protected void paintBorder(Graphics g) {

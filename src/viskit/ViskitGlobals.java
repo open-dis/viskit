@@ -96,7 +96,7 @@ public class ViskitGlobals
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popup;
-    private final myTypeListener myListener;
+    private final MyTypeListener myListener;
     private ViskitApplicationFrame mainApplicationWindow;
 
     private static ViskitProject currentViskitProject;
@@ -156,7 +156,7 @@ public class ViskitGlobals
     private ViskitGlobals()
 	{
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
-        myListener = new myTypeListener();
+        myListener = new MyTypeListener();
         buildTypePopup();
 		// do not initialize a new project here, viskit might be loading without one
 //        initializeProjectHomeDirectory();
@@ -762,7 +762,8 @@ public class ViskitGlobals
         return ty;
     }
 
-    public JComboBox<String> getTypeComboBox() {
+    public JComboBox<String> getTypeComboBox() 
+	{
         JComboBox<String> newComboBox = new JComboBox<>(defaultComboBoxModel);
         newComboBox.addActionListener(myListener);
         newComboBox.addItemListener(myListener);
@@ -1066,11 +1067,12 @@ public class ViskitGlobals
         }
     }
 
-    class myTypeListener implements ActionListener, ItemListener {
+    class MyTypeListener implements ActionListener, ItemListener {
 
         @Override
         public void itemStateChanged(ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.DESELECTED) {
+            if (e.getStateChange() == ItemEvent.DESELECTED)
+			{
                 lastSelected = e.getItem();
             }
         }

@@ -69,7 +69,7 @@ public class ParameterTable extends JTable
         }
         setShowGrid(true);
         setDefaultRenderer(String.class, new myStringClassRenderer());
-        setDefaultRenderer(Boolean.class, new myBooleanClassRenderer());
+        setDefaultRenderer(Boolean.class, new MyBooleanClassRenderer());
     }
 
     /**
@@ -184,20 +184,22 @@ public class ParameterTable extends JTable
      * Booleans are rendered with checkboxes.  That's what we want.  We have our own Renderer
      * so we can control the background colors of the cells.
      */
-    class myBooleanClassRenderer extends JCheckBox implements TableCellRenderer {
+    class MyBooleanClassRenderer extends JCheckBox implements TableCellRenderer {
 
-        public myBooleanClassRenderer() {
+        public MyBooleanClassRenderer() {
             super();
             setHorizontalAlignment(JLabel.CENTER);
             setBorderPainted(false);
 
             // This so we can change background of cells depending on the state of the checkboxes.
-            addItemListener(new ItemListener() {
-
+            addItemListener(new ItemListener()
+			{
                 @Override
-                public void itemStateChanged(ItemEvent e) {
+                public void itemStateChanged(ItemEvent e) 
+				{
                     ListSelectionModel lsm = ParameterTable.this.getSelectionModel();
-                    if (!lsm.isSelectionEmpty()) {
+                    if (!lsm.isSelectionEmpty()) 
+					{
                         int selectedRow = lsm.getMinSelectionIndex();
                         ((DefaultTableModel) ParameterTable.this.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
                     }

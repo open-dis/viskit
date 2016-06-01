@@ -92,6 +92,7 @@ public class SimkitEventGraphXML2Java
     private List<Parameter>   superParametersList;
     private List<Parameter>        parametersList;
     private List<StateVariable> stateVariableList;
+	private boolean hasImplicitStateVariable;
 
     /** Default to initialize the JAXBContext only */
     private SimkitEventGraphXML2Java() {
@@ -365,23 +366,40 @@ public class SimkitEventGraphXML2Java
         Constructor<?> cst;
         for (StateVariable stateVariable : stateVariableList)
 		{
+			String implicitStatus = "";
 			String description = stateVariable.getDescription().trim();
-			if (!description.isEmpty()) 
+			
+			if (stateVariable.isImplicit())
 			{
-				pw.println(SP_4 + JDO + SP + description + SP + JDC);
+				hasImplicitStateVariable = true;
+				implicitStatus = stateVariable.getName() + " is an implicit state variable whose value is computed from other state variables"  + "\n" +
+								 SP_8 + "  *  Be sure to provide a corresponding method in the event graph code block: compute_" + stateVariable.getName() + "()";
 			}
+			if (!description.isEmpty() || stateVariable.isImplicit())
+			{
+				String lineBreak = "";
+				if (!description.isEmpty() && stateVariable.isImplicit())
+					   lineBreak = "\n" + SP_8 + "  *  ";
+				pw.println(SP_4 + JDO + SP + description + lineBreak + implicitStatus);
+				pw.println(SP_4 + JDC);
+			}
+				
+			String implicitInlineComment = "";
+			if (stateVariable.isImplicit())
+				   implicitInlineComment = " // implicit";
 				
             // Non array type generics
             if (isGeneric(stateVariable.getType()))
 			{
+				
                 if (!isArray(stateVariable.getType()))
-                    pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stripType(stateVariable.getType()) + LP + RP + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stripType(stateVariable.getType()) + LP + RP + SC + implicitInlineComment);
                 else
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC + implicitInlineComment);
             } 
 			else 
 			{
-				pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+				pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC + implicitInlineComment);
 					
                 c = ViskitStatics.ClassForName(stateVariable.getType());
 
@@ -568,6 +586,12 @@ public class SimkitEventGraphXML2Java
             pw.print  (SP_4 + PUBLIC + SP + baseOf(stateVariable.getType()) + SP + "get" + capitalize(stateVariable.getName()));
             pw.println(SP + LP + indxncm(d) + RP);
             pw.println(SP_4 + OB);
+			if (stateVariable.isImplicit())
+			{
+				pw.println(SP_8 + "// implicit state variables are computed from other state variables");
+				pw.println(SP_8 + "compute_" + stateVariable.getName() + SP + "();");
+				pw.println(); 
+			}
             pw.println(SP_8 + "return" + SP + stateVariable.getName() + indxbr(d) + SC);
             pw.println(SP_4 + CB);
             pw.println();
@@ -577,6 +601,12 @@ public class SimkitEventGraphXML2Java
             pw.print  (SP_4 + PUBLIC + SP + stripLength(stateVariable.getType()) + SP + "get" + capitalize(stateVariable.getName()));
             pw.println(SP + LP + RP);
             pw.println(SP_4 + OB);
+			if (stateVariable.isImplicit())
+			{
+				pw.println(SP_8 + "// implicit state variables are computed from other state variables");
+				pw.println(SP_8 + "compute_" + stateVariable.getName() + SP + "();");
+				pw.println();
+			}
             pw.println(SP_8 + "return" + SP + (typeString + SP + stateVariable.getName() + cloneString).trim() + SC);
             pw.println(SP_4 + CB);
             pw.println();
@@ -892,13 +922,27 @@ public class SimkitEventGraphXML2Java
         if (run.getCode() != null && !run.getCode().isEmpty()) 
 		{
 			pw.println();
-            pw.println(SP_8 + "/* Code Block insertion for " + run.getName() + " event */");
+            pw.println(SP_8 + "/* ====== Code Block insertion for " + run.getName() + " event graph ====== */");
             String[] lines = run.getCode().split("\\n");
             for (String line : lines)
 			{
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* Code Block insertion */");
+			for (StateVariable stateVariable : stateVariableList)
+			{
+				if (stateVariable.isImplicit() && !run.getCode().contains("compute_" + stateVariable.getName()))
+				{
+					// similar code block found in StateVariableDialog.unloadWidgets()
+					pw.println();
+					pw.println(SP_8 + JDO + SP + "Implicit state variable computation" + SP + JDC);
+					pw.println(SP_8 + "private void compute_" + stateVariable.getName() + "()");
+					pw.println(SP_8 + OB);
+					pw.println(SP_8 + SP_4 + "// insert computation code here");
+					pw.println(SP_8 + CB);
+					pw.println();
+				}
+			}
+            pw.println(SP_8 + "/* Code Block insertion complete */");
             pw.println();
         }
 
@@ -1335,6 +1379,7 @@ public class SimkitEventGraphXML2Java
         if ((codeBlock != null) && !codeBlock.trim().isEmpty())
 		{
             pw.println(SP_4 + "/* Code Block for " + root.getName() + " */");
+            pw.println();
             String[] lines = codeBlock.split("\\n");
             for (String codeLines : lines) 
 			{

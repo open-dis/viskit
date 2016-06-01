@@ -142,15 +142,22 @@ public class ViskitEventGraphAssemblyComboMain
 	{
         String LOOK_AND_FEEL = UserPreferencesDialog.getLookAndFeel();
         try {
-            if (LOOK_AND_FEEL == null || LOOK_AND_FEEL.isEmpty() || LOOK_AND_FEEL.equalsIgnoreCase("default")) {
+            if (LOOK_AND_FEEL == null || LOOK_AND_FEEL.isEmpty() || LOOK_AND_FEEL.equalsIgnoreCase("default")) 
+			{
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            } else if (LOOK_AND_FEEL.equalsIgnoreCase("platform")) {
+            }
+			else if (LOOK_AND_FEEL.equalsIgnoreCase("platform")) 
+			{
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } else {
+            } 
+			else 
+			{
                 UIManager.setLookAndFeel(LOOK_AND_FEEL);
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            LOG.error("Error setting Look and Feel to " + LOOK_AND_FEEL);
+        } 
+		catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) 
+		{
+            LOG.error("Error setting Look and Feel to " + LOOK_AND_FEEL, ex);
         }
     }
 

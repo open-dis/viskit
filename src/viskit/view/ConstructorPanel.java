@@ -104,7 +104,8 @@ public final class ConstructorPanel extends JPanel
         revalidate();
     }
 
-    public List<Object> getData() {
+    public List<Object> getData() 
+	{
         return objectListPanel.getData(); // of VInstantiators
     }
 

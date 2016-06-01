@@ -214,6 +214,11 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
     public List<Object> getData() 
 	{
         Vector<Object> objectVector = new Vector<>();
+		if (typeLabelArray == null)
+		{
+			LOG.error ("Internal problem with getData() typeLabelArray");
+			return null;
+		}
         for (int i = 0; i < typeLabelArray.length; i++) 
 		{
             if (shadowInstantiatorArray[i] instanceof ViskitInstantiator.FreeForm)

@@ -22,6 +22,7 @@ public class ViskitStateVariable extends ViskitElement
     /** Object that represents its current value */
     private String  value;
     private String  indexingExpression;
+    private boolean implicit = false;
     private boolean operation;
     private String  operationOrAssignment;
     private String  comment = EMPTY;
@@ -45,6 +46,13 @@ public class ViskitStateVariable extends ViskitElement
     public ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue, String description)
 	{
         this (stateVariableName,stateVariableType, initialValue);
+        this.description  = description; // order is important
+    }
+
+    public ViskitStateVariable(String stateVariableName, String stateVariableType, boolean implicit, String initialValue, String description)
+	{
+        this (stateVariableName,stateVariableType, initialValue);
+		this.implicit = implicit;
         this.description  = description; // order is important
     }
 
@@ -135,5 +143,19 @@ public class ViskitStateVariable extends ViskitElement
 		moveLegacyCommentsToDescription ();
         return description;
     }
+
+	/**
+	 * @return the implicit
+	 */
+	public boolean isImplicit() {
+		return implicit;
+	}
+
+	/**
+	 * @param implicit the implicit to set
+	 */
+	public void setImplicit(boolean implicit) {
+		this.implicit = implicit;
+	}
 
 }

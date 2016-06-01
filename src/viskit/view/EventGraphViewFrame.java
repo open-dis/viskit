@@ -450,25 +450,25 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).deleteSimParameter((vParameter) event.getSource());
+                ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
             }
         });
         parametersPanel0.addDoubleClickedListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).simParameterEdit((vParameter) event.getSource());
+                ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
             }
         });
 
         parametersPanel.add(parametersPanel0);
         parametersPanel.add(Box.createVerticalStrut(10));
 
-        CodeBlockPanel codeblockPan = buildCodeBlockPanel();
+        CodeBlockPanel codeblockPanel = buildCodeBlockPanel();
 
         JSplitPane stateCodeBlockSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(stateVariablesPanel),
-                new JScrollPane(buildCodeBlockComponent(codeblockPan)));
+                new JScrollPane(buildCodeBlockComponent(codeblockPanel)));
         stateCodeBlockSplit.setResizeWeight(0.75);
         stateCodeBlockSplit.setMinimumSize(new Dimension(20, 20));
 
@@ -482,10 +482,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         vgcw.stateParameterSplitPane = splitPane;
         vgcw.parametersPanel = parametersPanel0;
         vgcw.stateVariablesPanel = stateVariablesPanel0;
-        vgcw.codeBlockPanel = codeblockPan;
+        vgcw.codeBlockPanel = codeblockPanel;
     }
 
-    private CodeBlockPanel buildCodeBlockPanel() {
+    private CodeBlockPanel buildCodeBlockPanel()
+	{
         CodeBlockPanel codeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
         codeBlockPanel.addUpdateListener(new ActionListener() {
 
@@ -1830,18 +1831,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public boolean doEditCancellingEdge(Edge edge) {
+    public boolean doEditCancellingEdge(Edge edge) 
+	{
         return doEditEdge(edge); // blocks
     }
 
     @Override
-    public boolean doEditParameter(vParameter param) {
+    public boolean doEditParameter(ViskitParameter param) 
+	{
         return ParameterDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), param);    // blocks
     }
 
     @Override
-    public boolean doEditStateVariable(ViskitStateVariable var) {
-        return StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), var);
+    public boolean doEditStateVariable(ViskitStateVariable var) 
+	{
+        return StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), var); // blocks
     }
 
     @Override
@@ -1864,6 +1868,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
                 null, null, initval);
     }
+	public void refreshCodeBlock (String newSource)
+	{
+        EventGraphComponentWrapper eventGraphComponentWrapper = getCurrentJGraphEventGraphComponentWrapper();
+		eventGraphComponentWrapper.codeBlockPanel.setData(newSource);
+	}
 
     @Override
     public void modelChanged(mvcModelEvent event)

@@ -100,14 +100,6 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
 
     /** Cached value of the double buffered state */
     transient boolean isDoubleBuffered = false;
-
-    /**
-     * Constructs a renderer that may be used to render vertices.
-     */
-    public JGraphAssemblyEventGraphVertexRenderer() {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
-    }
     private float[] dash = {5f, 5f};
     private BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -117,6 +109,15 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
             10.0f,
             dash,
             0.0f);
+
+    /**
+     * Constructs a renderer that may be used to render vertices.
+     */
+    public JGraphAssemblyEventGraphVertexRenderer() 
+	{
+        defaultForeground = UIManager.getColor("Tree.textForeground");
+        defaultBackground = UIManager.getColor("Tree.textBackground");
+    }
 
     /**
      * Constructs a renderer that may be used to render vertices.
@@ -222,7 +223,8 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
 
     // jmb
     @Override
-    protected void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g)
+	{
         Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
@@ -238,10 +240,10 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
         DefaultGraphCell cell = (DefaultGraphCell) view.getCell();
 
         // Use the getName method instead of toString
-        String nm = ((AssemblyNode) cell.getUserObject()).getName();
+        String cellName = ((AssemblyNode) cell.getUserObject()).getName();
         FontMetrics metrics = g2.getFontMetrics();
-        nm = breakName(nm, 50, metrics);
-        String[] lns = nm.split("\n");       // handle multi-line titles
+        cellName = breakName(cellName, 50, metrics);
+        String[] lns = cellName.split("\n");       // handle multi-line titles
 
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord
@@ -254,7 +256,7 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
     }
 
 	/** Mangle name for display readability */
-    private String breakName(String name, int maxWidth, FontMetrics fontMetrics)
+    public static String breakName(String name, int maxWidth, FontMetrics fontMetrics)
 	{
         StringBuilder sb = new StringBuilder();
         String[] nameSplitArray = name.split("(\n)|(_)"); // split on line feeds or underscores
@@ -297,7 +299,7 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
     }
      */
 
-    private String[] splitNameIfNeeded(String name, int maxWidth, FontMetrics metrics) // TODO review
+    private static String[] splitNameIfNeeded(String name, int maxWidth, FontMetrics metrics) // TODO review
 	{
         String[] nuts = new String[2];
         nuts[1] = name;
@@ -312,7 +314,7 @@ public class JGraphAssemblyEventGraphVertexRenderer extends JComponent implement
         return ra;
     }
 
-    private String[] splitOnce(String s, int maxW, FontMetrics metrics) // TODO review
+    private static String[] splitOnce(String s, int maxW, FontMetrics metrics) // TODO review
 	{
         String[] ra = new String[2];
         ra[0] = s;

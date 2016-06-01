@@ -501,8 +501,21 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
             if (argumentIndex != -1)
 			{
-                constructorPanels[argumentIndex].setData(viskitInstantiatorConstructor.getParameterTypesList());
-                tabbedPane.setSelectedIndex(argumentIndex);
+				if ((constructorPanels != null) && (constructorPanels[argumentIndex] != null))
+				{
+					constructorPanels[argumentIndex].setData(viskitInstantiatorConstructor.getParameterTypesList());
+					tabbedPane.setSelectedIndex(argumentIndex);
+				}
+				else 
+				{
+					String constructorStatus;
+					if ((constructorPanels == null) || (constructorPanels[0] == null))
+						 constructorStatus = "constructor[0] not available";
+					else constructorStatus = "using index 0";
+					LOG.error ("Internal problem with constructorPanels[" + argumentIndex + "] array generation, " + constructorStatus);
+					constructorPanels[0].setData(viskitInstantiatorConstructor.getParameterTypesList());
+					tabbedPane.setSelectedIndex(0);
+				}
             }
             actionPerformed(null);
         }

@@ -92,7 +92,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
                     );
-            e.printStackTrace();
+            LOG.error("Exception on JAXBContext instantiation", e);
         }
     }
 
@@ -199,10 +199,8 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                             "\n\nError is: " + e.getMessage() +
                             "\nin EventGraphModelImpl.newModel(File)"
                             );
-					e.printStackTrace();
 					LOG.error ("JAXB exception, likely XML validation error: " + e.getMessage(), e);
                 }
-				ee.printStackTrace();
 				LOG.error ("JAXB exception, likely incorrect XML file type error: " + ee.getMessage(), ee);
                 return false;    // fromEventNode either error case
             }
@@ -248,10 +246,12 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             fileWriter = new FileWriter(tempFile);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
-			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
+			jaxbMarshaller.setEventHandler(new ValidationEventHandler() 
+			{
 				@Override
-				public boolean handleEvent(ValidationEvent validationEvent) {
-					System.out.println("Marshaller event handler says: " + validationEvent.getMessage() + 
+				public boolean handleEvent(ValidationEvent validationEvent)
+				{
+					LOG.error("Marshaller event handler says: " + validationEvent.getMessage() + 
 									   " (Exception: " + validationEvent.getLinkedException() + ")");
 					return false;
 				}
@@ -286,7 +286,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                     "\n" + e.getMessage()
                     );
             returnValue = false;
-            e.printStackTrace();
+            LOG.error("Exception on JAXB marshalling for " + file.getName(), e);
         } 
 		catch (IOException ex)
 		{
@@ -296,7 +296,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
                     "\n" + ex.getMessage()
                     );
             returnValue = false;
-            ex.printStackTrace();
+            LOG.error("Exception on writing " + file.getName() , ex);
         } 
 		finally {
             try {
@@ -694,6 +694,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 			
             ViskitStateVariable stateVariable = new ViskitStateVariable(jaxbStateVariable.getName(),
 																		jaxbStateVariable.getType(),
+																		jaxbStateVariable.isImplicit(),
 																		jaxbStateVariable.getValue(),
 																		description);
             stateVariable.opaqueModelObject = jaxbStateVariable;
@@ -720,7 +721,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 			String description = (jaxbParameter.getDescription() + comments).trim();
 			jaxbParameter.getComment().clear();
 			
-            vParameter vp = new vParameter(jaxbParameter.getName(), jaxbParameter.getType(), description);
+            ViskitParameter vp = new ViskitParameter(jaxbParameter.getName(), jaxbParameter.getType(), description);
 			jaxbParameter.getComment().clear();
 			
             vp.opaqueModelObject = jaxbParameter;
@@ -758,7 +759,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 	{
         setDirty(true);
 
-        vParameter vp = new vParameter(name, type, description);
+        ViskitParameter vp = new ViskitParameter(name, type, description);
         simulationParameters.add(vp);
 
         if (!stateVariableParameterNameCheck()) {
@@ -778,7 +779,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     @Override
-    public void deleteSimParameter(vParameter vp) {
+    public void deleteSimParameter(ViskitParameter vp) {
         // remove jaxb variable
         Iterator<Parameter> spItr = jaxbSimEntity.getParameter().iterator();
         while (spItr.hasNext()) {
@@ -793,13 +794,20 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     @Override
-    public void changeCodeBlock(String newCodeBlock) {
+    public String getCodeBlock() 
+	{
+        return jaxbSimEntity.getCode();
+    }
+
+    @Override
+    public void changeCodeBlock(String newCodeBlock) 
+	{
         jaxbSimEntity.setCode(newCodeBlock);
         setDirty(true);
     }
 
     @Override
-    public boolean changeSimParameter(vParameter vp) {
+    public boolean changeSimParameter(ViskitParameter vp) {
         boolean success = true;
         if (!stateVariableParameterNameCheck()) {
             mangleName(vp);
@@ -858,22 +866,32 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 
     @Override
-    public boolean changeStateVariable(ViskitStateVariable vsv)
+    public boolean changeStateVariable(ViskitStateVariable viskitStateVariable)
 	{
         boolean success = true;
-        if (!stateVariableParameterNameCheck()) {
-            mangleName(vsv);
+        if (!stateVariableParameterNameCheck())
+		{
+            mangleName(viskitStateVariable);
             success = false;
         }
         // fill out jaxb variable
-        StateVariable jaxbStateVariable = (StateVariable) vsv.opaqueModelObject;
-        jaxbStateVariable.setName(ViskitGlobals.nullIfEmpty(vsv.getName()));
-        jaxbStateVariable.setType(ViskitGlobals.nullIfEmpty(vsv.getType()));
-        jaxbStateVariable.setValue(ViskitGlobals.nullIfEmpty(vsv.getValue()));
-        jaxbStateVariable.setDescription(ViskitGlobals.nullIfEmpty(vsv.getDescription()));
+        StateVariable jaxbStateVariable = (StateVariable) viskitStateVariable.opaqueModelObject;
+        jaxbStateVariable.setName(ViskitGlobals.nullIfEmpty(viskitStateVariable.getName()));
+        jaxbStateVariable.setType(ViskitGlobals.nullIfEmpty(viskitStateVariable.getType()));
+		boolean isImplicit = viskitStateVariable.isImplicit();
+        jaxbStateVariable.setImplicit(isImplicit);
+		if (isImplicit)
+		{
+			jaxbStateVariable.setValue(ViskitGlobals.nullIfEmpty(viskitStateVariable.getValue()));
+		}
+		else
+		{
+			jaxbStateVariable.setValue(ViskitGlobals.nullIfEmpty("")); // no value allowed
+		}
+        jaxbStateVariable.setDescription(ViskitGlobals.nullIfEmpty(viskitStateVariable.getDescription()));
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLE_CHANGED, "State variable changed: " + vsv.getName()));
+        notifyChanged(new ModelEvent(viskitStateVariable, ModelEvent.STATEVARIABLE_CHANGED, "State variable changed: " + viskitStateVariable.getName()));
         return success;
     }
 

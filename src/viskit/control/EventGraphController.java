@@ -116,7 +116,7 @@ public interface EventGraphController
      */
     void cancellingArcEdit(CancellingEdge edge);
 
-    void simParameterEdit(vParameter parameter);
+    void simParameterEdit(ViskitParameter parameter);
 
     void stateVariableEdit(ViskitStateVariable stateVariable);
 
@@ -185,7 +185,7 @@ public interface EventGraphController
 
     void postQuit();
 
-    void deleteSimParameter(vParameter p);
+    void deleteSimParameter(ViskitParameter p);
 
     void deleteStateVariable(ViskitStateVariable var);
 

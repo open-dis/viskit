@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.vParameter;
+import viskit.model.ViskitParameter;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -24,47 +24,65 @@ import viskit.ViskitGlobals;
  *
  * @author DMcG
  */
-public class ParameterDialog extends JDialog {
-
+public class ParameterDialog extends JDialog 
+{
     private static ParameterDialog dialog;
     private static boolean modified = false;
     public static String newName,  newType,  newDescription;
     private static int count = 0;
 
-    private final JTextField parameterNameField;        // Text field that holds the parameter name
-    private final JTextField expressionField;           // Text field that holds the expression
-    private final JTextField descriptionField;          // Text field that holds the description
-    private final JComboBox<String> parameterTypeCombo; // Editable combo box that lets us select a type
-    private vParameter parameter;
-    private final JButton okButton, cancelButton;
+    private ViskitParameter parameter;
+	Container container;
+	private final JPanel contentPanel = new JPanel();
+	/** Text field that holds the parameter name */
+    private final JTextField parameterNameField = new JTextField(15);
+	/** Text field that holds the expression */
+    private final JTextField expressionField = new JTextField(25);
+	/** Text field that holds the description */
+    private final JTextField descriptionField = new JTextField(25);
+	/** Editable combo box that lets us select a type */
+    private       JComboBox<String> parameterTypeCombo;
+    private final JButton     okButton = new JButton("Apply changes");
+    private final JButton cancelButton = new JButton("Cancel");
 
-    public static boolean showDialog(JFrame f, vParameter parm) {
-        if (dialog == null) {
-            dialog = new ParameterDialog(f, parm);
-        } else {
-            dialog.setParams(f, parm);
+    public static boolean showDialog(JFrame f, ViskitParameter parameter) 
+	{
+        if (dialog == null) 
+		{
+            dialog = new ParameterDialog(f, parameter);
+        }
+		else 
+		{
+            dialog.setParameters(f, parameter);
         }
 
-        dialog.setVisible(true);
-        // above call blocks
+        dialog.setVisible(true); // this call blocks
 
         return modified;
     }
 
-    private ParameterDialog(JFrame parent, vParameter param) {
+    private ParameterDialog(JFrame parent, ViskitParameter parameter)
+	{
         super(parent, "Parameter Inspector", true);
+		
+		initialize ();
+
+        setParameters(parent, parameter);
+	}
+	
+	private void initialize ()
+	{
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
 
-        Container cont = getContentPane();
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
-
-        JPanel con = new JPanel();
-        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
-        con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+        container = getContentPane();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 new EmptyBorder(10, 10, 10, 10)));
 
-        con.add(Box.createVerticalStrut(5));
+        contentPanel.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
@@ -74,32 +92,31 @@ public class ParameterDialog extends JDialog {
         JLabel  descriptionLabel = new JLabel("description");
         int labelWidth = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
 
-        parameterNameField = new JTextField(15);
+        
         setMaxHeight(parameterNameField);
-        expressionField = new JTextField(25);
+        
         setMaxHeight(expressionField);
-        descriptionField = new JTextField(25);
+        
         setMaxHeight(descriptionField);
 
         parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
-        fieldsPanel.add(new OneLinePanel(typeLabel,        labelWidth, parameterTypeCombo));
         fieldsPanel.add(new OneLinePanel(nameLabel,        labelWidth, parameterNameField));
+        fieldsPanel.add(new OneLinePanel(typeLabel,        labelWidth, parameterTypeCombo));
         fieldsPanel.add(new OneLinePanel(descriptionLabel, labelWidth, descriptionField));
-        con.add(fieldsPanel);
-        con.add(Box.createVerticalStrut(5));
+        contentPanel.add(fieldsPanel);
+        contentPanel.add(Box.createVerticalStrut(5));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
+            
         buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
-        con.add(buttonPanel);
-        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        cont.add(con);
+        contentPanel.add(buttonPanel);
+        contentPanel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        container.add(contentPanel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
@@ -110,8 +127,6 @@ public class ParameterDialog extends JDialog {
         descriptionField.addCaretListener(lis);
         expressionField.addCaretListener(lis);
         parameterTypeCombo.addActionListener(lis);
-
-        setParams(parent, param);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -120,7 +135,7 @@ public class ParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, vParameter p) {
+    public final void setParameters(Component c, ViskitParameter p) {
         parameter = p;
 
         fillWidgets();

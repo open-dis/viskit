@@ -66,7 +66,7 @@ public interface EventGraphModel
     /**
      * Messaged by controller to inst?? all defined simulation parameters
      *
-     * @return Vector of vParameter objects.
+     * @return Vector of ViskitParameter objects.
      */
     Vector<ViskitElement> getSimulationParameters();
 
@@ -143,13 +143,15 @@ public interface EventGraphModel
 
     boolean changeStateVariable(ViskitStateVariable stateParameter);
 
-    boolean changeSimParameter(vParameter simParameter);
+    boolean changeSimParameter(ViskitParameter simParameter);
+	
+    String getCodeBlock();
 
     void changeCodeBlock(String newCodeBlock);
 
     void deleteStateVariable(ViskitStateVariable stateVariable);
 
-    void deleteSimParameter(vParameter simParameter);
+    void deleteSimParameter(ViskitParameter simParameter);
 
     GraphMetadata getMetadata();
 

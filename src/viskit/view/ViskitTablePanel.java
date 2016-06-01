@@ -332,7 +332,8 @@ public abstract class ViskitTablePanel extends JPanel
      * If a double-clicked listener has been installed, message it with the row
      * object to be edited.
      */
-    private void doEdit() {
+    private void doEdit() 
+	{
         if (myEditListener != null) {
             Object o = shadow.get(table.getSelectedRow());
             ActionEvent ae = new ActionEvent(o, 0, "");
@@ -345,7 +346,8 @@ public abstract class ViskitTablePanel extends JPanel
      * @param o row object
      * @return row index
      */
-    protected int findObjectRow(Object o) {
+    protected int findObjectRow(Object o) 
+	{
         int row = 0;
 
         // the most probable case
