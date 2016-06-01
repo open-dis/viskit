@@ -40,14 +40,15 @@ public class ViskitStateVariable extends ViskitElement
 		this.value = initialValue;
 		if  (value == null)
 			 value = "";
+		this.implicit    = false;
         this.description = ViskitStatics.DEFAULT_DESCRIPTION;
     }
 
-    public ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue, String description)
-	{
-        this (stateVariableName,stateVariableType, initialValue);
-        this.description  = description; // order is important
-    }
+//    public ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue, String description)
+//	{
+//        this (stateVariableName,stateVariableType, initialValue);
+//        this.description  = description; // order is important
+//    }
 
     public ViskitStateVariable(String stateVariableName, String stateVariableType, boolean implicit, String initialValue, String description)
 	{

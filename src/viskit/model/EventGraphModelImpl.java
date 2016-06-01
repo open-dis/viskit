@@ -828,12 +828,12 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     // State variable mods
     // -------------------
     @Override
-    public void newStateVariable(String name, String type, String initialValue, String description)
+    public void newStateVariable(String name, String type, boolean implicit, String initialValue, String description)
 	{
         setDirty(true);
 
         // get the new one here and show it around
-        ViskitStateVariable viskitStateVariable = new ViskitStateVariable(name, type, initialValue, description);
+        ViskitStateVariable viskitStateVariable = new ViskitStateVariable(name, type, implicit, initialValue, description);
         stateVariables.add(viskitStateVariable);
         if (!stateVariableParameterNameCheck()) {
             mangleName(viskitStateVariable);

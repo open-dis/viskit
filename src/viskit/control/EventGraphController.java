@@ -43,7 +43,7 @@ public interface EventGraphController
 
     void buildNewSimParameter(String name, String type, String initialValue, String description);
 
-    void buildNewStateVariable(String name, String type, String initialValue, String description);
+    void buildNewStateVariable(String name, String type, boolean implicit, String initialValue, String description);
 
     /** Connect a scheduling edge between two nodes
      *

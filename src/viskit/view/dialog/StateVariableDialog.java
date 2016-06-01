@@ -22,13 +22,7 @@ import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.CB;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.JDC;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.JDO;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.OB;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.SP;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.SP_4;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.SP_8;
+import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.*;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -65,11 +59,12 @@ public class StateVariableDialog extends ViskitSmallDialog
     private final JButton     okButton = new JButton("Apply changes");
     private final JButton cancelButton = new JButton("Cancel");
     public static String newName,  newType, newValue, newDescription;
+	public static boolean newImplicit;
     private final myFocusListener focusListener;
     private final EnableApplyButtonListener listener = new EnableApplyButtonListener(okButton);
 	
-	private final String IMPLICIT_TOOLTIP = "Implicit state variables cannot be set, instead they are computed from other state variables whenever needed";
-	private final String IMPLICIT_VALUE_LABEL   = "* implicit *";
+	private final String IMPLICIT_TOOLTIP     = "Implicit state variables cannot be set, instead they are computed from other state variables whenever needed";
+	private final String IMPLICIT_VALUE_LABEL = "* implicit *";
 	
 	private       String priorValue = new String();
 
@@ -112,17 +107,18 @@ public class StateVariableDialog extends ViskitSmallDialog
 			public void itemStateChanged(ItemEvent e) 
 			{
 				boolean implicitSelected = implicitCheckBox.isSelected();
-				   stateVariable.setImplicit( implicitSelected);
 				initialValueField.setEnabled(!implicitSelected);
 				if (implicitSelected)
 				{
 					priorValue = initialValueField.getText(); // remember in case user changes mind
+					if (priorValue.equals(IMPLICIT_VALUE_LABEL) || priorValue.trim().isEmpty())
+						priorValue = "TODO"; // force setting a value
 					initialValueField.setText(IMPLICIT_VALUE_LABEL); // no value allowed
 					initialValueField.setToolTipText(IMPLICIT_TOOLTIP);
 				}
 				else // no longer implicit
 				{
-					if (priorValue.equals(IMPLICIT_VALUE_LABEL))
+					if (priorValue.equals(IMPLICIT_VALUE_LABEL) || priorValue.trim().isEmpty())
 						priorValue = "TODO"; // force setting a value
 					initialValueField.setText(priorValue); // restore (if user changed mind)
 					initialValueField.setToolTipText(priorValue); // readability
@@ -286,7 +282,8 @@ public class StateVariableDialog extends ViskitSmallDialog
         // make sure there are no spaces
         String type = (String) stateVariableTypeComboBox.getSelectedItem();
         type = ViskitGlobals.instance().typeChosen(type);
-        if (ViskitGlobals.instance().isArray(type)) {
+        if (ViskitGlobals.instance().isArray(type)) 
+		{
             type = type.substring(0, type.indexOf('[') + 1) + arraySizeField.getText().trim() + "]";
         }
         String name = stateVariableNameField.getText();
@@ -303,20 +300,23 @@ public class StateVariableDialog extends ViskitSmallDialog
             stateVariable.setValue(initialValue);
             stateVariable.setDescription (description);
         }
-		else
+		else // creating a new state variable; save these new values so that invoking code can retrieve them
 		{
-			LOG.error ("null state variable when unloading panel");
-//            newName        = name; // TODO confirm, what is this?
-//            newType        = type;
-//			newValue       = initialValue;
-//            newDescription = description;
+            newName        = name;
+            newType        = type;
+			newImplicit    = implicit;
+			newValue       = initialValue;
+            newDescription = description;
         }
 		// create code block if not found
 		
 		EventGraphModel eventGraphModel = ((EventGraphModel)ViskitGlobals.instance().getEventGraphController().getModel());
 		
-		
-		if (!eventGraphModel.getCodeBlock().contains("compute_" + stateVariable.getName()))
+		//  implicit state variables get a code block - add if not already present
+		if ( implicit && 
+			(eventGraphModel                != null) &&
+			(eventGraphModel.getCodeBlock() != null) &&
+			!eventGraphModel.getCodeBlock().contains("compute_" + name))
 		{
 			String newCodeBlock = eventGraphModel.getCodeBlock();
 			
@@ -326,7 +326,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 			// similar code block found in SimkitEventGraphXML2Java.buildStateVariableAccessor()
 			newCodeBlock +=
 				JDO + SP + "Implicit state variable computation" + SP + JDC + "\n" +
-				"private void compute_" + stateVariable.getName() + SP + "()" + "\n" +
+				"private void compute_" + name + SP + "()" + "\n" +
 				OB + "\n" +
 				SP_4 + "// insert computation code here" + "\n" +
 				CB + "\n";

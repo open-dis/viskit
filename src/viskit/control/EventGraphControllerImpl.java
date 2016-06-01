@@ -820,9 +820,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     // Comes in from view
     @Override
-    public void buildNewStateVariable(String name, String type, String initialValue, String description) //----------------------------
+    public void buildNewStateVariable(String name, String type, boolean implicit, String initialValue, String description) //----------------------------
     {
-        ((viskit.model.EventGraphModel) getModel()).newStateVariable(name, type, initialValue, description);
+        ((viskit.model.EventGraphModel) getModel()).newStateVariable(name, type, implicit, initialValue, description);
     }
 
     private Vector<Object> selectionVector = new Vector<>();

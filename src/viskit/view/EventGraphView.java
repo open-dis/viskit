@@ -123,6 +123,6 @@ public interface EventGraphView
      * run the add state variable dialog
      * @return the String representation of this state variable
      */
-    String addStateVariableDialog();
+String addStateVariableDialog();
 
 }

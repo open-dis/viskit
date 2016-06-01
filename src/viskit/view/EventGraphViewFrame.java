@@ -367,12 +367,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         stateVariablesPanel.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
-        stateVariablesPanel0.doAddsAndDeletes(false);
+        stateVariablesPanel0.doAddsAndDeletes(true);
         stateVariablesPanel0.addPlusListener(ActionIntrospector.getAction((EventGraphController) getController(), "newStateVariable"));
 
         // Introspector can't handle a param to the method....?
-        stateVariablesPanel0.addMinusListener(new ActionListener() {
-
+        stateVariablesPanel0.addMinusListener(new ActionListener()
+		{
             @Override
             public void actionPerformed(ActionEvent event) {
                 ((EventGraphController) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
@@ -684,9 +684,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 	{
         if (StateVariableDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null))  // blocks here
 		{
-            ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
+            ((EventGraphController) getController()).buildNewStateVariable (
+					StateVariableDialog.newName,
                     StateVariableDialog.newType,
-                    "TODO new value here",
+					StateVariableDialog.newImplicit,
+					StateVariableDialog.newValue,
                     StateVariableDialog.newDescription);
             return StateVariableDialog.newName;
         }

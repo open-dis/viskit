@@ -160,7 +160,8 @@ public class ParameterDialog extends JDialog
         }
     }
 
-    private void unloadWidgets() {
+    private void unloadWidgets() 
+	{
         String type = (String) parameterTypeCombo.getSelectedItem();
         type = ViskitGlobals.instance().typeChosen(type);
         String name = parameterNameField.getText();

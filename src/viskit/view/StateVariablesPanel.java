@@ -45,6 +45,7 @@ public class StateVariablesPanel extends ViskitTablePanel
         sa[1] = stateVariable.getName();
         sa[2] = stateVariable.getValue();
         sa[3] = stateVariable.getDescription();
+		// note: implicit is not displayed on the table
 		
 		// ensure non-empty
 		for (int index = 0; index < sa.length; index++)
@@ -54,16 +55,16 @@ public class StateVariablesPanel extends ViskitTablePanel
 				sa[index] = "TODO";
 				switch (index)
 				{
-					case 0:
+					case 0: // type
 						stateVariable.setType(sa[index]);
 						break;
-					case 1:
+					case 1: // name
 						stateVariable.setName(sa[index]);
 						break;
-					case 2:
+					case 2: // value
 						stateVariable.setValue(sa[index]);
 						break;
-					case 3:
+					case 3: // description
 						sa[index] = ViskitStatics.DEFAULT_DESCRIPTION;
 						stateVariable.setDescription(sa[index]);
 						break;
@@ -76,24 +77,27 @@ public class StateVariablesPanel extends ViskitTablePanel
     @Override
     public ViskitElement newRowObject()
 	{
-        ViskitStateVariable viskitStateVariable = new ViskitStateVariable("name", "int", "0", ViskitStatics.DEFAULT_DESCRIPTION);
+        ViskitStateVariable viskitStateVariable = new ViskitStateVariable("name", "int", false, "0", ViskitStatics.DEFAULT_DESCRIPTION);
         return viskitStateVariable;
     }
 
     @Override
-    public int getNumberVisibleRows() {
-        return 3;  // not used if we init super with a height
+    public int getNumberVisibleRows() 
+	{
+        return 3;  // not used if we init super with a height, TODO make adjustable?
     }
 
     // Custom tooltips
     @Override
-    protected String getMinusToolTip() {
+    protected String getMinusToolTip() 
+	{
         return minusToolTip;
     }
 
     // Protected methods
     @Override
-    protected String getPlusToolTip() {
+    protected String getPlusToolTip() 
+	{
         return plusToolTip;
     }
 }

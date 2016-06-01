@@ -137,7 +137,7 @@ public interface EventGraphModel
      */
     boolean changeEvent(EventNode eventNode);
 
-    void newStateVariable(String name, String type, String initialValue, String description);
+    void newStateVariable(String name, String type, boolean implicit, String initialValue, String description);
 
     void newSimParameter(String name, String type, String initialValue, String description);
 
