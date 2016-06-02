@@ -421,43 +421,52 @@ public abstract class ViskitTablePanel extends JPanel
     /**
      * Whether this class should add and delete rows on plus-minus clicks.
      * Else that's left to a listener
-     * @param boo How to play it
+     * @param value How to play it
      */
-    protected void doAddsAndDeletes(boolean boo) {
-        shouldDoAddsAndDeletes = boo;
+    protected void doAddsAndDeletes(boolean value) 
+	{
+        shouldDoAddsAndDeletes = value;
     }
 
     /** The local listener for plus, minus and edit clicks */
-    class MyAddDeleteEditHandler implements ActionListener {
-
+    class MyAddDeleteEditHandler implements ActionListener 
+	{
         @Override
-        public void actionPerformed(ActionEvent event) {
-            switch (event.getActionCommand()) {
-                case "p":
-                    if (myPlusListener != null) {
+        public void actionPerformed(ActionEvent event) 
+		{
+            switch (event.getActionCommand()) 
+			{
+                case "p": // plus
+                    if (myPlusListener != null) 
+					{
                         myPlusListener.actionPerformed(event);
                     }
-                    if (shouldDoAddsAndDeletes) {
+                    if (shouldDoAddsAndDeletes) 
+					{
                         addRow();
                     }
                     break;
-                case "m":
-                    int reti = JOptionPane.showConfirmDialog(ViskitTablePanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
-                    if (reti != JOptionPane.YES_OPTION) {
+					
+                case "m": // minus
+                    int returnValue = JOptionPane.showConfirmDialog(ViskitTablePanel.this, "Are you sure?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+                    if (returnValue != JOptionPane.YES_OPTION)
+					{
                         return;
                     }
-                    if (myMinusListener != null) {
+                    if (myMinusListener != null) 
+					{
                         event.setSource(shadow.get(table.getSelectedRow()));
                         myMinusListener.actionPerformed(event);
                     }
-
                     // Begin T/S for Bug 1373.  This process should remove edge
                     // parameters not only from the preceding EdgeInspectorDialog,
                     // but also from the EG XML representation
-                    if (shouldDoAddsAndDeletes) {
+                    if (shouldDoAddsAndDeletes) 
+					{
                         removeRow(table.getSelectedRow());
                     }
                     break;
+					
                 default:
                     doEdit();
                     break;

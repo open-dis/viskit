@@ -667,13 +667,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public String addParameterDialog() {
+    public String addParameterDialog() 
+	{
 
-        if (ParameterDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null)) {      // blocks here
-            ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
-                    ParameterDialog.newType,
-                    "TODO new value here",
-                    ParameterDialog.newDescription);
+        if (ParameterDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), null)) 
+		{
+            ((EventGraphController) getController()).buildNewSimParameter( // blocks here
+				   ParameterDialog.newName,     
+                   ParameterDialog.newType,
+                   "TODO new value here",
+                   ParameterDialog.newDescription);
             return ParameterDialog.newName;
         }
         return null;
@@ -1476,33 +1479,43 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
     private JFileChooser eventGraphFileChooser;
 
-    private JFileChooser buildOpenSaveChooser() {
+    private void buildOpenSaveEventGraphsChooser()
+	{
+		if ((eventGraphFileChooser == null) || // remember previous directory (likely package directory), if used already
+			!(eventGraphFileChooser.getCurrentDirectory().getPath().contains(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory().getPath()))) // project may have changed
+		{
+			eventGraphFileChooser = new JFileChooser();
+			
+			// Try to open in the current project directory for EventGraphs
+			if (ViskitGlobals.instance().getCurrentViskitProject() != null) 
+			{
+				eventGraphFileChooser.setCurrentDirectory (ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory());
+			} 
+			else 
+			{
+				eventGraphFileChooser.setCurrentDirectory (new File(ViskitProject.MY_VISKIT_PROJECTS_DIR + File.separator + ViskitProject.EVENTGRAPHS_DIRECTORY_NAME));
+			}
+			eventGraphFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			
+			eventGraphFileChooser.setDialogTitle("Open Event Graph File(s)");
 
-        // Try to open in the current project directory for EventGraphs
-        if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory());
-        } else {
-            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        }
+			eventGraphFileChooser.addChoosableFileFilter(new EventGraphFileFilter(
+					new String[] {"xml", "png"}));
+
+			// Bug fix: 1249
+			eventGraphFileChooser.setMultiSelectionEnabled(true);
+			eventGraphFileChooser.setFileHidingEnabled(true);
+			eventGraphFileChooser.setAcceptAllFileFilterUsed(false);
+		}
     }
 
     @Override
     public File[] openFilesAsk()
 	{
-        eventGraphFileChooser = buildOpenSaveChooser();
-        eventGraphFileChooser.setDialogTitle("Open Event Graph File(s)");
+		buildOpenSaveEventGraphsChooser();
 
-        // Bug fix: 1246
-        eventGraphFileChooser.addChoosableFileFilter(new EventGraphFileFilter(
-                new String[] {"assembly", "smal", "x3d", "x3dv", "java", "class"}));
-
-        // Bug fix: 1249
-        eventGraphFileChooser.setMultiSelectionEnabled(true);
-		eventGraphFileChooser.setFileHidingEnabled(true);
-		eventGraphFileChooser.setAcceptAllFileFilterUsed(false);
-
-        int retv = eventGraphFileChooser.showOpenDialog(this);
-        return (retv == JFileChooser.APPROVE_OPTION) ? eventGraphFileChooser.getSelectedFiles() : null;
+        int returnValue = eventGraphFileChooser.showOpenDialog(this);
+        return (returnValue == JFileChooser.APPROVE_OPTION) ? eventGraphFileChooser.getSelectedFiles() : null;
     }
 
     public final static String OPENPROJECT_METHOD = "openProject"; // must match following method name.  Not possible to accomplish this programmatically.
@@ -1772,16 +1785,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public File saveEventGraphFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
 	{
-        if (eventGraphFileChooser == null) {
-            eventGraphFileChooser = buildOpenSaveChooser();
-        }
+        buildOpenSaveEventGraphsChooser();
         eventGraphFileChooser.setDialogTitle(dialogTitle);
 
-        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory(), suggestedName);
-        if (!file.getParentFile().isDirectory())
-		{
-            file.getParentFile().mkdirs();
-        }
+        File file = new File(eventGraphFileChooser.getCurrentDirectory(), suggestedName);
         if (showUniqueName)
 		{
             file = getUniqueName(suggestedName, file.getParentFile());
@@ -1800,34 +1807,36 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
             return eventGraphFileChooser.getSelectedFile();
         }
-
-        // We canceled
-        deleteCanceledSave(file.getParentFile());
+        deleteCanceledSave(file.getParentFile()); // user canceled
         eventGraphFileChooser = null;
         return null;
     }
 
-    /** Handles a canceled new EG file creation
+    /** Handles a canceled new Event Graph file creation
      *
      * @param file to candidate EG file
      */
-    private void deleteCanceledSave(File file) {
+    private void deleteCanceledSave(File file) 
+	{
         ViskitGlobals.instance().getAssemblyEditViewFrame().deleteCanceledSave(file);
     }
 
     @Override
-    public File openRecentFilesAsk(Collection<String> lis) {
+    public File openRecentFilesAsk(Collection<String> lis) 
+	{
         return ViskitGlobals.instance().getAssemblyEditViewFrame().openRecentFilesAsk(lis);
     }
 
     @Override
-    public boolean doEditNode(EventNode node) {
+    public boolean doEditNode(EventNode node) 
+	{
         selectMode.doClick();     // always go back into select mode
         return EventInspectorDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), node); // blocks
     }
 
     @Override
-    public boolean doEditEdge(Edge edge) {
+    public boolean doEditEdge(Edge edge) 
+	{
         selectMode.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getViskitApplicationFrame(), edge); // blocks
     }

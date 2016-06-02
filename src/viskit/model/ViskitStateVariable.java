@@ -30,26 +30,37 @@ public class ViskitStateVariable extends ViskitElement
 
     /**
      * Constructor
+     */
+    public ViskitStateVariable()
+	{
+        this.name        = "newStateVariable";
+        this.type        = "int";
+		this.implicit    = false;
+		this.value       = "";
+        this.description = ViskitStatics.DEFAULT_DESCRIPTION;
+    }
+
+    /**
+     * Constructor
      * @param stateVariableName
      * @param stateVariableType
      */
-    ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue)
+    public ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue)
 	{
-        this.name = stateVariableName;
-        setType(stateVariableType);
-		this.value = initialValue;
+        this.name        = stateVariableName;
+        this.type        = stateVariableType;
+		this.value       = initialValue;
 		if  (value == null)
 			 value = "";
 		this.implicit    = false;
         this.description = ViskitStatics.DEFAULT_DESCRIPTION;
     }
 
-//    public ViskitStateVariable(String stateVariableName, String stateVariableType, String initialValue, String description)
-//	{
-//        this (stateVariableName,stateVariableType, initialValue);
-//        this.description  = description; // order is important
-//    }
-
+    /**
+     * Constructor
+     * @param stateVariableName
+     * @param stateVariableType
+     */
     public ViskitStateVariable(String stateVariableName, String stateVariableType, boolean implicit, String initialValue, String description)
 	{
         this (stateVariableName,stateVariableType, initialValue);

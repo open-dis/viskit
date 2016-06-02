@@ -75,7 +75,7 @@ public final class EventGraphFileFilter extends FileFilter
 {
     static final Logger LOG = LogUtilities.getLogger(EventGraphFileFilter.class);
 
-    /** we filter to accept only files starting with the contents of this [] */
+    /** we filter to accept only files ending with file extensions shown in the contents of this [] */
     private final String[] contents;
 
     /* CONSTRUCTOR(s) */
@@ -86,44 +86,47 @@ public final class EventGraphFileFilter extends FileFilter
      * @param contents file must not contain any of these Strings.
      *        Case Insensitive.
      */
-    public EventGraphFileFilter(String[] contents) {
+    public EventGraphFileFilter(String[] contents) 
+	{
         this.contents = contents;
-        int ix = 0;
+        int index = 0;
         for (String s : contents)
 		{
-            contents[ix] = s.toLowerCase();
-            ix++;
+            contents[index] = s.toLowerCase();
+            index++;
         }
     }
 
     /**
-     * Select only files not containing our String.  Does expose directories
+     * Select only files with names ending in one of the provided file extensions.  Does expose directories
      * for ease of navigation
      *
-     * @param f the file for naming determination
-     *
+     * @param file the file for determination of naming acceptence
      * @return false if and only if the name should be not included in the file
      *         list; true otherwise.
      */
     @Override
-    public boolean accept(File f) {
-        if (f.isDirectory()) 
+    public boolean accept(File file) 
+	{
+		if (file.getName().startsWith("."))
+		{
+			return false; // no hidden files or directories
+		}
+        if (file.isDirectory()) 
 		{
 			return true;
 		}
-		if (f.getName().startsWith("."))
+        boolean foundMatch = false;
+        String fileName = file.getName();
+        for (String s : contents) 
 		{
-			return false; // no hidden files
-		}
-        boolean returnValue = false;
-        String fileName = f.getName();
-        for (String s : contents) {
-            returnValue = !fileName.toLowerCase().contains(s);
-            if (!returnValue) {
+            foundMatch = fileName.toLowerCase().endsWith(s);
+            if (foundMatch) 
+			{
                 break;
             }
         }
-        return returnValue;
+        return foundMatch;
     }
 
     /** @return a fileview description of the filter */

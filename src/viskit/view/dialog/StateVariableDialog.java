@@ -36,7 +36,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 {
     static final Logger LOG = LogUtilities.getLogger(StateVariableDialog.class);
 	
-    private ViskitStateVariable stateVariable;
+    private static ViskitStateVariable viskitStateVariable;
 	/** Text field that holds the parameter name */
     private final JTextField stateVariableNameField = new JTextField(25);
 	/** Text field that holds the initial value */
@@ -68,9 +68,17 @@ public class StateVariableDialog extends ViskitSmallDialog
 	
 	private       String priorValue = new String();
 
-    public static boolean showDialog(JFrame f, ViskitStateVariable var) 
+    public static boolean showDialog(JFrame f, ViskitStateVariable passedStateVariable) 
 	{
-        return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var); // static invocation
+		viskitStateVariable = passedStateVariable;
+		if (viskitStateVariable == null)
+		{
+			// creating a new state variable
+			viskitStateVariable = new ViskitStateVariable ();
+			LOG.info ("creating new stateVariable");
+			setNewObjectInitialization(true);
+		}
+        return showDialog(StateVariableDialog.class.getName(), f, viskitStateVariable); // static invocation
     }
 
     protected StateVariableDialog(JFrame parent, Object parameter)
@@ -194,35 +202,31 @@ public class StateVariableDialog extends ViskitSmallDialog
     @Override
     final void setParameters(Component parentComponent, Object p) 
 	{
-        stateVariable = (ViskitStateVariable) p;
+        viskitStateVariable = (ViskitStateVariable) p;
 
         fillWidgets();
-
-        modified = (p == null);
-        okButton.setEnabled(p == null);
-
-        if (p == null) {
-            getRootPane().setDefaultButton(okButton);
-        } else {
-            getRootPane().setDefaultButton(cancelButton);
-        }
         pack();
         setLocationRelativeTo(parentComponent);
     }
 
-    private String stripArraySize(String typ) {
+    private String stripArraySize(String typ) 
+	{
         Pattern p = Pattern.compile("\\[.*?\\]");
         Matcher m = p.matcher(typ);
         return m.replaceAll("[]");
     }
 
-    private String getArraySize(String typ) {
+    private String getArraySize(String typ)
+	{
         Pattern p = Pattern.compile("\\[.*?\\]");
         Matcher m = p.matcher(typ);
-        if (m.find()) {
+        if (m.find())
+		{
             String f = m.group();
             return f.substring(1, f.length() - 1);
-        } else {
+        } 
+		else 
+		{
             return "";
         }
     }
@@ -231,19 +235,19 @@ public class StateVariableDialog extends ViskitSmallDialog
 	{
         boolean isArray;
         String type;
-        if (stateVariable != null)
+        if (viskitStateVariable != null)
 		{
-            type = stateVariable.getType();
+            type = viskitStateVariable.getType();
          stateVariableTypeComboBox.setSelectedItem(stripArraySize(type));
          stateVariableTypeComboBox.setToolTipText (stripArraySize(type));          // readability
-            stateVariableNameField.setText       (stateVariable.getName());
+            stateVariableNameField.setText       (viskitStateVariable.getName());
                     arraySizeField.setText       (getArraySize(type));
-                 initialValueField.setText       (stateVariable.getValue());
-                 initialValueField.setToolTipText(stateVariable.getValue());       // readability
-                  descriptionField.setText       (stateVariable.getDescription());
-                  descriptionField.setToolTipText(stateVariable.getDescription()); // readability
-				  implicitCheckBox.setSelected(stateVariable.isImplicit());
-            isArray = ViskitGlobals.instance().isArray(stateVariable.getType());
+                 initialValueField.setText       (viskitStateVariable.getValue());
+                 initialValueField.setToolTipText(viskitStateVariable.getValue());       // readability
+                  descriptionField.setText       (viskitStateVariable.getDescription());
+                  descriptionField.setToolTipText(viskitStateVariable.getDescription()); // readability
+				  implicitCheckBox.setSelected(viskitStateVariable.isImplicit() || viskitStateVariable.getValue().equals(IMPLICIT_VALUE_LABEL)); // safety net
+            isArray = ViskitGlobals.instance().isArray(viskitStateVariable.getType());
         } 
 		else // initialize stateVariable
 		{
@@ -271,6 +275,27 @@ public class StateVariableDialog extends ViskitSmallDialog
 		}
 		descriptionField.setToolTipText(descriptionField.getText()); // readability
 		
+        modified = (viskitStateVariable == null) || isNewObjectInitialization(); // enable okButton if a new object is being started.
+		
+		// safety net case: value indicates implicit while boolean does not
+		if (!viskitStateVariable.isImplicit() && viskitStateVariable.getValue().equals(IMPLICIT_VALUE_LABEL))
+		{
+			 viskitStateVariable.setImplicit(true); // override
+			 modified = true;
+			 okButton.setEnabled(true); // prompt user to review and approve (also see setSelected above)
+			 LOG.error ("Unexpected found value='" + IMPLICIT_VALUE_LABEL + "' when implicit='false', displaying implicit='true' instead for user approval");
+			 // design decision: don't popup a question panel since analyst might not know
+		}
+		okButton.setEnabled(modified);
+        if (modified) 
+		{
+            getRootPane().setDefaultButton(okButton);
+        } 
+		else 
+		{
+            getRootPane().setDefaultButton(cancelButton);
+        }
+		
         toggleArraySizeFields(isArray);
         stateVariableNameField.requestFocus();
         stateVariableNameField.selectAll();
@@ -292,24 +317,23 @@ public class StateVariableDialog extends ViskitSmallDialog
 		String initialValue = initialValueField.getText().trim();
 		String  description = descriptionField.getText().trim();
 
-        if (stateVariable != null)
+        if (viskitStateVariable != null)
 		{
-            stateVariable.setName(name);
-            stateVariable.setType(type);
-            stateVariable.setImplicit(implicit);
-            stateVariable.setValue(initialValue);
-            stateVariable.setDescription (description);
+            viskitStateVariable.setName(name);
+            viskitStateVariable.setType(type);
+            viskitStateVariable.setImplicit(implicit);
+            viskitStateVariable.setValue(initialValue);
+            viskitStateVariable.setDescription (description);
         }
-		else // creating a new state variable; save these new values so that invoking code can retrieve them
-		{
-            newName        = name;
-            newType        = type;
-			newImplicit    = implicit;
-			newValue       = initialValue;
-            newDescription = description;
-        }
-		// create code block if not found
 		
+		// when creating a new state variable, save these new values so that invoking code can retrieve them
+		newName        = name;
+		newType        = type;
+		newImplicit    = implicit;
+		newValue       = initialValue;
+		newDescription = description;
+		
+		// create implicit code block if not found
 		EventGraphModel eventGraphModel = ((EventGraphModel)ViskitGlobals.instance().getEventGraphController().getModel());
 		
 		//  implicit state variables get a code block - add if not already present
@@ -328,7 +352,7 @@ public class StateVariableDialog extends ViskitSmallDialog
 				JDO + SP + "Implicit state variable computation" + SP + JDC + "\n" +
 				"private void compute_" + name + SP + "()" + "\n" +
 				OB + "\n" +
-				SP_4 + "// insert computation code here" + "\n" +
+				SP_4 + name + SP + EQ + SP + "__TODO__" + "; // insert computation code here" + "\n" +
 				CB + "\n";
 			eventGraphModel.changeCodeBlock(newCodeBlock);
 			ViskitGlobals.instance().getEventGraphViewFrame().refreshCodeBlock(newCodeBlock);

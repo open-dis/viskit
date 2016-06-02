@@ -206,7 +206,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
             }
         }
         currentFile = file;
-		runEventStateTransitionsUpdate ();
+		runEventStateTransitionInitializationsUpdate ();
 
         setDirty(false); // required for initial file loading
         return true;
@@ -632,7 +632,7 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
     }
 	
 	/** Initialize state transitions from state variables */
-	public void runEventStateTransitionsUpdate ()
+	public void runEventStateTransitionInitializationsUpdate ()
 	{
         EventNode       runEventNode = null;
 		for (ViskitElement eventNode : getAllNodes())
@@ -645,13 +645,13 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 		}
 		if ((runEventNode == null) && (stateVariables != null) && (stateVariables.size() > 0))
 		{
-			LOG.info("need to create Run node to support stateVariable initializations");
+			LOG.info("creating Run node in order to support stateVariable initializations");
 			eventGraphController.buildNewRunNode();
 		}
 		if (runEventNode != null)
 		{
-			ArrayList<ViskitElement> runStateTransitions = runEventNode.getStateTransitions();
-			runStateTransitions.clear();
+			ArrayList<ViskitElement> runEventStateTransitions = runEventNode.getStateTransitions();
+			runEventStateTransitions.clear(); // clear then rebuild the array
 			
 			for (ViskitStateVariable stateVariable : stateVariables)
 			{
@@ -659,11 +659,12 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 				EventStateTransition eventStateTransition = new EventStateTransition();
 				eventStateTransition.setName(stateVariable.name);
 				eventStateTransition.setType(stateVariable.type);
+				eventStateTransition.setDescription(stateVariable.getDescription());
 				eventStateTransition.setOperation(false); // value initialization, TODO method operation; missing from eventStateTransition?
 				eventStateTransition.setOperationOrAssignment(stateVariable.getValue());
 //				eventStateTransition.setLocalVariableAssignment(stateVariable.name);
 				
-				runStateTransitions.add(eventStateTransition);
+				runEventStateTransitions.add(eventStateTransition);
 				
 //            eventStateTransition.setOperation(jaxbStateTransition.getOperation() != null);
 //            if (eventStateTransition.isOperation()) {
@@ -672,10 +673,6 @@ public class EventGraphModelImpl extends mvcAbstractModel implements EventGraphM
 //                eventStateTransition.setOperationOrAssignment(jaxbStateTransition.getAssignment().getValue());
 //            }
 			}
-		}
-		else
-		{
-			
 		}
 	}
 

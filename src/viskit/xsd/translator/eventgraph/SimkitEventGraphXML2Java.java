@@ -95,13 +95,15 @@ public class SimkitEventGraphXML2Java
 	private boolean hasImplicitStateVariable;
 
     /** Default to initialize the JAXBContext only */
-    private SimkitEventGraphXML2Java() {
+    private SimkitEventGraphXML2Java()
+	{
         try {
             jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
-        } catch (JAXBException ex) {
-            LOG.error(ex);
+        } 
+		catch (JAXBException ex) 
+		{
+            LOG.error("error initializing jaxbContext", ex);
             error(ex.getMessage());
-            ex.printStackTrace();
         }
     }
 
@@ -133,15 +135,19 @@ public class SimkitEventGraphXML2Java
         setEventGraphFile(f);
     }
 
-    public void unmarshal() {
-        try {
+    public void unmarshal()
+	{
+        try 
+		{
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             setUnMarshaller(jaxbUnmarshaller);
 			
 			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
-			jaxbUnmarshaller.setEventHandler(new ValidationEventHandler() {
+			jaxbUnmarshaller.setEventHandler(new ValidationEventHandler() 
+			{
 				@Override
-				public boolean handleEvent(ValidationEvent validationEvent) {
+				public boolean handleEvent(ValidationEvent validationEvent) 
+				{
 					System.out.println("Unmarshaller event handler says: " + validationEvent.getMessage() + 
 									   " (Exception: " + validationEvent.getLinkedException() + ")");
 					return false;
@@ -149,11 +155,9 @@ public class SimkitEventGraphXML2Java
 			});
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
             root = (SimEntity) getUnMarshalledObject();
-        } catch (JAXBException ex) {
-
-            // Silence attempting to unmarshal an Assembly here
-            LOG.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
-            ex.printStackTrace();
+        } catch (JAXBException ex) 
+		{
+            LOG.debug("Error occurring during Event Graph unmarshal()", ex);
         }
     }
 
@@ -811,7 +815,7 @@ public class SimkitEventGraphXML2Java
 	{
         PrintWriter pw = new PrintWriter(runBlock);
         List<LocalVariable>     localVariableList = run.getLocalVariable();
-        List<StateTransition> stateTransitionList = run.getStateTransition();
+        List<StateTransition> stateTransitionList = run.getStateTransition(); // list does not include implicit state variables
 
 		pw.println(SP_4 + JDO + SP + "Reset state variables back to initial values for " + root.getName() + " event graph.");
 		pw.println(SP_4 + SP + JDC);
@@ -846,7 +850,8 @@ public class SimkitEventGraphXML2Java
             String spaces = isArray ? SP_12 : SP_8;
             String in = indexFrom(stateTransition);
 
-            if (isArray) {
+            if (isArray) 
+			{
                 pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + stateVariable.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
                 pw.print(spaces + stateVariable.getName() + LB + in + RB);
             } 
@@ -937,7 +942,7 @@ public class SimkitEventGraphXML2Java
 					pw.println(SP_8 + JDO + SP + "Implicit state variable computation" + SP + JDC);
 					pw.println(SP_8 + "private void compute_" + stateVariable.getName() + "()");
 					pw.println(SP_8 + OB);
-					pw.println(SP_8 + SP_4 + "// insert computation code here");
+					pw.println(SP_8 + SP_4 + stateVariable.getName() + SP + EQ + SP + "__TODO__" + ";// insert computation code here");
 					pw.println(SP_8 + CB);
 					pw.println();
 				}
@@ -1467,7 +1472,8 @@ public class SimkitEventGraphXML2Java
 
         Class<?> c = resolveExtensionClass();
 
-        if (c != null) {
+        if (c != null) 
+		{
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
@@ -1485,9 +1491,12 @@ public class SimkitEventGraphXML2Java
             int pi = 0;
             Class<?>[] sparams = ca[maxIndex].getParameterTypes();
 
-            for (Parameter p : params) {
-                for (int i = pi; i < sparams.length; i++) {
-                    if (unqualifiedMatch(p.getType(), sparams[i].getName()) && pi < maxParamCount) {
+            for (Parameter p : params) 
+			{
+                for (int i = pi; i < sparams.length; i++) 
+				{
+                    if (unqualifiedMatch(p.getType(), sparams[i].getName()) && pi < maxParamCount) 
+					{
                         parray[pi] = p;
                         ++pi;
                         break;
@@ -1496,7 +1505,9 @@ public class SimkitEventGraphXML2Java
             }
 
             localSuperParams = Arrays.asList(parray);
-        } else {
+        }
+		else 
+		{
             LOG.error(extendz + " was not found on the working classpath");
         }
 

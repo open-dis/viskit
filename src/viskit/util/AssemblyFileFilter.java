@@ -64,39 +64,60 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten</a>
  */
-public final class AssemblyFileFilter extends FileFilter {
-
-    /** we filter to accept only files starting with this string */
-    private final String contains;
+public final class AssemblyFileFilter extends FileFilter
+{
+    /** we filter to accept only files ending with file extensions shown in the contents of this [] */
+    private final String[] contents;
 
     /* CONSTRUCTOR(s) */
 
     /**
-     * Creates an instance of AssemblyFileFilter
+     * Creates an instance of EventGraphFileFilter
      *
-     * @param contains file must contain this String. Case Insensitive.
+     * @param contents file must not contain any of these Strings.
+     *        Case Insensitive.
      */
-    public AssemblyFileFilter(String contains) {
-        this.contains = contains.toLowerCase();
+    public AssemblyFileFilter (String[] contents) 
+	{
+        this.contents = contents;
+        int index = 0;
+        for (String s : contents)
+		{
+            contents[index] = s.toLowerCase();
+            index++;
+        }
     }
 
     /**
-     * Select only files containing our String.  Does expose directories
+     * Select only files with names ending in one of the provided file extensions.  Does expose directories
      * for ease of navigation
      *
-     * @param f the file for naming determination
-     *
-     * @return true if and only if the name should be included in the file list;
-     *         false otherwise.
+     * @param file the file for determination of naming acceptence
+     * @return false if and only if the name should be not included in the file
+     *         list; true otherwise.
      */
     @Override
-    public boolean accept(File f) {
-        if (f.isDirectory()) {
-            return !f.getName().contains("svn");
+    public boolean accept(File file) 
+	{
+		if (file.getName().startsWith("."))
+		{
+			return false; // no hidden files or directories
+		}
+        if (file.isDirectory()) 
+		{
+			return true;
+		}
+        boolean foundMatch = false;
+        String fileName = file.getName();
+        for (String s : contents) 
+		{
+            foundMatch = fileName.toLowerCase().endsWith(s);
+            if (foundMatch) 
+			{
+                break;
+            }
         }
-		if (f.getName().startsWith("."))
-			return false; // no hidden files
-        return f.getName().toLowerCase().contains(contains);
+        return foundMatch;
     }
 
     /** @return a fileview description of the filter */

@@ -34,6 +34,9 @@ public abstract class ViskitSmallDialog extends JDialog
 {
     protected static boolean modified = false;
     private static ViskitSmallDialog dialog;
+	
+	/** Indicates whether a new object is being initialized, set prior to invoking dialog */
+	private static boolean newObjectInitialization = false; 
 
     protected static boolean showDialog(String className, JFrame frame, Object var)
 	{
@@ -78,6 +81,24 @@ public abstract class ViskitSmallDialog extends JDialog
         d.width = Integer.MAX_VALUE;
         c.setMaximumSize(d);
     }
+
+	/**
+	 * @return the newObjectInitialization
+	 */
+	public boolean isNewObjectInitialization() 
+	{
+		return newObjectInitialization;
+	}
+
+	/**
+	 * @param newObjectInitialization the newObjectInitialization to set
+	 */
+	public static void setNewObjectInitialization(boolean newObjectInitialization) 
+	{
+		if (newObjectInitialization)
+            modified = true; // enables Apply Settings button
+		ViskitSmallDialog.newObjectInitialization = newObjectInitialization;
+	}
 
     class CancelButtonListener implements ActionListener
 	{

@@ -1191,35 +1191,41 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     }
 
     private JFileChooser assemblyFileChooser;
-    private JFileChooser buildOpenSaveChooser() 
+    private void buildOpenSaveAssemblyFilesChooser() 
 	{
-        // Try to open in the current project directory for Assemblies
-        if (ViskitGlobals.instance().getCurrentViskitProject() != null) 
+
+		if (assemblyFileChooser == null) // remember previous directory (likely package directory), if used already
 		{
-            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory());
-        } 
-		else 
-		{
-            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        }
+			assemblyFileChooser = new JFileChooser();
+			// Try to open in the current project directory for Assemblies
+			if (ViskitGlobals.instance().getCurrentViskitProject() != null) 
+			{
+				assemblyFileChooser.setCurrentDirectory (ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory());
+			} 
+			else 
+			{
+				assemblyFileChooser.setCurrentDirectory (new File(ViskitProject.MY_VISKIT_PROJECTS_DIR + File.separator + ViskitProject.ASSEMBLIES_DIRECTORY_NAME));
+			}
+			assemblyFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			assemblyFileChooser.setDialogTitle("Open Assembly File(s)");
+
+			FileFilter filter = new AssemblyFileFilter(
+					new String[] {"xml", "png"}); 
+			assemblyFileChooser.setFileFilter(filter);
+
+			assemblyFileChooser.setMultiSelectionEnabled(true);
+			assemblyFileChooser.setFileHidingEnabled(true);
+			assemblyFileChooser.setAcceptAllFileFilterUsed(false);
+		}
     }
 
     @Override
     public File[] openFilesAsk()
 	{
-        assemblyFileChooser = buildOpenSaveChooser();
-        assemblyFileChooser.setDialogTitle("Open Assembly File(s)");
-
-        // Look for assembly in the filename, Bug 1247 fix
-        FileFilter filter = new AssemblyFileFilter("assembly");
-        assemblyFileChooser.setFileFilter(filter);
-
-        assemblyFileChooser.setMultiSelectionEnabled(true);
-		assemblyFileChooser.setFileHidingEnabled(true);
-		assemblyFileChooser.setAcceptAllFileFilterUsed(false);
-
-        int returnVal = assemblyFileChooser.showOpenDialog(this);
-        return (returnVal == JFileChooser.APPROVE_OPTION) ? assemblyFileChooser.getSelectedFiles() : null;
+		buildOpenSaveAssemblyFilesChooser();
+		
+        int returnValue = assemblyFileChooser.showOpenDialog(this);
+        return (returnValue == JFileChooser.APPROVE_OPTION) ? assemblyFileChooser.getSelectedFiles() : null;
     }
 
     @Override
@@ -1389,17 +1395,11 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
     @Override
     public File saveFileAsk(String suggestedName, boolean showUniqueName, String dialogTitle)
 	{
-        if (assemblyFileChooser == null)
-		{
-            assemblyFileChooser = buildOpenSaveChooser();
-        }
+        buildOpenSaveAssemblyFilesChooser();
 
         assemblyFileChooser.setDialogTitle(dialogTitle);
-        File file = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDirectory(), suggestedName);
-        if (!file.getParentFile().isDirectory())
-		{
-             file.getParentFile().mkdirs();
-        }
+		
+        File file = new File(assemblyFileChooser.getCurrentDirectory(), suggestedName);
         if (showUniqueName)
 		{
              file = getUniqueName(suggestedName);

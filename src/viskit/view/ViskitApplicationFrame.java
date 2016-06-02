@@ -139,11 +139,12 @@ public class ViskitApplicationFrame extends JFrame
 	}
 	public final void initialize()
 	{
+		// retrieve user's preferred screen size from preceding invocation
         int width  = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int height = Integer.parseInt(ViskitConfiguration.instance().getValue(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation((screenDimension.width - width) / 2, (screenDimension.height - height) / 2);
+        this.setLocation((screenDimension.width - width) / 2, (screenDimension.height - height) / 2); // centered
         this.setSize(width, height);
 
         // Let the quit handler take care of an exit initiation

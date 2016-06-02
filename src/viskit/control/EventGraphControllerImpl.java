@@ -42,6 +42,7 @@ import viskit.view.EventGraphView;
 import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.view.AssemblyEditView;
+import viskit.view.dialog.StateVariableDialog;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -789,14 +790,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void simParameterEdit(ViskitParameter param) {
         boolean modified = ((EventGraphView) getView()).doEditParameter(param);
         if (modified) {
-            ((viskit.model.EventGraphModel) getModel()).changeSimParameter(param);
+            ((viskit.model.EventGraphModelImpl) getModel()).changeSimParameter(param);
         }
     }
 
     @Override
     public void codeBlockEdit(String s)
 	{
-        ((viskit.model.EventGraphModel) getModel()).changeCodeBlock(s);
+        ((viskit.model.EventGraphModelImpl) getModel()).changeCodeBlock(s);
     }
 
     @Override
@@ -805,8 +806,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         boolean modified = ((EventGraphView) getView()).doEditStateVariable(stateVariable);
         if (modified) 
 		{
-            ((viskit.model.EventGraphModel) getModel()).changeStateVariable(stateVariable);
-		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
+            ((viskit.model.EventGraphModelImpl) getModel()).changeStateVariable(stateVariable);
+			// check to ensure Run event is present for initializations, also update
+			((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionInitializationsUpdate ();
         }
     }
 
@@ -814,15 +816,17 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void newStateVariable() // method name must exactly match preceding string value
 	{
-        ((EventGraphView) getView()).addStateVariableDialog();
-		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
+		StateVariableDialog.setNewObjectInitialization(true); // since this is a new state variable, have Apply Changes button enabled from the beginning.
+        ((EventGraphViewFrame) getView()).addStateVariableDialog(); // blocks
+		// check to ensure Run event is present for initializations, also update
+		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionInitializationsUpdate ();
     }
 
     // Comes in from view
     @Override
     public void buildNewStateVariable(String name, String type, boolean implicit, String initialValue, String description) //----------------------------
     {
-        ((viskit.model.EventGraphModel) getModel()).newStateVariable(name, type, implicit, initialValue, description);
+        ((viskit.model.EventGraphModelImpl) getModel()).newStateVariable(name, type, implicit, initialValue, description);
     }
 
     private Vector<Object> selectionVector = new Vector<>();
@@ -1130,7 +1134,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void deleteStateVariable(ViskitStateVariable var)
 	{
         ((EventGraphModelImpl) getModel()).deleteStateVariable(var);
-		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionsUpdate (); // check to ensure Run event is present for initializations, also update
+		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionInitializationsUpdate (); // check to ensure Run event is present for initializations, also update
     }
 
     private boolean checkSaveForSourceCompile()
@@ -1236,7 +1240,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		{
 			setModel (new EventGraphModelImpl(this)); // TODO fix this hack
 		}
-        return ((viskit.model.EventGraphModel) getModel()).newEventNode(nodeName, point);
+        return ((viskit.model.EventGraphModelImpl) getModel()).newEventNode(nodeName, point);
     }
 
     @Override
@@ -1313,7 +1317,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             done = true;
             modified = ((EventGraphView) getView()).doEditNode(node);
             if (modified) {
-                done = ((viskit.model.EventGraphModel) getModel()).changeEvent(node);
+                done = ((viskit.model.EventGraphModelImpl) getModel()).changeEvent(node);
             }
         } while (!done);
     }
@@ -1322,7 +1326,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void schedulingArcEdit(SchedulingEdge edge) {
         boolean modified = ((EventGraphView) getView()).doEditEdge(edge);
         if (modified) {
-            ((viskit.model.EventGraphModel) getModel()).changeSchedulingEdge(edge);
+            ((viskit.model.EventGraphModelImpl) getModel()).changeSchedulingEdge(edge);
         }
     }
 
@@ -1330,7 +1334,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void cancellingArcEdit(CancellingEdge edge) {
         boolean modified = ((EventGraphView) getView()).doEditCancellingEdge( edge);
         if (modified) {
-            ((viskit.model.EventGraphModel) getModel()).changeCancellingEdge(edge);
+            ((viskit.model.EventGraphModelImpl) getModel()).changeCancellingEdge(edge);
         }
     }
     private String imageSaveCount = "";
@@ -1349,7 +1353,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         Component component = egvf.getCurrentJgraphComponent();
         if (component == null) {return;}
         File localLastFile = ((EventGraphModelImpl) getModel()).getCurrentFile();
-        if (localLastFile != null) {
+        if (localLastFile != null) 
+		{
             fileName = localLastFile.getName();
 			if (fileName.endsWith(".xml"))
 				fileName = fileName.substring (0, fileName.indexOf(".xml"));
