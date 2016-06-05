@@ -43,6 +43,7 @@ import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.view.AssemblyEditView;
 import viskit.view.dialog.StateVariableDialog;
+import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.SP;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -516,6 +517,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             index++;
         }
         saveEventGraphHistoryXML(recentEventGraphFileSet);
+		
+//		// now remove current event graphs before displaying
+//		for (File eventGraph : openEventGraphsFileList)
+//		{
+//			recentEventGraphFileSet.remove(eventGraph);
+//		}
     }
 
     private void saveEventGraphHistoryXML(Set<File> recentFiles)
@@ -580,13 +587,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 		switch (dialogType)
 		{
 			case JOptionPane.ERROR_MESSAGE:
-				LOG.error (title + ": " + message);
+				LOG.error (title + ": " + AssemblyControllerImpl.scrubHTML(message));
 				break;
 			case JOptionPane.WARNING_MESSAGE:
-				LOG.warn (title + ": " + message);
+				LOG.warn  (title + ": " + AssemblyControllerImpl.scrubHTML(message));
 				break;
 			default:
-				LOG.info (title + ": " + message);
+				LOG.info  (title + ": " + AssemblyControllerImpl.scrubHTML(message));
 				break;
 		}
     }
@@ -1131,10 +1138,33 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void deleteStateVariable(ViskitStateVariable var)
+    public void deleteStateVariable(ViskitStateVariable viskitStateVariable)
 	{
-        ((EventGraphModelImpl) getModel()).deleteStateVariable(var);
+        ((EventGraphModelImpl) getModel()).deleteStateVariable(viskitStateVariable);
 		((viskit.model.EventGraphModelImpl) getModel()).runEventStateTransitionInitializationsUpdate (); // check to ensure Run event is present for initializations, also update
+		
+		String name = viskitStateVariable.getName();
+		EventGraphModel eventGraphModel = ((EventGraphModel)ViskitGlobals.instance().getEventGraphController().getModel());
+
+		boolean implicitCodeBlockComputeMethodFound = 
+			(eventGraphModel                != null) &&
+			(eventGraphModel.getCodeBlock() != null) &&
+			 eventGraphModel.getCodeBlock().contains("compute_" + name);
+
+		//  implicit state variables get a code block for computuation - notify user to delete the code block along with the given state variable
+		if (implicitCodeBlockComputeMethodFound)
+		{
+			String   title = "Unnecessary code block found";
+			String message = "<html>" + 
+							 "<p align='center'>Implicit state variable " + name + " has been removed." + ViskitStatics.RECENTER_SPACING + "</p>" + 
+						     "<p>&nbsp;</p>" +
+					         "<p align='center'>Please also remove unnecessary computation method from Event Graph code block:" + ViskitStatics.RECENTER_SPACING + "</p>" + 
+						     "<p>&nbsp;</p>" +
+					         "<p align='center'><code>private void compute_" + name + SP + "() " + ViskitStatics.RECENTER_SPACING + "</code>" + ViskitStatics.RECENTER_SPACING + "</p>" + 
+						     "<p>&nbsp;</p></html>";
+			ViskitGlobals.instance().getEventGraphController().messageToUser(
+					JOptionPane.ERROR_MESSAGE, title, message); // TODO add test to future diagnostics stylesheet
+		}					
     }
 
     private boolean checkSaveForSourceCompile()

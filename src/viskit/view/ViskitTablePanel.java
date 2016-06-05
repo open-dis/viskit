@@ -21,6 +21,8 @@ import javax.swing.table.TableModel;
 import org.apache.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.ViskitElement;
+import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.SP;
+import viskit.model.EventGraphModel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -256,8 +258,10 @@ public abstract class ViskitTablePanel extends JPanel
         shadow.clear();
         thisTableModel.setRowCount(0);
 
-        if (data != null) {
-            for (ViskitElement o : data) {
+        if (data != null) 
+		{
+            for (ViskitElement o : data) 
+			{
                 putARow(o);
             }
         }
@@ -461,10 +465,10 @@ public abstract class ViskitTablePanel extends JPanel
                     // Begin T/S for Bug 1373.  This process should remove edge
                     // parameters not only from the preceding EdgeInspectorDialog,
                     // but also from the EG XML representation
-                    if (shouldDoAddsAndDeletes) 
-					{
-                        removeRow(table.getSelectedRow());
-                    }
+//                    if (shouldDoAddsAndDeletes) 
+//					{
+//                        removeRow(table.getSelectedRow()); // apparently redundant, listener removed state variable
+//                    }
                     break;
 					
                 default:

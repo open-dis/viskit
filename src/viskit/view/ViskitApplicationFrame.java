@@ -64,10 +64,10 @@ import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
-import viskit.model.EventGraphModel;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.view.dialog.UserPreferencesDialog;
+import viskit.model.EventGraphModel;
 
 /**
  * MOVES Institute

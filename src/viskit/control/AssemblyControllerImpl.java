@@ -47,7 +47,6 @@ import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
-import static viskit.ViskitProject.MY_VISKIT_PROJECTS_NAME;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.doe.LocalBootLoader;
@@ -192,12 +191,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		{
             List<File> openAssemblyFileList = getOpenAssemblyFileList(false);
 			if ((openAssemblyFileList != null) && (openAssemblyFileList.size() > 1))
+			{
 				LOG.debug("begin: openAssemblyFileList.size()=" + openAssemblyFileList.size());
 
-            for (File f : openAssemblyFileList)
-			{
-                _doOpenAssembly(f);
-            }
+				for (File f : openAssemblyFileList)
+				{
+					_doOpenAssembly(f);
+				}
+			}
         }
         updateAssemblyFileLists();
 		ViskitGlobals.instance().getEventGraphViewFrame().checkHelpWindowBounds (); // initialize Help window sizing
@@ -1094,6 +1095,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // prerequisite to buildMenus
 		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
     }
+	
+	static String scrubHTML (String markupText)
+	{
+		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
+		markupText = markupText.replaceAll("&nbsp;", " ");                    // non-breaking space character
+		markupText = markupText.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " "); // elements and attributes
+		markupText = markupText.replaceAll("(\\s)+", " ").trim();             // normalize whitespace
+		return markupText;
+	}
 
     /**
      * A component wants to say something.
@@ -1117,9 +1127,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 		
 		// now clean up message HTML for logs
 		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
-		message = message.replaceAll("&nbsp;", " ");                    // non-breaking space character
-		message = message.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " "); // elements and attributes
-		message = message.replaceAll("(\\s)+", " ").trim();             // normalize whitespace
+		message = scrubHTML(message);
 		
 		title = title.trim();
 		String spacer = ": ";

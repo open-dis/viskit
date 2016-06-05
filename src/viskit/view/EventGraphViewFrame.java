@@ -374,15 +374,17 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         stateVariablesPanel0.addMinusListener(new ActionListener()
 		{
             @Override
-            public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
+            public void actionPerformed(ActionEvent event) 
+			{
+                ((EventGraphControllerImpl) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
             }
         });
 
-        stateVariablesPanel0.addDoubleClickedListener(new ActionListener() {
-
+        stateVariablesPanel0.addDoubleClickedListener(new ActionListener() 
+		{
             @Override
-            public void actionPerformed(ActionEvent event) {
+            public void actionPerformed(ActionEvent event) 
+			{
                 ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
             }
         });

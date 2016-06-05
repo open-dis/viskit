@@ -1,7 +1,6 @@
 package viskit.view.dialog;
 
 import edu.nps.util.LogUtilities;
-import viskit.model.EventGraphModel;
 import viskit.model.ViskitStateVariable;
 
 import javax.swing.*;
@@ -23,6 +22,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
 import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.*;
+import viskit.model.EventGraphModel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -336,13 +336,19 @@ public class StateVariableDialog extends ViskitSmallDialog
 		// create implicit code block if not found
 		EventGraphModel eventGraphModel = ((EventGraphModel)ViskitGlobals.instance().getEventGraphController().getModel());
 		
-		//  implicit state variables get a code block - add if not already present
-		if ( implicit && 
+		boolean implicitCodeBlockComputeMethodFound = 
 			(eventGraphModel                != null) &&
 			(eventGraphModel.getCodeBlock() != null) &&
-			!eventGraphModel.getCodeBlock().contains("compute_" + name))
+			!eventGraphModel.getCodeBlock().contains("compute_" + name);
+		
+		//  implicit state variables get a code block - add if not already present
+		if (implicit && implicitCodeBlockComputeMethodFound)
 		{
-			String newCodeBlock = eventGraphModel.getCodeBlock();
+			String newCodeBlock = "";
+			if ((eventGraphModel != null) && (eventGraphModel.getCodeBlock() != null))
+			{
+				newCodeBlock = eventGraphModel.getCodeBlock();
+			}
 			
 			if (newCodeBlock.trim().length() > 0)
 			    newCodeBlock += "\n\n";
@@ -356,7 +362,16 @@ public class StateVariableDialog extends ViskitSmallDialog
 				CB + "\n";
 			eventGraphModel.changeCodeBlock(newCodeBlock);
 			ViskitGlobals.instance().getEventGraphViewFrame().refreshCodeBlock(newCodeBlock);
-		}		
+		}
+		else if (implicitCodeBlockComputeMethodFound) // but not implicit
+		{
+			String   title = "Unnecessary code block found";
+			String message = "State variable " + name + " is not implicit, remove unnecessary method from Event Graph code block: " + "private void compute_" + name + SP + "()";
+			ViskitGlobals.instance().getEventGraphController().messageToUser(
+					JOptionPane.ERROR_MESSAGE, title, message);
+			LOG.error (title + ", " + message); // TODO add test to future diagnostics stylesheet
+			// TODO add similar test when removing a state variable
+		}
     }
 
     private boolean isGoodArray(String s) {
@@ -376,29 +391,31 @@ public class StateVariableDialog extends ViskitSmallDialog
     }
 
     // Little runnables to move the focus around
-    private Runnable sizeFieldFocus = new Runnable() {
-
+    private final Runnable sizeFieldFocus = new Runnable()
+	{
         @Override
         public void run() {
             arraySizeField.requestFocus();
         }
     };
 
-    private Runnable descriptionFieldFocus = new Runnable() {
-
+    private final Runnable descriptionFieldFocus = new Runnable() 
+	{
         @Override
         public void run() {
             descriptionField.requestFocus();
         }
     };
 
-    class myFocusListener extends FocusAdapter {
-
+    class myFocusListener extends FocusAdapter 
+	{
         @Override
-        public void focusGained(FocusEvent e) {
+        public void focusGained(FocusEvent e)
+		{
             handleSelect(e.getComponent());
 
-            if (e.getOppositeComponent() == myTyperComponent) {
+            if (e.getOppositeComponent() == myTyperComponent) 
+			{
                 handleArrayFieldEnable();
             }
         }
@@ -406,7 +423,8 @@ public class StateVariableDialog extends ViskitSmallDialog
         /**
          *  Enable the array size field if the type is an array, and set the focus to the right guy.
          */
-        private void handleArrayFieldEnable() {
+        private void handleArrayFieldEnable() 
+		{
             String s = (String) stateVariableTypeComboBox.getEditor().getItem();
             boolean isAr = ViskitGlobals.instance().isArray(s);
             toggleArraySizeFields(isAr);
@@ -423,8 +441,10 @@ public class StateVariableDialog extends ViskitSmallDialog
          * select the text in whatever comes in
          * @param c the component containing text
          */
-        private void handleSelect(Component c) {
-            if (c instanceof ComboBoxEditor) {
+        private void handleSelect(Component c) 
+		{
+            if (c instanceof ComboBoxEditor) 
+			{
                 c = ((ComboBoxEditor) c).getEditorComponent();
             }
 

@@ -71,11 +71,11 @@ import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
-import viskit.model.EventGraphModel;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.view.AnalystReportFrame;
 import viskit.view.ViskitApplicationFrame;
+import viskit.model.EventGraphModel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

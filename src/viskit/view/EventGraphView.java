@@ -104,9 +104,9 @@ public interface EventGraphView
      */
     void setSelectedEventGraphDescription(String description);
 
-    void addTab(EventGraphModel mod); // When a tab is added
+    void addTab(EventGraphModel eventGraphModel); // When a tab is added
 
-    void deleteTab(EventGraphModel mod); // When a tab is removed
+    void deleteTab(EventGraphModel eventGraphModel); // When a tab is removed
 
     EventGraphModel[] getOpenModels();
 
