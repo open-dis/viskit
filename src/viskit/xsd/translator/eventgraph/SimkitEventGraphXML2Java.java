@@ -390,7 +390,7 @@ public class SimkitEventGraphXML2Java
 				
 			String implicitInlineComment = "";
 			if (stateVariable.isImplicit())
-				   implicitInlineComment = " // implicit";
+				   implicitInlineComment = " // implicit state variable";
 				
             // Non array type generics
             if (isGeneric(stateVariable.getType()))
@@ -850,6 +850,12 @@ public class SimkitEventGraphXML2Java
             String spaces = isArray ? SP_12 : SP_8;
             String in = indexFrom(stateTransition);
 
+            if (stateVariable.isImplicit()) 
+			{
+                pw.println(SP_8 + "// " + stateVariable.getName() + " is implicit and thus gets computed, not initialized");
+                continue;
+            } 
+
             if (isArray) 
 			{
                 pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + stateVariable.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
@@ -942,7 +948,8 @@ public class SimkitEventGraphXML2Java
 					pw.println(SP_8 + JDO + SP + "Implicit state variable computation" + SP + JDC);
 					pw.println(SP_8 + "private void compute_" + stateVariable.getName() + "()");
 					pw.println(SP_8 + OB);
-					pw.println(SP_8 + SP_4 + stateVariable.getName() + SP + EQ + SP + "__TODO__" + ";// insert computation code here");
+					pw.println(SP_8 + SP_4 + "// define a code block to insert computation code here");
+					pw.println(SP_8 + SP_4 + stateVariable.getName() + SP + EQ + SP + "__TODO__" + "; // override using code block");
 					pw.println(SP_8 + CB);
 					pw.println();
 				}
