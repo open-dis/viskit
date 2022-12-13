@@ -23,20 +23,20 @@ public class Help
 {
     static final Logger LOG = LogUtilities.getLogger(Help.class);
 
-    public static final Version VERSION = new Version("viskit/version.txt");
+    public static final Version VERSION = new Version("version.txt");
     public static final String  VERSION_STRING = VERSION.getVersionString();
     public static final String  CR = "<br>";
     public static final String  ABOUT_EVENT_GRAPH =
             "Visual Simkit (Viskit) Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
-            + VERSION.getLastModified() + CR + CR;
+            + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String  ABOUT_ASSEMBLY =
             "Assembly Editor for Visual Simkit (Viskit)" + CR + "   version " + VERSION_STRING + CR
-            + VERSION.getLastModified() + CR + CR;
+            + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String   SIMKIT_URL = "http://eos.nps.edu/Simkit";
     public static final String   VISKIT_URL = "http://eos.nps.edu/Viskit";
     public static final String BUGZILLA_URL = "https://eos.nps.edu/bugzilla";
     public static final String   DEVELOPERS =
-            "Copyright &copy; 2004-2016 under the Lesser GNU Public License (LGPL)" + CR + CR
+            "Copyright &copy; 2004-2022 under the Lesser GNU Public License (LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;" + "Arnold Buss"     + CR
             + "&nbsp;&nbsp;&nbsp;" + "Terry Norbraten" + CR
@@ -115,16 +115,19 @@ public class Help
         aboutEventGraphEditorPane.setText(ABOUT_EVENT_GRAPH
                 + DEVELOPERS + CR + VISKIT_WEBSITE 
 			 // + BUGZILLA_PAGE
-                + SIMKIT_WEBSITE + VERSIONS_INFORMATION);
+//                + SIMKIT_WEBSITE + VERSIONS_INFORMATION
+        );
 
         aboutAssemblyEditorPane = new JEditorPane();
         aboutAssemblyEditorPane.addHyperlinkListener(browserLauncher);
         aboutAssemblyEditorPane.setContentType("text/html");
         aboutAssemblyEditorPane.setEditable(false);
         aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY
-                + DEVELOPERS + CR + VISKIT_WEBSITE
+                + DEVELOPERS 
+//                + CR + VISKIT_WEBSITE
 			 // + BUGZILLA_PAGE
-                + SIMKIT_WEBSITE);
+//                + SIMKIT_WEBSITE
+        );
     }
 
     public void aboutEventGraphEditor() 

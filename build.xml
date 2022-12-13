@@ -196,7 +196,7 @@ their descpritions.
         <tstamp/>
 
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
-        <echo message="Buildfile version ${SVNId}"/>
+        <!--<echo message="Buildfile version ${SVNId}"/>-->
         <echo message="Base directory: ${basedir}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
 

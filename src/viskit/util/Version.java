@@ -1,12 +1,21 @@
 package viskit.util;
 
 import edu.nps.util.LogUtilities;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
@@ -22,8 +31,8 @@ import viskit.ViskitGlobals;
  * @version $Id$
  * @author ahbuss
  */
-public class Version 
-{
+public class Version {
+
     static final Logger LOG = LogUtilities.getLogger(Version.class);
 
     protected String versionString;
@@ -34,34 +43,39 @@ public class Version
 
     protected int patchVersion;
 
-    protected Date lastModified;
+    protected LocalDate lastModified;
 
     protected int svnRevisionNumber;
 
-    public Version(String versionString, String dateString) {
-        int[] version = parseVersionString(versionString);
-        majorVersion = version[0];
-        minorVersion = version[1];
-        patchVersion = version[2];
-        lastModified = parseDateString(dateString);
-    }
-
     public Version(String fileName) {
-        InputStream versionStream =
-                ViskitGlobals.instance().getWorkClassLoader().getResourceAsStream(fileName);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(versionStream));
+        URL versionURL = ViskitGlobals.class.getResource(fileName);
         try {
-            versionString = reader.readLine();
-            int[] version = parseVersionString(versionString);
-            majorVersion = version[0];
-            minorVersion = version[1];
-            patchVersion = version[2];
-            String dateString = reader.readLine();
-            lastModified = parseDateString(dateString);
-            String revisionString = reader.readLine();
-            svnRevisionNumber = parseRevisionString(revisionString);
-            versionString += "." + svnRevisionNumber;
-        } catch (IOException e) {
+            InputStream versionStream = versionURL.openStream();
+            Properties versionProperties = new Properties();
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(versionStream));
+            versionProperties.load(versionStream);
+            Path versionPath = Paths.get(versionURL.toURI());
+            BasicFileAttributes attributes
+                    = Files.readAttributes(versionPath, BasicFileAttributes.class);
+            Date date = new Date(attributes.lastModifiedTime().toMillis());
+            Instant instant = date.toInstant();
+            ZonedDateTime zoneDateTime = instant.atZone(ZoneId.systemDefault());
+            lastModified = zoneDateTime.toLocalDate();
+            majorVersion = Integer.parseInt(versionProperties.getProperty("major"));
+            minorVersion = Integer.parseInt(versionProperties.getProperty("minor"));
+            patchVersion = Integer.parseInt(versionProperties.getProperty("patch"));
+            versionString = String.format("%s.%s.%s", majorVersion, minorVersion, patchVersion);
+//            versionString = reader.readLine();
+//            int[] version = parseVersionString(versionString);
+//            majorVersion = version[0];
+//            minorVersion = version[1];
+//            patchVersion = version[2];
+//            String dateString = reader.readLine();
+//            lastModified = parseDateString(dateString);
+//            String revisionString = reader.readLine();
+//            svnRevisionNumber = parseRevisionString(revisionString);
+//            versionString += "." + svnRevisionNumber;
+        } catch (IOException | URISyntaxException e) {
             LOG.error("Problem reading " + fileName + ": " + e);
         }
     }
@@ -83,8 +97,8 @@ public class Version
     protected static Date parseDateString(String dateString) {
         Date date = null;
         try {
-            Pattern pattern =
-                    Pattern.compile("\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d \\d\\d:\\d\\d:\\d\\d");
+            Pattern pattern
+                    = Pattern.compile("\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d \\d\\d:\\d\\d:\\d\\d");
             Matcher matcher = pattern.matcher(dateString);
             if (matcher.find()) {
                 date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(matcher.group());
@@ -104,7 +118,7 @@ public class Version
         return versionString;
     }
 
-    public Date getLastModified() {
+    public LocalDate getLastModified() {
         return lastModified;
     }
 
@@ -130,16 +144,16 @@ public class Version
 
     public boolean isHigherVersionThan(String otherVersionString) {
         int[] otherVersion = parseVersionString(otherVersionString);
-        return getMajorVersion() > otherVersion[0] ||
-                getMinorVersion() > otherVersion[1] ||
-                getPatchVersion() > otherVersion[2];
+        return getMajorVersion() > otherVersion[0]
+                || getMinorVersion() > otherVersion[1]
+                || getPatchVersion() > otherVersion[2];
     }
 
     @Override
     public String toString() {
-        return "Version " +  + getMajorVersion() + "." +
-                getMinorVersion() + "." + getPatchVersion() +
-                System.getProperty("line.separator") +
-                "Last Modified: " + getLastModified();
+        return "Version " + +getMajorVersion() + "."
+                + getMinorVersion() + "." + getPatchVersion()
+                + System.getProperty("line.separator")
+                + "Last Modified: " + getLastModified();
     }
 }
