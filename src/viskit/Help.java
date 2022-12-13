@@ -32,7 +32,7 @@ public class Help
     public static final String  ABOUT_ASSEMBLY =
             "Assembly Editor for Visual Simkit (Viskit)" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
-    public static final String   SIMKIT_URL = "http://eos.nps.edu/Simkit";
+    public static final String   SIMKIT_URL = "https://github.com/ahbuss/Simkit";
     public static final String   VISKIT_URL = "http://eos.nps.edu/Viskit";
     public static final String BUGZILLA_URL = "https://eos.nps.edu/bugzilla";
     public static final String   DEVELOPERS =
@@ -47,8 +47,8 @@ public class Help
             + "&nbsp;&nbsp;&nbsp;" + "Patrick Sullivan";
 	
     public static final String SIMKIT_WEBSITE =
-            CR
-            + "Simkit home page: " + CR
+            CR + CR 
+            + "Simkit home page: "
             + LinkURLString(SIMKIT_URL) + CR;
 	
     public static final String VISKIT_WEBSITE = CR
@@ -115,7 +115,8 @@ public class Help
         aboutEventGraphEditorPane.setText(ABOUT_EVENT_GRAPH
                 + DEVELOPERS + CR + VISKIT_WEBSITE 
 			 // + BUGZILLA_PAGE
-//                + SIMKIT_WEBSITE + VERSIONS_INFORMATION
+                + SIMKIT_WEBSITE 
+                + VERSIONS_INFORMATION + CR + CR
         );
 
         aboutAssemblyEditorPane = new JEditorPane();
@@ -126,7 +127,7 @@ public class Help
                 + DEVELOPERS 
 //                + CR + VISKIT_WEBSITE
 			 // + BUGZILLA_PAGE
-//                + SIMKIT_WEBSITE
+                + SIMKIT_WEBSITE
         );
     }
 
