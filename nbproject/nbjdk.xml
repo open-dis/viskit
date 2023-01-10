@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="Visual_Simkit__Viskit_">
+    <property file="nbproject/nbjdk.properties"/>
+    <property location="${netbeans.user}/build.properties" name="user.properties.file"/>
+    <property file="${user.properties.file}"/>
+    <import file="jdk.xml"/>
+    <target depends="-jdk-init" name="compile">
+        <ant inheritall="false" target="compile"/>
+    </target>
+    <target depends="-jdk-init" name="clean">
+        <ant inheritall="false" target="clean"/>
+    </target>
+    <target depends="-jdk-init" name="doc">
+        <ant inheritall="false" target="doc"/>
+    </target>
+    <target depends="-jdk-init" name="quick.run">
+        <ant inheritall="false" target="quick.run"/>
+    </target>
+    <target depends="-jdk-init" name="test-code-format">
+        <ant inheritall="false" target="test-code-format"/>
+    </target>
+    <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="quick.debug">
+        <ant inheritall="false" target="quick.debug"/>
+    </target>
+    <target depends="-jdk-init" name="compile-selected-files-in-src">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="compile-selected-files-in-src"/>
+    </target>
+    <target depends="-jdk-init" name="run-selected-file-in-src">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="run-selected-file-in-src"/>
+    </target>
+    <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="debug-selected-file-in-src">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="debug-selected-file-in-src"/>
+    </target>
+    <target depends="-jdk-init" name="run-selected-file-in-test">
+        <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="run-selected-file-in-test"/>
+    </target>
+</project>

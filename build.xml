@@ -58,7 +58,7 @@
     <property environment="env"/>
 
     <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar endorsed/jaxb-api.jar"/>
     </path>
 
     <path id="jaxb.runtime.path">

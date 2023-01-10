@@ -470,12 +470,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         // Prevent a case where we have simkit.jar in both the working classpath
         // and in a project's /lib directory.  We don't need to expose multiple
         // libs of the same name because they happen to be in two different places
-        Enumeration<DefaultMutableTreeNode> e = rootTreeNode.children();
+        Enumeration<TreeNode> e = rootTreeNode.children();
         String jarName = jarFile.getName().substring(jarFile.getName().lastIndexOf(File.separator) + 1);
         DefaultMutableTreeNode defaultMutableTreeNode;
         while (e.hasMoreElements())
 		{
-            defaultMutableTreeNode = e.nextElement();
+            defaultMutableTreeNode = (DefaultMutableTreeNode) e.nextElement();
             if (defaultMutableTreeNode.getUserObject().toString().contains(jarName)) {
                 return;
             }
