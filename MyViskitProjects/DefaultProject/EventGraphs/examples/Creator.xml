@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="Creator" package="examples" version="Creator" author="ahbuss" extend="SimEntityBase" description="TODO add description" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <StateVariable name="nextID" type="int">
+    <StateVariable name="nextID" type="int" description="">
         <Comment></Comment>
     </StateVariable>
     <Event name="Arrival" description="">
@@ -10,16 +10,16 @@
         </StateTransition>
         <Schedule delay="0.0" event="Customer_Arrival" condition="true" priority="DEFAULT">
             <Comment></Comment>
-            <EdgeParameter value="new Integer(nextID)"/>
+            <EdgeParameter value="nextID"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="120.0"/>
     </Event>
     <Event name="Customer_Arrival" description="">
         <Comment></Comment>
-        <Argument name="customer" type="Integer"/>
+        <Argument name="customer" type="Integer" description="empty"/>
         <Code></Code>
-        <Coordinate x="195.0" y="120.0"/>
+        <Coordinate x="200.0" y="120.0"/>
     </Event>
     <Event name="Run" description="">
         <Comment></Comment>
@@ -27,6 +27,6 @@
             <Assignment value="0"/>
         </StateTransition>
         <Code></Code>
-        <Coordinate x="30.0" y="15.0"/>
+        <Coordinate x="30.0" y="20.0"/>
     </Event>
 </SimEntity>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ArrayTester" package="examples" version="21 May 2016" author="Terry D. Norbraten" extend="SimEntityBase" description="Test Viskit's capability to create primative type arrays" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="param_0" type="int[]"/>
-    <StateVariable name="state_0" type="int[param_0.length]">
+    <Parameter description="" name="param_0" type="int[]"/>
+    <StateVariable description="" name="state_0" type="int[param_0.length]">
         <Comment></Comment>
     </StateVariable>
     <Event name="Run" description="Begin simulation">
@@ -14,7 +14,7 @@
     </Event>
     <Event name="Init" description="Initialize">
         <Comment></Comment>
-        <Argument name="i" type="int"/>
+        <Argument description="" name="i" type="int"/>
         <StateTransition state="state_0" index="i">
             <Assignment value="param_0[i]"/>
         </StateTransition>
