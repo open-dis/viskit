@@ -12,7 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitProject;
 
 /** Dialog to assist in generating a new viskit project directory space

@@ -55,7 +55,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 public final class ParameterTree extends JTree 
 {

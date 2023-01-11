@@ -24,7 +24,7 @@ import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcHandler;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import static javax.xml.bind.JAXBContext.newInstance;

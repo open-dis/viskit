@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.plaf.ComponentUI;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $

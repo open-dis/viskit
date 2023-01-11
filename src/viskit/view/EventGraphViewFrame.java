@@ -20,7 +20,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.Help;
 import viskit.control.EventGraphController;
 import viskit.ViskitConfiguration;
@@ -182,10 +182,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 			eventGraphController = (EventGraphControllerImpl) getController();
 			eventGraphController.addRecentEventGraphFileListener(new RecentEventGraphFileListener());
 			
-			menuShortcutCtrlKeyMask       = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			menuShortcutAltKeyMask        = InputEvent.ALT_MASK;
+			menuShortcutCtrlKeyMask       = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+			menuShortcutAltKeyMask        = InputEvent.ALT_DOWN_MASK;
 			projectMenuShortcutKeyMask    = menuShortcutCtrlKeyMask;                         //    Projects menu hotkey: <control>
-			eventGraphMenuShortcutKeyMask = menuShortcutCtrlKeyMask | InputEvent.SHIFT_MASK; // Event Graph menu hotkey: <control-shift>
+			eventGraphMenuShortcutKeyMask = menuShortcutCtrlKeyMask | InputEvent.SHIFT_DOWN_MASK; // Event Graph menu hotkey: <control-shift>
 		}
 		
 		projectsMenu    = new JMenu("Projects");
@@ -371,22 +371,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         stateVariablesPanel0.addPlusListener(ActionIntrospector.getAction((EventGraphController) getController(), "newStateVariable"));
 
         // Introspector can't handle a param to the method....?
-        stateVariablesPanel0.addMinusListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent event) 
-			{
-                ((EventGraphControllerImpl) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
-            }
+        stateVariablesPanel0.addMinusListener((ActionEvent event) -> {
+            ((EventGraphControllerImpl) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
         });
 
-        stateVariablesPanel0.addDoubleClickedListener(new ActionListener() 
-		{
-            @Override
-            public void actionPerformed(ActionEvent event) 
-			{
-                ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
-            }
+        stateVariablesPanel0.addDoubleClickedListener((ActionEvent event) -> {
+            ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
         });
 
         // Event jGraph parameters area
@@ -448,19 +438,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         parametersPanel0.addPlusListener(ActionIntrospector.getAction((EventGraphController) getController(), "newSimParameter"));
 
         // Introspector can't handle a param to the method....?
-        parametersPanel0.addMinusListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
-            }
+        parametersPanel0.addMinusListener((ActionEvent event) -> {
+            ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
         });
-        parametersPanel0.addDoubleClickedListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
-            }
+        parametersPanel0.addDoubleClickedListener((ActionEvent event) -> {
+            ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
         });
 
         parametersPanel.add(parametersPanel0);
@@ -490,14 +472,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private CodeBlockPanel buildCodeBlockPanel()
 	{
         CodeBlockPanel codeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
-        codeBlockPanel.addUpdateListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String s = (String) e.getSource();
-                if (s != null) {
-                    ((EventGraphController) getController()).codeBlockEdit(s);
-                }
+        codeBlockPanel.addUpdateListener((ActionEvent e) -> {
+            String s = (String) e.getSource();
+            if (s != null) {
+                ((EventGraphController) getController()).codeBlockEdit(s);
             }
         });
         return codeBlockPanel;
@@ -592,11 +570,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		nextTabIndex++; // increment in preparation for next tab
 
         // Now expose the EventGraph toolbar
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                getToolBar().setVisible(true);
-            }
+        Runnable r = () -> {
+            getToolBar().setVisible(true);
         };
         SwingUtilities.invokeLater(r);
     }
@@ -619,11 +594,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
                 // Don't allow operation of tools with no Event Graph tab in view (NPEs)
                 if (tabbedPane.getTabCount() == 0) {
-                    Runnable r = new Runnable() {
-                        @Override
-                        public void run() {
-                            getToolBar().setVisible(false);
-                        }
+                    Runnable r = () -> {
+                        getToolBar().setVisible(false);
                     };
                     SwingUtilities.invokeLater(r);
                 }
@@ -901,7 +873,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 		
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.NEWEVENTGRAPH_METHOD, "New Event Graph",  KeyEvent.VK_N, KeyStroke.getKeyStroke(KeyEvent.VK_N, eventGraphMenuShortcutKeyMask), isProjectOpen));
         eventGraphsMenu.add(buildMenuItem(eventGraphController, EventGraphControllerImpl.OPEN_METHOD,          "Open Event Graph", KeyEvent.VK_O, KeyStroke.getKeyStroke(KeyEvent.VK_O, eventGraphMenuShortcutKeyMask), isProjectOpen));
-		openRecentEventGraphMenu.setEnabled(isProjectOpen && eventGraphController.getRecentEventGraphFileSet().size() > 0);
+		openRecentEventGraphMenu.setEnabled(isProjectOpen && !eventGraphController.getRecentEventGraphFileSet().isEmpty());
 		eventGraphsMenu.add(openRecentEventGraphMenu);
         eventGraphsMenu.addSeparator();
 		
@@ -1193,41 +1165,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);
 
-        zoomInButton.addActionListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent e)
-			{
-				currentZoomFactor = getCurrentJGraphEventGraphComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT;
-                getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
-            }
+        zoomInButton.addActionListener((ActionEvent e) -> {
+            currentZoomFactor = getCurrentJGraphEventGraphComponentWrapper().getScale() + ViskitStatics.DEFAULT_ZOOM_INCREMENT;
+            getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
         });
-        zoomOutButton.addActionListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent e)
-			{
-				currentZoomFactor = Math.max(getCurrentJGraphEventGraphComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT); // no smaller than increment value, avoid zero/negative scaling
-                getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
-            }
+        zoomOutButton.addActionListener((ActionEvent e) -> {
+            currentZoomFactor = Math.max(getCurrentJGraphEventGraphComponentWrapper().getScale() - ViskitStatics.DEFAULT_ZOOM_INCREMENT, ViskitStatics.DEFAULT_ZOOM_INCREMENT); // no smaller than increment value, avoid zero/negative scaling
+            getCurrentJGraphEventGraphComponentWrapper().setScale(currentZoomFactor);
         });
-        zoomResetButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) 
-			{
-				currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
-                getCurrentJGraphEventGraphComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
-            }
+        zoomResetButton.addActionListener((ActionEvent e) -> {
+            currentZoomFactor = ViskitStatics.DEFAULT_ZOOM;
+            getCurrentJGraphEventGraphComponentWrapper().setScale(ViskitStatics.DEFAULT_ZOOM);
         });
-        saveButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-			   
-				EventGraphController eventGraphController = (EventGraphController) getController();
-				eventGraphController.save();
-            }
+        saveButton.addActionListener((ActionEvent e) -> {
+            EventGraphController eventGraphController1 = (EventGraphController) getController();
+            eventGraphController1.save();
         });
 
         TransferHandler th = new TransferHandler("text");
@@ -1243,26 +1195,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
         // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
-        selectMode.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(false);
-            }
+        selectMode.addActionListener((ActionEvent e) -> {
+            getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(false);
         });
-        arcMode.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
-            }
+        arcMode.addActionListener((ActionEvent e) -> {
+            getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
         });
-        cancelArcMode.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
-            }
+        cancelArcMode.addActionListener((ActionEvent e) -> {
+            getCurrentJGraphEventGraphComponentWrapper().setPortsVisible(true);
         });
 
     }
@@ -1454,28 +1394,26 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             // get the node in question from the jGraph
             Object o = getCurrentJGraphEventGraphComponentWrapper().getViskitElementAt(p);
 
-            if (dragger == NODE_DRAG) {
-                Point pp = new Point(
-                        p.x - addEvent.getWidth(),
-                        p.y - addEvent.getHeight());
-                ((EventGraphController) getController()).buildNewEventNode(pp);
-            } 
-			else if (dragger == SELF_REFERENTIAL_CANCELLING_EDGE_DRAG) 
-			{
-                if (o != null && o instanceof EventNode) {
-                    EventNode en = (EventNode) o;
-                    // We're making a self-referential arc
-                    ((EventGraphController) getController()).buildNewCancellingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
-                }
-            } 
-			else 
-			{
-                if (o != null && o instanceof EventNode)
-				{
-                    EventNode en = (EventNode) o;
-                    // We're making a self-referential arc
-                    ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
-                }
+            switch (dragger) {
+                case NODE_DRAG:
+                    Point pp = new Point(
+                            p.x - addEvent.getWidth(),
+                            p.y - addEvent.getHeight());
+                    ((EventGraphController) getController()).buildNewEventNode(pp);
+                    break;
+                case SELF_REFERENTIAL_CANCELLING_EDGE_DRAG:
+                    if (o != null && o instanceof EventNode) {
+                        EventNode en = (EventNode) o;
+                        // We're making a self-referential arc
+                        ((EventGraphController) getController()).buildNewCancellingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                    }   break;
+                default:
+                    if (o != null && o instanceof EventNode)
+                    {
+                        EventNode en = (EventNode) o;
+                        // We're making a self-referential arc
+                        ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                    }   break;
             }
         }
     }
@@ -1533,7 +1471,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         ViskitGlobals.instance().getAssemblyEditViewFrame().closeProject();
     }
 	
-    /** Edit the current project properties. */
+    /** Edit the current project properties.
+     * @param pathEditable 
+     */
     public void editProjectProperties (boolean pathEditable)
 	{
 		this.pathEditable = pathEditable;

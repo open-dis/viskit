@@ -1,7 +1,7 @@
 package edu.nps.util;
 
 import java.io.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  *  Generates and properly cleans up temporary files. Similar to {@link

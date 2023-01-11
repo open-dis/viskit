@@ -36,7 +36,7 @@ package edu.nps.util;
 import javax.swing.*;
 import javax.swing.SpringLayout;
 import java.awt.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * From Sun tutorial
@@ -52,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class SpringUtilities
 {
-    private final static Logger LOG = Logger.getLogger(SpringUtilities.class);
+    private final static Logger LOG = LogUtilities.getLogger(SpringUtilities.class);
     /**
      * A debugging utility that prints to stdout the component's
      * minimum, preferred, and maximum sizes.

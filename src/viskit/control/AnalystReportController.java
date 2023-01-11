@@ -45,7 +45,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;

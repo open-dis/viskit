@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.configuration.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;

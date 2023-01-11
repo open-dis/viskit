@@ -60,7 +60,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
@@ -168,12 +168,9 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     public void fillLayout() {
 
         // We don't always come in on the swing thread.
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                _fillLayout();
-            }
-         });
+        SwingUtilities.invokeLater(() -> {
+            _fillLayout();
+        });
     }
 
     private void _fillLayout() {
@@ -869,7 +866,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 	{
         AnalystReportController analystReportController = (AnalystReportController) getController();
 
-        int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         // Setup the File Menu
         myMenuBar = new JMenuBar();
@@ -977,7 +974,7 @@ class WrappingTextArea extends JTextArea {
 
 class ROTable extends JTable {
 
-    ROTable(Vector v, Vector c) {
+    ROTable(Vector<? extends Vector> v, Vector<?> c) {
         super(v, c);
     }
 
@@ -995,7 +992,7 @@ class EntityParamTable extends ROTable implements TableCellRenderer {
 
     TableCellRenderer defRenderer;
 
-    EntityParamTable(Vector v, Vector c) {
+    EntityParamTable(Vector<? extends Vector> v, Vector<?> c) {
         super(v, c);
         defRenderer = new DefaultTableCellRenderer();
 

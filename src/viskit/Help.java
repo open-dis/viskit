@@ -11,7 +11,7 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 

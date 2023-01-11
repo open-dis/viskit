@@ -9,7 +9,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Iterator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;

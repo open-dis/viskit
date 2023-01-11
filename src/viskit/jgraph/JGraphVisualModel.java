@@ -4,7 +4,7 @@ import edu.nps.util.LogUtilities;
 import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.Edge;

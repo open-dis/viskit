@@ -40,7 +40,7 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;

@@ -16,7 +16,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
  * XML.  Used to populate the LEGOs tree on the Assembly Editor.

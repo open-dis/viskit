@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBElement;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
@@ -45,7 +45,11 @@ public class TestGridkitServerAssembly3 extends Thread
     Object ret;
     public static final boolean verbose = false; // turns off console output from simkit
 
-    /** Creates a new instance of TestGridkitServerAssembly3 */
+    /** Creates a new instance of TestGridkitServerAssembly3
+     * @param server
+     * @param port
+     * @throws java.lang.Exception 
+     */
     public TestGridkitServerAssembly3(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server,port);
         args = new Vector<>();
@@ -368,11 +372,7 @@ public class TestGridkitServerAssembly3 extends Thread
 
             System.out.println("Test complete!");
 
-        } catch (IOException e) {
-            log.error(e);
-        } catch (NumberFormatException e) {
-            log.error(e);
-        } catch (XmlRpcException e) {
+        } catch (IOException | NumberFormatException | XmlRpcException e) {
             log.error(e);
         }
     }
@@ -382,6 +382,9 @@ public class TestGridkitServerAssembly3 extends Thread
         try {
             TestGridkitServerAssembly3 test = new TestGridkitServerAssembly3(args[0], Integer.parseInt(args[1]));
             test.start();
-        } catch (Exception e) { log.error(e); e.printStackTrace();}
+        } catch (Exception e) { 
+            log.error(e); 
+            e.printStackTrace(System.err);
+        }
     }
 }

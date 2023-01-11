@@ -14,8 +14,7 @@ import java.net.URLClassLoader;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-import org.apache.log4j.Logger;
-import viskit.ViskitGlobals;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
@@ -81,7 +80,7 @@ import viskit.ViskitStatics;
  */
 public class LocalBootLoader extends URLClassLoader 
 {
-    private final static Logger LOG = Logger.getLogger(LocalBootLoader.class);
+    private final static Logger LOG = LogUtilities.getLogger(LocalBootLoader.class);
 	
     String[] classPath;
     LocalBootLoader stage1;

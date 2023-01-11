@@ -10,7 +10,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.undo.UndoManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;

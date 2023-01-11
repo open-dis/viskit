@@ -4,7 +4,7 @@ import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

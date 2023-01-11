@@ -60,7 +60,7 @@ package viskit.jgraph;
 
 import edu.nps.util.LogUtilities;
 import javax.swing.JSplitPane;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.model.AssemblyModel;
 import viskit.view.AssemblyEditViewFrame;
 

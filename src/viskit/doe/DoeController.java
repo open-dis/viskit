@@ -53,7 +53,7 @@ import java.util.Vector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileFilterEx;
 import edu.nps.util.LogUtilities;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
 import viskit.xsd.bindings.assembly.SimkitAssembly;

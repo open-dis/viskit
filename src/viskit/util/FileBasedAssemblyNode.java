@@ -2,7 +2,7 @@ package viskit.util;
 
 import edu.nps.util.LogUtilities;
 import java.io.File;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /** Utility class to help identify whether an EG or PCL is from XML or *.class
  * form.  Used to help populate the LEGO tree on the Assembly Editor.

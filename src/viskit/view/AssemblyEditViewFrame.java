@@ -57,7 +57,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
@@ -181,8 +181,8 @@ public class AssemblyEditViewFrame extends mvcAbstractJFrameView implements Asse
 			assemblyController = (AssemblyControllerImpl) getController();
 			assemblyController.addRecentAssemblyFileSetListener(new RecentAssemblyFileListener());
 			
-			menuShortcutCtrlKeyMask       = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-			menuShortcutAltKeyMask        = InputEvent.ALT_MASK;
+			menuShortcutCtrlKeyMask       = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+			menuShortcutAltKeyMask        = InputEvent.ALT_DOWN_MASK;
 			projectMenuShortcutKeyMask    = menuShortcutCtrlKeyMask; 
 			
 			assemblyMenuShortcutKeyMask   = menuShortcutAltKeyMask; // Assembly menu hotkey: <alt>

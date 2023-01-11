@@ -11,11 +11,10 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.util.Compiler;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.util.FindClassesForInterface;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -73,19 +72,11 @@ public class SourceWindow extends JFrame
         toolBar.add(againButton);
         toolBar.addSeparator();
         toolBar.add(printButton);
-        fontPlusButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textArea.setFont(textArea.getFont().deriveFont(textArea.getFont().getSize2D() + 1.0f));
-            }
+        fontPlusButton.addActionListener((ActionEvent e) -> {
+            textArea.setFont(textArea.getFont().deriveFont(textArea.getFont().getSize2D() + 1.0f));
         });
-        fontMinusButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                textArea.setFont(textArea.getFont().deriveFont(Math.max(textArea.getFont().getSize2D() - 1.0f, 1.0f)));
-            }
+        fontMinusButton.addActionListener((ActionEvent e) -> {
+            textArea.setFont(textArea.getFont().deriveFont(Math.max(textArea.getFont().getSize2D() - 1.0f, 1.0f)));
         });
 
         printButton.setEnabled(false); // todo
@@ -152,33 +143,24 @@ public class SourceWindow extends JFrame
             }
         });
 
-        closeButton.addActionListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
+        closeButton.addActionListener((ActionEvent e) -> {
+            dispose();
         });
 		
-		xmlButton.addActionListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent e)
-			{
-                try {
-					if      (ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected())
-					{
-						     ViskitGlobals.instance().getEventGraphController().showXML();
-					}
-					else if (ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected())
-					{
-						     ViskitGlobals.instance().getAssemblyController().showXML();
-					}
-				}
-				catch (Exception ex) 
-				{
-                    LOG.error(ex);
+        xmlButton.addActionListener((ActionEvent e) -> {
+            try {
+                if      (ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected())
+                {
+                    ViskitGlobals.instance().getEventGraphController().showXML();
                 }
+                else if (ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected())
+                {
+                    ViskitGlobals.instance().getAssemblyController().showXML();
+                }
+            }
+            catch (Exception ex)
+            {
+                LOG.error(ex);
             }
         });
 
@@ -217,7 +199,7 @@ public class SourceWindow extends JFrame
                         textArea.setCaretPosition(startOffset);
                     }
                 } 
-				catch (Exception ex) 
+				catch (BadLocationException ex) 
 				{
                     LOG.error(ex);
                 }
@@ -226,37 +208,33 @@ public class SourceWindow extends JFrame
             }
         });
 
-        saveButton.addActionListener(new ActionListener()
-		{
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fn = getFileName();
-                saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(), fn));
-                int ret = saveChooser.showSaveDialog(SourceWindow.this);
-                if (ret != JFileChooser.APPROVE_OPTION) {
+        saveButton.addActionListener((ActionEvent e) -> {
+            String fn = getFileName();
+            saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(), fn));
+            int ret = saveChooser.showSaveDialog(SourceWindow.this);
+            if (ret != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+            File f = saveChooser.getSelectedFile();
+            
+            if (f.exists()) {
+                int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?", "Confirm",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (r != JOptionPane.YES_OPTION) {
                     return;
                 }
-                File f = saveChooser.getSelectedFile();
-
-                if (f.exists()) {
-                    int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?", "Confirm",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                    if (r != JOptionPane.YES_OPTION) {
-                        return;
-                    }
+            }
+            
+            try {
+                try (FileWriter fw = new FileWriter(f)) {
+                    fw.write(sourceCode);
                 }
-
-                try {
-                    try (FileWriter fw = new FileWriter(f)) {
-                        fw.write(sourceCode);
-                    }
-                    dispose();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, "Exception on source file write" +
-                            "\n" + f.getName() +
-                            "\n" + ex.getMessage(),
-                            "File Input/Output Error", JOptionPane.ERROR_MESSAGE);
-                }
+                dispose();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Exception on source file write" +
+                        "\n" + f.getName() +
+                        "\n" + ex.getMessage(),
+                        "File Input/Output Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -356,7 +334,7 @@ public class SourceWindow extends JFrame
         InputMap iMap = textArea/*contentPane*/.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap aMap = textArea/*contentPane*/.getActionMap();
 
-        int cntlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+        int cntlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_F, cntlKeyMask);
         iMap.put(key, startSearchHandle);
         aMap.put(startSearchHandle, startAction);

@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;

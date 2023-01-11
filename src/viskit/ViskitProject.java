@@ -45,7 +45,7 @@ import java.util.Set;
 import javax.swing.*;
 import javax.swing.filechooser.FileView;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;

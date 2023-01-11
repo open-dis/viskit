@@ -2,7 +2,7 @@ package viskit.mvc;
 
 import edu.nps.util.LogUtilities;
 import javax.swing.JFrame;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

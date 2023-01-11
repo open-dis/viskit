@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 import viskit.model.AssemblyNode;

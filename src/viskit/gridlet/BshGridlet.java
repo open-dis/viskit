@@ -50,7 +50,7 @@ import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.cli.Boot;
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.parseInt;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.parseInt;
 import static java.lang.Boolean.valueOf;

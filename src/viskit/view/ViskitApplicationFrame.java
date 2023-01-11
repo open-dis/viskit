@@ -48,7 +48,7 @@ import edu.nps.util.SystemExitHandler;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitEventGraphAssemblyComboMain;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
@@ -131,7 +131,7 @@ public class ViskitApplicationFrame extends JFrame
 
         this.initialFile = initialFile;
 		
-		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		
         initialize();
 		
@@ -327,7 +327,7 @@ public class ViskitApplicationFrame extends JFrame
         fileMenu.addSeparator();
 		JMenuItem userPreferencesMenuItem = new JMenuItem ("User Preferences"); // buildMenuItem(eventGraphController, "settings", "User Preferences", null, null);
 		userPreferencesMenuItem.setMnemonic(KeyEvent.VK_U);
-        userPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_MASK));
+        userPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, InputEvent.CTRL_DOWN_MASK));
         fileMenu.add(userPreferencesMenuItem);
         userPreferencesMenuItem.addActionListener(myUserPreferencesHandler);
 		
@@ -341,10 +341,10 @@ public class ViskitApplicationFrame extends JFrame
 //		fileMenu.add(closeProjectMI); 
 		
 		final String EXIT_METHOD = "quit"; // must match following method name.  Not possible to accomplish this programmatically. // do not change "quit" !!
-		exitMenuItem = buildMenuItem(eventGraphController, EXIT_METHOD, "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+		exitMenuItem = buildMenuItem(eventGraphController, EXIT_METHOD, "Exit", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
         addExitHandler(exitMenuItem, myExitAction);
 		exitMenuItem.setMnemonic(KeyEvent.VK_X);
-        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
         fileMenu.add(exitMenuItem);
 
         // Now that we have an assemblyEditViewFrame reference, set the recent open project's file listener for the eventGraphFrame

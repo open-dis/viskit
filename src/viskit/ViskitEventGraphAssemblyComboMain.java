@@ -34,13 +34,12 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtilities;
+import java.awt.Desktop;
 import java.awt.EventQueue;
-import java.awt.Image;
-import java.lang.reflect.InvocationHandler;
+import java.awt.Taskbar;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import javax.swing.*;
+import org.apache.logging.log4j.Logger;
 import viskit.control.EventGraphControllerImpl;
 import viskit.view.ViskitApplicationFrame;
 import viskit.view.dialog.UserPreferencesDialog;
@@ -55,7 +54,7 @@ import viskit.view.dialog.UserPreferencesDialog;
  */
 public class ViskitEventGraphAssemblyComboMain
 {
-	private static org.apache.log4j.Logger LOG; // create user's log directory before instantiating LOG below
+//    private static Logger LOG; // create user's log directory before instantiating LOG below
 
     private static ImageIcon aboutIcon = null;
 
@@ -65,36 +64,26 @@ public class ViskitEventGraphAssemblyComboMain
      */
     public static void main(final String[] args)
 	{
-		ViskitConfiguration initializeViskitConfigurationSingleton = ViskitConfiguration.instance (); // Create user's log directory first
-		LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
+//		ViskitConfiguration initializeViskitConfigurationSingleton = ViskitConfiguration.instance (); // Create user's log directory first
+//		LOG = LogUtilities.getLogger(EventGraphControllerImpl.class);
 		
         // Launch all GUI stuff on, or within the EventDispatchThread
         try 
 		{
             if (!EventQueue.isDispatchThread())
 			{
-                SwingUtilities.invokeAndWait(new Runnable()
-				{
-                    @Override
-                    public void run()
-					{
-                        createGUI(args);
-                    }
+                SwingUtilities.invokeAndWait(() -> {
+                    createGUI(args);
                 });
             } 
 			else 
 			{
-                SwingUtilities.invokeLater(new Runnable()
-				{
-                    @Override
-                    public void run()
-					{
-                        createGUI(args);
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    createGUI(args);
                 });
             }
         } 
-		catch (Exception e) // catch all
+		catch (InterruptedException | InvocationTargetException e) // catch all
 		{
             LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).error(e);
 
@@ -157,55 +146,18 @@ public class ViskitEventGraphAssemblyComboMain
         } 
 		catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) 
 		{
-            LOG.error("Error setting Look and Feel to " + LOOK_AND_FEEL, ex);
+            LogUtilities.getLogger(ViskitEventGraphAssemblyComboMain.class).error("Error setting Look and Feel to " + LOOK_AND_FEEL, ex);
         }
     }
 
     private static void setupMacGUI() {
-        try {
-            Class<?> applicationListener = ViskitStatics.ClassForName("com.apple.eawt.ApplicationListener");
-            Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[] { applicationListener }, new InvocationHandler() 
-			{
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) {
-                    switch (method.getName()) 
-					{
-                        case "handleQuit":
-                            ViskitGlobals.instance().getViskitApplicationFrame().myExitAction.actionPerformed(null);
-                            break;
-                        case "handleAbout":
-                            try {
-                                Help help = ViskitGlobals.instance().getHelp();
-                                help.aboutEventGraphEditor();
-                                Class<?> applicationEventClass = ViskitStatics.ClassForName("com.apple.eawt.ApplicationEvent");
-                                Method setHandled = applicationEventClass.getMethod("setHandled", boolean.class);
-                                setHandled.invoke(args[0], true);
-                            } 
-							catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                                LOG.error("Error showing About display: " + ex);
-                            }   break;
-                    }
-                    return null;
-                }
-            });
-
-            Class<?> applicationClass = ViskitStatics.ClassForName("com.apple.eawt.Application");
-            Object applicationInstance = applicationClass.newInstance();
-
-            Method m = applicationClass.getMethod("addApplicationListener", applicationListener);
-            m.invoke(applicationInstance, proxy);
-
-            if (aboutIcon != null) {
-                try {
-                    m = applicationClass.getMethod("setDockIconImage", Image.class);
-                    m.invoke(applicationInstance, aboutIcon.getImage());
-                } catch (NoSuchMethodException ex){
-                    LOG.error("Error showing aboutIcon in dock " + ex);
-                }
-            }
-        } catch (IllegalArgumentException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-            LOG.error("Error defining Apple Quit & About handlers: " + ex);
-        }
+        Desktop.getDesktop().setAboutHandler(e -> {
+            Help help = ViskitGlobals.instance().getHelp();
+            help.aboutEventGraphEditor();
+        });
+        
+        if (aboutIcon != null)
+            Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
     }
 
 } // end class file ViskitEventGraphAssemblyComboMain.java

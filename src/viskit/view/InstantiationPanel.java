@@ -28,7 +28,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;

@@ -237,6 +237,6 @@ class MyDataSet extends AbstractXYDataset implements XYDataset {
         if (!results.resultsValid) {
             return -1d;
         }
-        return (results.resultsMean < 1.0d) ? new Double(1d) : new Double(0d);
+        return (results.resultsMean < 1.0d) ? Double.valueOf(1d) : Double.valueOf(0d);
     }
 }

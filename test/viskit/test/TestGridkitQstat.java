@@ -10,7 +10,7 @@ package viskit.test;
 import edu.nps.util.LogUtilities;
 import java.io.IOException;
 import java.util.Vector;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -27,6 +27,9 @@ public class TestGridkitQstat extends Thread {
 
     /**
      * Creates a new instance of TestGridkitLogin
+     * @param server
+     * @param port
+     * @throws java.lang.Exception
      */
     public TestGridkitQstat(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server, port);
@@ -69,9 +72,7 @@ public class TestGridkitQstat extends Thread {
             ret = xmlrpc.execute("gridkit.logout", params);
             System.out.println("logged out");
 
-        } catch (IOException e) {
-            log.error(e);
-        } catch (XmlRpcException e) {
+        } catch (IOException | XmlRpcException e) {
             log.error(e);
         }
 

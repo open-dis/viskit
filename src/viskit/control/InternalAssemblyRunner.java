@@ -49,7 +49,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import javax.swing.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import simkit.Schedule;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
@@ -179,7 +179,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage());
             twiddleButtons(OFF);
-            throwable.printStackTrace();
+            throwable.printStackTrace(System.err);
             return;
         }
         twiddleButtons(REWIND);
@@ -191,7 +191,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         if (assemblyClass == null) {
             throw new ClassNotFoundException();
         }
-        assemblyInstance = assemblyClass.newInstance();
+        assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
 
         /* in order to resolve the Assembly as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
@@ -251,7 +251,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // Now we are in the pure classloader realm where each Assembly run can
             // be independent of any other
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
-            assemblyInstance = assemblyClass.newInstance();
+            assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
 
             Method setOutputStream            = assemblyClass.getMethod("setOutputStream", OutputStream.class);
             Method setNumberOfReplications    = assemblyClass.getMethod("setNumberOfReplications", int.class);
@@ -348,7 +348,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 waitOn.join();
             } catch (InterruptedException ex) {
                 LOG.error(ex);
-                ex.printStackTrace();
+                ex.printStackTrace(System.err);
             }
 
             end();
@@ -452,7 +452,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
                 LOG.error(ex);
-                ex.printStackTrace();
+                ex.printStackTrace(System.err);
             }
 
             twiddleButtons(STOP);
@@ -744,7 +744,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
               }
               catch (IOException ex1) {
                   LOG.error(ex1);
-                  ex1.printStackTrace();
+                  ex1.printStackTrace(System.err);
               }
             }
         }

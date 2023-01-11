@@ -10,8 +10,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.apache.log4j.Logger;
-import viskit.model.EventGraphNode;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -26,7 +24,6 @@ import viskit.model.EventGraphNode;
  */
 public class SplashScreenFrame2 extends JFrame
 {
-    static final Logger LOG = LogUtilities.getLogger(SplashScreenFrame2.class);
 
     Robot robot;
     BufferedImage screenImage;
@@ -140,12 +137,8 @@ public class SplashScreenFrame2 extends JFrame
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         splashScreen.setLocation((d.width - splashScreen.getWidth()) / 2, (d.height - splashScreen.getHeight()) / 2);
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                splashScreen.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            splashScreen.setVisible(true);
         });
 
         // This is for the launch4j executable for Win & executable jar for Unix
@@ -182,12 +175,8 @@ public class SplashScreenFrame2 extends JFrame
         }
         progressBar.setString("Complete");
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                splashScreen.dispose();
-            }
+        SwingUtilities.invokeLater(() -> {
+            splashScreen.dispose();
         });
     }
 

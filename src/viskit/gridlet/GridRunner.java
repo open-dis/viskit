@@ -32,34 +32,13 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import simkit.random.MersenneTwister;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
-import static java.io.File.createTempFile;
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.valueOf;
-import static java.lang.Long.parseLong;
-import static java.lang.System.getProperty;
-import static java.util.Collections.synchronizedList;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static java.io.File.createTempFile;
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.valueOf;
-import static java.lang.Long.parseLong;
-import static java.lang.System.getProperty;
-import static java.util.Collections.synchronizedList;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static java.io.File.createTempFile;
-import static java.lang.Integer.parseInt;
-import static java.lang.Integer.valueOf;
-import static java.lang.Long.parseLong;
-import static java.lang.System.getProperty;
-import static java.util.Collections.synchronizedList;
-import static javax.xml.bind.JAXBContext.newInstance;
 import static java.io.File.createTempFile;
 import static java.lang.Integer.parseInt;
 import static java.lang.Integer.valueOf;
@@ -105,7 +84,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     int port;
     static Logger LOG = getLogger(GridRunner.class);
     Vector<String> eventGraphs;
-    Hashtable<String, Object> thirdPartyJars;
+    Map<String, Object> thirdPartyJars;
     File experimentFile;
     // This SimkitAssembly is used to set up
     // the experiment. Read in by the setAssembly()
@@ -199,7 +178,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
             LOG.error(e);
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return Boolean.FALSE;
         }
 
@@ -291,7 +270,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // its own Boot class loader
     public Vector<String> getJars() {
         Vector<String> ret = new Vector<>();
-        Enumeration<Object> e = thirdPartyJars.elements();
+        Enumeration<Object> e = ((Hashtable<String, Object>)thirdPartyJars).elements();
         while ( e.hasMoreElements() ) {
             ret.add(e.nextElement().toString());
         }
@@ -343,7 +322,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         } catch (NumberFormatException | JAXBException e) {
             error = true;
             LOG.error(e);
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
 
         return error;
@@ -415,10 +394,10 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
 
     // Hashtable returned is name keyed to String of xml
-    public synchronized Hashtable<String, String> getDesignPointStatistics(int sampleIndex, int designPtIndex) {
+    public synchronized Map<String, String> getDesignPointStatistics(int sampleIndex, int designPtIndex) {
         Sample s = root.getExperiment().getSample().get(sampleIndex);
         DesignPoint dp = s.getDesignPoint().get(designPtIndex);
-        Hashtable<String, String> ret = new Hashtable<>();
+        Map<String, String> ret = new Hashtable<>();
         List<JAXBElement<?>> statistics = dp.getStatistics();
         int index = sampleIndex*designPointCount + designPtIndex;
         Boolean notifier = designPointStatisticsNotifiers.get(index);
@@ -453,11 +432,11 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     }
 
     // Hashtable returned is name keyed to String of xml
-    public synchronized Hashtable<String, String> getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) {
+    public synchronized Map<String, String> getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) {
         Sample s = root.getExperiment().getSample().get(sampleIndex);
         DesignPoint dp = s.getDesignPoint().get(designPtIndex);
         Replication rp = dp.getReplication().get(replicationIndex);
-        Hashtable<String, String> ret = new Hashtable<>();
+        Map<String, String> ret = new Hashtable<>();
         List<JAXBElement<?>> statistics = rp.getStatistics();
         int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
         Boolean notifier = replicationStatisticsNotifiers.get(index);
@@ -511,7 +490,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         } catch (JAXBException e) {
             LOG.error(e);
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return Boolean.FALSE;
         }
 
@@ -538,7 +517,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
         } catch (JAXBException e) {
             LOG.error(e);
-            e.printStackTrace();
+            e.printStackTrace(System.err);
             return Boolean.FALSE;
         }
 
@@ -983,30 +962,25 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         List<TerminalParameter> params = root.getDesignParameters();
         Map<TerminalParameter, Object> values = new HashMap<>();
-        Iterator<TerminalParameter> it = params.iterator();
-
-        while (it.hasNext()) {
-
-            TerminalParameter t = it.next();
+        for (TerminalParameter t : params) {
             LOG.debug("Batch Mode " + t);
             JAXBElement<ValueRange> range = t.getValueRange();
             Object returns;
             if (range.getName().toString().contains("DoubleRange")) {
                 returns = new Double[] {
-                    new Double(range.getValue().getLowValue()),
-                    new Double(range.getValue().getHighValue())
+                    Double.valueOf(range.getValue().getLowValue()), 
+                    Double.valueOf(range.getValue().getHighValue())
                 };
             } else {
                 returns = new Integer[] {
-                    new Integer(range.getValue().getLowValue()),
-                    new Integer(range.getValue().getHighValue())
+                    Integer.valueOf(range.getValue().getLowValue()), 
+                    Integer.valueOf(range.getValue().getHighValue())
                 };
             }
 
             values.put(t,returns);
-
         }
-        if (values.size() > 0) {
+        if (!values.isEmpty()) {
             iterate(values,values.size()-1);
         }
     }
@@ -1131,15 +1105,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     if (dp.getType().equals("double")) {
 
                         range = new Double[]{
-                            new Double(dp.getValueRange().getValue().getLowValue()),
-                            new Double(dp.getValueRange().getValue().getHighValue())
+                            Double.valueOf(dp.getValueRange().getValue().getLowValue()), 
+                            Double.valueOf(dp.getValueRange().getValue().getHighValue())
                         };
 
                     } else {
 
-                        range = new Integer[]{
-                            new Integer(dp.getValueRange().getValue().getLowValue()),
-                            new Integer(dp.getValueRange().getValue().getHighValue())
+                        range = new Integer[] {
+                            Integer.valueOf(dp.getValueRange().getValue().getLowValue()), 
+                            Integer.valueOf(dp.getValueRange().getValue().getHighValue())
                         };
 
                     }

@@ -49,7 +49,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.model.AdapterEdge;
 import viskit.model.EventGraphNode;
 import viskit.ViskitStatics;

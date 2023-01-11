@@ -18,7 +18,7 @@ import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.LogUtilities;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import simkit.Priority;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;

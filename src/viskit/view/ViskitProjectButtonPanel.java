@@ -38,7 +38,7 @@ import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;

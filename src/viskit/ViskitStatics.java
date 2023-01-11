@@ -44,16 +44,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +65,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
@@ -922,26 +923,21 @@ public class ViskitStatics
                 + message + "</body></html>");
 
         // handle link events to bring up mail client and debug.LOG
-        editorPane.addHyperlinkListener(new HyperlinkListener()
-		{
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent event)
-			{
-                try {
-                    if (    event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED) // never reached if tracing this line in debug mode, ENTERED occurs first
+        editorPane.addHyperlinkListener((HyperlinkEvent event) -> {
+            try {
+                if (    event.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED) // never reached if tracing this line in debug mode, ENTERED occurs first
 //						|| (event.getEventType().equals(HyperlinkEvent.EventType.ENTERED) && ViskitStatics.debug)
-					   )
-					{
-                        if (showLog)
-                            Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_DEBUG_LOG.toURI());
-
-                        Desktop.getDesktop().mail(url.toURI()); // mail invoked second, thus goes on top
-                    }
-                } 
-				catch (IOException | URISyntaxException ex) 
-				{
-                    LOG.error(ex);
+                        )
+                {
+                    if (showLog)
+                        Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_DEBUG_LOG.toURI());
+                    
+                    Desktop.getDesktop().mail(url.toURI()); // mail invoked second, thus goes on top
                 }
+            }
+            catch (IOException | URISyntaxException ex)
+            {
+                LOG.error(ex);
             }
         });
         editorPane.setEditable(false);
@@ -984,7 +980,7 @@ public class ViskitStatics
 				);
 				mailtoString = "<a href='" + mailtoUrl.toString()+ "'>" + ViskitConfiguration.VISKIT_MAILING_LIST + "</a>";
             } 
-			catch (Exception ex) 
+			catch (UnsupportedEncodingException | MalformedURLException ex) 
 			{
                 LOG.error(ex);
 			}

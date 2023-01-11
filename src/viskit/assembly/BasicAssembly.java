@@ -47,7 +47,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import javax.swing.JOptionPane;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import simkit.BasicSimEntity;
 import simkit.Schedule;
 import simkit.SimEntity;

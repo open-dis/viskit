@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import viskit.model.EventGraphNode;
 import viskit.model.ViskitInstantiator;

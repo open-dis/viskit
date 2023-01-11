@@ -49,7 +49,7 @@ package viskit.util;
 import edu.nps.util.LogUtilities;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Filters files whose names contain a given String, case insensitive

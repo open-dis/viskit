@@ -1,12 +1,13 @@
 package viskit.util;
 
+import edu.nps.util.LogUtilities;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /** This class was written by CDR Duane Davis for the AUV Workbench.
  * It was copied to this application to perform handy XSLT conversions.
@@ -17,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class XsltUtility 
 {
-    private final static Logger LOG = Logger.getLogger(XsltUtility.class);
+    private final static Logger LOG = LogUtilities.getLogger(XsltUtility.class);
 
     /**
      * Runs an XSL Transformation on an XML file and writes the result to another file

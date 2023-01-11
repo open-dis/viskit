@@ -1,7 +1,7 @@
 package viskit.model;
 
 import edu.nps.util.LogUtilities;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.view.dialog.UserPreferencesDialog;
 import viskit.xsd.bindings.assembly.SimEntity;
 

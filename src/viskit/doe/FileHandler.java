@@ -43,7 +43,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;

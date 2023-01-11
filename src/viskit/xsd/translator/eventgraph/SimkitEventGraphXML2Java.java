@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -271,7 +271,7 @@ public class SimkitEventGraphXML2Java
         pw.println("// Application specific imports");
 
         // For debugging only
-//        pw.println("import org.apache.log4j.Logger;");
+//        pw.println("import org.apache.logging.log4j.Logger;");
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
         pw.println();            

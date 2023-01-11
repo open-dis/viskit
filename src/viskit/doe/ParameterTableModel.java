@@ -44,7 +44,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.model.EventGraphModelImpl;
 
 /**

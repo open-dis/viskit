@@ -3,7 +3,7 @@ package viskit.mvc;
 import edu.nps.util.LogUtilities;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.ModelEvent;
 

@@ -64,7 +64,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.control.AnalystReportController;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
@@ -577,7 +577,7 @@ public class ViskitGlobals
                         if (isArr) {
                             o = Array.newInstance(c, 1);
                         } else {
-                            o = c.newInstance();
+                            o = c.getDeclaredConstructor().newInstance();
                         }
                     }
                 }
@@ -1087,13 +1087,9 @@ public class ViskitGlobals
                 if (comboBox.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
-                    Runnable r = new Runnable() {
-
-                        @Override
-                        public void run() {
-                            if (comboBox.isShowing())
-                                popup.show(comboBox, 0, 0);
-                        }
+                    Runnable r = () -> {
+                        if (comboBox.isShowing())
+                            popup.show(comboBox, 0, 0);
                     };
 
                     if (SwingUtilities.isEventDispatchThread()) {

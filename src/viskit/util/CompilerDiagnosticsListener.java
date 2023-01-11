@@ -4,7 +4,7 @@ import edu.nps.util.LogUtilities;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileObject;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 /** Taken from viskit.view.SourceWindow to be more broadly used
  *

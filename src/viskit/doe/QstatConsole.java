@@ -16,9 +16,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
 import javax.swing.text.NumberFormatter;
-import java.util.Vector;
-
-import org.apache.xmlrpc.XmlRpcClientLite;
 
 /**
  * @author Rick Goldberg
@@ -46,7 +43,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     public QstatConsole() {
         super("Visual Simkit (Viskit) Grid Queue Status Console");
         
-        addWindowListener(this);
+        addWindowListener(QstatConsole.this);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         content = new JPanel();
@@ -75,29 +72,36 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         return content;
     }
     
+    @Override
     public void windowActivated(WindowEvent windowEvent) {
         
     }
     
+    @Override
     public void windowClosed(WindowEvent windowEvent) {
         
     }
     
+    @Override
     public void windowClosing(WindowEvent windowEvent) {
         pauseQstat();
         reset();
     }
     
+    @Override
     public void windowDeactivated(WindowEvent windowEvent) {
     }
     
+    @Override
     public void windowDeiconified(WindowEvent windowEvent) {
         
     }
     
+    @Override
     public void windowIconified(WindowEvent windowEvent) {
     }
     
+    @Override
     public void windowOpened(WindowEvent windowEvent) {
         
     }
@@ -126,6 +130,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     }
     
     // Timer event
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         textArea.setText((new java.util.Date()).toString() + "\n");
         if (doe != null) {
@@ -136,7 +141,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
                 textArea.setRows(lines > MIN_ROWS ? lines : MIN_ROWS);
                 textArea.setText(textArea.getText() + "\n" + data);
                
-            } catch (Exception e) {
+            } catch (DoeException e) {
                 textArea.setText("Can't qstat! \n" + e.toString());
             }
         }
@@ -157,22 +162,23 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             slider.setMinorTickSpacing(2);
             slider.setPaintTicks(true);
             slider.setPaintLabels(true);
-            slider.addChangeListener(this);
+            slider.addChangeListener(FrameRateSliderPanel.this);
             slider.setToolTipText("Adjust number of queries per minute to qstat at the front end");
             sliderLabel = new JLabel("Queries Per Minute", JLabel.CENTER);
             sliderLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             NumberFormat numberFormat =
                     java.text.NumberFormat.getIntegerInstance();
             NumberFormatter formatter = new NumberFormatter(numberFormat);
-            formatter.setMinimum(new Integer(min));
-            formatter.setMaximum(new Integer(max));
+            formatter.setMinimum(min);
+            formatter.setMaximum(max);
             framesPerMin = new JFormattedTextField(formatter);
-            framesPerMin.setValue(new Integer(INIT_FPM));
+            framesPerMin.setValue(INIT_FPM);
             framesPerMin.setColumns(2);
             framesPerMin.getInputMap().put(KeyStroke.getKeyStroke(
                     KeyEvent.VK_ENTER, 0),
                     "check");
             framesPerMin.getActionMap().put("check", new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if (!framesPerMin.isEditValid()) {
                         Toolkit.getDefaultToolkit().beep();
@@ -195,6 +201,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             return getContentPane();
         }
         
+        @Override
         public void stateChanged(ChangeEvent changeEvent) {
             JSlider source = (JSlider) changeEvent.getSource();
             int fpm = (int) source.getValue();
@@ -211,12 +218,12 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
                 }
                 
             }
-            framesPerMin.setValue(new Integer(fpm));
+            framesPerMin.setValue(fpm);
             
         }
         
         void reset() {
-            framesPerMin.setValue(new Integer(INIT_FPM));
+            framesPerMin.setValue(INIT_FPM);
             slider.setValue(INIT_FPM);
         }
         

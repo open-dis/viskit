@@ -17,14 +17,10 @@
     <!-- in this build.xml file, so, be careful.                                            -->
     <property file="build.properties"/>
 
-    <!-- ID properties (this file) -->
-    <property name="SVNId" value="$Id$"/>
-
     <!-- Project directories -->
-
     <property description="Where the distribution files wind up." location="dist" name="dir.dist"/>
 
-    <property description="Where all the JAXB 2.2 extensions are." location="${dir.lib}/jaxb" name="dir.lib.xml"/>
+    <property description="Where all the JAXB extensions are." location="${dir.lib}/jaxb" name="dir.lib.xml"/>
 
     <property description="Runtime module extension libraries." location="${dir.lib}/ext" name="dir.lib.ext"/>
 
@@ -58,11 +54,11 @@
     <property environment="env"/>
 
     <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar jaxb-core.jar endorsed/jaxb-api.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar istack-commons-tools.jar jaxb-api.jar jaxb-runtime.jar codemodel.jar istack-commons-runtime.jar xsom.jar relaxng-datatype.jar rngom.jar"/>
     </path>
 
     <path id="jaxb.runtime.path">
-        <fileset dir="${dir.lib.xml}" includes="**/*.jar" excludes="jaxb-xjc.jar" id="jaxb.classes"/>
+        <fileset dir="${dir.lib.xml}" includes="jaxb-runtime.jar javax.activation-api.jar istack-commons-runtime.jar" id="jaxb.classes"/>
     </path>
 
     <path id="runtime.extension.classes.path">
@@ -71,7 +67,8 @@
 
     <path id="compile.classpath">
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
-        <pathelement location="${dir.lib}/jdom-1.1.3.jar"/>
+        <pathelement location="${jaxb-api.jar}"/>
+        <pathelement location="${dir.lib}/jdom.jar"/>
         <pathelement location="${dir.lib}/jgraph.jar"/>
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
@@ -81,7 +78,7 @@
         <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
         <pathelement location="${dir.lib}/commons-io-2.5.jar"/>
         <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
-        <pathelement location="${log4j.jar}"/>
+        <pathelement path="${log4j.jars}"/>
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
     </path>
 
@@ -89,7 +86,7 @@
         <pathelement location="${dir.build.classes}"/>
         <pathelement location="${dir.lib}/batik-ext.jar"/>
         <pathelement location="${jcommon.jar}"/>
-        <pathelement location="${dir.lib}/commons-beanutils-1.8.3.jar"/>
+        <pathelement location="${dir.lib}/commons-beanutils-1.9.4.jar"/>
         <pathelement location="${dir.lib}/commons-collections-3.2.1.jar"/>
         <pathelement location="${dir.lib}/commons-digester-2.1.jar"/>
         <pathelement location="${dir.lib}/commons-jxpath-1.3.jar"/>
@@ -112,7 +109,7 @@
     <fileset file="${dist.exe.jar}" id="runtime.viskit.exe"/>
 
     <!-- The following filesets are used for the IzPack installer routine -->
-    <fileset dir="${dir.lib}" id="runtime.lib" >
+    <fileset dir="${dir.lib}" id="runtime.lib">
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
         <exclude name="izpack/**"/>
@@ -196,7 +193,7 @@ their descpritions.
         <tstamp/>
 
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
-        <!--<echo message="Buildfile version ${SVNId}"/>-->
+        <echo message="Build version ${product.Version}"/>
         <echo message="Base directory: ${basedir}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
 
@@ -554,14 +551,14 @@ their descpritions.
             <fileset file="${dist.jar}"/>
             <fileset dir="${dir.lib}">
                 <include name="bsh-2.0b4.jar"/>
-                <include name="commons-beanutils-1.8.3.jar"/>
+                <include name="commons-beanutils-1.9.4.jar"/>
                 <include name="commons-codec-1.3.jar"/>
                 <include name="commons-collections-3.2.1.jar"/>
                 <include name="commons-configuration-1.7.jar"/>
                 <include name="commons-digester-2.1.jar"/>
                 <include name="commons-lang-2.6.jar"/>
                 <include name="commons-logging-1.1.1.jar"/>
-                <include name="jdom-1.1.3.jar"/>
+                <include name="jdom.jar"/>
                 <include name="log4j.jar"/>
                 <include name="simkit.jar"/>
                 <include name="xmlrpc-2.0.jar"/>
@@ -635,6 +632,7 @@ their descpritions.
             <jvmarg value="-Xdock:name=${product.shortname}"/>
             <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
             <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+            <jvmarg value="-Dapple.awt.brushMetalLook=true "/>
             <arg value="${main.class}"/>
         </java>
     </target>
@@ -683,6 +681,10 @@ their descpritions.
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
 
             <jvmarg line="${common.run.args}"/>
+            <jvmarg value="-Xdock:name=${product.shortname}"/>
+            <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
+            <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
+            <jvmarg line="--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED"/>
 
             <!-- Any debug args can go here -->
             <!--arg value="localhost" />
@@ -706,16 +708,20 @@ their descpritions.
 
     </target>
 
-    <target name="test" depends="test-code-format" description="run all working tests">
+    <target name="test" depends="test.code.format,test.var.args" description="run all working tests">
         <!-- TODO add other test targets and other tests when ready -->
     </target>
 
-    <target name="test-code-format" depends="compile.test" description="TestCodeFormat runner">
+    <target name="test.code.format" depends="compile.test" description="TestCodeFormat runner">
         <echo message="viskit.test.TestCodeFormat test/ArrayTester.xml"/>
         <!-- TODO improve output formatting -->
         <java classname="viskit.test.TestCodeFormat" classpathref="runtime.test.classpath" fork="true" failonerror="true">
             <arg value="test/ArrayTester.xml"/>
         </java>
+    </target>
+    <target name="test.var.args" depends="compile.test" description="TestVarArgs runner">
+        <echo message="viskit.test.TestVarArgs"/>
+        <java classname="viskit.test.TestVarArgs" classpathref="runtime.test.classpath" fork="true" failonerror="true"/>
     </target>
 
     <!-- For the following test targets set up a server, first run the ant gridkit-jar target,

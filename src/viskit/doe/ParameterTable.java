@@ -43,7 +43,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import viskit.xsd.bindings.assembly.SimEntity;
 import viskit.xsd.bindings.assembly.TerminalParameter;

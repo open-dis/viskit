@@ -51,7 +51,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
@@ -238,7 +238,7 @@ public class UserPreferencesDialog extends JDialog
         JPanel classpathAdditionsPanel = new JPanel();
         classpathAdditionsPanel.setLayout(new BoxLayout(classpathAdditionsPanel, BoxLayout.Y_AXIS));
 		
-        classpathAdditionsJlist = new JList<>(new DefaultListModel<String>());
+        classpathAdditionsJlist = new JList<>(new DefaultListModel<>());
         JScrollPane jsp = new JScrollPane(classpathAdditionsJlist);
         jsp.setPreferredSize(new Dimension(70, 70));  // don't want it to control size of dialog
         classpathAdditionsPanel.add(jsp);
@@ -552,19 +552,22 @@ public class UserPreferencesDialog extends JDialog
         verboseDebugMessagesPreferenceCheckBox.setSelected(ViskitStatics.debug = isVerboseDebug());
 
         String lookAndFeelName = getLookAndFeel();
-        if(lookAndFeelName == null || lookAndFeelName.equals(ViskitConfiguration.LOOK_AND_FEEL_PLATFORM)) 
+        if(null == lookAndFeelName) 
 		{
             platformLookAndFeelRB.setSelected(true);
         } 
-		else if(lookAndFeelName.equals(ViskitConfiguration.LOOK_AND_FEEL_DEFAULT)) 
-		{
-            defaultLookAndFeelRB.setSelected(true);
-        } 
-		else 
-		{
-			otherLookAndFeelRB.setSelected(true);
-			otherTF.setEnabled(true);
-			otherTF.setText(lookAndFeelName);
+		else switch (lookAndFeelName) {
+            case ViskitConfiguration.LOOK_AND_FEEL_PLATFORM:
+                platformLookAndFeelRB.setSelected(true);
+                break;
+            case ViskitConfiguration.LOOK_AND_FEEL_DEFAULT:
+                defaultLookAndFeelRB.setSelected(true);
+                break;
+            default:
+                otherLookAndFeelRB.setSelected(true);
+                otherTF.setEnabled(true);
+                otherTF.setText(lookAndFeelName);
+                break;
         }
     }
 

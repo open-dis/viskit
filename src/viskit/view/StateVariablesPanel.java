@@ -1,7 +1,7 @@
 package viskit.view;
 
 import edu.nps.util.LogUtilities;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitElement;
 import viskit.model.ViskitStateVariable;

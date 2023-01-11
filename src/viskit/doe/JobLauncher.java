@@ -49,7 +49,7 @@ import edu.nps.util.DirectoryWatch;
 import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
