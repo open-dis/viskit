@@ -133,9 +133,9 @@ public class ViskitApplicationFrame extends JFrame
 		
 		menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 		
+        initializeUserInterface();
         initialize();
 		
-        initializeUserInterface();
 	}
 	public final void initialize()
 	{
@@ -417,22 +417,12 @@ public class ViskitApplicationFrame extends JFrame
 
         // let the event graph controller establish the Viskit classpath and open
         // EventGraphs first
-        runLater(0L, new Runnable() 
-		{
-            @Override
-            public void run() 
-			{
-                eventGraphController.begin();
-            }
+        runLater(0L, () -> {
+            eventGraphController.begin();
         });
 
-        runLater(500L, new Runnable() 
-		{
-            @Override
-            public void run() 
-			{
-                assemblyController.begin();
-            }
+        runLater(500L, () -> {
+            assemblyController.begin();
         });
 
         // Swing:

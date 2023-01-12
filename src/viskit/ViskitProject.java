@@ -232,7 +232,6 @@ public class ViskitProject
         ViskitConfiguration.instance().setProjectXMLConfigurationPath(getProjectFile().getAbsolutePath());
 		
         setProjectOpen(projectFileExists);
-        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
         return projectFileExists;
     }
 

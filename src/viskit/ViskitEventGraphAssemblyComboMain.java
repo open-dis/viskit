@@ -39,8 +39,6 @@ import java.awt.EventQueue;
 import java.awt.Taskbar;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.*;
-import org.apache.logging.log4j.Logger;
-import viskit.control.EventGraphControllerImpl;
 import viskit.view.ViskitApplicationFrame;
 import viskit.view.dialog.UserPreferencesDialog;
 

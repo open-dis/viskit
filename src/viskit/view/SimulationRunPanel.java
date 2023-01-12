@@ -91,7 +91,7 @@ public class SimulationRunPanel extends JPanel
     /**
      * Create an Simulation Run panel
      * @param title the title of this panel
-     * @param skipCloseButton if ture, don't supply rewind or pause buttons on VCR,
+     * @param skipCloseButton if true, don't supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A false will enable all VCR buttons.
      * Currently, only start and stop work
      * @param simulationRunPanelPanelVisible if true, will enable the analyst report check box
@@ -135,7 +135,7 @@ public class SimulationRunPanel extends JPanel
 
         leftRightSplit.setLeftComponent(leftSplit);
         leftRightSplit.setRightComponent(jsp);
-        leftRightSplit.setDividerLocation(275); // (w/2) - (w/4));
+        leftRightSplit.setDividerLocation((w/2) - (w/4)); // ~=275
 
         add(leftRightSplit, BorderLayout.CENTER);
 		
@@ -184,18 +184,14 @@ public class SimulationRunPanel extends JPanel
 		simulationRunControlPanel.add(Box.createVerticalStrut(5));
 
         numberOfReplicationsTF = new JTextField(10);
-        numberOfReplicationsTF.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setNumberOfReplications(Integer.parseInt(numberOfReplicationsTF.getText().trim()));
-                    if (getNumberOfReplications() < 1)
-					{
-						setNumberOfReplications(1);
-                        numberOfReplicationsTF.setText("1");
-                    }
-                }
-            });
+        numberOfReplicationsTF.addActionListener((ActionEvent e) -> {
+            setNumberOfReplications(Integer.parseInt(numberOfReplicationsTF.getText().trim()));
+            if (getNumberOfReplications() < 1)
+            {
+                setNumberOfReplications(1);
+                numberOfReplicationsTF.setText("1");
+            }
+        });
         ViskitStatics.clampSize(numberOfReplicationsTF);
         JLabel numberOfReplicationsLabel = new JLabel("   Total # replications: ");
         vcrPanel = new JPanel(); // reset
@@ -254,7 +250,7 @@ public class SimulationRunPanel extends JPanel
 
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable analyst report");
-        analystReportCB.setSelected(true);
+        analystReportCB.setSelected(false);
         analystReportCB.setEnabled(simulationRunPanelVisible);
         simulationRunControlPanel.add(analystReportCB);
         simulationRunControlPanel.add(Box.createVerticalStrut(5));

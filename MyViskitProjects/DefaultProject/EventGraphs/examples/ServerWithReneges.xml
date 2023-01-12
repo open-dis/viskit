@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ServerWithReneges" package="examples" version="ServerWithReneges" extend="SimEntityBase" description="Simple Server process where Arrival entities can decide to renege and leave the Server queue before being serviced" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ServerWithReneges" package="examples" version="ServerWithReneges" extend="SimEntityBase" description="Simple Server process where Arrival entities can decide to renege and leave the Server queue before being serviced" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="numberServers" type="int" description=""/>
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" description=""/>
     <Parameter name="renegeTime" type="simkit.random.RandomVariate" description=""/>
@@ -41,9 +41,7 @@
         <Coordinate x="80.0" y="170.0"/>
     </Event>
     <Event name="StartService" description="">
-        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()">
-            <Comment></Comment>
-        </LocalVariable>
+        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" description=""/>
         <StateTransition state="queue">
             <Operation method="removeFirst()"/>
         </StateTransition>

@@ -143,43 +143,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void begin()
 	{
-		// check if prior project was open, if so then open it
-		String projectStatus = "false";
-		if (ViskitConfiguration.instance() != null)
-			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY); // might return null if not found
-		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
-		{
-			String projectName = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
-			if (projectName == null)
-				projectName = "";
-			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
-			File projectDirectory = new File (projectPath);
-			if ( projectDirectory.isDirectory() &&
-				!projectDirectory.getName().toLowerCase().endsWith(ViskitProject.MY_VISKIT_PROJECTS_NAME.toLowerCase()))
-			{
-				openProjectDirectory (projectDirectory);
-			}
-			else // keep trying to find a useful project directory, or project-selection directory
-			{
-				projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY); // pop up one level
-				projectDirectory = new File (projectPath);
-				if (projectDirectory.isDirectory())
-				{
-					openProjectDirectory (projectDirectory);
-				}
-				else
-				{
-					LOG.error ("No known project path to open: " + projectPath);
-				}
-			}
-			reportProjectOpenResult (projectName);
-		}
-		else
-		{
-			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.VISKIT_READY_MESSAGE, "<html>" +
-					"<p align='center'>Open or create a project to begin." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp;</p>");
-		}
+//		// check if prior project was open, if so then open it
+//		String projectStatus = "false";
+//		if (ViskitConfiguration.instance() != null)
+//			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY); // might return null if not found
+//		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
+//		{
+//			String projectName = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
+//			if (projectName == null)
+//				projectName = "";
+//			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
+//			File projectDirectory = new File (projectPath);
+//			if ( projectDirectory.isDirectory() &&
+//				!projectDirectory.getName().toLowerCase().endsWith(ViskitProject.MY_VISKIT_PROJECTS_NAME.toLowerCase()))
+//			{
+//				openProjectDirectory (projectDirectory);
+//			}
+//			else // keep trying to find a useful project directory, or project-selection directory
+//			{
+//				projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY); // pop up one level
+//				projectDirectory = new File (projectPath);
+//				if (projectDirectory.isDirectory())
+//				{
+//					openProjectDirectory (projectDirectory);
+//				}
+//				else
+//				{
+//					LOG.error ("No known project path to open: " + projectPath);
+//				}
+//			}
+//			reportProjectOpenResult (projectName);
+//		}
+//		else
+//		{
+//			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.VISKIT_READY_MESSAGE, "<html>" +
+//					"<p align='center'>Open or create a project to begin." + ViskitStatics.RECENTER_SPACING + "</p>" +
+//					"<p>&nbsp;</p>");
+//		}
 
         // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
         if (initialFilePath != null)
@@ -2253,23 +2253,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     // Known modelPath for Assembly compilation
     @Override
-    public void initializeAssemblyRun()
-	{
+    public void initializeAssemblyRun() {
         String sourceCode = produceJavaAssemblyClass(); // asks to save
 
         PackageAndFile packageAndFile = compileJavaClassAndSetPackage(sourceCode);
-        if (packageAndFile != null)
-		{
+        if (packageAndFile != null) {
             File f = packageAndFile.file;
             String className = f.getName().substring(0, f.getName().indexOf('.'));
             className = packageAndFile.pkg + "." + className;
-
-            String classPath = ""; // no longer necessary since we don't invoke Runtime.exec to compile anymore
-
-            executionParameters = buildExecutionParameterArray(className, classPath);
-        }
-		else
-		{
+            executionParameters = buildExecutionParameterArray(className);
+        } else {
             executionParameters = null;
         }
     }
@@ -2367,54 +2360,24 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         worker.execute(); // do it to it
     }
 
-    // No longer invoking a Runtime.Exec for compilation
-//    public static final int EXEC_JAVACMD = 0;
-//    public static final int EXEC_VMARG0 = 1;
-//    public static final int EXEC_VMARG1 = 2;
-//    public static final int EXEC_VMARG3 = 3;
-//    public static final int EXEC_DASH_CP = 4;
-//    public static final int EXEC_CLASSPATH = 5;
-    public static final int EXEC_TARGET_CLASS_NAME = 6;
-    public static final int EXEC_VERBOSE_SWITCH = 7;
-    public static final int EXEC_STOPTIME_SWITCH = 8;
-//    public static final int EXEC_FIRST_ENTITY_NAME = 9;
+    public static final int EXEC_TARGET_CLASS_NAME = 0;
+    public static final int EXEC_VERBOSE_SWITCH = 1;
+    public static final int EXEC_STOPTIME_SWITCH = 2;;
 
     /** Prepare for running the loaded assembly file from java source.
-     * Maintain the above static enumerations to match the order below.
+     * Maintain the above statics indicies to match the order used.
      * @param className the name of the Assembly file to compile
-     * @param classPath the current ClassLoader context
-     * @return operation-system specific array of execution parameters as String array
+     * @return a parameter array
      */
-    private String[] buildExecutionParameterArray(String className, String classPath)
-	{
-        Vector<String> v = new Vector<>();
-        String fileSeparator = ViskitStatics.getFileSeparator();
+    private String[] buildExecutionParameterArray(String className) {
+        List<String> v = new ArrayList<>();
+        
+        v.add(className);                                               // 0
+        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 1
+        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 2
 
-        StringBuilder invocation = new StringBuilder();
-        invocation.append(System.getProperty("java.home"));
-        invocation.append(fileSeparator);
-        invocation.append("bin");
-        invocation.append(fileSeparator);
-        invocation.append("java");
-        v.add(invocation.toString());// 0
-		// execution parameters, TODO consider including these properties as user preferences
-        v.add("-Xss2m");                                                // 1
-        v.add("-Xincgc");                                               // 2
-        v.add("-Xmx512m");                                              // 3
-        v.add("-cp");                                                   // 4
-        v.add(classPath);                                               // 5
-        v.add(className);                                               // 6
-
-        v.add("" + ((AssemblyModelImpl) getModel()).getMetadata().verbose);  // 7
-        v.add(     ((AssemblyModelImpl) getModel()).getMetadata().stopTime); // 8
-
-        Vector<String> detailedOutputEntityNames = ((AssemblyModelImpl) getModel()).getDetailedOutputEntityNames();
-        for (String entityName : detailedOutputEntityNames)
-		{
-            v.add(entityName);                                          // 9+
-        }
-        String[] returnStringArray = new String[v.size()];
-        return v.toArray(returnStringArray);
+        String[] ra = new String[v.size()];
+        return v.toArray(ra);
     }
     private String imageSaveCount = "";
     private int imageSaveInt = -1;

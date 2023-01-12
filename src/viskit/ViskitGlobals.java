@@ -158,9 +158,8 @@ public class ViskitGlobals
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myListener = new MyTypeListener();
         buildTypePopup();
-		// do not initialize a new project here, viskit might be loading without one
-//        initializeProjectHomeDirectory();
-//        createWorkDirectory();
+        initializeProjectHomeDirectory();
+        createWorkDirectory();
     }
 
     /* routines to manage the singleton-aspect of the views. */
@@ -892,9 +891,17 @@ public class ViskitGlobals
             // Forcing exposure of extra classpaths here.  Bugfix 1237
             URL[] urlArray = UserPreferencesDialog.getExtraClassPathArraytoURLArray();
 
+            /* Not sure if this breaks the "fresh" classloader for assembly
+               running, but in post JDK8 land, the Java Platform Module System
+               (JPMS) rules and as such we need to retain certain modules, i.e.
+               java.sql. With retaining the boot class loader, not sure if that
+               causes sibling classloader static variables to be retained. In
+               any case we must retain the original bootloader as it has 
+               references to the loaded module system. 
+            */
             LocalBootLoader loader = new LocalBootLoader(urlArray,
-                    null,
-                    getWorkDirectory());
+                ClassLoader.getPlatformClassLoader(), // should be the interal boot loader
+                getWorkDirectory());
 
             // Allow Assembly files in the ClassLoader
             freshLoader = loader.init(true);

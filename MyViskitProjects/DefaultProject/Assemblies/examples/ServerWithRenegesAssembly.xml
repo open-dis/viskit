@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerWithRenegesAssembly" version="1.0" package="examples" extend="viskit.assembly.ViskitAssembly" description="TODO add description" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ServerWithRenegesAssembly" version="1.0" package="examples" extend="viskit.assembly.ViskitAssembly" description="TODO add description" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <TerminalParameter name="arrivalProcess_1_1_1" link="arrivalProcess_1_1_1" value="Exponential" type="java.lang.String">
         <DoubleRange lowValue="Exponential" highValue="Exponential"/>
     </TerminalParameter>
@@ -52,23 +52,23 @@
         <Coordinate x="360.0" y="150.0"/>
     </SimEntity>
     <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="queue" type="java.lang.String"/>
+        <TerminalParameter name="parameter[0]" value="queue" type="java.lang.String"/>
         <Coordinate x="560.0" y="60.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
+        <TerminalParameter name="parameter[0]" value="numberAvailableServers" type="java.lang.String"/>
         <Coordinate x="350.0" y="330.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="numberServed" type="java.lang.String"/>
+        <TerminalParameter name="parameter[0]" value="numberServed" type="java.lang.String"/>
         <Coordinate x="350.0" y="20.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="numberReneges" type="java.lang.String"/>
+        <TerminalParameter name="parameter[0]" value="numberReneges" type="java.lang.String"/>
         <Coordinate x="560.0" y="140.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
-        <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
+        <TerminalParameter name="parameter[0]" value="numberArrivals" type="java.lang.String"/>
         <Coordinate x="50.0" y="260.0"/>
     </PropertyChangeListener>
     <SimEventListenerConnection listener="creator" source="arrivalProcess"/>
