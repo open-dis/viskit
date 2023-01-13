@@ -318,7 +318,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             new SimulationRunThreadMonitor(simulationRunThread).start();
 
             // Restore Viskit's working ClassLoader
-//            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
             LOG.error(ex);
@@ -427,7 +427,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
                 if (assemblyInstance != null) {
 
-//                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
                     Method setStopRun = assemblyClass.getMethod("setStopRun", boolean.class);
                     setStopRun.invoke(assemblyInstance, true);
