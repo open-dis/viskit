@@ -43,7 +43,7 @@ import junit.textui.TestRunner;
 import viskit.ViskitGlobals;
 
 /** Test of static variables isolated by unique class loaders. The static "debug"
- * variable of the ViskitStatics class is initialized to false.
+ * variable of the ViskitStatics class is initialized to true.
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.doe.StaticsTest">Terry D. Norbraten</a>
  */
@@ -92,7 +92,7 @@ public class StaticsTest extends TestCase {
         Object fdebugz = debugz.get(rstaticz); // should be false
         System.out.println(fdebugz);
         
-        debug.set(rstaticz, true);
+        debug.set(rstaticz, false);
         fdebug = debug.get(rstatics);
         
         Assert.assertFalse(fdebug == fdebugz);

@@ -49,8 +49,7 @@
                 </action>
                 <action name="test">
                     <script>${ant.script}</script>
-                    <target>test.code.format</target>
-                    <target>test.var.args</target>
+                    <target>test</target>
                 </action>
                 <action name="rebuild">
                     <script>${ant.script}</script>
