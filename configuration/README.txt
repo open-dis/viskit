@@ -2,10 +2,10 @@ This is a Visual Simkit (viskit) project archive.
 
 Open-source software for Discrete Event Simulation (DES) can be found at
 
-	https://eos.nps.edu/simkit
+	https://github.com/ahbuss/Simkit
 
-	https://eos.nps.edu/viskit
+	https://gitlab.nps.edu/Savage/viskit
 
 For more information please contact
 
-	viskit@movesInstitute.org
+	brutzman@nps.edu
