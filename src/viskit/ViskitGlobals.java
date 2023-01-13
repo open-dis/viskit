@@ -900,7 +900,7 @@ public class ViskitGlobals
                references to the loaded module system. 
             */
             LocalBootLoader loader = new LocalBootLoader(urlArray,
-                ClassLoader.getPlatformClassLoader(), // should be the interal boot loader
+                ClassLoader.getPlatformClassLoader(),  // <- the parent of the platform loader should be the interal boot loader
                 getWorkDirectory());
 
             // Allow Assembly files in the ClassLoader
