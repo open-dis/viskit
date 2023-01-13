@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
@@ -362,7 +364,7 @@ public class LocalBootLoader extends URLClassLoader
         JarOutputStream jos = null;
         try {
             jarOut = TempFileManager.createTempFile("eventGraphs", ".jar");
-            FileOutputStream fos = new FileOutputStream(jarOut);
+            OutputStream fos = new FileOutputStream(jarOut);
             jos = new JarOutputStream(fos);
             if (dir2jar.isDirectory()) {
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
@@ -386,7 +388,7 @@ public class LocalBootLoader extends URLClassLoader
 
     private void makeJarFileFromDir(File baseDir, File newDir, JarOutputStream jos) {
         File[] dirList = newDir.listFiles();
-        FileInputStream fis = null;
+        InputStream fis = null;
         JarEntry je;
         for (File file : dirList) {
 
