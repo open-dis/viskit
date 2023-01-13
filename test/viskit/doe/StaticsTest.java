@@ -92,8 +92,11 @@ public class StaticsTest extends TestCase {
         Object fdebugz = debugz.get(rstaticz); // should be false
         System.out.println(fdebugz);
         
+        Assert.assertTrue(fdebug == fdebugz);
+        
         debug.set(rstaticz, false);
         fdebug = debug.get(rstatics);
+        fdebugz = debugz.get(rstaticz);
         
         Assert.assertFalse(fdebug == fdebugz);
     }
