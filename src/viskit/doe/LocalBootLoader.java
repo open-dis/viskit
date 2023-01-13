@@ -152,9 +152,9 @@ public class LocalBootLoader extends URLClassLoader
 			// TODO: Clearly, adding build/classes to the classpath violates the
 			// dirty assembly in the classpath issue that we were attempting to
 			// mitigate with the buildCleanWorkJar call below, but something doesn't
-			// go quite right if we are building a project from scratch  where
+                        // go quite right if we are building a project from scratch where
 			// we have no build/classes compiled, and/or have no cached EGs in the
-			// viskitProject.xml.  So, leaving commeted out for now and will need
+                        // viskitProject.xml.  So, leaving commeted out for now. Will need
 			// to reopen this issue when we need strict design points for DOE.
 
 			// Now add our project's working directory, i.e. build/classes

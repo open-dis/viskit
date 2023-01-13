@@ -5,10 +5,10 @@ Post release fixes / upgrades / issues:
   Do to the nature of XML to Java translation, any derived class from a super
   type must list the super type's fields in identical order so that type
   matching can verify the super type for correct calls to super from the
-  derived tranlated java source.
+  derived translated java source.
 
   On Mac OS X 10.10.3 (Yosemite) & JDK 1.8.0_45, in the default L&F mode, while
-  inputing EG Parameters when the user selects more... to expose RandomVariate
+  inputting EG Parameters when the user selects more... to expose RandomVariate
   types, a NPE will be thrown:
 
     at com.apple.laf.AquaMenuPainter.paintSelectedMenuItemBackground(AquaMenuPainter.java:153)
@@ -18,7 +18,7 @@ Post release fixes / upgrades / issues:
   quite quirky.  The default L&F for Win machines is recommended.
 
   On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
-  JGraph pallete will revert back to the select cursor (arrow) when a node or
+  JGraph palette will revert back to the select cursor (arrow) when a node or
   edge inspector pops up.  If the user selects cancel or schedule mode again,
   the cursor will not change (remains in select) mode until the user moves the
   cursor out of the JPanel containing the JGraph component and menu bar up to
@@ -36,16 +36,16 @@ Post release fixes / upgrades / issues:
 
   At this time, the XML to Java translators cannot handle a super type generic
   container declaration in XML, then instantiate it as a dynamic type, i.e.
-  List<String> list = new ArrayList<>();  The static declaration will match the
+  List<String> list = new ArrayList<>();  The static declaration must match the
   dynamic type accordingly.
 
   Because of the unique nature of XML IDs, we are not able to have similar
   method names, i.e. Arrival, in an EG file even with differing method
   signatures.  As such, subclassing is still possible, but the user will have
   to manually name Events in this manner using an underscore character, i.e.
-  Arrival, Arrival_e, etc.
+  Arrival, Arrival_e (where the "e" hints at the type argument of the event).
 
-  If the CNTL key is held down while attempting to drag and edge control point
+  If the CNTL key is held down while attempting to drag an edge control point
   a IOOBE will be thrown by JGraph v5.14.0.  This may be fixed in a subsequent
   release of JGraphX (new code base name) should we decide to upgrade to v6+.
 
@@ -67,9 +67,33 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
 
+Release: 1.0.16(December 13, 2022)
+-----------------------------------
+Major changes since 1.0.15
+
+    Fixed NPE from version attempting to read SVN strings, which are no longer
+    relevant since switching to git.
+
+    Upgraded to latest JAXB. Bumped src release to 11 and tested to run on 
+    JDK17+.
+
+    In an attempt to maintain a clean/fresh classloader for each assy run (the 
+    idea being that we don't want any previous static references to interfere 
+    with independent runs), and since the inception of the Java Module Platform
+    System (JPMS), stripping out all but the "boot" class loader is accomplished 
+    in the LocalBootLoader, thus preserving our goal of isolated class loaders.
+
 Release: 1.0.15(June 08, 2015)
 -------------------------
 Major changes since 1.0.10:
+
+  Moved codebase to new repository at: https://gitlab.nps.edu/tdnorbra/viskit
+  The codebase was forked at R2900 from the old SVN repository at:
+  https://eos.nps.edu/wcm/Viskit.  Due to the many refactorings that took place
+  since R2900 (09 DEC 2015), R2900 marks the revision that was the last known
+  functional build of Viskit.  Rather than branch at the original SVN site, it
+  was decided to move to a more functional repository for version control w/ 
+  Git.
 
   EventNodes that are similarly named can be achieved using an underscore
   character, i.e. Arrival, Arrival_e.  The "e" would denote an event argument

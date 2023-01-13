@@ -708,9 +708,7 @@ their descpritions.
 
     </target>
 
-    <target name="test" depends="test.code.format,test.var.args" description="run all working tests">
-        <!-- TODO add other test targets and other tests when ready -->
-    </target>
+    <target name="test" depends="test.code.format,test.var.args,test.statics" description="run all working tests"/>
 
     <target name="test.code.format" depends="compile.test" description="TestCodeFormat runner">
         <echo message="viskit.test.TestCodeFormat test/ArrayTester.xml"/>
@@ -722,6 +720,10 @@ their descpritions.
     <target name="test.var.args" depends="compile.test" description="TestVarArgs runner">
         <echo message="viskit.test.TestVarArgs"/>
         <java classname="viskit.test.TestVarArgs" classpathref="runtime.test.classpath" fork="true" failonerror="true"/>
+    </target>
+    <target name="test.statics" depends="compile.test" description="LocalBootLoader test">
+        <echo message="viskit.doe.StaticsTest"/>
+        <java classname="viskit.doe.StaticsTest" classpathref="runtime.test.classpath" fork="true" failonerror="true"/>
     </target>
 
     <!-- For the following test targets set up a server, first run the ant gridkit-jar target,

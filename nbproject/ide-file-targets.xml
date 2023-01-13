@@ -45,10 +45,24 @@
 
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
-    <target name="run-selected-file-in-test" depends="compile.test">
+    <target depends="compile.test" name="run-selected-file-in-test">
         <fail unless="run.class">Must set property 'run.class'</fail>
         <java classname="${run.class}" failonerror="true" fork="true">
             <classpath refid="runtime.test.classpath"/>
+        </java>
+    </target>
+    
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
+    <target depends="compile.test" name="debug-selected-file-in-test">
+        <fail unless="debug.class">Must set property 'debug.class'</fail>
+        <nbjpdastart addressproperty="jpda.address" name="Visual Simkit (Viskit)" transport="dt_socket">
+            <classpath refid="runtime.test.classpath"/>
+        </nbjpdastart>
+        <java classname="${debug.class}" fork="true">
+            <classpath refid="runtime.test.classpath"/>
+            <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=${jpda.address}"/>
+            <arg line="${translation.args}"/>
         </java>
     </target>
 </project>
