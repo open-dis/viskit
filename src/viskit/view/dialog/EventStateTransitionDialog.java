@@ -1,6 +1,5 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,14 +13,13 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
-import viskit.control.EventGraphControllerImpl;
+import viskit.VGlobals;
+import viskit.VStatics;
+import viskit.control.EventGraphController;
 
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
-import viskit.model.ViskitStateVariable;
+import viskit.model.vStateVariable;
 import viskit.view.ArgumentsPanel;
 import viskit.view.LocalVariablesPanel;
 
@@ -35,130 +33,136 @@ import viskit.view.LocalVariablesPanel;
  * @author DMcG, Mike Bailey
  * @version $Id$
  */
-public class EventStateTransitionDialog extends JDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(EventStateTransitionDialog.class);
+public class EventStateTransitionDialog extends JDialog {
 
     private static EventStateTransitionDialog dialog;
     private static boolean modified = false;
-    private static boolean allGood; // proper initialization
+    private static boolean allGood;
 
-    private final JTextField actionTF, arrayIndexTF, localAssignmentTF, localInvocationTF, descriptionTF;
-    private JComboBox<ViskitElement> stateVariablesCB;
-    private final JComboBox<String> stateTransitionMethodsCB, localVariableMethodsCB;
-    private final JRadioButton assignToRB, invokeOnRB;
-    private EventStateTransition eventStateTransition;
-    private final JButton okButton, cancelButton;
-    private JButton newStateVariableButton;
-    private final JLabel actionLabel1, actionLabel2, localInvokeDot;
-    private final JPanel localAssignmentPanel, indexPanel, stateTransInvokePanel, localInvocationPanel;
+    private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
+    private JComboBox<ViskitElement> stateVarsCB;
+    private JComboBox<String> stateTranMethodsCB, localVarMethodsCB;
+    private JRadioButton assTo, opOn;
+    private EventStateTransition param;
+    private JButton okButt, canButt;
+    private JButton newSVButt;
+    private JLabel actionLab1, actionLab2, localInvokeDot;
+    private JPanel localAssignmentPanel, indexPanel, stateTransInvokePanel, localInvocationPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
-    private final ArgumentsPanel argumentsPanel;
+    private ArgumentsPanel argPanel;
 
     /** Required to get the type of any declared local variables */
-    private final LocalVariablesPanel localVariablesPanel;
+    private LocalVariablesPanel localVariablesPanel;
 
-    public static boolean showDialog(JFrame parent, String nodeName, EventStateTransition eventStateTransition, ArgumentsPanel argumentsPanel, LocalVariablesPanel localVariablesPanel) {
-        if  (dialog == null)
-             dialog = new EventStateTransitionDialog(parent, nodeName, eventStateTransition, argumentsPanel, localVariablesPanel);
-		else dialog.setParameters(parent, eventStateTransition);
+    public static boolean showDialog(JFrame f, EventStateTransition est, ArgumentsPanel ap, LocalVariablesPanel lvp) {
+        if (dialog == null)
+            dialog = new EventStateTransitionDialog(f, est, ap, lvp);
+        else
+            dialog.setParams(f, est);
 
         if (allGood)
-            dialog.setVisible(true); // this call blocks
+            dialog.setVisible(true);
 
+        // above call blocks
         return modified;
     }
 
-    private EventStateTransitionDialog(JFrame parent, String nodeName, EventStateTransition eventStateTransition, ArgumentsPanel argumentsPanel, LocalVariablesPanel localVariablesPanel)
-	{		
-        super(parent, "State Transitions for " + nodeName + " Event", true);
-        this.argumentsPanel      = argumentsPanel;
-        this.localVariablesPanel = localVariablesPanel;
+    private EventStateTransitionDialog(JFrame parent, EventStateTransition param, ArgumentsPanel ap, LocalVariablesPanel lvp) {
+
+        super(parent, "State Transition", true);
+        argPanel = ap;
+        localVariablesPanel = lvp;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new MyCloseListener());
+        this.addWindowListener(new myCloseListener());
 
-        JPanel content = new JPanel();
-        setContentPane(content);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //createEtchedBorder(EtchedBorder.RAISED));
+        JPanel con = new JPanel();
+        setContentPane(con);
+        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
+        con.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); //createEtchedBorder(EtchedBorder.RAISED));
 
-        content.add(Box.createVerticalStrut(5));
+        con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.PAGE_AXIS));
 
-        JLabel descriptionLabel     = new JLabel("description");
-        JLabel localAssignmentLabel = new JLabel("local assignment");
-        JLabel nameLabel            = new JLabel("state variable");
-        JLabel indexVariableLabel   = new JLabel("index variable");
+        JLabel commLab = new JLabel("description");
+        JLabel localAssignLab = new JLabel("local assignment");
+        JLabel nameLab = new JLabel("state variable");
+        JLabel arrayIdxLab = new JLabel("index variable");
 
-        assignToRB = new JRadioButton("assign to (\"=\")");
-        invokeOnRB = new JRadioButton("invoke on (\".\")");
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(assignToRB);
-        buttonGroup.add(invokeOnRB);
+        assTo = new JRadioButton("assign to (\"=\")");
+        opOn = new JRadioButton("invoke on (\".\")");
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(assTo);
+        bg.add(opOn);
 
-        actionLabel1 = new JLabel("invoke");
-        Dimension dx = actionLabel1.getPreferredSize();
-        actionLabel1.setText("");
-        actionLabel1.setPreferredSize(dx);
-        actionLabel1.setHorizontalAlignment(JLabel.TRAILING);
+        actionLab1 = new JLabel("invoke");
+        Dimension dx = actionLab1.getPreferredSize();
+        actionLab1.setText("");
+        actionLab1.setPreferredSize(dx);
+        actionLab1.setHorizontalAlignment(JLabel.TRAILING);
 
-        actionLabel2 = new JLabel("invoke");
-        actionLabel2.setText("");
-        actionLabel2.setPreferredSize(dx);
-        actionLabel2.setHorizontalAlignment(JLabel.LEADING);
+        actionLab2 = new JLabel("invoke");
+        actionLab2.setText("");
+        actionLab2.setPreferredSize(dx);
+        actionLab2.setHorizontalAlignment(JLabel.LEADING);
 
-        JLabel localInvokeLabel = new JLabel("local invocation");
-        JLabel localVariableMethodLabel = new JLabel("invoke local variable method");
-        JLabel stateTransitionInvokeLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD);
+        JLabel localInvokeLab = new JLabel("local invocation");
+        JLabel methodLab = new JLabel("invoke local var method");
+        JLabel stateTranInvokeLab = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD);
 
-        stateVariablesCB = new JComboBox<>();
-        setMaxHeight(stateVariablesCB);
-        stateVariablesCB.setBackground(Color.white);
-        newStateVariableButton = new JButton("new");
-        descriptionTF = new JTextField(25);
-        setMaxHeight(descriptionTF);
-        actionTF = new JTextField(15);
-        actionTF.setToolTipText("Use this field to provide an assignment value or a method argument"); // 
-        setMaxHeight(actionTF);
-        arrayIndexTF = new JTextField(5);
-        setMaxHeight(arrayIndexTF);
-        localAssignmentTF = new JTextField(15);
-        localAssignmentTF.setToolTipText("Use this field to optionally assign a return type, from a state variable to an already declared local variable");
-        setMaxHeight(localAssignmentTF);
-        localInvocationTF = new JTextField(15);
-        localInvocationTF.setToolTipText("Use this field to optionally invoke a zero parameter void method call to an already-declared local variable, or an argument");
-        setMaxHeight(localInvocationTF);
+        stateVarsCB = new JComboBox<>();
+        setMaxHeight(stateVarsCB);
+        stateVarsCB.setBackground(Color.white);
+        newSVButt = new JButton("new");
+        descriptionField = new JTextField(25);
+        setMaxHeight(descriptionField);
+        actionField = new JTextField(15);
+        actionField.setToolTipText("Use this field to provide a method "
+                + "argument, or a value to assign");
+        setMaxHeight(actionField);
+        arrayIndexField = new JTextField(5);
+        setMaxHeight(arrayIndexField);
+        localAssignmentField = new JTextField(15);
+        localAssignmentField.setToolTipText("Use this field to optionally "
+                + "assign a return type from a state variable to an already "
+                + "declared local variable");
+        setMaxHeight(localAssignmentField);
+        localInvocationField = new JTextField(15);
+        localInvocationField.setToolTipText("Use this field to optionally "
+                + "invoke a zero parameter void method call to an already "
+                + "declared local variable, or an argument");
+        setMaxHeight(localInvocationField);
 
-        int width = OneLinePanel.maxWidth(new JComponent[]{descriptionLabel, localAssignmentLabel,
-            nameLabel, indexVariableLabel, assignToRB, invokeOnRB, stateTransitionInvokeLabel,
-            localInvokeLabel, localVariableMethodLabel});
+        int w = OneLinePanel.maxWidth(new JComponent[]{commLab, localAssignLab,
+            nameLab, arrayIdxLab, assTo, opOn, stateTranInvokeLab,
+            localInvokeLab, methodLab});
 
-        fieldsPanel.add(new OneLinePanel(descriptionLabel, width, descriptionTF));
+        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
 
         JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
         divider.setBackground(Color.blue.brighter());
 
         fieldsPanel.add(divider);
-        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignmentLabel,
-                width,
-                localAssignmentTF,
+        fieldsPanel.add(localAssignmentPanel = new OneLinePanel(localAssignLab,
+                w,
+                localAssignmentField,
                 new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "=" + OneLinePanel.CLOSE_LABEL_BOLD)));
         fieldsPanel.add(Box.createVerticalStrut(10));
-        fieldsPanel.add(new OneLinePanel(nameLabel, width, stateVariablesCB, newStateVariableButton));
-        fieldsPanel.add(indexPanel = new OneLinePanel(indexVariableLabel, width, arrayIndexTF));
-        fieldsPanel.add(new OneLinePanel(new JLabel(""), width, assignToRB));
-        fieldsPanel.add(new OneLinePanel(new JLabel(""), width, invokeOnRB));
+        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarsCB, newSVButt));
+        fieldsPanel.add(indexPanel = new OneLinePanel(arrayIdxLab, w, arrayIndexField));
+        fieldsPanel.add(new OneLinePanel(new JLabel(""), w, assTo));
+        fieldsPanel.add(new OneLinePanel(new JLabel(""), w, opOn));
 
-        stateTransitionMethodsCB = new JComboBox<>();
-        stateTransitionMethodsCB.setToolTipText("Select methods to invoke on state variables");
-        setMaxHeight(stateTransitionMethodsCB);
-        stateTransitionMethodsCB.setBackground(Color.white);
+        stateTranMethodsCB = new JComboBox<>();
+        stateTranMethodsCB.setToolTipText("Use this to select methods to invoke"
+                + " on state variables");
+        setMaxHeight(stateTranMethodsCB);
+        stateTranMethodsCB.setBackground(Color.white);
 
-        fieldsPanel.add(stateTransInvokePanel = new OneLinePanel(stateTransitionInvokeLabel, width, stateTransitionMethodsCB));
-        fieldsPanel.add(new OneLinePanel(actionLabel1, width, actionTF, actionLabel2));
+        fieldsPanel.add(stateTransInvokePanel = new OneLinePanel(stateTranInvokeLab, w, stateTranMethodsCB));
+        fieldsPanel.add(new OneLinePanel(actionLab1, w, actionField, actionLab2));
 
         divider = new JSeparator(JSeparator.HORIZONTAL);
         divider.setBackground(Color.blue.brighter());
@@ -166,108 +170,103 @@ public class EventStateTransitionDialog extends JDialog
         fieldsPanel.add(divider);
         fieldsPanel.add(Box.createVerticalStrut(10));
 
-        localVariableMethodsCB = new JComboBox<>();
-        localVariableMethodsCB.setToolTipText("Select void return type methods for locally declared variables, or arguments");
-        setMaxHeight(localVariableMethodsCB);
-        localVariableMethodsCB.setBackground(Color.white);
+        localVarMethodsCB = new JComboBox<>();
+        localVarMethodsCB.setToolTipText("Use this to select void return type methods "
+                + "for locally declared variables, or arguments");
+        setMaxHeight(localVarMethodsCB);
+        localVarMethodsCB.setBackground(Color.white);
 
         fieldsPanel.add(new OneLinePanel(
-                localInvokeLabel,
-                width,
-                localInvocationTF,
+                localInvokeLab,
+                w,
+                localInvocationField,
                 localInvokeDot = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD)));
-        fieldsPanel.add(localInvocationPanel = new OneLinePanel(localVariableMethodLabel, width, localVariableMethodsCB));
+        fieldsPanel.add(localInvocationPanel = new OneLinePanel(methodLab, w, localVarMethodsCB));
 
-        content.add(fieldsPanel);
-        content.add(Box.createVerticalStrut(5));
+        con.add(fieldsPanel);
+        con.add(Box.createVerticalStrut(5));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(    okButton);
-        buttonPanel.add(cancelButton);
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
 
-        content.add(buttonPanel);
-        content.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        con.add(buttPan);
+        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
 
         // attach listeners
-            okButton.addActionListener(new  ApplyButtonListener());
-        cancelButton.addActionListener(new CancelButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
-        EnableApplyButtonListener enableApplyButtonListener = new EnableApplyButtonListener();
-        descriptionTF.addCaretListener(enableApplyButtonListener);
-        localAssignmentTF.addCaretListener(enableApplyButtonListener);
-        arrayIndexTF.addCaretListener(enableApplyButtonListener);
-        actionTF.addCaretListener(enableApplyButtonListener);
-        localInvocationTF.addCaretListener(enableApplyButtonListener);
+        enableApplyButtonListener lis = new enableApplyButtonListener();
+        descriptionField.addCaretListener(lis);
+        localAssignmentField.addCaretListener(lis);
+        arrayIndexField.addCaretListener(lis);
+        actionField.addCaretListener(lis);
+        localInvocationField.addCaretListener(lis);
 
-        stateVariablesCB.addActionListener(new ActionListener()
-		{
+        stateVarsCB.addActionListener(new ActionListener() {
+
             @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                JComboBox cb = (JComboBox) actionEvent.getSource();
-                ViskitStateVariable stateVariable = (ViskitStateVariable) cb.getSelectedItem();
-                descriptionTF.setText(stateVariable.getDescription());
-                okButton.setEnabled(true);
-                indexPanel.setVisible(ViskitGlobals.instance().isArray(stateVariable.getType()));
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                vStateVariable sv = (vStateVariable) cb.getSelectedItem();
+                descriptionField.setText(sv.getComment());
+                okButt.setEnabled(true);
+                indexPanel.setVisible(VGlobals.instance().isArray(sv.getType()));
                 modified = true;
                 pack();
             }
         });
-        newStateVariableButton.addActionListener(new ActionListener() {
+        newSVButt.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                String name = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
-                if (name != null)
-				{
-                    stateVariablesCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
-                    for (int i = 0; i < stateVariablesCB.getItemCount(); i++)
-					{
-                        ViskitStateVariable vsv = (ViskitStateVariable) stateVariablesCB.getItemAt(i);
-                        if (vsv.getName().contains(name))
-						{
-                            stateVariablesCB.setSelectedIndex(i);
+                String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
+                if (nm != null) {
+                    stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+                    for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
+                        vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
+                        if (vsv.getName().contains(nm)) {
+                            stateVarsCB.setSelectedIndex(i);
                             break;
                         }
                     }
                 }
             }
         });
-        stateTransitionMethodsCB.addActionListener(new ActionListener() {
+        stateTranMethodsCB.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                okButton.setEnabled(true);
+                okButt.setEnabled(true);
                 modified = true;
             }
         });
-        localVariableMethodsCB.addActionListener(new ActionListener() {
+        localVarMethodsCB.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                okButton.setEnabled(true);
+                okButt.setEnabled(true);
                 modified = true;
             }
         });
 
         // to start off:
-        if (stateVariablesCB.getItemCount() > 0)
-		{
-            descriptionTF.setText(((ViskitStateVariable) stateVariablesCB.getItemAt(0)).getDescription());
-        } 
-		else 
-		{
-            descriptionTF.setText(ViskitStatics.DEFAULT_DESCRIPTION);
+        if (stateVarsCB.getItemCount() > 0) {
+            descriptionField.setText(stateVarsCB.getItemAt(0).getComment());
+        } else {
+            descriptionField.setText("");
         }
 
-        RadioButtonListener radioButtonListener = new RadioButtonListener();
-        assignToRB.addActionListener(radioButtonListener);
-        invokeOnRB.addActionListener(radioButtonListener);
+        RadButtListener rbl = new RadButtListener();
+        assTo.addActionListener(rbl);
+        opOn.addActionListener(rbl);
 
-        setParameters(parent, eventStateTransition);
+        setParams(parent, param);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -276,7 +275,7 @@ public class EventStateTransitionDialog extends JDialog
         c.setMaximumSize(d);
     }
 
-    private ComboBoxModel<String> resolveStateTransitionMethodCalls() {
+    private ComboBoxModel<String> resolveStateTranMethodCalls() {
         Class<?> type;
         String typ;
         java.util.List<Method> methods;
@@ -284,14 +283,14 @@ public class EventStateTransitionDialog extends JDialog
         java.util.List<ViskitElement> types = new ArrayList<>();
 
         // Prevent duplicate types
-        for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
-            ViskitElement e = stateVariablesCB.getItemAt(i);
+        for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
+            ViskitElement e = stateVarsCB.getItemAt(i);
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (VGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (ViskitGlobals.instance().isArray(typ)) {
+            if (VGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
 
@@ -308,22 +307,22 @@ public class EventStateTransitionDialog extends JDialog
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (VGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (ViskitGlobals.instance().isArray(typ)) {
+            if (VGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
 
             // Beware of qualified types here
-            type = ViskitStatics.ClassForName(typ);
+            type = VStatics.classForName(typ);
             methods = Arrays.asList(type.getMethods());
 
             // Filter out methods of Object, and any
             // methods requiring more then one parameter
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
 
                 if (method.getParameterCount() == 0) {
                     methodNames.add(method.getName() + "()");
@@ -336,8 +335,7 @@ public class EventStateTransitionDialog extends JDialog
         return new DefaultComboBoxModel<>(methodNames);
     }
 
-    private ComboBoxModel<String> resolveLocalMethodCalls()
-	{
+    private ComboBoxModel<String> resolveLocalMethodCalls() {
         Class<?> type;
         Method[] methods;
         String typ;
@@ -345,7 +343,7 @@ public class EventStateTransitionDialog extends JDialog
         java.util.List<ViskitElement> types = new ArrayList<>(localVariablesPanel.getData());
 
         // Enable argument type methods to be invoked as well
-        types.addAll(argumentsPanel.getData());
+        types.addAll(argPanel.getData());
 
         // Last chance to pull if from a quickly declared local variable
         // NOTE: Not ready for this, but good intention here
@@ -362,16 +360,16 @@ public class EventStateTransitionDialog extends JDialog
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (VGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (ViskitGlobals.instance().isArray(typ)) {
+            if (VGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = ViskitStatics.ClassForName(typ);
+            type = VStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController()).messageToUser(
+                ((EventGraphController) VGlobals.instance().getEventGraphController()).messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "
@@ -384,7 +382,7 @@ public class EventStateTransitionDialog extends JDialog
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (!method.getReturnType().getName().contains("void")) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 
@@ -396,118 +394,100 @@ public class EventStateTransitionDialog extends JDialog
         return new DefaultComboBoxModel<>(methodNames);
     }
 
-    public final void setParameters(Component c, EventStateTransition pEventStateTransition)
-	{
+    public final void setParams(Component c, EventStateTransition p) {
         allGood = true;
-        this.eventStateTransition = pEventStateTransition;
+        param = p;
 
         fillWidgets();
 
         if (!allGood) {return;}
 
-        modified =         (eventStateTransition == null);
-        okButton.setEnabled(eventStateTransition == null);
+        modified = (p == null);
+        okButt.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack(); // do this prior to next
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets()
-	{
-        String indexArgument = "";
+    // bugfix 1183
+    private void fillWidgets() {
+        String indexArg = "";
 
         // Conceptually, should only be one indexing argument
-        if (!argumentsPanel.isEmpty())
-		{
-            for (ViskitElement argument : argumentsPanel.getData())
-			{
-                indexArgument = argument.getName();
+        if (!argPanel.isEmpty()) {
+            for (ViskitElement ia : argPanel.getData()) {
+                indexArg = ia.getName();
                 break;
             }
         }
 
-        if (eventStateTransition != null)
-		{
-            if (stateVariablesCB.getItemCount() > 0) 
-			{
-                descriptionTF.setText(((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getDescription());
-            } else 
-			{
-                descriptionTF.setText(ViskitStatics.DEFAULT_DESCRIPTION);
+        if (param != null) {
+            if (stateVarsCB.getItemCount() > 0) {
+                descriptionField.setText(((ViskitElement) stateVarsCB.getSelectedItem()).getComment());
+            } else {
+                descriptionField.setText("");
             }
-            localAssignmentTF.setText(eventStateTransition.getLocalVariableAssignment());
-            setStateVariableCBValue(eventStateTransition);
-            String indexingExpression = eventStateTransition.getIndexingExpression();
-            if (indexingExpression == null || indexingExpression.isEmpty())
-			{
-                arrayIndexTF.setText(indexArgument);
-            } 
-			else 
-			{
-                arrayIndexTF.setText(indexingExpression);
+            localAssignmentField.setText(param.getLocalVariableAssignment());
+            setStateVariableCBValue(param);
+            String ie = param.getIndexingExpression();
+            if (ie == null || ie.isEmpty()) {
+                arrayIndexField.setText(indexArg);
+            } else {
+                arrayIndexField.setText(ie);
             }
-            boolean isOperation = eventStateTransition.isOperation();
-            if (isOperation)
-			{
-                invokeOnRB.setSelected(isOperation);
-                invokeOnRB.setEnabled( isOperation);
-                assignToRB.setEnabled(!isOperation);
-                actionLabel1.setText("(");
-                actionLabel2.setText(" )");
+            boolean isOp = param.isOperation();
+            if (isOp) {
+                opOn.setSelected(isOp);
+                actionLab1.setText("(");
+                actionLab2.setText(" )");
 
                 // Strip out the argument from the method name and its
                 // parentheses
-                String operation = eventStateTransition.getOperationOrAssignment();
-                operation = operation.substring(operation.indexOf("("), operation.length());
-                operation = operation.replace("(", "");
-                operation = operation.replace(")", "");
-                actionTF.setText(operation);
-            } 
-			else 
-			{
-                assignToRB.setSelected(!isOperation);
-                assignToRB.setEnabled(!isOperation);
-                invokeOnRB.setEnabled( isOperation);
-                actionLabel1.setText("=");
-                actionLabel2.setText("");
-                actionTF.setText(eventStateTransition.getOperationOrAssignment());
+                String op = param.getOperationOrAssignment();
+                op = op.substring(op.indexOf("("), op.length());
+                op = op.replace("(", "");
+                op = op.replace(")", "");
+                actionField.setText(op);
+            } else {
+                assTo.setSelected(!isOp);
+                actionLab1.setText("=");
+                actionLab2.setText("");
+                actionField.setText(param.getOperationOrAssignment());
             }
-            setStateTransitionMethodsCBValue(eventStateTransition);
+            setStateTranMethodsCBValue(param);
 
             // We only need the variable, not the method invocation
-            String localVariableInvocation = eventStateTransition.getLocalVariableInvocation();
-            if (localVariableInvocation != null && !localVariableInvocation.isEmpty())
-                localInvocationTF.setText(localVariableInvocation.split("\\.")[0]);
+            String localInvoke = param.getLocalVariableInvocation();
+            if (localInvoke != null && !localInvoke.isEmpty())
+                localInvocationField.setText(localInvoke.split("\\.")[0]);
 
-            setLocalVariableCBValue(eventStateTransition);
-        } 
-		else // eventStateTransition == null
-		{
-                descriptionTF.setText("");
-            localAssignmentTF.setText("");
-             stateVariablesCB.setSelectedIndex(0);
-                 arrayIndexTF.setText(indexArgument);
-     stateTransitionMethodsCB.setSelectedIndex(0);
-                     actionTF.setText("");
-                   assignToRB.setSelected(true);
-            localInvocationTF.setText("");
-       localVariableMethodsCB.setSelectedIndex(0);
+            setLocalVariableCBValue(param);
+        } else {
+            descriptionField.setText("");
+            localAssignmentField.setText("");
+            stateVarsCB.setSelectedIndex(0);
+            arrayIndexField.setText(indexArg);
+            stateTranMethodsCB.setSelectedIndex(0);
+            actionField.setText("");
+            assTo.setSelected(true);
+            localInvocationField.setText("");
+            localVarMethodsCB.setSelectedIndex(0);
         }
 
         // We have an indexing argument already set
-        String typeName = ((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType();
-        indexPanel.setVisible(ViskitGlobals.instance().isArray(typeName));
-        localAssignmentPanel.setVisible(invokeOnRB.isSelected());
+        String typ = ((ViskitElement) stateVarsCB.getSelectedItem()).getType();
+        indexPanel.setVisible(VGlobals.instance().isArray(typ));
+        localAssignmentPanel.setVisible(opOn.isSelected());
     }
 
     private void setStateVariableCBValue(EventStateTransition est) {
-        stateVariablesCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
-        stateVariablesCB.setSelectedIndex(0);
-        for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {
-            ViskitStateVariable sv = (ViskitStateVariable) stateVariablesCB.getItemAt(i);
+        stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+        stateVarsCB.setSelectedIndex(0);
+        for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
+            vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
             if (est.getName().equalsIgnoreCase(sv.getName())) {
-                stateVariablesCB.setSelectedIndex(i);
+                stateVarsCB.setSelectedIndex(i);
                 return;
             }
         }
@@ -515,35 +495,35 @@ public class EventStateTransitionDialog extends JDialog
         // TODO: determine if this is necessary
 //        if (est.getStateVarName().isEmpty()) // for first time
 //        {
-//            ViskitGlobals.instance().getEventGraphController().messageToUser(
+//            ((EventGraphControllerImpl)VGlobals.instance().getEventGraphController()).messageUser(
 //                    JOptionPane.ERROR_MESSAGE,
 //                    "Alert",
 //                    "State variable " + est.getStateVarName() + "not found.");
 //        }
     }
 
-    private void setStateTransitionMethodsCBValue(EventStateTransition est) {
-        stateTransitionMethodsCB.setModel(resolveStateTransitionMethodCalls());
-        stateTransInvokePanel.setVisible(invokeOnRB.isSelected());
+    private void setStateTranMethodsCBValue(EventStateTransition est) {
+        stateTranMethodsCB.setModel(resolveStateTranMethodCalls());
+        stateTransInvokePanel.setVisible(opOn.isSelected());
         pack();
 
-        if (stateTransitionMethodsCB.getItemCount() <= 0) {return;}
+        if (stateTranMethodsCB.getItemCount() <= 0) {return;}
 
-        stateTransitionMethodsCB.setSelectedIndex(0);
+        stateTranMethodsCB.setSelectedIndex(0);
         String ops = est.getOperationOrAssignment();
 
-        if (invokeOnRB.isSelected())
+        if (opOn.isSelected())
             ops = ops.substring(0, ops.indexOf("("));
 
         String me;
-        for (int i = 0; i < stateTransitionMethodsCB.getItemCount(); i++) {
-            me = stateTransitionMethodsCB.getItemAt(i);
+        for (int i = 0; i < stateTranMethodsCB.getItemCount(); i++) {
+            me = stateTranMethodsCB.getItemAt(i);
 
-            if (invokeOnRB.isSelected())
+            if (opOn.isSelected())
                 me = me.substring(0, me.indexOf("("));
 
             if (me.contains(ops)) {
-                stateTransitionMethodsCB.setSelectedIndex(i);
+                stateTranMethodsCB.setSelectedIndex(i);
                 break;
             }
         }
@@ -558,38 +538,47 @@ public class EventStateTransitionDialog extends JDialog
             return;
         }
 
-        localVariableMethodsCB.setModel(mod);
-        localInvocationPanel.setVisible(invokeOnRB.isSelected());
+        localVarMethodsCB.setModel(mod);
+        localInvocationPanel.setVisible(opOn.isSelected());
         pack();
 
         // Check for any local variables first
-        if (localVariableMethodsCB.getItemCount() <= 0) {return;}
+        if (localVarMethodsCB.getItemCount() <= 0) {return;}
 
-        localVariableMethodsCB.setSelectedIndex(0);
+        localVarMethodsCB.setSelectedIndex(0);
         String lVMethodCall = est.getLocalVariableInvocation();
         String call;
-        for (int i = 0; i < localVariableMethodsCB.getItemCount(); i++) {
-            call = localVariableMethodsCB.getItemAt(i);
+        for (int i = 0; i < localVarMethodsCB.getItemCount(); i++) {
+            call = localVarMethodsCB.getItemAt(i);
             if (lVMethodCall != null && lVMethodCall.contains(call)) {
-                localVariableMethodsCB.setSelectedIndex(i);
+                localVarMethodsCB.setSelectedIndex(i);
                 break;
             }
         }
     }
 
-    private void unloadWidgets()
-	{
-        if (eventStateTransition != null)
-		{
-            eventStateTransition.setDescription(descriptionTF.getText().trim());
-            eventStateTransition.setLocalVariableAssignment(localAssignmentTF.getText().trim());
-            eventStateTransition.setName(((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getName());
-            eventStateTransition.setType(((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType());
-            eventStateTransition.setIndexingExpression(arrayIndexTF.getText().trim());
+    private void unloadWidgets() {
+        if (param != null) {
 
-            String arg = actionTF.getText().trim();
-            if (invokeOnRB.isSelected()) {
-                String methodCall = (String) stateTransitionMethodsCB.getSelectedItem();
+            param.getComments().clear();
+
+            String cs = descriptionField.getText().trim();
+            if (!cs.isEmpty()) {
+                param.getComments().add(0, cs);
+            }
+
+            if (!localAssignmentField.getText().isEmpty())
+                param.setLocalVariableAssignment(localAssignmentField.getText().trim());
+            else
+                param.setLocalVariableAssignment("");
+
+            param.setName(((ViskitElement) stateVarsCB.getSelectedItem()).getName());
+            param.setType(((ViskitElement) stateVarsCB.getSelectedItem()).getType());
+            param.setIndexingExpression(arrayIndexField.getText().trim());
+
+            String arg = actionField.getText().trim();
+            if (opOn.isSelected()) {
+                String methodCall = (String) stateTranMethodsCB.getSelectedItem();
 
                 // Insert the argument
                 if (!arg.isEmpty()) {
@@ -597,93 +586,82 @@ public class EventStateTransitionDialog extends JDialog
                     methodCall += arg + ")";
                 }
 
-                eventStateTransition.setOperationOrAssignment(methodCall);
+                param.setOperationOrAssignment(methodCall);
             } else {
-                eventStateTransition.setOperationOrAssignment(arg);
+                param.setOperationOrAssignment(arg);
             }
-            eventStateTransition.setOperation(invokeOnRB.isSelected());
+            param.setOperation(opOn.isSelected());
 
-            if (!localInvocationTF.getText().isEmpty())
-                eventStateTransition.setLocalVariableInvocation(localInvocationTF.getText().trim()
+            if (!localInvocationField.getText().isEmpty())
+                param.setLocalVariableInvocation(localInvocationField.getText().trim()
                         + "."
-                        + (String) localVariableMethodsCB.getSelectedItem());
+                        + localVarMethodsCB.getSelectedItem());
         }
     }
 
-    class CancelButtonListener implements ActionListener {
+    class cancelButtonListener implements ActionListener {
 
         // bugfix 1183
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
-            localAssignmentTF.setText("");
-                 arrayIndexTF.setText("");
-            actionTF.setText("");
-            localInvocationTF.setText("");
-            ViskitGlobals.instance().getActiveEventGraphModel().resetIndexVariableNameGenerator();
+            localAssignmentField.setText("");
+            arrayIndexField.setText("");
+            actionField.setText("");
+            localInvocationField.setText("");
+            VGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
             dispose();
         }
     }
 
-    class RadioButtonListener implements ActionListener 
-	{
-        @Override
-        public void actionPerformed(ActionEvent e) 
-		{
-            modified = true;
-            okButton.setEnabled(true);
-            String typeName = ((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType();
-			invokeOnRB.setEnabled(!ViskitGlobals.instance().isPrimitive(typeName));
+    class RadButtListener implements ActionListener {
 
-            Dimension d = actionLabel1.getPreferredSize();
-            if (assignToRB.isSelected())
-			{
-                actionLabel1.setText("=");
-                actionLabel2.setText("");
-            }
-			else if (invokeOnRB.isSelected())
-			{
-                if (ViskitGlobals.instance().isPrimitive(typeName))
-				{
-                    ViskitGlobals.instance().getEventGraphController().messageToUser(
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            modified = true;
+            okButt.setEnabled(true);
+
+            Dimension d = actionLab1.getPreferredSize();
+            if (assTo.isSelected()) {
+                actionLab1.setText("=");
+                actionLab2.setText("");
+            } else if (opOn.isSelected()) {
+                String ty = ((ViskitElement) stateVarsCB.getSelectedItem()).getType();
+                if (VGlobals.instance().isPrimitive(ty)) {
+                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Java Language Error",
-                            "A method cannot be invoked on a primitive type.");
-                    assignToRB.setSelected(true);
-                } else
-				{
-                    actionLabel1.setText("(");
-                    actionLabel2.setText(" )");
+                            "A method may not be invoked on a primitive type.");
+                    assTo.setSelected(true);
+                } else {
+                    actionLab1.setText("(");
+                    actionLab2.setText(" )");
                 }
             }
-            localAssignmentPanel.setVisible(invokeOnRB.isSelected());
-            stateTransInvokePanel.setVisible(invokeOnRB.isSelected());
-            actionLabel1.setPreferredSize(d);
-            actionLabel2.setPreferredSize(d);
+            localAssignmentPanel.setVisible(opOn.isSelected());
+            stateTransInvokePanel.setVisible(opOn.isSelected());
+            actionLab1.setPreferredSize(d);
+            actionLab2.setPreferredSize(d);
             pack();
         }
     }
 
-    class ApplyButtonListener implements ActionListener {
+    class applyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (modified)
-			{
+            if (modified) {
                 // check for array index
-                String typeName = ((ViskitStateVariable) stateVariablesCB.getSelectedItem()).getType();
-                if (ViskitGlobals.instance().isArray(typeName))
-				{
-                    if (arrayIndexTF.getText().trim().isEmpty())
-					{
-                        int returnValue = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
+                String typ = ((ViskitElement) stateVarsCB.getSelectedItem()).getType();
+                if (VGlobals.instance().isArray(typ)) {
+                    if (arrayIndexField.getText().trim().isEmpty()) {
+                        int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
                                 "Using a state variable which is an array" +
                                 "\nrequires an indexing expression.\nIgnore and continue?",
                                 "Warning",
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
-                        if (returnValue != JOptionPane.YES_OPTION)
-						{
+                        if (ret != JOptionPane.YES_OPTION) {
                             return;
                         }
                     }
@@ -694,15 +672,15 @@ public class EventStateTransitionDialog extends JDialog
         }
     }
 
-    class EnableApplyButtonListener implements CaretListener, ActionListener {
+    class enableApplyButtonListener implements CaretListener, ActionListener {
 
         @Override
         public void caretUpdate(CaretEvent event) {
-            localInvocationPanel.setVisible(!localInvocationTF.getText().isEmpty());
-            localInvokeDot.setEnabled(!localInvocationTF.getText().isEmpty());
+            localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
+            localInvokeDot.setEnabled(!localInvocationField.getText().isEmpty());
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
             pack();
         }
 
@@ -712,26 +690,20 @@ public class EventStateTransitionDialog extends JDialog
         }
     }
 
-    class MyCloseListener extends WindowAdapter
-	{
+    class myCloseListener extends WindowAdapter {
+
         @Override
-        public void windowClosing(WindowEvent e)
-		{
-            if (modified)
-			{
-                int returnValue = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this, "Apply changes?",
+        public void windowClosing(WindowEvent e) {
+            if (modified) {
+                int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION)
-				{
-                    okButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
+                } else {
+                    canButt.doClick();
                 }
-				else
-				{
-                    cancelButton.doClick();
-                }
-            } else
-			{
-                cancelButton.doClick();
+            } else {
+                canButt.doClick();
             }
         }
     }

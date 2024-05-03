@@ -17,31 +17,15 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
-import static javax.xml.bind.JAXBContext.newInstance;
 import javax.xml.bind.JAXBException;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcHandler;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
-import static javax.xml.bind.JAXBContext.newInstance;
 
 /**
  *
@@ -49,7 +33,7 @@ import static javax.xml.bind.JAXBContext.newInstance;
  */
 public class AssemblyHandler implements XmlRpcHandler {
 
-    static final Logger LOG = LogUtilities.getLogger(AssemblyHandler.class);
+    static Logger LOG = LogUtils.getLogger(AssemblyHandler.class);
     SessionManager sessionManager;
     Hashtable<String, GridRunner> gridRuns;
 
@@ -63,7 +47,7 @@ public class AssemblyHandler implements XmlRpcHandler {
     // during an addReport(), likewise enabling the appropriate
     // getReport() monitor.
     int port;
-    JAXBContext jaxbContext;
+    JAXBContext jaxbCtx;
     InputStream inputStream;
 
     public AssemblyHandler(int port) {
@@ -75,10 +59,9 @@ public class AssemblyHandler implements XmlRpcHandler {
         this.sessionManager = sessionManager;
         gridRuns = new Hashtable<>();
         try {
-            jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error("Classpath error loading jaxb bindings?", e);
-            e.printStackTrace();
         }
     }
 
@@ -164,28 +147,28 @@ public class AssemblyHandler implements XmlRpcHandler {
                         ret = gridRunner.getResultByTaskID(taskID);
                         break;
                     }
-                case "gridkit.getDesignPointStatistics":
+                case "gridkit.getDesignPointStats":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
-                        ret = gridRunner.getDesignPointStatistics(sample, designPt);
+                        ret = gridRunner.getDesignPointStats(sample, designPt);
                         break;
                     }
-                case "gridkit.getReplicationStatistics":
+                case "gridkit.getReplicationStats":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
                         Integer replication = (Integer) arguments.elementAt(3);
-                        ret = gridRunner.getReplicationStatistics(sample, designPt, replication);
+                        ret = gridRunner.getReplicationStats(sample, designPt, replication);
                         break;
                     }
                 case "gridkit.addDesignPointStat":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
                         Integer designPt = (Integer) arguments.elementAt(2);
-                        Integer numberOfStatistics = (Integer) arguments.elementAt(3);
+                        Integer numberOfStats = (Integer) arguments.elementAt(3);
                         String stat = (String) arguments.elementAt(4);
-                        ret = gridRunner.addDesignPointStatistics(sample, designPt, numberOfStatistics, stat);
+                        ret = gridRunner.addDesignPointStat(sample, designPt, numberOfStats, stat);
                         break;
                     }
                 case "gridkit.addReplicationStat":

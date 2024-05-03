@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -49,52 +49,43 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import org.apache.logging.log4j.Logger;
 
 /**
  * A class to observe a directory (tree) for changes and report them to listeners
  */
-public class DirectoryWatch 
-{
-    static final Logger LOG = LogUtilities.getLogger(DirectoryWatch.class);
+public class DirectoryWatch {
 
-    private static int sequenceNumber = 0;
-    private final static int   DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
+    private static int sequenceNum = 0;
+    private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
     private long sleepTimeMs = DEFAULTSLEEPTIMEMS;
     private Map<File, Long> lastFiles;
     private Thread thread;
     private File root;
 
-    public DirectoryWatch(File root) throws FileNotFoundException 
-	{
+    public DirectoryWatch(File root) throws FileNotFoundException {
         this(root, false);
     }
 
-    public DirectoryWatch(File root, boolean recurse) throws FileNotFoundException 
-	{
+    public DirectoryWatch(File root, boolean recurse) throws FileNotFoundException {
         this(root, recurse, null);
     }
 
-    public DirectoryWatch(File root, boolean recurse, DirectoryChangeListener directoryChangeListener) throws FileNotFoundException
-	{
-        buildInitialFileList(root, recurse);
-        if (directoryChangeListener != null) 
-		{
-            addListener(directoryChangeListener);
+    public DirectoryWatch(File root, boolean recurse, DirectoryChangeListener lis) throws FileNotFoundException {
+        buildInitialList(root, recurse);
+        if (lis != null) {
+            addListener(lis);
         }
         this.root = root;
     }
 
-    public void startWatcher() 
-	{
-        thread = new Thread(new Runner(), "DirectoryWatch-" + sequenceNumber++);
+    public void startWatcher() {
+        thread = new Thread(new Runner(), "DirectoryWatch-" + sequenceNum++);
         thread.setPriority(Thread.NORM_PRIORITY);
         thread.setDaemon(true);
         thread.start();
     }
 
-    public void stopWatcher()
-	{
+    public void stopWatcher() {
         if (thread != null) {
             thread.interrupt();
             thread = null;
@@ -105,55 +96,42 @@ public class DirectoryWatch
         sleepTimeMs = ms;
     }
 
-    private void buildInitialFileList(File rootFile, boolean recurse) throws FileNotFoundException 
-	{
-        if (!rootFile.exists()) 
-		{
+    private void buildInitialList(File root, boolean recurse) throws FileNotFoundException {
+        if (!root.exists()) {
             throw new FileNotFoundException("File or directory passed to DirectoryWatch constructor does not exist");
         }
         lastFiles = new HashMap<>();
 
-        FileAdder fa = new FileAdder();
-        if (recurse) 
-		{
-            recurseTree(rootFile, new FileAdder());
-        } else 
-		{
-            fa.foundFile(rootFile);
+        fileAdder fa = new fileAdder();
+        if (recurse) {
+            recurseTree(root, new fileAdder());
+        } else {
+            fa.foundFile(root);
         }
     }
 
-    class FileAdder implements RecurseListener
-	{
+    class fileAdder implements RecurseListener {
+
         @Override
-        public void foundFile(File file)
-		{
-            lastFiles.put(file, file.lastModified());
+        public void foundFile(File f) {
+            lastFiles.put(f, f.lastModified());
         }
     }
 
-    private void recurseTree(File file, RecurseListener recurseListener) 
-	{
-        if (file == null)
-		{
+    private void recurseTree(File f, RecurseListener lis) {
+        if (f == null) {
             return;
         }
-        if (file.isHidden())
-		{
+        if (f.isHidden()) {
             return;
         }
-        if (file.isFile()) 
-		{
-            recurseListener.foundFile(file);
-        } 
-		else 
-		{
-            File[] containedFileArray = file.listFiles();
-            if (containedFileArray != null)
-			{
-                for (File containedFile : containedFileArray) 
-				{
-                    recurseTree(containedFile, recurseListener);
+        if (f.isFile()) {
+            lis.foundFile(f);
+        } else {
+            File[] fa = f.listFiles();
+            if (fa != null) {
+                for (File fa1 : fa) {
+                    recurseTree(fa1, lis);
                 }
             }
         }
@@ -176,24 +154,20 @@ public class DirectoryWatch
         return listeners.remove(listener);
     }
 
-    private void fireAction(File file, int action)
-	{
-        for (DirectoryChangeListener listener : listeners) 
-		{
-            listener.fileChanged(file, action, this);
+    private void fireAction(File f, int action) {
+        for (DirectoryChangeListener lis : listeners) {
+            lis.fileChanged(f, action, this);
         }
     }
 
-    class Runner implements Runnable, RecurseListener 
-	{
-        Map<File, Long> workingHashMap = new HashMap<>(50);
+    class Runner implements Runnable, RecurseListener {
+
+        Map<File, Long> workingHM = new HashMap<>(50);
 
         @Override
-        public void run()
-		{
-            while (true) 
-			{
-                workingHashMap.clear();
+        public void run() {
+            while (true) {
+                workingHM.clear();
 
                 added.clear();
                 changed.clear();
@@ -202,28 +176,23 @@ public class DirectoryWatch
                 recurseTree(root, this);    // this removes from lastFiles
 
                 // Now see if any were removed...they will be the ones left
-                for (File cPath : lastFiles.keySet()) 
-				{
+                for (File cPath : lastFiles.keySet()) {
                     fireAction(cPath, DirectoryChangeListener.FILE_REMOVED);
                 }
                 Map<File, Long> temp = lastFiles;
-                lastFiles = workingHashMap;
-                workingHashMap = temp; // gets zeroed above
-                for (File f : changed) 
-				{
+                lastFiles = workingHM;
+                workingHM = temp; // gets zeroed above
+                for (File f : changed) {
                     fireAction(f, DirectoryChangeListener.FILE_CHANGED);
                 }
-                for (File f : added)
-				{
+                for (File f : added) {
                     fireAction(f, DirectoryChangeListener.FILE_ADDED);
                 }
 
                 try {
                     Thread.sleep(sleepTimeMs);
-                } 
-				catch (InterruptedException e) 
-				{
-                    LOG.error("DirectoryWatcher killed", e);
+                } catch (InterruptedException e) {
+                    System.err.println("DirWatcher killed");
                     break;
                 }
             }
@@ -232,36 +201,31 @@ public class DirectoryWatch
         Vector<File> changed = new Vector<>();
 
         @Override
-        public void foundFile(File file)
-		{
-            long modifiedDate = file.lastModified();
+        public void foundFile(File f) {
 
-            Long lastFileDate = lastFiles.get(file);
+            long moddate = f.lastModified();
 
-            if (lastFileDate == null)
-			{
-                added.add(file);
-            } 
-			else 
-			{
-                lastFiles.remove(file);
-                if (lastFileDate != modifiedDate) 
-				{
-                    changed.add(file);
+            Long lastdate = lastFiles.get(f);
+
+            if (lastdate == null) {
+                added.add(f);
+            } else {
+                lastFiles.remove(f);
+                if (lastdate != moddate) {
+                    changed.add(f);
                 }
             }
-            workingHashMap.put(file, modifiedDate);
+            workingHM.put(f, moddate);
         }
     }
 
-    interface RecurseListener 
-	{
-        void foundFile(File rile);
+    interface RecurseListener {
+        void foundFile(File f);
     }
 
-    public interface DirectoryChangeListener 
-	{
-        int FILE_ADDED   = 0;
+    public interface DirectoryChangeListener {
+
+        int FILE_ADDED = 0;
         int FILE_REMOVED = 1;
         int FILE_CHANGED = 2;
 

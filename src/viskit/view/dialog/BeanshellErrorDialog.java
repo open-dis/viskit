@@ -4,8 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
+import viskit.VGlobals;
+import viskit.ViskitConfig;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -19,27 +19,27 @@ import viskit.ViskitConfiguration;
  */
 public class BeanshellErrorDialog extends JDialog {
 
-    private final JTextArea errorMessage;
+    private JTextArea errorMsg;
     private boolean returnBool = false;
     private static BeanshellErrorDialog me;
-    private final JCheckBox current,  permanent,  nullCB;
-    private JCheckBox selectedButton;
+    private JCheckBox current,  permanent,  nullCB;
+    private JCheckBox selectedButt;
 
     public static boolean showDialog(String errMsg, Component locationComp) {
         if (me == null) {
             me = new BeanshellErrorDialog();
         }
-        me.errorMessage.setText(errMsg);
-        me.errorMessage.setCaretPosition(0);
+        me.errorMsg.setText(errMsg);
+        me.errorMsg.setCaretPosition(0);
         me.setLocationRelativeTo(locationComp);
         me.setVisible(true);
         return me.returnBool;
     }
 
     private BeanshellErrorDialog() {
-        ViskitConfiguration cfg = ViskitConfiguration.instance();
+        ViskitConfig cfg = ViskitConfig.instance();
 
-        setTitle(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_TITLE)); //"Warning"
+        setTitle(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_TITLE)); //"Warning"
         setModal(true);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
@@ -54,20 +54,20 @@ public class BeanshellErrorDialog extends JDialog {
         leftPan.setLayout(new BoxLayout(leftPan, BoxLayout.Y_AXIS));
 
         Icon ic = UIManager.getIcon("OptionPane.warningIcon");
-        JLabel lab = new JLabel(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_LABEL), ic, JLabel.LEFT);//"Java language error:"
+        JLabel lab = new JLabel(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_LABEL), ic, JLabel.LEFT);//"Java language error:"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
-        errorMessage = new JTextArea(4, 40);
-        errorMessage.setLineWrap(true);
-        errorMessage.setWrapStyleWord(true);
-        errorMessage.setBackground(lab.getBackground());      // lose the white
-        JScrollPane jsp = new JScrollPane(errorMessage);
+        errorMsg = new JTextArea(4, 40);
+        errorMsg.setLineWrap(true);
+        errorMsg.setWrapStyleWord(true);
+        errorMsg.setBackground(lab.getBackground());      // lose the white
+        JScrollPane jsp = new JScrollPane(errorMsg);
         jsp.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0),
                 BorderFactory.createLineBorder(Color.black, 1)));
         jsp.setAlignmentX(JTextArea.LEFT_ALIGNMENT);
         leftPan.add(jsp);
         leftPan.add(Box.createVerticalStrut(3));
-        lab = new JLabel(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_QUESTION)); //"Ignore and continue?"
+        lab = new JLabel(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_QUESTION)); //"Ignore and continue?"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
         topPan.add(leftPan);
@@ -76,19 +76,19 @@ public class BeanshellErrorDialog extends JDialog {
 
         p.add(Box.createVerticalStrut(10));
 
-        current = new JCheckBox(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX)); //"Hide warnings for current session"
-        permanent = new JCheckBox(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX)); //"Hide warnings permanently"
+        current = new JCheckBox(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX)); //"Hide warnings for current session"
+        permanent = new JCheckBox(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX)); //"Hide warnings permanently"
         nullCB = new JCheckBox("hidden");
         current.setSelected(false);
         permanent.setSelected(false);
         nullCB.setSelected(true);
-        selectedButton = nullCB;
+        selectedButt = nullCB;
         ButtonGroup bg = new ButtonGroup();
         bg.add(current);
         bg.add(permanent);
         bg.add(nullCB);
 
-        permanent.setToolTipText(cfg.getValue(ViskitConfiguration.BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP)); //"Set permanent options in File->Preferences"
+        permanent.setToolTipText(cfg.getVal(ViskitConfig.BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP)); //"Set permanent options in File->Preferences"
 
         current.addActionListener(new cbTweeker(current));
         permanent.addActionListener(new cbTweeker(permanent));
@@ -103,19 +103,19 @@ public class BeanshellErrorDialog extends JDialog {
         cbPan.add(permanent);
         p.add(cbPan);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        buttPan.setAlignmentX(JPanel.LEFT_ALIGNMENT);
 
-        buttonPanel.add(Box.createHorizontalGlue());
+        buttPan.add(Box.createHorizontalGlue());
         JButton noButton = new JButton("No");
         JButton yesButton = new JButton("Yes");
 
-        buttonPanel.add(noButton);
-        buttonPanel.add(yesButton);
+        buttPan.add(noButton);
+        buttPan.add(yesButton);
 
         p.add(Box.createVerticalStrut(5));
-        p.add(buttonPanel);
+        p.add(buttPan);
 
         setContentPane(p);
         pack();
@@ -134,9 +134,9 @@ public class BeanshellErrorDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (current.isSelected()) {
-                    ViskitConfiguration.instance().setSessionValue(ViskitConfiguration.BEANSHELL_WARNING, "false");
+                    ViskitConfig.instance().setSessionVal(ViskitConfig.BEANSHELL_WARNING, "false");
                 } else if (permanent.isSelected()) {
-                    ViskitConfiguration.instance().setValue(ViskitConfiguration.BEANSHELL_WARNING, "false");
+                    ViskitConfig.instance().setVal(ViskitConfig.BEANSHELL_WARNING, "false");
                 }
                 returnBool = true;
                 dispose();
@@ -154,23 +154,17 @@ public class BeanshellErrorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (selectedButton == cb) {// need to turn it off
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        nullCB.setSelected(true);
-                    }
-                });
-                selectedButton = nullCB;
+            if (selectedButt == cb) {// need to turn it off
+                nullCB.setSelected(true);
+                selectedButt = nullCB;
             } else {
-                selectedButton = cb;
+                selectedButt = cb;
             }
         }
     }
 
     public static void main(String[] args) {
         BeanshellErrorDialog.showDialog("Mama Leone and \nblah blah", null);
-        ViskitGlobals.instance().systemExit(0);
+        VGlobals.instance().sysExit(0);
     }
 }

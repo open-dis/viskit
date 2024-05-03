@@ -3,7 +3,7 @@
  *
  * Created on:  December 17, 2007, 0413Z
  *
- * References:  This code adapted from Roedy Green's FileFilter suite at:
+ * Refenences:  This code adapted from Roedy Green's FileFilter suite at:
  *              <a href="http://mindprod.com/products1.html#FILTER">http://mindprod.com/products1.html#FILTER</a>
  *
  * Assumptions: Just give it the String to parse and it should filter based on
@@ -11,7 +11,7 @@
  */
 
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -46,10 +46,8 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.util;
 
 // Standard library imports
-import edu.nps.util.LogUtilities;
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Filters files whose names contain a given String, case insensitive
@@ -71,11 +69,9 @@ import org.apache.logging.log4j.Logger;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.EventGraphFileFilter">Terry Norbraten</a>
  */
-public final class EventGraphFileFilter extends FileFilter
-{
-    static final Logger LOG = LogUtilities.getLogger(EventGraphFileFilter.class);
+public final class EventGraphFileFilter extends FileFilter {
 
-    /** we filter to accept only files ending with file extensions shown in the contents of this [] */
+    /** we filter to accept only files starting with the contents of this [] */
     private final String[] contents;
 
     /* CONSTRUCTOR(s) */
@@ -86,54 +82,40 @@ public final class EventGraphFileFilter extends FileFilter
      * @param contents file must not contain any of these Strings.
      *        Case Insensitive.
      */
-    public EventGraphFileFilter(String[] contents) 
-	{
+    public EventGraphFileFilter(String[] contents) {
         this.contents = contents;
-        int index = 0;
-        for (String s : contents)
-		{
-            contents[index] = s.toLowerCase();
-            index++;
+        int ix = 0;
+        for (String s : contents) {
+            contents[ix] = s.toLowerCase();
+            ix++;
         }
     }
 
     /**
-     * Select only files with names ending in one of the provided file extensions.  Does expose directories
+     * Select only files not containing our String.  Does expose directories
      * for ease of navigation
      *
-     * @param file the file for determination of naming acceptence
+     * @param f the file for naming determination
+     *
      * @return false if and only if the name should be not included in the file
      *         list; true otherwise.
      */
     @Override
-    public boolean accept(File file) 
-	{
-		if (file.getName().startsWith("."))
-		{
-			return false; // no hidden files or directories
-		}
-        if (file.isDirectory()) 
-		{
-			return true;
-		}
-        boolean foundMatch = false;
-        String fileName = file.getName();
-        for (String s : contents) 
-		{
-            foundMatch = fileName.toLowerCase().endsWith(s);
-            if (foundMatch) 
-			{
+    public boolean accept(File f) {
+        if (f.isDirectory()) {return true;}
+        boolean retVal = false;
+        String fileName = f.getName();
+        for (String s : contents) {
+            retVal = !fileName.toLowerCase().contains(s);
+            if (!retVal) {
                 break;
             }
         }
-        return foundMatch;
+        return retVal;
     }
 
     /** @return a fileview description of the filter */
     @Override
-    public String getDescription() 
-	{
-		return "Event Graph XML files only";
-	}
+    public String getDescription() {return "EventGraph XML Files Only";}
 
 } // end class file EventGraphFileFilter.java

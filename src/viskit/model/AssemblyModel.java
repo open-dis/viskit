@@ -3,7 +3,7 @@ package viskit.model;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
-import viskit.util.FileBasedAssemblyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
 /**
@@ -15,45 +15,41 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * Date: May 17, 2004
  * Time: 9:16:26 AM
  */
- public interface AssemblyModel 
- {
+ public interface AssemblyModel {
+
     /** Places an event graph node on the assembly pallete when the user drags
      * an icon from the LEGO tree
      *
      * @param widgetName the name of the EG
-     * @param className the EventGraph class from parsing third party libs of the current project
+     * @param className the EG class from parsing third party libs of the current project
      * @param p the point on the pallete to place the node icon
      */
-	 
-     void newEventGraph(String widgetName, String className, Point2D p, String description);
+     void newEventGraph(String widgetName, String className, Point2D p);
 
      /**
       * Support redo for the event graph node
       * @param node the node to redo
       */
-     void redoEventGraph(EventGraphNode node);
+     void redoEventGraph(EvGraphNode node);
 
     /** Places an event graph node on the assembly pallete when the user drags
      * an icon from the LEGO tree
      *
      * @param widgetName the name of the EG
-//   * @param node the cached node from parsing the EG directory of the current project
-     * @param className the EventGraph class from parsing third party libs of the current project
+     * @param node the cached node from parsing the EG directory of the current project
      * @param p the point on the pallete to place the node icon
-	 * @param description the value of description
-	 * @param assemblyNode XML from drag+drop
      */
-    void newEventGraphFromXML(String widgetName, String className, Point2D p, String description, FileBasedAssemblyNode assemblyNode);
+    void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
-    void newPropertyChangeListener(String widgetName, String className, Point2D p, String description);
+    void newPropChangeListener(String widgetName, String className, Point2D p);
 
     /**
-     * Supports redo of a PropertyChangeListenerNode
+     * Supports redo of a PropChangeListenerNode
      * @param node the node to redo
      */
-    void redoPropertyChangeListener(PropertyChangeListenerNode node);
+    void redoPropChangeListener(PropChangeListenerNode node);
 
-    void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p, String description);
+    void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p);
 
     /**
      * Boolean to signify whether the model has been changed since last disk
@@ -76,7 +72,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     /** Saves the current Assembly file out to XML
      *
-     * @param f the Assembly file to save
+     * @param f the Assy file to save
      */
     void saveModel(File f);
 
@@ -90,31 +86,31 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      *
      * @return the meta data for this Assembly
      */
-    GraphMetadata getMetadata();
+    GraphMetaData getMetaData();
 
-    void setMetadata(GraphMetadata graphMetadata);
+    void changeMetaData(GraphMetaData gmd);
 
     SimkitAssembly getJaxbRoot();
 
-    AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
+    AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-    PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropertyChangeListenerNode target);
+    PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
 
-    void newSimEventListenerEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
+    void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-    boolean changePclNode(PropertyChangeListenerNode pclNode);
+    boolean changePclNode(PropChangeListenerNode pclNode);
 
-    boolean changeEventGraphNode(EventGraphNode eventNode);
+    boolean changeEvGraphNode(EvGraphNode evNode);
 
-    void changePclEdge(PropertyChangeListenerEdge pclEdge);
+    void changePclEdge(PropChangeEdge pclEdge);
 
     void changeAdapterEdge(AdapterEdge aEdge);
 
-    void changeSimEventListenerEdge(SimEventListenerEdge seEdge);
+    void changeSimEvEdge(SimEvListenerEdge seEdge);
 
-    void deleteEventGraphNode(EventGraphNode eventNode);
+    void deleteEvGraphNode(EvGraphNode evNode);
 
-    void deletePropertyChangeListener(PropertyChangeListenerNode pclNode);
+    void deletePropChangeListener(PropChangeListenerNode pclNode);
 
     void deleteAdapterEdge(AdapterEdge ae);
 
@@ -128,21 +124,21 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Assembly nodes don't hold onto edges.
      * @param pce the edge to delete
      */
-    void deletePropChangeEdge(PropertyChangeListenerEdge pce);
+    void deletePropChangeEdge(PropChangeEdge pce);
 
     /**
-     * Supports redo of a PropertyChangeListenerEdge
+     * Supports redo of a PropChangeEdge
      * @param pce the edge to redo
      */
-    void redoPropertyChangeListenerEdge(PropertyChangeListenerEdge pce);
+    void redoPropChangeEdge(PropChangeEdge pce);
 
-    void deleteSimEventListenerEdge(SimEventListenerEdge sele);
+    void deleteSimEvLisEdge(SimEvListenerEdge sele);
 
     /**
      * Supports redo of a SimEvLisEdge
      * @param sele the edge to redo
      */
-    void redoSimEventListenerEdge(SimEventListenerEdge sele);
+    void redoSimEvLisEdge(SimEvListenerEdge sele);
 
     /** Retrieve a list of detailed output entity names
      *

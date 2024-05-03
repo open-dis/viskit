@@ -24,7 +24,7 @@
  *
  * TODO:
  *
- * Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+ * Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -58,26 +58,26 @@
  */
 package viskit.reports;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.awt.Color;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.DomainInfo;
 import org.jfree.data.function.Function2D;
 import org.jfree.data.function.LineFunction2D;
-import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.general.DatasetUtils;
 import org.jfree.data.statistics.Regression;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -111,8 +111,8 @@ public class LinearRegressionChart {
      * @return the path url of the created object
      */
     public String createChart(String title, String label, double[] data) {
-        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
-        File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "LinearRegression.png");
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "LinearRegression.png");
         XYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 
@@ -164,10 +164,10 @@ public class LinearRegressionChart {
         // calculate the regression and create subplot 2...
         double[] coefficients = Regression.getOLSRegression(dataset, 0);
         Function2D curve = new LineFunction2D(coefficients[0], coefficients[1]);
-        XYDataset regressionData = DatasetUtilities.sampleFunction2D(
+        XYDataset regressionData = DatasetUtils.sampleFunction2D(
                 curve,
-                ((XYSeriesCollection) dataset).getDomainLowerBound(true),
-                ((XYSeriesCollection) dataset).getDomainUpperBound(true),
+                ((DomainInfo) dataset).getDomainLowerBound(true),
+                ((DomainInfo) dataset).getDomainUpperBound(true),
                 dataset.getItemCount(0),
                 "Fitted Regression Line");
 
@@ -188,17 +188,10 @@ public class LinearRegressionChart {
      */
     private void saveChart(JFreeChart chart, File outFile) {
 
-        FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(outFile);
-            ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
+            ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtilities.getLogger(LinearRegressionChart.class).error(ioe);
-        } finally {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException ioe) {}
+            LogUtils.getLogger(LinearRegressionChart.class).error(ioe);
         }
     }
 }

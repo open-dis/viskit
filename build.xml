@@ -44,8 +44,6 @@
 
     <property description="Event Graph utilities" location="${dir.src}/viskit/xsd/sge" name="dir.src.sge.util"/>
 
-    <property description="Simevg utility" location="${dir.src}/viskit/xsd/translator" name="dir.src.simevg.util"/>
-
     <property description="where the help source sits" location="${dir.src}/viskit/javahelp" name="javahelp"/>
 
     <property description="where the generated and copied help files go" location="${dir.build.classes}/viskit/javahelp" name="build.javahelp"/>
@@ -54,11 +52,11 @@
     <property environment="env"/>
 
     <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-xjc.jar istack-commons-tools.jar jaxb-api.jar jaxb-runtime.jar codemodel.jar istack-commons-runtime.jar xsom.jar relaxng-datatype.jar rngom.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="codemodel.jar istack-commons-runtime.jar istack-commons-tools.jar jaxb-api.jar jaxb-runtime.jar jaxb-xjc.jar relaxng-datatype.jar rngom.jar xsom.jar"/>
     </path>
 
     <path id="jaxb.runtime.path">
-        <fileset dir="${dir.lib.xml}" includes="jaxb-runtime.jar javax.activation-api.jar istack-commons-runtime.jar" id="jaxb.classes"/>
+        <fileset dir="${dir.lib.xml}" includes="istack-commons-runtime.jar javax.activation-api.jar jaxb-runtime.jar" id="jaxb.classes"/>
     </path>
 
     <path id="runtime.extension.classes.path">
@@ -66,31 +64,32 @@
     </path>
 
     <path id="compile.classpath">
+        <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
+        <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration2-2.10.1.jar"/>
+        <pathelement location="${dir.lib}/commons-lang3-3.14.0.jar"/>
         <pathelement location="${jaxb-api.jar}"/>
         <pathelement location="${dir.lib}/jdom.jar"/>
-        <pathelement location="${dir.lib}/jgraph.jar"/>
-        <pathelement location="${dir.lib}/actions.jar"/>
-        <pathelement location="${dir.lib}/simkit.jar"/>
-        <pathelement location="${dir.lib}/jhall.jar"/>
         <pathelement location="${jfreechart.jar}"/>
-        <pathelement location="${dir.lib}/commons-configuration-1.7.jar"/>
-        <pathelement location="${dir.lib}/commons-codec-1.3.jar"/>
-        <pathelement location="${dir.lib}/commons-io-2.5.jar"/>
-        <pathelement location="${dir.lib}/commons-lang-2.6.jar"/>
+        <pathelement location="${dir.lib}/jgraph5.jar"/>
+        <pathelement location="${dir.lib}/jhall.jar"/>
         <pathelement path="${log4j.jars}"/>
+        <pathelement location="${dir.lib}/simkit.jar"/>
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
     </path>
 
     <path id="runtime.classpath">
-        <pathelement location="${dir.build.classes}"/>
+        <pathelement location="${dist.jar}"/>
         <pathelement location="${dir.lib}/batik-ext.jar"/>
-        <pathelement location="${jcommon.jar}"/>
         <pathelement location="${dir.lib}/commons-beanutils-1.9.4.jar"/>
-        <pathelement location="${dir.lib}/commons-collections-3.2.1.jar"/>
-        <pathelement location="${dir.lib}/commons-digester-2.1.jar"/>
+        <pathelement location="${dir.lib}/commons-collections4-4.1.jar"/>
+        <pathelement location="${dir.lib}/commons-digester3-3.2.jar"/>
         <pathelement location="${dir.lib}/commons-jxpath-1.3.jar"/>
-        <pathelement location="${dir.lib}/commons-logging-1.1.1.jar"/>
+        <pathelement location="${dir.lib}/commons-lang3-3.14.0.jar"/>
+        <pathelement location="${dir.lib}/commons-logging-1.3.1.jar"/>
+        <pathelement location="${dir.lib}/commons-text-1.12.0.jar"/>
+        <pathelement location="${jcommon.jar}"/>
         <pathelement location="${dir.lib}/resolver.jar"/>
         <pathelement location="${dir.lib}/serializer.jar"/>
         <pathelement location="${dir.lib}/xalan.jar"/>
@@ -103,6 +102,7 @@
     <path id="runtime.test.classpath">
         <path refid="runtime.classpath"/>
         <pathelement location="${dir.lib}/support/junit.jar"/>
+        <path path="${dir.build.classes}"/>
     </path>
 
     <!-- For the launch4j installers -->
@@ -208,7 +208,7 @@ their descpritions.
     </target>
 
     <!-- @deprecated - Now a legacy target as we are no longer building schema from DTD -->
-    <target name="deprecated.build.createNewSchemaFromDtd"
+    <target name="build.schema"
             depends="init"
             description="Create xsd Schemas from dtd @deprecated">
         <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
@@ -222,7 +222,7 @@ their descpritions.
         <trang failonerror="true" input="${cli.dtd}" output="${cli.xsd}" schemaIn="dtd" schemaOut="xsd"/>
     </target>
 
-    <target name="build.bindings.simkit.jaxb"
+    <target name="bindings.simkit"
             depends="init"
             description="Create bindings to Simkit XML Schemas" >
 
@@ -259,7 +259,7 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="build.bindings.simkit.jaxb,javahelp">
+    <target name="compile" depends="bindings.simkit,javahelp">
 
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"
@@ -282,11 +282,10 @@ their descpritions.
                 <include name="viskit/images/*.jpg"/>
             </fileset>
             <fileset dir="${basedir}">
-                <include name="${configuration.dir}/log4j.properties"/>
-                <include name="${license.dir}/*"/>
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
+        <copy file="${configuration.dir}/log4j2.properties" todir="${dir.build.classes}"/>
 
         <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>
@@ -315,49 +314,53 @@ their descpritions.
 
     <!--  === TARGET: jar === -->
     <target name="jar" depends="compile">
+        <manifest file="MANIFEST.MF">
+            <attribute name="Built-By" value="${my.name} ${my.email}"/>
+            <attribute name="Specification-Title"
+                       value="${product.Name}"/>
+            <attribute name="Specification-Version"
+                       value="${product.version.major}.${product.version.minor}"/>
+            <attribute name="Specification-Vendor"
+                       value="${spec.vendor}"/>
+            <attribute name="Implementation-Title"
+                       value="${impl.title}"/>
+            <attribute name="Implementation-Version"
+                       value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
+            <attribute name="Implementation-Vendor"
+                       value="${nps}, ${moves.institute}, ${savage.research.group}"/>
+            <attribute name="Implementation-URL"
+                       value="${Savage.url}"/>
+
+            <section name="edu.nps.util"/>
+            <section name="viskit"/>
+            <section name="viskit.assembly"/>
+            <section name="viskit.control"/>
+            <section name="viskit.doe"/>
+            <section name="viskit.gridlet"/>
+            <section name="viskit.images"/>
+            <section name="viskit.jgraph"/>
+            <section name="viskit.model"/>
+            <section name="viskit.mvc"/>
+            <section name="viskit.util"/>
+            <section name="viskit.view"/>
+            <section name="viskit.view.dialog"/>
+            <section name="viskit.xsd.bindings.assembly"/>
+            <section name="viskit.xsd.bindings.assembly.stats"/>
+            <section name="viskit.xsd.bindings.cli"/>
+            <section name="viskit.xsd.bindings.eventgraph"/>
+            <section name="viskit.xsd.cli"/>
+            <section name="viskit.xsd.translator.assembly"/>
+            <section name="viskit.xsd.translator.eventgraph"/>
+        </manifest>
         <jar basedir="${dir.build.classes}"
              compress="false"
-             destfile="${dist.jar}">
-            <manifest>
-                <attribute name="Built-By" value="${my.name}"/>
-                <attribute name="Specification-Title"
-                           value="${product.Name}"/>
-                <attribute name="Specification-Version"
-                           value="${product.version.major}.${product.version.minor}"/>
-                <attribute name="Specification-Vendor"
-                           value="${spec.vendor}"/>
-                <attribute name="Implementation-Title"
-                           value="${impl.title}"/>
-                <attribute name="Implementation-Version"
-                           value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
-                <attribute name="Implementation-Vendor"
-                           value="${nps}, ${moves.institute}, ${savage.research.group}"/>
-                <attribute name="Implementation-URL"
-                           value="${Savage.url}"/>
-
-                <section name="edu.nps.util"/>
-                <section name="viskit"/>
-                <section name="viskit.assembly"/>
-                <section name="viskit.control"/>
-                <section name="viskit.doe"/>
-                <section name="viskit.gridlet"/>
-                <section name="viskit.images"/>
-                <section name="viskit.jgraph"/>
-                <section name="viskit.model"/>
-                <section name="viskit.mvc"/>
-                <section name="viskit.util"/>
-                <section name="viskit.view"/>
-                <section name="viskit.view.dialog"/>
-                <section name="viskit.xsd.bindings.assembly"/>
-                <section name="viskit.xsd.bindings.assembly.stats"/>
-                <section name="viskit.xsd.bindings.cli"/>
-                <section name="viskit.xsd.bindings.eventgraph"/>
-                <section name="viskit.xsd.cli"/>
-                <section name="viskit.xsd.translator.assembly"/>
-                <section name="viskit.xsd.translator.eventgraph"/>
-            </manifest>
+             destfile="${dist.jar}"
+             excludes="viskit.test.*"
+             manifest="MANIFEST.MF">
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
+            <metainf file="license/license.html"/>
+            <metainf file="license/THIRDPARTYLICENSEREADME.html"/>
         </jar>
     </target>
 
@@ -400,48 +403,13 @@ their descpritions.
 
         <jar basedir="${dir.build.classes}"
              compress="false"
-             destfile="${dist.exe.jar}">
+             destfile="${dist.exe.jar}"
+             manifest="MANIFEST.MF">
             <manifest>
-                <attribute name="Built-By" value="${my.name}"/>
-                <attribute name="Specification-Title"
-                           value="${product.Name}"/>
-                <attribute name="Specification-Version"
-                           value="${product.version.major}.${product.version.minor}"/>
-                <attribute name="Specification-Vendor"
-                           value="${spec.vendor}"/>
-                <attribute name="Implementation-Title"
-                           value="${impl.title}"/>
-                <attribute name="Implementation-Version"
-                           value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
-                <attribute name="Implementation-Vendor"
-                           value="${nps}, ${moves.institute}, ${savage.research.group}"/>
-                <attribute name="Implementation-URL"
-                           value="${Savage.url}"/>
 
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.SplashScreenFrame2" />
+                <attribute name="Main-Class" value="viskit.Splash2" />
                 <attribute name="Class-Path" value="${launcher.classpath}" />
-
-                <section name="edu.nps.util"/>
-                <section name="viskit"/>
-                <section name="viskit.assembly"/>
-                <section name="viskit.control"/>
-                <section name="viskit.doe"/>
-                <section name="viskit.gridlet"/>
-                <section name="viskit.images"/>
-                <section name="viskit.jgraph"/>
-                <section name="viskit.model"/>
-                <section name="viskit.mvc"/>
-                <section name="viskit.util"/>
-                <section name="viskit.view"/>
-                <section name="viskit.view.dialog"/>
-                <section name="viskit.xsd.bindings.assembly"/>
-                <section name="viskit.xsd.bindings.assembly.stats"/>
-                <section name="viskit.xsd.bindings.cli"/>
-                <section name="viskit.xsd.bindings.eventgraph"/>
-                <section name="viskit.xsd.cli"/>
-                <section name="viskit.xsd.translator.assembly"/>
-                <section name="viskit.xsd.translator.eventgraph"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
@@ -559,13 +527,11 @@ their descpritions.
                 <include name="commons-lang-2.6.jar"/>
                 <include name="commons-logging-1.1.1.jar"/>
                 <include name="jdom.jar"/>
-                <include name="log4j.jar"/>
+                <include name="${log4j.jars}"/>
                 <include name="simkit.jar"/>
                 <include name="xmlrpc-2.0.jar"/>
             </fileset>
-            <fileset dir="${dir.lib.ext}">
-                <include name="*.jar"/>
-            </fileset>
+            <fileset dir="${dir.lib.ext}" includes="*.jar"/>
             <fileset refid="jaxb.classes"/>
         </copy>
 
@@ -608,13 +574,13 @@ their descpritions.
             description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
     </target>
 
-    <!-- TARGET: Quick Run, don't check dependencies, TBD ant should be able to not rebuild if not needed -->
+    <!-- TARGET: Quick Run, doesn't check dependencies, or compile -->
     <target name="quick.run"
             depends="init,quick.run.not.mac,quick.run.mac"
             description="Run Viskit, don't check dependencies, don't rebuild"/>
 
     <target name="quick.run.not.mac" unless="isMac">
-        <java classname="viskit.SplashScreenFrame2"
+        <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
 
@@ -624,7 +590,7 @@ their descpritions.
     </target>
 
     <target name="quick.run.mac" if="isMac">
-        <java classname="viskit.SplashScreenFrame2"
+        <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
 
@@ -632,7 +598,7 @@ their descpritions.
             <jvmarg value="-Xdock:name=${product.shortname}"/>
             <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
             <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
-            <jvmarg value="-Dapple.awt.brushMetalLook=true "/>
+            <jvmarg value="-Dapple.awt.brushMetalLook=true"/>
             <arg value="${main.class}"/>
         </java>
     </target>
@@ -654,9 +620,6 @@ their descpritions.
               fork="true"
               failonerror="true">
 
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${common.run.args}"/>
         </java>
@@ -665,23 +628,34 @@ their descpritions.
 
     <target depends="compile,quick.debug" description="Debug Project" name="debug"/>
 
-    <!-- TARGET: Quick Debug don't check dependencies -->
+    <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
 
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
+        <antcall target="quick.debug.not.mac"/>
+        <antcall target="quick.debug.mac"/>
+    </target>
+    <target name="quick.debug.not.mac" unless="isMac">
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-
             <jvmarg line="${common.run.args}"/>
-            <jvmarg value="-Xdock:name=${product.shortname}"/>
+
+            <!-- Any debug args can go here -->
+            <!--arg value="localhost" />
+            <arg value="4444" /-->
+        </java>
+    </target>
+    <target name="quick.debug.mac" if="isMac">
+        <java classname="${debug.class}"
+              classpathref="runtime.classpath"
+              fork="true">
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg line="${common.run.args}"/>
             <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
             <jvmarg value="-Dapple.laf.useScreenMenuBar=true"/>
             <jvmarg line="--add-exports java.desktop/com.apple.eawt=ALL-UNNAMED"/>

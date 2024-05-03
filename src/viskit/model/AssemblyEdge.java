@@ -1,8 +1,5 @@
 package viskit.model;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -13,44 +10,33 @@ import org.apache.logging.log4j.Logger;
  * @since 2:57:37 PM
  * @version $Id$
  */
-abstract public class AssemblyEdge extends ViskitElement 
-{
-    static final Logger LOG = LogUtilities.getLogger(AssemblyEdge.class);
-	
-    private Object to, from; // TODO use proper class, if possible
+abstract public class AssemblyEdge extends ViskitElement {
+
+    private Object to;
+    private Object from;
     private String description = "";
 
-    public Object getToObject() 
-	{
+    public Object getTo() {
         return to;
     }
 
-    public void setToObject(Object toObject) 
-	{
-        to = toObject;
+    public void setTo(Object t) {
+        to = t;
     }
 
-    public Object getFromObject() 
-	{
+    public Object getFrom() {
         return from;
     }
 
-    public void setFromObject(Object fromObject) 
-	{
-        this.from = fromObject;
+    public void setFrom(Object f) {
+        from = f;
     }
 
-	@Override
-    public String getDescription()
-	{
-		if (description == null)
-			description = "";
+    public String getDescriptionString() {
         return description;
     }
 
-	@Override
-    public void setDescription(String newDescription)
-	{
-        description = newDescription;
+    public void setDescriptionString(String d) {
+        description = d;
     }
 }

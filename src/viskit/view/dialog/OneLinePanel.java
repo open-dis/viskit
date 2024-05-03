@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -45,7 +45,7 @@ import javax.swing.JPanel;
  * other complex panel
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.view.dialog.OneLinePanel">Terry Norbraten, NPS MOVES</a>
- * @version $Id$
+ * @version $Id:$
  */
 public class OneLinePanel extends JPanel {
 

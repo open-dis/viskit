@@ -11,7 +11,7 @@
  */
 
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -64,66 +64,42 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.AssemblyFileFilter">Terry Norbraten</a>
  */
-public final class AssemblyFileFilter extends FileFilter
-{
-    /** we filter to accept only files ending with file extensions shown in the contents of this [] */
-    private final String[] contents;
+public final class AssemblyFileFilter extends FileFilter {
+
+    /** we filter to accept only files starting with this string */
+    private final String contains;
 
     /* CONSTRUCTOR(s) */
 
     /**
-     * Creates an instance of EventGraphFileFilter
+     * Creates an instance of AssemblyFileFilter
      *
-     * @param contents file must not contain any of these Strings.
-     *        Case Insensitive.
+     * @param contains file must contain this String. Case Insensitive.
      */
-    public AssemblyFileFilter (String[] contents) 
-	{
-        this.contents = contents;
-        int index = 0;
-        for (String s : contents)
-		{
-            contents[index] = s.toLowerCase();
-            index++;
-        }
+    public AssemblyFileFilter(String contains) {
+        this.contains = contains.toLowerCase();
     }
 
     /**
-     * Select only files with names ending in one of the provided file extensions.  Does expose directories
+     * Select only files containing our String.  Does expose directories
      * for ease of navigation
      *
-     * @param file the file for determination of naming acceptence
-     * @return false if and only if the name should be not included in the file
-     *         list; true otherwise.
+     * @param f the file for naming determination
+     *
+     * @return true if and only if the name should be included in the file list;
+     *         false otherwise.
      */
     @Override
-    public boolean accept(File file) 
-	{
-		if (file.getName().startsWith("."))
-		{
-			return false; // no hidden files or directories
-		}
-        if (file.isDirectory()) 
-		{
-			return true;
-		}
-        boolean foundMatch = false;
-        String fileName = file.getName();
-        for (String s : contents) 
-		{
-            foundMatch = fileName.toLowerCase().endsWith(s);
-            if (foundMatch) 
-			{
-                break;
-            }
+    public boolean accept(File f) {
+        if (f.isDirectory()) {
+            return !f.getName().contains("svn");
         }
-        return foundMatch;
+        return f.getName().toLowerCase().contains(contains);
     }
 
     /** @return a fileview description of the filter */
     @Override
-    public String getDescription() 
-	{
+    public String getDescription() {
         return "Viskit Assembly XML Files Only";
     }
 

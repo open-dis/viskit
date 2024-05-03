@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -24,21 +24,20 @@ import viskit.ViskitGlobals;
  */
 public class EventArgumentDialog extends JDialog {
 
-    private final JTextField                 nameField;    // Text field that holds the parameter name
-    private final JTextField          descriptionField;    // Text field that holds the description
-    private final JComboBox<String> parameterTypeCombo;    // Editable combo box that lets us select a type
+    private JTextField nameField;    // Text field that holds the parameter name
+    private JTextField descriptionField;          // Text field that holds the description
+    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
-    private EventArgument eventArgument;
-    private final JButton okButton,  cancelButton;
+    private EventArgument myEA;
+    private JButton okButt,  canButt;
     public static String newName,  newType,  newDescription;
 
-    public static boolean showDialog(JFrame f, EventArgument eventArg)
-	{
+    public static boolean showDialog(JFrame f, EventArgument parm) {
         if (dialog == null) {
-            dialog = new EventArgumentDialog(f, eventArg);
+            dialog = new EventArgumentDialog(f, parm);
         } else {
-            dialog.setParameters(f, eventArg);
+            dialog.setParams(f, parm);
         }
 
         dialog.setVisible(true);
@@ -46,15 +45,14 @@ public class EventArgumentDialog extends JDialog {
         return modified;
     }
 
-    private EventArgumentDialog(JFrame parent, EventArgument eventArgument)
-	{
+    private EventArgumentDialog(JFrame parent, EventArgument param) {
         super(parent, "Event Argument", true);
-        this.eventArgument = eventArgument;
+        this.myEA = param;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        Container cont = getContentPane();
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -64,46 +62,46 @@ public class EventArgumentDialog extends JDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLabel         = new JLabel("name");
-        JLabel initialValueLabel = new JLabel("initial value");
-        JLabel typeLabel         = new JLabel("type");
-        JLabel descriptionLabel  = new JLabel("description");
-        int width = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
+        JLabel nameLab = new JLabel("name");
+        JLabel initLab = new JLabel("initial value");
+        JLabel typeLab = new JLabel("type");
+        JLabel descriptionLabel = new JLabel("description");
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
         descriptionField = new JTextField(25);
         setMaxHeight(descriptionField);
-        parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
+        parameterTypeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
 
-        fieldsPanel.add(new OneLinePanel(nameLabel, width, nameField));
-        fieldsPanel.add(new OneLinePanel(typeLabel, width, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(descriptionLabel, width, descriptionField));
+        fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
+        fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         panel.add(fieldsPanel);
         panel.add(Box.createVerticalStrut(5));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        panel.add(buttonPanel);
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        panel.add(buttPan);
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        contentPane.add(panel);
+        cont.add(panel);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener listener = new enableApplyButtonListener();
         this.nameField.addCaretListener(listener);
         this.descriptionField.addCaretListener(listener);
         this.parameterTypeCombo.addActionListener(listener);
 
-        setParameters(parent, eventArgument);
+        setParams(parent, param);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -112,52 +110,51 @@ public class EventArgumentDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParameters(Component c, EventArgument p) {
-        eventArgument = p;
+    public final void setParams(Component c, EventArgument p) {
+        myEA = p;
 
         fillWidgets();
 
         modified = (p == null);
-        okButton.setEnabled(p == null);
+        okButt.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack();
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets()
-	{
-        if (eventArgument != null) {
-            nameField.setText(eventArgument.getName());
-            parameterTypeCombo.setSelectedItem(eventArgument.getType());
-            descriptionField.setText(eventArgument.getDescription());
-            descriptionField.setToolTipText(eventArgument.getDescription());
-        } 
-		else
-		{
+    private void fillWidgets() {
+        if (myEA != null) {
+            nameField.setText(myEA.getName());
+            parameterTypeCombo.setSelectedItem(myEA.getType());
+            if (myEA.getDescription().size() > 0) {
+                descriptionField.setText(myEA.getDescription().get(0));
+            } else {
+                descriptionField.setText("");
+            }
+        } else {
             nameField.setText("");
-            parameterTypeCombo.setSelectedIndex(-1);
             descriptionField.setText("");
-            descriptionField.setToolTipText("");
         }
     }
 
     private void unloadWidgets() {
-        String type = (String) parameterTypeCombo.getSelectedItem();
-        type = ViskitGlobals.instance().typeChosen(type);
-        String name = nameField.getText();
-        name = name.replaceAll("\\s", "");
+        String ty = (String) parameterTypeCombo.getSelectedItem();
+        ty = VGlobals.instance().typeChosen(ty);
+        String nm = nameField.getText();
+        nm = nm.replaceAll("\\s", "");
 
-        if (eventArgument != null)
-		{
-            eventArgument.setName(name);
-            eventArgument.setType(type);
-            eventArgument.setDescription(descriptionField.getText().trim());
-        } 
-		else 
-		{
-            newName = name;
-            newType = type;
+        if (myEA != null) {
+            myEA.setName(nm);
+            myEA.setType(ty);
+            myEA.getDescription().clear();
+            String cs = descriptionField.getText().trim();
+            if (cs.length() > 0) {
+                myEA.getDescription().add(0, cs);
+            }
+        } else {
+            newName = nm;
+            newType = ty;
             newDescription = descriptionField.getText().trim();
         }
     }
@@ -187,8 +184,8 @@ public class EventArgumentDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override
@@ -202,15 +199,15 @@ public class EventArgumentDialog extends JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int returnValue = JOptionPane.showConfirmDialog(EventArgumentDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
                 } else {
-                    cancelButton.doClick();
+                    canButt.doClick();
                 }
             } else {
-                cancelButton.doClick();
+                canButt.doClick();
             }
         }
     }

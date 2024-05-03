@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class BrowserLauncher extends BasicContentViewerUI {
 
-    static final Logger LOG = LogUtilities.getLogger(BrowserLauncher.class);
+    static final Logger LOG = LogUtils.getLogger(BrowserLauncher.class);
 
     public static ComponentUI createUI(JComponent x) {
         return new BrowserLauncher((JHelpContentViewer) x);

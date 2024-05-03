@@ -36,7 +36,7 @@ public interface DoeRunDriver {
 
     int getDesignPointCount() throws DoeException;
 
-    Map getDesignPointStatistics(int sampleIndex, int designPtIndex) throws DoeException;
+    Map getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException;
 
     /**
      * handler for returning number of remaining tasks in queue.
@@ -46,7 +46,7 @@ public interface DoeRunDriver {
      */
     int getRemainingTasks() throws DoeException;
 
-    Map getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException;
+    Map getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException;
 
     /**
      * hook to retrieve results from an experimental run.

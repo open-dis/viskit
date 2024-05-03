@@ -1,10 +1,8 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
-import viskit.model.GraphMetadata;
+import viskit.model.GraphMetaData;
 
 import javax.swing.JFrame;
-import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -16,30 +14,26 @@ import org.apache.logging.log4j.Logger;
  * @since 1:35:07 PM
  * @version $Id$
  */
-public class AssemblyMetadataDialog extends MetadataDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(AssemblyMetadataDialog.class);
+public class AssemblyMetaDataDialog extends MetaDataDialog {
 
-    private static MetadataDialog dialog;
+    private static MetaDataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) 
-	{
-        if (dialog == null) 
-		{
-            dialog = new AssemblyMetadataDialog(f, graphMetadata);
-        } 
-		else 
-		{
-            dialog.setGraphMetadata(f, graphMetadata);
+    public static boolean showDialog(JFrame f, GraphMetaData gmd) {
+        gmd.description = "NOTE: The description field for this Assembly is not" +
+                " currently implemented.  Any text typed in this area will not" +
+                " be saved to XML";
+        if (dialog == null) {
+            dialog = new AssemblyMetaDataDialog(f, gmd);
+        } else {
+            dialog.setParams(f, gmd);
         }
-		dialog.fillWidgets();
-        dialog.setVisible(true); // this call blocks
-       
+
+        dialog.setVisible(true);
+        // above call blocks
         return modified;
     }
 
-    AssemblyMetadataDialog(JFrame f, GraphMetadata graphMetadata) 
-	{
-        super(f, graphMetadata, "Assembly Properties");
+    AssemblyMetaDataDialog(JFrame f, GraphMetaData gmd) {
+        super(f, gmd, "Assembly Properties");
     }
 }

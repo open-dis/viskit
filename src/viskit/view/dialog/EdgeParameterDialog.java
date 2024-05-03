@@ -1,7 +1,6 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
-import viskit.model.ViskitEdgeParameter;
+import viskit.model.vEdgeParameter;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -12,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import org.apache.logging.log4j.Logger;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -23,20 +21,18 @@ import org.apache.logging.log4j.Logger;
  *
  * @author DMcG
  */
-public class EdgeParameterDialog extends JDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(EdgeParameterDialog.class);
+public class EdgeParameterDialog extends JDialog {
 
-    private final JTextField valueField;       // Text field that holds the expression
-    private final JLabel typeLabel;            // static type value passed in
+    private JTextField valueField;       // Text field that holds the expression
+    private JLabel typeLabel;            // static type value passed in
     private static EdgeParameterDialog dialog;
     private static boolean modified = false;
-    private ViskitEdgeParameter param;
+    private vEdgeParameter param;
     private String type;
-    private final JButton okButton,  cancelButton;
+    private JButton okButt,  canButt;
     public static String newValue;
 
-    public static boolean showDialog(JDialog d, ViskitEdgeParameter parm) {
+    public static boolean showDialog(JDialog d, vEdgeParameter parm) {
         if (dialog == null) {
             dialog = new EdgeParameterDialog(d, parm);
         } else {
@@ -47,7 +43,7 @@ public class EdgeParameterDialog extends JDialog
         return modified;
     }
 
-    private EdgeParameterDialog(JDialog parent, ViskitEdgeParameter param) {
+    private EdgeParameterDialog(JDialog parent, vEdgeParameter param) {
         super(parent, "Edge Parameter", true);
         this.param = param;
         this.type = param.bogus != null ? param.bogus : "";
@@ -79,20 +75,20 @@ public class EdgeParameterDialog extends JDialog
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        con.add(buttonPanel);
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        con.add(buttPan);
         con.add(Box.createVerticalGlue());           // takes up space when dialog is expanded vertically
         cont.add(con);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         this.valueField.addCaretListener(lis);
@@ -106,16 +102,16 @@ public class EdgeParameterDialog extends JDialog
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, ViskitEdgeParameter p) {
+    public final void setParams(Component c, vEdgeParameter p) {
         param = p;
         type = p.bogus != null ? p.bogus : "";
 
         fillWidgets();
 
         modified = (p == null);
-        okButton.setEnabled((p == null));
+        okButt.setEnabled((p == null));
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack();
         setLocationRelativeTo(c);
     }
@@ -158,8 +154,8 @@ public class EdgeParameterDialog extends JDialog
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override
@@ -173,15 +169,15 @@ public class EdgeParameterDialog extends JDialog
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int returnValue = JOptionPane.showConfirmDialog(EdgeParameterDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(EdgeParameterDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
                 } else {
-                    cancelButton.doClick();
+                    canButt.doClick();
                 }
             } else {
-                cancelButton.doClick();
+                canButt.doClick();
             }
         }
     }

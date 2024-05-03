@@ -1,8 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.model.EventLocalVariable;
 import viskit.model.ViskitElement;
 
@@ -18,8 +16,6 @@ import viskit.model.ViskitElement;
  */
 public class LocalVariablesPanel extends ViskitTablePanel
 {
-    static final Logger LOG = LogUtilities.getLogger(LocalVariablesPanel.class);
-	
   private String[] mytitles = {"name","type","initial value","description"};
 
   public LocalVariablesPanel(int wid)
@@ -40,13 +36,13 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public String[] getFields(ViskitElement viskitElement, int rowNum)
+  public String[] getFields(ViskitElement e, int rowNum)
   {
     String[] sa = new String[4];
-    sa[0] = viskitElement.getName();
-    sa[1] = viskitElement.getType();
-    sa[2] = viskitElement.getValue();
-    sa[3] = viskitElement.getDescription();
+    sa[0] = e.getName();
+    sa[1] = e.getType();
+    sa[2] = e.getValue();
+    sa[3] = e.getComment();
     return sa;
   }
 
@@ -55,13 +51,13 @@ public class LocalVariablesPanel extends ViskitTablePanel
   {
     //return new EventLocalVariable("locvar_"+count++,"int","0");
     return new EventLocalVariable(
-            ViskitGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
+            VGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
             "int",
             "0");
   }
 
   @Override
-  public int getNumberVisibleRows()
+  public int getNumVisibleRows()
   {
     return 3;
   }

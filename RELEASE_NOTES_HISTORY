@@ -2,12 +2,6 @@ These are release notes for Viskit from 0.1 forward.  Each release will
 detail its functionality in meeting the applicable specifications and document
 any known issues.
 
-Release: 1.0.16 (December 13, 2022)
------------------------------------
-[X] Fixed NPE from version attempting to read SVN strings, which are no longer
-    relevant since switching to git.
-[ ] In Event Graph Editor, scheduling edges cannot be selected/edited
-
 Release: 1.0.0(March 10, 2015)
 -------------------------
 Major changes since 0.7.0:

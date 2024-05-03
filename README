@@ -1,10 +1,10 @@
-                         Welcome to Viskit codebase.
+                      Welcome to the Viskit codebase
 
-If you have arrived at this file as a result of directly downloading the SVN
-archive, we suggest looking at Ant target "help".  This will
+If you have arrived at this file as a result of directly downloading the Git
+archive, we suggest looking at the Ant target "help" in build.xml.  This will
 take you through the basics of how to use Viskit.
 
-This is a simple roadmap to the entire codebase as found in SVN:
+This is a simple roadmap to the entire codebase as found on GitHub:
 
 Directory           Description
 ---------           -----------
@@ -18,42 +18,47 @@ installer           Configuration files for the iZpack installer API
 lib                 3rd-party libraries needed to compile and run Viskit
 license             3rd-party and Viskit license information
 nbproject           NetBeans IDE specific project files
-src                 Source code used to build Viksit and associated applications,
+src                 Source code used to build Viskit and associated applications,
                     such as the installers
 test                JUnit tests for the main codebase
 
 Depending on how you got here, some of these directories may not be present
 on your machine.
 
+Release Distributions
+---------------------
+
+Available at: https://github.com/terry-norbraten/viskit/releases
+
+
 Documentation and Support
 --------------------------
 
 The majority of documentation about Viskit is on a public website. This can
-be accessed at
+be accessed at:
 
 https://savage.nps.edu/Savage/developers.html#DES
 
 There you will find some tutorials, a FAQ and general documentation about
 the project, contributors etc.
 
-If you have problems with Viskit, please join up and send email to the MOVES
-Institute Source mailing list. Details on how to sign up can be found
-on this page:
+If you have problems with Viskit, please send an issue ticket to:
 
-https://www.movesinstitute.org/mailman/listinfo/viskit
+https://github.com/terry-norbraten/viskit/issues
 
-If you have found bugs in Viskit, please check out our bug tracker at
+If you have found bugs in Viskit, please send an issue ticket to:
 
-https://diana.nps.edu/bugzilla/buglist.cgi?quicksearch=Viskit
+https://github.com/terry-norbraten/viskit/issues
 
-to see if someone has already found the same bug as yours. We are federally
+to see if someone has already found the same bug as yours. We are a federally
 funded research institute dedicated to advancing modeling and simulation best
-practices to include open source 3D rendering. Priority of response on the bugs
-may or may not be fast, depending on what the various developers are currently
-working on.  If you require support, please contact the Naval Postgraduate
-School's (NPS) Modeling, Virtual Environments and Simulation (MOVES) Institute.
+practices to include open source discrete event simulation (DES) modeling. 
+Priority of response on any bugs may or may not be fast, depending on what the 
+various developers are currently working on. If you require support, please 
+contact the Naval Postgraduate School's (NPS) Modeling, Virtual Environments and 
+Simulation (MOVES) Institute.
 
-http://www.movesinstitute.org
+https://my.nps.edu/web/moves
 
 License
 -------

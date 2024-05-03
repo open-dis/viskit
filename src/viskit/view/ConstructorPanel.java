@@ -1,10 +1,8 @@
 package viskit.view;
 
-import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
-import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -16,102 +14,72 @@ import org.apache.logging.log4j.Logger;
  * @since 8:33:17 AM
  * @version $Id$
  */
-public final class ConstructorPanel extends JPanel 
-{
-    static final Logger LOG = LogUtilities.getLogger(ConstructorPanel.class);
+public class ConstructorPanel extends JPanel {
 
-    private JButton selectButton;
-    private final ActionListener modifiedListener;
-    private JPanel selectButtonPanel;
-    private final boolean showButton;
-    private final ActionListener selectButtonListener;
-    private ObjectListPanel objectListPanel;
-    private final JDialog parent;
+    private JButton selectButt;
+    private ActionListener modLis;
+    private JPanel selectButtPan;
+    private boolean showButt;
+    private ActionListener selectButtListener;
+    private ObjListPanel olp;
+    private JDialog parent;
 
-    public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButton, ActionListener selectListener, JDialog parentDialog) 
-	{
-        this.modifiedListener = modifiedListener;
-        showButton = showSelectButton;
-        selectButtonListener = selectListener;
-        this.parent = parentDialog;
-		
-		initialize ();
-    }
-	
-	public void initialize ()
-	{
+    public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButt, ActionListener selectListener, JDialog parent) {
+        modLis = modifiedListener;
+        showButt = showSelectButt;
+        selectButtListener = selectListener;
+        this.parent = parent;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        selectButtonPanel = new JPanel();
-        selectButtonPanel.setLayout(new BoxLayout(selectButtonPanel, BoxLayout.X_AXIS));
-        selectButtonPanel.add(Box.createHorizontalGlue());
-        selectButton = new JButton("Select this constructor");
-        selectButtonPanel.add(selectButton);
-        selectButtonPanel.add(Box.createHorizontalGlue());
-	}
-	
-	public void hideSelectConstructorButton ()
-	{
-		selectButton.setVisible(false);
-		selectButtonPanel.setVisible(false);
-		repaint();
-	}
-	
-	public void showSelectConstructorButton ()
-	{
-		selectButton.setVisible(true);
-		selectButtonPanel.setVisible(true);
-		repaint();
-	}
+        selectButtPan = new JPanel();
+        selectButtPan.setLayout(new BoxLayout(selectButtPan, BoxLayout.X_AXIS));
+        selectButtPan.add(Box.createHorizontalGlue());
+        selectButt = new JButton("Select this constructor");
+        selectButtPan.add(selectButt);
+        selectButtPan.add(Box.createHorizontalGlue());
+    }
 
     public void setData(List<Object> args) // of VInstantiators
     {
         this.removeAll();
         add(Box.createVerticalGlue());
 
-        objectListPanel = new ObjectListPanel(modifiedListener); // may have to intercept
-        objectListPanel.setDialogInfo(parent);
-        if ((args == null) || (args.isEmpty()))
-		{
-            JLabel label = new JLabel("zero argument constructor");
-            label.setAlignmentX(Box.CENTER_ALIGNMENT);
-            add(label);
-        } 
-		else
-		{
-			objectListPanel.setData(args, true);
-            add(objectListPanel);
+        olp = new ObjListPanel(modLis); // may have to intercept
+        olp.setDialogInfo(parent);
+        olp.setData(args, true);
+        if (args.size() > 0) {
+            add(olp);
+        } else {
+            JLabel lab = new JLabel("zero argument constructor");
+            lab.setAlignmentX(Box.CENTER_ALIGNMENT);
+            add(lab);
         }
-        if (showButton)
-		{
+        if (showButt) {
             add(Box.createVerticalStrut(5));
             add(Box.createVerticalGlue());
 
-            add(selectButtonPanel);
+            add(selectButtPan);
             add(Box.createVerticalStrut(5));
 
-            if (selectButtonListener != null) {
-                selectButton.addActionListener(selectButtonListener);
+            if (selectButtListener != null) {
+                selectButt.addActionListener(selectButtListener);
             }
 
             setSelected(false);
-        }
-		else 
-		{
+        } else {
             add(Box.createVerticalGlue());
             setSelected(true);
         }
         revalidate();
     }
 
-    public List<Object> getData() 
-	{
-        return objectListPanel.getData(); // of VInstantiators
+    public List<Object> getData() {
+        return olp.getData(); // of VInstantiators
     }
 
     public void setSelected(boolean tf) {
-        if (objectListPanel != null) {
-            objectListPanel.setEnabled(tf);
+        if (olp != null) {
+            olp.setEnabled(tf);
         }  // todo...make this work maybe olp should be built in constructor
     }
 
@@ -120,14 +88,14 @@ public final class ConstructorPanel extends JPanel
      * @return String identifying Class's signature
      */
     public static String getSignature(Class<?>[] clazz) {
-        StringBuilder buffer = new StringBuilder("(");
+        StringBuilder buf = new StringBuilder("(");
         for (int i = 0; i < clazz.length; ++i) {
-            buffer.append(clazz[i].getName());
+            buf.append(clazz[i].getName());
             if (i < clazz.length - 1) {
-                buffer.append(',');
+                buf.append(',');
             }
         }
-        buffer.append(')');
-        return buffer.toString();
+        buf.append(')');
+        return buf.toString();
     }
 }

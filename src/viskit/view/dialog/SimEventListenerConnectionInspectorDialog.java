@@ -11,9 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import viskit.ViskitStatics;
-import viskit.model.EventGraphNode;
-import viskit.model.SimEventListenerEdge;
+import javax.swing.text.JTextComponent;
+import viskit.VStatics;
+import viskit.model.EvGraphNode;
+import viskit.model.SimEvListenerEdge;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -27,20 +28,20 @@ import viskit.model.SimEventListenerEdge;
  */
 public class SimEventListenerConnectionInspectorDialog extends JDialog
 {
-  private final JLabel     sourceLabel, targetLabel, descriptionLabel;
-  private final JTextField sourceTF, targetTF, descriptionTF;
+  private JLabel sourceLab, targetLab, descLab;
+  private JTextField sourceTF, targetTF, descTF;
 
   private static SimEventListenerConnectionInspectorDialog dialog;
   private static boolean modified = false;
-  private SimEventListenerEdge simEvEdge;
-  private final JButton  okButton, cancelButton;
+  private SimEvListenerEdge simEvEdge;
+  private JButton  okButt, canButt;
 
-  private final JPanel  buttonPanel;
-  private final enableApplyButtonListener lis;
+  private JPanel  buttPan;
+  private enableApplyButtonListener lis;
   public static String xnewProperty;
   public static String newTarget,newTargetEvent,newSource,newSourceEvent;
 
-  public static boolean showDialog(JFrame f, SimEventListenerEdge parm)
+  public static boolean showDialog(JFrame f, SimEvListenerEdge parm)
   {
     if (dialog == null)
       dialog = new SimEventListenerConnectionInspectorDialog(f, parm);
@@ -52,7 +53,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     return modified;
   }
 
-  private SimEventListenerConnectionInspectorDialog(JFrame parent, SimEventListenerEdge ed)
+  private SimEventListenerConnectionInspectorDialog(JFrame parent, SimEvListenerEdge ed)
   {
     super(parent, "SimEvent Listener Connection", true);
     simEvEdge = ed;
@@ -61,26 +62,26 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
     lis = new enableApplyButtonListener();
 
-    sourceLabel = new JLabel("producing event graph",JLabel.TRAILING);
-    targetLabel = new JLabel("listening event graph",JLabel.TRAILING);
-    descriptionLabel   = new JLabel("description",JLabel.TRAILING);
+    sourceLab = new JLabel("producing event graph",JLabel.TRAILING);
+    targetLab = new JLabel("listening event graph",JLabel.TRAILING);
+    descLab   = new JLabel("description",JLabel.TRAILING);
 
     sourceTF = new JTextField();
     targetTF = new JTextField();
-    descriptionTF   = new JTextField();
+    descTF   = new JTextField();
 
-    pairWidgets(sourceLabel,sourceTF,false);
-    pairWidgets(targetLabel,targetTF,false);
-    pairWidgets(descriptionLabel,  descriptionTF,true);
+    pairWidgets(sourceLab,sourceTF,false);
+    pairWidgets(targetLab,targetTF,false);
+    pairWidgets(descLab,  descTF,true);
 
-    buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        okButton = new JButton("Apply changes");
-    cancelButton = new JButton("Cancel");
-    buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttonPanel.add(okButton);
-    buttonPanel.add(cancelButton);
-    buttonPanel.add(Box.createHorizontalStrut(5));
+    buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    canButt = new JButton("Cancel");
+    okButt = new JButton("Apply changes");
+    buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+    buttPan.add(canButt);
+    buttPan.add(okButt);
+    buttPan.add(Box.createHorizontalStrut(5));
 
     // Make the first display a minimum of 400 width
     Dimension d = getSize();
@@ -88,33 +89,33 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     setSize(d);
 
     // attach listeners
-    cancelButton.addActionListener(new cancelButtonListener());
-    okButton.addActionListener(new applyButtonListener());
+    canButt.addActionListener(new cancelButtonListener());
+    okButt.addActionListener(new applyButtonListener());
 
     setParams(parent, ed);
   }
 
   private void pairWidgets(JLabel lab, JComponent tf, boolean edit)
   {
-    ViskitStatics.clampHeight(tf);
+    VStatics.clampHeight(tf);
     lab.setLabelFor(tf);
     if(tf instanceof JTextField){
-      ((JTextField)tf).setEditable(edit);
+      ((JTextComponent)tf).setEditable(edit);
       if(edit)
-        ((JTextField)tf).addCaretListener(lis);
+        ((JTextComponent)tf).addCaretListener(lis);
     }
   }
 
-  public final void setParams(Component c, SimEventListenerEdge ae)
+  public final void setParams(Component c, SimEvListenerEdge ae)
   {
     simEvEdge = ae;
 
     fillWidgets();
 
     modified = (ae == null);
-    okButton.setEnabled((ae == null));
+    okButt.setEnabled((ae == null));
 
-    getRootPane().setDefaultButton(cancelButton);
+    getRootPane().setDefaultButton(canButt);
     pack();
     setLocationRelativeTo(c);
   }
@@ -122,11 +123,11 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if(simEvEdge != null) {
-      EventGraphNode egnS = (EventGraphNode)simEvEdge.getFromObject();
-      EventGraphNode egnT = (EventGraphNode)simEvEdge.getToObject();
+      EvGraphNode egnS = (EvGraphNode)simEvEdge.getFrom();
+      EvGraphNode egnT = (EvGraphNode)simEvEdge.getTo();
       sourceTF.setText(egnS.getName() + " (" + egnS.getType()+")");
       targetTF.setText(egnT.getName() + " (" + egnT.getType()+")");
-      descriptionTF  .setText(simEvEdge.getDescription());
+      descTF  .setText(simEvEdge.getDescriptionString());
     }
     else {
       sourceTF.setText("");
@@ -138,12 +139,12 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     JPanel cont = new JPanel(new SpringLayout());
-    cont.add(sourceLabel);      cont.add(sourceTF);
-    cont.add(targetLabel);      cont.add(targetTF);
-    cont.add(descriptionLabel);        cont.add(descriptionTF);
+    cont.add(sourceLab);      cont.add(sourceTF);
+    cont.add(targetLab);      cont.add(targetTF);
+    cont.add(descLab);        cont.add(descTF);
     SpringUtilities.makeCompactGrid(cont,3,2,10,10,5,5);
     content.add(cont);
-    content.add(buttonPanel);
+    content.add(buttPan);
     content.add(Box.createVerticalStrut(5));
     setContentPane(content);
   }
@@ -151,7 +152,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void unloadWidgets()
   {
     if(simEvEdge != null)
-      simEvEdge.setDescription(descriptionTF.getText().trim());
+      simEvEdge.setDescriptionString(descTF.getText().trim());
   }
 
   class cancelButtonListener implements ActionListener
@@ -182,8 +183,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
-      okButton.setEnabled(true);
-      getRootPane().setDefaultButton(okButton);
+      okButt.setEnabled(true);
+      getRootPane().setDefaultButton(okButt);
     }
 
     @Override
@@ -201,15 +202,15 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     {
 
       if (modified) {
-        int returnValue=  JOptionPane.showConfirmDialog(SimEventListenerConnectionInspectorDialog.this, "Apply changes?",
+        int ret = JOptionPane.showConfirmDialog(SimEventListenerConnectionInspectorDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (returnValue == JOptionPane.YES_OPTION)
-          okButton.doClick();
+        if (ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
         else
-          cancelButton.doClick();
+          canButt.doClick();
       }
       else
-        cancelButton.doClick();
+        canButt.doClick();
     }
   }
 }

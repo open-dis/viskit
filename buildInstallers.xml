@@ -12,7 +12,6 @@
     <property file="nbproject/private/private.properties"/>
 
     <!-- ID properties (this file) -->
-    <property name="SVNId" value="$Id$"/>
     <property name="installers.dir" value="${basedir}/installer"/>
     <property name="launch4j" value="${user.home}/launch4j"/>
 
@@ -34,8 +33,17 @@
         <os family="mac"/>
     </condition>
 
+    <!-- ===== Build Viskit installer jars into ./installer directory ===== -->
+    
+    <!-- Prerequisite for creating installer: you must have local izPack v5+ installed from http://izpack.org
+         Place ${izpack.dist} key in nbproject/private/private.properties pointing to local izPack 
+         Prerequisite: apply .jar fix in ${izpack.dist}/izpack-lang-fix to local ${izpack.dist}/lib -->
+    <path id="izpack.lib.path">
+        <fileset dir="${izpack.dist}/lib" includes="*.jar"/>
+    </path>
+  
     <taskdef name="izpack"
-             classpath="${dir.lib}/izpack/standalone-compiler.jar"
+             classpathref="izpack.lib.path"
              classname="com.izforge.izpack.ant.IzPackTask"/>
 
     <!-- No good way of getting around this as we need the binary for the particular platform -->
@@ -50,13 +58,13 @@
     </target>
 
     <target name="getLaunch4jWin" if="build.host.windows">
-        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-win32.zip" dest="${launch4j}.zip" />
+        <get src="https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-win32.zip/download" dest="${launch4j}.zip" />
         <unzip src="${user.home}/launch4j.zip" dest="${user.home}"/>
         <delete file="${launch4j}.zip"/>
     </target>
 
     <target name="getLaunch4jLinux" if="build.host.linux">
-        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-linux.tgz" dest="${launch4j}.tgz" />
+        <get src="https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-linux-x64.tgz" dest="${launch4j}.tgz" />
         <untar src="${launch4j}.tgz" dest="${user.home}" compression="gzip"/>
         <chmod file="${launch4j}/bin/windres" perm="a+x"/>
         <chmod file="${launch4j}/bin/ld" perm="a+x"/>
@@ -64,7 +72,7 @@
     </target>
 
     <target name="getLaunch4jMac" if="build.host.mac">
-        <get src="http://sourceforge.net/projects/launch4j/files/launch4j-3/3.5/launch4j-3.5-macosx-x86-10.8.tgz" dest="${launch4j}.tgz" />
+        <get src="https://sourceforge.net/projects/launch4j/files/launch4j-3/3.50/launch4j-3.50-macosx-x86.tgz" dest="${launch4j}.tgz" />
         <untar src="${user.home}/launch4j.tgz" dest="${user.home}" compression="gzip"/>
         <chmod file="${launch4j}/bin/windres" perm="a+x"/>
         <chmod file="${launch4j}/bin/ld"      perm="a+x"/>
@@ -74,7 +82,7 @@
     <target name="check.viskit">
         <available file="${dir.build.lib}/viskit-exe.jar" property="viskit.built"/>
     </target>
-    <target name="no.extensions" depends="check.viskit" unless="viskit.built" >
+    <target name="no.extensions" depends="check.viskit" unless="viskit.built">
         <ant target="jar.executable"/>
     </target>
     <target name="with.extensions" depends="no.extensions" unless="extensions.built">
@@ -86,11 +94,6 @@
             depends="no.extensions,getLaunch4j,clean.installers"
             description="Build the installers with no runtime extensions">
 
-        <copy todir="${installers.dir}/stage/">
-            <fileset dir="${dir.src}/viskit/javahelp/Pages">
-                <include name="Introduction.html"/>
-            </fileset>
-        </copy>
         <ant target="installers.common"/>
         <ant target="make.win.unix.installer"/>
         <ant target="make.mac.installer"/>
@@ -140,28 +143,32 @@
         <copy todir="${installers.dir}/stage/viskit/javahelp">
             <fileset dir="${dir.src}/viskit/javahelp"/>
         </copy>
-        <copy todir="${installers.dir}/stage">
+        <copy todir="${installers.dir}/stage/">
+            <fileset dir="${dir.src}/viskit/javahelp/Pages">
+                <include name="Introduction.html"/>
+            </fileset>
             <fileset dir="${basedir}">
                 <include name="RELEASE_NOTES*"/>
             </fileset>
         </copy>
-        <copy todir="${installers.dir}/stage">
+        <copy todir="${installers.dir}/stage/doc">
             <fileset dir="${basedir}/doc">
                 <include name="ViskitOperation.txt"/>
+                <include name="Viskit-overview.pdf"/>
                 <include name="NB-Project-Creation.txt"/>
+                <include name="references/Discrete Event Simulation Modeling.pdf"/>
             </fileset>
         </copy>
-        <mkdir dir="${installers.dir}/build" />
     </target>
 
     <target name="make.win.unix.installer">
 
-        <taskdef name="launch4j"
+<!--        <taskdef name="launch4j"
                  classname="net.sf.launch4j.ant.Launch4jTask"
                  classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
 
-        <!-- Associate the viskit-exe.jar with a native win executable -->
-        <launch4j configFile="${installers.dir}/launch4jConfig.xml"/>
+         Associate the viskit-exe.jar with a native win executable 
+        <launch4j configFile="${installers.dir}/launch4jConfig.xml"/>-->
 
         <copy todir="${installers.dir}/stage">
             <fileset refid="runtime.viskit.exe"/>
@@ -173,35 +180,41 @@
         <echo message="Running IzPack to build the installers..."/>
 
         <!-- create an executable out of the jar file that installs Viskit and related files, assumes java exists,
-            however once Viskit.exe actually runs it should check and download latest JDK -->
+             however once Viskit.exe actually runs it should check and download latest JDK -->
+        <!-- TODO: commons-compress-1.21 in NB IDE install throwing URISyntaxException during any compress op -->
         <izpack input="${installers.dir}/izpack.xml"
                 output="${installers.dir}/build/${win.installer.jar}"
                 installerType="standard"
-                basedir="${installers.dir}"
+                baseDir="${installers.dir}"
                 inheritAll="true"
-                compression="deflate"
-                compressionlevel="9"/>
+                compression="default" 
+                compressionlevel="9"
+                izPackDir="${izpack.dist}"
+                mkdirs="true"/>
         <izpack input="${installers.dir}/izpack.xml"
                 output="${installers.dir}/build/${linux.installer.jar}"
                 installerType="standard"
-                basedir="${installers.dir}"
+                baseDir="${installers.dir}"
                 inheritAll="true"
-                compression="deflate"
-                compressionlevel="9"/>
+                compression="default"
+                compressionLevel="9"
+                izPackDir="${izpack.dist}"
+                mkdirs="true"/>
 
         <!-- create native installer wrapping the ViskitInstallWin.jar as .exe -->
-        <launch4j>
+<!--        <launch4j>
             <config chdir="."
                     dontwrapjar="false"
                     jar="${installers.dir}/build/${win.installer.jar}"
                     outfile="${installers.dir}/build/${win.installer.exe}"
                     headertype="gui"
                     icon="${installers.dir}/images/ViskitIcon.ico">
-                <jre minVersion="1.7.0"/>
+                <jre minVersion="17"/>
             </config>
-        </launch4j>
+        </launch4j>-->
 
-        <chmod file="${installers.dir}/build/${win.installer.exe}" perm="ugo+rx"/>
+        <chmod file="${installers.dir}/build/${win.installer.jar}" perm="ugo+rx"/>
+        <chmod file="${installers.dir}/build/${linux.installer.jar}" perm="ugo+rx"/>
     </target>
 
     <target name="make.mac.installer">
@@ -211,8 +224,10 @@
                 installerType="standard"
                 basedir="${installers.dir}"
                 inheritAll="true"
-                compression="deflate"
-                compressionlevel="9"/>
+                compression="default"
+                compressionlevel="9"
+                izPackDir="${izpack.dist}"
+                mkdirs="true"/>
 
         <chmod file="${installers.dir}/build/${mac.installer.jar}" perm="ugo+rx"/>
     </target>
@@ -226,7 +241,7 @@
             depends="clean.installers"
             description="Clean up all materials from building a Viskit installation executable">
 
-         <delete dir="${launch4j}"/>
+        <delete dir="${launch4j}"/> <!-- Careful with this one, esp. if locally installed -->
     </target>
 
 </project>

@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import viskit.ViskitStatics;
+import viskit.VStatics;
 
 /**Implements a Local Doe Driver, to be interchangeable with the remote
  * (Grid Engine) Driver
@@ -27,11 +27,11 @@ public class LocalDriverImpl implements DoeRunDriver {
 
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        this(new URL[] {}, viskit.ViskitGlobals.instance().getWorkDirectory());
+        this(new URL[] {}, viskit.VGlobals.instance().getWorkDirectory());
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
-        loader = new LocalBootLoader(extClassPaths, viskit.ViskitGlobals.instance().getWorkClassLoader(), workDir);
+        loader = new LocalBootLoader(extClassPaths, viskit.VGlobals.instance().getWorkClassLoader(), workDir);
         initGridRunner(loader);
     }
 
@@ -41,12 +41,12 @@ public class LocalDriverImpl implements DoeRunDriver {
         try {
             gridRunnerz = loader.loadClass("viskit.gridlet.GridRunner");
             try {
-                Class<?> loaderz = loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
+                Class<?> loaderz = loader.loadClass(VStatics.LOCAL_BOOT_LOADER);
                 Constructor lconstr = loaderz.getConstructor(URL[].class, ClassLoader.class, File.class);
-                Object rloader = lconstr.newInstance(loader.getExternalClasspathUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDirectory());
+                Object rloader = lconstr.newInstance(loader.getExtUrls(), ClassLoader.getSystemClassLoader(), loader.getWorkDir());
                 Method initr = loaderz.getMethod("init");
                 rloader = initr.invoke(rloader);
-                Constructor constr = gridRunnerz.getConstructor(loader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER)); //yep
+                Constructor constr = gridRunnerz.getConstructor(loader.loadClass(VStatics.LOCAL_BOOT_LOADER)); //yep
                 runner = constr.newInstance(rloader);
                 Method[] mthds = gridRunnerz.getMethods();
                 methods = new Hashtable<>();
@@ -96,14 +96,14 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
 
     @Override
-    public synchronized Hashtable getDesignPointStatistics(int sampleIndex, int designPointIndex) throws DoeException {
+    public synchronized Hashtable getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getDesignPointStatistics").invoke(runner,sampleIndex,designPointIndex);
+            return (Hashtable) methods.get("getDesignPointStats").invoke(runner,sampleIndex,designPtIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
-        //return runner.getDesignPointStatistics(sampleIndex,designPtIndex);
+        //return runner.getDesignPointStats(sampleIndex,designPtIndex);
     }
 
     @Override
@@ -119,14 +119,14 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
 
     @Override
-    public synchronized Hashtable getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
+    public synchronized Hashtable getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getReplicationStatistics").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
+            return (Hashtable) methods.get("getReplicationStats").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
         }
-        //return runner.getReplicationStatistics(sampleIndex,designPtIndex,replicationIndex);
+        //return runner.getReplicationStats(sampleIndex,designPtIndex,replicationIndex);
 
     }
 
@@ -158,7 +158,7 @@ public class LocalDriverImpl implements DoeRunDriver {
             List queue = (List) methods.get("getTaskQueue").invoke(runner,new Object[]{});
             List<Object> cloneQueue = new ArrayList<>();
             for (Object queue1 : queue) {
-                cloneQueue.add(((Boolean) queue1));
+                cloneQueue.add(queue1);
             }
             return cloneQueue;
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

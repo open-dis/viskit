@@ -1,7 +1,7 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
-import viskit.model.ViskitStateVariable;
+import viskit.model.Model;
+import viskit.model.vStateVariable;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -13,16 +13,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
-import viskit.ViskitStatics;
-import static viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java.*;
-import viskit.model.EventGraphModel;
+import viskit.VGlobals;
+import viskit.ViskitConfig;
+import viskit.control.EventGraphController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -32,161 +27,96 @@ import viskit.model.EventGraphModel;
  * @author Mike Bailey
  * @version $Id$
  */
-public class StateVariableDialog extends ViskitSmallDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(StateVariableDialog.class);
-	
-    private static ViskitStateVariable viskitStateVariable;
-	/** Text field that holds the parameter name */
-    private final JTextField stateVariableNameField = new JTextField(25);
-	/** Text field that holds the initial value */
-    private JTextField initialValueField;
-	/** Text field that holds the description */
-    private JTextField descriptionField;
-	
-    private JTextField arraySizeField;
-	private final JCheckBox         implicitCheckBox = new JCheckBox();
-    private       JComboBox<String> stateVariableTypeComboBox;    // Editable combo box that lets us select a type
-    private       Component myTyperComponent;                     // i.e., the editor of the type JComboBox
-	
-    private final JLabel     implicitLabel = new JLabel("implicit");
-    private final JLabel         nameLabel = new JLabel("name");
-    private final JLabel         typeLabel = new JLabel("type");
-    private final JLabel initialValueLabel = new JLabel("initial value");
-    private final JLabel  descriptionLabel = new JLabel("description");    
-    private final JLabel    arraySizeLabel = new JLabel("array size");
-	
-    private final JButton     okButton = new JButton("Apply changes");
-    private final JButton cancelButton = new JButton("Cancel");
-    public static String newName,  newType, newValue, newDescription;
-	public static boolean newImplicit;
-    private final myFocusListener focusListener;
-    private final EnableApplyButtonListener listener = new EnableApplyButtonListener(okButton);
-	
-	private final String IMPLICIT_TOOLTIP     = "Implicit state variables cannot be set, instead they are computed from other state variables whenever needed";
-	private final String IMPLICIT_VALUE_LABEL = "* implicit *";
-	
-	private       String priorValue = new String();
+public class StateVariableDialog extends ViskitSmallDialog {
 
-    public static boolean showDialog(JFrame f, ViskitStateVariable passedStateVariable) 
-	{
-		viskitStateVariable = passedStateVariable;
-		if (viskitStateVariable == null)
-		{
-			// creating a new state variable
-			viskitStateVariable = new ViskitStateVariable ();
-			LOG.info ("creating new stateVariable");
-			setNewObjectInitialization(true);
-		}
-        return showDialog(StateVariableDialog.class.getName(), f, viskitStateVariable); // static invocation
+    private JTextField stateVarNameField;    // Text field that holds the parameter name
+    private JTextField commentField;          // Text field that holds the comment
+    private JTextField arraySizeField;
+    private JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
+    private JLabel arrSizeLab;
+    private vStateVariable stVar;
+    private JButton okButt, canButt;
+    public static String newName,  newType,  newComment;
+    private myFocusListener focList;
+    private Component myTyperComponent;       // i.e., the editor of the type JComboBox
+
+    public static boolean showDialog(JFrame f, vStateVariable var) {
+        return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var);
     }
 
-    protected StateVariableDialog(JFrame parent, Object parameter)
-	{
-        super(parent, "State Variable Declaration", true); // Inspector
-		
-		initialize ();
+    protected StateVariableDialog(JFrame parent, Object param) {
+        super(parent, "State Variable Declaration Inspector", true);
 
-        focusListener = new myFocusListener();
+        focList = new myFocusListener();
 
-        setParameters(parent, parameter);
-	}
-	private void initialize ()
-	{
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        Container cont = getContentPane();
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
 
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+        JPanel con = new JPanel();
+        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
+        con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 new EmptyBorder(10, 10, 10, 10)));
 
-        content.add(Box.createVerticalStrut(5));
+        con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        int width = OneLinePanel.maxWidth(new JComponent[] {implicitLabel, nameLabel, typeLabel, initialValueLabel, descriptionLabel});
-		
-		implicitLabel.setToolTipText(IMPLICIT_TOOLTIP);
-		implicitCheckBox.setToolTipText(IMPLICIT_TOOLTIP);
-		implicitCheckBox.addItemListener(new ItemListener()
-		{
-			@Override
-			public void itemStateChanged(ItemEvent e) 
-			{
-				boolean implicitSelected = implicitCheckBox.isSelected();
-				initialValueField.setEnabled(!implicitSelected);
-				if (implicitSelected)
-				{
-					priorValue = initialValueField.getText(); // remember in case user changes mind
-					if (priorValue.equals(IMPLICIT_VALUE_LABEL) || priorValue.trim().isEmpty())
-						priorValue = "TODO"; // force setting a value
-					initialValueField.setText(IMPLICIT_VALUE_LABEL); // no value allowed
-					initialValueField.setToolTipText(IMPLICIT_TOOLTIP);
-				}
-				else // no longer implicit
-				{
-					if (priorValue.equals(IMPLICIT_VALUE_LABEL) || priorValue.trim().isEmpty())
-						priorValue = "TODO"; // force setting a value
-					initialValueField.setText(priorValue); // restore (if user changed mind)
-					initialValueField.setToolTipText(priorValue); // readability
-				}
-				modified = true;
-				okButton.setEnabled(true);
-				getRootPane().setDefaultButton(okButton);  // in JDialog
-			}
-		});
+        JLabel nameLab = new JLabel("name");
+        JLabel initLab = new JLabel("initial value");
+        JLabel typeLab = new JLabel("type");
+        JLabel commLab = new JLabel("description");
+        arrSizeLab = new JLabel("array size");
 
-        stateVariableNameField.addFocusListener(focusListener);
-        setMaxHeight(stateVariableNameField);
+        int w = OneLinePanel.maxWidth(new JComponent[] {nameLab, initLab, typeLab, commLab});
 
-        stateVariableTypeComboBox = ViskitGlobals.instance().getTypeComboBox();
-        stateVariableTypeComboBox.getEditor().getEditorComponent().addFocusListener(focusListener);
-        setMaxHeight(stateVariableTypeComboBox);
+        stateVarNameField = new JTextField(15);
+        stateVarNameField.addFocusListener(focList);
+        setMaxHeight(stateVarNameField);
 
-        arraySizeField = new JTextField(25);
-        arraySizeField.addFocusListener(focusListener);
-		
+        commentField = new JTextField(25);
+        commentField.addFocusListener(focList);
+        setMaxHeight(commentField);
 
-        initialValueField = new JTextField(25);
-        initialValueField.addFocusListener(focusListener);
-        setMaxHeight(initialValueField);
+        stateVarTypeCombo = VGlobals.instance().getTypeCB();
+        stateVarTypeCombo.getEditor().getEditorComponent().addFocusListener(focList);
+        setMaxHeight(stateVarTypeCombo);
 
-        descriptionField = new JTextField(25); // readability
-        descriptionField.addFocusListener(focusListener);
-        setMaxHeight(descriptionField);
+        arraySizeField = new JTextField(15);
+        arraySizeField.addFocusListener(focList);
 
-        fieldsPanel.add(new OneLinePanel(    implicitLabel, width, implicitCheckBox));
-        fieldsPanel.add(new OneLinePanel(        nameLabel, width, stateVariableNameField));
-        fieldsPanel.add(new OneLinePanel(        typeLabel, width, stateVariableTypeComboBox));
-        fieldsPanel.add(new OneLinePanel(   arraySizeLabel, width, arraySizeField));
-        fieldsPanel.add(new OneLinePanel(initialValueLabel, width, initialValueField));
-        fieldsPanel.add(new OneLinePanel( descriptionLabel, width, descriptionField));
-        content.add(fieldsPanel);
-        content.add(Box.createVerticalStrut(5));
+        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarNameField));
+        fieldsPanel.add(new OneLinePanel(typeLab, w, stateVarTypeCombo));
+        fieldsPanel.add(new OneLinePanel(arrSizeLab, w, arraySizeField));
+        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        con.add(fieldsPanel);
+        con.add(Box.createVerticalStrut(5));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(    okButton);
-        buttonPanel.add(cancelButton);
-        content.add(buttonPanel);
-        content.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        contentPane.add(content);
-
-        myTyperComponent = stateVariableTypeComboBox.getEditor().getEditorComponent();
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        con.add(buttPan);
+        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        cont.add(con);
 
         // attach listeners
-        cancelButton.addActionListener(new CancelButtonListener());
-        okButton.addActionListener(new StateVariableApplyButtonListener());//applyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
 
-        stateVariableNameField.getDocument().addDocumentListener(listener);// addCaretListener(lis);
-             initialValueField.getDocument().addDocumentListener(listener);
-              descriptionField.getDocument().addDocumentListener(listener);// addCaretListener(lis);
-        stateVariableTypeComboBox.addActionListener(listener);
+        enableApplyButtonListener lis = new enableApplyButtonListener(okButt);
+        stateVarNameField.getDocument().addDocumentListener(lis);//addCaretListener(lis);
+        commentField.getDocument().addDocumentListener(lis);// addCaretListener(lis);
+        stateVarTypeCombo.addActionListener(lis);
+
+        myTyperComponent = stateVarTypeCombo.getEditor().getEditorComponent();
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowClosingListener(this, okButton, cancelButton));
+        addWindowListener(new WindowClosingListener(this, okButt, canButt));
+
+        setParams(parent, param);
     }
 
     /** Toggle these fields appropriately
@@ -194,184 +124,88 @@ public class StateVariableDialog extends ViskitSmallDialog
      * @param b if true, then enable
      */
     private void toggleArraySizeFields(boolean b) {
-        arraySizeLabel.setEnabled(b);
+        arrSizeLab.setEnabled(b);
         arraySizeField.setEnabled(b);
         arraySizeField.setEditable(b);     // grays background if false
     }
 
     @Override
-    final void setParameters(Component parentComponent, Object p) 
-	{
-        viskitStateVariable = (ViskitStateVariable) p;
+    final void setParams(Component c, Object p) {
+        stVar = (vStateVariable) p;
 
         fillWidgets();
+
+        modified = (p == null);
+        okButt.setEnabled(p == null);
+
+        if (p == null) {
+            getRootPane().setDefaultButton(okButt);
+        } else {
+            getRootPane().setDefaultButton(canButt);
+        }
         pack();
-        setLocationRelativeTo(parentComponent);
+        setLocationRelativeTo(c);
     }
 
-    private String stripArraySize(String typ) 
-	{
+    private String stripArraySize(String typ) {
         Pattern p = Pattern.compile("\\[.*?\\]");
         Matcher m = p.matcher(typ);
         return m.replaceAll("[]");
     }
 
-    private String getArraySize(String typ)
-	{
+    private String getArraySize(String typ) {
         Pattern p = Pattern.compile("\\[.*?\\]");
         Matcher m = p.matcher(typ);
-        if (m.find())
-		{
+        if (m.find()) {
             String f = m.group();
             return f.substring(1, f.length() - 1);
-        } 
-		else 
-		{
+        } else {
             return "";
         }
     }
 
-    private void fillWidgets()
-	{
+    private void fillWidgets() {
         boolean isArray;
-        String type;
-        if (viskitStateVariable != null)
-		{
-            type = viskitStateVariable.getType();
-         stateVariableTypeComboBox.setSelectedItem(stripArraySize(type));
-         stateVariableTypeComboBox.setToolTipText (stripArraySize(type));          // readability
-            stateVariableNameField.setText       (viskitStateVariable.getName());
-                    arraySizeField.setText       (getArraySize(type));
-                 initialValueField.setText       (viskitStateVariable.getValue());
-                 initialValueField.setToolTipText(viskitStateVariable.getValue());       // readability
-                  descriptionField.setText       (viskitStateVariable.getDescription());
-                  descriptionField.setToolTipText(viskitStateVariable.getDescription()); // readability
-				  implicitCheckBox.setSelected(viskitStateVariable.isImplicit() || viskitStateVariable.getValue().equals(IMPLICIT_VALUE_LABEL)); // safety net
-            isArray = ViskitGlobals.instance().isArray(viskitStateVariable.getType());
-        } 
-		else // initialize stateVariable
-		{
-            type = (String) stateVariableTypeComboBox.getSelectedItem();
-			                stateVariableTypeComboBox.setToolTipText ("");
-            stateVariableNameField.setText(((EventGraphModel) ViskitGlobals.instance().getEventGraphViewFrame().getModel()).generateStateVariableName()); //"state_"+count++);
-                    arraySizeField.setText("");
-                 initialValueField.setText("");
-                 initialValueField.setToolTipText("");
-                  descriptionField.setText       (ViskitStatics.DEFAULT_DESCRIPTION);
-                  descriptionField.setToolTipText(ViskitStatics.DEFAULT_DESCRIPTION);
-				  implicitCheckBox.setSelected(false);
-            isArray = ViskitGlobals.instance().isArray(type);
+        String ty;
+        if (stVar != null) {
+            stateVarNameField.setText(stVar.getName());
+            ty = stVar.getType();
+            stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
+            arraySizeField.setText(getArraySize(ty));
+            commentField.setText(stVar.getComment());
+            isArray = VGlobals.instance().isArray(stVar.getType());
+        } else {
+            stateVarNameField.setText(((Model) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
+            ty = (String) stateVarTypeCombo.getSelectedItem();
+            isArray = VGlobals.instance().isArray(ty);
+            commentField.setText("");
+            arraySizeField.setText("");
         }
-		if (implicitCheckBox.isSelected())
-		{
-			initialValueField.setText(IMPLICIT_VALUE_LABEL);
-			initialValueField.setToolTipText(IMPLICIT_TOOLTIP);
-			initialValueField.setEnabled(false);
-		}
-		else
-		{
-			initialValueField.setToolTipText(initialValueField.getText()); // readability
-			initialValueField.setEnabled(true);
-		}
-		descriptionField.setToolTipText(descriptionField.getText()); // readability
-		
-        modified = (viskitStateVariable == null) || isNewObjectInitialization(); // enable okButton if a new object is being started.
-		
-		// safety net case: value indicates implicit while boolean does not
-		if (!viskitStateVariable.isImplicit() && viskitStateVariable.getValue().equals(IMPLICIT_VALUE_LABEL))
-		{
-			 viskitStateVariable.setImplicit(true); // override
-			 modified = true;
-			 okButton.setEnabled(true); // prompt user to review and approve (also see setSelected above)
-			 LOG.error ("Unexpected found value='" + IMPLICIT_VALUE_LABEL + "' when implicit='false', displaying implicit='true' instead for user approval");
-			 // design decision: don't popup a question panel since analyst might not know
-		}
-		okButton.setEnabled(modified);
-        if (modified) 
-		{
-            getRootPane().setDefaultButton(okButton);
-        } 
-		else 
-		{
-            getRootPane().setDefaultButton(cancelButton);
-        }
-		
         toggleArraySizeFields(isArray);
-        stateVariableNameField.requestFocus();
-        stateVariableNameField.selectAll();
+        stateVarNameField.requestFocus();
+        stateVarNameField.selectAll();
     }
 
     @Override
-    void unloadWidgets()
-	{
+    void unloadWidgets() {
         // make sure there are no spaces
-        String type = (String) stateVariableTypeComboBox.getSelectedItem();
-        type = ViskitGlobals.instance().typeChosen(type);
-        if (ViskitGlobals.instance().isArray(type)) 
-		{
-            type = type.substring(0, type.indexOf('[') + 1) + arraySizeField.getText().trim() + "]";
+        String ty = (String) stateVarTypeCombo.getSelectedItem();
+        ty = VGlobals.instance().typeChosen(ty);
+        if (VGlobals.instance().isArray(ty)) {
+            ty = ty.substring(0, ty.indexOf('[') + 1) + arraySizeField.getText().trim() + "]";
         }
-        String name = stateVariableNameField.getText();
-        name = name.replaceAll("\\s", "");
-		boolean    implicit = implicitCheckBox.isSelected();
-		String initialValue = initialValueField.getText().trim();
-		String  description = descriptionField.getText().trim();
+        String nm = stateVarNameField.getText();
+        nm = nm.replaceAll("\\s", "");
 
-        if (viskitStateVariable != null)
-		{
-            viskitStateVariable.setName(name);
-            viskitStateVariable.setType(type);
-            viskitStateVariable.setImplicit(implicit);
-            viskitStateVariable.setValue(initialValue);
-            viskitStateVariable.setDescription (description);
+        if (stVar != null) {
+            stVar.setName(nm);
+            stVar.setType(ty);
+            stVar.setComment(this.commentField.getText().trim());
+        } else {
+            newName = nm;
+            newType = ty;
+            newComment = commentField.getText().trim();
         }
-		
-		// when creating a new state variable, save these new values so that invoking code can retrieve them
-		newName        = name;
-		newType        = type;
-		newImplicit    = implicit;
-		newValue       = initialValue;
-		newDescription = description;
-		
-		// create implicit code block if not found
-		EventGraphModel eventGraphModel = ((EventGraphModel)ViskitGlobals.instance().getEventGraphController().getModel());
-		
-		boolean implicitCodeBlockComputeMethodFound = 
-			(eventGraphModel                != null) &&
-			(eventGraphModel.getCodeBlock() != null) &&
-			!eventGraphModel.getCodeBlock().contains("compute_" + name);
-		
-		//  implicit state variables get a code block - add if not already present
-		if (implicit && implicitCodeBlockComputeMethodFound)
-		{
-			String newCodeBlock = "";
-			if ((eventGraphModel != null) && (eventGraphModel.getCodeBlock() != null))
-			{
-				newCodeBlock = eventGraphModel.getCodeBlock();
-			}
-			
-			if (newCodeBlock.trim().length() > 0)
-			    newCodeBlock += "\n\n";
-			
-			// similar code block found in SimkitEventGraphXML2Java.buildStateVariableAccessor()
-			newCodeBlock +=
-				JDO + SP + "Implicit state variable computation" + SP + JDC + "\n" +
-				"private void compute_" + name + SP + "()" + "\n" +
-				OB + "\n" +
-				SP_4 + name + SP + EQ + SP + "__TODO__" + "; // insert computation code here" + "\n" +
-				CB + "\n";
-			eventGraphModel.changeCodeBlock(newCodeBlock);
-			ViskitGlobals.instance().getEventGraphViewFrame().refreshCodeBlock(newCodeBlock);
-		}
-		else if (implicitCodeBlockComputeMethodFound) // but not implicit
-		{
-			String   title = "Unnecessary code block found";
-			String message = "State variable " + name + " is not implicit, remove unnecessary method from Event Graph code block: " + "private void compute_" + name + SP + "()";
-			ViskitGlobals.instance().getEventGraphController().messageToUser(
-					JOptionPane.ERROR_MESSAGE, title, message);
-			LOG.error (title + ", " + message); // TODO add test to future diagnostics stylesheet
-			// TODO add similar test when removing a state variable
-		}
     }
 
     private boolean isGoodArray(String s) {
@@ -390,32 +224,13 @@ public class StateVariableDialog extends ViskitSmallDialog
         return (typ.contains("<K,V>") || typ.contains("<E>"));
     }
 
-    // Little runnables to move the focus around
-    private final Runnable sizeFieldFocus = new Runnable()
-	{
-        @Override
-        public void run() {
-            arraySizeField.requestFocus();
-        }
-    };
+    class myFocusListener extends FocusAdapter {
 
-    private final Runnable descriptionFieldFocus = new Runnable() 
-	{
         @Override
-        public void run() {
-            descriptionField.requestFocus();
-        }
-    };
-
-    class myFocusListener extends FocusAdapter 
-	{
-        @Override
-        public void focusGained(FocusEvent e)
-		{
+        public void focusGained(FocusEvent e) {
             handleSelect(e.getComponent());
 
-            if (e.getOppositeComponent() == myTyperComponent) 
-			{
+            if (e.getOppositeComponent() == myTyperComponent) {
                 handleArrayFieldEnable();
             }
         }
@@ -423,17 +238,16 @@ public class StateVariableDialog extends ViskitSmallDialog
         /**
          *  Enable the array size field if the type is an array, and set the focus to the right guy.
          */
-        private void handleArrayFieldEnable() 
-		{
-            String s = (String) stateVariableTypeComboBox.getEditor().getItem();
-            boolean isAr = ViskitGlobals.instance().isArray(s);
+        private void handleArrayFieldEnable() {
+            String s = (String) stateVarTypeCombo.getEditor().getItem();
+            boolean isAr = VGlobals.instance().isArray(s);
             toggleArraySizeFields(isAr);
 
             // Do this this way to shake out all the pending focus events before twiddling focus.
             if (isAr) {
-                SwingUtilities.invokeLater(sizeFieldFocus);
+                arraySizeField.requestFocus();
             } else {
-                SwingUtilities.invokeLater(descriptionFieldFocus);
+                commentField.requestFocus();
             }
         }
 
@@ -441,10 +255,8 @@ public class StateVariableDialog extends ViskitSmallDialog
          * select the text in whatever comes in
          * @param c the component containing text
          */
-        private void handleSelect(Component c) 
-		{
-            if (c instanceof ComboBoxEditor) 
-			{
+        private void handleSelect(Component c) {
+            if (c instanceof ComboBoxEditor) {
                 c = ((ComboBoxEditor) c).getEditorComponent();
             }
 
@@ -456,38 +268,33 @@ public class StateVariableDialog extends ViskitSmallDialog
         }
     }
 
-    class StateVariableApplyButtonListener implements ActionListener
-	{
-        @Override
-        public void actionPerformed(ActionEvent event)
-		{
-            if (modified) {
-                String typeName = ((String) stateVariableTypeComboBox.getSelectedItem()).trim();
-                String name = stateVariableNameField.getText().trim();
-                String arraySize = arraySizeField.getText().trim();
+    class StateVarApplyButtonListener implements ActionListener {
 
-                if ((name.length() <= 0) || (typeName.length() <= 0) ||
-                    (ViskitGlobals.instance().isArray(typeName) && (arraySize.length() <= 0))) 
-				{
-                    ViskitGlobals.instance().getEventGraphController().messageToUser(
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            if (modified) {
+                String typ = ((String) stateVarTypeCombo.getSelectedItem()).trim();
+                String nam = stateVarNameField.getText().trim();
+                String arsz = arraySizeField.getText().trim();
+
+                if (nam.length() <= 0 ||
+                        typ.length() <= 0 ||
+                        (VGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
+                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
-                            "Name, type and (if array) array size must be entered."); // TODO better message
+                            "Name, type and (if array) array size must be entered.");
                     toggleArraySizeFields(true);
                     arraySizeField.requestFocus();
                     return;
-                } 
-				else if (ViskitGlobals.instance().isArray(typeName) && !isGoodArray(typeName)) 
-				{
-                    ViskitGlobals.instance().getEventGraphController().messageToUser(
+                } else if (VGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
+                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.");
                     return;
-                } 
-				else if (isGeneric(typeName)) 
-				{
-                    ViskitGlobals.instance().getEventGraphController().messageToUser(
+                } else if (isGeneric(typ)) {
+                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Actual Keys, Values or Element types must replace " +
@@ -498,13 +305,13 @@ public class StateVariableDialog extends ViskitSmallDialog
                 /* Do a beanshell test for array declaration
                  * isPrimitive returns false for arrays
                  */
-                if (!ViskitGlobals.instance().isPrimitive(typeName) && ViskitGlobals.instance().isArray(typeName)) {
+                if (!VGlobals.instance().isPrimitive(typ) && VGlobals.instance().isArray(typ)) {
 
-                    String s = typeName + " " + name + " = new " + typeName;
-                    s = s.substring(0, s.lastIndexOf('[') + 1) + arraySize + "]";          // stick in size
+                    String s = typ + " " + nam + " = new " + typ;
+                    s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
-                    if (ViskitConfiguration.instance().getValue(ViskitConfiguration.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
-                        String result = ViskitGlobals.instance().parseCode(null, s);
+                    if (ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
+                        String result = VGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);
                             if (!ret) // don't ignore

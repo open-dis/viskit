@@ -1,6 +1,5 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,12 +9,10 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.logging.log4j.Logger;
 
-import viskit.model.EventGraphNode;
-import viskit.model.ViskitInstantiator;
-import viskit.ViskitStatics;
-import static viskit.ViskitStatics.DEFAULT_DESCRIPTION;
+import viskit.model.EvGraphNode;
+import viskit.model.VInstantiator;
+import viskit.VStatics;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -28,47 +25,37 @@ import viskit.view.InstantiationPanel;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class EventGraphNodeInspectorDialog extends JDialog
-{
-    static final Logger LOG = LogUtilities.getLogger(EventGraphNodeInspectorDialog.class);
-	
+public class EventGraphNodeInspectorDialog extends JDialog {
+
     public static String newName;
-    public static ViskitInstantiator newInstantiator;
+    public static VInstantiator newInstantiator;
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
-    private final JPanel        contentPanel = new JPanel();
-    private final JPanel         buttonPanel = new JPanel();
-    private final JLabel     handleNameLabel = new JLabel("name", JLabel.TRAILING);
-    private final JLabel    descriptionLabel = new JLabel("description", JLabel.TRAILING);
-    private final JTextField    handleNameTF = new JTextField();
-    private final JTextField   descriptionTF = new JTextField();
-    private final JButton           okButton = new JButton("Apply changes");
-    private final JButton       cancelButton = new JButton("Cancel");
-    private final EnableApplyButtonListener listener = new EnableApplyButtonListener();
-    private final JCheckBox   detailedOutputCheckBox = new JCheckBox("detailed output");
+    private JLabel handleLab; //,outputLab;
+    private JTextField handleField;
 
-    private final String NAME_TOOLTIP = "Unique name for this node (no spaces allowed)";
-    private InstantiationPanel instantiationPanel;
-    private EventGraphNode eventGraphNode;
+    // verboseCheck not used, does nothing for Viskit
+    private JCheckBox outputCheck /*, verboseCheck*/;
+    private InstantiationPanel ip;
+    private EvGraphNode egNode;
+    private JButton okButt, canButt;
+    private enableApplyButtonListener lis;
+    private JPanel buttPan;
+    private JTextField descField;
+    private JLabel descLab;
 
-    public static boolean showDialog(JFrame parent, EventGraphNode eventGraphNode)
-	{
+    public static boolean showDialog(JFrame f, EvGraphNode parm) {
         try {
-            if (dialog == null)
-			{
-                dialog = new EventGraphNodeInspectorDialog(parent, eventGraphNode);
-            } 
-			else 
-			{
-                dialog.setParameterWidgets(parent, eventGraphNode);
+            if (dialog == null) {
+                dialog = new EventGraphNodeInspectorDialog(f, parm);
+            } else {
+                dialog.setParams(f, parm);
             }
-        } 
-		catch (ClassNotFoundException e) 
-		{
-            String message = "An object type specified in this element (probably " + eventGraphNode.getType() + ") was not found.\n" +
+        } catch (ClassNotFoundException e) {
+            String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            JOptionPane.showMessageDialog(parent, message, "Event Graph definition not found", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(f, msg, "Event Graph Definition Not Found", JOptionPane.ERROR_MESSAGE);
             dialog = null;
             return false; // unmodified
         }
@@ -79,257 +66,225 @@ public class EventGraphNodeInspectorDialog extends JDialog
         dialog.setSize(d.width+1, d.height+1);
         dialog.setSize(d);
 
-        dialog.setVisible(true); // this call blocks to show dialog
-       
+        dialog.setVisible(true);
+        // above call blocks
         return modified;
     }
 
-    private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException
-	{
-        super(parent, "Assembly Editor", true); // instance
-        EventGraphNodeInspectorDialog.this.eventGraphNode = node;
-        EventGraphNodeInspectorDialog.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        EventGraphNodeInspectorDialog.this.addWindowListener(new MyCloseListener());
-		
-		initialize ();
+    private EventGraphNodeInspectorDialog(JFrame parent, EvGraphNode node) throws ClassNotFoundException {
+        super(parent, "Event Graph Inspector", true);
+        this.egNode = node;
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new myCloseListener());
 
-        setParameterWidgets(parent, node); // TODO rename setEventGraphInstanceParamaters
-    }
-	
-	private void initialize ()
-	{
-        setContentPane(contentPanel);
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-		
-        ViskitStatics.clampHeight(  handleNameTF);
-        handleNameLabel.setLabelFor(handleNameTF);
-        handleNameLabel.setToolTipText(NAME_TOOLTIP);
-           handleNameTF.setToolTipText(NAME_TOOLTIP);
-		
-        detailedOutputCheckBox.setToolTipText("Enable a list dump of all entity names to the console"); // TODO improve
+        lis = new enableApplyButtonListener();
 
-        ViskitStatics.clampHeight(descriptionTF);
-        
-        descriptionLabel.setLabelFor(descriptionTF);
-        descriptionLabel.setToolTipText("Describe purpose of this event graph instance");
-           descriptionTF.setToolTipText("Describe purpose of this event graph instance");
-        ViskitStatics.cloneSize(handleNameLabel, descriptionLabel);    // make labels same size
-		
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(    okButton);
-        buttonPanel.add(cancelButton);
-		
-        JPanel content = (JPanel)getContentPane();
+        JPanel content = new JPanel();
+        setContentPane(content);
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        JPanel eventGraphIdentificationPanel = new JPanel();
-        eventGraphIdentificationPanel.setLayout(new BoxLayout(eventGraphIdentificationPanel, BoxLayout.X_AXIS));
-        eventGraphIdentificationPanel.add(handleNameLabel);
-        eventGraphIdentificationPanel.add(Box.createHorizontalStrut(5));
-        eventGraphIdentificationPanel.add(handleNameTF);
-        eventGraphIdentificationPanel.add(Box.createHorizontalStrut(2));
-        eventGraphIdentificationPanel.add(detailedOutputCheckBox);
-        content.add(Box.createVerticalStrut(5));
-        content.add(Box.createVerticalGlue());
-        content.add(eventGraphIdentificationPanel);
+        handleField = new JTextField();
+        VStatics.clampHeight(handleField);
+        handleLab = new JLabel("name", JLabel.TRAILING);
+        handleLab.setLabelFor(handleField);
+        outputCheck = new JCheckBox("detailed output");
+        outputCheck.setToolTipText("Enable a list dump of all entity names to the console");
 
-        JPanel descriptionContent = new JPanel();
-        descriptionContent.setLayout(new BoxLayout(descriptionContent, BoxLayout.X_AXIS));
-        descriptionContent.add(descriptionLabel);
-        descriptionContent.add(Box.createHorizontalStrut(5));
-        descriptionContent.add(descriptionTF);
-        content.add(Box.createVerticalStrut(5));
-        content.add(Box.createVerticalGlue());
-        content.add(descriptionContent);
+        descField = new JTextField();
+        VStatics.clampHeight(descField);
+        descLab = new JLabel("description", JLabel.TRAILING);
+        descLab.setLabelFor(descField);
 
-        instantiationPanel = new InstantiationPanel(this, listener, true);
-        instantiationPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
-                    /* Event Graph Parameter initialization*/ 
-				    "Event Graph parameter initialization", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+        VStatics.cloneSize(handleLab, descLab);    // make handle same size
 
-        instantiationPanel.setToolTipText("Event Graph parameter initialization: SimEntity creation for Simulation Run");
-        instantiationPanel.setAlignmentX(Box.CENTER_ALIGNMENT);
-        content.add(Box.createVerticalStrut(10));
-        content.add(instantiationPanel);
-        content.add(Box.createVerticalStrut(10));
-        content.add(buttonPanel);
+        buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        okButt.setEnabled(false);
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+
+        placeWidgets();
 
         // attach listeners
-        cancelButton.addActionListener(new CancelButtonListener());
-            okButton.addActionListener(new ApplyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
-         handleNameTF.addCaretListener(listener);
-        descriptionTF.addCaretListener(listener);
-        detailedOutputCheckBox.addActionListener(listener);
-	}
+        handleField.addCaretListener(lis);
+        descField.addCaretListener(lis);
+        outputCheck.addActionListener(lis);
 
-    public final void setParameterWidgets(Component relatedComponent, EventGraphNode currentEventGraphNode) throws ClassNotFoundException
-	{
-        eventGraphNode = currentEventGraphNode;
+        setParams(parent, node);
+    }
+
+    public final void setParams(Component c, EvGraphNode p) throws ClassNotFoundException {
+        egNode = p;
 
         fillWidgets();
         getContentPane().invalidate();
-           getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
 
         pack();     // do this prior to next
-        setLocationRelativeTo(relatedComponent);
+        setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() throws ClassNotFoundException
-	{
-        if (eventGraphNode != null)
-		{
-                  handleNameTF.setText    (eventGraphNode.getName());
-                 descriptionTF.setText    (eventGraphNode.getDescription());
-        detailedOutputCheckBox.setSelected(eventGraphNode.isVerboseMarked());
-            instantiationPanel.setData    (eventGraphNode.getInstantiator());
-        } 
-		else
-		{
-            handleNameTF.setText("Event Graph node name");
-            detailedOutputCheckBox.setSelected(false);
+    private void placeWidgets()
+    {
+        JPanel content = (JPanel)getContentPane();
+        content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        JPanel bcont = new JPanel();
+        bcont.setLayout(new BoxLayout(bcont, BoxLayout.X_AXIS));
+        bcont.add(handleLab);
+        bcont.add(Box.createHorizontalStrut(5));
+        bcont.add(handleField);
+        bcont.add(Box.createHorizontalStrut(2));
+        bcont.add(outputCheck);
+        content.add(bcont);
+
+        JPanel dcont = new JPanel();
+        dcont.setLayout(new BoxLayout(dcont, BoxLayout.X_AXIS));
+        dcont.add(descLab);
+        dcont.add(Box.createHorizontalStrut(5));
+        dcont.add(descField);
+
+        content.add(dcont);
+        ip = new InstantiationPanel(this, lis, true);
+
+        ip.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black),
+                    "Object creation", TitledBorder.CENTER, TitledBorder.DEFAULT_POSITION));
+
+        ip.setAlignmentX(Box.CENTER_ALIGNMENT);
+        content.add(ip);
+        content.add(Box.createVerticalStrut(5));
+        content.add(buttPan);
+    }
+
+    private void fillWidgets() throws ClassNotFoundException {
+        if (egNode != null) {
+            handleField.setText(egNode.getName());
+            outputCheck.setSelected(egNode.isOutputMarked());
+            descField.setText(egNode.getDescriptionString());
+            ip.setData(egNode.getInstantiator());
+        } else {
+            handleField.setText("egNode name");
+            outputCheck.setSelected(false);
+            descField.setText("");
+       }
+    }
+
+    private void unloadWidgets() {
+        String nm = handleField.getText();
+        nm = nm.replaceAll("\\s", "");
+        if (egNode != null) {
+            egNode.setName(nm);
+            egNode.setDescriptionString(descField.getText().trim());
+            egNode.setInstantiator(ip.getData());
+            egNode.setOutputMarked(outputCheck.isSelected());
+        } else {
+            newName = nm;
+            newInstantiator = ip.getData();
         }
-		if (descriptionTF.getText().isEmpty())			
-            descriptionTF.setText(DEFAULT_DESCRIPTION); // better to nag than ignore
-		descriptionTF.setToolTipText(descriptionTF.getText().trim()); // readability for long descriptions
-		
-        okButton.setEnabled(false); // disabled until modifications occur
     }
 
-    private void unloadWidgets()
-	{
-        String name = handleNameTF.getText();
-        name = name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
-        if (eventGraphNode != null)
-		{
-            eventGraphNode.setName(name);
-            eventGraphNode.setDescription(descriptionTF.getText().trim());
-            eventGraphNode.setVerboseMarked(detailedOutputCheckBox.isSelected());
-            eventGraphNode.setInstantiator(instantiationPanel.getData());
-        } 
-		else
-		{
-            newName = name;
-            newInstantiator = instantiationPanel.getData();
-        }
-    }
+    class cancelButtonListener implements ActionListener {
 
-    class CancelButtonListener implements ActionListener 
-	{
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
-            modified = false; // for the caller; no changes made
-            dispose();        // all done
+        public void actionPerformed(ActionEvent event) {
+            modified = false;    // for the caller
+            dispose();
         }
     }
 
-    class ApplyButtonListener implements ActionListener 
-	{
+    class applyButtonListener implements ActionListener {
+
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
-            if (modified)
-			{
+        public void actionPerformed(ActionEvent event) {
+            if (modified) {
                 unloadWidgets();
-                if (continueClosingDespiteBlankFields())
-				{
-                    return; // continue working
+                if (checkBlankFields()) {
+                    return;
                 }
             }
-            dispose(); // release dialog, all done
+            dispose();
         }
     }
 
-    class EnableApplyButtonListener implements CaretListener, ActionListener
-	{
+    class enableApplyButtonListener implements CaretListener, ActionListener {
+
         @Override
-        public void caretUpdate(CaretEvent event) 
-		{
+        public void caretUpdate(CaretEvent event) {
             common();
         }
 
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
+        public void actionPerformed(ActionEvent event) {
             common();
         }
 
         private void common()
         {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
     }
 
     /**
      * Check for blank fields and return true if user wants to cancel close
-     * @return true means to continue close, despite blank fields remaining
+     * @return true = cancel close
      */
-    boolean continueClosingDespiteBlankFields() 
-	{
-        ViskitInstantiator viskitInstantiator;
+    boolean checkBlankFields() {
+        VInstantiator vi;
 
-        if (eventGraphNode != null) 
-		{
-            viskitInstantiator = eventGraphNode.getInstantiator();
-        } 
-		else 
-		{
-            viskitInstantiator = newInstantiator;
+        if (egNode != null) {
+            vi = egNode.getInstantiator();
+        } else {
+            vi = newInstantiator;
         }
         testLp:
         {
-            if (handleNameTF.getText().trim().isEmpty()) 
-			{
+            if (handleField.getText().trim().isEmpty()) {
                 break testLp;
             }
-            if (!viskitInstantiator.isValid()) 
-			{
+            if (!vi.isValid()) {
                 break testLp;
             }
             return false; // no blank fields, don't cancel close
         }   // testLp
 
-        // Here if we found an empty field
-        int returnValue = JOptionPane.showConfirmDialog(
+        // Here if we found a problem
+        int ret = JOptionPane.showConfirmDialog(
                 EventGraphNodeInspectorDialog.this,
-                "All fields will need to be completed. Close anyway?",
-                "Only partially complete...",
+                "All fields must be completed. Close anyway?",
+                "Question",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
-		boolean cancellation = (returnValue != JOptionPane.YES_OPTION); // whether or not user cancelled
-        return  cancellation;
+        return ret != JOptionPane.YES_OPTION; // don't cancel
+        // cancel close
     }
 
-    class MyCloseListener extends WindowAdapter 
-	{
+    class myCloseListener extends WindowAdapter {
+
         @Override
-        public void windowClosing(WindowEvent e) 
-		{
-            if (modified) 
-			{
-                int returnValue = JOptionPane.showConfirmDialog(
+        public void windowClosing(WindowEvent e) {
+            if (modified) {
+                int ret = JOptionPane.showConfirmDialog(
                         EventGraphNodeInspectorDialog.this,
                         "Apply changes?",
                         "Question",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) 
-				{
-                        okButton.doClick();
-                } 
-				else 
-				{
-                    cancelButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
+                } else {
+                    canButt.doClick();
                 }
-            } 
-			else 
-			{
-                    cancelButton.doClick();
+            } else {
+                canButt.doClick();
             }
         }
     }

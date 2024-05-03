@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -35,7 +35,6 @@ package viskit.view.dialog;
 
 import edu.nps.util.SpringUtilities;
 import static edu.nps.util.GenericConversion.toArray;
-import edu.nps.util.LogUtilities;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
@@ -49,10 +48,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.Logger;
 import viskit.model.AdapterEdge;
-import viskit.model.EventGraphNode;
-import viskit.ViskitStatics;
+import viskit.model.EvGraphNode;
+import viskit.VStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -64,23 +62,21 @@ import viskit.ViskitStatics;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class AdapterConnectionInspectorDialog extends JDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(AdapterConnectionInspectorDialog.class);
+public class AdapterConnectionInspectorDialog extends JDialog {
 
-    private final JLabel sourceLabel,  targetLabel,  nameLabel,  descriptionLabel;
-    private final JTextField sourceTF,  targetTF,  nameTF,  descriptionTF;
-    private final JTextField sourceEventTF,  targetEventTF;
-    private final JLabel sourceEventLabel,  targetEventLabel;
-    private final JButton eventSourceNavigationButton,  eventTargetNavigationButt;
-    private final JPanel sourceEventPanel,  targetEventPanel;
+    private JLabel sourceLab,  targetLab,  nameLab,  descLab;
+    private JTextField sourceTF,  targetTF,  nameTF,  descTF;
+    private JTextField sourceEventTF,  targetEventTF;
+    private JLabel sourceEventLab,  targetEventLab;
+    private JButton evSourceNavButt,  evTargetNavButt;
+    private JPanel sourceEventPan,  targetEventPan;
     private static AdapterConnectionInspectorDialog dialog;
     private static boolean modified = false;
-    private EventGraphNode sourceEVG,  targetEVG;
+    private EvGraphNode sourceEVG,  targetEVG;
     private AdapterEdge adapterEdge;
-    private final JButton okButton,  cancelButton;
-    private final JPanel buttonPanel;
-    private final enableApplyButtonListener listener;
+    private JButton okButt,  canButt;
+    private JPanel buttPan;
+    private enableApplyButtonListener lis;
     public static String xnewProperty;
     public static String newTarget,  newTargetEvent,  newSource,  newSourceEvent;
 
@@ -102,11 +98,11 @@ public class AdapterConnectionInspectorDialog extends JDialog
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        listener = new enableApplyButtonListener();
+        lis = new enableApplyButtonListener();
 
-        nameLabel = new JLabel("adapter name", JLabel.TRAILING);
-        sourceLabel = new JLabel("source event graph", JLabel.TRAILING);
-        targetLabel = new JLabel("target event graph", JLabel.TRAILING);
+        nameLab = new JLabel("adapter name", JLabel.TRAILING);
+        sourceLab = new JLabel("source event graph", JLabel.TRAILING);
+        targetLab = new JLabel("target event graph", JLabel.TRAILING);
 
         nameTF = new JTextField();
         float[] tfColors = nameTF.getBackground().getRGBColorComponents(null);
@@ -116,55 +112,55 @@ public class AdapterConnectionInspectorDialog extends JDialog
         sourceEventTF = new JTextField();
         sourceEventTF.setEditable(false); // events are chosen from list
         sourceEventTF.setBackground(tfBack);
-        ViskitStatics.clampHeight(sourceEventTF);
+        VStatics.clampHeight(sourceEventTF);
         targetEventTF = new JTextField();
         targetEventTF.setEditable(false); // events are chosen from list
         targetEventTF.setBackground(tfBack);
-        ViskitStatics.clampHeight(targetEventTF);
+        VStatics.clampHeight(targetEventTF);
 
-        eventSourceNavigationButton = new JButton("...");
-        eventSourceNavigationButton.addActionListener(new findSourceEventsAction());
-        eventSourceNavigationButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        ViskitStatics.clampHeight(eventSourceNavigationButton, sourceEventTF);
-        eventTargetNavigationButt = new JButton("...");
-        eventTargetNavigationButt.addActionListener(new findTargetEventsAction());
-        eventTargetNavigationButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        ViskitStatics.clampHeight(eventTargetNavigationButt, targetEventTF);
+        evSourceNavButt = new JButton("...");
+        evSourceNavButt.addActionListener(new findSourceEventsAction());
+        evSourceNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        VStatics.clampHeight(evSourceNavButt, sourceEventTF);
+        evTargetNavButt = new JButton("...");
+        evTargetNavButt.addActionListener(new findTargetEventsAction());
+        evTargetNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        VStatics.clampHeight(evTargetNavButt, targetEventTF);
 
-        sourceEventLabel = new JLabel("source event", JLabel.TRAILING);
-        sourceEventPanel = new JPanel();
-        sourceEventPanel.setLayout(new BoxLayout(sourceEventPanel, BoxLayout.X_AXIS));
-        sourceEventPanel.add(sourceEventTF);
-        sourceEventPanel.add(eventSourceNavigationButton);
+        sourceEventLab = new JLabel("source event", JLabel.TRAILING);
+        sourceEventPan = new JPanel();
+        sourceEventPan.setLayout(new BoxLayout(sourceEventPan, BoxLayout.X_AXIS));
+        sourceEventPan.add(sourceEventTF);
+        sourceEventPan.add(evSourceNavButt);
 
-        targetEventLabel = new JLabel("target event", JLabel.TRAILING);
-        targetEventPanel = new JPanel();
-        targetEventPanel.setLayout(new BoxLayout(targetEventPanel, BoxLayout.X_AXIS));
-        targetEventPanel.add(targetEventTF);
-        targetEventPanel.add(eventTargetNavigationButt);
+        targetEventLab = new JLabel("target event", JLabel.TRAILING);
+        targetEventPan = new JPanel();
+        targetEventPan.setLayout(new BoxLayout(targetEventPan, BoxLayout.X_AXIS));
+        targetEventPan.add(targetEventTF);
+        targetEventPan.add(evTargetNavButt);
 
-        descriptionLabel = new JLabel("description", JLabel.TRAILING);
-        descriptionTF = new JTextField();
+        descLab = new JLabel("description", JLabel.TRAILING);
+        descTF = new JTextField();
 
-        pairWidgets(nameLabel, nameTF, true);
-        pairWidgets(sourceLabel, sourceTF, false);
-        pairWidgets(targetLabel, targetTF, false);
-        pairWidgets(sourceEventLabel, sourceEventPanel, true);
-        pairWidgets(targetEventLabel, targetEventPanel, true);
-        pairWidgets(descriptionLabel, descriptionTF, true);
+        pairWidgets(nameLab, nameTF, true);
+        pairWidgets(sourceLab, sourceTF, false);
+        pairWidgets(targetLab, targetTF, false);
+        pairWidgets(sourceEventLab, sourceEventPan, true);
+        pairWidgets(targetEventLab, targetEventPan, true);
+        pairWidgets(descLab, descTF, true);
 
-        nameTF.addCaretListener(listener);
-        sourceEventTF.addCaretListener(listener);
-        targetEventTF.addCaretListener(listener);
+        nameTF.addCaretListener(lis);
+        sourceEventTF.addCaretListener(lis);
+        targetEventTF.addCaretListener(lis);
 
-        buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(Box.createHorizontalStrut(5));
+        buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        buttPan.add(Box.createHorizontalStrut(5));
 
         // Make the first display a minimum of 400 width
         Dimension d = getSize();
@@ -172,19 +168,19 @@ public class AdapterConnectionInspectorDialog extends JDialog
         setSize(d);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
         setParams(parent, ed);
     }
 
     private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
-        ViskitStatics.clampHeight(tf);
+        VStatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
             ((JTextComponent) tf).setEditable(edit);
             if (edit) {
-                ((JTextComponent) tf).addCaretListener(listener);
+                ((JTextComponent) tf).addCaretListener(lis);
             }
         }
     }
@@ -195,9 +191,9 @@ public class AdapterConnectionInspectorDialog extends JDialog
         fillWidgets();
 
         modified = (ae == null);
-        okButton.setEnabled((ae == null));
+        okButt.setEnabled((ae == null));
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack();
         setLocationRelativeTo(c);
     }
@@ -205,19 +201,19 @@ public class AdapterConnectionInspectorDialog extends JDialog
     private void fillWidgets() {
         if (adapterEdge != null) {
             nameTF.setText(adapterEdge.getName());
-            sourceEVG = (EventGraphNode) adapterEdge.getFromObject();
+            sourceEVG = (EvGraphNode) adapterEdge.getFrom();
             sourceTF.setText(sourceEVG.getName() + " (" + sourceEVG.getType() + ")");
             sourceEventTF.setText(adapterEdge.getSourceEvent());
-            targetEVG = (EventGraphNode) adapterEdge.getToObject();
+            targetEVG = (EvGraphNode) adapterEdge.getTo();
             targetTF.setText(targetEVG.getName() + " (" + targetEVG.getType() + ")");
             targetEventTF.setText(adapterEdge.getTargetEvent());
-            descriptionTF.setText(adapterEdge.getDescription());
+            descTF.setText(adapterEdge.getDescriptionString());
         } else {
             sourceTF.setText("");
             sourceEventTF.setText("");
             targetTF.setText("");
             targetEventTF.setText("");
-            descriptionTF.setText("");
+            descTF.setText("");
         }
 
         JPanel content = new JPanel();
@@ -225,22 +221,22 @@ public class AdapterConnectionInspectorDialog extends JDialog
         content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
         JPanel cont = new JPanel(new SpringLayout());
-        cont.add(nameLabel);
+        cont.add(nameLab);
         cont.add(nameTF);
-        cont.add(sourceLabel);
+        cont.add(sourceLab);
         cont.add(sourceTF);
-        cont.add(sourceEventLabel);
-        cont.add(sourceEventPanel);
-        cont.add(targetLabel);
+        cont.add(sourceEventLab);
+        cont.add(sourceEventPan);
+        cont.add(targetLab);
         cont.add(targetTF);
-        cont.add(targetEventLabel);
-        cont.add(targetEventPanel);
-        cont.add(descriptionLabel);
-        cont.add(descriptionTF);
+        cont.add(targetEventLab);
+        cont.add(targetEventPan);
+        cont.add(descLab);
+        cont.add(descTF);
 
         SpringUtilities.makeCompactGrid(cont, 6, 2, 10, 10, 5, 5);
         content.add(cont);
-        content.add(buttonPanel);
+        content.add(buttPan);
         content.add(Box.createVerticalStrut(5));
         setContentPane(content);
     }
@@ -250,7 +246,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
             adapterEdge.setName(nameTF.getText().trim());
             adapterEdge.setSourceEvent(sourceEventTF.getText().trim());
             adapterEdge.setTargetEvent(targetEventTF.getText().trim());
-            adapterEdge.setDescription(descriptionTF.getText().trim());
+            adapterEdge.setDescriptionString(descTF.getText().trim());
         }
     //todo implement
     //newTarget,newTargetEvent,newSource,newSourceEvent;
@@ -288,8 +284,8 @@ public class AdapterConnectionInspectorDialog extends JDialog
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override
@@ -314,11 +310,11 @@ public class AdapterConnectionInspectorDialog extends JDialog
         }
     }
 
-    private void commonFindEvents(EventGraphNode node, JTextField selection) {
+    private void commonFindEvents(EvGraphNode node, JTextField selection) {
         Class<?> c;
         String classname = node.getType();
         try {
-            c = ViskitStatics.ClassForName(classname);
+            c = VStatics.classForName(classname);
             if (c == null) {
                 throw new ClassNotFoundException("classname not found");
             }
@@ -357,7 +353,7 @@ public class AdapterConnectionInspectorDialog extends JDialog
                 selection.setText(evsv.get(which));
             }
         } catch (ClassNotFoundException | SecurityException | HeadlessException t) {
-            LOG.error("Error connecting: " + t.getMessage(), t);
+            System.err.println("Error connecting: " + t.getMessage());
         }
 //    catch (ClassNotFoundException e) {
 //      e.printStackTrace();
@@ -369,15 +365,15 @@ public class AdapterConnectionInspectorDialog extends JDialog
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int returnValue = JOptionPane.showConfirmDialog(AdapterConnectionInspectorDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(AdapterConnectionInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
                 } else {
-                    cancelButton.doClick();
+                    canButt.doClick();
                 }
             } else {
-                cancelButton.doClick();
+                canButt.doClick();
             }
         }
     }

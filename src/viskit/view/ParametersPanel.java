@@ -1,7 +1,7 @@
 package viskit.view;
 
 import viskit.model.ViskitElement;
-import viskit.model.ViskitParameter;
+import viskit.model.vParameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -15,8 +15,8 @@ import viskit.model.ViskitParameter;
  */
 public class ParametersPanel extends ViskitTablePanel {
 
-    private String[] mytitles   = {"type", "name", "description"};
-    private String plusToolTip  = "Add a simulation parameter";
+    private String[] mytitles = {"name", "type", "description"};
+    private String plusToolTip = "Add a simulation parameter";
     private String minusToolTip = "Removed the selected parameter";
 
     ParametersPanel(int wid) {
@@ -36,20 +36,20 @@ public class ParametersPanel extends ViskitTablePanel {
     @Override
     public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = e.getType();
-        sa[1] = e.getName();
-        sa[2] = e.getDescription();
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        sa[2] = e.getComment();
         return sa;
     }
 
     @Override
     public ViskitElement newRowObject() {
-        ViskitParameter ea = new ViskitParameter("someType", "someName", "description");
+        vParameter ea = new vParameter("name", "int", "description");
         return ea;
     }
 
     @Override
-    public int getNumberVisibleRows() {
+    public int getNumVisibleRows() {
         return 3;
     }
 

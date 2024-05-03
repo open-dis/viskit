@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ViskitProject author="Arnie Buss, Terry Norbraten and Don Brutzman" description="Example project for testing and experimentation." name="DefaultProject" revision="17 April 2016">
+<ViskitProject name="DefaultProject">
   <AnalystReports name="AnalystReports" />
   <AssembliesDirectory name="Assemblies" />
   <EventGraphsDirectory name="EventGraphs" />
@@ -9,6 +9,6 @@
   </BuildDirectory>
   <DistDirectory name="dist" />
   <LibDirectory name="lib" />
-  <Cached />
+  <Cached/>
 </ViskitProject>
 

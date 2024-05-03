@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
@@ -58,20 +58,17 @@ import viskit.view.AnalystReportFrame;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.AnalystReportController">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class AnalystReportController extends mvcAbstractController
-{
-    static final Logger LOG = LogUtilities.getLogger(AnalystReportController.class);
+public class AnalystReportController extends mvcAbstractController {
+
+    static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
 
     private AnalystReportFrame frame;
-    private File   analystReportFile;
-    private File currentAssemblyFile;
+    private File analystReportFile;
+    private File currentAssyFile;
     private AnalystReportModel analystReportModel;
 
     /** Creates a new instance of AnalystReportController */
-    public AnalystReportController()
-	{
-		// constructor initialization
-	}
+    public AnalystReportController() {}
 
     /** Called from the InternalAssemblyRunner when the temp Analyst report is
      * filled out and ready to copy from a temp to a permanent directory
@@ -83,14 +80,7 @@ public class AnalystReportController extends mvcAbstractController
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory;
-		if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-			 analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
-		else
-		{
-			LOG.error ("No current viskit project");
-			return;
-		}
+        File analystReportDirectory = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -109,7 +99,7 @@ public class AnalystReportController extends mvcAbstractController
             frame = (AnalystReportFrame) getView();
         }
 
-//        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
+        frame.showProjectName();
         buildAnalystReport(targetFile);
     }
 
@@ -126,17 +116,46 @@ public class AnalystReportController extends mvcAbstractController
         mainTabbedPaneIdx = idx;
     }
 
+    public void openAnalystReport() {
+        if (frame.isReportDirty()) {
+            int result = JOptionPane.showConfirmDialog(frame,
+                    "Save current simulation data and analyst report annotations?",
+                    "Confirm",
+                    JOptionPane.WARNING_MESSAGE);
+            switch (result) {
+                case JOptionPane.OK_OPTION:
+                    saveReport();
+                    break;
+                case JOptionPane.CANCEL_OPTION:
+                case JOptionPane.NO_OPTION:
+                default:
+                    break;
+            }
+        }
+
+        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        JFileChooser openChooser = new JFileChooser(aRDir);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
+        openChooser.setFileFilter(filter);
+        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        int resp = openChooser.showOpenDialog(frame);
+        if (resp != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        openAnalystReport(openChooser.getSelectedFile());
+    }
+
     public void setCurrentAssyFile(File f) {
-        currentAssemblyFile = f;
+        currentAssyFile = f;
 
         if (analystReportModel != null) {
-            analystReportModel.setAssemblyFile(currentAssemblyFile);
+            analystReportModel.setAssemblyFile(currentAssyFile);
         }
     }
 
-    public final static String SAVE_ANALYST_REPORT_METHOD = "saveAnalystReport"; // must match following method name.  Not possible to accomplish this programmatically.
-    public void saveAnalystReport() // method name must exactly match preceding string value
-	{
+    public void saveAnalystReport() {
         JFileChooser saveChooser = new JFileChooser(analystReportFile.getParent());
         saveChooser.setSelectedFile(analystReportFile);
         saveChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -160,17 +179,13 @@ public class AnalystReportController extends mvcAbstractController
                 outFile, "configuration/AnalystReportXMLtoHTML.xslt");
     }
 
-    public final static String GENERATE_ANALYST_REPORT_METHOD = "generateAnalystReport"; // must match following method name.  Not possible to accomplish this programmatically.
-    
-	public void generateAnalystReport() // method name must exactly match preceding string value
-	{
-        if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected())
-		{
+    public void generateHtmlReport() {
+        if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
             JOptionPane.showMessageDialog(null, "<html><body><p align='center'>"
-                    + "The checkbox for <code>Enable analyst report</code> is not"
-                    + " currently selected.  Please select on the <code>Simulation Run</code> panel,"
+                    + "The checkbox for <code>Enable Analyst Reports </code>is not"
+                    + " currently selected.  Please select on the <code>Assembly Run </code>panel,"
                     + " re-run the experiment and the report will then be available to "
-                    + "view.</p></body></html>", "Enable analyst report not selected",
+                    + "view.</p></body></html>", "Enable Analyst Reports not selected",
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -183,7 +198,7 @@ public class AnalystReportController extends mvcAbstractController
 
         outFile = outFile.substring(0, idx) + ".html";
 
-        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser genChooser = new JFileChooser(aRDir);
         genChooser.setSelectedFile(new File(outFile));
         genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -212,67 +227,24 @@ public class AnalystReportController extends mvcAbstractController
     private void saveReport(File f) {
         try {
             analystReportModel.writeToXMLFile(f);
-            frame.setReportFileDirty(false);
+            frame.setReportDirty(false);
         } catch (Exception e) {
             LOG.error(e);
         }
     }
 
-    public final static String VIEW_ANALYST_REPORT_XML_METHOD = "viewAnalystReportXML"; // must match following method name.  Not possible to accomplish this programmatically.
-    
-	public void viewAnalystReportXML() // method name must exactly match preceding string value
-	{
-		// TODO
-    }
-
-    public final static String OPEN_ANALYST_REPORT_METHOD = "openAnalystReport"; // must match following method name.  Not possible to accomplish this programmatically.
-    
-	public void openAnalystReport() // method name must exactly match preceding string value
-	{
-        if (frame.isReportFileDirty()) 
-		{
-            int result = JOptionPane.showConfirmDialog(frame,
-                    "Save current simulation data and analyst report annotations?",
-                    "Confirm",
-                    JOptionPane.WARNING_MESSAGE);
-            switch (result) {
-                case JOptionPane.OK_OPTION:
-                    saveReport();
-                    break;
-                case JOptionPane.CANCEL_OPTION:
-                case JOptionPane.NO_OPTION:
-                default:
-                    break;
-            }
-        }
-        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
-        JFileChooser openChooser = new JFileChooser(aRDir);
-		openChooser.setDialogTitle("Open Analyst Report");
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
-        openChooser.setFileFilter(filter);
-        openChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        int resp = openChooser.showOpenDialog(frame);
-        if (resp != JFileChooser.APPROVE_OPTION) {
-            return;
-        }
-
-        openAnalystReport(openChooser.getSelectedFile());
-    }
-
-	private void openAnalystReport(File selectedFile)
-	{
+    private void openAnalystReport(File selectedFile) {
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
         analystReportFile = selectedFile;
-        frame.setReportFileDirty(false);
+        frame.setReportDirty(false);
     }
 
     private void buildAnalystReport(File targetFile) {
         LOG.debug("TargetFile is: " + targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
-            analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssemblyFile);
+            analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
         } catch (Exception e) {
             LOG.error("Error parsing analyst report: " + e.getMessage());
 //            e.printStackTrace();
@@ -280,11 +252,11 @@ public class AnalystReportController extends mvcAbstractController
         }
         setContent(analystReportModelLocal);
         analystReportFile = targetFile;
-        frame.setReportFileDirty(false);
+        frame.setReportDirty(false);
     }
 
     private void setContent(AnalystReportModel analystReportModelLocal) {
-        if (analystReportModelLocal != null && frame.isReportFileDirty()) {
+        if (analystReportModelLocal != null && frame.isReportDirty()) {
             int resp = JOptionPane.showConfirmDialog(frame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
                     "The current report data has not been saved. Save current report before continuing?</p></body></html>",
@@ -296,7 +268,7 @@ public class AnalystReportController extends mvcAbstractController
             }
         }
 
-        frame.setReportFileDirty(false);
+        frame.setReportDirty(false);
 
         this.analystReportModel = analystReportModelLocal;
         frame.setReportBuilder(analystReportModelLocal);

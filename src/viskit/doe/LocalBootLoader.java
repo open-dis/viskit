@@ -1,6 +1,6 @@
 package viskit.doe;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.JarURLConnection;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -17,91 +18,90 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitStatics;
+import viskit.VGlobals;
+import viskit.VStatics;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
  * class loading that can be used in "Local Grid" mode.
  *
  * In "Remote Grid" mode, Grid nodes can't have already loaded classes
- from the Viskit panel, not unless we serialize the classes and their
- instances, which could be problematic.
-
- So in Remote ( or Regular ) Grid mode, a class loader
- called Boot loads up all the Event Graphs from XML, the Assembly,
- and any jars sent via the XML-RPC call, or any jars packaged within
- the Gridkit deployment jar.
-
- In Local mode, all these classes should be loaded by Viskit already,
- by DOE time, and we'd like to run a DOE with little interaction from
- Viskit other than the API's already used for Gridkit, so basically
- 'logging in' to a local service. It should still build up class definitions
- from the Assembly XML since in each replication a new class definition
- of the same type is used.
-
- Viskit caches all generated classes in the ViskitGlobals workDirectory,
- however, it also caches the Assembly classes, which need to be
- "zero turn-around" for each DesignPoint in the experiment, meaning
- a class loader has to "forget" the Assembly class each time since
- the parameters are coded into the class and these change per
- DesignPoint. Since DesignPoint runs can be done in parallel threads,
- each thread should own its own individual context instance.
-
- This class should read from the workDirectory, discard any Assembly
- classes, jar the remaining ones or otherwise pass the new directory
- to the super-class which then adds them to the current context
- in a disposable manner. Aside from the common runtime classes,
- the current context class loader should already resolve Viskit specific
- libs, such as simkit.jar. Then LocalBoot should add all jars found
- in Viskit's lib before loading the pruned workDirectory and then
- be ready to accept a modified Assembly; in this way one or many
- threads can be executed, each with their own LocalBoot context.
-
- In other words, this is a two stage process, first capture the cache as
- last left by Viskit and prune it, then spawn as many threads per
- DesignPoint modified Assemblies, which inherit stage one context but
- individually create the second stage. Both stages can be handled by
- the LocalBootLoader class. The zero'th stage is adding all classes
- required to run Simkit and the ViskitAssembly.
-
- Each thread that uses a LocalBootLoader should set the contextClassLoader
- to be its own LocalBootLoaders's parent's parent; this should enable multiple
- threads to use class methods in a unique context, e.g. Schedule.reset();
-
- In order to do that, as in create a separate context for Simkit per Thread,
- without running an external Process, everything must be read into a
- ClassLoader that has the current Viskit running Thread's parent's
- contextClassLoader, above from where simkit.jar got loaded in, i.e., the
- stage prior to reading in the lib directory during JVM initialization. Then
- each new ClassLoader so constructed can have a unique Simkit run
- simultaneously. Furthermore, it can now have a unique Assembly per Thread
- as originally expected.
+ * from the Viskit panel, not unless we serialize the classes and their
+ * instances, which could be problematic.
+ *
+ * So in Remote ( or Regular ) Grid mode, a class loader
+ * called Boot loads up all the Event Graphs from XML, the Assembly,
+ * and any jars sent via the XML-RPC call, or any jars packaged within
+ * the Gridkit deployment jar.
+ *
+ * In Local mode, all these classes should be loaded by Viskit already,
+ * by DOE time, and we'd like to run a DOE with little interaction from
+ * Viskit other than the API's already used for Gridkit, so basically
+ * 'logging in' to a local service. It should still build up class definitions
+ * from the Assembly XML since in each replication a new class definition
+ * of the same type is used.
+ *
+ * Viskit caches all generated classes in the VGlobals workDirectory,
+ * however, it also caches the Assembly classes, which need to be
+ * "zero turn-around" for each DesignPoint in the experiment, meaning
+ * a class loader has to "forget" the Assembly class each time since
+ * the parameters are coded into the class and these change per
+ * DesignPoint. Since DesignPoint runs can be done in parallel threads,
+ * each thread should own its own individual context instance.
+ *
+ * This class should read from the workDirectory, discard any Assembly
+ * classes, jar the remaining ones or otherwise pass the new directory
+ * to the super-class which then adds them to the current context
+ * in a disposable manner. Aside from the common runtime classes,
+ * the current context class loader should already resolve Viskit specific
+ * libs, such as simkit.jar. Then LocalBoot should add all jars found
+ * in Viskit's lib before loading the pruned workDirectory and then
+ * be ready to accept a modified Assembly; in this way one or many
+ * threads can be executed, each with their own LocalBoot context.
+ *
+ * In other words, this is a two stage process, first capture the cache as
+ * last left by Viskit and prune it, then spawn as many threads per
+ * DesignPoint modified Assemblies, which inherit stage one context but
+ * individually create the second stage. Both stages can be handled by
+ * the LocalBootLoader class. The zero'th stage is adding all classes
+ * required to run Simkit and the ViskitAssembly.
+ *
+ * Each thread that uses a LocalBootLoader should set the contextClassLoader
+ * to be its own LocalBootLoaders's parent's parent; this should enable multiple
+ * threads to use class methods in a unique context, e.g. Schedule.reset();
+ *
+ * In order to do that, as in create a separate context for Simkit per Thread,
+ * without running an external Process, everything must be read into a
+ * ClassLoader that has the current Viskit running Thread's parent's
+ * contextClassLoader, above from where simkit.jar got loaded in, i.e., the
+ * stage prior to reading in the lib directory during JVM initialization. Then
+ * each new ClassLoader so constructed can have a unique Simkit run
+ * simultaneously. Furthermore, it can now have a unique Assembly per Thread
+ * as originally expected.
  *
  * @author Rick Goldberg
  * @since December 27, 2006, 11:47 AM
  * @version $Id$
  */
-public class LocalBootLoader extends URLClassLoader 
-{
-    private final static Logger LOG = LogUtilities.getLogger(LocalBootLoader.class);
-	
+public class LocalBootLoader extends URLClassLoader {
+
+    private final static Logger LOG = LogUtils.getLogger(LocalBootLoader.class);
     String[] classPath;
     LocalBootLoader stage1;
-    File workDirectory;
-    URL[] externalClasspathUrls;
+    File workDir;
+    URL[] extUrls;
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
 
     /** Creates a new instance of LocalBootLoader
      * @param classes external classpath urls
      * @param parent the parent Classloader to this one
-     * @param workDirectory the current project working directory
+     * @param workDir the current project working directory
      */
-    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDirectory)
-	{
+    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
         super(new URL[] {}, parent);
-        externalClasspathUrls = classes;
-        this.workDirectory = workDirectory;
-//        LOG.debug(ViskitGlobals.instance().printCallerLog());
+        extUrls = classes;
+        this.workDir = workDir;
+        LOG.debug(VGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with the generated
@@ -113,76 +113,69 @@ public class LocalBootLoader extends URLClassLoader
      * @param allowAssembly
      * @return an isolated Context Class Loader instance
      */
-    public LocalBootLoader init(boolean allowAssembly) 
-	{
+    public LocalBootLoader init(boolean allowAssembly) {
         this.allowAssembly = allowAssembly;
         return init();
     }
 
     /** @return a custom ClassLoader */
-    public LocalBootLoader init()
-	{
+    public LocalBootLoader init() {
         File jar = null;
 
         // Capture the current runtime classpath
         initStage1();
 
         stage1.allowAssembly = this.allowAssembly;
-		
+
         // Now add any external classpaths
-        if (externalClasspathUrls != null)
-		{
-			for (URL ext : externalClasspathUrls)
-			{
-				// Can happen if a path is present in the viskitProject.xml, but the
-				// jar was removed from where is was supposed to be
-				if (ext == null) {continue;}
+        for (URL ext : extUrls) {
 
-				stage1.addURL(ext);
-				String[] tmp = new String[getClassPath().length + 1];
-				System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
-				try {
-					tmp[tmp.length - 1] = ext.toURI().getPath();
-					classPath = tmp;
-				} catch (URISyntaxException ex) {
-					LOG.error(ex);
-				}
-			}
+            // Can happen if a path is present in the viskitProject.xml, but the
+            // jar was removed from where is was supposed to be
+            if (ext == null) {continue;}
 
-			// TODO: Clearly, adding build/classes to the classpath violates the
-			// dirty assembly in the classpath issue that we were attempting to
-			// mitigate with the buildCleanWorkJar call below, but something doesn't
-                        // go quite right if we are building a project from scratch where
-			// we have no build/classes compiled, and/or have no cached EGs in the
-                        // viskitProject.xml.  So, leaving commeted out for now. Will need
-			// to reopen this issue when we need strict design points for DOE.
+            stage1.addURL(ext);
+            String[] tmp = new String[getClassPath().length + 1];
+            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            try {
+                tmp[tmp.length - 1] = ext.toURI().getPath();
+                classPath = tmp;
+            } catch (URISyntaxException ex) {
+                LOG.error(ex);
+            }
+        }
 
-			// Now add our project's working directory, i.e. build/classes
-			if (getWorkDirectory() != null)
-			{
-				try {
-					stage1.addURL(getWorkDirectory().toURI().toURL());
-					String[] tmp = new String[getClassPath().length + 1];
-					System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
-					try {
-						tmp[tmp.length - 1] = getWorkDirectory().getCanonicalPath();
-						classPath = tmp;
-					} catch (IOException ex) {
-						LOG.error(ex);
-					}
-				} catch (MalformedURLException ex) {
-					LOG.error(ex);
-				}
-			}
-		}
+        // TODO: Clearly, adding build/classes to the classpath violates the
+        // dirty assembly in the classpath issue that we were attempting to
+        // mitigate with the buildCleanWorkJar call below, but something doesn't
+        // go quite right if we are building a project from scratch where
+        // we have no build/classes compiled, and/or have no cached EGs in the
+        // viskitProject.xml.  So, leaving commeted out for now. Will need
+        // to reopen this issue when we need strict design points for DOE.
+
+        // Now add our project's working directory, i.e. build/classes
+        try {
+
+            stage1.addURL(getWorkDir().toURI().toURL());
+            String[] tmp = new String[getClassPath().length + 1];
+            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            try {
+                tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
+                classPath = tmp;
+            } catch (IOException ex) {
+                LOG.error(ex);
+            }
+        } catch (MalformedURLException ex) {
+            LOG.error(ex);
+        }
 
 //        jar = buildCleanWorkJar(); // See TODO note above
 
         // stage1 gets dirty during bring up of clean jar <-- Why?
         // reboot it with cleanWorkJar
-//        LOG.debug("Stage1 reinit");
+        LOG.debug("Stage1 reinit");
 //        initStage1();
-//        LOG.debug("Adding cleaned jar " + jar);
+        LOG.debug("Adding cleaned jar "+jar);
 
         // Now add our tmp jars containing compiled EGs and Assemblies
 //        try {
@@ -228,8 +221,8 @@ public class LocalBootLoader extends URLClassLoader
      * Convenience method for the DOE local driver
      * @return a URL[] of External ClassPath paths
      */
-    public URL[] getExternalClasspathUrls() {
-        return externalClasspathUrls;
+    public URL[] getExtUrls() {
+        return extUrls;
     }
 
     /** @return a custom classpath String [] */
@@ -244,8 +237,8 @@ public class LocalBootLoader extends URLClassLoader
     }
 
     /** @return the working class directory for this project */
-    public File getWorkDirectory() {
-        return workDirectory;
+    public File getWorkDir() {
+        return workDir;
     }
 
     /** @return an indication for allowing an Assembly to be jarred up */
@@ -277,7 +270,7 @@ public class LocalBootLoader extends URLClassLoader
             JarURLConnection uc;
             Attributes attr;
             try {
-                url = new URL("jar:file:" + classPathProp + "!/");
+                url = new URI("jar:file:" + classPathProp + "!/").toURL();
                 uc = (JarURLConnection)url.openConnection();
                 attr = uc.getMainAttributes();
 
@@ -288,7 +281,7 @@ public class LocalBootLoader extends URLClassLoader
                     cPath.append(path);
                 }
 
-            } catch (IOException | NullPointerException ex) {
+            } catch (IOException | NullPointerException | URISyntaxException ex) {
                 LOG.error(ex);
             }
 
@@ -300,7 +293,7 @@ public class LocalBootLoader extends URLClassLoader
 
         ClassLoader parentClassLoader = getParent();
 
-        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -311,13 +304,13 @@ public class LocalBootLoader extends URLClassLoader
         while (loop) {
             try {
                 if (reloadSimkit) {
-                    stage1.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS_NAME);
+                    stage1.loadClass(VStatics.RANDOM_VARIATE_CLASS);
                 } else {
-                    stage1.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
+                    stage1.loadClass(VStatics.LOCAL_BOOT_LOADER);
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
@@ -342,15 +335,15 @@ public class LocalBootLoader extends URLClassLoader
         try {
 
             // Don't jar up an empty build/classes directory
-            if (getWorkDirectory().listFiles().length == 0) {return null;}
+            if (getWorkDir().listFiles().length == 0) {return null;}
 
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
-            stage1.addURL(getWorkDirectory().toURI().toURL());
+            stage1.addURL(getWorkDir().toURI().toURL());
 
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
-            newJar = makeJarFileFromDir(getWorkDirectory());
+            newJar = makeJarFileFromDir(getWorkDir());
 
         } catch (MalformedURLException ex) {
             LOG.error(ex);
@@ -425,7 +418,7 @@ public class LocalBootLoader extends URLClassLoader
                             isEventGraph = false;
                         }
                     } catch (ClassNotFoundException ex) {
-                        LOG.error("Check that viskit.jar has jaxb bindings, or: " + entryClass, ex);
+                        System.err.println("Check that viskit.jar has jaxb bindings, or: " + entryClass);
                         LOG.error(ex);
                     }
 

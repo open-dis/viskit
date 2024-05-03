@@ -4,7 +4,6 @@
     Document   : launch4jConfig.xml
     Created on : September 3, 2006, 2:34 PM
     Author     : rmgold
-    Version    : $Id$
 -->
 
 <launch4jConfig>
@@ -18,11 +17,11 @@
     <stayAlive>true</stayAlive>
     <icon>images/ViskitIcon.ico</icon>
     <jre>
-      <minVersion>1.7.0</minVersion>
-      <jdkPreference>jdkOnly</jdkPreference>
+      <path>$JAVA_HOME</path>
+      <minVersion>17.0.2</minVersion>
+      <requiresJdk>true</requiresJdk>
       <opt>-Xmx256m</opt>
       <opt>-Dswing.aatext=true</opt>
-      <opt>-Djava.endorsed.dirs=lib/jaxb/endorsed</opt>
     </jre>
 
     <!--splash>
@@ -32,12 +31,12 @@
       <timeoutErr>false</timeoutErr>
     </splash-->
     <versionInfo>
-      <fileVersion>1.0.15.0</fileVersion>
-      <txtFileVersion>1.0.15</txtFileVersion>
+      <fileVersion>1.0.16.0</fileVersion>
+      <txtFileVersion>1.0.16</txtFileVersion>
       <fileDescription>Viskit launcher</fileDescription>
-      <copyright>Copyright (c) 1995-2015 held by the author(s).  All rights reserved.</copyright>
-      <productVersion>1.0.15.0</productVersion>
-      <txtProductVersion>1.0.15</txtProductVersion>
+      <copyright>Copyright (c) 1995-2023 held by the author(s).  All rights reserved.</copyright>
+      <productVersion>1.0.16.0</productVersion>
+      <txtProductVersion>1.0.16</txtProductVersion>
       <productName>Viskit</productName>
       <companyName>MOVES Institute, Naval Postgraduate School</companyName>
       <internalName>Viskit</internalName>

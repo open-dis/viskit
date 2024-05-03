@@ -1,10 +1,8 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
-import viskit.model.GraphMetadata;
+import viskit.model.GraphMetaData;
 
 import javax.swing.JFrame;
-import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -16,32 +14,24 @@ import org.apache.logging.log4j.Logger;
  * @since 1:35:07 PM
  * @version $Id$
  */
-public class EventGraphMetadataDialog extends MetadataDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(EventGraphMetadataDialog.class);
+public class EventGraphMetaDataDialog extends MetaDataDialog {
 
-    private static MetadataDialog dialog;
+    private static MetaDataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata)
-	{
-        if (dialog == null)
-		{
-            dialog = new EventGraphMetadataDialog(f, graphMetadata);
-        } 
-		else 
-		{
-            dialog.setGraphMetadata(f, graphMetadata);
+    public static boolean showDialog(JFrame f, GraphMetaData gmd) {
+        if (dialog == null) {
+            dialog = new EventGraphMetaDataDialog(f, gmd);
+        } else {
+            dialog.setParams(f, gmd);
         }
-		dialog.fillWidgets();
-        dialog.setVisible(true); // this call blocks
-       
+        dialog.setVisible(true);
+        // above call blocks
         return modified;
     }
 
-    EventGraphMetadataDialog(JFrame f, GraphMetadata graphMetadata)
-	{
-        super(f, graphMetadata, "Event Graph Properties");
-        remove(this.runtimePanel);  // panel is only used by assembly
+    EventGraphMetaDataDialog(JFrame f, GraphMetaData gmd) {
+        super(f, gmd, "Event Graph Properties");
+        remove(this.runtimePanel);  // only for assembly
         pack();
     }
 }

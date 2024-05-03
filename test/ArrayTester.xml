@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity extend="SimEntityBase" name="ArrayTester" package="test" version="$Id:$" description="empty" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <StateVariable name="sinus" type="double[180]" description="empty">
+<SimEntity extend="SimEntityBase" name="ArrayTester" package="test" version="$Id:$" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <StateVariable name="sinus" type="double[180]">
         <Comment/>
     </StateVariable>
-    <Event name="Run" description="empty">
+    <Event name="Run">
         <Comment/>
         <LocalVariable name="_idxvar_0" type="int" value="0">
             <Comment>used internally</Comment>
@@ -17,9 +17,9 @@
         </Schedule>
         <Coordinate x="30" y="30"/>
     </Event>
-    <Event name="DumpArrayElement" description="empty">
+    <Event name="DumpArrayElement">
         <Comment/>
-        <Argument name="i" type="int" description="empty"/>
+        <Argument name="i" type="int"/>
         <LocalVariable name="code" type="boolean" value="true; System.out.println(getSinus(i))">
             <Comment/>
         </LocalVariable>

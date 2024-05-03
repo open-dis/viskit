@@ -1,6 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import javax.swing.*;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.Logger;
 import viskit.util.Compiler;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
+import viskit.VGlobals;
+import viskit.VStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -27,145 +27,115 @@ import viskit.ViskitStatics;
  * @version $Id$
  */
 @SuppressWarnings("serial")
-public class SourceWindow extends JFrame
-{
-    static final Logger LOG = LogUtilities.getLogger(SourceWindow.class);
+public class SourceWindow extends JFrame {
 
-    public final String sourceCode;
-    Thread systemOutThread;
-    JTextArea textArea;
+    static final Logger LOGGER = LogUtils.getLogger(SourceWindow.class);
+
+    public final String src;
+    Thread sysOutThread;
+    JTextArea jta;
     private static JFileChooser saveChooser;
     private JPanel contentPane;
     private Searcher searcher;
-    private Action startAction;
-    private Action againAction;
+    private Action startAct;
+    private Action againAct;
 
-    public SourceWindow(JFrame main, final String className, String source)
-	{
-        this.sourceCode = source;
-        if (saveChooser == null)
-		{
+    public SourceWindow(JFrame main, final String className, String source) {
+
+        this.src = source;
+        if (saveChooser == null) {
             saveChooser = new JFileChooser();
-		    saveChooser.setDialogTitle("Java Source Code");
-			if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-				saveChooser.setCurrentDirectory(ViskitGlobals.instance().getCurrentViskitProject().getSrcDirectory());
+            saveChooser.setCurrentDirectory(VGlobals.instance().getCurrentViskitProject().getSrcDir());
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
-        JPanel containerPanel = new JPanel();
-        contentPane.add(containerPanel, BorderLayout.CENTER);
+        JPanel con = new JPanel();
+        contentPane.add(con, BorderLayout.CENTER);
 
-        containerPanel.setLayout(new BoxLayout(containerPanel, BoxLayout.Y_AXIS));
-        containerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JToolBar toolBar = new JToolBar();
-        JButton  fontPlusButton = new JButton("Larger");
-        JButton fontMinusButton = new JButton("Smaller");
-        JButton     printButton = new JButton("Print");
-        JButton    searchButton = new JButton("Find"); // this text gets overwritten by action
-        JButton     againButton = new JButton("Find next");
-        toolBar.add(new JLabel("Font:"));
-        toolBar.addSeparator(); // TODO ok?
-        toolBar.add(fontPlusButton);
-        toolBar.add(fontMinusButton);
-        toolBar.addSeparator();
-        toolBar.add(searchButton);
-        toolBar.add(againButton);
-        toolBar.addSeparator();
-        toolBar.add(printButton);
-        fontPlusButton.addActionListener((ActionEvent e) -> {
-            textArea.setFont(textArea.getFont().deriveFont(textArea.getFont().getSize2D() + 1.0f));
+        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
+        con.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JToolBar tb = new JToolBar();
+        JButton fontPlus = new JButton("Larger");
+        JButton fontMinus = new JButton("Smaller");
+        JButton printB = new JButton("Print");
+        JButton searchButt = new JButton("Find"); // this text gets overwritten by action
+        JButton againButt = new JButton("Find next");
+        tb.add(new JLabel("Font:"));
+        tb.add(fontPlus);
+        tb.add(fontMinus);
+        tb.add(printB);
+        tb.addSeparator();
+        tb.add(searchButt);
+        tb.add(againButt);
+        fontPlus.addActionListener((ActionEvent e) -> {
+            jta.setFont(jta.getFont().deriveFont(jta.getFont().getSize2D() + 1.0f));
         });
-        fontMinusButton.addActionListener((ActionEvent e) -> {
-            textArea.setFont(textArea.getFont().deriveFont(Math.max(textArea.getFont().getSize2D() - 1.0f, 1.0f)));
+        fontMinus.addActionListener((ActionEvent e) -> {
+            jta.setFont(jta.getFont().deriveFont(Math.max(jta.getFont().getSize2D() - 1.0f, 1.0f)));
         });
 
-        printButton.setEnabled(false); // todo
-        printButton.setToolTipText("to be implemented");
+        printB.setEnabled(false); // todo
+        printB.setToolTipText("to be implemented");
 
-        contentPane.add(toolBar, BorderLayout.NORTH);
+        contentPane.add(tb, BorderLayout.NORTH);
 
-        textArea = new JTextArea();
-        textArea.setText(addLineNumbers(sourceCode));
-        textArea.setCaretPosition(0);
+        jta = new JTextArea(); //src);
+        jta.setText(addLineNums(src));
+        jta.setCaretPosition(0);
 
-        textArea.setEditable(false);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        JScrollPane jScrollPane = new JScrollPane(textArea);
-        containerPanel.add(jScrollPane);
+        jta.setEditable(false);
+        jta.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane jsp = new JScrollPane(jta);
+        con.add(jsp);
 
-        JPanel buttonPanel = new JPanel();
-		buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
 
-        buttonPanel.add(Box.createHorizontalGlue());
+        buttPan.add(Box.createHorizontalGlue());
 
-        JButton xmlButton = new JButton("XML model");
-        buttonPanel.add(xmlButton);
+        JButton compileButt = new JButton("Compile test");
+        buttPan.add(compileButt);
 
-        JButton compileButton = new JButton("Compile test");
-        buttonPanel.add(compileButton);
+        JButton saveButt = new JButton("Save source and close");
+        buttPan.add(saveButt);
 
-        JButton saveButton = new JButton("Save source and close");
-        buttonPanel.add(saveButton);
+        JButton closeButt = new JButton("Close");
+        buttPan.add(closeButt);
 
-        JButton closeButton = new JButton("Close");
-        buttonPanel.add(closeButton);
-
-        containerPanel.add(buttonPanel);
+        con.add(buttPan);
 
         setupSearchKeys();
-        searchButton.setAction(startAction);
-         againButton.setAction(againAction);
+        searchButt.setAction(startAct);
+        againButt.setAction(againAct);
 
-        if (main.isVisible())
-		{
+        if (main.isVisible()) {
             this.setSize(main.getWidth() - 200, main.getHeight() - 100);
             this.setLocationRelativeTo(main);
-        } 
-		else 
-		{
+        } else {
             pack();
             Dimension d = getSize();
-            d.height = Math.min(d.height, 800); // no larger than 800x600
-            d.width  = Math.min(d.width,  600);
+            d.height = Math.min(d.height, 400);
+            d.width = Math.min(d.width, 800);
             setSize(d);
             setLocationRelativeTo(null);
         }
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setModalExclusionType(Dialog.ModalExclusionType.NO_EXCLUDE);
 
         //Make textArea get the focus whenever frame is activated.
-        addWindowListener(new WindowAdapter()
-		{
+        addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowActivated(WindowEvent e) {
-                textArea.requestFocusInWindow();
+                jta.requestFocusInWindow();
             }
         });
 
-        closeButton.addActionListener((ActionEvent e) -> {
-            dispose();
-        });
-		
-        xmlButton.addActionListener((ActionEvent e) -> {
-            try {
-                if      (ViskitGlobals.instance().getViskitApplicationFrame().isEventGraphEditorTabSelected())
-                {
-                    ViskitGlobals.instance().getEventGraphController().showXML();
-                }
-                else if (ViskitGlobals.instance().getViskitApplicationFrame().isAssemblyEditorTabSelected())
-                {
-                    ViskitGlobals.instance().getAssemblyController().showXML();
-                }
-            }
-            catch (Exception ex)
-            {
-                LOG.error(ex);
-            }
+        closeButt.addActionListener((ActionEvent e) -> {
+            SourceWindow.this.dispose();
         });
 
-        compileButton.addActionListener(new ActionListener()
-		{
+        compileButt.addActionListener(new ActionListener() {
+
             StringBuffer sb = new StringBuffer();
             BufferedReader br;
 
@@ -174,41 +144,40 @@ public class SourceWindow extends JFrame
 
                 // An error stream to write additional error info out to
                 ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-                Compiler.setOutputStream(baosOut);
+                Compiler.setOutPutStream(baosOut);
 
                 try {
-                    String diagnostic = Compiler.invoke("", className, sourceCode);
+                    String diagnostic = Compiler.invoke("", className, src);
 
                     sb.append(baosOut.toString());
                     sb.append(diagnostic);
 
-                    CompilationOutputDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
+                    sysOutDialog.showDialog(SourceWindow.this, SourceWindow.this, sb.toString(), getFileName());
 
-                    if (!diagnostic.contains(Compiler.COMPILE_SUCCESS_MESSAGE))
-					{
+                    if (!diagnostic.contains(Compiler.COMPILE_SUCCESS_MESSAGE)) {
                         ErrorHighlightPainter errorHighlightPainter = new ErrorHighlightPainter(Color.PINK);
                         int startOffset = (int) Compiler.getDiagnostic().lineNumber * 5 + (int) Compiler.getDiagnostic().startOffset;
-                        int   endOffset = (int) Compiler.getDiagnostic().lineNumber * 5 + (int) Compiler.getDiagnostic().endOffset;
+                        int endOffset = (int) Compiler.getDiagnostic().lineNumber * 5 + (int) Compiler.getDiagnostic().endOffset;
                         int columnNumber = (int) Compiler.getDiagnostic().columnNumber;
                         if (startOffset == endOffset) {
                             startOffset = endOffset - columnNumber;
                         }
-                        textArea.getHighlighter().addHighlight(startOffset, endOffset, errorHighlightPainter);
-                        textArea.getCaret().setBlinkRate(250);
-                        textArea.getCaret().setVisible(true);
-                        textArea.setCaretPosition(startOffset);
+                        SourceWindow.this.jta.getHighlighter().addHighlight(startOffset, endOffset, errorHighlightPainter);
+                        SourceWindow.this.jta.getCaret().setBlinkRate(250);
+                        SourceWindow.this.jta.getCaret().setVisible(true);
+                        SourceWindow.this.jta.setCaretPosition(startOffset);
                     }
-                } 
-				catch (BadLocationException ex) 
-				{
-                    LOG.error(ex);
+
+                } catch (BadLocationException ex) {
+                    LOGGER.error(ex);
                 }
+
                 // Reset the message buffer for the next compilation
                 sb.setLength(0);
             }
         });
 
-        saveButton.addActionListener((ActionEvent e) -> {
+        saveButt.addActionListener((ActionEvent e) -> {
             String fn = getFileName();
             saveChooser.setSelectedFile(new File(saveChooser.getCurrentDirectory(), fn));
             int ret = saveChooser.showSaveDialog(SourceWindow.this);
@@ -227,14 +196,14 @@ public class SourceWindow extends JFrame
             
             try {
                 try (FileWriter fw = new FileWriter(f)) {
-                    fw.write(sourceCode);
+                    fw.write(src);
                 }
-                dispose();
+                SourceWindow.this.dispose();
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Exception on source file write" +
                         "\n" + f.getName() +
                         "\n" + ex.getMessage(),
-                        "File Input/Output Error", JOptionPane.ERROR_MESSAGE);
+                        "File I/O Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -246,13 +215,13 @@ public class SourceWindow extends JFrame
         }
     }
 
-    private String addLineNumbers(String src) {
+    private String addLineNums(String src) {
         // Choose the right lineNumber ending
-        String le  = "\r\n";
+        String le = "\r\n";
         String le2 = "\n";
         String le3 = "\r";
 
-        String[] sa  = src.split(le);
+        String[] sa = src.split(le);
         String[] sa2 = src.split(le2);
         String[] sa3 = src.split(le3);
 
@@ -287,64 +256,59 @@ public class SourceWindow extends JFrame
      * Get the file name from the class statement
      * @return classname+".java"
      */
-    private String getFileName()
-	{
-        String[] sourceCodeSplit = sourceCode.split("public class "); // find the class, won't work if there is the word 'class' in top comments
-        if (sourceCodeSplit.length >= 2) 
-		{
-            sourceCodeSplit = sourceCodeSplit[1].split("\\b");            // find the space after the class
-            int index = 0;
-            while (index < sourceCodeSplit.length) 
-			{
-                if (sourceCodeSplit[index] != null && sourceCodeSplit[index].trim().length() > 0) 
-				{
-                    return sourceCodeSplit[index].trim() + ".java"; // ClassName.java
+    private String getFileName() {
+        String[] nm = src.split("\\bclass\\b"); // find the class, won't work if there is the word 'class' in top comments
+        if (nm.length >= 2) {
+            nm = nm[1].split("\\b");            // find the space after the class
+            int idx = 0;
+            while (idx < nm.length) {
+                if (nm[idx] != null && nm[idx].trim().length() > 0) {
+                    return nm[idx].trim() + ".java";
                 }
-                index++;
+                idx++;
             }
         }
-		LOG.error ("SourceWindow for compilation failed to find class name for file");
         return "unnamed.java";
     }
     private String startSearchHandle = "Find";
     private String searchAgainHandle = "Find next";
 
     private void setupSearchKeys() {
-        searcher = new Searcher(textArea, contentPane);
+        searcher = new Searcher(jta, contentPane);
 
-        startAction = new AbstractAction(startSearchHandle) {
+        startAct = new AbstractAction(startSearchHandle) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 searcher.startSearch();
-                textArea.requestFocusInWindow();  // to make the selected text show up if button-initiated
+                jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
             }
         };
-        againAction = new AbstractAction(searchAgainHandle) {
+        againAct = new AbstractAction(searchAgainHandle) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 searcher.searchAgain();
-                textArea.requestFocusInWindow();  // to make the selected text show up if button-initiated
+                jta.requestFocusInWindow();  // to make the selected text show up if button-initiated
             }
         };
 
         // todo contentPane should work here so the focus can be on the bigger button, etc., and
         // the search will still be done.  I'm doing something wrong.
-        InputMap iMap = textArea/*contentPane*/.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        ActionMap aMap = textArea/*contentPane*/.getActionMap();
+        InputMap iMap = jta/*contentPane*/.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap aMap = jta/*contentPane*/.getActionMap();
 
         int cntlKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_F, cntlKeyMask);
         iMap.put(key, startSearchHandle);
-        aMap.put(startSearchHandle, startAction);
+        aMap.put(startSearchHandle, startAct);
 
         key = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
         iMap.put(key, searchAgainHandle);
-        aMap.put(searchAgainHandle, againAction);
+        aMap.put(searchAgainHandle, againAct);
 
         // Mac uses cmd-G
-        String vers = ViskitStatics.OPERATING_SYSTEM.toLowerCase();
+        String vers = VStatics.OPERATING_SYSTEM.toLowerCase();
         if (vers.contains("mac")) {
             key = KeyStroke.getKeyStroke(KeyEvent.VK_G, cntlKeyMask);
             iMap.put(key, searchAgainHandle);
@@ -352,10 +316,8 @@ public class SourceWindow extends JFrame
     }
 }
 
-class Searcher
-{
-    static final Logger LOG = LogUtilities.getLogger(Searcher.class);
-	
+class Searcher {
+
     JTextComponent jtc;
     Document doc;
     JComponent comp;
@@ -382,7 +344,7 @@ class Searcher
                 mat = null;
             }
         } catch (BadLocationException e1) {
-            LOG.error(e1.getMessage(), e1);
+            System.err.println(e1.getMessage());
         }
     }
 
@@ -409,13 +371,13 @@ class Searcher
 }
 
 @SuppressWarnings("serial")
-class CompilationOutputDialog extends JDialog implements ActionListener {
+class sysOutDialog extends JDialog implements ActionListener {
 
-    private static CompilationOutputDialog dialog;
+    private static sysOutDialog dialog;
     private static String value = "";
     private JList<Object> list;
-    private JTextArea textArea;
-    private JScrollPane textScrollPane;
+    private JTextArea jta;
+    private JScrollPane jsp;
 
     /**
      * Set up and show the dialog.  The first Component argument
@@ -425,45 +387,43 @@ class CompilationOutputDialog extends JDialog implements ActionListener {
      * to come up with its left corner in the center of the screen;
      * otherwise, it should be the component on top of which the
      * dialog should appear.
-     * @param frameComponent
-     * @param locationComponent
+     * @param frameComp
+     * @param locationComp
      * @param labelText
      * @param title
      * @return the dialog for this SourceWindow
      */
-    public static String showDialog(Component frameComponent,
-            Component locationComponent,
+    public static String showDialog(Component frameComp,
+            Component locationComp,
             String labelText,
             String title) {
-        Frame frame = JOptionPane.getFrameForComponent(frameComponent);
-        dialog = new CompilationOutputDialog(frame,
-                locationComponent,
+        Frame frame = JOptionPane.getFrameForComponent(frameComp);
+        dialog = new sysOutDialog(frame,
+                locationComp,
                 labelText,
                 title);
         dialog.setVisible(true);
         return value;
     }
 
-    private CompilationOutputDialog(Frame frame,
-            Component locationComponent,
+    private sysOutDialog(Frame frame,
+            Component locationComp,
             String text,
             String title) {
-        super(frame, title + " compilation", true);
-		
-		this.setModal(false);
+        super(frame, title, true);
 
         //Create and initialize the buttons.
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener(CompilationOutputDialog.this);
-        getRootPane().setDefaultButton(okButton);
+        JButton cancelButton = new JButton("OK");
+        cancelButton.addActionListener(sysOutDialog.this);
+        getRootPane().setDefaultButton(cancelButton);
 
         //main part of the dialog
-        textArea = new JTextArea(text);
-        textArea.setCaretPosition(text.length());
-        textScrollPane = new JScrollPane(textArea);
-        textScrollPane.setPreferredSize(new Dimension(frame.getWidth() - 50, frame.getHeight() - 50));
-        textScrollPane.setAlignmentX(LEFT_ALIGNMENT);
-        textScrollPane.setBorder(BorderFactory.createEtchedBorder());
+        jta = new JTextArea(text);
+        jta.setCaretPosition(text.length());
+        jsp = new JScrollPane(jta);
+        jsp.setPreferredSize(new Dimension(frame.getWidth() - 50, frame.getHeight() - 50));
+        jsp.setAlignmentX(LEFT_ALIGNMENT);
+        jsp.setBorder(BorderFactory.createEtchedBorder());
 
         //Create a container so that we can add a title around
         //the scroll pane.  Can't add a title directly to the
@@ -475,33 +435,27 @@ class CompilationOutputDialog extends JDialog implements ActionListener {
         label.setLabelFor(list);
         listPane.add(label);
         listPane.add(Box.createRigidArea(new Dimension(0, 5)));
-        listPane.add(textScrollPane); //listScroller);
+        listPane.add(jsp); //listScroller);
         listPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Lay out the buttons from left to right.
+        //Lay out the buttons from left to right.
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         buttonPane.add(Box.createHorizontalGlue());
-        buttonPane.add(okButton);
+        buttonPane.add(cancelButton);
 
-        // Put everything together, using the content pane's BorderLayout.
+        //Put everything together, using the content pane's BorderLayout.
         Container contentPane = getContentPane();
         contentPane.add(listPane, BorderLayout.CENTER);
         contentPane.add(buttonPane, BorderLayout.PAGE_END);
         pack();
-		Dimension d = locationComponent.getSize(); // match
-		d.height = Math.min(d.height, 800); // no larger than 800x600
-		d.width  = Math.min(d.width,  600);
-		setSize(d);
-//        setLocationRelativeTo(locationComp);
-		this.setLocation(locationComponent.getLocation().x + (locationComponent.getWidth()), // shift right of center
-						 locationComponent.getLocation().y);
+        setLocationRelativeTo(locationComp);
     }
 
     //Handle clicks on the Set and Cancel buttons.
     @Override
     public void actionPerformed(ActionEvent e) {
-        CompilationOutputDialog.dialog.dispose();
+        sysOutDialog.dialog.dispose();
     }
 }

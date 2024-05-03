@@ -41,9 +41,9 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     private JPanel content;
     
     public QstatConsole() {
-        super("Visual Simkit (Viskit) Grid Queue Status Console");
+        super("Viskit Grid Queue Status Console");
         
-        addWindowListener(QstatConsole.this);
+        addWindowListener(this);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         content = new JPanel();
@@ -141,7 +141,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
                 textArea.setRows(lines > MIN_ROWS ? lines : MIN_ROWS);
                 textArea.setText(textArea.getText() + "\n" + data);
                
-            } catch (DoeException e) {
+            } catch (Exception e) {
                 textArea.setText("Can't qstat! \n" + e.toString());
             }
         }
@@ -162,7 +162,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
             slider.setMinorTickSpacing(2);
             slider.setPaintTicks(true);
             slider.setPaintLabels(true);
-            slider.addChangeListener(FrameRateSliderPanel.this);
+            slider.addChangeListener(this);
             slider.setToolTipText("Adjust number of queries per minute to qstat at the front end");
             sliderLabel = new JLabel("Queries Per Minute", JLabel.CENTER);
             sliderLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -204,7 +204,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
         @Override
         public void stateChanged(ChangeEvent changeEvent) {
             JSlider source = (JSlider) changeEvent.getSource();
-            int fpm = (int) source.getValue();
+            int fpm = source.getValue();
             if (!source.getValueIsAdjusting()) {
                 if (fpm == 0) {
                     timer.setDelay(MAX_FPM * 1000); // just set it big, will be paused anyway

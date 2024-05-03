@@ -51,7 +51,7 @@ public class ConditionalExpressionPanel extends JPanel {
         conditionalPanel.add(ifTextPan);
 
         conditionalTA = new JTextArea(3, 25);
-        conditionalTA.setText(edge.condition);
+        conditionalTA.setText(edge.conditional);
         conditionalTA.setEditable(true);
         JScrollPane conditionalJsp = new JScrollPane(conditionalTA);
         conditionalPanel.add(conditionalJsp);

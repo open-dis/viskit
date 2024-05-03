@@ -1,9 +1,12 @@
 package viskit;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import javax.swing.*;
 import javax.help.HelpBroker;
@@ -11,7 +14,6 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
-import org.apache.logging.log4j.Logger;
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 
@@ -19,181 +21,150 @@ import viskit.util.Version;
  * @version $Id$
  * @author  ahbuss
  */
-public class Help 
-{
-    static final Logger LOG = LogUtilities.getLogger(Help.class);
+public class Help {
 
     public static final Version VERSION = new Version("version.txt");
-    public static final String  VERSION_STRING = VERSION.getVersionString();
-    public static final String  CR = "<br>";
-    public static final String  ABOUT_EVENT_GRAPH =
-            "Visual Simkit (Viskit) Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
+    public static final String VERSION_STRING = VERSION.getVersionString();
+    public static final String CR = "<br>";
+    public static final String ABOUT_EG_STRING =
+            "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
-    public static final String  ABOUT_ASSEMBLY =
-            "Assembly Editor for Visual Simkit (Viskit)" + CR + "   version " + VERSION_STRING + CR
+    public static final String ABOUT_ASSEMBLY_STRING =
+            "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
-    public static final String   SIMKIT_URL = "https://github.com/ahbuss/Simkit";
-    public static final String   VISKIT_URL = "http://eos.nps.edu/Viskit";
-    public static final String BUGZILLA_URL = "https://eos.nps.edu/bugzilla";
-    public static final String   DEVELOPERS =
+    public static final String SIMKIT_URL = "https://github.com/ahbuss/Simkit/";
+    public static final String VISKIT_URL = "https://github.com/terry-norbraten/viskit";
+    public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
+    public static final String DEVELOPERS =
             "Copyright &copy; 2004-2022 under the Lesser GNU Public License (LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Arnold Buss"     + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Terry Norbraten" + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Mike Bailey"     + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Don Brutzman"    + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Rick Goldberg"   + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Don McGregor"    + CR
-            + "&nbsp;&nbsp;&nbsp;" + "Patrick Sullivan";
-	
-    public static final String SIMKIT_WEBSITE =
-            CR + CR 
-            + "Simkit home page: "
+            + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
+            + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
+            + "&nbsp;&nbsp;&nbsp;Rick Goldberg" + CR
+            + "&nbsp;&nbsp;&nbsp;Don McGregor" + CR
+            + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
+            + "&nbsp;&nbsp;&nbsp;Patrick Sullivan" + CR
+            + "&nbsp;&nbsp;&nbsp;Terry Norbraten";
+    public static final String SIMKIT_PAGE =
+            CR
+            + "Visit the Simkit home page at" + CR
             + LinkURLString(SIMKIT_URL) + CR;
-	
-    public static final String VISKIT_WEBSITE = CR
-            + "Visual Simkit (Viskit) home page: " + CR
+    public static final String VISKIT_PAGE = CR
+            + "Visit the Viskit home page at" + CR
             + LinkURLString(VISKIT_URL);
-    public static final String VERSIONS_INFORMATION =
+    public static final String VERSIONS =
             "<hr>Simkit Version: "
             + simkit.Version.getVersion()
             + CR + "Java version: "
             + System.getProperty("java.version");
-	
-    public static final String BUGZILLA_PAGE = CR // TODO currently inactive
-            + "Please register for the Visual Simkit (Viskit) Issue Tracker:" + CR
+    public static final String BUGZILLA_PAGE = CR
+            + "Please register for the Viskit Issue tracker:" + CR
             + LinkURLString(BUGZILLA_URL);
 
-    private HelpBroker helpBroker;
+    private HelpBroker hb;
 
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private final Component      TUTORIAL_COMPONENT;
-	private final String         TUTORIAL_COMPONENT_ID = "Tutorial"; // must match help TOC identifier
-    private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
+    private Component TUTORIAL_COMPONENT;
+    private ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
-    private       Component   parent;
-    private final Icon        viskitLogoIcon;
-    private final JEditorPane aboutEventGraphEditorPane;
-    private final JEditorPane aboutAssemblyEditorPane;
+    private Component parent;
+    private Icon icon;
+    private JEditorPane aboutEGEditorPane;
+    private JEditorPane aboutAssemblyEditorPane;
 
     /** Creates a new instance of Help
      * @param parent main frame to center on
      */
-    public Help(Component parent)
-	{
+    public Help(Component parent) {
         this.parent = parent;
 
-        ClassLoader classLoader = viskit.Help.class.getClassLoader();
-        URL helpSetURL = HelpSet.findHelpSet(classLoader, "viskit/javahelp/vHelpSet.hs");
+        ClassLoader cl = viskit.Help.class.getClassLoader();
+        URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
         try {
-            helpBroker = new HelpSet(null, helpSetURL).createHelpBroker();
-			helpBroker.setCurrentView("Introduction"); // initial page to view
-        } 
-		catch (HelpSetException e)
-		{
+            hb = new HelpSet(null, helpSetURL).createHelpBroker();
+        } catch (HelpSetException e) {
 //        e.printStackTrace();
-            LOG.error ("Unable to load help set", e);
+            LogUtils.getLogger(Help.class).error(e);
         }
 
         // Here we're setting up the action event peripherals for the tutorial menu selection
-        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(helpBroker);
-        TUTORIAL_COMPONENT         = new Button();
+        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(hb);
+        TUTORIAL_COMPONENT = new Button();
 
-        CSH.setHelpIDString(TUTORIAL_COMPONENT, TUTORIAL_COMPONENT_ID);
+        CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
 
-        viskitLogoIcon = new ImageIcon(
-                ViskitGlobals.instance().getWorkClassLoader().getResource(
+        icon = new ImageIcon(
+                VGlobals.instance().getWorkClassLoader().getResource(
                 "viskit/images/ViskitLogo.png"));
 
-        BrowserLauncher browserLauncher = new BrowserLauncher(null);
+        BrowserLauncher bl = new BrowserLauncher(null);
         SwingHelpUtilities.setContentViewerUI("viskit.util.BrowserLauncher");
 
-        aboutEventGraphEditorPane = new JEditorPane();
-        aboutEventGraphEditorPane.addHyperlinkListener(browserLauncher);
-        aboutEventGraphEditorPane.setContentType("text/html");
-        aboutEventGraphEditorPane.setEditable(false);
-        aboutEventGraphEditorPane.setText(ABOUT_EVENT_GRAPH
-                + DEVELOPERS + CR + VISKIT_WEBSITE 
-			 // + BUGZILLA_PAGE
-                + SIMKIT_WEBSITE 
-                + VERSIONS_INFORMATION + CR + CR
-        );
+        aboutEGEditorPane = new JEditorPane();
+        aboutEGEditorPane.addHyperlinkListener(bl);
+        aboutEGEditorPane.setContentType("text/html");
+        aboutEGEditorPane.setEditable(false);
+        aboutEGEditorPane.setText(ABOUT_EG_STRING
+                + DEVELOPERS + CR + VISKIT_PAGE //+ BUGZILLA_PAGE
+                + SIMKIT_PAGE + VERSIONS);
 
         aboutAssemblyEditorPane = new JEditorPane();
-        aboutAssemblyEditorPane.addHyperlinkListener(browserLauncher);
+        aboutAssemblyEditorPane.addHyperlinkListener(bl);
         aboutAssemblyEditorPane.setContentType("text/html");
         aboutAssemblyEditorPane.setEditable(false);
-        aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY
-                + DEVELOPERS 
-//                + CR + VISKIT_WEBSITE
-			 // + BUGZILLA_PAGE
-                + SIMKIT_WEBSITE
-        );
+        aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY_STRING
+                + DEVELOPERS + CR + VISKIT_PAGE //+ BUGZILLA_PAGE
+                + SIMKIT_PAGE);
     }
 
-    public void aboutEventGraphEditor() 
-	{
-        JOptionPane.showMessageDialog(parent, aboutEventGraphEditorPane,
-                "About Visual Simkit (Viskit) Event Graph Editor...",
-                JOptionPane.OK_OPTION, viskitLogoIcon);
+    public void aboutEventGraphEditor() {
+        JOptionPane.showMessageDialog(parent, aboutEGEditorPane,
+                "About Viskit Event Graph Editor...",
+                JOptionPane.OK_OPTION, icon);
     }
 
-    public final static String SHOW_HELP_ABOUT_ASSEMBLY_METHOD = "aboutAssemblyEditor"; // must match following method name.  not possible to accomplish this programmatically.
-    public void aboutAssemblyEditor() // method name must exactly match preceding string value
-	{
+    public void aboutAssemblyEditor() {
         JOptionPane.showMessageDialog(parent, aboutAssemblyEditorPane,
-                "About Visual Simkit (Viskit) Assembly Editor...",
-                JOptionPane.OK_OPTION, viskitLogoIcon);
+                "About Viskit Assembly Editor...",
+                JOptionPane.OK_OPTION, icon);
     }
 
-    public final static String SHOW_HELP_CONTENTS_METHOD = "showHelpContents"; // must match following method name.  not possible to accomplish this programmatically.
-    public void showHelpContents() // method name must exactly match preceding string value
-	{
-        helpBroker.setCurrentView("Introduction"); // initial page to view
-        helpBroker.setDisplayed(true);
+    public void doContents() {
+        hb.setDisplayed(true);
+        hb.setCurrentView("TOC");
     }
 
-    public final static String SHOW_HELP_SEARCH_METHOD = "showHelpSearch"; // must match following method name.  not possible to accomplish this programmatically.
-    public void showHelpSearch() // method name must exactly match preceding string value
-	{
-        helpBroker.setCurrentView("Search");
-        helpBroker.setDisplayed(true);
+    public void doSearch() {
+        hb.setDisplayed(true);
+        hb.setCurrentView("Search");
     }
 
-    public final static String SHOW_HELP_TUTORIAL_METHOD = "showHelpTutorial"; // must match following method name.  not possible to accomplish this programmatically.
-    public void showHelpTutorial() // method name must exactly match preceding string value
-	{
-//        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "Tutorial"); // TODO
-//        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(actionEvent);
-        helpBroker.setCurrentView("Tutorial"); // initial page to view (not tree directory)
-        helpBroker.setDisplayed(true);
+    public void doTutorial() {
+        ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
+        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }
 
-    public void mainFrameLocated(Rectangle bounds)
-	{
-        Point panelLocation = new Point(bounds.x, bounds.y);
-        Dimension  d = new Dimension(bounds.width, bounds.height);
+    public void mainFrameLocated(Rectangle bounds) {
+        Point p = new Point(bounds.x, bounds.y);
+        Dimension d = new Dimension(bounds.width, bounds.height);
         Dimension hd = new Dimension(1200, 700);
-        helpBroker.setSize(hd);
-        panelLocation.x = Math.max(panelLocation.x + d.width  / 2 - hd.width  / 2, 0); // non-negative
-        panelLocation.y = Math.max(panelLocation.y + d.height / 2 - hd.height / 2, 0);
-        helpBroker.setLocation(panelLocation);
+        hb.setSize(hd);
+        p.x = p.x + d.width / 2 - hd.width / 2;
+        p.y = p.y + d.height / 2 - hd.height / 2;
+        hb.setLocation(p);
     }
 
-    public static String LinkURLString(String urlString) 
-	{
+    public static String LinkURLString(String urlString) {
         String linkString = "";
         try {
-            URL url = new URL(urlString);
+            URL url = new URI(urlString).toURL();
             linkString = "<a href = " + url + ">" + url + "</a>";
-        } 
-		catch (MalformedURLException ex) {}
+        } catch (MalformedURLException | URISyntaxException ex) {}
         return linkString;
 
     }
 
-    public static void main(String[] args)
-	{
-        System.out.println("Visual Simkit (Viskit) Discrete Event Simulation (DES) interface: " + VERSION);
+    public static void main(String[] args) {
+        System.out.println("Viskit DES interface: " + VERSION);
     }
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -75,7 +75,7 @@ public class CryptoMethods
       return getString(ciphertext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        LogUtilities.getLogger(CryptoMethods.class).error(e);
+        LogUtils.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }
@@ -91,7 +91,7 @@ public class CryptoMethods
       return new String(cleartext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        LogUtilities.getLogger(CryptoMethods.class).error(e);
+        LogUtils.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }
@@ -106,7 +106,7 @@ public class CryptoMethods
       return s;
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-        LogUtilities.getLogger(CryptoMethods.class).error(e);
+        LogUtils.getLogger(CryptoMethods.class).error(e);
     }
     return null;
   }

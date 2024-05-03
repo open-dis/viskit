@@ -1,7 +1,10 @@
-/build/classes/
+.DS_Store
+/build
+/installer/stage/
+/installer/build/
 /nbproject/private/
 /src/viskit/xsd/bindings/
-**/.DS_Store
-/.DS_Store
 /MyViskitProjects/DefaultProject/build/
+/MyViskitProjects/DefaultProject/lib/
 /MyViskitProjects/DefaultProject/AnalystReports/
+/MANIFEST.MF

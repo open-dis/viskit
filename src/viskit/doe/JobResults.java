@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -146,9 +146,9 @@ public class JobResults extends JFrame {
         yAxis.setLowerMargin(0.025d);
         plot.setRangeAxis(yAxis);
 
-        plot.getRenderer().setBaseShape(new Ellipse2D.Double(-2.0, -2.0, 5.0, 5.0));
-        plot.getRenderer().setBasePaint(new Color(255, 0, 0, 128));
-        plot.getRenderer().setBaseToolTipGenerator(
+        plot.getRenderer().setDefaultShape(new Ellipse2D.Double(-2.0, -2.0, 5.0, 5.0));
+        plot.getRenderer().setDefaultPaint(new Color(255, 0, 0, 128));
+        plot.getRenderer().setDefaultToolTipGenerator(
                 new XYToolTipGenerator() {
 
                     StringBuffer sb = new StringBuffer();
@@ -198,11 +198,9 @@ class MyDataSet extends AbstractXYDataset implements XYDataset {
     public void addToTail(JobLauncher.Gresults res) {
         v.add(res);
         if (v.size() > 200) {
-            mom.plot.getRenderer().setBaseShape(new Ellipse2D.Double(-1.0, -1.0, 3.0, 3.0));
-//      mom.repAxis.setTickUnit(new NumberTickUnit(20.0d));
+            mom.plot.getRenderer().setDefaultShape(new Ellipse2D.Double(-1.0, -1.0, 3.0, 3.0));
         } else if (v.size() > 100) {
-            mom.plot.getRenderer().setBaseShape(new Ellipse2D.Double(-1.0, -1.0, 3.0, 3.0));
-//      mom.repAxis.setTickUnit(new NumberTickUnit(10.0d));
+            mom.plot.getRenderer().setDefaultShape(new Ellipse2D.Double(-1.0, -1.0, 3.0, 3.0));
         }
         this.fireDatasetChanged();
     }
@@ -237,6 +235,6 @@ class MyDataSet extends AbstractXYDataset implements XYDataset {
         if (!results.resultsValid) {
             return -1d;
         }
-        return (results.resultsMean < 1.0d) ? Double.valueOf(1d) : Double.valueOf(0d);
+        return (results.resultsMean < 1.0d) ? 1.0d : 0.0d;
     }
 }

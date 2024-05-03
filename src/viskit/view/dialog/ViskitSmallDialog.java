@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
@@ -11,7 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import viskit.ViskitStatics;
+import viskit.VStatics;
 
 /** This is a class to help in code reuse.  There are several small Dialogs
  * which are all used the same way.  This class puts the common code in a single
@@ -30,173 +30,127 @@ import viskit.ViskitStatics;
  * @since May 3, 2004 : 2:39:34 PM
  * @version $Id$
  */
-public abstract class ViskitSmallDialog extends JDialog
-{
+public abstract class ViskitSmallDialog extends JDialog {
+
     protected static boolean modified = false;
     private static ViskitSmallDialog dialog;
-	
-	/** Indicates whether a new object is being initialized, set prior to invoking dialog */
-	private static boolean newObjectInitialization = false; 
 
-    protected static boolean showDialog(String className, JFrame frame, Object var)
-	{
-        if (dialog == null) 
-		{
+    protected static boolean showDialog(String className, JFrame f, Object var) {
+        if (dialog == null) {
             try {
-                Class<?>[] args = new Class[] 
-				{
-                    ViskitStatics.ClassForName("javax.swing.JFrame"),
-                    ViskitStatics.ClassForName(ViskitStatics.JAVA_LANG_OBJECT)
+                Class[] args = new Class[] {
+                    VStatics.classForName("javax.swing.JFrame"),
+                    VStatics.classForName(VStatics.JAVA_LANG_OBJECT)
                 };
-                Class<?> c = ViskitStatics.ClassForName(className);
-                Constructor<?> constr = c.getDeclaredConstructor(args);
-                dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {frame, var});
-            } 
-			catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-                LogUtilities.getLogger(ViskitSmallDialog.class).error(e);
+                Class<?> c = VStatics.classForName(className);
+                Constructor constr = c.getDeclaredConstructor(args);
+                dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
+            } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
+                LogUtils.getLogger(ViskitSmallDialog.class).error(e);
             }
-        } 
-		else 
-		{
-            dialog.setParameters(frame, var);
+        } else {
+            dialog.setParams(f, var);
         }
 
-        dialog.setVisible(true); // this call blocks
-        
+        dialog.setVisible(true);
+        // above call blocks
         return modified;
     }
 
-    abstract void setParameters(Component comp, Object o);
+    abstract void setParams(Component comp, Object o);
 
     abstract void unloadWidgets();
 
-    protected ViskitSmallDialog(JFrame parent, String title, boolean bool) 
-	{
+    protected ViskitSmallDialog(JFrame parent, String title, boolean bool) {
         super(parent, title, bool);
     }
 
-    protected void setMaxHeight(JComponent c) 
-	{
+    protected void setMaxHeight(JComponent c) {
         Dimension d = c.getPreferredSize();
         d.width = Integer.MAX_VALUE;
         c.setMaximumSize(d);
     }
 
-	/**
-	 * @return the newObjectInitialization
-	 */
-	public boolean isNewObjectInitialization() 
-	{
-		return newObjectInitialization;
-	}
+    class cancelButtonListener implements ActionListener {
 
-	/**
-	 * @param newObjectInitialization the newObjectInitialization to set
-	 */
-	public static void setNewObjectInitialization(boolean newObjectInitialization) 
-	{
-		if (newObjectInitialization)
-            modified = true; // enables Apply Settings button
-		ViskitSmallDialog.newObjectInitialization = newObjectInitialization;
-	}
-
-    class CancelButtonListener implements ActionListener
-	{
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
+        public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
         }
     }
 
     /** NOT USED */
-    class ApplyButtonListener implements ActionListener 
-	{
+    class applyButtonListener implements ActionListener {
+
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
-            if (modified) 
-			{
+        public void actionPerformed(ActionEvent event) {
+            if (modified) {
                 unloadWidgets();
             }
             dispose();
         }
     }
 
-    class EnableApplyButtonListener implements ActionListener, DocumentListener 
-	{
-        private final JButton applyButton;
+    class enableApplyButtonListener implements ActionListener, DocumentListener {
 
-        EnableApplyButtonListener(JButton applyButton) 
-		{
-            this.applyButton = applyButton;
+        private JButton applyButt;
+
+        enableApplyButtonListener(JButton applyButton) {
+            this.applyButt = applyButton;
         }
 
         @Override
-        public void changedUpdate(DocumentEvent e) 
-		{
-            enableButton();
+        public void changedUpdate(DocumentEvent e) {
+            enableButt();
         }
 
         @Override
-        public void insertUpdate(DocumentEvent e) 
-		{
-            enableButton();
+        public void insertUpdate(DocumentEvent e) {
+            enableButt();
         }
 
         @Override
-        public void removeUpdate(DocumentEvent e) 
-		{
-            enableButton();
+        public void removeUpdate(DocumentEvent e) {
+            enableButt();
         }
 
         @Override
-        public void actionPerformed(ActionEvent event) 
-		{
-            enableButton();
+        public void actionPerformed(ActionEvent event) {
+            enableButt();
         }
 
-        private void enableButton() 
-		{
+        private void enableButt() {
             modified = true;
-            applyButton.setEnabled(true);
-            getRootPane().setDefaultButton(applyButton);       // in JDialog
+            applyButt.setEnabled(true);
+            getRootPane().setDefaultButton(applyButt);       // in JDialog
         }
     }
 
-    class WindowClosingListener extends WindowAdapter 
-	{
-        private final Component parent;
-        private final JButton okButton;
-        private final JButton cancelButton;
+    class WindowClosingListener extends WindowAdapter {
 
-        WindowClosingListener(Component parent, JButton okButton, JButton cancelButton) 
-		{
+        private Component parent;
+        private JButton okButt;
+        private JButton cancelButt;
+
+        WindowClosingListener(Component parent, JButton okButt, JButton cancelButt) {
             this.parent = parent;
-            this.okButton = okButton;
-            this.cancelButton = cancelButton;
+            this.okButt = okButt;
+            this.cancelButt = cancelButt;
         }
 
         @Override
-        public void windowClosing(WindowEvent e) 
-		{
-            if (modified) 
-			{
-                int returnValue = JOptionPane.showConfirmDialog(parent, "Apply changes?",
+        public void windowClosing(WindowEvent e) {
+            if (modified) {
+                int ret = JOptionPane.showConfirmDialog(parent, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) 
-				{
-                    okButton.doClick();
-                } 
-				else 
-				{
-                    cancelButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
+                } else {
+                    cancelButt.doClick();
                 }
-            } 
-			else 
-			{
-                cancelButton.doClick();
+            } else {
+                cancelButt.doClick();
             }
         }
     }

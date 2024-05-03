@@ -7,15 +7,18 @@
  */
 package viskit.test;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Vector;
+import java.util.logging.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  *
@@ -24,12 +27,15 @@ import viskit.ViskitGlobals;
  */
 public class TestGridkitLogin extends Thread {
 
-    static Logger LOG = LogUtilities.getLogger(TestGridkitLogin.class);
+    static Logger LOG = LogUtils.getLogger(TestGridkitLogin.class);
 
     XmlRpcClientLite xmlrpc;
 
     /**
      * Creates a new instance of TestGridkitLogin
+     * @param server
+     * @param port
+     * @throws java.lang.Exception
      */
     public TestGridkitLogin(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server, port);
@@ -142,9 +148,10 @@ public class TestGridkitLogin extends Thread {
 
             // now send a jar to newbies new session
 
-            URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
+            URL u = VGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
+            
             LOG.info("Opening " + u);
-            u = new URL((u.getFile().split("!"))[0].trim());
+            u = new URI((u.getFile().split("!"))[0].trim()).toURL();
             File jar = new File(u.getFile());
             LOG.info("Opening " + jar);
             java.io.InputStream fis = u.openStream();
@@ -181,8 +188,8 @@ public class TestGridkitLogin extends Thread {
                 chunks--;
             }
 
-        } catch (XmlRpcException | IOException e) {
-            LOG.error(e);
+        } catch (XmlRpcException | IOException | URISyntaxException ex) {
+            java.util.logging.Logger.getLogger(TestGridkitLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

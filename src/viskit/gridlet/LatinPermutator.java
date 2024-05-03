@@ -162,8 +162,8 @@ public class LatinPermutator {
         }
 
         for ( int i = 0; i < size; i ++) {
-            row[i] = r.remove((int) ((double) r.size() * rnd.draw()));
-            col[i] = c.remove((int) ((double) c.size() * rnd.draw()));
+            row[i] = r.remove((int) (r.size() * rnd.draw()));
+            col[i] = c.remove((int) (c.size() * rnd.draw()));
         }
     }
 

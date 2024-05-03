@@ -1,6 +1,6 @@
 package viskit.gridlet;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.doe.DoeException;
 import viskit.doe.LocalBootLoader;
 
@@ -25,7 +25,7 @@ import viskit.doe.LocalBootLoader;
 @SuppressWarnings("serial")
 public class LocalTaskQueue extends ArrayList<Object> {
 
-    static final Logger LOG = LogUtilities.getLogger(LocalTaskQueue.class);
+    static Logger log = LogUtils.getLogger(LocalTaskQueue.class);
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;
@@ -73,7 +73,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 return true;
             }
         } else if ((Boolean) o) {
-            Object parent = ViskitGlobals.instance().getWorkClassLoader();
+            Object parent = VGlobals.instance().getWorkClassLoader();
             Class<?> parentz = parent.getClass();
             try {
                 Method getExtUrls = parentz.getMethod("getExtUrls");
@@ -114,25 +114,13 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 // so send as Object
                 //task.setGridRunner(gridRunner);
                 mthd = gridletz.getMethod("setGridRunner",Object.class);
-                mthd.invoke(task,(Object)gridRunner);
+                mthd.invoke(task, gridRunner);
 
                 super.set(i, task);
                 ((Thread) task).start();
 
-            } catch (NoSuchMethodException e) {
-                LOG.error(e);
-            } catch (SecurityException e) {
-                LOG.error(e);
-            } catch (IllegalAccessException e) {
-                LOG.error(e);
-            } catch (IllegalArgumentException e) {
-                LOG.error(e);
-            } catch (InvocationTargetException e) {
-                LOG.error(e);
-            } catch (InstantiationException e) {
-                LOG.error(e);
-            } catch (ClassNotFoundException e) {
-                LOG.error(e);
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException | ClassNotFoundException e) {
+                log.error(e);
             }
         }
         return false;

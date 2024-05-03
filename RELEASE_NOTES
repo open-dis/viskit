@@ -15,18 +15,20 @@ Post release fixes / upgrades / issues:
 
   Select the Platform L&F for OS X users as the work around.  On Win machines,
   the platform L&F is not the best choice as the background coloring for tabs is
-  quite quirky.  The default L&F for Win machines is recommended.
+  quite quirky. The default L&F for Win machines is recommended.
 
   On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
   JGraph palette will revert back to the select cursor (arrow) when a node or
-  edge inspector pops up.  If the user selects cancel or schedule mode again,
+  edge inspector pops up. If the user selects cancel or schedule mode again,
   the cursor will not change (remains in select) mode until the user moves the
   cursor out of the JPanel containing the JGraph component and menu bar up to
-  the parent Frame's title bar.  Then it will change as expected.
+  the parent Frame's title bar. Then it will change as expected. UPDATE: Haven't
+  seen this issue occur in later versions of JDK 17+ and later macOS versions.
+  TDN 19 FEB 2023.
 
   Due to the way the SimkitXML2Java generates EG extensions of super
   SimEntities, a default constructor will not be generated in subclasses
-  accordingly.  When it is time to parameterize EG constructors at Assy creation
+  accordingly. When it is time to parameterize EG constructors at Assy creation
   time, an EG with a default (no arg) constructor will conveniently establish a
   Random Variate Factory instance automatically within the Event Node Inspector.
   A subclass of a SimEntity will not automatically establish a RVF instance,
@@ -36,21 +38,21 @@ Post release fixes / upgrades / issues:
 
   At this time, the XML to Java translators cannot handle a super type generic
   container declaration in XML, then instantiate it as a dynamic type, i.e.
-  List<String> list = new ArrayList<>();  The static declaration must match the
+  List<String> list = new ArrayList<>(). The static declaration must match the
   dynamic type accordingly.
 
   Because of the unique nature of XML IDs, we are not able to have similar
   method names, i.e. Arrival, in an EG file even with differing method
-  signatures.  As such, subclassing is still possible, but the user will have
+  signatures. As such, subclassing is still possible, but the user will have
   to manually name Events in this manner using an underscore character, i.e.
   Arrival, Arrival_e (where the "e" hints at the type argument of the event).
 
   If the CNTL key is held down while attempting to drag an edge control point
-  a IOOBE will be thrown by JGraph v5.14.0.  This may be fixed in a subsequent
+  a IOOBE will be thrown by JGraph v5.14.0. This may be fixed in a subsequent
   release of JGraphX (new code base name) should we decide to upgrade to v6+.
 
   If a single Assy file was closed, it will close all open EGs file including
-  non-associated EGs.  This happens due to the EG caching system that relies on
+  non-associated EGs. This happens due to the EG caching system that relies on
   parsing SimEntities of Assy files to know which EG to keep open
 
   If one strays from the Java Bean convention of naming variables by starting
@@ -62,14 +64,29 @@ Post release fixes / upgrades / issues:
   BeanShell checking of code snippets was a good idea in the beginning, but
   since we are only giving BeanShell a snippet and not the whole source file, it
   can only perform very minor primitive checking and some instantiating checks
-  of generic containers.  The compiler will notify of any errors at which time
+  of generic containers. The compiler will notify of any errors at which time
   the user can investigate and fix during EG or Assy authoring.
 
   ****** FIXES / UPGRADES:
 
+    Updated most 3rd party libs, esp. Commons Config to fix File menu histories
+    not being retained for next start of the application.
+
+    Simkit updated to v1.5.6
+
+    Fixed unit tests to run independently in their own ant target, some were 
+    dormant.
+
+    Tested on JDK 22.0.1
+
 Release: 1.0.16(December 13, 2022)
 -----------------------------------
 Major changes since 1.0.15
+
+    Fix to JAXB exception for not finding files from deleted project spaces.
+
+    Fixed not being able to select a scheduling or cancelling edge to invoke its
+    inspector (editor). Event clicks were not happening in the EDT.
 
     Fixed NPE from version attempting to read SVN strings, which are no longer
     relevant since switching to git.
@@ -89,26 +106,26 @@ Major changes since 1.0.10:
 
   Moved codebase to new repository at: https://gitlab.nps.edu/tdnorbra/viskit
   The codebase was forked at R2900 from the old SVN repository at:
-  https://eos.nps.edu/wcm/Viskit.  Due to the many refactorings that took place
+  https://eos.nps.edu/wcm/Viskit. Due to the many refactorings that took place
   since R2900 (09 DEC 2015), R2900 marks the revision that was the last known
-  functional build of Viskit.  Rather than branch at the original SVN site, it
+  functional build of Viskit. Rather than branch at the original SVN site, it
   was decided to move to a more functional repository for version control w/ 
   Git.
 
   EventNodes that are similarly named can be achieved using an underscore
-  character, i.e. Arrival, Arrival_e.  The "e" would denote an event argument
-  name.  The EventNode will graphically render correctly without the underscore
+  character, i.e. Arrival, Arrival_e. The "e" would denote an event argument
+  name. The EventNode will graphically render correctly without the underscore
   character and the generated java code will observe overloaded method names.
 
   We now label the name of the parameter in addition to its type for the Event
-  Graph Node Inspector Dialog's Instantiation Panels.  This will aid in proper
+  Graph Node Inspector Dialog's Instantiation Panels. This will aid in proper
   EG parameterization
 
-  JavaHelp contents now render external links.  Update jhall.jar to v2.0_05
+  JavaHelp contents now render external links. Update jhall.jar to v2.0_05
   to account for missing helper classes from v2.0.0.
 
   Config files for initial startup will now force the platform L&F for Macs and
-  leave the default L&F for Win and other machines.  This is due to what is
+  leave the default L&F for Win and other machines. This is due to what is
   described above under issues.
 
   Now using relative paths for all images generated for the Analyst Report
@@ -126,10 +143,10 @@ Release: 1.0.5(June 01, 2015)
 Major changes since 1.0.0:
 
   Fixed NPE when unqualified names were being used for local variables as well
-  as in parameters.  User is now notified to fix by stating qualified names.
+  as in parameters. User is now notified to fix by stating qualified names.
 
   Fixed issue where user desires a specific replication to be verbose and only
-  that one in particular.  If a specific rep. is given, that will uncheck the
+  that one in particular. If a specific rep. is given, that will uncheck the
   verbose box
 
   Since canceling edges to nodes with parameters do not have to actually send
@@ -159,8 +176,8 @@ Major changes since 1.0.0:
   Assy. runtime causing a NPE and incorrect stat output due to name mismatches.
 
   Fixed an issue where the default Random Number Generator's seed reset call was
-  performed incorrectly and was unnecessary.  The default RNG is the Mersenne
-  Twister who's seed state is generated at instantiation time in Simkit with a
+  performed incorrectly and was unnecessary. The default RNG is the Mersenne
+  Twister with a seed state generated at instantiation time in Simkit with a
   default seed.
 
   Fixed issue when a user used the Assy editor's recent project's list to
@@ -173,7 +190,7 @@ Major changes since 1.0.0:
   during SimEntity parameterization at Assy. creation time.
 
   Major refactor to implement a combo box selection for scheduling edge time
-  delays.  Can now select parameters, local or argument vars and invoke methods,
+  delays. Can now select parameters, local or argument vars and invoke methods,
   or simply type in a delay value
 
   Fixed a potential NPE issue in the File Based Assembly Node (FBAN) when

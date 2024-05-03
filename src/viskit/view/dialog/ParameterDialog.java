@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.ViskitParameter;
+import viskit.model.vParameter;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -24,109 +24,94 @@ import viskit.ViskitGlobals;
  *
  * @author DMcG
  */
-public class ParameterDialog extends JDialog 
-{
+public class ParameterDialog extends JDialog {
+
     private static ParameterDialog dialog;
     private static boolean modified = false;
-    public static String newName,  newType,  newDescription;
+    public static String newName,  newType,  newComment;
     private static int count = 0;
 
-    private ViskitParameter parameter;
-	Container container;
-	private final JPanel contentPanel = new JPanel();
-	/** Text field that holds the parameter name */
-    private final JTextField parameterNameField = new JTextField(15);
-	/** Text field that holds the expression */
-    private final JTextField expressionField = new JTextField(25);
-	/** Text field that holds the description */
-    private final JTextField descriptionField = new JTextField(25);
-	/** Editable combo box that lets us select a type */
-    private       JComboBox<String> parameterTypeCombo;
-    private final JButton     okButton = new JButton("Apply changes");
-    private final JButton cancelButton = new JButton("Cancel");
+    private JTextField parameterNameField;    // Text field that holds the parameter name
+    private JTextField expressionField;       // Text field that holds the expression
+    private JTextField commentField;          // Text field that holds the comment
+    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
+    private vParameter param;
+    private JButton okButt, canButt;
 
-    public static boolean showDialog(JFrame f, ViskitParameter parameter) 
-	{
-        if (dialog == null) 
-		{
-            dialog = new ParameterDialog(f, parameter);
-        }
-		else 
-		{
-            dialog.setParameters(f, parameter);
+    public static boolean showDialog(JFrame f, vParameter parm) {
+        if (dialog == null) {
+            dialog = new ParameterDialog(f, parm);
+        } else {
+            dialog.setParams(f, parm);
         }
 
-        dialog.setVisible(true); // this call blocks
+        dialog.setVisible(true);
+        // above call blocks
 
         return modified;
     }
 
-    private ParameterDialog(JFrame parent, ViskitParameter parameter)
-	{
+    private ParameterDialog(JFrame parent, vParameter param) {
         super(parent, "Parameter Inspector", true);
-		
-		initialize ();
-
-        setParameters(parent, parameter);
-	}
-	
-	private void initialize ()
-	{
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
 
-        container = getContentPane();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-		
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+        Container cont = getContentPane();
+        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+
+        JPanel con = new JPanel();
+        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
+        con.setBorder(new CompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 new EmptyBorder(10, 10, 10, 10)));
 
-        contentPanel.add(Box.createVerticalStrut(5));
+        con.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel         typeLabel = new JLabel("type");
-        JLabel         nameLabel = new JLabel("name");
-        JLabel initialValueLabel = new JLabel("initial value"); // not used, force instantiation
-        JLabel  descriptionLabel = new JLabel("description");
-        int labelWidth = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
+        JLabel nameLab = new JLabel("name");
+        JLabel initLab = new JLabel("initial value");
+        JLabel typeLab = new JLabel("type");
+        JLabel commLab = new JLabel("description");
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, commLab});
 
-        
+        parameterNameField = new JTextField(15);
         setMaxHeight(parameterNameField);
-        
+        expressionField = new JTextField(25);
         setMaxHeight(expressionField);
-        
-        setMaxHeight(descriptionField);
+        commentField = new JTextField(25);
+        setMaxHeight(commentField);
 
-        parameterTypeCombo = ViskitGlobals.instance().getTypeComboBox();
+        parameterTypeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
 
-        fieldsPanel.add(new OneLinePanel(nameLabel,        labelWidth, parameterNameField));
-        fieldsPanel.add(new OneLinePanel(typeLabel,        labelWidth, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(descriptionLabel, labelWidth, descriptionField));
-        contentPanel.add(fieldsPanel);
-        contentPanel.add(Box.createVerticalStrut(5));
+        fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
+        fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
+        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        con.add(fieldsPanel);
+        con.add(Box.createVerticalStrut(5));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        contentPanel.add(buttonPanel);
-        contentPanel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        container.add(contentPanel);
+        JPanel buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        con.add(buttPan);
+        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        cont.add(con);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         parameterNameField.addCaretListener(lis);
-        descriptionField.addCaretListener(lis);
+        commentField.addCaretListener(lis);
         expressionField.addCaretListener(lis);
         parameterTypeCombo.addActionListener(lis);
+
+        setParams(parent, param);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -135,49 +120,46 @@ public class ParameterDialog extends JDialog
         c.setMaximumSize(d);
     }
 
-    public final void setParameters(Component c, ViskitParameter p) {
-        parameter = p;
+    public final void setParams(Component c, vParameter p) {
+        param = p;
 
         fillWidgets();
 
-        okButton.setEnabled((p == null));
+        okButt.setEnabled((p == null));
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack();
         setLocationRelativeTo(c);
     }
 
     private void fillWidgets() {
-        if (parameter != null) {
-            parameterNameField.setText(parameter.getName());
-            parameterTypeCombo.setSelectedItem(parameter.getType());
-            descriptionField.setText(parameter.getDescription());
-            descriptionField.setToolTipText(parameter.getDescription());
+        if (param != null) {
+            parameterNameField.setText(param.getName());
+            parameterTypeCombo.setSelectedItem(param.getType());
+            commentField.setText(param.getComment());
         } else {
-            parameterNameField.setText("NewParameter_" + count++);
-            descriptionField.setText("");
-            descriptionField.setToolTipText("");
+            parameterNameField.setText("param_" + count++);
+            commentField.setText("");
         }
     }
 
-    private void unloadWidgets() 
-	{
-        String type = (String) parameterTypeCombo.getSelectedItem();
-        type = ViskitGlobals.instance().typeChosen(type);
-        String name = parameterNameField.getText();
-        name = name.replaceAll("\\s", "");
-        if (parameter != null) {
-            parameter.setName(name);
+    private void unloadWidgets() {
+        String ty = (String) parameterTypeCombo.getSelectedItem();
+        ty = VGlobals.instance().typeChosen(ty);
+        String nm = parameterNameField.getText();
+        nm = nm.replaceAll("\\s", "");
+        if (param != null) {
+            param.setName(nm);
             //
-            if (type.equals("String") || type.equals("Double") || type.equals("Integer")) {
-                type = "java.lang." + type;
+            if (ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
+                ty = "java.lang." + ty;
             }
-            parameter.setType(type);
-            parameter.setDescription(descriptionField.getText());
+            param.setType(ty);
+            param.setComment(commentField.getText());
         } else {
-            newName = name;
-            newType = type;
-            newDescription = descriptionField.getText().trim();
+            newName = nm;
+            newType = ty;
+            newComment = commentField.getText().trim();
         }
     }
 
@@ -206,8 +188,8 @@ public class ParameterDialog extends JDialog
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override
@@ -221,15 +203,15 @@ public class ParameterDialog extends JDialog
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int returnValue = JOptionPane.showConfirmDialog(ParameterDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(ParameterDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
                 } else {
-                    cancelButton.doClick();
+                    canButt.doClick();
                 }
             } else {
-                cancelButton.doClick();
+                canButt.doClick();
             }
         }
     }

@@ -2,7 +2,7 @@
 
 <shortcuts>
   <skipIfNotSupported />
-  <programGroup defaultName="Viskit\Viskit-1.0.15" location="applications"/>
+  <programGroup defaultName="Viskit\Viskit-1.0.16" location="applications"/>
 
   <shortcut
      name="Viskit"
@@ -22,7 +22,7 @@
    </shortcut>
 
    <shortcut
-     name="Viskit-1.0.15 Uninstaller"
+     name="Viskit-1.0.16 Uninstaller"
      programGroup="yes"
      desktop="no"
      applications="no"

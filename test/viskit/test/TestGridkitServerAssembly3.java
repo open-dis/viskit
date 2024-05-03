@@ -14,10 +14,12 @@
 
 package viskit.test;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
@@ -27,16 +29,14 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
  * @version $Id: TestGridkitServerAssembly3.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class TestGridkitServerAssembly3 extends Thread 
-{
-    static Logger log = LogUtilities.getLogger(TestGridkitServerAssembly3.class);
-	
+public class TestGridkitServerAssembly3 extends Thread {
+    static Logger log = LogUtils.getLogger(TestGridkitServerAssembly3.class);
     XmlRpcClientLite xmlrpc;
     Vector<Object> args;
     String usid;
@@ -48,8 +48,7 @@ public class TestGridkitServerAssembly3 extends Thread
     /** Creates a new instance of TestGridkitServerAssembly3
      * @param server
      * @param port
-     * @throws java.lang.Exception 
-     */
+     * @throws java.lang.Exception */
     public TestGridkitServerAssembly3(String server, int port) throws Exception {
         xmlrpc = new XmlRpcClientLite(server,port);
         args = new Vector<>();
@@ -58,14 +57,14 @@ public class TestGridkitServerAssembly3 extends Thread
         // calculate the base directory, hack, know examples is next to lib
         // this of course only works in a development workspace
 
-        // get the jar url path to viskit.ViskitEventGraphAssemblyComboMain
-        URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/ViskitEventGraphAssemblyComboMain.class");
+        // get the jarurl path to viskit.EventGraphAssemblyComboMain
+        URL u = VGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
         log.info(u);
 
         // We're in a jar
         if (u.getFile().contains("!"))
-            u = new URL((u.getFile().split("!"))[0].trim());
+            u = new URI((u.getFile().split("!"))[0].trim()).toURL();
 
         String path = u.getFile();
         path = path.replace('\\','/');
@@ -92,7 +91,7 @@ public class TestGridkitServerAssembly3 extends Thread
             usid = (String)xmlrpc.execute("gridkit.login",args);
             // send ArrivalProcess.xml
             String arrivalProcess;
-            URL u = new URL(basedir+"MyViskitProjects/DefaultProject/EventGraphs/examples/ArrivalProcess.xml");
+            URL u = new URI(basedir+"MyViskitProjects/DefaultProject/EventGraphs/examples/ArrivalProcess.xml").toURL();
             InputStream is = u.openStream();
             byte[] buf = new byte[256];
             int readIn;
@@ -111,7 +110,7 @@ public class TestGridkitServerAssembly3 extends Thread
 
             // send SimpleServer.xml
             String simpleServer;
-            u = new URL(basedir+"MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml");
+            u = new URI(basedir+"MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml").toURL();
             is = u.openStream();
             buffer = new ByteArrayOutputStream();
             while ( (readIn = is.read(buf)) > 0 ) {
@@ -132,7 +131,7 @@ public class TestGridkitServerAssembly3 extends Thread
             // first make a jaxb tree to add DesignParameters
             SimkitAssemblyXML2Java sax2j =
                     new SimkitAssemblyXML2Java(
-                        (new URL(basedir+"MyViskitProjects/DefaultProject/Assemblies/examples/ServerAssembly3.xml")
+                        (new URI(basedir+"MyViskitProjects/DefaultProject/Assemblies/examples/ServerAssembly3.xml").toURL()
                             .openStream())
                     );
             sax2j.unmarshal();
@@ -326,7 +325,7 @@ public class TestGridkitServerAssembly3 extends Thread
                 for ( int i = 0; i < queue.size(); i ++ ) {
                     // trick: any change between queries indicates a transition at
                     // taskID = i (well i+1 really, taskID's in SGE start at 1)
-                    if ( !((Boolean) lastQueue.get(i)).equals(((Boolean) queue.get(i))) ) {
+                    if (!lastQueue.get(i).equals(queue.get(i)) ) {
                         int sampleIndex = i / 3; // number of designPoints chosed in this experiemnt was 3
                         int designPtIndex = i % 3; // can also just use getResultByTaskID(int)
                         args.clear();
@@ -372,7 +371,7 @@ public class TestGridkitServerAssembly3 extends Thread
 
             System.out.println("Test complete!");
 
-        } catch (IOException | NumberFormatException | XmlRpcException e) {
+        } catch (IOException | NumberFormatException | XmlRpcException | URISyntaxException e) {
             log.error(e);
         }
     }
@@ -382,9 +381,6 @@ public class TestGridkitServerAssembly3 extends Thread
         try {
             TestGridkitServerAssembly3 test = new TestGridkitServerAssembly3(args[0], Integer.parseInt(args[1]));
             test.start();
-        } catch (Exception e) { 
-            log.error(e); 
-            e.printStackTrace(System.err);
-        }
+        } catch (Exception e) { log.error(e); }
     }
 }

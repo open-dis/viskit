@@ -59,7 +59,7 @@ public class TextAreaDialog extends JDialog
 
   private static TextAreaDialog dialog;
   private static boolean modified = false;
-  private JButton okButton, cancelButton;
+  private JButton okButt, canButt;
 
   public static StringBuffer newComment;
   public StringBuffer param;
@@ -115,18 +115,18 @@ public class TextAreaDialog extends JDialog
     cont.add(jsp);
     cont.add(Box.createVerticalStrut(5));
 
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        okButton = new JButton("Apply changes");
-    cancelButton = new JButton("Cancel");
-    buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttonPanel.add(okButton);
-    buttonPanel.add(cancelButton);
-    cont.add(buttonPanel);
+    JPanel buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    canButt = new JButton("Cancel");
+    okButt = new JButton("Apply changes");
+    buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+    buttPan.add(canButt);
+    buttPan.add(okButt);
+    cont.add(buttPan);
 
     // attach listeners
-    cancelButton.addActionListener(new cancelButtonListener());
-    okButton .addActionListener(new applyButtonListener());
+    canButt.addActionListener(new cancelButtonListener());
+    okButt .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener();
     this.commentArea.addCaretListener(lis);
@@ -141,9 +141,9 @@ public class TextAreaDialog extends JDialog
     fillWidgets();
 
     modified = (p.length() == 0);
-    okButton.setEnabled((p.length() == 0));
+    okButt.setEnabled((p.length() == 0));
 
-    getRootPane().setDefaultButton(cancelButton);
+    getRootPane().setDefaultButton(canButt);
     pack();
     setLocationRelativeTo(c);
   }
@@ -194,8 +194,8 @@ public class TextAreaDialog extends JDialog
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
-      okButton.setEnabled(true);
-      getRootPane().setDefaultButton(okButton);
+      okButt.setEnabled(true);
+      getRootPane().setDefaultButton(okButt);
     }
 
     @Override
@@ -211,15 +211,15 @@ public class TextAreaDialog extends JDialog
     public void windowClosing(WindowEvent e)
     {
       if (modified) {
-        int returnValue = JOptionPane.showConfirmDialog(TextAreaDialog.this, "Apply changes?",
+        int ret = JOptionPane.showConfirmDialog(TextAreaDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (returnValue == JOptionPane.YES_OPTION)
-          okButton.doClick();
+        if (ret == JOptionPane.YES_OPTION)
+          okButt.doClick();
         else
-          cancelButton.doClick();
+          canButt.doClick();
       }
       else
-        cancelButton.doClick();
+        canButt.doClick();
     }
   }
 

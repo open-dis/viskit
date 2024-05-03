@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,7 +14,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /** Using the java compiler, now part of javax.tools, we no longer have to
  * ship tools.jar from the JDK install.
@@ -23,35 +23,35 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class Compiler 
-{
-    static final Logger LOG = LogUtilities.getLogger(Compiler.class);
+public class Compiler {
 
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
+
+    static Logger log = LogUtils.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;
 
     /** Compiler diagnostic object */
-    private static CompilerDiagnosticsListener compilerDiagnosticsListener;
+    private static CompilerDiagnosticsListener diag;
 
     /** Call the java compiler to test compile our event graph java source
      *
-     * @param packageName package containing java file
+     * @param pkg package containing java file
      * @param className name of the java file
-     * @param sourceCode a string containing the full source code
+     * @param src a string containing the full source code
      * @return diagnostic messages from the compiler
      */
-    public static String invoke(String packageName, String className, String sourceCode) {
+    public static String invoke(String pkg, String className, String src) {
 
         StringBuilder diagnosticMessages = new StringBuilder();
         StandardJavaFileManager sjfm = null;
         StringBuilder classPaths;
-        String classPath;
+        String cp;
 
-        if (packageName != null && !packageName.isEmpty()) {
-            packageName += ".";
+        if (pkg != null && !pkg.isEmpty()) {
+            pkg += ".";
         }
 
         try {
@@ -61,37 +61,38 @@ public class Compiler
             // JDK's java.exe.  If so, correct the Path in Computer ->
             // Properties -> Advanced system settings -> Environment variables
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            compilerDiagnosticsListener = new CompilerDiagnosticsListener(diagnosticMessages);
-            sjfm = compiler.getStandardFileManager(compilerDiagnosticsListener, null, null);
+            diag = new CompilerDiagnosticsListener(diagnosticMessages);
+            sjfm = compiler.getStandardFileManager(diag, null, null);
 
-            JavaObjectFromString javaObjectFromString = new JavaObjectFromString(packageName + className, sourceCode);
-            Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(javaObjectFromString);
-            File workDirectory = ViskitGlobals.instance().getWorkDirectory();
-            String workDirectoryPath = workDirectory.getCanonicalPath();
+            JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
+            Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
+            File workDir = VGlobals.instance().getWorkDirectory();
+            String workDirPath = workDir.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
-            String[] workClassPath = ((viskit.doe.LocalBootLoader) (ViskitGlobals.instance().getWorkClassLoader())).getClassPath();
-            int workClassPathLength = workClassPath.length;
-            classPaths = new StringBuilder(workClassPathLength);
+            String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
+            int wkpLength = workClassPath.length;
+            classPaths = new StringBuilder(wkpLength);
 
-            for (String nextClassPath : workClassPath) {
-                classPaths.append(nextClassPath);
+            for (String cPath : workClassPath) {
+                classPaths.append(cPath);
                 classPaths.append(File.pathSeparator);
             }
 
             // Get rid of the last ";" or ":" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
-            classPath = classPaths.toString();
-            LOG.debug("classPath is: " + classPath);
+            cp = classPaths.toString();
+            log.debug("cp is: " + cp);
 
             String[] options = {
                 "-Xlint:unchecked",
                 "-Xlint:deprecation",
+                "-proc:none",
                 "-cp",
-                 classPath,
+                 cp,
                 "-d",
-                workDirectoryPath
+                workDirPath
             };
             java.util.List<String> optionsList = Arrays.asList(options);
 
@@ -101,7 +102,7 @@ public class Compiler
 
             compiler.getTask(new BufferedWriter(new OutputStreamWriter(baosOut)),
                     sjfm,
-                    compilerDiagnosticsListener,
+                    diag,
                     optionsList,
                     null,
                     fileObjects).call();
@@ -110,33 +111,30 @@ public class Compiler
             if (diagnosticMessages.toString().isEmpty()) {
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
             }
-        } 
-		catch (Exception ex)
-		{
-            if (ex instanceof NullPointerException)
-			{
-                String message = "Your environment variable for Path likely has the JRE's "
+        } catch (Exception ex) {
+            if (ex instanceof NullPointerException) {
+
+                String msg = "Your environment variable for Path likely has the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
-                                + "Please reset your Path to have the JDK's java.exe first in the Path";
-				
-				// TODO fixable?
+                                + "Please reset your Path to have the JDK's "
+                                + "java.exe first in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
-                ViskitGlobals.instance().getAssemblyEditViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                        "Incorrect Path", message);
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                        "Incorrect Path", msg);
 
-                LOG.error(message);
+                log.error(msg);
             }
-            LOG.error(ex);
-//            LOG.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
-//            LOG.info("Classpath is: " + cp);
+            log.error(ex);
+//            log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+//            log.info("Classpath is: " + cp);
         } finally {
 
             if (sjfm != null) {
                 try {
                     sjfm.close();
                 } catch (IOException ex) {
-                    LOG.error(ex);
+                    log.error(ex);
                 }
             }
         }
@@ -146,7 +144,7 @@ public class Compiler
     /**
      * @param baosOut the ByteArrayOutputStream to set
      */
-    public static void setOutputStream(OutputStream baosOut) {
+    public static void setOutPutStream(OutputStream baosOut) {
         Compiler.baosOut = baosOut;
     }
 
@@ -154,7 +152,7 @@ public class Compiler
      * @return the compiler diagnostic tool
      */
     public static CompilerDiagnosticsListener getDiagnostic() {
-        return compilerDiagnosticsListener;
+        return diag;
     }
 
 } // end class file Compiler.java

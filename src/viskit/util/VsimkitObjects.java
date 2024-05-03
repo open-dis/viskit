@@ -5,9 +5,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import simkit.random.*;
-import viskit.ViskitStatics;
+import viskit.VStatics;
 
 /**
  * A class to provide the beanshell parser in viskit with sample, throw-away
@@ -35,13 +35,13 @@ public class VsimkitObjects {
 
     static {
         try {
-            Class<?> c = ViskitStatics.ClassForName("viskit.VsimkitObjects");
+            Class<?> c = VStatics.classForName("viskit.VsimkitObjects");
             Method[] meths = c.getDeclaredMethods();
             for (Method method : meths) {
                 String name = method.getName();
 
                 // we can skip these
-                if (name.equals(ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD) || name.equals("getFullName")) {
+                if (name.equals(VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD) || name.equals("getFullName")) {
                     continue;
                 }
 
@@ -55,12 +55,12 @@ public class VsimkitObjects {
                 // TODO: this breaks on AR1Variate instance "getting"
                 Object m = method.invoke(null, (Object[]) null);
                 Object o = new FullNameAndInstance(name, m);
-                LogUtilities.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
+                LogUtils.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
                 HASH_MAP.put(name, o);
                 HASH_MAP.put(noPackageName, o);
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            LogUtilities.getLogger(VsimkitObjects.class).error(e);
+            LogUtils.getLogger(VsimkitObjects.class).error(e);
 //            e.printStackTrace();
         }
     }
@@ -105,10 +105,6 @@ public class VsimkitObjects {
 
     public static Object get_random_BinomialVariate() {
         return new BinomialVariate();
-    }
-
-    public static Object get_random_BivariateNormal() {
-        return new BivariateNormal();
     }
 
     public static Object get_random_Congruential() {
@@ -231,10 +227,6 @@ public class VsimkitObjects {
 
     public static Object get_random_RandomVariate() {
         return get_random_PoissonVariate();
-    }
-
-    public static Object get_random_RandomVector() {
-        return get_random_BivariateNormal();
     }
 
     public static Object get_random_RenewalProcessVariate() {

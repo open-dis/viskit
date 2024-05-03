@@ -11,8 +11,8 @@
  * for selected ouput streams.
  *
  */
-
 package viskit.gridlet;
+
 import java.io.ByteArrayOutputStream;
 import simkit.EventList;
 import java.io.PrintWriter;
@@ -36,6 +36,7 @@ public class GridletEventList extends EventList {
         return buffer;
     }
     
+    @Override
     public void dump(String reason) {
         printWriter.println(super.getEventListAsString(reason));
         System.out.println(getEventListAsString(reason));

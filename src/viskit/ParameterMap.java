@@ -18,21 +18,17 @@ import java.lang.annotation.Target;
  * to properly identify constructors of EGs classes on the classpath whether
  * they are from generated source, or contained in third party libraries.  The
  * importance of this feature is that when Assemblies are constructed from
- * iconized Event Graphs, the Assembly can be constructed such that each Event
- * Graph parameter is identified and properly initialized at runtime from
- * generated Assembly source code.
+ * iconized EGs, the Assembly can be constructed such that each EG parameter is
+ * identified and properly initialized at runtime from generated Assembly source
+ * code.
  *
  * @since April 3, 2007, 7:47 PM
  * @author Rick Goldberg
  * @version $Id$
  */
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR})
-
-public @interface ParameterMap 
-{
+public @interface ParameterMap {
       String[] names();
       String[] types();
-      String[] descriptions();
 }

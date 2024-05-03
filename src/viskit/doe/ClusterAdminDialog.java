@@ -43,7 +43,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.doe;
 
-import edu.nps.util.LogUtilities;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.gridlet.SessionManager;
 
@@ -55,13 +54,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Vector;
-import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 
 public class ClusterAdminDialog extends JDialog implements ActionListener
 {
-    static final Logger LOG = LogUtilities.getLogger(ClusterAdminDialog.class);
-	
   private JButton closeButt;
   private JButton addUserButt;
   private JButton delUserButt;
@@ -183,16 +179,16 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     actionPanel.setEnabled(false); //todo test
 
     closeButt = new JButton("Close");
-    JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
-    buttonPanel.add(Box.createHorizontalGlue());
-    buttonPanel.add(closeButt);
+    JPanel buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan,BoxLayout.X_AXIS));
+    buttPan.add(Box.createHorizontalGlue());
+    buttPan.add(closeButt);
 
     c.add(loginP);
     c.add(Box.createVerticalStrut(5));
     c.add(actionPanel);
     c.add(Box.createVerticalStrut(5));
-    c.add(buttonPanel);
+    c.add(buttPan);
 
     c.setBorder(new EmptyBorder(10,10,10,10));
     setContentPane(c);
@@ -215,13 +211,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   }
   private void showResultsOrStatus_SWTHR(final String s, final boolean isError)
   {
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    SwingUtilities.invokeLater(() -> {
         showResultsOrStatus(s,isError);
-      }
     });
   }
   private void addHandlers()
@@ -241,13 +232,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
 
   private void enableActions_SWTHR(final boolean wh)
   {
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    SwingUtilities.invokeLater(() -> {
         enableActions(wh);
-      }
     });
   }
   private void enableActions(boolean wh)
@@ -261,13 +247,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   }
   private void enableButtonActions_SWTHR(final boolean wh)
   {
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    SwingUtilities.invokeLater(() -> {
         enableButtonActions(wh);
-      }
     });
   }
   private void enableButtonActions(boolean wh)
@@ -303,13 +284,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
   }
   private void enableButt_SWTHR(final JButton butt, final boolean wh)
   {
-    SwingUtilities.invokeLater(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    SwingUtilities.invokeLater(() -> {
         enableButt(butt,wh);
-      }
     });
   }
   private void close()
@@ -321,7 +297,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
         xmlrpc.execute("gridkit.logout",args);
       }
       catch (XmlRpcException | IOException e) {
-        LOG.error("Error logging out from cluster.");
+        System.err.println("Error logging out from cluster.");
       }
     }
     ClusterAdminDialog.this.dispose();
@@ -344,36 +320,31 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     enableButt(loginButt,false);
     showResultsOrStatus("Trying login to "+clusterName+":"+port,false);    //not error
 
-    runInThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    runInThread(() -> {
         Exception ex = null;
         try {
-          xmlrpc = new XmlRpcClientLite(clusterName,port);
-          Vector<String> args = new Vector<>();
-          args.add(adminuname);
-          args.add(pw);
-          String usrID = (String)xmlrpc.execute("gridkit.login",args);
-          if(!usrID.equals(SessionManager.LOGIN_ERROR)) {
-            ClusterAdminDialog.this.adminUsrID = usrID;
-            showResultsOrStatus_SWTHR("Logged in.",false);
-            enableActions_SWTHR(true);
-            return;   // good return
-          }
+            xmlrpc = new XmlRpcClientLite(clusterName,port);
+            Vector<String> args = new Vector<>();
+            args.add(adminuname);
+            args.add(pw);
+            String usrID = (String)xmlrpc.execute("gridkit.login",args);
+            if(!usrID.equals(SessionManager.LOGIN_ERROR)) {
+                ClusterAdminDialog.this.adminUsrID = usrID;
+                showResultsOrStatus_SWTHR("Logged in.",false);
+                enableActions_SWTHR(true);
+                return;   // good return
+            }
         }
         catch (XmlRpcException | IOException e) {
-          ex = e;
+            ex = e;
         }
         //error;
         if (ex != null)
-          showResultsOrStatus_SWTHR("Error ("+ex.getClass().getName()+") logging in.",true); //error
+            showResultsOrStatus_SWTHR("Error ("+ex.getClass().getName()+") logging in.",true); //error
         else
-          showResultsOrStatus_SWTHR("Login to "+clusterName+":"+port+" refused.",true);
+            showResultsOrStatus_SWTHR("Login to "+clusterName+":"+port+" refused.",true);
         enableButt_SWTHR(loginButt,true);
         ClusterAdminDialog.this.adminUsrID = null;
-      }
     });
   }
 
@@ -385,47 +356,42 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
       return;
     showResultsOrStatus("Trying add user " + uname,false);
     enableButtonActions(false);
-    runInThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    runInThread(() -> {
         Exception ex = null;
         breakClause:
         {
-          try {
-            Vector<String> args = new Vector<>();
-            args.add(adminUsrID);
-            args.add(uname);
-            Boolean ret = (Boolean) xmlrpc.execute("gridkit.addUser", args);
-            if (!ret)   // i.e., ret != true
-              break breakClause;
-
-            // We now have a user with a pw = uname; set the password to that specified
-            args.clear();
-            args.add(adminUsrID);
-            args.add(uname);
-            args.add(pw);
-            ret = (Boolean) xmlrpc.execute("gridkit.changePassword", args);
-            if (ret) {   // i.e., ret == true
-              showResultsOrStatus_SWTHR("User " + uname + " added.",false);
-              enableButtonActions_SWTHR(true);
-              return;   // good return
+            try {
+                Vector<String> args = new Vector<>();
+                args.add(adminUsrID);
+                args.add(uname);
+                Boolean ret = (Boolean) xmlrpc.execute("gridkit.addUser", args);
+                if (!ret)   // i.e., ret != true
+                    break breakClause;
+                
+                // We now have a user with a pw = uname; set the password to that specified
+                args.clear();
+                args.add(adminUsrID);
+                args.add(uname);
+                args.add(pw);
+                ret = (Boolean) xmlrpc.execute("gridkit.changePassword", args);
+                if (ret) {   // i.e., ret == true
+                    showResultsOrStatus_SWTHR("User " + uname + " added.",false);
+                    enableButtonActions_SWTHR(true);
+                    return;   // good return
+                }
             }
-          }
-          catch (XmlRpcException | IOException e) {
-            ex = e;
-          }
+            catch (XmlRpcException | IOException e) {
+                ex = e;
+            }
         } // breakClause
 
         //error;
         if (ex != null)
-          showResultsOrStatus_SWTHR("Error (" + ex.getMessage() + ") adding user " + uname,true);
+            showResultsOrStatus_SWTHR("Error (" + ex.getMessage() + ") adding user " + uname,true);
         else
-          showResultsOrStatus_SWTHR("Add user name " + uname + " denied.",true);
-
+            showResultsOrStatus_SWTHR("Add user name " + uname + " denied.",true);
+        
         enableButtonActions_SWTHR(true);
-      }
     });
   }
 
@@ -438,38 +404,33 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     showResultsOrStatus("Trying delete user " + uname,false);
     enableButtonActions(false);
 
-    runInThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    runInThread(() -> {
         Exception ex = null;
         breakClause:
         {
-          try {
-            Vector<String> args = new Vector<>();
-            args.add(adminUsrID);
-            args.add(uname);
-            Boolean ret = (Boolean) xmlrpc.execute("gridkit.deleteUser", args);
-            if (ret) {   // i.e., ret == true
-              showResultsOrStatus_SWTHR("User " + uname + " deleted.",false);
-              enableButtonActions_SWTHR(true);
-              return;   // good return
+            try {
+                Vector<String> args = new Vector<>();
+                args.add(adminUsrID);
+                args.add(uname);
+                Boolean ret = (Boolean) xmlrpc.execute("gridkit.deleteUser", args);
+                if (ret) {   // i.e., ret == true
+                    showResultsOrStatus_SWTHR("User " + uname + " deleted.",false);
+                    enableButtonActions_SWTHR(true);
+                    return;   // good return
+                }
             }
-          }
-          catch (XmlRpcException | IOException e) {
-            ex = e;
-          }
+            catch (XmlRpcException | IOException e) {
+                ex = e;
+            }
         } // breakClause
 
         //error;
         if (ex != null)
-          showResultsOrStatus_SWTHR("Error (" + ex.getMessage() + ") deleting user " + uname,true);
+            showResultsOrStatus_SWTHR("Error (" + ex.getMessage() + ") deleting user " + uname,true);
         else
-          showResultsOrStatus_SWTHR("Delete user name " + uname + " denied.",true);
-
+            showResultsOrStatus_SWTHR("Delete user name " + uname + " denied.",true);
+        
         enableButtonActions_SWTHR(true);
-      }
     });
 
   }
@@ -483,13 +444,8 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
     showResultsOrStatus("Trying change password for " + uname,false);
     enableButtonActions(false);
 
-    runInThread(new Runnable()
-    {
-      @Override
-      public void run()
-      {
+    runInThread(() -> {
         _chgPassword(uname,pw);
-      }
     });
   }
 

@@ -1,10 +1,7 @@
 package viskit.view;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitStatics;
 import viskit.model.ViskitElement;
-import viskit.model.ViskitStateVariable;
+import viskit.model.vStateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -16,88 +13,51 @@ import viskit.model.ViskitStateVariable;
  * @since 8:49:21 AM
  * @version $Id$
  */
-public class StateVariablesPanel extends ViskitTablePanel
-{
-    static final Logger LOG = LogUtilities.getLogger(StateVariablesPanel.class);
+public class StateVariablesPanel extends ViskitTablePanel {
 
-    private final String[] columnTitles = {"type", "name", "initial value", "description"};
-    private final String    plusToolTip = "Add a state variable";
-    private final String   minusToolTip = "Removed the selected state variable";
+    private String[] mytitles = {"name", "type", "description"};
+    private String plusToolTip = "Add a state variable";
+    private String minusToolTip = "Removed the selected state variable";
 
-    StateVariablesPanel(int width, int height)
-	{
-        super(width, height); // separate constructor from initialization
+    StateVariablesPanel(int wid, int height) {
+        super(wid, height);            // separate constructor from initialization
         init(true);
     }
 
     @Override
-    public String[] getColumnTitles()
-	{
-        return columnTitles;
+    public String[] getColumnTitles() {
+        return mytitles;
     }
 
     @Override
-    public String[] getFields(ViskitElement viskitElement, int rowNum)
-	{
-		ViskitStateVariable stateVariable = (ViskitStateVariable)viskitElement;
-        String[] sa = new String[4];
-        sa[0] = stateVariable.getType();
-        sa[1] = stateVariable.getName();
-        sa[2] = stateVariable.getValue();
-        sa[3] = stateVariable.getDescription();
-		// note: implicit is not displayed on the table
-		
-		// ensure non-empty
-		for (int index = 0; index < sa.length; index++)
-		{
-			if ((sa[index] == null) || sa[index].isEmpty())
-			{
-				sa[index] = "TODO";
-				switch (index)
-				{
-					case 0: // type
-						stateVariable.setType(sa[index]);
-						break;
-					case 1: // name
-						stateVariable.setName(sa[index]);
-						break;
-					case 2: // value
-						stateVariable.setValue(sa[index]);
-						break;
-					case 3: // description
-						sa[index] = ViskitStatics.DEFAULT_DESCRIPTION;
-						stateVariable.setDescription(sa[index]);
-						break;
-				}
-			}
-		}
+    public String[] getFields(ViskitElement e, int rowNum) {
+        String[] sa = new String[3];
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        sa[2] = e.getComment();
         return sa;
     }
 
     @Override
-    public ViskitElement newRowObject()
-	{
-        ViskitStateVariable viskitStateVariable = new ViskitStateVariable("name", "int", false, "0", ViskitStatics.DEFAULT_DESCRIPTION);
-        return viskitStateVariable;
+    public ViskitElement newRowObject() {
+        vStateVariable ea = new vStateVariable("name", "int", "description");
+        return ea;
     }
 
     @Override
-    public int getNumberVisibleRows() 
-	{
-        return 3;  // not used if we init super with a height, TODO make adjustable?
+    public int getNumVisibleRows() {
+        return 3;  // not used if we init super with a height
     }
 
     // Custom tooltips
     @Override
-    protected String getMinusToolTip() 
-	{
+    protected String getMinusToolTip() {
         return minusToolTip;
     }
 
     // Protected methods
     @Override
-    protected String getPlusToolTip() 
-	{
+    protected String getPlusToolTip() {
         return plusToolTip;
     }
 }

@@ -1,8 +1,8 @@
 package viskit.model;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import java.util.ArrayList;
+import java.util.List;
+import viskit.VGlobals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,17 +11,15 @@ import viskit.ViskitGlobals;
  * @since 3:59:01 PM
  * @version $Id$
  */
-public class EventLocalVariable extends ViskitElement 
-{
-    static final Logger LOG = LogUtilities.getLogger(EventLocalVariable.class);
+public class EventLocalVariable extends ViskitElement {
 
+    private String value;
+    private String comment = EMPTY;
     private String[] arraySize;
-    private String   indexingExpression;
-    private boolean  operation;
-    private String   operationOrAssignment;
-    private String   value;
-    private String   comment = EMPTY;
-    private String   description = new String();
+    private List<String> descriptionArray = new ArrayList<>();
+    private String indexingExpression;
+    private boolean operation;
+    private String operationOrAssignment;
 
     public EventLocalVariable(String name, String type, String value) {
         this.name = name;
@@ -33,6 +31,16 @@ public class EventLocalVariable extends ViskitElement
     public String toString() {
         return (type.isEmpty() && name.isEmpty()) ? EMPTY : "(" + type + ") " + name;
     }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String getValue() {
         return value;
@@ -45,12 +53,23 @@ public class EventLocalVariable extends ViskitElement
     @Override
     public final void setType(String pType) {
         super.setType(pType);
-        arraySize = ViskitGlobals.instance().getArraySize(pType);
+        arraySize = VGlobals.instance().getArraySize(pType);
     }
 
     public String[] getArraySize() {
         return arraySize;
     }
+
+    @Override
+    public List<String> getDescriptionArray() {
+        return descriptionArray;
+    }
+
+    @Override
+    public void setDescriptionArray(List<String> descriptionArray) {
+        this.descriptionArray = descriptionArray;
+    }
+
    @Override
     public String getIndexingExpression() {
         return indexingExpression;
@@ -64,40 +83,5 @@ public class EventLocalVariable extends ViskitElement
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-	@Override
-    public String getDescription() 
-	{		
-		moveLegacyCommentsToDescription ();
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        this.description = newDescription;
-    }
-	
-	/**
-	 * "Comment" elements are earlier viskit constructs.
-	 * If found from an earlier model, append them as part of description and then delete.
-	 */
-	private void moveLegacyCommentsToDescription ()
-	{
-		if (description == null)
-			description = new String();
-		if ((comment != null) && !comment.isEmpty())
-		{
-			description = comment.trim();
-			comment     = "";
-		}
-	}
-
-    @Deprecated
-    @Override
-    public String getComment()
-	{
-		moveLegacyCommentsToDescription ();
-        return description;
     }
 }

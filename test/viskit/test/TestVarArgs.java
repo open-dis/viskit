@@ -70,7 +70,7 @@ public class TestVarArgs extends SimEntityBase  {
                 (Object) new String[] { "Hi", "Again!" });
 //        This next call triggers the warning.  Worse, the "right"
 //        event is not scheduled.  Uncomment to test
-//        waitDelay("Bar", 2.0, new String[] { "This", "is", "a", "warning!"});
+        waitDelay("Bar", 2.0, new String[] { "This", "is", "a", "warning!"});
         waitDelay("FooBar", 5.0, new int[] { 3, 4, -17, Integer.MAX_VALUE} );
     }
 

@@ -1,11 +1,7 @@
 package viskit.mvc;
 
-import edu.nps.util.LogUtilities;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.model.ModelEvent;
 
 /**
  * Abstract root class of the model hierarchy.  Provides basic notification behavior.
@@ -20,53 +16,25 @@ import viskit.model.ModelEvent;
  * @since Mar 2, 2004 : 11:04:25 AM
  * @version $Id$
  */
-public abstract class mvcAbstractModel implements mvcModel 
-{
-    private final List<mvcModelListener> listenersList;
+public abstract class mvcAbstractModel implements mvcModel {
 
-    static final Logger LOG = LogUtilities.getLogger(mvcAbstractModel.class);
-
-	public mvcAbstractModel() 
-	{
-		this.listenersList = new ArrayList<>(8);
-	}
+    private List<mvcModelListener> listeners = new ArrayList<>(4);
 
     @Override
-    public void notifyChanged(mvcModelEvent modelEvent)
-	{		
-		String eventID = Integer.toString(modelEvent.getID());
-		if (modelEvent.getID() < 10)
-			eventID = " " + eventID; // spacing for readability
-		
-        for (mvcModelListener modelListener : listenersList) 
-		{
-            modelListener.modelChanged(modelEvent);
-        }
-		if (listenersList.isEmpty())
-		{
-			LOG.error ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " ignored, listeners list is empty (\""                                + modelEvent.getActionCommand() + "\")");
-		}
-		else if (ViskitGlobals.LOG_EVENT_NOTIFICATIONS == true)
-		{
-			String plural = "";
-			if (listenersList.size() > 1)
-				   plural = "s";
-			LOG.info  ("MVC modelEvent " + eventID + "=" + ModelEvent.toString(modelEvent.getID()) + " received by " + listenersList.size() + " listener" + plural + " (\"" + modelEvent.getActionCommand() + "\")");
-		}
-    }
+    public void notifyChanged(mvcModelEvent event) {
 
-    public void addModelListener(mvcModelListener modelListener)
-	{
-        if (!listenersList.contains(modelListener)) 
-		{
-            listenersList.add(modelListener);
-			LOG.info  ("MVC " + this.getClass() +    ".addModelListener(" + modelListener.getClass() + ")");
+        for (mvcModelListener ml : listeners) {
+            ml.modelChanged(event);
         }
     }
 
-    public void removeModelListener(mvcModelListener modelListener)
-	{
-        listenersList.remove(modelListener);
-		LOG.info      ("MVC " + this.getClass() + ".removeModelListener(" + modelListener.getClass() + ")");
+    public void addModelListener(mvcModelListener l) {
+        if (!listeners.contains(l)) {
+            listeners.add(l);
+        }
+    }
+
+    public void removeModelListener(mvcModelListener l) {
+        listeners.remove(l);
     }
 }

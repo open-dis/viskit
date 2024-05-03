@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="Creator" package="examples" version="Creator" author="ahbuss" extend="SimEntityBase" description="TODO add description" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <StateVariable name="nextID" type="int" description="">
+<SimEntity name="Creator" package="examples" version="1.0" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <StateVariable name="nextID" type="int">
         <Comment></Comment>
     </StateVariable>
-    <Event name="Arrival" description="">
+    <Event name="Arrival">
         <Comment></Comment>
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
         </StateTransition>
-        <Schedule delay="0.0" event="Customer_Arrival" condition="true" priority="DEFAULT">
+        <Schedule delay="0.0" event="CustomerArrival" condition="true" priority="DEFAULT">
             <Comment></Comment>
             <EdgeParameter value="nextID"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="120.0"/>
     </Event>
-    <Event name="Customer_Arrival" description="">
+    <Event name="CustomerArrival">
         <Comment></Comment>
-        <Argument name="customer" type="Integer" description="empty"/>
+        <Argument name="customer" type="Integer"/>
         <Code></Code>
-        <Coordinate x="200.0" y="120.0"/>
+        <Coordinate x="190.0" y="120.0"/>
     </Event>
-    <Event name="Run" description="">
+    <Event name="Run">
         <Comment></Comment>
         <StateTransition state="nextID">
             <Assignment value="0"/>
         </StateTransition>
         <Code></Code>
-        <Coordinate x="30.0" y="20.0"/>
+        <Coordinate x="30.0" y="10.0"/>
     </Event>
 </SimEntity>

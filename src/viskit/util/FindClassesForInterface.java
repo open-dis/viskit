@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,19 +14,17 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.logging.log4j.Logger;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
- * XML.  Used to populate the LEGOs tree on the Assembly Editor.
+ * XML.  Used to populate the LEGOs tree on the Assy Editor.
  *
  * @version $Id$
  * @author  ahbuss
  */
-public class FindClassesForInterface 
-{
-    static final Logger LOG = LogUtilities.getLogger(FindClassesForInterface.class);
+public class FindClassesForInterface {
 
     /**
      * Added by Mike Bailey
@@ -78,7 +76,7 @@ public class FindClassesForInterface
         private File f;
         private ByteBuffer buffer;
         private RandomAccessFile classFile;
-        private Hashtable<String, Class<?>> found = new Hashtable<>();
+        private Map<String, Class<?>> found = new Hashtable<>();
 
         Class<?> buildIt(File fil) throws java.lang.Throwable {
             f = fil;
@@ -100,14 +98,14 @@ public class FindClassesForInterface
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                LogUtilities.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
+                LogUtils.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
 
                 clazz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
                 found.put(name, clazz);
 
-                LogUtilities.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
+                LogUtils.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
             } catch (Exception e) {
-                LogUtilities.getLogger(FindClassesForInterface.class).error(e);
+                LogUtils.getLogger(FindClassesForInterface.class).error(e);
             } finally {
                 try {
                     classFile.close();
@@ -187,7 +185,7 @@ public class FindClassesForInterface
         if (true) {
             return;
         }
-        List<Class<?>> simEntities             = new ArrayList<>();
+        List<Class<?>> simEntities = new ArrayList<>();
         List<Class<?>> propertyChangeListeners = new ArrayList<>();
         System.out.println(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
@@ -225,7 +223,7 @@ public class FindClassesForInterface
             System.out.println(propertyChangeListeners.get(i));
         }
 
-        if (true) { // TODO skips test code?
+        if (true) {
             return;
         }
         System.out.println(loader);

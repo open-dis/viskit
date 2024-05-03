@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
 
 <!--
     Document   : izpackMac.xml
@@ -8,7 +8,11 @@
         IzPack Installer builder for Viskit - Mac
 -->
 
-<installation version="1.0">
+<izpack:installation version="5.0"
+                     xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+    
     <info>
         <appname>@{product.Name}</appname>
         <appversion>v@{product.Version}</appversion>
@@ -27,49 +31,47 @@
         </authors>
         <url>@{product.url}</url>
         <!-- Minimum JDK version required -->
-        <javaversion>1.7</javaversion>
+        <javaversion>17</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
     </info>
 
     <guiprefs height="600" width="800" resizable="yes">
-        <laf name="liquid">
+        <laf name="looks">
             <os family="mac"/>
+            <param name="variant" value="plastic3D"/>
         </laf>
+        <modifier key="useHeadingPanel" value="yes"/>
     </guiprefs>
 
     <locale>
         <!-- The English will have to live with USA version -->
         <langpack iso3="usa"/>
-        <langpack iso3="fra"/>
-        <langpack iso3="deu"/>
-        <langpack iso3="spa"/>
-        <langpack iso3="jpn"/>
-        <langpack iso3="ita"/>
-        <langpack iso3="chn"/>
     </locale>
 
     <resources>
         <res src="images/ViskitLogo.png" id="Installer.image"/>
         <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
         <res src="stage/Introduction.html" id="HTMLInfoPanel.info"/>
-        <res src="macosx/LegacyJava6.html" id="HTMLInfoPanel.java"/>
+        <!--<res src="macosx/LegacyJava6.html" id="HTMLInfoPanel.java"/>-->
     </resources>
 
     <panels>
-        <panel classname="HelloPanel"/>
-        <panel classname="HTMLInfoPanel" id="info" />
-        <panel classname="HTMLInfoPanel" id="java" />
-        <panel classname="LicencePanel" id="licence"/><!--not my english-->
-        <panel classname="PacksPanel"/>
-        <panel classname="TargetPanel"/>
-        <panel classname="InstallPanel"/>
-        <panel classname="SimpleFinishPanel"/>
+        <panel classname="HelloPanel"         id="HelloPanel"/>
+        <panel classname="HTMLInfoPanel"      id="panel.html"/>
+        <panel classname="LicencePanel"       id="LicencePanel"/>
+        <panel classname="TargetPanel"        id="TargetPanel"/>
+        <panel classname="PacksPanel"         id="PacksPanel"/>
+        <panel classname="ShortcutPanel"      id="ShortcutPanel"/>
+        <panel classname="SummaryPanel"       id="SummaryPanel"/>
+        <panel classname="InstallPanel"       id="panel.install"/>
+        <panel classname="SimpleFinishPanel"  id="SimpleFinishPanel"/>
     </panels>
-
+    
     <listeners>
-        <listener installer="SummaryLoggerInstallerListener">
-            <os family="mac"/>
+        <listener classname="SummaryLoggerInstallerListener" stage="install">
+            <os family="windows"/>
+            <os family="unix"/>
         </listener>
     </listeners>
 
@@ -87,12 +89,14 @@
               <include name="configuration/**"/>
               <exclude name="configuration/c_gui.xml"/>
               <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
+              <include name="doc/**"/>
               <include name="images/**"/>
               <exclude name="images/american-flag.gif"/>
               <include name="license/**"/>
               <include name="viskit/**"/>
               <include name="RELEASE_NOTES*"/>
               <include name="ViskitOperation.txt"/>
+              <include name="Viskit-overview.docx"/>
               <include name="NB-Project-Creation.txt"/>
           </fileset>
 
@@ -106,7 +110,7 @@
           </fileset>
 
           <!-- Apple specific files -->
-          <file src="macosx/LegacyJava6.html"             targetdir="$INSTALL_PATH/Viskit.app"/>
+          <!--<file src="macosx/LegacyJava6.html"             targetdir="$INSTALL_PATH/Viskit.app"/>-->
           <file src="macosx/Info.plist"                   targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/PkgInfo"                      targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/ViskitLogo.icns"              targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources"/>
@@ -117,4 +121,5 @@
 
         </pack>
     </packs>
-</installation>
+    
+</izpack:installation>

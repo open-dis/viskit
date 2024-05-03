@@ -1,7 +1,5 @@
 package viskit.model;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
@@ -15,115 +13,51 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  * @since 3:50:28 PM
  * @version $Id$
  */
-public class GraphMetadata
-{
-    static final Logger LOG = LogUtilities.getLogger(GraphMetadata.class);
+public class GraphMetaData {
 
-    public String name        = "";
+    public String name = "";
     public String packageName = "";
-    public String author      = "";
-    public String created     = "";
-    public String revision    = "";  // TODO originally "version", make XML consistent
-    public String path        = "";
-    public String description = ""; // originally captured in "Comment" element(s), now is description attribute
-    public String stopTime    = "100.0";    
-    public String extendsPackageName    = "";
+    public String author = "";
+    public String version = "1.0";
+    public String description = ""; // originally called "comment"
+    public String stopTime = "100.0";    
+    public String extendsPackageName = "";
     public String implementsPackageName = "";
     
-    public  boolean pathEditable = false;
-    private boolean project      = false;
-    public  boolean updated      = false;
-    public  boolean verbose      = true; // TODO user preference
-    private String  label;
-	private String  DEFAULT_PACKAGE_NAME = "examples"; // TODO user preference
-	
-	public static final String ASSEMBLY    = "assembly";
-	public static final String EVENT_GRAPH = "event graph";
-	public static final String PROJECT     = "project";
+    public boolean verbose = false;
 
-    public GraphMetadata()
-	{
-        initialize ();
+    public GraphMetaData() {
+        this(null);
     }
 
-    public GraphMetadata(Object caller)
-	{
-        initialize ();
+    public GraphMetaData(Object caller) {
+        author = System.getProperty("user.name");
+        packageName = "test";
         
-        if (caller instanceof AssemblyModelImpl)
-		{
-			label   = ASSEMBLY;
-			project = false;
-            name    = "NewAssembly";
-            viskit.xsd.bindings.assembly.ObjectFactory objectFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
-            SimkitAssembly tmp    = objectFactory.createSimkitAssembly();
-               extendsPackageName = tmp.getExtend();
+        if (caller instanceof AssemblyModelImpl) {
+            name = "AssemblyName";
+            viskit.xsd.bindings.assembly.ObjectFactory of =
+                    new viskit.xsd.bindings.assembly.ObjectFactory();
+            SimkitAssembly tmp = of.createSimkitAssembly();
+            extendsPackageName = tmp.getExtend();
             implementsPackageName = tmp.getImplement();
-        } 
-		else if (caller instanceof EventGraphModelImpl)
-		{
-			label   = EVENT_GRAPH;
-			project = false;
-            name    = "NewEventGraph";
-            viskit.xsd.bindings.eventgraph.ObjectFactory objectFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
-            SimEntity tempSimEntity = objectFactory.createSimEntity();
-                 extendsPackageName = tempSimEntity.getExtend();
-              implementsPackageName = tempSimEntity.getImplement();
+
+        } else {
+            name = "EventGraphName";
+            viskit.xsd.bindings.eventgraph.ObjectFactory of =
+                    new viskit.xsd.bindings.eventgraph.ObjectFactory();
+            SimEntity tmp = of.createSimEntity();
+            extendsPackageName = tmp.getExtend();
+            implementsPackageName = tmp.getImplement();
         }
-		else // project TODO verify OK
-		{
-			label   = PROJECT;
-			project = true;
-			name 				    = "NewProject";
-			packageName 	        = ""; // unused
-            extendsPackageName      = ""; // unused
-            implementsPackageName   = ""; // unused
-        }
-		this.created = ""; // do not insert date into legacy models
-		this.updated = false;
     }
 
-    public GraphMetadata(String name, String packageName, String author, String created, String revision, String extendsPackageName, String implementsPackageName, 
-			             String path, String description, boolean isProject)
-	{
-        initialize ();
-		
-        this.name                  = name;
-        this.packageName           = packageName;
-        this.author                = author;
-        this.created               = created;
-        this.revision              = revision;
-        this.extendsPackageName    = extendsPackageName;
-        this.implementsPackageName = implementsPackageName;
-		this.path                  = path;
-		this.description           = description;
-		project                    = isProject;
-		if (project)
-			label   = PROJECT;
-		this.updated = false;
-    } 
-	
-	private void initialize ()
-	{
-        packageName = DEFAULT_PACKAGE_NAME;
-		
-		if (description == null) // when not defined in XML
-		{
-			 description = new String(); // keep empty since legacy Comment information may get added
-		}
-	}
-
-	/**
-	 * @return the project
-	 */
-	public boolean isProject() {
-		return project;
-	}
-
-	/**
-	 * @return the label
-	 */
-	public String getLabel() {
-		return label;
-	}
+    public GraphMetaData(String n, String p, String a, String v, String e, String i) {
+        name = n;
+        packageName = p;
+        author = a;
+        version = v;
+        extendsPackageName = e;
+        implementsPackageName = i;
+    }
 }

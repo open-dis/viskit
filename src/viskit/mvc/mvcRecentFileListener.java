@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2015 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -38,9 +38,9 @@ package viskit.mvc;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.mvc.mvcRecentFileListener">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public interface mvcRecentFileListener 
-{
-    /** Each of the view frames will handle recent file openings */
-    void recentFileListChanged();
+public interface mvcRecentFileListener {
 
-}
+    /** Each of the view frames will handle recent file openings */
+    void listChanged();
+
+} // end class file mvcRecentFileListener.java

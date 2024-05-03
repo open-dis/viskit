@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -52,8 +52,6 @@ import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileFilterEx;
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -62,9 +60,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
 /**
  * Note:  The filechooser stuff is not used since the DOE panel does not expose the corresponding menu items.
  */
-public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssemblyChangeListener 
-{
-    static final Logger LOG = LogUtilities.getLogger(DoeController.class);
+public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssyChangeListener {
 
     private JFileChooser openSaveFileChooser;
     private DoeMainFrame doeFrame;
@@ -96,7 +92,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case OPEN_FILE:
                 // Todo remove menu
                 checkDirty();
-                old_doOpen(new File(((String) e.getSource())));
+                olddoOpen(new File(((String) e.getSource())));
                 break;
 
             case OPEN_FILE_CHOOSE:
@@ -108,7 +104,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 }
 
                 File f = openSaveFileChooser.getSelectedFile();
-                old_doOpen(f);
+                olddoOpen(f);
                 break;
 
             case SAVE_FILE:
@@ -158,38 +154,34 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     private int checkDirty() {
         DoeFileModel dfm = doeFrame.getModel();
-        int response = JOptionPane.YES_OPTION;
+        int reti = JOptionPane.YES_OPTION;
         if (dfm != null) {
-            if (((ParameterTableModel) dfm.paramTable.getModel()).dirty) {
-                response = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
-                if (response == JOptionPane.YES_OPTION) {
+            if (((ParamTableModel) dfm.paramTable.getModel()).dirty) {
+                reti = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
+                if (reti == JOptionPane.YES_OPTION) {
                     doSave(dfm);
                 }
             }
         }
-        return response;
+        return reti;
     }
 
-    private void clearDirty()
-	
-	{
-        DoeFileModel doeFileModel = doeFrame.getModel();
-        if (doeFileModel != null) {
-            ((ParameterTableModel) doeFileModel.paramTable.getModel()).dirty = false;
+    private void clearDirty() {
+        DoeFileModel dfm = doeFrame.getModel();
+        if (dfm != null) {
+            ((ParamTableModel) dfm.paramTable.getModel()).dirty = false;
         }
     }
 
-    private void doSaveAs(DoeFileModel doeFileModel)
-	{
-        String fileName = doeFileModel.userFile.getName();
-        if (!fileName.endsWith(".grd")) // TODO likely switch to Grid.xml or somesuch
-		{
-            int idx = fileName.lastIndexOf('.');
-            fileName = fileName.substring(0, idx);
-            fileName = fileName + ".grd";
+    private void doSaveAs(DoeFileModel dfm) {
+        String nm = dfm.userFile.getName();
+        if (!nm.endsWith(".grd")) {
+            int idx = nm.lastIndexOf('.');
+            nm = nm.substring(0, idx);
+            nm = nm + ".grd";
         }
 
-        openSaveFileChooser.setSelectedFile(new File(fileName));
+        openSaveFileChooser.setSelectedFile(new File(nm));
         int ret = openSaveFileChooser.showSaveDialog(doeFrame);
         if (ret != JFileChooser.APPROVE_OPTION) {
             return;
@@ -197,24 +189,23 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
         File f = openSaveFileChooser.getSelectedFile();
         try {
-            doeFileModel.marshallJaxb(f);
+            dfm.marshallJaxb(f);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(doeFrame, "Error on file save-as: " + e.getMessage(), "File save error", JOptionPane.OK_OPTION);
         }
-        doeFileModel.userFile = f;
-        doeFrame.setTitle(doeFrame.titleString + " -- " + doeFileModel.userFile.getName());
+        dfm.userFile = f;
+        doeFrame.setTitle(doeFrame.titleString + " -- " + dfm.userFile.getName());
     }
 
-    private void doSave(DoeFileModel doeFileModel) {
+    private void doSave(DoeFileModel dfm) {
         try {
-            doeFileModel.marshallJaxb(doeFileModel.userFile);
+            dfm.marshallJaxb(dfm.userFile);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(doeFrame, "Error on file save: " + e.getMessage(), "File save error", JOptionPane.OK_OPTION);
         }
     }
 
-	@Deprecated
-    private void old_doOpen(File f) // todo remove
+    private void olddoOpen(File f) // todo remove
     {
         try {
             DoeFileModel dfm = FileHandler.openFile(f);
@@ -226,30 +217,30 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         }
     }
 
-    private void doOpen(SimkitAssembly jaxbSimkitAssembly, File f) {
-        DoeFileModel doeFileModel = FileHandler._openFileJaxb(jaxbSimkitAssembly, f);
-        doeFrame.setModel(doeFileModel);
+    private void doOpen(SimkitAssembly jaxbRoot, File f) {
+        DoeFileModel dfm = FileHandler._openFileJaxb(jaxbRoot, f);
+        doeFrame.setModel(dfm);
         doeFrame.installContent();
-        doeFrame.setTitle(doeFrame.titleString + " -- " + doeFileModel.userFile.getName());
+        doeFrame.setTitle(doeFrame.titleString + " -- " + dfm.userFile.getName());
     }
     private JobLauncherTab2 jobLauncher;
 
-    public void setJobLauncher(JobLauncherTab2 jobLauncher) {
-        this.jobLauncher = jobLauncher;
+    public void setJobLauncher(JobLauncherTab2 jobL) {
+        jobLauncher = jobL;
     }
-    Vector<TerminalParameter> savedDesignParameters;
+    Vector<TerminalParameter> savedDesignParms;
     Vector<EventGraph> savedEvGraphs;
 
     public boolean prepRun() {
-        DoeFileModel doeFileModel = doeFrame.getModel();
+        DoeFileModel dfm = doeFrame.getModel();
 
         // check for anything checked
         check:
         {
-            int n = doeFileModel.paramTable.getModel().getRowCount();
+            int n = dfm.paramTable.getModel().getRowCount();
 
             for (int r = 0; r < n; r++) {
-                if (((Boolean) doeFileModel.paramTable.getModel().getValueAt(r, ParameterTableModel.FACTOR_COLUMN))) {
+                if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
                     break check;
                 }
             }
@@ -261,25 +252,25 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // clone the jaxbroot (we want to use currently checked widgets, but don't want to force save
     // No clone method, but save the params
 
-        savedDesignParameters = new Vector<>(OpenAssembly.getInstance().jaxbRoot.getDesignParameters());
-        saveDoeParametersNoNotify();
+        savedDesignParms = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
+        saveDoeParmsNoNotify();
 
         // put Event graphs in place (CDATA stuff)
 
-        savedEvGraphs = new Vector<>(OpenAssembly.getInstance().jaxbRoot.getEventGraph());
+        savedEvGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
         // eventgraphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
         return true;
     }
 
-    public Collection<File> getLoadedEventGraphs() {
+    public Collection getLoadedEventGraphs() {
         return new Vector<>(loadedEventGraphs);
     }
 
     public void restorePrepRun() {
-        SimkitAssembly sa = OpenAssembly.getInstance().jaxbRoot;
+        SimkitAssembly sa = OpenAssembly.inst().jaxbRoot;
         sa.getDesignParameters().clear();
-        sa.getDesignParameters().addAll(savedDesignParameters);
-        savedDesignParameters = null;
+        sa.getDesignParameters().addAll(savedDesignParms);
+        savedDesignParms = null;
         sa.getEventGraph().clear();
         sa.getEventGraph().addAll(savedEvGraphs);
         savedEvGraphs = null;
@@ -326,7 +317,6 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 
     private JFileChooser initFileChooser() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Open Design of Experiment (DOE) file");
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
         FileFilterEx[] filter = {new FileFilterEx(".grd", "Doe files (*.grd)", true),
@@ -343,15 +333,15 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
      * the jaxb SimkitAssembly object, ready to be marshalled with the next Assembly save;
      */
     public void saveDoeParams() {
-        saveDoeParametersNoNotify();
-        OpenAssembly.getInstance().doSendAssyJaxbChanged(this);
+        saveDoeParmsNoNotify();
+        OpenAssembly.inst().doSendAssyJaxbChanged(this);
     }
 
-    private void saveDoeParametersNoNotify() {
+    private void saveDoeParmsNoNotify() {
         doeFrame.getModel().saveTableEditsToJaxb();
     }
 
-    public OpenAssembly.AssemblyChangeListener getOpenAssemblyListener() {
+    public OpenAssembly.AssyChangeListener getOpenAssemblyListener() {
         return this;
     }
 
@@ -361,52 +351,52 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case JAXB_CHANGED:
                 break;
 
-            case NEW_ASSEMBLY:
-                doOpen(OpenAssembly.getInstance().jaxbRoot, OpenAssembly.getInstance().file);
+            case NEW_ASSY:
+                doOpen(OpenAssembly.inst().jaxbRoot, OpenAssembly.inst().file);
 
                 if (jobLauncher != null) {
-                    jobLauncher.setAssemblyFile(OpenAssembly.getInstance().jaxbRoot, OpenAssembly.getInstance().file); //todo fixfile);
+                    jobLauncher.setAssemblyFile(OpenAssembly.inst().jaxbRoot, OpenAssembly.inst().file); //todo fixfile);
           //todo required? remarshallEvGraphs();
                 }
                 break;
 
-            case PARAM_LOCALLY_EDITED:
+            case PARAM_LOCALLY_EDITTED:
                 break;
-            case CLOSE_ASSEMBLY:
+            case CLOSE_ASSY:
                 break;
             default:
-                LOG.error("Program error DoeController.assemblyChanged");
+                System.err.println("Program error DoeController.assyChanged");
         }
 
     }
 
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
-        return myEventGraphListener;
+        return myEGListener;
     }
-    private DirectoryWatch.DirectoryChangeListener myEventGraphListener = new EventGraphListener();
+    private DirectoryWatch.DirectoryChangeListener myEGListener = new EGListener();
     Vector<File> loadedEventGraphs = new Vector<>();
 
     /* and here we hear about open event graphs */
-    class EventGraphListener implements DirectoryWatch.DirectoryChangeListener {
+    class EGListener implements DirectoryWatch.DirectoryChangeListener {
 
         @Override
         public void fileChanged(File file, int action, DirectoryWatch source) {
             switch (action) {
                 case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-                    //System.out.println("DoeController got event-graph change message: FILE_ADDED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got eg change message: FILE_ADDED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.add(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-                    //System.out.println("DoeController got event-graph change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got eg change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.remove(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-                    //System.out.println("DoeController got event-graph change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
+                    //System.out.println("DoeController got eg change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
                     break;
                 default:
             }

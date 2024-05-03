@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -35,7 +35,7 @@ package viskit.view;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import edu.nps.util.SpringUtilities;
 import java.awt.Color;
 import java.awt.Component;
@@ -46,7 +46,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,7 +60,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -78,10 +76,9 @@ import viskit.model.AnalystReportModel;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssemblyChangeListener
-{
-    static final Logger LOG = LogUtilities.getLogger(AnalystReportFrame.class);
-	
+public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssyChangeListener {
+
+    static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
     private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
     private AnalystReportModel arb;
 
@@ -89,33 +86,27 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * TODO: rewire this functionality?
      * boolean to show that raw report has not been saved to AnalystReports
      */
-    private boolean reportFileDirty = false;
+    private boolean dirty = false;
     private JMenuBar myMenuBar;
-    private JMenu    analystReportMenu = new JMenu("Analyst Report");
     private JFileChooser locationImageFileChooser;
-	
-    JTextField                titleTF = new JTextField();
-    JTextField          analystNameTF = new JTextField();
-    JComboBox<String> accessControlTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET"});
-    JTextField                 dateTF = new JTextField();
-    File currentAssemblyFile;
 
-    public AnalystReportFrame(mvcController controller)
-	{
+    public AnalystReportFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
-        initializeMVC(controller);
+        initMVC(controller);
         setLayout();
         setBackground(new Color(251, 251, 229)); // yellow
         buildMenus();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
-		dateTF.setText(simpleDateFormat.format(new Date()));
 
         locationImageFileChooser = new JFileChooser("./images/");
-		locationImageFileChooser.setDialogTitle("Open Image");
     }
+    JTextField titleTF = new JTextField();
+    JTextField analystNameTF = new JTextField();
+    JComboBox<String> classifiedTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+    File currentAssyFile;
 
-    private void initializeMVC(mvcController controller) {
-        setController(controller);
+    private void initMVC(mvcController cntlr) {
+        setController(cntlr);
     }
 
     /** Captures the name of the assembly file
@@ -124,21 +115,21 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * @param param the object to act upon
      */
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
-            case NEW_ASSEMBLY:
-                currentAssemblyFile = (File) param;
+            case NEW_ASSY:
+                currentAssyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssyFile(currentAssemblyFile);
+                cntlr.setCurrentAssyFile(currentAssyFile);
                 break;
 
-            case CLOSE_ASSEMBLY:
-            case PARAM_LOCALLY_EDITED:
+            case CLOSE_ASSY:
+            case PARAM_LOCALLY_EDITTED:
             case JAXB_CHANGED:
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assemblyChanged");
+                LOG.error("Program error AnalystReportFrame.assyChanged");
         }
     }
 
@@ -151,12 +142,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         return myMenuBar;
     }
 
-    public boolean isReportFileDirty() {
-        return reportFileDirty;
+    public boolean isReportDirty() {
+        return dirty;
     }
 
-    public void setReportFileDirty(boolean b) {
-        reportFileDirty = b;
+    public void setReportDirty(boolean b) {
+        dirty = b;
     }
 
     public void setReportBuilder(AnalystReportModel b) {
@@ -180,7 +171,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         fillSimulationConfiguration();
         fillEntityParams();
         fillBehaviors();
-        fillStatisticsPanel();
+        fillStatsPan();
         fillConclusionsRecommendationsPanel();
     }
 
@@ -191,7 +182,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         unFillSimulationConfiguration();
         unFillEntityParams();
         unFillBehaviors();
-        unFillStatisticsPanel();
+        unFillStatsPan();
         unFillConRecPan();
     }
 
@@ -204,14 +195,14 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         } else {
             dateTF.setText(DateFormat.getDateInstance().format(new Date()));
         } //now
-        accessControlTF.setSelectedItem(arb.getClassification());
+        classifiedTF.setSelectedItem(arb.getClassification());
     }
 
     private void unFillHeader() {
         arb.setReportName(titleTF.getText());
         arb.setAuthor(analystNameTF.getText());
         arb.setDateOfReport(dateTF.getText());
-        arb.setClassification((String) accessControlTF.getSelectedItem());
+        arb.setClassification((String) classifiedTF.getSelectedItem());
     }
 
     private void setLayout() {
@@ -220,14 +211,35 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
         JTabbedPane tabs = new JTabbedPane();
 
-//      tabs.add("1. Document Header",     headerPanel);
-        tabs.add("1. Executive Summary",   makeExecutiveSummaryPanel());
-        tabs.add("2. Scenario Location",   makeSimulationLocationPanel());
-        tabs.add("3. Simulation Assembly", makeAssemblyDesignPanel());
-        tabs.add("4. Entity Parameters",   makeEntityParamsPanel());
-        tabs.add("5. Model Behaviors",     makeBehaviorsPanel());
-        tabs.add("6. Statistical Results", makeStatisticsPanel());
-        tabs.add("7. Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+        JPanel headerPanel = new JPanel(new SpringLayout());
+        headerPanel.add(new JLabel("Title"));
+        headerPanel.add(titleTF);
+        headerPanel.add(new JLabel("Author"));
+        headerPanel.add(analystNameTF);
+        headerPanel.add(new JLabel("Analysis Date"));
+        headerPanel.add(dateTF);
+        headerPanel.add(new JLabel("Report Classification"));
+        headerPanel.add(classifiedTF);
+        Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
+        titleTF.setMaximumSize(new Dimension(d));
+        analystNameTF.setMaximumSize(new Dimension(d));
+        dateTF.setMaximumSize(new Dimension(d));
+        classifiedTF.setMaximumSize(new Dimension(d));
+        SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
+
+        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
+        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
+
+        tabs.add("1 Header", headerPanel);
+        tabs.add("2 Executive Summary", makeExecutiveSummaryPanel());
+        tabs.add("3 Simulation Location", makeSimulationLocationPanel());
+        tabs.add("4 Assembly Configuration", makeAssemblyDesignPanel());
+        tabs.add("5 Entity Parameters", makeEntityParamsPanel());
+        tabs.add("6 Behavior Descriptions", makeBehaviorsPanel());
+        tabs.add("7 Statistical Results", makeStatisticsPanel());
+        tabs.add("8 Conclusions, Recommendations", makeConclusionsRecommendationsPanel());
 
         add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
@@ -235,42 +247,16 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     JCheckBox wantExecutiveSummary;
     JTextArea execSummTA;
 
-    private JPanel makeExecutiveSummaryPanel() 
-	{
+    private JPanel makeExecutiveSummaryPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-
-        JPanel headerPanel = new JPanel(new SpringLayout());
-        headerPanel.add(new JLabel("Title"));
-        headerPanel.add(titleTF); // TODO setting defaults
-        headerPanel.add(new JLabel("Author"));
-        headerPanel.add(analystNameTF); // TODO setting defaults
-        headerPanel.add(new JLabel("Analysis Date"));
-        headerPanel.add(dateTF);
-        headerPanel.add(new JLabel("Report Classification"));
-        headerPanel.add(accessControlTF);
-        Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
-        titleTF.setMaximumSize(new Dimension(d));
-        analystNameTF.setMaximumSize(new Dimension(d));
-        dateTF.setMaximumSize(new Dimension(d));
-        accessControlTF.setMaximumSize(new Dimension(d));
-        SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
-
-        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
-        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
-		
-		p.add(headerPanel);
-		
-        wantExecutiveSummary = new JCheckBox("include Executive Summary", true);
-        wantExecutiveSummary.setToolTipText("include in output report");
+        wantExecutiveSummary = new JCheckBox("Include executive summary", true);
+        wantExecutiveSummary.setToolTipText("Include entries in output report");
         wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantExecutiveSummary);
 
         JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        jsp.setBorder(new TitledBorder("Description of Location Features"));
         p.add(jsp);
 
         execSummTA.setLineWrap(true);
@@ -301,8 +287,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     private JPanel makeSimulationLocationPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantLocationDescriptions = new JCheckBox("include Location Features and notes", true);
-        wantLocationDescriptions.setToolTipText("include in output report");
+        wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
+        wantLocationDescriptions.setToolTipText("Include entries in output report");
         wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantLocationDescriptions);
 
@@ -545,7 +531,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             Vector<Vector<String>> tableVector = new Vector<>();
             String nm = (String) oa[0];
             Vector<Object[]> v0 = (Vector) oa[1];
-            for (Object[] oa0 : v0) {
+            v0.forEach(oa0 -> {
                 // Rows here
                 String nm0 = (String) oa0[0];
                 Vector<String> rowVect = new Vector<>(3);
@@ -561,7 +547,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
                     rowVect.add(sa[1]); // description
                     tableVector.add(rowVect);
                 }
-            }
+            });
 
             entityParamTabs.add(nm, new JScrollPane(new EntityParamTable(tableVector, colNames)));
         }
@@ -638,9 +624,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         List behaviorList = arb.getBehaviorList();
 
         behaviorTabs.removeAll();
-        for (Iterator iterator = behaviorList.iterator(); iterator.hasNext();)
-		{
-            List nextBehavior = (List) iterator.next();
+        for (Iterator itr = behaviorList.iterator(); itr.hasNext();) {
+            List nextBehavior = (List) itr.next();
             String behaviorName = (String) nextBehavior.get(0);
             String behaviorDescription = (String) nextBehavior.get(1);
             List behaviorParameters = (List) nextBehavior.get(2);
@@ -694,12 +679,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         }
     }
     JCheckBox wantStatisticsDescriptionAnalysis;
-    JCheckBox wantStatisticsReplications;
+    JCheckBox wantStatsReplications;
     JCheckBox wantStatisticsSummary;
-    JTextArea statisticsComments;
-    JTextArea statisticsConclusions;
-    JPanel statisticsSummaryPanel;
-    JPanel statisticsRepPanel;
+    JTextArea statsComments;
+    JTextArea statsConclusions;
+    JPanel statsSummaryPanel;
+    JPanel statsRepPanel;
     JScrollPane repsJsp;
     JScrollPane summJsp;
 
@@ -711,25 +696,25 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsDescriptionAnalysis);
 
-        JScrollPane jsp = new JScrollPane(statisticsComments = new WrappingTextArea());
+        JScrollPane jsp = new JScrollPane(statsComments = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Description of Expected Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        jsp = new JScrollPane(statisticsConclusions = new WrappingTextArea());
+        jsp = new JScrollPane(statsConclusions = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        wantStatisticsReplications = new JCheckBox("Include replication statistics", true);
-        wantStatisticsReplications.setToolTipText("Include entries in output report");
-        wantStatisticsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantStatisticsReplications);
+        wantStatsReplications = new JCheckBox("Include replication statistics", true);
+        wantStatsReplications.setToolTipText("Include entries in output report");
+        wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatsReplications);
 
-        repsJsp = new JScrollPane(statisticsRepPanel = new JPanel());
+        repsJsp = new JScrollPane(statsRepPanel = new JPanel());
         repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsRepPanel.setLayout(new BoxLayout(statisticsRepPanel, BoxLayout.Y_AXIS));
+        statsRepPanel.setLayout(new BoxLayout(statsRepPanel, BoxLayout.Y_AXIS));
         p.add(repsJsp);
 
         wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
@@ -737,46 +722,46 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsSummary);
 
-        summJsp = new JScrollPane(statisticsSummaryPanel = new JPanel());
+        summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
         summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsSummaryPanel.setLayout(new BoxLayout(statisticsSummaryPanel, BoxLayout.Y_AXIS));
+        statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel, BoxLayout.Y_AXIS));
         p.add(summJsp);
 
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         return p;
     }
 
-    private void fillStatisticsPanel() {
-        boolean bool = arb.isPrintStatisticsComments();
+    private void fillStatsPan() {
+        boolean bool = arb.isPrintStatsComments();
         wantStatisticsDescriptionAnalysis.setSelected(bool);
-        statisticsComments.setText(arb.getStatisticsComments());
-        statisticsConclusions.setText(arb.getStatisticsConclusions());
-        statisticsComments.setEnabled(bool);
-        statisticsConclusions.setEnabled(bool);
+        statsComments.setText(arb.getStatsComments());
+        statsConclusions.setText(arb.getStatsConclusions());
+        statsComments.setEnabled(bool);
+        statsConclusions.setEnabled(bool);
 
-        bool = arb.isPrintReplicationStatistics();
-        wantStatisticsReplications.setSelected(bool);
-        bool = arb.isPrintSummaryStatistics();
+        bool = arb.isPrintReplicationStats();
+        wantStatsReplications.setSelected(bool);
+        bool = arb.isPrintSummaryStats();
         wantStatisticsSummary.setSelected(bool);
 
-        List reps = arb.getStatisticsReplicationsList();
-        statisticsRepPanel.removeAll();
+        List reps = arb.getStatsReplicationsList();
+        statsRepPanel.removeAll();
         JLabel lab;
         JScrollPane jsp;
         JTable tab;
 
-        statisticsRepPanel.add(lab = new JLabel("Replication Reports"));
+        statsRepPanel.add(lab = new JLabel("Replication Reports"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsRepPanel.add(Box.createVerticalStrut(10));
+        statsRepPanel.add(Box.createVerticalStrut(10));
         String[] colNames = new String[] {"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
 
         for (Iterator repItr = reps.iterator(); repItr.hasNext();) {
             List r = (List) repItr.next();
             String nm = (String) r.get(0);
             String prop = (String) r.get(1);
-            statisticsRepPanel.add(lab = new JLabel("Entity: " + nm));
+            statsRepPanel.add(lab = new JLabel("Entity: " + nm));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            statisticsRepPanel.add(lab = new JLabel("Property: " + prop));
+            statsRepPanel.add(lab = new JLabel("Property: " + prop));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
             List vals = (List) r.get(2);
@@ -785,12 +770,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             for (Iterator r2 = vals.iterator(); r2.hasNext();) {
                 saa[i++] = (String[]) r2.next();
             }
-            statisticsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+            statsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
             tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
             jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-            statisticsRepPanel.add(Box.createVerticalStrut(20));
+            statsRepPanel.add(Box.createVerticalStrut(20));
         }
         List summs = arb.getStastSummaryList();
 
@@ -801,12 +786,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
             saa[i++] = (String[]) sumItr.next();
         }
 
-        statisticsSummaryPanel.removeAll();
-        statisticsSummaryPanel.add(lab = new JLabel("Summary Report"));
+        statsSummaryPanel.removeAll();
+        statsSummaryPanel.add(lab = new JLabel("Summary Report"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsSummaryPanel.add(Box.createVerticalStrut(10));
+        statsSummaryPanel.add(Box.createVerticalStrut(10));
 
-        statisticsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+        statsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
         tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -815,12 +800,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
     }
 
-    private void unFillStatisticsPanel() {
-        arb.setPrintStatisticsComments(wantStatisticsDescriptionAnalysis.isSelected());
-        arb.setStatisticsDescription(statisticsComments.getText());
-        arb.setStatisticsConclusions(statisticsConclusions.getText());
-        arb.setPrintReplicationStatistics(wantStatisticsReplications.isSelected());
-        arb.setPrintSummaryStatistics(wantStatisticsSummary.isSelected());
+    private void unFillStatsPan() {
+        arb.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
+        arb.setStatsDescription(statsComments.getText());
+        arb.setStatsConclusions(statsConclusions.getText());
+        arb.setPrintReplicationStats(wantStatsReplications.isSelected());
+        arb.setPrintSummaryStats(wantStatisticsSummary.isSelected());
     }
     JCheckBox wantConclusionsRecommendations;
     JTextArea conRecConclusionsTA;
@@ -862,54 +847,46 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setRecommendations(conRecRecsTA.getText());
     }
 
-    private void buildMenus()
-	{
-        AnalystReportController analystReportController = (AnalystReportController) getController();
+    private void buildMenus() {
 
-        int menuShortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        AnalystReportController controller = (AnalystReportController) getController();
+
+        int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         // Setup the File Menu
         myMenuBar = new JMenuBar();
-        analystReportMenu.setMnemonic(KeyEvent.VK_N);
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        analystReportMenu.add(buildMenuItem(analystReportController,
-                AnalystReportController.OPEN_ANALYST_REPORT_METHOD,
-                "Open Previous Analyst Report",
+        fileMenu.add(buildMenuItem(controller,
+                "openAnalystReport",
+                "Open another analyst report",
                 KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcutKeyMask)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
 
-        JMenuItem saveMI = buildMenuItem(analystReportController,
-                AnalystReportController.SAVE_ANALYST_REPORT_METHOD,
-                "Save Analyst Report",
+        JMenuItem view = new JMenuItem("View analyst report XML");
+        view.setMnemonic(KeyEvent.VK_V);
+        view.setToolTipText("Currently not implemented");
+        view.setEnabled(false); // TODO:  implement listener and view functionality
+
+        fileMenu.add(view);
+        fileMenu.add(buildMenuItem(controller,
+                "saveAnalystReport",
+                "Save analyst report XML",
                 KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcutKeyMask));
-        saveMI.setToolTipText("Save Analyst Report as XML file");
-        analystReportMenu.add(saveMI);
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
 
-		
-        JMenuItem generateMI = buildMenuItem(analystReportController,
-                AnalystReportController.GENERATE_ANALYST_REPORT_METHOD,
-                "Display Analyst Report",
+        fileMenu.add(buildMenuItem(controller,
+                "generateHtmlReport",
+                "Display analyst report HTML",
                 KeyEvent.VK_D,
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcutKeyMask));
-        saveMI.setToolTipText("Save Analyst Report as HTML page");
-        analystReportMenu.add(generateMI);
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
-        JMenuItem viewAnalystReportXmlMI = buildMenuItem(analystReportController,
-                AnalystReportController.VIEW_ANALYST_REPORT_XML_METHOD,
-				"View analyst report XML",
-                KeyEvent.VK_X,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuShortcutKeyMask));
-        viewAnalystReportXmlMI.setEnabled(false); // TODO:  implement listener and view functionality
-        viewAnalystReportXmlMI.setToolTipText("TODO future capability");
-        analystReportMenu.add(viewAnalystReportXmlMI);
-
-        myMenuBar.add(analystReportMenu);
+        myMenuBar.add(fileMenu);
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel)
-	{
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
         Action a = ActionIntrospector.getAction(source, method);
         Map<String, Object> map = new HashMap<>();
         if (mn != null) {
@@ -930,20 +907,6 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
     @Override
     public void modelChanged(mvcModelEvent event) {}
-
-	/**
-	 * @return the analystReportMenu
-	 */
-	public JMenu getFileMenu() {
-		return analystReportMenu;
-	}
-
-	/**
-	 * @param fileMenu the analystReportMenu to set
-	 */
-	public void setFileMenu(JMenu fileMenu) {
-		this.analystReportMenu = fileMenu;
-	}
 
     class fileChoiceListener implements ActionListener {
 

@@ -1,14 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
 
 <!--
     Document   : izpack.xml
     Created on : September 3, 2006, 2:29 PM
     Author     : rmgold
     Description:
-        IzPack Installer builder for Win 32 / Unix Viskit
+        IzPack Installer builder for Win 64 / Unix Viskit
 -->
 
-<installation version="1.0">
+<izpack:installation version="5.0"
+                     xmlns:izpack="http://izpack.org/schema/installation"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
 
     <variables>
         <variable name="DesktopShortcutCheckboxEnabled" value="true"/>
@@ -30,8 +33,9 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
+        <uninstaller write="yes" name="Viskituninstaller.jar"/>
         <!-- Minimum JDK version required -->
-        <javaversion>1.7</javaversion>
+        <javaversion>17</javaversion>
         <requiresjdk>yes</requiresjdk>
         <summarylogfilepath>$INSTALL_PATH/InstallSummary.htm</summarylogfilepath>
         <!-- Hopefully helps with Win Vista/7 installs -->
@@ -40,27 +44,17 @@
     </info>
 
     <guiprefs height="600" width="800" resizable="yes">
-        <laf name="liquid">
-            <os family="windows"/>
-        </laf>
-        <laf name="metouia">
-            <os family="unix" />
-        </laf>
-        <!--laf name="looks">
+        <laf name="substance">
             <os family="windows" />
-            <param name="variant" value="extwin" />
-        </laf-->
+            <os family="unix" />
+            <param name="variant" value="mist-silver" />
+        </laf>
+        <modifier key="useHeadingPanel" value="yes" />
     </guiprefs>
 
     <locale>
         <!-- The English will have to live with USA version -->
         <langpack iso3="usa"/>
-        <langpack iso3="fra"/>
-        <langpack iso3="deu"/>
-        <langpack iso3="spa"/>
-        <langpack iso3="jpn"/>
-        <langpack iso3="ita"/>
-        <langpack iso3="chn"/>
     </locale>
 
     <resources>
@@ -72,28 +66,29 @@
     </resources>
 
     <panels>
-        <panel classname="HelloPanel"/>
-        <panel classname="HTMLInfoPanel" id="info"/>
-        <panel classname="LicencePanel" id="licence"/><!--not my english-->
-        <panel classname="PacksPanel"/>
-        <panel classname="TargetPanel"/>
-        <panel classname="InstallPanel"/>
-        <panel classname="ShortcutPanel"/>
-        <panel classname="SimpleFinishPanel"/>
+        <panel classname="HelloPanel"         id="HelloPanel"/>
+        <panel classname="HTMLInfoPanel"      id="panel.html"/>
+        <panel classname="LicencePanel"       id="LicencePanel"/>
+        <panel classname="TargetPanel"        id="TargetPanel"/>
+        <panel classname="PacksPanel"         id="PacksPanel"/>
+        <panel classname="ShortcutPanel"      id="ShortcutPanel"/>
+        <panel classname="SummaryPanel"       id="SummaryPanel"/>
+        <panel classname="InstallPanel"       id="panel.install"/>
+        <panel classname="SimpleFinishPanel"  id="SimpleFinishPanel"/>
     </panels>
     <listeners>
-        <listener installer="SummaryLoggerInstallerListener">
+        <listener classname="SummaryLoggerInstallerListener" stage="install">
             <os family="windows"/>
             <os family="unix"/>
         </listener>
     </listeners>
     <packs>
-        <pack name="Core" required="yes">
-            <description>Core Viskit Application Files</description>
-            <fileset dir="stage" targetdir="$INSTALL_PATH">
+        <pack name="Base" required="yes">
+            <description>The base files</description>
+<!--            <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="windows"/>
                 <include name="Viskit.exe"/>
-            </fileset>
+            </fileset>-->
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="windows"/>
                 <os family="unix"/>
@@ -102,6 +97,7 @@
                 <include name="configuration/**"/>
                 <exclude name="configuration/c_gui_mac.xml"/>
                 <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
+                <include name="doc/**"/>
                 <include name="images/**"/>
                 <exclude name="images/american-flag.gif"/>
                 <include name="lib/**" />
@@ -110,6 +106,7 @@
                 <include name="viskit-exe.jar"/>
                 <include name="RELEASE_NOTES*"/>
                 <include name="ViskitOperation.txt"/>
+                <include name="Viskit-overview.docx"/>
                 <include name="NB-Project-Creation.txt"/>
             </fileset>
             <fileset dir="stage" targetdir="$USER_HOME">
@@ -125,29 +122,25 @@
             </fileset>
 
             <!-- Sets +x attributes -->
-            <executable targetfile="$INSTALL_PATH/Viskit.exe" type="bin" keep="true" stage="never" failure="warn">
+<!--            <executable targetfile="$INSTALL_PATH/Viskit.exe" type="bin" keep="true" stage="never" failure="warn">
                 <os family="windows"/>
-            </executable>
+            </executable>-->
 
-            <executable targetfile="$INSTALL_PATH/viskit-exe.jar" type="jar" keep="true" stage="never" failure="warn">
+            <executable targetfile="$INSTALL_PATH/viskit-exe.jar" type="jar" 
+                        keep="true" stage="never" failure="warn" class="viskit.Splash2">
                 <os family="windows"/>
                 <os family="unix"/>
             </executable>
         </pack>
     </packs>
 
-    <native type="izpack" name="ShellLink.dll">
-        <os family="windows"/>
-    </native>
-    <native type="3rdparty" name="COIOSHelper.dll" stage="both">
+    <!-- Don't forget 64 bit Windows O/Ss -->
+    <native type="izpack" name="ShellLink_x64.dll" uninstaller="true">
         <os family="windows"/>
     </native>
 
-    <!-- Don't forget 64 bit Windows O/Ss -->
-    <native type="izpack" name="ShellLink_x64.dll">
+    <native type="3rdparty" name="COIOSHelper_x64.dll" uninstaller="true">
         <os family="windows"/>
     </native>
-    <native type="3rdparty" name="COIOSHelper_x64.dll" stage="both">
-        <os family="windows"/>
-    </native>
-</installation>
+
+</izpack:installation>

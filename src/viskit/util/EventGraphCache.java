@@ -24,7 +24,7 @@
  *
  * TODO:
  *
- * Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+ * Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -58,7 +58,7 @@
  */
 package viskit.util;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.File;
 
 import java.io.IOException;
@@ -70,7 +70,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
@@ -98,9 +98,9 @@ import viskit.ViskitGlobals;
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class EventGraphCache
-{
-    static final Logger LOG = LogUtilities.getLogger(EventGraphCache.class);
+public class EventGraphCache {
+
+    static Logger log = LogUtils.getLogger(EventGraphCache.class);
 
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;
@@ -114,7 +114,7 @@ public class EventGraphCache
     private List<File> eventGraphImageFilesList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
-            ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDirectory().getPath();
+            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
     private Element entityTable;
     private static EventGraphCache me;
 
@@ -132,7 +132,7 @@ public class EventGraphCache
     }
 
     /**
-     * Converts a loaded Assembly file into a Document
+     * Converts a loaded assy file into a Document
      *
      * @param assyFile the assembly file loaded
      */
@@ -142,7 +142,7 @@ public class EventGraphCache
 
     /**
      * Creates the entity table for an analyst report xml object.  Also aids in
-     * opening EG files that are a SimEntity node of an Assembly file
+     * opening EG files that are a SimEntity node of an Assy file
      *
      * @param assyFile the assembly file loaded
      */
@@ -165,7 +165,7 @@ public class EventGraphCache
             getEventGraphImageFilesList().clear();
         }
 
-        setEventGraphFiles(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDirectory());
+        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
 
         Element localRootElement = assemblyDocument.getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
@@ -202,7 +202,7 @@ public class EventGraphCache
             SAXBuilder builder = new SAXBuilder();
             doc = builder.build(xmlFile);
         } catch (JDOMException | IOException ex) {
-            LOG.error(ex);
+            log.error(ex);
         }
         return doc;
     }
@@ -212,26 +212,25 @@ public class EventGraphCache
      * in the project's EGs directory, and adds it to the list of event graphs
      * with the proper formatting of the file's path
      *
-     * @param eventGraphFile the EG file type and name to save
+     * @param egFile the EG file type and name to save
      */
-    private void saveEventGraphReferences(File eventGraphFile)
-	{
-//        LOG.debug("Event graph: " + eventGraphFile);
+    private void saveEventGraphReferences(File egFile) {
+        log.debug("EG: " + egFile);
 
         // find the package seperator
-        int   lastSlash = eventGraphFile.getPath().lastIndexOf(File.separator);
-        int dotPosition = eventGraphFile.getPath().lastIndexOf(".");
+        int lastSlash = egFile.getPath().lastIndexOf(File.separator);
+        int pos = egFile.getPath().lastIndexOf(".");
 
-        String    packageName = eventGraphFile.getParentFile().getName();
-        String eventGraphName = eventGraphFile.getPath().substring(lastSlash + 1, dotPosition);
-        eventGraphNamesList.add(packageName + "." + eventGraphName);
+        String pkg = egFile.getParentFile().getName();
+        String egName = egFile.getPath().substring(lastSlash + 1, pos);
+        eventGraphNamesList.add(pkg + "." + egName);
 
-//        LOG.debug("EventGraph Name: " + eventGraphName);
+        log.debug("EventGraph Name: " + egName);
 
-        File imageFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + packageName + "/" + eventGraphName + ".xml.png");
-//        LOG.debug("Event Graph image file location: " + imageFile);
+        File imgFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + pkg + "/" + egName + ".xml.png");
+        log.debug("Event Graph Image location: " + imgFile);
 
-        eventGraphImageFilesList.add(imageFile);
+        eventGraphImageFilesList.add(imgFile);
     }
 
     /** Use recursion to find EventGraph XML files
@@ -254,7 +253,7 @@ public class EventGraphCache
             } else {
 
                 localRootElement = assemblyDocument.getRootElement();
-                simEntityList = (List<Element>) localRootElement.getChildren("SimEntity");
+                simEntityList = localRootElement.getChildren("SimEntity");
 
                 // Check all names against the simEntityList obtained from the Assembly
                 for (Element entity : simEntityList) {

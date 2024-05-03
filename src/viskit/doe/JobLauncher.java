@@ -46,10 +46,10 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
-import org.apache.logging.log4j.Logger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
@@ -67,9 +67,7 @@ import viskit.util.TitleListener;
  * @since 12:29:08 PM
  * @version $Id$
  */
-public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener
-{
-    static final Logger LOG = LogUtilities.getLogger(JobLauncher.class);
+public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener {
 
     String inputFileString;
     File inputFile;
@@ -88,8 +86,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
     String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
     String clusterWebStatus = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
-    private JButton cancelButton;
-    private JButton runButton;
+    private JButton canButt;
+    private JButton runButt;
     private JButton closeButt;
     private Document doc;
     private JTextField sampsTF;
@@ -137,7 +135,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    cancelButton.doClick();
+                    canButt.doClick();
                 }
             });
         }
@@ -190,12 +188,12 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         SpringUtilities.makeCompactGrid(topPan, 6, 2, 10, 10, 5, 5);
         topPan.setMaximumSize(topPan.getPreferredSize());
 
-        cancelButton = new JButton("Cancel job");
-        cancelButton.setEnabled(false);
-        runButton = new JButton("Run job");
+        canButt = new JButton("Cancel job");
+        canButt.setEnabled(false);
+        runButt = new JButton("Run job");
         botBar.add(Box.createHorizontalGlue());
-        botBar.add(cancelButton);
-        botBar.add(runButton);
+        botBar.add(canButt);
+        botBar.add(runButt);
         if (!isSubComponent) {
             botBar.add(Box.createHorizontalStrut(20));
             closeButt = new JButton("Close");
@@ -229,7 +227,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         try {
             getParams();
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
         doTitle(title);
     }
@@ -292,11 +290,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     }
 
     private void doListeners() {
-        cancelButton.setActionCommand("cancel");
-        runButton.setActionCommand("run");
+        canButt.setActionCommand("cancel");
+        runButt.setActionCommand("run");
         ActionListener al = new ButtListener();
-        cancelButton.addActionListener(al);
-        runButton.addActionListener(al);
+        canButt.addActionListener(al);
+        runButt.addActionListener(al);
         if (!isSubComponent) {
             closeButt.setActionCommand("x");
             closeButt.addActionListener(al);
@@ -309,19 +307,19 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         // temp:
         switch (action) {
             case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: " + " " + file.getAbsolutePath());
                 }
                 setFile(null, null);
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.VStatics.debug) {
                     System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
@@ -337,8 +335,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand().charAt(0)) {
                 case 'r':
-                    runButton.setEnabled(false);
-                    cancelButton.setEnabled(true);
+                    runButt.setEnabled(false);
+                    canButt.setEnabled(true);
                     if (!isSubComponent) {
                         closeButt.setEnabled(false);
                     }
@@ -350,12 +348,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     stopRun();
                     break;
                 case 'x':
-                    runButton.setEnabled(true);  // for next time (probably not used)
-                    cancelButton.setEnabled(false);
+                    runButt.setEnabled(true);  // for next time (probably not used)
+                    canButt.setEnabled(false);
                     if (outputDirty) {
-                        if (JOptionPane.showConfirmDialog(JobLauncher.this, "Save simulation output?") == JOptionPane.YES_OPTION) {
+                        if (JOptionPane.showConfirmDialog(JobLauncher.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
-							jfc.setDialogTitle("Save Design of Experiment (DOE) file");
                             jfc.setSelectedFile(new File("DOEOutput.txt"));
                             jfc.showSaveDialog(JobLauncher.this);
                             if (jfc.getSelectedFile() != null) {
@@ -365,7 +362,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                                 fw.write(ta.getText());
                             }
                                 } catch (IOException e1) {
-                                    e1.printStackTrace();
+                                    e1.printStackTrace(System.err);
                                 }
                             }
                         }
@@ -376,7 +373,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     break;
                 default:
                     //assert false:"Program error JobLauncher.java";
-                    LOG.error("Program error JobLauncher.java");
+                    System.err.println("Program error JobLauncher.java");
             }
         }
     }
@@ -401,11 +398,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     private void stopRun() {
         outputList.clear();
 
-        cancelButton.setEnabled(false);
+        canButt.setEnabled(false);
         if (!isSubComponent) {
             closeButt.setEnabled(true);
         }
-        runButton.setEnabled(true);
+        runButt.setEnabled(true);
 
         if (thread == null) {
             return;
@@ -414,30 +411,25 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         writeStatus("Stopping run.");
         hideClusterStatus();
 
-        Thread jobKiller = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                if (thread != null) {
-                    Thread t = thread;
-                    thread = null;
-                    t.interrupt();
-                    try {
-                        t.join(1_000);
-                    } catch (InterruptedException e) {
-                        System.out.println("join exception");
-                    }
-
-                }
+        Thread jobKiller = new Thread(() -> {
+            if (thread != null) {
+                Thread t = thread;
+                thread = null;
+                t.interrupt();
                 try {
-                    Vector parms = new Vector();
-                    //o = rpc.execute("experiment.flushQueue",parms);
-                    Object o = rpc.execute("experiment.clear", parms);
-                //writeStatus("flushQueue = " + o);
-                } catch (XmlRpcException | IOException e) {
-                    e.printStackTrace();
+                    t.join(1_000);
+                } catch (InterruptedException e) {
+                    System.out.println("join exception");
                 }
 
+            }
+            try {
+                Vector parms = new Vector();
+                //o = rpc.execute("experiment.flushQueue",parms);
+                Object o = rpc.execute("experiment.clear", parms);
+                //writeStatus("flushQueue = " + o);
+            } catch (XmlRpcException | IOException e) {
+                e.printStackTrace(System.err);
             }
         }, "JobKiller");
         jobKiller.setPriority(Thread.NORM_PRIORITY);
@@ -445,13 +437,9 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     }
 
     private void writeStatus(final String s) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                ta.append(s);
-                ta.append("\n");
-            }
+        SwingUtilities.invokeLater(() -> {
+            ta.append(s);
+            ta.append("\n");
         });
     }
     StringWriter data;
@@ -580,29 +568,29 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             System.out.println("Error unmarshalling results: " + e.getMessage());
             return null;
         }
-        Element jdomRootElement = document.getRootElement();
-        if (!jdomRootElement.getName().equals("Results")) {
+        Element el = document.getRootElement();
+        if (!el.getName().equals("Results")) {
             System.out.println("Unknown results format, design point = " + dp + ", run = " + nrun);
             return res;
         }
-        String design = attValue(jdomRootElement, "design");
-        String index  = attValue(jdomRootElement, "index");
-        String job    = attValue(jdomRootElement, "job");
-        String run    = attValue(jdomRootElement, "run");
+        String design = attValue(el, "design");
+        String index = attValue(el, "index");
+        String job = attValue(el, "job");
+        String run = attValue(el, "run");
 
-        Element jdomPropertyChange = jdomRootElement.getChild("PropertyChange");
-        if (jdomPropertyChange == null) {
-            if (viskit.ViskitStatics.debug) {
+        Element propCh = el.getChild("PropertyChange");
+        if (propCh == null) {
+            if (viskit.VStatics.debug) {
                 System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
             }
             return res;
         }
-        String listenerName = attValue(jdomPropertyChange, "listenerName");
-        String property     = attValue(jdomPropertyChange, "property");
-        java.util.List propertyContent = jdomPropertyChange.getContent();
+        String listenerName = attValue(propCh, "listenerName");
+        String property = attValue(propCh, "property");
+        java.util.List propertyContent = propCh.getContent();
         Text txt = (Text) propertyContent.get(0);
         String cstr = txt.getTextTrim();
-        if (viskit.ViskitStatics.debug) {
+        if (viskit.VStatics.debug) {
             System.out.println("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
@@ -623,13 +611,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         res.run = Integer.parseInt(run);
         //assert res.run == nrun :"JobLauncher.doResults";
         if (res.run != nrun) {
-            LOG.error("JobLauncher.doResults");
+            System.err.println("JobLauncher.doResults");
         }
 
         res.dp = Integer.parseInt(design);
         //assert res.dp == dp : "JobLauncher.doResults1";
         if (res.dp != dp) {
-            LOG.error("JobLauncher.doResults1");
+            System.err.println("JobLauncher.doResults1");
         }
 
         res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);
@@ -682,7 +670,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             editorPane.setEditable(false);
             editorScrollPane = new JScrollPane(editorPane);
             editorScrollPane.setVerticalScrollBarPolicy(
-            JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
             editorScrollPane.setPreferredSize(new Dimension(680, 800)); //640,480));
             editorScrollPane.setMinimumSize(new Dimension(10, 10));
 
@@ -691,10 +679,10 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         }
 
         try {
-            statusURL = new URL(surl);
+            statusURL = new URI(surl).toURL();
             editorPane.setPage(statusURL);
-        } catch (IOException e) {
-            System.out.println("Error showing cluster status: " + e.getMessage());
+        } catch (IOException | URISyntaxException e) {
+            System.err.println("Error showing cluster status: " + e.getMessage());
             return;
         }
 
@@ -710,11 +698,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
         clusterStatusFrame.setBounds(frR);
 
-        Runnable rn = new Runnable() {
-            @Override
-            public void run() {
-                clusterStatusFrame.setVisible(true);
-            }
+        Runnable rn = () -> {
+            clusterStatusFrame.setVisible(true);
         };
         SwingUtilities.invokeLater(rn);
 
@@ -779,16 +764,12 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     editorPane.setCaretPosition(editorPane.getDocument().getLength());
                     int hm = hbar.getMaximum();
                     int vm = vbar.getMaximum();
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            hbar.setValue(50);
-                            vbar.setValue(50); //vbar.getMaximum());
-                        }
+                    SwingUtilities.invokeLater(() -> {
+                        hbar.setValue(50);
+                        vbar.setValue(50); //vbar.getMaximum());
                     });
                 } catch (InterruptedException | IOException e) {
-                    System.out.println("statusUpdater kill: " + e.getMessage());
+                    System.err.println("statusUpdater kill: " + e.getMessage());
                 }
             }
         }
@@ -799,11 +780,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             System.out.println("Give .xml file as argument");
         } else {
 
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    new JobLauncher(false, args[0], args[0], null);
-                }
+            Runnable r = () -> {
+                new JobLauncher(false, args[0], args[0], null);
             };
             SwingUtilities.invokeLater(r);
         }
@@ -829,7 +807,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         double resultsVariance;
         double resultsStdDev;
     }
-    private String namePrefix = "Visual Simkit (Viskit) Cluster Job Controller";
+    private String namePrefix = "Viskit Cluster Job Controller";
     private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {

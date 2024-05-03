@@ -38,6 +38,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -54,8 +55,8 @@ import javax.tools.ToolProvider;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
+import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.doe.DoeException;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.assembly.ViskitAssembly;
@@ -69,7 +70,7 @@ import viskit.xsd.bindings.assembly.SampleStatistics;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.assembly.TerminalParameter;
 import viskit.xsd.cli.Boot;
-import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**
  *
@@ -153,7 +154,7 @@ public class Gridlet extends Thread {
                 filename = props.get("FILENAME");
                 port = Integer.parseInt(props.get("PORT"));
                 pwd = props.get("PWD");
-                sax2j = new SimkitAssemblyXML2Java(new URL("file:"+pwd+"/"+filename).openStream());
+                sax2j = new SimkitAssemblyXML2Java(new URI("file:"+pwd+"/"+filename).toURL().openStream());
                 System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd);
                 //TBD: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
@@ -174,10 +175,10 @@ public class Gridlet extends Thread {
                 // TODO: Fix generics
                 v = (Vector) xmlrpc.execute("gridkit.getJars",v);
                 Enumeration e = v.elements();
-                ClassLoader boot = ViskitGlobals.instance().getWorkClassLoader();
+                ClassLoader boot = VGlobals.instance().getWorkClassLoader();
                 if (boot instanceof Boot) {
                     while (e.hasMoreElements()) {
-                        ((Boot) boot).addJar(new URL((String) e.nextElement()));
+                        ((Boot) boot).addJar(new URI((String) e.nextElement()).toURL());
                     }
                 } else {
                     if (!v.isEmpty()) {
@@ -187,15 +188,15 @@ public class Gridlet extends Thread {
 
             } else {
                 // check if LocalBootLoader mode, otherwise throw exception
-                Object loaderO = ViskitGlobals.instance().getWorkClassLoader();
+                Object loaderO = VGlobals.instance().getWorkClassLoader();
                 Class<?> loaderz = loaderO.getClass();
-                if ( !( loaderz.getName().equals(ViskitStatics.LOCAL_BOOT_LOADER) ) ) {
+                if ( !( loaderz.getName().equals(VStatics.LOCAL_BOOT_LOADER) ) ) {
                     throw new RuntimeException("Not running as SGE job or local mode?");
                 }
                 usid = "LOCAL-RUN";
             }
-        } catch (IOException | XmlRpcException | RuntimeException e) {
-            e.printStackTrace();
+        } catch (IOException | XmlRpcException | RuntimeException | URISyntaxException e) {
+            e.printStackTrace(System.err);
         }
     }
 
@@ -208,7 +209,7 @@ public class Gridlet extends Thread {
         this.filename = expFile.getName();
         try {
             //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
-            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getWorkClassLoader());
+            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ VGlobals.instance().getWorkClassLoader());
             //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURI().toURL().openStream());
         } catch (IOException ex) {
@@ -322,7 +323,7 @@ public class Gridlet extends Thread {
 
                 // generate java for the eventGraph and evaluate a loaded
                 // class
-                SimkitEventGraphXML2Java sx2j = new SimkitEventGraphXML2Java(bais);
+                SimkitXML2Java sx2j = new SimkitXML2Java(bais);
                 // first convert XML to java source
                 sx2j.unmarshal();
 
@@ -398,11 +399,11 @@ public class Gridlet extends Thread {
             System.out.println(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
 
             if(cloader instanceof Boot) {
-                ((Boot) cloader).addURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
-            } else if (cloader.getClass().getName().equals(ViskitStatics.LOCAL_BOOT_LOADER)) {
+                ((Boot) cloader).addURL(new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());
+            } else if (cloader.getClass().getName().equals(VStatics.LOCAL_BOOT_LOADER)) {
                 System.out.println("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
                 Method doAddURL = cloader.getClass().getMethod("doAddURL",java.net.URL.class);
-                doAddURL.invoke(cloader,new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
+                doAddURL.invoke(cloader, new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());
                 //((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
             }
 
@@ -421,7 +422,7 @@ public class Gridlet extends Thread {
 
             // finished running, collect some statistics
 
-            simkit.stat.SampleStatistics[] designPointStatistics = sim.getDesignPointStatistics();
+            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
             simkit.stat.SampleStatistics replicationStat;
 
             // go through and copy in the statistics
@@ -429,10 +430,10 @@ public class Gridlet extends Thread {
             ObjectFactory of = new ObjectFactory();
             String statXml;
 
-            // first get designPoint statistics
-            if (designPointStatistics != null ) {
+            // first get designPoint stats
+            if (designPointStats != null ) {
                 try {
-                    for (simkit.stat.SampleStatistics designPointStat : designPointStatistics) {
+                    for (simkit.stat.SampleStatistics designPointStat : designPointStats) {
                         if (designPointStat instanceof simkit.stat.IndexedSampleStatistics) {
                             // tbd handle this for local case too
                             IndexedSampleStatistics iss = of.createIndexedSampleStatistics();
@@ -453,14 +454,14 @@ public class Gridlet extends Thread {
                             // local gridRunner
                             Class<?> gridRunnerz = gridRunner.getClass();
                             Method mthd = gridRunnerz.getMethod("addDesignPointStat", int.class, int.class, int.class, String.class);
-                            mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStatistics.length, statXml);
+                            mthd.invoke(gridRunner, sampleIndex, designPtIndex, designPointStats.length, statXml);
                         } else {
 
                             Vector<Object> args = new Vector<>();
                             args.add(usid);
                             args.add(sampleIndex);
                             args.add(designPtIndex);
-                            args.add(designPointStatistics.length);
+                            args.add(designPointStats.length);
                             args.add(statXml);
                             if (debug_io) {
                                 System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
@@ -468,7 +469,7 @@ public class Gridlet extends Thread {
                             }
                             xmlrpc.execute("gridkit.addDesignPointStat", args);
                         }
-                        // replication statistics similarly
+                        // replication stats similarly
                         String repName = designPointStat.getName();
                         repName = repName.substring(0, repName.length() - 6); // strip off ".count"
                         for (int j = 0; j < replicationsPerDesignPoint; j++) {
@@ -522,7 +523,7 @@ public class Gridlet extends Thread {
                 }
             }
             else {
-                System.out.println("No DesignPointStatistics");
+                System.out.println("No DesignPointStats");
 
 
                 // reconnect io
@@ -537,7 +538,7 @@ public class Gridlet extends Thread {
             }
 
             // skim through console chatter and organize
-            // into log, error, and if non statistics property
+            // into log, error, and if non stats property
             // change messages which are wrapped in xml,
             // then so sent as a Results tag. Results
             // should probably not be named Results as
@@ -639,11 +640,11 @@ public class Gridlet extends Thread {
                     xmlrpc.execute("gridkit.removeTask", parms);
                 }
             } catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | XmlRpcException e) {
-                e.printStackTrace();
+                e.printStackTrace(System.err);
             }
 
-        } catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IOException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException | InstantiationException | URISyntaxException e) {
+            e.printStackTrace(System.err);
         }
     }
 

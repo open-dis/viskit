@@ -40,10 +40,10 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /** Test of static variables isolated by unique class loaders. The static "debug"
- * variable of the ViskitStatics class is initialized to true.
+ * variable of the VStatics class is initialized to false.
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.doe.StaticsTest">Terry D. Norbraten</a>
  */
@@ -62,8 +62,8 @@ public class StaticsTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
-        statics = loaderNoReset.loadClass("viskit.ViskitStatics");
+        loaderNoReset = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
+        statics = loaderNoReset.loadClass("viskit.VStatics");
         Constructor sconstr = statics.getConstructor();
         rstatics = sconstr.newInstance();
         debug = statics.getDeclaredField("debug");
@@ -83,8 +83,8 @@ public class StaticsTest extends TestCase {
 
     public void testStatics() throws Exception {
         
-        LocalBootLoader loaderWithReset = (LocalBootLoader) ViskitGlobals.instance().getFreshClassLoader();
-        Class<?> staticz = loaderWithReset.loadClass("viskit.ViskitStatics");
+        LocalBootLoader loaderWithReset = (LocalBootLoader) VGlobals.instance().getFreshClassLoader();
+        Class<?> staticz = loaderWithReset.loadClass("viskit.VStatics");
         Constructor sconstr = staticz.getConstructor();
         Object rstaticz = sconstr.newInstance();
         Field debugz = staticz.getDeclaredField("debug");
@@ -94,7 +94,7 @@ public class StaticsTest extends TestCase {
         
         Assert.assertTrue(fdebug == fdebugz);
         
-        debug.set(rstaticz, false);
+        debug.set(rstaticz, true);
         fdebug = debug.get(rstatics);
         fdebugz = debugz.get(rstaticz);
         

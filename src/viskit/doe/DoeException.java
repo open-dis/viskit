@@ -11,7 +11,7 @@ package viskit.doe;
  *
  * @author Rick Goldberg
  */
-public class DoeException extends java.lang.Exception {
+public class DoeException extends Exception {
     
     /**
      * Creates a new instance of <code>DoeException</code> without detail message.

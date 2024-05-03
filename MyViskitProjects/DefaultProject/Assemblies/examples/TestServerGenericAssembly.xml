@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="TestServerGenericAssembly" version="21 May 2016" package="examples" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="TestServerGenericAssembly" version="$Id: TestServerGenericAssembly.xml 1590 2007-10-07 05:41:19Z tdnorbra $" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="ServerGeneric_0" type="examples.ServerGeneric" description="">
         <TerminalParameter name="totalNumberServers" value="1" type="int"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Constant" type="java.lang.String"/>
-            <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter name="" value="1.1" type="java.lang.Object"/>
-            </MultiParameter>
+            <TerminalParameter name="" value="1.1" type="double"/>
         </FactoryParameter>
         <Coordinate x="390.0" y="200.0"/>
     </SimEntity>
     <SimEntity name="ArrivalProcess_1" type="examples.ArrivalProcess" description="">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
-            <MultiParameter type="java.lang.Object[]">
-                <TerminalParameter name="" value="1.2" type="java.lang.Object"/>
-            </MultiParameter>
+            <TerminalParameter name="" value="1.2" type="double"/>
         </FactoryParameter>
         <Coordinate x="140.0" y="200.0"/>
     </SimEntity>

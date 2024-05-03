@@ -1,13 +1,12 @@
 package viskit.reports;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.awt.Color;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -15,7 +14,7 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -40,8 +39,8 @@ public class HistogramChart {
      * @return the path url of the created object
      */
     public String createChart(String title, String label, double[] data) {
-        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
-        File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "Histogram.png");
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 
@@ -66,7 +65,7 @@ public class HistogramChart {
         double min = dataCopy[0];
 
         // From: http://www.isixsigma.com/library/forum/c031022_number_bins_histogram.asp
-        double result = 1 + (3.3 * Math.log((double) dataCopy.length));
+        double result = 1 + (3.3 * Math.log(dataCopy.length));
         int binNum = (int) Math.rint(result);
 
         dataset.addSeries(label, data, binNum, min, max);
@@ -117,17 +116,10 @@ public class HistogramChart {
      */
     private void saveChart(JFreeChart chart, File outFile) {
 
-        FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(outFile);
-            ChartUtilities.saveChartAsPNG(outFile, chart, 969, 641);
+            ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtilities.getLogger(HistogramChart.class).error(ioe);
-        } finally {
-            try {
-                fos.flush();
-                fos.close();
-            } catch (IOException ioe) {}
+            LogUtils.getLogger(HistogramChart.class).error(ioe);
         }
     }
 }

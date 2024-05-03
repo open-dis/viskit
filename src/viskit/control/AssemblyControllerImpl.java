@@ -2,9 +2,9 @@ package viskit.control;
 
 import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
-import edu.nps.util.ZipUtilities;
+import edu.nps.util.ZipUtils;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -21,13 +21,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -38,34 +39,32 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
-import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 import viskit.util.EventGraphCache;
-import viskit.util.FileBasedAssemblyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
-import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
+import viskit.VGlobals;
+import viskit.ViskitConfig;
 import viskit.ViskitProject;
-import viskit.ViskitStatics;
+import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.doe.LocalBootLoader;
-import viskit.jgraph.JGraphGraphUndoManager;
+import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
-import viskit.view.dialog.AssemblyMetadataDialog;
-import viskit.view.SimulationRunPanel;
-import viskit.view.AssemblyEditViewFrame;
-import viskit.view.ViskitApplicationFrame;
-import viskit.view.dialog.UserPreferencesDialog;
+import viskit.view.dialog.AssemblyMetaDataDialog;
+import viskit.view.RunnerPanel2;
+import viskit.view.AssemblyViewFrame;
+import viskit.view.AssemblyView;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
-import viskit.view.AssemblyEditView;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -75,206 +74,97 @@ import viskit.view.AssemblyEditView;
  * @author Mike Bailey
  * @since May 14, 2004
  * @since 9:26:02 AM
- * @version $Id$
+ * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener
-{
-    static final Logger LOG = LogUtilities.getLogger(AssemblyControllerImpl.class);
+public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
 
-	private static int mutex = 0;
+    static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
+    private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
-    private String initialFilePath;
+    private String initialFile;
 
     /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
-    private int eventGraphNodeCount             = 0;
-    private int adapterNodeCount                = 0;
-    private int propertyChangeListenerNodeCount = 0;    // A little experiment in class introspection
-    private static Field eventGraphNodeCountField;
-    private static Field adapterNodeCountField;
-    private static Field propertyChangeListenerNodeCountField;
 
-    static { // static initialization block is performed at class initialization time
-        try {
-                        eventGraphNodeCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
-                           adapterNodeCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
-            propertyChangeListenerNodeCountField = AssemblyControllerImpl.class.getDeclaredField("propertyChangeListenerNodeCount");
-        }
-		catch (NoSuchFieldException | SecurityException ex)
-		{
-            throw new RuntimeException(ex);
-        }
-    }
-
-    /** Constructor creates a new instance of AssemblyController */
-    public AssemblyControllerImpl()
-	{
-        initializeHistoryXMLConfiguration();
+    /** Creates a new instance of AssemblyController */
+    public AssemblyControllerImpl() {
+        initConfig();
     }
 
     /**
-     * Sets an initial assembly file to open upon Viskit startup supplied by the
+     * Sets an initial assy file to open upon Viskit startup supplied by the
      * command line
-     * @param assemblyPath the assembly file to immediately open upon startup
+     * @param fil the assy file to initially open upon startup
      */
-    public void setInitialFile(String assemblyPath)
-	{
-        if (viskit.ViskitStatics.debug)
-		{
-            LOG.debug("Initial assembly path: " + assemblyPath);
+    public void setInitialFile(String fil) {
+        if (viskit.VStatics.debug) {
+            System.out.println("Initial file set: " + fil);
         }
-        initialFilePath = assemblyPath;
+        initialFile = fil;
     }
 
     /** This method is for introducing Assemblies to compile from outside of
-     * Viskit.  This method is not used from Viskit and is required for third-party access.
+     * Viskit.  This method is not used from Viskit and must is required for
+     * third party access.
      *
-     * @param assemblyPath an assembly file to compile
+     * @param assyPath an assembly file to compile
      */
-    public void compileAssembly(String assemblyPath)
-	{
-        LOG.debug("Compiling assembly: " + assemblyPath);
-        File f = new File(assemblyPath);
-        initialFilePath = assemblyPath;
-        _doOpenAssembly(f);
-        compileAssemblyAndPrepareSimulationRunner();
+    public void compileAssembly(String assyPath) {
+        LOG.debug("Compiling assembly: " + assyPath);
+        File f = new File(assyPath);
+        initialFile = assyPath;
+        _doOpen(f);
+        compileAssemblyAndPrepSimRunner();
     }
 
     @Override
-    public void begin()
-	{
-//		// check if prior project was open, if so then open it
-//		String projectStatus = "false";
-//		if (ViskitConfiguration.instance() != null)
-//			 projectStatus = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_OPEN_KEY); // might return null if not found
-//		if ((projectStatus != null) && projectStatus.equalsIgnoreCase("true"))
-//		{
-//			String projectName = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_NAME_KEY);
-//			if (projectName == null)
-//				projectName = "";
-//			String projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY) + File.separator + projectName;
-//			File projectDirectory = new File (projectPath);
-//			if ( projectDirectory.isDirectory() &&
-//				!projectDirectory.getName().toLowerCase().endsWith(ViskitProject.MY_VISKIT_PROJECTS_NAME.toLowerCase()))
-//			{
-//				openProjectDirectory (projectDirectory);
-//			}
-//			else // keep trying to find a useful project directory, or project-selection directory
-//			{
-//				projectPath = ViskitConfiguration.instance().getValue(ViskitConfiguration.PROJECT_PATH_KEY); // pop up one level
-//				projectDirectory = new File (projectPath);
-//				if (projectDirectory.isDirectory())
-//				{
-//					openProjectDirectory (projectDirectory);
-//				}
-//				else
-//				{
-//					LOG.error ("No known project path to open: " + projectPath);
-//				}
-//			}
-//			reportProjectOpenResult (projectName);
-//		}
-//		else
-//		{
-//			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.VISKIT_READY_MESSAGE, "<html>" +
-//					"<p align='center'>Open or create a project to begin." + ViskitStatics.RECENTER_SPACING + "</p>" +
-//					"<p>&nbsp;</p>");
-//		}
+    public void begin() {
 
-        // The initialFilePath is set if we have stated a file "arg" upon startup from the command line
-        if (initialFilePath != null)
-		{
-            LOG.debug("Loading initial file: " + initialFilePath);
-            compileAssembly(initialFilePath);
-        }
-		else
-		{
-            List<File> openAssemblyFileList = getOpenAssemblyFileList(false);
-			if ((openAssemblyFileList != null) && (openAssemblyFileList.size() > 1))
-			{
-				LOG.debug("begin: openAssemblyFileList.size()=" + openAssemblyFileList.size());
+        // The initialFile is set if we have stated a file "arg" upon startup
+        // from the command line
+        if (initialFile != null) {
+            LOG.debug("Loading initial file: " + initialFile);
+            compileAssembly(initialFile);
+        } else {
+            List<File> lis = getOpenAssyFileList(false);
+            LOG.debug("Inside begin() and lis.size() is: " + lis.size());
 
-				for (File f : openAssemblyFileList)
-				{
-					_doOpenAssembly(f);
-				}
-			}
+            for (File f : lis) {
+                
+                // Prevent project mismatch
+                if (f.exists())
+                    _doOpen(f);
+            }
         }
-        updateAssemblyFileLists();
-		ViskitGlobals.instance().getEventGraphViewFrame().checkHelpWindowBounds (); // initialize Help window sizing
+
+        recordProjFiles();
     }
-
-	/**
-	 * Report on success or failure of Project Open to user
-	 * @param projectName name of original attempt, used in case of failure to open
-	 */
-	public void reportProjectOpenResult (String projectName)
-	{
-		String message, phrasing = new String();
-
-		if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-			 ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen() &&
-			!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty() &&
-			 ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().equalsIgnoreCase(projectName))
-		{
-			// TODO re-open previously open assemblies and event graphs, otherwise:
-
-			if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().toLowerCase().contains("project"))
-				phrasing = "Project ";
-
-			message = phrasing + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + " is open.";
-			LOG.info (message);
-			messageToUser (JOptionPane.INFORMATION_MESSAGE, ViskitStatics.PROJECT_OPEN_SUCCESS_MESSAGE,
-				"<html><p align='center'>" + phrasing + "<i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + " is open." + ViskitStatics.RECENTER_SPACING + "</p>" +
-						"<p align='center'>&nbsp;</p>" +
-						"<p align='center'>Open or create either an Assembly or an Event Graph." + ViskitStatics.RECENTER_SPACING + "</p>"  +
-						"<p align='center'>&nbsp;</p></html>");
-		}
-		else
-		{
-			message = "Selected project " + projectName + " did not open as expected, see error log for details.  Ensuring current project is closed.";
-			LOG.error (message);
-			messageToUser (JOptionPane.ERROR_MESSAGE, ViskitStatics.PROJECT_OPEN_FAILURE_MESSAGE, "<html>" +
-				"<p align='center'>Selected project <i>" + projectName + "</i> did not open, see error log for details." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp;</p>" +
-				"<p align='center'>Please open or create another project to continue." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp;</p>");
-			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
-		}
-	}
-
-    public List<File> getOpenAssemblyFileList()
-	{
-		return getOpenAssemblyFileList (true);
-	}
 
     /** Information required by the EventGraphControllerImpl to see if an Assembly
      * file is already open.  Also checked internally by this class.
      * @param refresh flag to refresh the list from viskitConfig.xml
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
-    private List<File> getOpenAssemblyFileList(boolean refresh)
-	{
-        if (refresh || openAssembliesFileList == null)
-		{
-            updateAssemblyFileLists();
+    public final List<File> getOpenAssyFileList(boolean refresh) {
+        if (refresh || openAssemblies == null) {
+            recordAssyFiles();
         }
-        return openAssembliesFileList;
+        return openAssemblies;
     }
 
     private boolean checkSaveIfDirty() {
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssemblyChangeListener> iterator = isLocalDirty.iterator(); iterator.hasNext();) {
-                sb.append(iterator.next().getHandle());
+            for (Iterator<OpenAssembly.AssyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+                sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
             sb.setLength(sb.length() - 2); // last comma-space
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int yn = (((AssemblyEditView) getView()).genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
+            int yn = (((AssemblyView) getView()).genericAsk2Butts("Question", sb.toString(), "Stop and let me save",
                     "Ignore my execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -285,16 +175,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 return false;
             }
         }
-        boolean returnValue = true;
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (assemblyModel != null)
-		{
-            if (((AssemblyModelImpl) getModel()).isDirty())
-			{
+        boolean ret = true;
+        AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
+        if (mod != null) {
+            if (((AssemblyModel) getModel()).isDirty()) {
                 return askToSaveAndContinue();
             }
         }
-        return returnValue;  // proceed
+        return ret;  // proceed
     }
 
     @Override
@@ -302,167 +190,95 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // placeholder for combo gui
     }
 
-    public final static String OPENASSEMBLY_METHOD = "openAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void openAssembly () // method name must exactly match preceding string value
-	{
-        // Don't allow a new assembly to be created if a current project is  not open
-        if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
-			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-		{
-			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory", "<html>" +
-					"<p align='center'>Assemblies are only opened within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>");
-			return;
-		}
-        File[] assemblyFiles = ((AssemblyEditView) getView()).openFilesAsk();
-        if (assemblyFiles == null)
-		{
+    public void open() {
+
+        File[] files = ((AssemblyView) getView()).openFilesAsk();
+        if (files == null) {
             return;
         }
-        for (File assemblyFile : assemblyFiles)
-		{
-            if (assemblyFile != null)
-			{
-				if (!assemblyFile.getName().endsWith(".xml"))
-				{
-					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal Assembly file", "<html>" +
-							"<p align='center'>Assembly models always end with .xml file extensions." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>" +
-							"<p align='center'>Please choose an assemly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
-					break;
-				}
-				// check that path is contained within project
-				else if (assemblyFile.getParentFile().getAbsolutePath().startsWith(ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath()))
-				{
-					_doOpenAssembly(assemblyFile);
-					ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab();
-				}
-				else // path is outside project
-				{
-					messageToUser (JOptionPane.WARNING_MESSAGE, "Illegal directory for current project", "<html>" +
-							"<p align='center'>Open assemblies must be within the currently open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>" +
-							"<p>Current project name: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>Current project path: <i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory().getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>" +
-							"<p align='center'>Please choose an assembly in current project, or else open a different project." + ViskitStatics.RECENTER_SPACING + "</p>");
-					// TODO offer to copy?
-					break;
-				}
-			}
+        for (File file : files) {
+            if (file != null) {
+                _doOpen(file);
+            }
         }
-//		updateAssemblyFileLists(); // update file lists  TODO verify
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
-    private void _doOpenAssembly(File assemblyFile)
-	{
-        if (!assemblyFile.exists())
-		{
-			String message = "Assembly file does not exist, cannot open it.";
-			LOG.error (message + " " + assemblyFile.getAbsolutePath());
-			messageToUser (JOptionPane.WARNING_MESSAGE, "Cannot find requested Assembly file", "<html>" +
-					"<p align='center'>" + message + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp;</p>" +
-					"<p align='center'><i>" + assemblyFile.getAbsolutePath() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp;</p>");
+    private void _doOpen(File file) {
+        if (!file.exists()) {
             return;
         }
-        AssemblyEditView  assemblyEditView = (AssemblyEditView) getView();
-        if (assemblyEditView == null)
-		{
-			LOG.error ("Viskit initialization problem: when opening assembly " + assemblyFile.getName() + ", unexpectedly found assemblyEditView == null");
-			return;
-		}
 
-        // these may initialize to null on startup, check before doing any openAlready lookups
-        AssemblyModel[] openAssemblyModelArray = assemblyEditView.getOpenAssemblyModelArray();
+        AssemblyView vaw = (AssemblyView) getView();
+        AssemblyModelImpl mod = new AssemblyModelImpl(this);
+        mod.init();
+        vaw.addTab(mod);
 
-        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
-        assemblyModel.initialize();
-
-		// figure out if assembly is open already
-        boolean isAssemblyOpenAlready = false;
-        if (openAssemblyModelArray != null)
-		{
-            for (AssemblyModel openAssemblyModel : openAssemblyModelArray)
-			{
-                if (openAssemblyModel.getLastFile() != null)
-				{
-                    String path = openAssemblyModel.getLastFile().getAbsolutePath();
-                    if (path.equals(assemblyFile.getAbsolutePath()))
-					{
-                        isAssemblyOpenAlready = true;
-						break;
+        // these may init to null on startup, check
+        // before doing any openAlready lookups
+        AssemblyModel[] openAlready = null;
+        if (vaw != null) {
+            openAlready = vaw.getOpenModels();
+        }
+        boolean isOpenAlready = false;
+        if (openAlready != null) {
+            for (AssemblyModel model : openAlready) {
+                if (model.getLastFile() != null) {
+                    String path = model.getLastFile().getAbsolutePath();
+                    if (path.equals(file.getAbsolutePath())) {
+                        isOpenAlready = true;
                     }
                 }
             }
         }
-        if (isAssemblyOpenAlready)
-		{
-			assemblyEditView.deleteTab(assemblyModel); // ? TODO confirm.  Seems like it should stay open.
-        }
-		else
-		{
-			assemblyEditView.addTab(assemblyModel); // must addTab before reading model or else no listener hears events for jGraph
 
-			if (!assemblyModel.newModel(assemblyFile)) // open assemblyFile, returns true if successful
-			{
-				LOG.error ("assemblyModel " + assemblyModel + " did not open from " + assemblyFile.getName());
-				return;
-			}
+        if (mod.newModel(file) && !isOpenAlready) {
 
-            assemblyEditView.setSelectedAssemblyName(assemblyModel.getMetadata().name);
+            vaw.setSelectedAssemblyName(mod.getMetaData().name);
             // TODO: Implement an Assembly description block set here
-			// TODO simplify the following invocation
-			ViskitGlobals.instance().getAssemblyEditViewFrame().getSelectedPane().setToolTipText(assemblyModel.getMetadata().description);
 
-            adjustRecentAssemblyFileSet(assemblyFile);
-            markAssemblyFilesOpened();
+            adjustRecentAssySet(file);
+            markAssyFilesOpened();
 
-            // Order is important.  Tab must be open first, otherwise no listener present.
-            initializeOpenAssemblyWatch(assemblyFile, assemblyModel.getJaxbRoot()); // replaces old fileWatchOpen(file);
-            openEventGraphs(assemblyFile);
+            // replaces old fileWatchOpen(file);
+            initOpenAssyWatch(file, mod.getJaxbRoot());
+            openEventGraphs(file);
+
+        } else {
+            vaw.delTab(mod);
         }
 
-        resetJGraphRedoUndoStatus();
-        ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // refresh
+        resetRedoUndoStatus();
     }
 
-    /** Start with undo/redo disabled in the Edit Menu after opening a file */
-    private void resetJGraphRedoUndoStatus()
-	{
-        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
+    /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
+    private void resetRedoUndoStatus() {
 
-        if (view.getCurrentJGraphAssemblyComponentWrapper() != null)
-		{
-            JGraphGraphUndoManager jGraphGraphUndoManager = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
-            jGraphGraphUndoManager.discardAllEdits();
-            updateJGraphUndoRedoStatus();
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+
+        if (view.getCurrentVgacw() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+            undoMgr.discardAllEdits();
+            updateUndoRedoStatus();
         }
     }
 
-    /** Mark every Assembly file opened as "open" in the app config file */
-    private void markAssemblyFilesOpened()
-	{
-        // Mark every openAssemblyModel opened as "open"
-        AssemblyModel[] openAssemblyModelArray = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
-        for (AssemblyModel openAssemblyModel : openAssemblyModelArray)
-		{
-            if (openAssemblyModel.getLastFile() != null)
-			{
-                String modelPath = openAssemblyModel.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                markAssemblyConfigurationOpen(modelPath);
+    /** Mark every Assy file opened as "open" in the app config file */
+    private void markAssyFilesOpened() {
+
+        // Mark every vAMod opened as "open"
+        AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
+        for (AssemblyModel vAMod : openAlready) {
+            if (vAMod.getLastFile() != null) {
+                String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
+                markAssyConfigOpen(modelPath);
             }
         }
     }
 
     @Override
-    public void openRecentAssembly(File path)
-	{
-        _doOpenAssembly(path);
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
+    public void openRecentAssembly(File path) {
+        _doOpen(path);
     }
 
     /** Tell the Assembly File listener our new name
@@ -470,22 +286,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param f the XML Assembly file
      * @param jaxbroot the JAXB root of this XML file
      */
-    public void initializeOpenAssemblyWatch(File f, SimkitAssembly jaxbroot)
-	{
-        OpenAssembly.getInstance().setFile(f, jaxbroot);
+    public void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
+        OpenAssembly.inst().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
-    public OpenAssembly.AssemblyChangeListener getAssemblyChangeListener() {
-        return assemblyChangeListener;
+    public OpenAssembly.AssyChangeListener getAssemblyChangeListener() {
+        return assyChgListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() {
+    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<>();
+    OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -493,43 +308,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                         localDirty = false;
                     }
 
-                    ((AssemblyModelImpl) getModel()).setDirty(true);
+                    ((AssemblyModel) getModel()).setDirty(true);
                     break;
 
-                case NEW_ASSEMBLY:
+                case NEW_ASSY:
                     isLocalDirty.clear();
                     localDirty = false;
                     break;
 
-                case PARAM_LOCALLY_EDITED:
+                case PARAM_LOCALLY_EDITTED:
                     // This gets hit when you type something in the last three tabs
                     isLocalDirty.add(source);
                     localDirty = true;
                     break;
 
-                case CLOSE_ASSEMBLY:
+                case CLOSE_ASSY:
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
-                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
+                    ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
 
-                    AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-                    markAssemblyConfigurationClosed(assemblyModel.getLastFile());
+                    AssemblyModel vAMod = (AssemblyModel) getModel();
+                    markAssyConfigClosed(vAMod.getLastFile());
 
-                    AssemblyEditView view = (AssemblyEditView) getView();
-                    view.deleteTab(assemblyModel);
+                    AssemblyView view = (AssemblyView) getView();
+                    view.delTab(vAMod);
 
-                    // NOTE: This doesn't work quite right.  If no Assembly is open,
+                    // NOTE: This doesn't work quite right.  If no Assy is open,
                     // then any non-associated EGs that were also open will
                     // annoyingly close from the closeAll call above.  We are
                     // using an open EG cache system that relies on parsing an
-                    // Assembly file to find its associated EGs to open
+                    // Assy file to find its associated EGs to open
                     if (!isCloseAll()) {
 
-                        AssemblyModel[] modAr = view.getOpenAssemblyModelArray();
+                        AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(assemblyModel)) {
+                            if (!mod.equals(vAMod)) {
                                 openEventGraphs(mod.getLastFile());
                             }
                         }
@@ -538,7 +353,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     break;
 
                 default:
-                    LOG.warn("Program error AssemblyControllerImpl.assemblyChanged");
+                    LOG.warn("Program error AssemblyController.assyChanged");
             }
         }
 
@@ -550,73 +365,66 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public String getHandle() {
-        return assemblyChangeListener.getHandle();
+        return assyChgListener.getHandle();
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
-        assemblyChangeListener.assemblyChanged(action, source, param);
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        assyChgListener.assyChanged(action, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
-        OpenAssembly.getInstance().addListener(listener);
+    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+        OpenAssembly.inst().addListener(lis);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener listener) {
-        OpenAssembly.getInstance().removeListener(listener);
+    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+        OpenAssembly.inst().removeListener(lis);
     }
 
-    Set<mvcRecentFileListener> recentAssemblyListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssemblyFileSetListener(mvcRecentFileListener listener) {
-        recentAssemblyListeners.add(listener);
+    public void addRecentAssyFileSetListener(mvcRecentFileListener lis) {
+        recentAssyListeners.add(lis);
     }
 
     @Override
-    public void removeRecentAssemblyFileSetListener(mvcRecentFileListener listener) {
-        recentAssemblyListeners.remove(listener);
+    public void removeRecentAssyFileSetListener(mvcRecentFileListener lis) {
+        recentAssyListeners.remove(lis);
     }
 
     /** Here we are informed of open Event Graphs */
 
-    private void notifyRecentAssemblyFileListeners() {
-        for (mvcRecentFileListener listener : recentAssemblyListeners) {
-            listener.recentFileListChanged();
+    private void notifyRecentAssyFileListeners() {
+        for (mvcRecentFileListener lis : recentAssyListeners) {
+            lis.listChanged();
         }
     }
 
-    Set<mvcRecentFileListener> recentProjectListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjectListener(mvcRecentFileListener listener)
-	{
-        recentProjectListeners.add(listener);
+    public void addRecentProjFileSetListener(mvcRecentFileListener lis) {
+        recentProjListeners.add(lis);
     }
 
     @Override
-    public void removeRecentProjectListener(mvcRecentFileListener listener) {
-        recentProjectListeners.remove(listener);
+    public void removeRecentProjFileSetListener(mvcRecentFileListener lis) {
+        recentProjListeners.remove(lis);
     }
 
-    private void notifyRecentProjectFileListeners()
-	{
-        for (mvcRecentFileListener listener : recentProjectListeners)
-		{
-            listener.recentFileListChanged();
+    private void notifyRecentProjFileListeners() {
+        for (mvcRecentFileListener lis : recentProjListeners) {
+            lis.listChanged();
         }
     }
 
     /** Here we are informed of open Event Graphs */
-    DirectoryWatch.DirectoryChangeListener egListener = new DirectoryWatch.DirectoryChangeListener() {
-
-        @Override
-        public void fileChanged(File file, int action, DirectoryWatch source) {
-            // Do nothing.  The DirectoryWatch still tracks temp EGs, but we
-            // don't need anything special from this method, yet....
-        }
+    DirectoryWatch.DirectoryChangeListener egListener = (File file, int action, DirectoryWatch source) -> {
+        // Do nothing.  The DirectoryWatch still tracks temp EGs, but we
+        // don't need anything special from this method, yet....
     };
 
     @Override
@@ -624,88 +432,88 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return egListener;
     }
 
-    public final static String SAVE_METHOD = "save"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void save () // method name must exactly match preceding string value
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (assemblyModel.getLastFile() == null)
-		{
-            saveAs ();
-        }
-		else
-		{
-            assemblyModel.saveModel(assemblyModel.getLastFile());
+    public void save() {
+        AssemblyModel mod = (AssemblyModel) getModel();
+        if (mod.getLastFile() == null) {
+            saveAs();
+        } else {
+            mod.saveModel(mod.getLastFile());
         }
     }
 
-    public final static String SAVEAS_METHOD = "saveAs"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void saveAs () // method name must exactly match preceding string value
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        AssemblyEditView  view          = (AssemblyEditView) getView();
-        GraphMetadata     graphMetadata = assemblyModel.getMetadata();
-		String            fileName      = graphMetadata.name.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
+    public void saveAs() {
+        AssemblyModel model = (AssemblyModel) getModel();
+        AssemblyView view = (AssemblyView) getView();
+        GraphMetaData gmd = model.getMetaData();
 
         // Allow the user to type specific package names
-        String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + fileName + ".xml", false, "Save Assembly File As");
+        String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
 
-        if (saveFile != null) // save successful if file returned
-		{
+        if (saveFile != null) {
+
             String n = saveFile.getName();
             if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
-            graphMetadata.name = n;
-            assemblyModel.setMetadata(graphMetadata); // might have been renamed
+            gmd.name = n;
+            model.changeMetaData(gmd); // might have renamed
 
-            assemblyModel.saveModel(saveFile);
-            view.setSelectedAssemblyName(graphMetadata.name);
-            adjustRecentAssemblyFileSet(saveFile);
-            markAssemblyFilesOpened();
+            model.saveModel(saveFile);
+            view.setSelectedAssemblyName(gmd.name);
+            adjustRecentAssySet(saveFile);
+            markAssyFilesOpened();
         }
     }
 
-    public final static String EDITGRAPHMETADATA_METHOD = "editGraphMetadata"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void editGraphMetadata () // method name must exactly match preceding string value
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (assemblyModel == null) {return;}
-        GraphMetadata graphMetadata = assemblyModel.getMetadata();
-
-        boolean modified = AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditViewFrame(), graphMetadata);
-        if     (modified)
-		{
-            assemblyModel.setMetadata(AssemblyMetadataDialog.getGraphMetadata());
+    public void editGraphMetaData() {
+        AssemblyModel mod = (AssemblyModel) getModel();
+        if (mod == null) {return;}
+        GraphMetaData gmd = mod.getMetaData();
+        boolean modified =
+                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+        if (modified) {
+            ((AssemblyModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((AssemblyEditView) getView()).setSelectedAssemblyName(graphMetadata.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+        }
+    }
+    private int egNodeCount = 0;
+    private int adptrNodeCount = 0;
+    private int pclNodeCount = 0;    // A little experiment in class introspection
+    private static Field egCountField;
+    private static Field adptrCountField;
+    private static Field pclCountField;
+
+    static { // do at class init time
+        try {
+            egCountField = AssemblyControllerImpl.class.getDeclaredField("egNodeCount");
+            adptrCountField = AssemblyControllerImpl.class.getDeclaredField("adptrNodeCount");
+            pclCountField = AssemblyControllerImpl.class.getDeclaredField("pclNodeCount");
+        } catch (NoSuchFieldException | SecurityException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    private String shortUniqueEventGraphName(String typeName)
-	{
-        return shortUniqueInstanceName(typeName, "EventGraph_", eventGraphNodeCountField); // use same counter for this AssemblyControllerImpl
+    private String shortEgName(String typeName) {
+        return shortName(typeName, "evgr_", egCountField);
     }
 
-    private String shortUniqueInstancePropertyChangeListenerName(String typeName)
-	{
-        return shortUniqueInstanceName(typeName, "Listener_", propertyChangeListenerNodeCountField); // use same counter for this AssemblyControllerImpl
+    private String shortPCLName(String typeName) {
+        return shortName(typeName, "lstnr_", pclCountField); // use same counter
     }
 
-    private String shortUniqueInstanceAdapterName(String typeName)
-	{
-        return shortUniqueInstanceName(typeName, "Adapter_", adapterNodeCountField); // use same counter for this AssemblyControllerImpl
+    private String shortAdapterName(String typeName) {
+        return shortName(typeName, "adptr_", adptrCountField); // use same counter
     }
 
-    private String shortUniqueInstanceName(String typeName, String prefix, Field intField)
-	{
+    private String shortName(String typeName, String prefix, Field intField) {
         String shortname = prefix;
-        if (typeName.lastIndexOf('.') != -1)
-		{
+        if (typeName.lastIndexOf('.') != -1) {
             shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
         }
 
@@ -714,238 +522,101 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         ca[0] = Character.toLowerCase(ca[0]);
         shortname = new String(ca);
 
-        String shortUniqueName = shortname;
+        String retn = shortname;
         try {
             int count = intField.getInt(this);
             // Find a unique name
-            AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-            do
-			{
-                shortUniqueName = shortname + count++;
-            }
-			while (assemblyModel.nameExists(shortUniqueName));   // don't force the vAMod to mangle the name
-
+            AssemblyModel model = (AssemblyModel) getModel();
+            do {
+                retn = shortname + count++;
+            } while (model.nameExists(retn));   // don't force the vAMod to mangle the name
             intField.setInt(this, count);
-        }
-		catch (IllegalArgumentException | IllegalAccessException ex)
-		{
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             LOG.error(ex);
         }
-        return shortUniqueName;
+        return retn;
     }
 
-    public final static String NEWPROJECT_METHOD = "newProject"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newProject () // method name must exactly match preceding string value
-	{
-		// if a project is currently open, first ask to confirm
-        if ((ViskitGlobals.instance().getCurrentViskitProject() != null) &&
-		     ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-		{
-			boolean continueClosing = confirmProjectClosing();
+    public void newProject() {
+        if (handleProjectClosing()) {
+            VGlobals.instance().initProjectHome();
+            VGlobals.instance().createWorkDirectory();
 
-			if (!continueClosing)
-			{
-				return; // user decided not to continue, so do not open a new project
-			}
-			else
-			{
-				// perform project closing before continuing
-				ViskitGlobals.instance().getCurrentViskitProject().closeProject();
-			}
+            // For a brand new empty project open a default EG
+            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            if (egFiles.length == 0) {
+                ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
+            }
         }
-
-        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
-
-		String newProjectPath = viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PATH_KEY);
-		if (newProjectPath == null)
-		{
-			newProjectPath = System.getProperty("user.dir"); // start somewhere
-		}
-
-		File   newProjectRoot = new File (newProjectPath); // starting point; TODO user preference
-		ViskitProject viskitProject = new ViskitProject(newProjectRoot); // object initialization prior to using directory chooser
-
-		do
-		{
-			// directory chooser for new project
-			newProjectRoot = ViskitProject.newProjectPath (ViskitGlobals.instance().getEventGraphViewFrame().getContent(), newProjectPath);
-			if  (newProjectRoot == null)
-				return; // no project directory chosen, cancel and return
-
-			if (!newProjectRoot.exists()) // create directory with name that user typed in
-			{
-				boolean directoryCreated = newProjectRoot.mkdir();
-				if    (!directoryCreated)
-				{
-					System.out.println("Directory was not created, probably due to insufficient user permissions.  Please choose or create an empty directory.");
-					messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here",
-							"<html>" +
-							"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> cannot be created here!" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>" +
-							"<p align='center'>You do not have permissions to create a new directory at that location" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>" +
-							"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
-							"<p>&nbsp;</p>");
-				}
-				continue;
-			}
-
-			newProjectPath = newProjectRoot.getPath(); // update to match chooser selection
-			if (newProjectRoot.list().length > 0)
-			{
-				System.out.println("Directory is not empty!  Please choose or create an empty directory.");
-				messageToUser(JOptionPane.ERROR_MESSAGE, "Can't create new Viskit project here",
-						"<html>" +
-						"<p align='center'>Directory <i>" + newProjectRoot.getName() + "</i> is not empty!" + ViskitStatics.RECENTER_SPACING + "</p>" +
-						"<p>&nbsp;</p>" +
-						"<p align='center'>Please try again: create or choose an empty directory" + ViskitStatics.RECENTER_SPACING + "</p>" +
-						"<p>&nbsp;</p>");
-				continue;
-			}
-		}
-		while (!newProjectRoot.exists() || (newProjectRoot.list() == null) || (newProjectRoot.list().length > 0));
-
-		// User dialog: project properties
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_PATH_KEY,        newProjectPath);
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_NAME_KEY,        newProjectRoot.getName()); // "*Enter new project name*");
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_AUTHOR_KEY,      System.getProperty("user.name")); // TODO user preference, default author name
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_CREATED_KEY,     simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_REVISION_KEY,    simpleDateFormat.format(new Date())); // prefer date, version number is acceptable alternative
-		viskitConfiguration.setValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY, "*Enter new project description*");
-
-		boolean pathEditable = false; // TODO consider true; if a change-your-mind chooser is added to editProjectProperties panel
-		ViskitGlobals.instance().getEventGraphViewFrame().editProjectProperties(pathEditable); // user panel for Project Properties
-
-		if (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_PROPERTIES_EDIT_COMPLETED_KEY).equals("false"))
-			return; // user cancelled Project Properties update, do not continue
-
-		if (!viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY).equals(newProjectRoot.getName()))
-		{
-			// project name changed, TODO may require further error checking
-			// simpler, better to restring renaming to Projects menu item
-		}
-//		viskitProject.cleanAll(); // dangerous to users file system!
-
-        viskitProject = new ViskitProject(newProjectRoot); // reset
-		boolean initializedOK = viskitProject.initializeProject ();
-		if (!initializedOK)
-		{
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Problem initializing new project",
-					"<html><p>Please check logs to find or report problem" + ViskitStatics.RECENTER_SPACING + "</p>");
-			return;
-		}
-		viskitProject.setProjectRootDirectory (newProjectRoot);
-		ViskitProject.MY_VISKIT_PROJECTS_DIR = newProjectRoot.getParent();
-		viskitProject.setProjectName       (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_NAME_KEY));
-		viskitProject.setProjectOpen(true);
-		viskitProject.setProjectAuthor     (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_AUTHOR_KEY));
-		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_CREATED_KEY));
-		viskitProject.setProjectRevision   (viskitConfiguration.getValue(ViskitConfiguration.PROJECT_REVISION_KEY));
-		viskitProject.setProjectDescription(viskitConfiguration.getValue(ViskitConfiguration.PROJECT_DESCRIPTION_KEY));
-		viskitProject.saveProjectFile ();
-
-		ViskitGlobals.setCurrentViskitProject(viskitProject);
-        ViskitStatics.setViskitProjectDirectory(newProjectRoot);
-//		ViskitGlobals.instance().initializeProjectHomeDirectory();
-//		ViskitGlobals.instance().createWorkDirectory();
-
-        UserPreferencesDialog.saveExtraClassPathEntries(viskitProject.getProjectClasspathArray());
-
-		// For a brand new empty project open a default Event Graph
-		File[] eventGraphFileArray = viskitProject.getEventGraphsDirectory().listFiles();
-		if (eventGraphFileArray.length == 0)
-		{
-			((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
-		}
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
-        ViskitGlobals.instance().getViskitApplicationFrame().showProjectName();
     }
 
-    public final static String MAIL_ZIPPED_PROJECT_FILES_METHOD = "mailZippedProjectFiles"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void mailZippedProjectFiles () // method name must exactly match preceding string value
-	{
+    public void zipAndMailProject() {
+
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
-            File projectDirectory;
-            File projectArchiveZip;
+            File projDir;
+            File projZip;
             File logFile;
 
             @Override
-            public Void doInBackground()
-			{
-				// TODO ensure project zip has a README at top
-				if (ViskitGlobals.instance().getCurrentViskitProject() == null)
-					return null;
-                projectDirectory  = ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory();
-                projectArchiveZip = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
-                logFile = new File(projectDirectory, "debug.log");
-                File readmeFile = new File(projectDirectory, "README.txt"); // TODO copy/create if missing
+            public Void doInBackground() {
 
-                if (projectArchiveZip.exists())
-                    projectArchiveZip.delete(); // delete previous version
+                projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
+                logFile = new File(projDir, "debug.log");
 
-//                if (logFile.exists())
-//                    logFile.delete(); // saveConfigurationFiles for next time
+                if (projZip.exists())
+                    projZip.delete();
+
+                if (logFile.exists())
+                    logFile.delete();
 
                 try {
-                    // First, copy the README.txt file to the project directory
-                    Files.copy(ViskitConfiguration.USER_README_FILE.toPath(),
-							   (new File (logFile.getParentFile().getPath() + "/" + ViskitConfiguration.USER_README_FILE.getName())).toPath(),
-							   StandardCopyOption.REPLACE_EXISTING);
-                    // Next, copy the debug.LOG to the project dir
-                    Files.copy(ViskitConfiguration.VISKIT_DEBUG_LOG.toPath(),   logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ZipUtilities.zipFolder(projectDirectory, projectArchiveZip);
 
-                    try // open directory holding the .zip so that use can select, drag and mail it
-					{
-                        Desktop.getDesktop().open(projectArchiveZip.getParentFile());
-                    }
-					catch (IOException e)
-					{
-                        LOG.error(e);
-                    }
-                }
-				catch (IOException e)
-				{
+                    // First, copy the debug.log to the project dir
+                    Files.copy(ViskitConfig.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    ZipUtils.zipFolder(projDir, projZip);
+                } catch (IOException e) {
                     LOG.error(e);
                 }
+
                 return null;
             }
 
             @Override
-            public void done()
-			{
-                try
-				{
-                    get(); // Waits for the zip process and directory opening to finish
-                    get(); // Waits for the directory launch process to finish
+            public void done() {
+                try {
 
-                    URL url = null;
-					String urlString = "[not found]";
-                    try // launch email
-					{
-                        url = new URL("mailto:" + ViskitConfiguration.VISKIT_MAILING_LIST
-                                + "?subject=Viskit%20Project%20Archive%20for%20"
-                                + projectDirectory.getName() + "&body=Visual%20Simkit%20project%20file%20attached...");
-						urlString =  url.toString();
-                    }
-					catch (MalformedURLException e) {
+                    // Waits for the zip process to finish
+                    get();
+
+                    try {
+                        URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST
+                                + "?subject=Viskit%20Project%20Submission%20for%20"
+                                + projDir.getName() + "&body=see%20attachment").toURL();
+                        String msg = "Please navigate to<br/>"
+                                + projZip.getParent()
+                                + "<br/>and email the " + projZip.getName()
+                                + " file to "
+                                + "<b><a href=\"" + url.toString() + "\">"
+                                + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                                + "<br/><br/>Click the link to open up an email "
+                                + "form, then attach the zip file";
+                        VStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
+
+                    } catch (MalformedURLException | URISyntaxException e) {
                         LOG.error(e);
                     }
 
-                    String message = "<html><p align='center'>Select this <a href=\"" + urlString + "\">email link</a> to attach and send the project zip archive </p>"
-							+ "<p align='center'><i>" + projectArchiveZip.getParent() + File.separatorChar + projectArchiveZip.getName() + "</i> </p>"
-                            + "<p align='center'> to mailing list <i>"
-                            + ViskitConfiguration.VISKIT_MAILING_LIST + "</i> (or whomever you want).</p>";
+                    try {
+                        Desktop.getDesktop().open(projZip.getParentFile());
+                    } catch (IOException e) {
+                        LOG.error(e);
+                    }
 
-                    ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, message, false);
-                }
-				catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
                 }
             }
@@ -953,206 +624,99 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssemblyEditView and this AssemblyController
+    /** Common method between the AssyView and this AssyController
      *
-     * @return indication to continue closing (true) or cancel closing (false)
+     * @return indication of continue or cancel
      */
-    public boolean confirmProjectClosing ()
-	{
-        boolean continueClosing = true; // default: continue closing process after this dialog, unless user says to cancel
+    public boolean handleProjectClosing() {
+        boolean retVal = true;
+        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+            String msg = "Are you sure you want to close your current Viskit Project?";
+            String title = "Close Current Project";
 
-		if (ViskitGlobals.instance().getCurrentViskitProject() == null)
-		{
-			ViskitGlobals.setProjectOpen(false); // cleanup if needed
-			return continueClosing; // project is closed already
-		}
-		else if (ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty())
-		{
-			ViskitGlobals.setProjectOpen(false); // cleanup if needed
-			return continueClosing; // project is closed already
-		}
-		else if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-		{
-             String title   = "Close Project";
-             String message = "<html><p align='center'>Are you sure you want to close the current project?" + ViskitStatics.RECENTER_SPACING + "</p>";
-			 if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-			 	 message += "<p>&nbsp;</p>" +
-						    "<p align='center'><i>" + ViskitGlobals.instance().getCurrentViskitProject().getProjectName() + "</i>" + ViskitStatics.RECENTER_SPACING + "</p>" +
-						    "<p>&nbsp;</p>";
-             int responseValue = ((AssemblyEditView) getView()).genericAskYN(title, message);
-             if (responseValue == JOptionPane.YES_OPTION)
-			 {
+            int ret = ((AssemblyView) getView()).genericAskYN(title, msg);
+            if (ret == JOptionPane.YES_OPTION) {
                 doProjectCleanup();
-             }
-			 else
-			 {
-                continueClosing = false;
-             }
-			 return continueClosing; // user decision
+            } else {
+                retVal = false;
+            }
         }
-		else return continueClosing; // existing project is closed already
+        return retVal;
     }
 
     @Override
-    public void doProjectCleanup()
-	{
-        closeAll(); // assemblies
-        ViskitGlobals.instance().getEventGraphController().closeAll(); // event graphs
-		if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-			ViskitGlobals.instance().getCurrentViskitProject().closeProject();
-        ViskitConfiguration.instance().clearViskitConfiguration();
-        clearRecentAssemblyFileList();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
+    public void doProjectCleanup() {
+        closeAll();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
+        ViskitConfig.instance().clearViskitConfig();
+        clearRecentAssyFileList();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
+        VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override
-    public void openProjectDirectory(File projectDirectory)
-	{
-        ViskitStatics.setViskitProjectDirectory(projectDirectory);
-        ViskitGlobals.instance().createWorkDirectory();
+    public void openProject(File file) {
+        VStatics.setViskitProjectFile(file);
+        VGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjectFileSet(projectDirectory);
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus();   // reset
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
-		ViskitApplicationFrame viskitApplicationFrame = ViskitGlobals.instance().getViskitApplicationFrame();
-		if (!viskitApplicationFrame.isEventGraphEditorTabSelected() &&
-			!viskitApplicationFrame.isAssemblyEditorTabSelected())
-			 viskitApplicationFrame.displayAssemblyEditorTab(); // select relevant tab
-		if (!ViskitGlobals.instance().getCurrentViskitProject().getProjectName().trim().isEmpty())
-		{
-			ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(true);
-		}
-		else
-		{
-			LOG.error ("Project has no name, cannot be opened." + ViskitGlobals.instance().getCurrentViskitProject().getProjectRootDirectory());
-		    ViskitGlobals.instance().getCurrentViskitProject().setProjectOpen(false);
-		}
+        adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
     }
 
-    public final static String NEWASSEMBLY_METHOD = "newAssembly"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newAssembly () // method name must exactly match preceding string value
-	{
-        // Don't allow a new assembly to be created if a current project is  not open
-        if ((ViskitGlobals.instance().getCurrentViskitProject() == null) ||
-			!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
-		{
-			messageToUser (JOptionPane.WARNING_MESSAGE, "No project directory",  "<html>" +
-					"<p align='center'>New assemblies are only created within an open project." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp;</p>" +
-					"<p align='center'>Open or create a project first." + ViskitStatics.RECENTER_SPACING + "</p>" +
-					"<p>&nbsp;</p>");
-			return;
-		}
-		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // prerequisite to possible menu
+    public void newAssembly() {
 
-        GraphMetadata priorAssemblyMetadata = null;
-        AssemblyModelImpl priorAssemblyModel = (AssemblyModelImpl) getModel();
-        if (priorAssemblyModel != null)
-		{
-            priorAssemblyMetadata = priorAssemblyModel.getMetadata();
+        // Don't allow a new event graph to be created is a current project is
+        // not open
+        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+
+        GraphMetaData oldGmd = null;
+        AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
+        if (viskitAssemblyModel != null) {
+            oldGmd = viskitAssemblyModel.getMetaData();
         }
 
-        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
-        assemblyModel.initialize();
-        assemblyModel.newModel(null); // no file
+        AssemblyModelImpl mod = new AssemblyModelImpl(this);
+        mod.init();
+        mod.newModel(null);
 
-        // No vAssemblyModel set in controller yet...it gets set
+        // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((AssemblyEditView) getView()).addTab(assemblyModel);
+        ((AssemblyView) getView()).addTab(mod);
 
-        GraphMetadata newAssemblyMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assembly
-        if (priorAssemblyMetadata != null)
-		{
-            newAssemblyMetadata.packageName = priorAssemblyMetadata.packageName;
-            newAssemblyMetadata.author      = priorAssemblyMetadata.author;
+        GraphMetaData gmd = new GraphMetaData(mod);   // build a new one, specific to Assy
+        if (oldGmd != null) {
+            gmd.packageName = oldGmd.packageName;
         }
-		if ((newAssemblyMetadata.author == null) || newAssemblyMetadata.author.trim().isEmpty())
-		{
-			newAssemblyMetadata.author = System.getProperty("user.name"); // TODO user preference
-		}
-		newAssemblyMetadata.description   = ViskitStatics.DEFAULT_DESCRIPTION + " for this new assembly";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ViskitGlobals.getDateFormat());
-		newAssemblyMetadata.created       = simpleDateFormat.format(new Date());
-		newAssemblyMetadata.pathEditable  = true;
 
-        boolean modified = AssemblyMetadataDialog.showDialog((JFrame) getView(), newAssemblyMetadata);
-        if (modified)
-		{
-            assemblyModel.setMetadata(newAssemblyMetadata);
+        boolean modified =
+                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+        if (modified) {
+            ((AssemblyModel) getModel()).changeMetaData(gmd);
 
             // update title bar
-            ((AssemblyEditView) getView()).setSelectedAssemblyName(newAssemblyMetadata.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
 
             // TODO: Implement this
-//            ((AssemblyEditView)  getView()).setSelectedEventGraphDescription(graphMetadata.description);
+//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
+        } else {
+            ((AssemblyView) getView()).delTab(mod);
         }
-		else
-		{
-            ((AssemblyEditView) getView()).deleteTab(assemblyModel);
-        }
-		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // prerequisite to buildMenus
-		ViskitGlobals.instance().getViskitApplicationFrame().buildMenus(); // reset
     }
 
-	static String scrubHTML (String markupText)
-	{
-		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
-		markupText = markupText.replaceAll("&nbsp;", " ");                    // non-breaking space character
-		markupText = markupText.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " "); // elements and attributes
-		markupText = markupText.replaceAll("(\\s)+", " ").trim();             // normalize whitespace
-		return markupText;
-	}
-
-    /**
-     * A component wants to say something.
-     *
-     * @param dialogType the type of dialog popup, i.e. ERROR, WARN, INFO, QUESTION
-     * @param title the title of the dialog frame
-     * @param message the information to present
-     */
     @Override
-    public void messageToUser(int dialogType, String title, String message) // dialogType is one of JOptionPane types
-    {
-		AssemblyEditView view = (AssemblyEditView) getView();
+    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
+    {   AssemblyView view = (AssemblyView) getView();
         if (view != null)
-		{
-			((AssemblyEditView) getView()).genericReport(dialogType, title, message);
-		}
-        else
-		{
-            JOptionPane.showMessageDialog(null, message, title, dialogType);
+            ((AssemblyView) getView()).genericReport(typ, title, msg);
+        else {
+            JOptionPane.showMessageDialog(null, msg, title, typ);
         }
-
-		// now clean up message HTML for logs
-		// http://stackoverflow.com/questions/3607965/how-to-convert-html-text-to-plain-text
-		message = scrubHTML(message);
-
-		title = title.trim();
-		String spacer = ": ";
-		if (title.endsWith(",") || title.endsWith(".") || title.endsWith("!") || title.endsWith("-") || title.endsWith(":") || title.endsWith(";"))
-			   spacer = " ";
-
-		switch (dialogType) // use appropriate LOG setting
-		{
-			case JOptionPane.ERROR_MESSAGE:
-				LOG.error (title + spacer + message);
-				break;
-			case JOptionPane.WARNING_MESSAGE:
-				LOG.warn (title + spacer + message);
-				break;
-			default:
-				LOG.info (title + spacer + message);
-				break;
-		}
     }
 
     @Override
-    public void quit()
-	{
-        if (preQuit())
-		{
+    public void quit() {
+        if (preQuit()) {
             postQuit();
         }
     }
@@ -1160,11 +724,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public boolean preQuit() {
 
-        // Check for dirty models before exiting, first ask if user wants to save them
-        AssemblyModel[] openAssemblyModels = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
-        for (AssemblyModel assemblyModel : openAssemblyModels)
-		{
-            setModel((mvcModel) assemblyModel);
+        // Check for dirty models before exiting
+        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
+        for (AssemblyModel vmod : modAr) {
+            setModel((mvcModel) vmod);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -1175,243 +738,167 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void postQuit()
-	{
-        ViskitGlobals.instance().quitAssemblyEditor();
+    public void postQuit() {
+        VGlobals.instance().quitAssemblyEditor();
     }
 
     private boolean closeAll = false;
 
-    public final static String CLOSEALL_METHOD = "closeAll"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void closeAll () // method name must exactly match preceding string value
-	{
-        AssemblyModel[] assemblyModelArray = ((AssemblyEditView) getView()).getOpenAssemblyModelArray();
-        for (AssemblyModel assemblyModel : assemblyModelArray)
-		{
-            setModel((mvcModel) assemblyModel);
-			setCloseAll(true);
+    public void closeAll() {
+
+        AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
+        for (AssemblyModel vmod : modAr) {
+            setModel((mvcModel) vmod);
+            setCloseAll(true);
             close();
         }
-		// included in close(): ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
         setCloseAll(false);
     }
 
-    public final static String CLOSE_METHOD = "close"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void close () // method name must exactly match preceding string value
-	{
-        if (preClose())
-		{
+    public void close() {
+        if (preClose()) {
             postClose();
         }
-//		updateAssemblyFileLists(); // save for next time
-		ViskitGlobals.instance().getViskitApplicationFrame().displayAssemblyEditorTab(); // ensure focus isn't lost
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
     }
 
     @Override
-    public boolean preClose()
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (assemblyModel == null)
-		{
+    public boolean preClose() {
+        AssemblyModel vmod = (AssemblyModel) getModel();
+        if (vmod == null) {
             return false;
         }
-		openAssembliesFileList.remove(assemblyModel.getLastFile());
-        if (assemblyModel.isDirty())
-		{
+
+        if (vmod.isDirty()) {
             return checkSaveIfDirty();
         }
+
         return true;
     }
 
     @Override
-    public void postClose()
-	{
-        OpenAssembly.getInstance().doSendCloseAssembly();
+    public void postClose() {
+        OpenAssembly.inst().doSendCloseAssy();
     }
 
-    private void markAssemblyConfigurationClosed(File f)
-	{
-        if (f == null) {return;} // Someone may try to close a file that hasn't been saved
+    private void markAssyConfigClosed(File f) {
 
-        int index = 0;
-        for (File recentAssemblyFile : recentAssemblyFileSet)
-		{
-            if ((historyXMLConfiguration != null) && recentAssemblyFile.getPath().contains(f.getName()))
-			{
-                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]", "false");
+        // Someone may try to close a file that hasn't been saved
+        if (f == null) {return;}
+
+        int idx = 0;
+        for (File key : recentAssyFileSet) {
+            if (key.getPath().contains(f.getName())) {
+                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             }
-            index++;
+            idx++;
         }
     }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
-    private void markAssemblyConfigurationOpen(String path)
-	{
-        int index = 0;
-        for (File tempPath : recentAssemblyFileSet)
-		{
-            if ((historyXMLConfiguration != null) && tempPath.getPath().equals(path))
-			{
-                historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]", "true");
+    private void markAssyConfigOpen(String path) {
+
+        int idx = 0;
+        for (File tempPath : recentAssyFileSet) {
+
+            if (tempPath.getPath().equals(path)) {
+                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             }
-            index++;
+            idx++;
         }
     }
 
     private final Point nextPoint = new Point(25, 25);
-    private Point getNextPoint()
-	{
+    private Point getNextPoint() {
         nextPoint.x = nextPoint.x >= 200 ? 25 : nextPoint.x + 25;
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
         return nextPoint;
     }
 
-    public final static String NEWEVENTGRAPH_METHOD = "newEventGraphNode"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void newEventGraphNode () // method name must exactly match preceding string value
+    public void newEventGraphNode() // menu click
     {
-        Object o = ((AssemblyEditView) getView()).getSelectedEventGraph();
+        Object o = ((AssemblyView) getView()).getSelectedEventGraph();
 
-        if (o != null)
-		{
-            if (o instanceof Class<?>)
-			{
-                newEventGraphNode(((Class<?>) o).getName(), getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
+        if (o != null) {
+            if (o instanceof Class<?>) {
+                newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            }
-			else if (o instanceof FileBasedAssemblyNode)
-			{
-                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint(), ViskitStatics.DEFAULT_DESCRIPTION);
+            } else if (o instanceof FileBasedAssyNode) {
+                newFileBasedEventGraphNode((FileBasedAssyNode) o, getNextPoint());
                 return;
             }
         }
         // Nothing selected or non-leaf
-        messageToUser(JOptionPane.ERROR_MESSAGE,
-				"Can't create a new Event Graph instance",
-				"<html><p>You must first open and build an Event Graph before adding a new node." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp;</p>");
+        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select an Event Graph from the panel on the left.");
     }
 
     @Override
-    public void newEventGraphNode(String typeName, Point point)
-	{
-        String instanceName = shortUniqueEventGraphName(typeName);
-        ((AssemblyModelImpl) getModel()).newEventGraph(instanceName, typeName, point, ViskitStatics.DEFAULT_DESCRIPTION);
+    public void newEventGraphNode(String typeName, Point p) {
+        String shName = shortEgName(typeName);
+        ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
     @Override
-    public void newEventGraphNode(String typeName, Point point, String description)
-	{
-        String instanceName = shortUniqueEventGraphName(typeName);
-        ((AssemblyModelImpl) getModel()).newEventGraph(instanceName, typeName, point, description);
+    public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
+        String shName = shortEgName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
     @Override
-    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point)
-	{
-		String     fullName = xnode.loadedClass;
-		String instanceName = shortUniqueEventGraphName(xnode.loadedClass); // instanceName must be unique, and will appear in "widget" shown on assembly display
-		String    className = fullName.substring(fullName.lastIndexOf(".") + 1);
-//		String  packageName = fullName.substring(0, fullName.lastIndexOf("."));
-		// if description is available, the follow-on method should be used
-
-        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
-    }
-
-    @Override
-    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point point, String description)
-	{
-		String     fullName = xnode.loadedClass;
-		String instanceName = shortUniqueEventGraphName(xnode.loadedClass); // instanceName must be unique, and will appear in "widget" shown on assembly display
-		String    className = fullName.substring(fullName.lastIndexOf(".") + 1);
-
-//        String shortName = shortUniqueEventGraphName(xnode.loadedClass);
-//        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(shortName, shortName, point, description, xnode); broken
-        ((AssemblyModelImpl) getModel()).newEventGraphFromXML(instanceName, className, point, ViskitStatics.DEFAULT_DESCRIPTION, xnode);
-    }
-
-
-    public final static String NEWPCLNODE_METHOD = "newPropertyChangeListenerNode"; // must match following method name.  Not possible to accomplish this programmatically.
-    @Override
-    public void newPropertyChangeListenerNode () // method name must exactly match preceding string value
+    public void newPropChangeListenerNode() // menu click
     {
-        Object o = ((AssemblyEditView) getView()).getSelectedPropertyChangeListener();
+        Object o = ((AssemblyView) getView()).getSelectedPropChangeListener();
 
         if (o != null) {
             if (o instanceof Class<?>) {
-                newPropertyChangeListenerNode(((Class<?>) o).getName(), getNextPoint(), "");
+                newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssemblyNode) {
-                newFileBasedPropertyChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint(), "");
+            } else if (o instanceof FileBasedAssyNode) {
+                newFileBasedPropChangeListenerNode((FileBasedAssyNode) o, getNextPoint());
                 return;
             }
         }
         // If nothing selected or a non-leaf
-        messageToUser(JOptionPane.ERROR_MESSAGE,
-				"Can't create",
-				"<html><p>You must first select a Property Change Listener from the panel on the left." + ViskitStatics.RECENTER_SPACING + "</p>" +
-				"<p>&nbsp;</p>");
+        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
 
     @Override
-    public void newPropertyChangeListenerNode(String name, Point p)
-	{
-        String shortName = shortUniqueInstancePropertyChangeListenerName(name);
-        ((AssemblyModelImpl) getModel()).newPropertyChangeListener(shortName, name, p, ViskitStatics.DEFAULT_DESCRIPTION);
+    public void newPropChangeListenerNode(String name, Point p) {
+        String shName = shortPCLName(name);
+        ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
     @Override
-    public void newPropertyChangeListenerNode(String name, Point p, String description)
-	{
-        String shortName = shortUniqueInstancePropertyChangeListenerName(name);
-        ((AssemblyModelImpl) getModel()).newPropertyChangeListener(shortName, name, p, description);
-    }
-
-    @Override
-    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p)
-	{
-        String shortName = shortUniqueInstancePropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModelImpl) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, ViskitStatics.DEFAULT_DESCRIPTION);
-    }
-
-    @Override
-    public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description)
-	{
-        String shortName = shortUniqueInstancePropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModelImpl) getModel()).newPropertyChangeListenerFromXML(shortName, xnode, p, description);
+    public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
+        String shName = shortPCLName(xnode.loadedClass);
+        ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }
 
     /**
      *
      * @return true = continue, false = don't (i.e., we canceled)
      */
-    private boolean askToSaveAndContinue()
-	{
-		String    title = ((AssemblyEditView) getView()).getSelectedAssemblyName() + " has been modified";
-        int returnValue = ((AssemblyEditView) getView()).genericAsk(title, "Save modified assembly?");
+    private boolean askToSaveAndContinue() {
+        int yn = (((AssemblyView) getView()).genericAsk("Question", "Save modified assembly?"));
 
-        switch (returnValue)
-		{
+        switch (yn) {
             case JOptionPane.YES_OPTION:
                 save();
+
                 // TODO: Can't remember why this is here after a save?
-                if (((AssemblyModelImpl) getModel()).isDirty())
-				{
-                    return false; // we cancelled
-                }
+                if (((AssemblyModel) getModel()).isDirty()) {
+                    return false;
+                } // we cancelled
                 return true;
-
             case JOptionPane.NO_OPTION:
+
                 // No need to recompile
-                if (((AssemblyModelImpl) getModel()).isDirty())
-				{
-                    ((AssemblyModelImpl) getModel()).setDirty(false);
+                if (((AssemblyModel) getModel()).isDirty()) {
+                    ((AssemblyModel) getModel()).setDirty(false);
                 }
                 return true;
-
             case JOptionPane.CANCEL_OPTION:
                 return false;
 
@@ -1428,20 +915,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         AssemblyNode[] oArr;
         try {
-            oArr = checkLegalForSimEventListenerArc(oA, oB);
+            oArr = checkLegalForSEListenerArc(oA, oB);
         } catch (Exception e) {
-            messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Connection error.",
-					"Possible class not found.  All referenced entities must be in a list at left.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
         if (oArr == null) {
-            messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Incompatible connection",
-					"The nodes must be a SimEventListener and SimEventSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        adapterEdgeEdit(((AssemblyModelImpl) getModel()).newAdapterEdge(shortUniqueInstanceAdapterName(""), oArr[0], oArr[1]));
+        adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
     }
 
     @Override
@@ -1449,48 +932,44 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForSimEventListenerArc(oA, oB);
+        AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
 
         if (oArr == null) {
-            messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Incompatible connection",
-					"The node connection must be a SimEventListener and SimEventSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        ((AssemblyModelImpl) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
+        ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
     }
 
     @Override
-    public void newPropertyChangeListArc(Object[] nodes) {
+    public void newPropChangeListArc(Object[] nodes) {
         // One and only one has to be a prop change listener
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForPropertyChangeArc(oA, oB);
+        AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
 
         if (oArr == null) {
-            messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Incompatible connection",
-					"The node connection must be a PropertyChangeListener and PropertyChangeSource combination.");
+            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        propertyChangeListenerEdgeEdit(((AssemblyModelImpl) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        pcListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
-    AssemblyNode[] checkLegalForSimEventListenerArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderSELSrcAndLis(a, b, ca, cb);
     }
 
-    AssemblyNode[] checkLegalForPropertyChangeArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderPCLSrcAndLis(a, b, ca, cb);
     }
 
     Class<?> findClass(AssemblyNode o) {
-        return ViskitStatics.ClassForName(o.getType());
+        return VStatics.classForName(o.getType());
     }
 
     AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
@@ -1499,10 +978,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // we don't know if the workClassLoader is the same instance
         // as it used to be when these were originally loaded
         // the tbd here is to see if there can be a shared root loader
-        simEvSrcClass = ViskitStatics.ClassForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.ClassForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.ClassForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.ClassForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
         if (propChgSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (propChgSrcClass.isAssignableFrom(cb)) {
@@ -1522,10 +1001,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
         AssemblyNode[] obArr = new AssemblyNode[2];
-        simEvSrcClass = ViskitStatics.ClassForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.ClassForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.ClassForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.ClassForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
         if (simEvSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (simEvSrcClass.isAssignableFrom(cb)) {
@@ -1548,50 +1027,50 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param pclNode Property Change Listener Node
      */
     @Override
-    public void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode) {
+    public void pcListenerEdit(PropChangeListenerNode pclNode) {
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerNode(pclNode);
+            boolean modified = ((AssemblyView) getView()).doEditPclNode(pclNode);
             if (modified) {
-                done = ((AssemblyModelImpl) getModel()).changePclNode(pclNode);
+                done = ((AssemblyModel) getModel()).changePclNode(pclNode);
             }
         } while (!done);
     }
 
     @Override
-    public void eventGraphEdit(EventGraphNode eventNode) {
+    public void evGraphEdit(EvGraphNode evNode) {
         boolean done;
         do {
             done = true;
-            boolean modified = ((AssemblyEditView) getView()).doEditEventGraphNode(eventNode);
+            boolean modified = ((AssemblyView) getView()).doEditEvGraphNode(evNode);
             if (modified) {
-                done = ((AssemblyModelImpl) getModel()).changeEventGraphNode(eventNode);
+                done = ((AssemblyModel) getModel()).changeEvGraphNode(evNode);
             }
         } while (!done);
     }
 
     @Override
-    public void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
-        boolean modified = ((AssemblyEditView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
+    public void pcListenerEdgeEdit(PropChangeEdge pclEdge) {
+        boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
         if (modified) {
-            ((AssemblyModelImpl) getModel()).changePclEdge(pclEdge);
+            ((AssemblyModel) getModel()).changePclEdge(pclEdge);
         }
     }
 
     @Override
     public void adapterEdgeEdit(AdapterEdge aEdge) {
-        boolean modified = ((AssemblyEditView) getView()).doEditAdapterEdge(aEdge);
+        boolean modified = ((AssemblyView) getView()).doEditAdapterEdge(aEdge);
         if (modified) {
-            ((AssemblyModelImpl) getModel()).changeAdapterEdge(aEdge);
+            ((AssemblyModel) getModel()).changeAdapterEdge(aEdge);
         }
     }
 
     @Override
-    public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
-        boolean modified = ((AssemblyEditView) getView()).doEditSimEventListEdge(seEdge);
+    public void simEvListenerEdgeEdit(SimEvListenerEdge seEdge) {
+        boolean modified = ((AssemblyView) getView()).doEditSimEvListEdge(seEdge);
         if (modified) {
-            ((AssemblyModelImpl) getModel()).changeSimEventListenerEdge(seEdge);
+            ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
     }
 
@@ -1617,7 +1096,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return nodeOrEdgeInVector(selectionVector);
     }
 
-    private boolean nodeOrEdgeInVector(Vector v) {
+    private boolean nodeOrEdgeInVector(Vector<Object> v) {
         for (Object o : v) {
             if (o instanceof AssemblyNode) {
                 return true;
@@ -1631,57 +1110,40 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     private boolean doRemove = false;
 
-    public final static String REMOVE_METHOD = "remove"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void remove () // method name must exactly match preceding string value
-	{
-        if (!selectionVector.isEmpty()) // first ask:
-		{
-            String title   = "Remove element";
-			if (selectionVector.size() > 1)
-				   title += "s";
-			title += "?";
-
-            String message = "<html><p>Confirm removal, please:</p>" + "<ul>";
-            int localNodeCount = 0;  // different message for edge delete
-            for (Object o : selectionVector)
-			{
-				message += "<li>";
-                if (o instanceof AssemblyNode)
-				{
-                     localNodeCount++;
-					 message += ((AssemblyNode)o).getName() + " (" + o.toString().replace('\n', ' ')  + ")";
+    public void remove() {
+        if (!selectionVector.isEmpty()) {
+            // first ask:
+            String msg = "";
+            int nodeCount = 0;  // different msg for edge delete
+            for (Object o : selectionVector) {
+                if (o instanceof AssemblyNode) {
+                    nodeCount++;
                 }
-                else message +=                                "(" + o.toString().replace('\n', ' ')  + ")"; // any other element types?
-				message += "</li>";
+                String s = o.toString();
+                s = s.replace('\n', ' ');
+                msg += ", \n" + s;
             }
-			message += "</ul>";
-            String specialNodeMessage = (localNodeCount > 0) ? "<p>All unselected but attached edges will also be removed.</p>" : "";
-            doRemove = ((AssemblyEditView) getView()).genericAskYN(title, message + specialNodeMessage) == JOptionPane.YES_OPTION;
-            if (doRemove)
-			{
-                delete(); // TODO edges first?  also include Verbose list
+            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
+            doRemove = ((AssemblyView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            if (doRemove) {
+                // do edges first?
+                delete();
             }
         }
     }
 
-    public final static String CUT_METHOD = "cut"; // must match following method name.  not possible to accomplish this programmatically.
-	/**
-	 * Not supported
-	 */
     @Override
-    public void cut () // method name must exactly match preceding string value
+    public void cut() //---------------
     {
         // Not supported
     }
 
-    public final static String COPY_METHOD = "copy"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
     @SuppressWarnings("unchecked")
-    public void copy () // method name must exactly match preceding string value
-	{
+    public void copy() {
         if (selectionVector.isEmpty()) {
-            messageToUser(JOptionPane.WARNING_MESSAGE,
+            messageUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
                     "Edges cannot be copied.");
             return;
@@ -1699,36 +1161,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Also acts as a bias for point offset */
     private int copyCount = 0;
 
-    public final static String PASTE_METHOD = "paste"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void paste () // method name must exactly match preceding string value
+    public void paste() //-----------------
     {
         if (copyVector.isEmpty()) {
             return;
         }
-        int x = 100, y = 100;
-        int offset = 20;
-        for (Object copiedObject : copyVector)
-		{
-            if (copiedObject instanceof AssemblyEdge)
-			{
+        int x = 100, y = 100, offset = 20;
+        Point2D p;
+        String nm, typ;
+        for (Object o : copyVector) {
+            if (o instanceof AssemblyEdge) {
                 continue;
             }
-            Point2D point = new Point(x + (offset * copyCount), y + (offset * copyCount));
 
-            if (copiedObject instanceof EventGraphNode)
-			{
-                String eventGraphName        = ((ViskitElement) copiedObject).getName();
-                String eventGraphType        = ((ViskitElement) copiedObject).getType();
-                String eventGraphDescription = ((ViskitElement) copiedObject).getDescription();
-                ((AssemblyModelImpl) getModel()).newEventGraph(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
-            }
-			else if (copiedObject instanceof PropertyChangeListenerNode)
-			{
-                String eventGraphName        = ((ViskitElement) copiedObject).getName();
-                String eventGraphType        = ((ViskitElement) copiedObject).getType();
-                String eventGraphDescription = ((ViskitElement) copiedObject).getDescription();
-                ((AssemblyModelImpl) getModel()).newPropertyChangeListener(eventGraphName + "-copy" + copyCount, eventGraphType, point, eventGraphDescription);
+            p = new Point(x + (offset * copyCount), y + (offset * copyCount));
+            if (o instanceof EvGraphNode) {
+                nm = ((ViskitElement) o).getName();
+                typ = ((ViskitElement) o).getType();
+                ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
+            } else if (o instanceof PropChangeListenerNode) {
+                nm = ((ViskitElement) o).getName();
+                typ = ((ViskitElement) o).getType();
+                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
             }
             copyCount++;
         }
@@ -1736,46 +1191,39 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    private void delete()
-	{
-        Vector<Object> selectedObjects = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
-        for (Object selectedObject : selectedObjects)
-		{
-            if (selectedObject instanceof AssemblyEdge)
-			{
-                removeEdge((AssemblyEdge) selectedObject);
-            }
-			else if (selectedObject instanceof EventGraphNode)
-			{
-                EventGraphNode eventGraphNode = (EventGraphNode) selectedObject;
-                for (AssemblyEdge assemblyEdge : eventGraphNode.getConnections())
-				{
-                    removeEdge(assemblyEdge);
-                }
-                ((AssemblyModelImpl) getModel()).deleteEventGraphNode(eventGraphNode); // TODO Verbose ?
-            }
-			else if (selectedObject instanceof PropertyChangeListenerNode)
-			{
-                PropertyChangeListenerNode en = (PropertyChangeListenerNode) selectedObject;
-                for (AssemblyEdge ed : en.getConnections())
-				{
+    private void delete() {
+        Vector<Object> v = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
+        AssemblyNode en;
+        for (Object elem : v) {
+            if (elem instanceof AssemblyEdge) {
+                removeEdge((AssemblyEdge) elem);
+            } else if (elem instanceof EvGraphNode) {
+                en = (EvGraphNode) elem;
+                for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModelImpl) getModel()).deletePropertyChangeListener(en);
+                ((AssemblyModel) getModel()).deleteEvGraphNode((EvGraphNode) en);
+            } else if (elem instanceof PropChangeListenerNode) {
+                en = (PropChangeListenerNode) elem;
+                for (AssemblyEdge ed : en.getConnections()) {
+                    removeEdge(ed);
+                }
+                ((AssemblyModel) getModel()).deletePropChangeListener((PropChangeListenerNode) en);
             }
         }
+
         // Clear the cache after a delete to prevent unnecessary buildup
         if (!selectionVector.isEmpty())
-             selectionVector.clear();
+            selectionVector.clear();
     }
 
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
-            ((AssemblyModelImpl) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropertyChangeListenerEdge) {
-            ((AssemblyModelImpl) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
-        } else if (e instanceof SimEventListenerEdge) {
-            ((AssemblyModelImpl) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
+            ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
+        } else if (e instanceof PropChangeEdge) {
+            ((AssemblyModel) getModel()).deletePropChangeEdge((PropChangeEdge) e);
+        } else if (e instanceof SimEvListenerEdge) {
+            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
         }
     }
 
@@ -1793,19 +1241,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         return isUndo;
     }
 
-    public final static String UNDO_METHOD = "undo"; // must match following method name.  not possible to accomplish this programmatically.
     /**
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo () // method name must exactly match preceding string value
-	{
+    public void undo() {
+
         isUndo = true;
 
-        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
-        Object[] roots = view.getCurrentJGraphAssemblyComponentWrapper().getRoots();
+        Object[] roots = view.getCurrentVgacw().getRoots();
         redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
 
         // Prevent dups
@@ -1819,263 +1266,211 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
             LOG.error("Unable to undo: " + ex);
         } finally {
-            updateJGraphUndoRedoStatus();
+            updateUndoRedoStatus();
         }
     }
 
-    public final static String REDO_METHOD = "redo"; // must match following method name.  Not possible to accomplish this programmatically.
     /**
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo () // method name must exactly match preceding string value
-	{
-        // Recreate the JAXB (XML) bindings since the paste function only does nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) // TODO fix
-		{
+    public void redo() {
+
+        // Recreate the JAXB (XML) bindings since the paste function only does
+        // nodes and not edges
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
+
             // Handles both arcs and self-referential arcs
-            if (redoGraphCell.getUserObject() instanceof AdapterEdge)
-			{
+            if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
-                ((AssemblyModelImpl) getModel()).redoAdapterEdge(ed);
+                ((AssemblyModel) getModel()).redoAdapterEdge(ed);
+            } else if (redoGraphCell.getUserObject() instanceof PropChangeEdge) {
+                PropChangeEdge ed = (PropChangeEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
+            } else {
+                SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
             }
-			else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge)
-			{
-                PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModelImpl) getModel()).redoPropertyChangeListenerEdge(ed);
-            }
-			else
-			{
-                SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModelImpl) getModel()).redoSimEventListenerEdge(ed);
-            }
-        }
-		else
-		{
-            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode)
-			{
-                PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
-                ((AssemblyModelImpl) getModel()).redoPropertyChangeListener(node);
-            }
-			else
-			{
-                EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
-                ((AssemblyModelImpl) getModel()).redoEventGraph(node);
+        } else {
+
+            if (redoGraphCell.getUserObject() instanceof PropChangeListenerNode) {
+                PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropChangeListener(node);
+            } else {
+                EvGraphNode node = (EvGraphNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoEventGraph(node);
             }
         }
 
-        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
             LOG.error("Unable to redo: " + ex);
         } finally {
-            updateJGraphUndoRedoStatus();
+            updateUndoRedoStatus();
         }
     }
 
     /** Toggles the undo/redo Edit menu items on/off */
-    public void updateJGraphUndoRedoStatus() {
-        AssemblyEditViewFrame view = (AssemblyEditViewFrame) getView();
-        JGraphGraphUndoManager undoMgr = (JGraphGraphUndoManager) view.getCurrentJGraphAssemblyComponentWrapper().getUndoManager();
+    public void updateUndoRedoStatus() {
+        AssemblyViewFrame view = (AssemblyViewFrame) getView();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
-        ActionIntrospector.getAction(this, UNDO_METHOD).setEnabled(undoMgr.canUndo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, REDO_METHOD).setEnabled(undoMgr.canRedo(view.getCurrentJGraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
 
         isUndo = false;
     }
 
-    public final static String SHOWXML_METHOD = "showXML"; // must match following method name.  Not possible to accomplish this programmatically.
-    @Override
-    public void showXML () // method name must exactly match preceding string value
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+    /********************************/
+    /* from menu:*/
 
-        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
+    @Override
+    public void showXML() {
+        AssemblyModel vmod = (AssemblyModel) getModel();
+        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
             return;
         }
 
-        ((AssemblyEditView) getView()).displayXML(assemblyModel.getLastFile()); // TODO getCurrentFile ?
+        ((AssemblyView) getView()).displayXML(vmod.getLastFile());
     }
 
-    private boolean checkSaveForSourceCompile()
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+    private boolean checkSaveForSourceCompile() {
+        AssemblyModel vmod = (AssemblyModel) getModel();
 
         // Perhaps a cached file is no longer present in the path
-        if (assemblyModel == null) {return false;}
-        if (assemblyModel.isDirty() || assemblyModel.getLastFile() == null)
-		{
-            int returnValue = ((AssemblyEditView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
-            if (returnValue != JOptionPane.YES_OPTION)
-			{
+        if (vmod == null) {return false;}
+        if (vmod.isDirty() || vmod.getLastFile() == null) {
+            int ret = ((AssemblyView) getView()).genericAskYN("Confirm", "The model will be saved.\nContinue?");
+            if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }
-            this.save(); // falls back to saveAs when needed
+            this.saveAs();
         }
         return true;
     }
 
-    public final static String JAVASOURCE_METHOD = "generateJavaSource"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void generateJavaSource () // method name must exactly match preceding string value
-	{
+    public void generateJavaSource() {
         String source = produceJavaAssemblyClass();
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (source != null && !source.isEmpty())
-		{
-            String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
-            ((AssemblyEditView) getView()).showSource(className, source, assemblyModel.getLastFile().getName());
+        AssemblyModel vmod = (AssemblyModel) getModel();
+        if (source != null && !source.isEmpty()) {
+            String className = vmod.getMetaData().packageName + "." + vmod.getMetaData().name;
+            ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
         }
     }
 
-    private String produceJavaAssemblyClass()
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
-			// TODO error notification needed, or is it already getting handled?
+    private String produceJavaAssemblyClass() {
+
+        AssemblyModel vmod = (AssemblyModel) getModel();
+        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
             return null;
         }
-		String sourceCode = buildJavaAssemblySource(assemblyModel.getLastFile());
-        return sourceCode;
+        return buildJavaAssemblySource(vmod.getLastFile());
     }
 
     /**
      * Builds the actual source code from the Assembly XML after a successful
-     * XML validation.  These routines to operate on the current assembly.
+     * XML validation
      *
      * @param f the Assembly file to produce source from
      * @return a string of Assembly source code
      */
-    public String buildJavaAssemblySource(File f)
-	{
+    public String buildJavaAssemblySource(File f) {
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xmlValidationTool = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
+        XMLValidationTool xvt = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
-        if (!xmlValidationTool.isValidXML())
-		{
-			String message = f.getName() + " is not valid XML, see log console";
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Invalid Assembly XML",
-					message);
-            LOG.error(message);
+        if ((xvt == null) || !xvt.isValidXML()) {
+
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
-        }
-		else
-		{
-            LOG.info(f.getName() + " is valid XML");
+        } else {
+            LOG.info(f + " is valid XML\n");
         }
 
-        SimkitAssemblyXML2Java simkitAssemblyXML2Java = null;
+        SimkitAssemblyXML2Java x2j = null;
         try {
-            simkitAssemblyXML2Java = new SimkitAssemblyXML2Java(f);
-            simkitAssemblyXML2Java.unmarshal();
+            x2j = new SimkitAssemblyXML2Java(f);
+            x2j.unmarshal();
         } catch (FileNotFoundException e) {
-			String message = f.getName() + " updated Assembly XML file not found when unmarshalling";
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					"XML file not found",
-					message);
             LOG.error(e);
         }
-		if  (simkitAssemblyXML2Java != null)
-		  	 return simkitAssemblyXML2Java.translate();
-		else
-		{
-			String message = f.getName() + " autogenenerated Java file not found";
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					"File not found",
-					message);
-			return "Error, no Java source produced";
-		}
+        return x2j.translate();
     }
+
+    // NOTE: above are routines to operate on current assembly
 
     /**
      * Build the actual source code from the Event Graph XML after a successful
      * XML validation
      *
-     * @param simkitXML2Java the Event Graph initialized translator to produce source with
+     * @param x2j the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitEventGraphXML2Java simkitXML2Java)
-	{
-        String eventGraphSource;
+    public String buildJavaEventGraphSource(SimkitXML2Java x2j) {
+        String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xmlValidationTool =
-				      new XMLValidationTool(simkitXML2Java.getEventGraphFile(),
-                                            new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
+        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(),
+                new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
 
-        if (!xmlValidationTool.isValidXML())
-		{
-			String message = simkitXML2Java.getEventGraphFile().getName() + " event graph is not schema-valid XML. View model, view source and compile to debug.";
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					" Invalid Event Graph XML",
-					message);
-			LOG.error(message);
+        if ((xvt == null) || !xvt.isValidXML()) {
+
+            // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
-        }
-		else
-		{
-            LOG.info(simkitXML2Java.getEventGraphFile().getName() + " event graph is schema-valid XML");
+        } else {
+            LOG.info(x2j.getEventGraphFile() + " is valid XML\n");
         }
 
         try {
-            eventGraphSource = simkitXML2Java.translate();
-        }
-		catch (Exception e)
-		{
-			String message = "Error building Java source code from " + simkitXML2Java.getFileBaseName() +
-                             " model:\n" + e.getMessage() + ", erroneous event-graph XML found." +
-							 "Review the XML model, view Java source, and view the source compilation to debug.";
-			messageToUser(JOptionPane.ERROR_MESSAGE,
-					"Failed Event Graph conversion to Java",
-					message);
-			LOG.error(message);
-			eventGraphSource = "Error, no Java source produced";
+            eventGraphSource = x2j.translate();
+        } catch (Exception e) {
+            LOG.error("Error building Java from " + x2j.getFileBaseName() +
+                    ": " + e.getMessage() + ", erroneous event-graph xml found");
         }
         return eventGraphSource;
     }
 
     /** Create and test compile our EventGraphs and Assemblies from XML
      *
-     * @param sourceCode the translated source either from SimkitEventGraphXML2Java, or SimkitAssemblyXML2Java
+     * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to a successfully compiled *.class file or null if
      * a compile failure occurred
      */
-    public static File compileJavaClassFromString(String sourceCode) {
+    public static File compileJavaClassFromString(String src) {
         String baseName;
 
         // Find the package subdirectory
-        Pattern pattern = Pattern.compile("package.+;");
-        Matcher matcher = pattern.matcher(sourceCode);
-        boolean findResult = matcher.find();
+        Pattern pat = Pattern.compile("package.+;");
+        Matcher mat = pat.matcher(src);
+        boolean fnd = mat.find();
 
         String packagePath = "";
-        String packageName = "";
-        if (findResult) {
-            int st = matcher.start();
-            int end = matcher.end();
-            String s = sourceCode.substring(st, end);
-            packageName = sourceCode.substring(st, end - 1);
-            packageName = packageName.substring("package".length(), packageName.length()).trim();
-            s = s.replace(';', '/');
+        String pkg = "";
+        if (fnd) {
+            int st = mat.start();
+            int end = mat.end();
+            String s = src.substring(st, end);
+            pkg = src.substring(st, end - 1);
+            pkg = pkg.substring("package".length(), pkg.length()).trim();
+            s = s.replace(';', File.separatorChar);
             String[] sa = s.split("\\s");
-            sa[1] = sa[1].replace('.', '/');
+            sa[1] = sa[1].replace('.', File.separatorChar);
             packagePath = sa[1].trim();
         }
 
-        pattern = Pattern.compile("public\\s+class\\s+");
-        matcher = pattern.matcher(sourceCode);
-        matcher.find();
+        pat = Pattern.compile("public\\s+class\\s+");
+        mat = pat.matcher(src);
+        mat.find();
 
-        int end = matcher.end();
-        String s = sourceCode.substring(end, sourceCode.length()).trim();
+        int end = mat.end();
+        String s = src.substring(end, src.length()).trim();
         String[] sa = s.split("\\s+");
 
         baseName = sa[0];
@@ -2085,150 +1480,132 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
-            File sourcePackage = new File(viskitProject.getSrcDirectory(), packagePath);
-            if (!sourcePackage.isDirectory()) {
-                 sourcePackage.mkdirs();
+            File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
+            if (!srcPkg.isDirectory()) {
+                srcPkg.mkdirs();
             }
-            File javaFile = new File(sourcePackage, baseName + ".java");
+            File javaFile = new File(srcPkg, baseName + ".java");
             javaFile.createNewFile();
 
             fw = new FileWriter(javaFile);
-            fw.write(sourceCode);
+            fw.write(src);
 
             // An error stream to write additional error info out to
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            Compiler.setOutputStream(byteArrayOutputStream);
+            OutputStream baosOut = new ByteArrayOutputStream();
+            Compiler.setOutPutStream(baosOut);
 
-            File classesDirectory = viskitProject.getClassesDirectory();
+            File classesDir = viskitProj.getClassesDir();
 
             LOG.info("Test compiling " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
-            String diagnostic = Compiler.invoke(packageName, baseName, sourceCode);
+            String diagnostic = Compiler.invoke(pkg, baseName, src);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
-            if (compileSuccess)
-			{
-                LOG.info(diagnostic);
-                return new File(classesDirectory, packagePath + baseName + ".class");
-            }
-			else
-			{
-				String message = "Error compiling " + javaFile.getCanonicalPath();
-                LOG.error(message);
-                LOG.error(diagnostic);
-                if (!byteArrayOutputStream.toString().isEmpty())
-				{
-                    LOG.error(byteArrayOutputStream.toString());
+            if (compileSuccess) {
+
+                LOG.info(diagnostic + "\n");
+                return new File(classesDir, packagePath + baseName + ".class");
+            } else {
+
+                LOG.error(diagnostic + "\n");
+                if (!baosOut.toString().isEmpty()) {
+                    LOG.error(baosOut.toString() + "\n");
                 }
             }
+
         } catch (IOException ioe) {
             LOG.error(ioe);
         } finally {
             try {
                 if (fw != null)
                     fw.close();
-            }
-			catch (IOException e) {}
+            } catch (IOException e) {}
         }
         return null;
     }
 
     /**
      * Known modelPath for EventGraph compilation.  Called whenever an XML file
-     * loads for the first time, or is saved during an analyst editing session.
+     * loads for the first time, or is saved during an edit
      *
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    public PackageAndFile createTemporaryEventGraphClass(File xmlFile)
-	{
-        PackageAndFile packageAndFile = null;
+    public PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
+        PkgAndFile paf = null;
         try {
-            SimkitEventGraphXML2Java xml2java = new SimkitEventGraphXML2Java(xmlFile);
-            xml2java.unmarshal();
+            SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
+            x2j.unmarshal();
 
-            boolean isEventGraph = xml2java.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
-            if (!isEventGraph)
-			{
-                LOG.debug(xmlFile.getName() + "is an Assembly: " + !isEventGraph);
+            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
+            if (!isEventGraph) {
+                LOG.debug("Is an Assembly: " + !isEventGraph);
                 return null;
             }
-            String sourceCode = buildJavaEventGraphSource(xml2java);
 
-            /* Warn that we may have forgotten a parameter required for a super class */
-            if (sourceCode == null)
-			{
-                String message = xmlFile + " did not compile.\n" +
-                        "Please check that you have provided initialization parameters in the \n" +
-                        "identical order declared by any super classes";
-                LOG.error(xmlFile + " " + message);
-                LOG.error(sourceCode);
-                messageToUser(JOptionPane.ERROR_MESSAGE,
-						"Source code compilation error",
-						message);
+            String src = buildJavaEventGraphSource(x2j);
+
+            /* We may have forgotten a parameter required for a super class */
+            if (src == null) {
+                String msg = xmlFile + " did not compile.\n" +
+                        "Please check that you have provided parameters in \n" +
+                        "identical order declared for any super classes";
+                LOG.error(xmlFile + " " + msg);
+                messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
             }
 
             // If using plain Vanilla Viskit, don't compile diskit extended EGs
-            // as diskit.jar won't be available  TODO confirm
-            String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader()).getClassPath();
+            // as diskit.jar won't be available
+            String[] classPath = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader()).getClassPath();
             boolean foundDiskit = false;
-            for (String path : classPath)
-			{
+            for (String path : classPath) {
                 if (path.contains("diskit.jar")) {
                     foundDiskit = !foundDiskit;
                     break;
                 }
             }
 
-            if (sourceCode.contains("diskit") && !foundDiskit)
-			{
+            if (src.contains("diskit") && !foundDiskit) {
                 FileBasedClassManager.instance().addCacheMiss(xmlFile);
 
                 // TODO: Need to announce/recommend to the user to place
                 // diskit.jar in the classpath, then restart Viskit
+            } else {
+                paf = compileJavaClassAndSetPackage(src);
             }
-			else
-			{
-                packageAndFile = compileJavaClassAndSetPackage(sourceCode);
-            }
-        }
-		catch (FileNotFoundException e)
-		{
-            LOG.error("Error creating Java class file from " + xmlFile + "\n" + e.getMessage());
+        } catch (FileNotFoundException e) {
+            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
-        return packageAndFile;
+        return paf;
     }
 
-    /** Path for EventGraph and Assembly compilation
+    /** Path for EG and Assy compilation
      *
-     * @param sourceCode the raw source to write to file
+     * @param source the raw source to write to file
      * @return a package and file pair
      */
-    private PackageAndFile compileJavaClassAndSetPackage(String sourceCode)
-	{
-        String packageName = new String();
-        if (sourceCode != null && !sourceCode.isEmpty())
-		{
+    private PkgAndFile compileJavaClassAndSetPackage(String source) {
+        String pkg = null;
+        if (source != null && !source.isEmpty()) {
             Pattern p = Pattern.compile("package.*;");
-            Matcher m = p.matcher(sourceCode);
-            if (m.find())
-			{
+            Matcher m = p.matcher(source);
+            if (m.find()) {
                 String nuts = m.group();
                 if (nuts.endsWith(";")) {
                     nuts = nuts.substring(0, nuts.length() - 1);
                 }
+
                 String[] sa = nuts.split("\\s");
-                packageName = sa[1]; // TODO confirm
+                pkg = sa[1];
             }
-            File f = compileJavaClassFromString(sourceCode);
-            if (f != null)
-			{
-                return new PackageAndFile(packageName, f);
+            File f = compileJavaClassFromString(source);
+            if (f != null) {
+                return new PkgAndFile(pkg, f);
             }
         }
         return null;
@@ -2236,48 +1613,41 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     // From menu
     @Override
-    public void export2grid()
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+    public void export2grid() {
+        AssemblyModel model = (AssemblyModel) getModel();
         File tFile;
         try {
             tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
         } catch (IOException e) {
-            messageToUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
+            messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
-        assemblyModel.saveModel(tFile);
+        model.saveModel(tFile);
     //todo switch to DOE
     }
-    private String[] executionParameters;
+    private String[] execStrings;
 
-    // Known modelPath for Assembly compilation
+    // Known modelPath for Assy compilation
     @Override
-    public void initializeAssemblyRun() {
-        String sourceCode = produceJavaAssemblyClass(); // asks to save
+    public void initAssemblyRun() {
+        String src = produceJavaAssemblyClass(); // asks to save
 
-        PackageAndFile packageAndFile = compileJavaClassAndSetPackage(sourceCode);
-        if (packageAndFile != null) {
-            File f = packageAndFile.file;
-            String className = f.getName().substring(0, f.getName().indexOf('.'));
-            className = packageAndFile.pkg + "." + className;
-            executionParameters = buildExecutionParameterArray(className);
+        PkgAndFile paf = compileJavaClassAndSetPackage(src);
+        if (paf != null) {
+            File f = paf.f;
+            String clNam = f.getName().substring(0, f.getName().indexOf('.'));
+            clNam = paf.pkg + "." + clNam;
+
+            execStrings = buildExecStrings(clNam);
         } else {
-            executionParameters = null;
+            execStrings = null;
         }
     }
 
-	@Override
-	public boolean isAssemblyReady ()
-	{
-		return (executionParameters != null); // if parameters are ready, then Assembly passed all tests
-	}
-
-    public final static String PREPARESIMULATIONRUN_METHOD = "compileAssemblyAndPrepareSimulationRunner"; // must match following method name.  Not possible to accomplish this programmatically.
     @Override
-    public void compileAssemblyAndPrepareSimulationRunner () // method name must exactly match preceding string value
-	{
-        // Prevent multiple pushes of the initialize Simulation Run button
+    public void compileAssemblyAndPrepSimRunner() {
+
+        // Prevent multiple pushes of the initialize sim run button
         mutex++;
         if (mutex > 1) {
             return;
@@ -2285,79 +1655,71 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Prevent double clicking which will cause potential ClassLoader issues
         Runnable r = () -> {
-            ((AssemblyEditViewFrame) getView()).compileInitializeAssemblyButton.setEnabled(false);
+            ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
         };
-        if (SwingUtilities.isEventDispatchThread())
+        
+        try {
             SwingUtilities.invokeLater(r);
-        else {
-            try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOG.error(e);
-            }
+        } catch (Exception e) {
+            LOG.error(e);
         }
 
-        SwingWorker worker = new SwingWorker<Void, Void>()
-		{
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+
             @Override
-            public Void doInBackground () // TODO why Void arther than void?  SwingWorker convention of some sort
-			{
-                initializeAssemblyRun(); // generate, compile sourceCode and prepare the executionParameters
+            public Void doInBackground() {
 
-                if (executionParameters == null)
-				{
-                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
-					{
-                        messageToUser(JOptionPane.WARNING_MESSAGE,
-                            "No Assembly file is active",
-                            "Please open an Assembly file before running a simulation");
+                // Compile and prep the execStrings
+                initAssemblyRun();
+
+                if (execStrings == null) {
+
+                    if (VGlobals.instance().getActiveAssemblyModel() == null) {
+                        messageUser(JOptionPane.WARNING_MESSAGE,
+                            "Assembly File Not Opened",
+                            "Please open an Assembly file");
+                    } else {
+                        String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
+                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
                     }
-					else
-					{
-                        String message = "<html>" +
-								         "<p align='center'>Runtime error: no executionParameters found." + ViskitStatics.RECENTER_SPACING + "</p>" +
-								         "<p>&nbsp;</p>" +
-										 "<p align='center'>Please locate and correct the source error in assembly XML for proper compilation." + ViskitStatics.RECENTER_SPACING + "</p>" +
-								         "<p>&nbsp;</p>";
-                        messageToUser(JOptionPane.WARNING_MESSAGE, "Failed Assembly source generation/compilation", message);
-                    }
+                } else {
+
+                    // Ensure a cleared Assembly Run panel upon every Assembly compile
+                    RunnerPanel2 rp2 = VGlobals.instance().getRunPanel();
+                    rp2.soutTA.setText(null);
+                    rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
+                            + "----------------------" + rp2.lineEnd);
+
+                    // Ensure changes to the Assembly Properties dialog get saved
+                    save();
+
+                    // Initializes a fresh class loader
+                    runner.exec(execStrings);
+
+                    // reset
+                    execStrings = null;
                 }
-				else
-				{
-                    // Ensure a cleared Simulation Run panel upon every Assembly compile
-                    SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
-					simulationRunPanel.setTitle( ((AssemblyModelImpl) getModel()).getMetadata().name );
-					simulationRunPanel.initializeRunWidgetsSimulationOutputTA ();
 
-                    save(); // Ensure changes to the Assembly Properties dialog get saved
-
-                    runner.exec(executionParameters); // Initializes a fresh class loader
-
-                    executionParameters = null; // reset
-                }
                 return null;
             }
 
             @Override
             protected void done() {
-                try
-				{
-                   get(); // Wait for the compile, save and Assembly preparations to finish
-                }
-				catch (InterruptedException | ExecutionException e)
-				{
+                try {
+
+                    // Wait for the compile, save and Assy preps to finish
+                    get();
+
+                } catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
 //                    e.printStackTrace();
-                }
-				finally
-				{
-                    ((AssemblyEditViewFrame) getView()).compileInitializeAssemblyButton.setEnabled(true);
-                    mutex--; // clear lock
-					ViskitGlobals.instance().getViskitApplicationFrame().displaySimulationRunTab(); // send analyst to Simulation Run tab
+                } finally {
+                    ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
+                    mutex--;
                 }
             }
         };
-        worker.execute(); // do it to it
+        worker.execute();
     }
 
     public static final int EXEC_TARGET_CLASS_NAME = 0;
@@ -2369,54 +1731,51 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param className the name of the Assembly file to compile
      * @return a parameter array
      */
-    private String[] buildExecutionParameterArray(String className) {
+    private String[] buildExecStrings(String className) {
         List<String> v = new ArrayList<>();
         
         v.add(className);                                               // 0
-        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 1
-        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 2
+        v.add("" + ((AssemblyModel) getModel()).getMetaData().verbose); // 1
+        v.add(((AssemblyModel) getModel()).getMetaData().stopTime);     // 2
 
         String[] ra = new String[v.size()];
         return v.toArray(ra);
     }
-    private String imageSaveCount = "";
-    private int imageSaveInt = -1;
+    private String imgSaveCount = "";
+    private int imgSaveInt = -1;
 
-    public final static String IMAGECAPTURE_METHOD = "windowImageCapture"; // must match following method name.  not possible to accomplish this programmatically.
     @Override
-    public void windowImageCapture () // method name must exactly match preceding string value
-	{
-        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
-        String assemblyDiagramfileName = "AssemblyDiagram"; // default, replaced by filename
-        if (assemblyModel.getLastFile() != null)
-		{
-            assemblyDiagramfileName = assemblyModel.getLastFile().getName();
-            assemblyDiagramfileName = assemblyDiagramfileName.replaceAll("\\s", ""); // squeeze out illegal whitespace to ensure legal name
-			if (assemblyDiagramfileName.endsWith(".xml"))
-				assemblyDiagramfileName = assemblyDiagramfileName.substring (0, assemblyDiagramfileName.indexOf(".xml"));
+    public void captureWindow() {
+
+        AssemblyModel vmod = (AssemblyModel) getModel();
+        String fileName = "AssemblyScreenCapture";
+        if (vmod.getLastFile() != null) {
+            fileName = vmod.getLastFile().getName();
         }
-        File imageFile = ((AssemblyEditView) getView()).saveFileAsk(assemblyDiagramfileName + imageSaveCount + ".png", true, "Save Assembly Diagram");
-        if (imageFile == null) {
+
+        File fil = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true);
+        if (fil == null) {
             return;
         }
-        final Timer timer = new Timer(100, new timerCallback(imageFile, true));
-        timer.setRepeats(false);
-        timer.start();
 
-        imageSaveCount = "" + (++imageSaveInt);
+        final Timer tim = new Timer(100, new timerCallback(fil, true));
+        tim.setRepeats(false);
+        tim.start();
+
+        imgSaveCount = "" + (++imgSaveInt);
     }
 
     /** Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
      *
-     * @param assemblyImage an image file to write the .png
+     * @param assyImage an image file to write the .png
      */
-    public void captureAssemblyImage(File assemblyImage) {
+    public void captureAssemblyImage(File assyImage) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer timer = new Timer(100, new timerCallback(assemblyImage, false));
-        timer.setRepeats(false);
-        timer.start();
+        final Timer tim = new Timer(100, new timerCallback(assyImage, false));
+        tim.setRepeats(false);
+        tim.start();
     }
 
     public boolean isCloseAll() {
@@ -2443,25 +1802,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev)
-		{
+        public void actionPerformed(ActionEvent ev) {
+
             // create and save the image
-            AssemblyEditViewFrame assemblyEditViewFrame = (AssemblyEditViewFrame) getView();
+            AssemblyViewFrame avf = (AssemblyViewFrame) getView();
 
             // Get only the jgraph part
-            Component component = assemblyEditViewFrame.getCurrentJgraphComponent();
+            Component component = avf.getCurrentJgraphComponent();
             if (component == null) {return;}
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
             }
-            Rectangle rectangle = component.getBounds();
-            Image image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_3BYTE_BGR);
+            Rectangle rec = component.getBounds();
+            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_3BYTE_BGR);
 
             // Tell the jgraph component to draw into memory
             component.paint(image.getGraphics());
 
             try {
-                ImageIO.write((RenderedImage)image, "png", fil); // write to file
+                ImageIO.write((RenderedImage)image, "png", fil);
             } catch (IOException e) {
                 LOG.error(e);
             }
@@ -2469,8 +1828,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // display a scaled version
             if (display) {
                 final JFrame frame = new JFrame("Saved as " + fil.getName());
-                Icon imageIcon = new ImageIcon(image);
-                JLabel lab = new JLabel(imageIcon);
+                Icon ii = new ImageIcon(image);
+                JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
                 frame.getContentPane().add(lab, BorderLayout.CENTER);
                 frame.pack();
@@ -2492,225 +1851,180 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         runner = plug;
     }
 
-    /**
-     * Opens each Event Graph associated with this Assembly
-     *
+    /** Opens each EG associated with this Assembly
+     * 
      * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
         File tempFile = null;
         try {
-            List<File> eventGraphFilesList = EventGraphCache.instance().getEventGraphFilesList();
-            for (File file : eventGraphFilesList) {
+            List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
+            for (File file : eGFiles) {
                 tempFile = file;
 
-                // _doOpenEventGraph includes checks whether a tab is already opened
-                ViskitGlobals.instance().getEventGraphController()._doOpenEventGraph(file);
+                // _doOpen checks if a tab is already opened
+                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
             }
-//            ViskitGlobals.instance().getViskitApplicationFrame().displayAnalystReportTab(); // ensure correct context when building menus
-//            ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
-            messageToUser(JOptionPane.WARNING_MESSAGE,
+            messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
-            );
-            ex.printStackTrace(System.err);
+                    );
             closeAll();
         }
     }
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private final Set<File> recentAssemblyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
-    private final Set<File> recentProjectDirectorySet  = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
-     * @param newAssemblyFile an assembly file to add to the list
+     * @param file an assembly file to add to the list
      */
-    private void adjustRecentAssemblyFileSet(File newAssemblyFile)
-	{
-        for (Iterator<File> iterator = recentAssemblyFileSet.iterator(); iterator.hasNext();)
-		{
-            File recentFile = iterator.next();
-            if (newAssemblyFile.getPath().equals(recentFile.getPath()))
-			{
-                iterator.remove(); // duplicate removed from list...
+    private void adjustRecentAssySet(File file) {
+        for (Iterator<File> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
+
+            File f = itr.next();
+            if (file.getPath().equals(f.getPath())) {
+                itr.remove();
                 break;
             }
         }
-        recentAssemblyFileSet.add(newAssemblyFile); // ... then added to to the top
-        notifyRecentAssemblyFileListeners();
-        saveAssemblyHistoryXML(recentAssemblyFileSet);
+
+        recentAssyFileSet.add(file); // to the top
+        saveAssyHistoryXML(recentAssyFileSet);
+        notifyRecentAssyFileListeners();
     }
 
     /**
-     * If passed directory is in the list, move it to the top.  Else insert it;
+     * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
-     * @param recentProjectDirectory a project directory to add to the list
+     * @param file a project file to add to the list
      */
-    public void adjustRecentProjectFileSet(File recentProjectDirectory)
-	{
-		if (recentProjectDirectory == null)
-			return;
+    public void adjustRecentProjSet(File file) {
+        for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
 
-        for (Iterator<File> iterator = recentProjectDirectorySet.iterator();
-				            iterator.hasNext();)
-		{
-            File recentProject = iterator.next();
-            if (recentProjectDirectory.getPath().equals(recentProject.getPath()))
-			{
-                iterator.remove(); // duplicate removed from list...
+            File f = itr.next();
+            if (file.getPath().equals(f.getPath())) {
+                itr.remove();
                 break;
             }
         }
-        recentProjectDirectorySet.add(recentProjectDirectory); // ... then added to to the top
-        notifyRecentProjectFileListeners();
-        saveProjectHistoryXML(recentProjectDirectorySet);
+
+        recentProjFileSet.add(file); // to the top
+        saveProjHistoryXML(recentProjFileSet);
+        notifyRecentProjFileListeners();
     }
 
-    private List<File> openAssembliesFileList = new ArrayList<>(RECENTLISTSIZE);
+    private List<File> openAssemblies;
 
     @SuppressWarnings("unchecked")
-    public void updateAssemblyFileLists ()
-	{
-        if (historyXMLConfiguration == null)
-		{
-			initializeHistoryXMLConfiguration();
-		}
-        List<String> assemblyFilePathList = historyXMLConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
+    private void recordAssyFiles() {
+        if (historyConfig == null) {initConfig();}
+        openAssemblies = new ArrayList<>(4);
+        List<Object> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
+        LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
+        int idx = 0;
+        for (Object s : valueAr) {
+            if (recentAssyFileSet.add(new File((String) s))) {
+                String op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
-		if (assemblyFilePathList == null)
-		{
-			LOG.error ("updateAssemblyFileLists () failing mysteriously, apparently historyXMLConfiguration is null");
-			return;
-		}
-//      LOG.debug("updateAssemblyFileLists() assemblyFilePathList.size()=" + assemblyFilePathList.size());
-
-        int index = 0;
-        for (String assemblyFilePath : assemblyFilePathList)
-		{
-            if (recentAssemblyFileSet.add(new File(assemblyFilePath))) // returns true if file added
-			{
-                String openValue = historyXMLConfiguration.getString(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@open]");
-
-                if (openValue != null && (openValue.toLowerCase().equals("true") || openValue.toLowerCase().equals("yes"))) {
-                    openAssembliesFileList.add(new File(assemblyFilePath));
+                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
+                    openAssemblies.add(new File((String) s));
                 }
-                notifyRecentAssemblyFileListeners();
+
+                notifyRecentAssyFileListeners();
             }
-            index++;
+            idx++;
         }
-        saveAssemblyHistoryXML(recentAssemblyFileSet);
     }
 
     @SuppressWarnings("unchecked")
-    public void updateProjectFileLists()
-	{
-        if (historyXMLConfiguration == null)
-		{
-			initializeHistoryXMLConfiguration();
-		}
-        List<String> projectHistoryList = historyXMLConfiguration.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
-		if (projectHistoryList == null)
-			projectHistoryList = new ArrayList<>();
-//      LOG.debug("recordProjectFiles projectHistoryList.size()=" + projectHistoryList.size());
-        for (String project : projectHistoryList)
-		{
-            adjustRecentProjectFileSet(new File(project)); // includes saving to XML
+    private void recordProjFiles() {
+        if (historyConfig == null) {initConfig();}
+        List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
+        for (Object value : valueAr) {
+            adjustRecentProjSet(new File((String) value));
         }
     }
 
-    private void saveAssemblyHistoryXML(Set<File> recentFiles)
-	{
-        historyXMLConfiguration.clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
-        int index = 0;
+    private void saveAssyHistoryXML(Set<File> recentFiles) {
+        historyConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+        int idx = 0;
 
         // The value's modelPath is already delimited with "/"
-        for (File recentFile : recentFiles) {
-            historyXMLConfiguration.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + index + ")[@value]", recentFile.getPath());
-            index++;
+        for (File value : recentFiles) {
+            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
+            idx++;
         }
-        historyXMLConfiguration.getDocument().normalize();
+        historyConfig.getDocument().normalize();
     }
 
-    /** Always keep our project historyXMLConfiguration until a user clears it manually
+    /** Always keep our project Hx until a user clears it manually
      *
      * @param recentFiles a Set of recently opened projects
      */
-    private void saveProjectHistoryXML(Set<File> recentFiles)
-	{
-        int index = 0;
-        for (File recentFile : recentFiles) {
-            historyXMLConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + index + ")[@value]", recentFile.getPath());
-            index++;
+    private void saveProjHistoryXML(Set<File> recentFiles) {
+        int ix = 0;
+        for (File value : recentFiles) {
+            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
+            ix++;
         }
-        historyXMLConfiguration.getDocument().normalize();
+        historyConfig.getDocument().normalize();
     }
 
     @Override
-    public void clearRecentAssemblyFileList()
-	{
-        recentAssemblyFileSet.clear();
-        notifyRecentAssemblyFileListeners();
-        saveAssemblyHistoryXML(recentAssemblyFileSet);
-		ViskitGlobals.instance().getAssemblyEditViewFrame().buildMenus(); // reset
+    public void clearRecentAssyFileList() {
+        recentAssyFileSet.clear();
+        saveAssyHistoryXML(recentAssyFileSet);
+        notifyRecentAssyFileListeners();
     }
 
     @Override
-    public Set<File> getRecentAssemblyFileSet()
-	{
-        return getRecentAssemblyFileSet(true); // typically must refresh to see changes
+    public Set<File> getRecentAssyFileSet() {
+        return getRecentAssyFileSet(false);
     }
 
-    private Set<File> getRecentAssemblyFileSet(boolean refresh)
-	{
-        if (refresh || recentAssemblyFileSet == null) {
-            updateAssemblyFileLists();
+    private Set<File> getRecentAssyFileSet(boolean refresh) {
+        if (refresh || recentAssyFileSet == null) {
+            recordAssyFiles();
         }
-        return recentAssemblyFileSet;
+        return recentAssyFileSet;
     }
 
     @Override
-    public void clearRecentProjectFileSet()
-	{
-        recentProjectDirectorySet.clear();
-        saveProjectHistoryXML(recentProjectDirectorySet);
-        notifyRecentProjectFileListeners();
-		ViskitGlobals.instance().getEventGraphViewFrame().buildMenus(); // reset
+    public void clearRecentProjFileSet() {
+        recentProjFileSet.clear();
+        saveProjHistoryXML(recentProjFileSet);
+        notifyRecentProjFileListeners();
     }
 
     @Override
-    public Set<File> getRecentProjectFileSet()
-	{
-        return getRecentProjectFileSet(false); // don't refresh or infinite loop occurs
+    public Set<File> getRecentProjFileSet() {
+        return getRecentProjFileSet(false);
     }
 
-    private Set<File> getRecentProjectFileSet(boolean refresh)
-	{
-        if (refresh || recentProjectDirectorySet == null)
-		{
-            updateProjectFileLists();
+    private Set<File> getRecentProjFileSet(boolean refresh) {
+        if (refresh || recentProjFileSet == null) {
+            recordProjFiles();
         }
-        return recentProjectDirectorySet;
+        return recentProjFileSet;
     }
 
-    XMLConfiguration historyXMLConfiguration;
+    XMLConfiguration historyConfig;
 
-    private void initializeHistoryXMLConfiguration()
-	{
+    private void initConfig() {
         try {
-            historyXMLConfiguration = ViskitConfiguration.instance().getViskitApplicationXMLConfiguration();
-			if (historyXMLConfiguration == null)
-				historyXMLConfiguration = new XMLConfiguration();
-        }
-		catch (Exception e)
-		{
-            LOG.error("Error loading recent history file: " + e.getMessage());
-            LOG.warn ("Error, recent history file disabled");
-            historyXMLConfiguration = null;
+            historyConfig = ViskitConfig.instance().getViskitAppConfig();
+        } catch (Exception e) {
+            LOG.error("Error loading history file: " + e.getMessage());
+            LOG.warn("Recent file saving disabled");
+            historyConfig = null;
         }
     }
 }

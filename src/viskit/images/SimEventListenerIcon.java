@@ -39,7 +39,7 @@ public class SimEventListenerIcon implements Icon
     Graphics2D g2d = (Graphics2D)g;
     Insets ins = new Insets(0,0,0,0);
     if(c instanceof JComponent)
-      ins = ((JComponent)c).getInsets();
+      ins = ((Container)c).getInsets();
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.translate(ins.left,ins.top);
 

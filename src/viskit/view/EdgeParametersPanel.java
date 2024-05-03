@@ -1,7 +1,8 @@
 package viskit.view;
 
 import viskit.model.EventArgument;
-import viskit.model.ViskitEdgeParameter;
+import viskit.model.vEdgeParameter;
+import viskit.model.ViskitElement;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -9,7 +10,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
-import viskit.model.ViskitElement;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -19,11 +19,11 @@ import viskit.model.ViskitElement;
  * @author Mike Bailey
  * @since Apr 8, 2004
  * @since 8:49:21 AM
- * @version $Id$
+ * @version $Id: EdgeParametersPanel.java 2641 2015-03-01 03:08:08Z tdnorbra $
  */
 public class EdgeParametersPanel extends ViskitTablePanel {
 
-    private String[] mytitles = {"event argument", "value"};
+    private final String[] mytitles = {"event argument", "value"};
     private List<? extends ViskitElement> argList;
 
     public EdgeParametersPanel(int wid) {
@@ -31,7 +31,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
         init(false);
 
         // Set the first column background to be the color of the panel (indicating r/o)
-        TableColumn tc = table.getColumnModel().getColumn(0);
+        TableColumn tc = tab.getColumnModel().getColumn(0);
         tc.setCellRenderer(new DifferentTableColumnBackgroundRenderer(getBackground()));
 
         super.addDoubleClickedListener(new myEditListener());
@@ -58,11 +58,11 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        return new ViskitEdgeParameter("value");
+        return new vEdgeParameter("value");
     }
 
     @Override
-    public int getNumberVisibleRows() {
+    public int getNumVisibleRows() {
         return 3;
     }
 
@@ -85,7 +85,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
             // more arguments than we've got.
             for (int i = 0; i < diff; i++) {
-                myList.add(new ViskitEdgeParameter("0"));
+                myList.add(new vEdgeParameter("0"));
             }
             super.setData(myList);
         } else {
@@ -98,8 +98,6 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     }
 
     class DifferentTableColumnBackgroundRenderer extends DefaultTableCellRenderer {
-
-        Color c;
 
         public DifferentTableColumnBackgroundRenderer(Color c) {
             super();
@@ -126,7 +124,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
                 Object o = e.getSource();
                 int row = findObjectRow(o);
                 EventArgument ea = (EventArgument) argList.get(row);
-                ((ViskitEdgeParameter) o).bogus = ea.getType();
+                ((vEdgeParameter) o).bogus = ea.getType();
                 ActionEvent ae = new ActionEvent(o, 0, "");
                 alis.actionPerformed(ae);
             }

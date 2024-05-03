@@ -15,35 +15,35 @@ import viskit.mvc.mvcRecentFileListener;
  * @since 9:00:57 AM
  * @version $Id$
  */
-public interface EventGraphController 
-{
+public interface EventGraphController {
+
     /**
-     * Start application
+     * Start app
      */
     void begin();
+
+    /**
+     * User has clicked a button or menu item
+     */
+    void newNode();
 
     void newSimParameter();
 
     /** Comes in from plus button on State Variables panel */
     void newStateVariable();
 
-    void newNode();
-
     /**
      * User has established some entity parameters, model can create objects
      *
      * @param p the graphical point of new node
-	 * @return newly created EventNode
      */
-    EventNode buildNewEventNode(Point p);
+    void buildNewNode(Point p);
 
-    EventNode buildNewEventNode(String name);
+    void buildNewNode(Point p, String name);
 
-    EventNode buildNewEventNode(Point p, String name);
+    void buildNewSimParameter(String name, String type, String initVal, String comment);
 
-    void buildNewSimParameter(String name, String type, String initialValue, String description);
-
-    void buildNewStateVariable(String name, String type, boolean implicit, String initialValue, String description);
+    void buildNewStateVariable(String name, String type, String initVal, String comment);
 
     /** Connect a scheduling edge between two nodes
      *
@@ -51,11 +51,11 @@ public interface EventGraphController
      */
     void buildNewSchedulingArc(Object[] nodes);
 
-    /** Connect a cancelling edge between two nodes
+    /** Connect a canceling edge between two nodes
      *
      * @param nodes an array of source and target nodes
      */
-    void buildNewCancellingArc(Object[] nodes);
+    void buildNewCancelingArc(Object[] nodes);
 
     /**
      * Provides an automatic capture of all Event Graphs images used in an
@@ -68,7 +68,7 @@ public interface EventGraphController
      */
     void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages);
 
-    void editEventGraphMetadata();
+    void editGraphMetaData();
 
     /**
      * Creates a new blank EventGraph model
@@ -83,18 +83,18 @@ public interface EventGraphController
     /** Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */
-    void mailZippedProjectFiles();
+    void zipAndMailProject();
 
     /** Show the XML form of an event graph */
     void showXML();
 
     /** A component, e.g., vMod, wants to say something.
      *
-     * @param dialogType the type of message, i.e. ERROR, WARN, INFO, QUESTION, etc.
+     * @param typ the type of message, i.e. ERROR, WARN, INFO, QUESTION, etc.
      * @param title the title of the message in the dialog frame
      * @param msg the message to transmit
      */
-    void messageToUser(int dialogType, String title, String msg);    // typ is one of JOptionPane types
+    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
     /** Requests to the controller to perform editing operations on existing entities
      *
@@ -105,27 +105,27 @@ public interface EventGraphController
     /**
      * Edit a scheduling edge
      *
-     * @param edge the edge to edit
+     * @param ed the edge to edit
      */
-    void schedulingArcEdit(SchedulingEdge edge);
+    void schedulingArcEdit(Edge ed);
 
     /**
-     * Edit a cancelling edge
+     * Edit a canceling edge
      *
-     * @param edge the edge to edit
+     * @param ed the edge to edit
      */
-    void cancellingArcEdit(CancellingEdge edge);
+    void cancellingArcEdit(Edge ed);
 
-    void simParameterEdit(ViskitParameter parameter);
+    void simParameterEdit(vParameter param);
 
-    void stateVariableEdit(ViskitStateVariable stateVariable);
+    void stateVariableEdit(vStateVariable var);
 
-    void codeBlockEdit(String codeBlockSource);
+    void codeBlockEdit(String s);
 
     /**
      * Opens selected files from a FileChooser
      */
-    void openEventGraph();
+    void open();
 
     void openRecentEventGraph(File path);
 
@@ -175,7 +175,7 @@ public interface EventGraphController
 
     void selectNodeOrEdge(Vector<Object> v);
 
-//    void settings();
+    void settings();
 
     boolean preClose();
 
@@ -185,9 +185,9 @@ public interface EventGraphController
 
     void postQuit();
 
-    void deleteSimParameter(ViskitParameter p);
+    void deleteSimParameter(vParameter p);
 
-    void deleteStateVariable(ViskitStateVariable var);
+    void deleteStateVariable(vStateVariable var);
 
     void eventList();
 
@@ -195,20 +195,22 @@ public interface EventGraphController
      * Generates Java source code from an Event Graph file
      */
     void generateJavaSource();
-	
-    /** Screen capture an image snapshot of the Event Graph Editor frame */
-    void windowImageCapture();
 
-    void            addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener);
+    /**
+     * Provides a single screenshot capture capability
+     */
+    void captureWindow();
 
-    void         removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener listener);
+    void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void      addRecentEventGraphFileListener(mvcRecentFileListener listener);
+    void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void   removeRecentEventGraphFileListener(mvcRecentFileListener listener);
+    void addRecentEgFileListener(mvcRecentFileListener lis);
 
-    Set<File> getRecentEventGraphFileSet();
+    void removeRecentEgFileListener(mvcRecentFileListener lis);
 
-    /** Clears the recent Event Graph file list thus far generated */
-    void    clearRecentEventGraphFileSet();
+    Set<File> getRecentEGFileSet();
+
+    /** Clears the recent EG file list thus far generated */
+    void clearRecentEGFileSet();
 }

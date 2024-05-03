@@ -1,14 +1,11 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
-import java.awt.Point;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.apache.logging.log4j.Logger;
-import viskit.model.ViskitInstantiator;
+import viskit.model.VInstantiator;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -20,81 +17,67 @@ import viskit.view.InstantiationPanel;
  * Date: Jun 16, 2004
  * Time: 3:27:42 PM
  *
- * @version $Id$
+ * @version $Id:$
  */
 public class ObjectInspector extends JDialog
 {
-    static final Logger LOG = LogUtilities.getLogger(ObjectInspector.class);
-	
   public boolean modified = false;
-  private final JButton     okButton = new JButton("Apply changes");
-  private final JButton cancelButton = new JButton("Cancel");
-  private final JPanel  contentPanel = new JPanel();
-  private final JPanel   buttonPanel = new JPanel();
-  private final JDialog parent;
-  private final Point newLocation = new Point();
-  private InstantiationPanel instantiationPanel;
-  private EnableApplyButtonListener enableApplyButtonListener;
+  private JButton canButt,okButt;
+  private JPanel buttPan,contentP;
+  InstantiationPanel ip;
+  enableApplyButtonListener lis;
 
   public ObjectInspector(JDialog parent)
   {
     super(parent,"Object Inspector",true);
-	this.parent = parent;
-	
-	initialize ();
-  }
-  
-  private void initialize ()
-  {
-    contentPanel.setLayout(new BoxLayout(contentPanel,BoxLayout.Y_AXIS));
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-    setContentPane(contentPanel);
+    contentP = new JPanel();
+    contentP.setLayout(new BoxLayout(contentP,BoxLayout.Y_AXIS));
+    contentP.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+    setContentPane(contentP);
 
-    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-    okButton.setEnabled(false);
-    buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttonPanel.add(okButton);
-    buttonPanel.add(cancelButton);
+    buttPan = new JPanel();
+    buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+    canButt = new JButton("Cancel");
+    okButt = new JButton("Apply changes");
+    okButt.setEnabled(false);
+    buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+    buttPan.add(canButt);
+    buttPan.add(okButt);
 
     // attach listeners
-    enableApplyButtonListener = new EnableApplyButtonListener();
-    cancelButton.addActionListener(new CancelButtonListener());
-        okButton.addActionListener(new ApplyButtonListener());
+    lis = new enableApplyButtonListener();
+    canButt.addActionListener(new cancelButtonListener());
+    okButt.addActionListener(new applyButtonListener());
   }
 
-  public void setType(String typeName)
+  public void setType(String typ)
   {
-    contentPanel.removeAll();
+    contentP.removeAll();
 
-    instantiationPanel = new InstantiationPanel(this,enableApplyButtonListener,false,true);  // allow type editing
-    instantiationPanel.setBorder(null);
+    ip = new InstantiationPanel(this,lis,false,true);  // allow type editing
+    ip.setBorder(null);
 
-    contentPanel.add(instantiationPanel);
+    contentP.add(ip);
     //contentP.add(Box.createVerticalGlue());
-    contentPanel.add(Box.createVerticalStrut(5));
-    contentPanel.add(buttonPanel);
+    contentP.add(Box.createVerticalStrut(5));
+    contentP.add(buttPan);
 
     pack();     // do this prior to next
-
-//    setLocationRelativeTo(getParent());
-    this.setSize(parent.getWidth(), this.getHeight()); // same width as parent
-	newLocation.x = parent.getLocation().x - ((this.getWidth() - parent.getWidth()) / 2); // shift left, center sub-panel
-	newLocation.y = parent.getLocation().y + (parent.getHeight()); // shift below parent panel
-	this.setLocation(newLocation);
+    setLocationRelativeTo(getParent());
   }
 
-  public void setData(ViskitInstantiator viskitInstantiator) throws ClassNotFoundException
+  public void setData(VInstantiator vi) throws ClassNotFoundException
   {
-    instantiationPanel.setData(viskitInstantiator);
+    ip.setData(vi);
     pack();
   }
 
-  public ViskitInstantiator getData()
+  public VInstantiator getData()
   {
-    return instantiationPanel.getData();
+    return ip.getData();
   }
 
-  class CancelButtonListener implements ActionListener
+  class cancelButtonListener implements ActionListener
   {
     @Override
     public void actionPerformed(ActionEvent event)
@@ -104,7 +87,7 @@ public class ObjectInspector extends JDialog
     }
   }
 
-  class ApplyButtonListener implements ActionListener
+  class applyButtonListener implements ActionListener
   {
     @Override
     public void actionPerformed(ActionEvent event)
@@ -113,20 +96,20 @@ public class ObjectInspector extends JDialog
     }
   }
 
-  class EnableApplyButtonListener implements CaretListener, ActionListener
+  class enableApplyButtonListener implements CaretListener, ActionListener
   {
     @Override
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
-      okButton.setEnabled(true);
-      getRootPane().setDefaultButton(okButton);
+      okButt.setEnabled(true);
+      getRootPane().setDefaultButton(okButt);
     }
 
     @Override
     public void actionPerformed(ActionEvent event)
     {
-//      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom // TODO check
+      ObjectInspector.this.pack();             // fix for buttons disappearing on bottom
       caretUpdate(null);
     }
   }

@@ -9,11 +9,9 @@ package viskit.view;
  * Date: May 14, 2004
  * Time: 9:44:55 AM
  */
-public class LegosPanel extends ClassDisplayPanel {
+public class LegosPanel extends ClassPanel {
   public LegosPanel(LegoTree ltree) {
-    super(ltree,"Event Graph Selection",
-			"Select and drag an event graph onto the Assembly Editor",              // hint
-			"Add event graph class file, XML file or directory root to this list",  //  plus-sign tooltip
-			"Remove event graph class file, XML file or directory from this list"); // minus-sign tooltip
+    super(ltree,"Event Graphs","Add event graph class file, XML file or directory root to this list",
+                               "Remove event graph class file, XML file or directory from this list");
   }
 }

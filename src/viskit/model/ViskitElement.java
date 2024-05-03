@@ -1,7 +1,6 @@
 package viskit.model;
 
-import edu.nps.util.LogUtilities;
-import org.apache.logging.log4j.Logger;
+import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -15,38 +14,31 @@ import org.apache.logging.log4j.Logger;
  *
  * Base class for the objects that get passed around between M, V and C.
  */
-abstract public class ViskitElement implements Comparable<ViskitElement>
-{
-    static final Logger LOG = LogUtilities.getLogger(ViskitElement.class);
+abstract public class ViskitElement implements Comparable<ViskitElement> {
 
-    /** an object provided for private use of View */
-	public Object opaqueViewObject;       
-	/** an object provided for private use of Model */
-    public Object opaqueModelObject;
+    public Object opaqueViewObject;       // for private use of V
+    public Object opaqueModelObject;      // for private use of M
 
-    /** NOT USED. an object provided for private use of Controller */
-    public Object opaqueControllerObject;
+    /** NOT USED */
+    public Object opaqueControllerObject; // for private use of C
 
     protected static final String EMPTY = "";
-    protected String type       = EMPTY;
-    protected String name       = EMPTY;
+    protected String type = EMPTY;
+    protected String name = EMPTY;
 
-    /** every node or edge instance has a unique key */
-    private static int sequenceID = 0;
-    private Object modelKey = EMPTY + (sequenceID++); // TODO placeholder, does type change?  or is it always a String?
+    /** every node or edge has a unique key */
+    private static int seqID = 0;
+    private Object modelKey = EMPTY + (seqID++);
 
-    protected ViskitElement shallowCopy(ViskitElement newViskitElement)
-	{
-        newViskitElement.opaqueControllerObject = this.opaqueControllerObject;
-        newViskitElement.opaqueViewObject       = this.opaqueViewObject;
-        newViskitElement.opaqueModelObject      = this.opaqueModelObject;
-        newViskitElement.modelKey               = this.modelKey;
-		
-        return newViskitElement;
+    protected ViskitElement shallowCopy(ViskitElement newVe) {
+        newVe.opaqueControllerObject = this.opaqueControllerObject;
+        newVe.opaqueViewObject = this.opaqueViewObject;
+        newVe.opaqueModelObject = this.opaqueModelObject;
+        newVe.modelKey = this.modelKey;
+        return newVe;
     }
 
-    public Object getModelKey()
-	{
+    public Object getModelKey() {
         return modelKey;
     }
 
@@ -99,12 +91,11 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
 
     public abstract String getValue();
 
-	@Deprecated
     public abstract String getComment();
 
-    public abstract String getDescription();
+    public abstract List<String> getDescriptionArray();
 
-    public abstract void setDescription(String description);
+    public abstract void setDescriptionArray(List<String> descriptionArray);
 
     public abstract String getOperationOrAssignment();
 

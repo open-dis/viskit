@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -55,17 +55,17 @@ public class FileFilterEx extends javax.swing.filechooser.FileFilter {
     private String _msg;
     private boolean _showDirs;
 
-    public FileFilterEx(String extension, String message) {
-        this(extension, message, false);
+    public FileFilterEx(String extension, String msg) {
+        this(extension, msg, false);
     }
 
-    public FileFilterEx(String extension, String message, boolean showDirectories) {
-        this(new String[] {extension}, message, showDirectories);
+    public FileFilterEx(String extension, String msg, boolean showDirectories) {
+        this(new String[] {extension}, msg, showDirectories);
     }
 
-    public FileFilterEx(String[] extensions, String message, boolean showDirectories) {
+    public FileFilterEx(String[] extensions, String msg, boolean showDirectories) {
         this._extensions = extensions;
-        this._msg = message;
+        this._msg = msg;
         this._showDirs = showDirectories;
     }
 
@@ -93,8 +93,6 @@ public class FileFilterEx extends javax.swing.filechooser.FileFilter {
      */
     @Override
     public String getDescription() {
-		if (_msg == null)
-			_msg = new String();
         return _msg;
     }
 } // FileFilterEx

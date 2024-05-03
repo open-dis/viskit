@@ -7,7 +7,7 @@
 package viskit.test;
 
 import viskit.xsd.bindings.eventgraph.*;
-import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.Marshaller;
@@ -23,18 +23,19 @@ import javax.xml.bind.JAXBException;
  *
  * @author Rick Goldberg
  */
-
 public class TestCodeFormat extends Thread {
 
     String testFile;
     JAXBContext jaxbCtx;
-    SimkitEventGraphXML2Java sx2j;
+    SimkitXML2Java sx2j;
     SimEntity root;
     InputStream inputStream;
     ByteArrayOutputStream bufferOut;
     ByteArrayInputStream bufferIn;
 
-    /** Creates a new instance of TestCodeFormat */
+    /** Creates a new instance of TestCodeFormat
+     * @param testFile 
+     */
     public TestCodeFormat(String testFile) {
         this.testFile = testFile;
         bufferOut = new ByteArrayOutputStream();
@@ -42,7 +43,7 @@ public class TestCodeFormat extends Thread {
         try {
             jaxbCtx = JAXBContext.newInstance("viskit.xsd.bindings.eventgraph");
         } catch ( JAXBException jaxbe ) {
-            jaxbe.printStackTrace();
+            jaxbe.printStackTrace(System.err);
         }
     }
 
@@ -67,7 +68,7 @@ public class TestCodeFormat extends Thread {
             showJava(bufferIn);
 
         } catch ( Exception e ) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 
@@ -77,7 +78,7 @@ public class TestCodeFormat extends Thread {
 	    is = new FileInputStream(filename);
 	} catch ( FileNotFoundException e ) {
             System.err.println("Failed to open "+filename);
-	    e.printStackTrace();
+	    e.printStackTrace(System.err);
 	}
         return is;
     }
@@ -87,7 +88,7 @@ public class TestCodeFormat extends Thread {
 	try {
 	    u = jaxbCtx.createUnmarshaller();
 	    this.root = (SimEntity) u.unmarshal(is);
-	} catch (JAXBException e) { e.printStackTrace(); }
+	} catch (JAXBException e) { e.printStackTrace(System.err); }
 
     }
 
@@ -100,13 +101,13 @@ public class TestCodeFormat extends Thread {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(root,out);
         } catch ( JAXBException e ) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
 
     }
 
     void showJava(InputStream is) throws Exception {
-        sx2j = new SimkitEventGraphXML2Java(is);
+        sx2j = new SimkitXML2Java(is);
         sx2j.unmarshal();
         System.out.println( sx2j.translate() );
     }

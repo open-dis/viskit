@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
@@ -41,7 +41,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.doe;
 
-import edu.nps.util.LogUtilities;
 import edu.nps.util.TempFileManager;
 import org.jdom.Document;
 import viskit.util.OpenAssembly;
@@ -50,25 +49,23 @@ import viskit.xsd.bindings.assembly.ValueRange;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
-import org.apache.logging.log4j.Logger;
 
-public class DoeFileModel 
-{
-    static final Logger LOG = LogUtilities.getLogger(DoeFileModel.class);
+public class DoeFileModel {
 
     public File userFile;
-    public ParameterTable paramTable;
-    public List<TerminalParameter> designParmeters;
+    public ParamTable paramTable;
+    public List<TerminalParameter> designParms;
     public Document jdomDocument;
     public boolean dirty = false;
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
 
-    private List<SimEntity> jaxbSimEntities;
+    private List<SimEntity> simEntities;
     private Map<String, Integer> nameSpace = new HashMap<>();
 
     public File marshallJaxb() throws Exception {
@@ -82,8 +79,8 @@ public class DoeFileModel
     }
 
     public void saveEventGraphsToJaxb(Collection<File> evGraphs) {
-        SimkitAssembly assembly = OpenAssembly.getInstance().jaxbRoot;
-        List<EventGraph> lis = assembly.getEventGraph();
+        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
+        List<EventGraph> lis = assy.getEventGraph();
         lis.clear();
 
         for (File f : evGraphs) {
@@ -97,7 +94,7 @@ public class DoeFileModel
                     sb.append(cbuf, 0, retc);
                 }
 
-                EventGraph eg = OpenAssembly.getInstance().jaxbFactory.createEventGraph();
+                EventGraph eg = OpenAssembly.inst().jaxbFactory.createEventGraph();
                 eg.setFileName(f.getName());
                 String s = sb.toString();
                 String[] sa = s.split("<\\?xml.*\\?>"); // remove the hdr if present
@@ -109,33 +106,31 @@ public class DoeFileModel
 
                 //eg.getContent().add(0,src.trim());
                 lis.add(eg);
-            }
-			catch (Exception e) 
-			{
-                LOG.error("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
+            } catch (IOException e) {
+                System.err.println("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
             }
         }
     }
 
     public void saveTableEditsToJaxb() {
-        SimkitAssembly jaxbSimkitAssembly = OpenAssembly.getInstance().jaxbRoot;
-        ObjectFactory objectFactory = OpenAssembly.getInstance().jaxbFactory;
+        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
+        ObjectFactory factory = OpenAssembly.inst().jaxbFactory;
 
-        List<TerminalParameter> jaxbDesignParameters = jaxbSimkitAssembly.getDesignParameters();
+        List<TerminalParameter> designParameters = assy.getDesignParameters();
 
         // Throw away existing design points
-        jaxbDesignParameters.clear();
+        designParameters.clear();
 
         // Go down rows, update the nameRef and value fields (type, content aren't changed)
         // For each row that's a factor (design point) add a design point TP at top
         // If experiment tag doesn't exist add it with default values
 
-        ParameterTableModel ptm = (ParameterTableModel) paramTable.getModel();
+        ParamTableModel ptm = (ParamTableModel) paramTable.getModel();
         int n = ptm.getRowCount();
 
         int dpCount = 0;
         for (int r = 0; r < n; r++) {
-            if (!ptm.isCellEditable(r, ParameterTableModel.FACTOR_COLUMN)) {
+            if (!ptm.isCellEditable(r, ParamTableModel.FACTOR_COL)) {
                 continue;
             }
 
@@ -145,13 +140,13 @@ public class DoeFileModel
 
             // 20 Mar 2006, RG's new example for setting design points does not use "setValue", only "setValueRange"
             // I'm going to retain the value bit
-            String val = (String) rData[ParameterTableModel.VALUE_COLUMN];
+            String val = (String) rData[ParamTableModel.VALUE_COL];
             if (val != null && val.length() > 0) {
                 tp.setValue(val);
             }
 
-            if (((Boolean) rData[ParameterTableModel.FACTOR_COLUMN])) {
-                String name = (String) rData[ParameterTableModel.NAME_COLUMN];
+            if (((Boolean) rData[ParamTableModel.FACTOR_COL])) {
+                String name = (String) rData[ParamTableModel.NAME_COL];
                 name = name.replace('.', '_');  // periods illegal in java identifiers
                 tp.setName(name);
                 Integer cnt = nameSpace.get(name);
@@ -165,7 +160,7 @@ public class DoeFileModel
                 //tp.setLinkRef(name+"_"+cnt.toString()+"_DP");
                 tp.setName(name + "_" + cnt);
                 // Create a designpoint TP with a name
-                TerminalParameter newTP = objectFactory.createTerminalParameter();
+                TerminalParameter newTP = factory.createTerminalParameter();
 
                 newTP.setName(name + "_" + cnt.toString());
                 newTP.setLink(name + "_" + cnt.toString());
@@ -176,8 +171,8 @@ public class DoeFileModel
                 String lowRange = tp.getValue();     // default
                 String highRange = tp.getValue();
 
-                String lowTable = (String) rData[ParameterTableModel.MIN_COLUMN];
-                String hiTable = (String) rData[ParameterTableModel.MAX_COLUMN];
+                String lowTable = (String) rData[ParamTableModel.MIN_COL];
+                String hiTable = (String) rData[ParamTableModel.MAX_COL];
                 if (lowTable != null && lowTable.length() > 0) {
                     lowRange = lowTable;
                 }
@@ -186,13 +181,13 @@ public class DoeFileModel
                 }
 
                 ValueRange dr = new ValueRange();
-                JAXBElement<ValueRange> jevr = objectFactory.createDoubleRange(dr);
+                JAXBElement<ValueRange> jevr = factory.createDoubleRange(dr);
 
                 dr.setLowValue(lowRange);
                 dr.setHighValue(highRange);
                 newTP.setValueRange(jevr);
 
-                jaxbDesignParameters.add(dpCount++, newTP);
+                designParameters.add(dpCount++, newTP);
 
                 tp.setLinkRef(newTP);
             }
@@ -201,12 +196,11 @@ public class DoeFileModel
 
     /** @return a List of SimEntities for this experiment */
     public List<SimEntity> getSimEntities() {
-        return jaxbSimEntities;
+        return simEntities;
     }
 
-    public void setSimEntities(List<SimEntity> newSimEntitiesList)
-	{
-        jaxbSimEntities = newSimEntitiesList; 
-        seTerminalParamsHM = new HashMap<>(newSimEntitiesList.size());
+    public void setSimEntities(List<SimEntity> se) {
+        simEntities = se;   //jdom
+        seTerminalParamsHM = new HashMap<>(se.size());
     }
 }

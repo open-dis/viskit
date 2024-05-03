@@ -1,8 +1,6 @@
 package viskit.mvc;
 
-import edu.nps.util.LogUtilities;
 import java.awt.event.ActionEvent;
-import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -25,10 +23,9 @@ import org.apache.logging.log4j.Logger;
 
 public class mvcModelEvent extends ActionEvent
 {
-    static final Logger LOG = LogUtilities.getLogger(mvcModelEvent.class);
-	
-	public mvcModelEvent(Object obj, int id, String message)
-	{
-	  super(obj,id,message);
-	}
+  public mvcModelEvent(Object obj, int id, String message)
+  {
+    super(obj,id,message);
+  }
+
 }

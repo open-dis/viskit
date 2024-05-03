@@ -1,6 +1,6 @@
 package viskit.model;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -14,12 +14,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
-import viskit.util.FileBasedAssemblyNode;
+import viskit.VGlobals;
+import viskit.VStatics;
+import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
 import viskit.mvc.mvcController;
@@ -37,271 +34,204 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 9:16:44 AM
  * @version $Id$
  */
-public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
-{
-    static final Logger LOG = LogUtilities.getLogger(AssemblyModelImpl.class);
+public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel {
 
-    private JAXBContext    jaxbContext;
-    private ObjectFactory  jaxbObjectFactory;
-    private SimkitAssembly jaxbSimkitAssembly;
-    private File           currentFile;
-    private boolean        assemblyModelDirty = false;
-    private GraphMetadata  graphMetadata;
+    private JAXBContext jc;
+    private ObjectFactory oFactory;
+    private SimkitAssembly jaxbRoot;
+    private File currentFile;
+    private boolean modelDirty = false;
+    private GraphMetaData metaData;
 
     /** We require specific order on this Map's contents */
-    private final Map<String, AssemblyNode> assemblyNodeCacheMap;
-    private final String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private Map<String, AssemblyNode> nodeCache;
+    private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
-    private final AssemblyControllerImpl assemblyController;
+    private AssemblyControllerImpl controller;
 
-    public AssemblyModelImpl(mvcController assemblyController)
-	{
+    public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
-        this.assemblyController = (AssemblyControllerImpl) assemblyController;
-        graphMetadata = new GraphMetadata(this);
-		if ((graphMetadata.description == null) || graphMetadata.description.trim().isEmpty())
-			 graphMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
-        assemblyNodeCacheMap  = new LinkedHashMap<>();
+        controller = (AssemblyControllerImpl) cont;
+        metaData = new GraphMetaData(this);
+        nodeCache = new LinkedHashMap<>();
     }
 
-    public void initialize() 
-	{
+    public void init() {
         try {
-            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            jaxbObjectFactory = new ObjectFactory();
-            jaxbSimkitAssembly = jaxbObjectFactory.createSimkitAssembly(); // to start with empty graph
-			assemblyModelDirty = true; // unsaved when new
-        } 
-		catch (JAXBException e) {
-            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
+            jc = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            oFactory = new ObjectFactory();
+            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
+        } catch (JAXBException e) {
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
                     );
-            e.printStackTrace();
         }
     }
 
     @Override
-    public boolean isDirty() 
-	{
-        return assemblyModelDirty;
+    public boolean isDirty() {
+        return modelDirty;
     }
 
     @Override
-    public void setDirty(boolean dirtyStatus)
-	{
-        assemblyModelDirty = dirtyStatus;
+    public void setDirty(boolean wh) {
+        modelDirty = wh;
     }
 
     @Override
-    public SimkitAssembly getJaxbRoot()
-	{
-        return jaxbSimkitAssembly;
+    public SimkitAssembly getJaxbRoot() {
+        return jaxbRoot;
     }
 
     @Override
-    public GraphMetadata getMetadata() 
-	{
-        return graphMetadata;
+    public GraphMetaData getMetaData() {
+        return metaData;
     }
 
     @Override
-    public void setMetadata(GraphMetadata graphMetadata) 
-	{
-        this.graphMetadata = graphMetadata;
+    public void changeMetaData(GraphMetaData gmd) {
+        metaData = gmd;
         setDirty(true);
     }
 
     @Override
-    public boolean newModel(File file)
-	{
-		// important: tab must be created first, or else JGraph listener isn't yet created to draw changes
-		
-        getAssemblyNodeCacheMap().clear();
+    public boolean newModel(File f) {
+        getNodeCache().clear();
         pointLess = new Point2D.Double(30, 60);
+        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEW_ASSEMBLY_MODEL, "New empty assembly model"));
-
-        if (file == null)
-		{
-            jaxbSimkitAssembly = jaxbObjectFactory.createSimkitAssembly(); // to start with empty graph
-        } 
-		else 
-		{
+        if (f == null) {
+            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
+        } else {
             try {
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                Unmarshaller u = jc.createUnmarshaller();
 
                 // Check for inadvertant opening of an EG, tough to do, yet possible (bugfix 1248)
                 try {
-                    jaxbSimkitAssembly = (SimkitAssembly) unmarshaller.unmarshal(file);
-                } 
-				catch (ClassCastException cce) {
-                    // If we get here, they've likely tried to load an event graph.
-                    assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                            "Wrong File Type", // TODO confirm
-                            "This file is not an Assembly model!"
+                    jaxbRoot = (SimkitAssembly) u.unmarshal(f);
+                } catch (ClassCastException cce) {
+                    // If we get here, they've tried to load an event graph.
+                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                            "Wrong File Format",
+                            "Use the event graph editor to" +
+                            "\n" + "work with this file."
                             );
                     return false;
                 }
 
-                GraphMetadata newMetadata         = new GraphMetadata(this);
-                newMetadata.name                  = jaxbSimkitAssembly.getName();
-                newMetadata.author                = jaxbSimkitAssembly.getAuthor();
-                newMetadata.created               = jaxbSimkitAssembly.getCreated();
-                newMetadata.revision              = jaxbSimkitAssembly.getVersion();
-                newMetadata.extendsPackageName    = jaxbSimkitAssembly.getExtend();
-                newMetadata.implementsPackageName = jaxbSimkitAssembly.getImplement();
-                newMetadata.packageName           = jaxbSimkitAssembly.getPackage();
-                newMetadata.description           = jaxbSimkitAssembly.getDescription(); // TODO salvage Comment entries in older versions
-				if ((newMetadata.description == null) || newMetadata.description.trim().isEmpty())
-					 newMetadata.description = ViskitStatics.DEFAULT_DESCRIPTION;
+                GraphMetaData mymetaData = new GraphMetaData(this);
+                mymetaData.version = jaxbRoot.getVersion();
+                mymetaData.name = jaxbRoot.getName();
+                mymetaData.packageName = jaxbRoot.getPackage();
 
-                Schedule schedule = jaxbSimkitAssembly.getSchedule();
-                if (schedule != null) 
-				{
-                    String stopTime = schedule.getStopTime();
-                    if (stopTime != null && stopTime.trim().length() > 0)
-					{
-                        newMetadata.stopTime = stopTime.trim();
+                Schedule sch = jaxbRoot.getSchedule();
+                if (sch != null) {
+                    String stpTime = sch.getStopTime();
+                    if (stpTime != null && stpTime.trim().length() > 0) {
+                        mymetaData.stopTime = stpTime.trim();
                     }
-                    newMetadata.verbose = schedule.getVerbose().equalsIgnoreCase("true");
+                    mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
 
-                setMetadata(newMetadata);
-				// simEntity instances in assembly:
-                buildEventGraphsFromJaxb                      (jaxbSimkitAssembly.getSimEntity(), jaxbSimkitAssembly.getOutput(), jaxbSimkitAssembly.getVerbose());
-                buildPropertyChangeListenersFromJaxb          (jaxbSimkitAssembly.getPropertyChangeListener());
-                buildPropertyChangeListenerConnectionsFromJaxb(jaxbSimkitAssembly.getPropertyChangeListenerConnection());
-                buildSimEventListenerConnectionsFromJaxb      (jaxbSimkitAssembly.getSimEventListenerConnection());
-                buildAdapterConnectionsFromJaxb               (jaxbSimkitAssembly.getAdapter());
-            } 
-			catch (JAXBException e)
-			{
-                assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                        "XML Input/Output Error",
+                changeMetaData(mymetaData);
+                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
+                buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
+                buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
+                buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
+                buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
+            } catch (JAXBException e) {
+                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                        "XML I/O Error",
                         "Exception on JAXB unmarshalling of" +
-                            "\n" + file.getName() +
+                            "\n" + f.getName() +
                             "\n" + e.getMessage() +
                             "\nin AssemblyModel.newModel(File)"
                             );
-				LOG.error ("Exception on JAXB unmarshalling of " + file.getName(), e);
 
-                return false; // failure
+                return false;
             }
         }
 
-        currentFile = file;
-        setDirty(false); // just loaded, as yet unmodified
-        return true; // success
+        currentFile = f;
+        setDirty(false);
+        return true;
     }
 
     @Override
-    public void saveModel(File file) 
-	{
-        if (file == null)
-		{
-            file = currentFile;
+    public void saveModel(File f) {
+        if (f == null) {
+            f = currentFile;
         }
 
-        // Do the marshalling into a temporary file, in order to avoid possible
+        // Do the marshalling into a temporary file so as to avoid possible
         // deletion of existing file on a marshal error.
 
-        File tempFile;
-        FileWriter fileWriter = null;
+        File tmpF;
+        FileWriter fw = null;
         try {
-            tempFile = TempFileManager.createTempFile("tempAssemblyMarshalOutput", ".xml");
-        } 
-		catch (IOException e) 
-		{
-            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                    "Input/Output (I/O) Error",
-                    "Exception creating temporary file tempAssemblyMarshalOutput.xml , AssemblyModel.saveModel():" +
+            tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
+        } catch (IOException e) {
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "I/O Error",
+                    "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
                     );
             return;
         }
 
         try {
-            fileWriter = new FileWriter(tempFile);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			// https://dersteps.wordpress.com/2012/08/22/enable-jaxb-event-handling-to-catch-errors-as-they-happen
-			jaxbMarshaller.setEventHandler(new ValidationEventHandler() {
-				@Override
-				public boolean handleEvent(ValidationEvent validationEvent) {
-					LOG.error("Marshaller event handler says: " + validationEvent.getMessage() + 
-							  " (Exception: " + validationEvent.getLinkedException() + ")");
-					return false;
-				}
-			});
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
+            fw = new FileWriter(tmpF);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 
-            jaxbSimkitAssembly.setName       (ViskitGlobals.nullIfEmpty(graphMetadata.name));
-            jaxbSimkitAssembly.setAuthor     (ViskitGlobals.nullIfEmpty(graphMetadata.author));
-            jaxbSimkitAssembly.setCreated    (ViskitGlobals.nullIfEmpty(graphMetadata.created));
-            jaxbSimkitAssembly.setVersion    (ViskitGlobals.nullIfEmpty(graphMetadata.revision));
-            jaxbSimkitAssembly.setExtend     (ViskitGlobals.nullIfEmpty(graphMetadata.extendsPackageName));
-            jaxbSimkitAssembly.setImplement  (ViskitGlobals.nullIfEmpty(graphMetadata.implementsPackageName));
-            jaxbSimkitAssembly.setPackage    (ViskitGlobals.nullIfEmpty(graphMetadata.packageName));
-            jaxbSimkitAssembly.setDescription(ViskitGlobals.nullIfEmpty(graphMetadata.description));
+            jaxbRoot.setName(nIe(metaData.name));
+            jaxbRoot.setVersion(nIe(metaData.version));
+            jaxbRoot.setPackage(nIe(metaData.packageName));
 
-            if (jaxbSimkitAssembly.getSchedule() == null)
-			{
-                jaxbSimkitAssembly.setSchedule(jaxbObjectFactory.createSchedule());
+            if (jaxbRoot.getSchedule() == null) {
+                jaxbRoot.setSchedule(oFactory.createSchedule());
             }
-            if (!graphMetadata.stopTime.equals(""))
-			{
-                jaxbSimkitAssembly.getSchedule().setStopTime(graphMetadata.stopTime);
-            } 
-			else 
-			{
-                jaxbSimkitAssembly.getSchedule().setStopTime("100.0"); // TODO global default
+            if (!metaData.stopTime.equals("")) {
+                jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+            } else {
+                jaxbRoot.getSchedule().setStopTime("100.0");
             }
 
-            jaxbSimkitAssembly.getSchedule().setVerbose("" + graphMetadata.verbose);
+            jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
-            jaxbMarshaller.marshal(jaxbSimkitAssembly, fileWriter);
+            m.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            assemblyModelDirty = false;
-            currentFile = file;
-        } 
-		catch (JAXBException e) 
-		{
-            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                    "XML Input/Output Error",
+            modelDirty = false;
+            currentFile = f;
+        } catch (JAXBException e) {
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "XML I/O Error",
                     "Exception on JAXB marshalling" +
-                    "\n" + file +
+                    "\n" + f +
                     "\n" + e.getMessage() +
                     "\n(check for blank data fields)"
                     );
-            e.printStackTrace();
-        } 
-		catch (IOException ex) {
-            assemblyController.messageToUser(JOptionPane.ERROR_MESSAGE,
-                    "File Input/Output Error",
-                    "Exception on writing " + file.getName() +
+        } catch (IOException ex) {
+            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    "File I/O Error",
+                    "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage());
-            ex.printStackTrace();
-        } 
-		finally {
+        } finally {
             try {
-                if (fileWriter != null)
-                    fileWriter.close();
-            }
-			catch (IOException ioe)
-			{
-				ioe.printStackTrace();
-			}
+                if (fw != null)
+                    fw.close();
+            } catch (IOException ioe) {}
         }
     }
 
     @Override
-    public File getLastFile()
-	{
+    public File getLastFile() {
         return currentFile;
     }
 
@@ -309,27 +239,23 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public void externalClassesChanged(Vector<String> v) {
 
     }
-    private final char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    public static final char[] HEX_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-    private String _fourHexDigits(int i)
-	{
+    public static String _fourHexDigits(int i) {
         char[] ca = new char[4];
-        for (int j = 3; j >= 0; j--)
-		{
+        for (int j = 3; j >= 0; j--) {
             int idx = i & 0xF;
             i >>= 4;
-            ca[j] = hexDigits[idx];
+            ca[j] = HEX_DIGITS[idx];
         }
         return new String(ca);
     }
-    Random mangleRandom = new Random();
+    static Random mangleRandom = new Random();
 
-    private String mangleName(String name)
-	{
+    public static String mangleName(String name) {
         int nxt = mangleRandom.nextInt(0x1_0000); // 4 hex digits
         StringBuilder sb = new StringBuilder(name);
-        if (sb.charAt(sb.length() - 1) == '_')
-		{
+        if (sb.charAt(sb.length() - 1) == '_') {
             sb.setLength(sb.length() - 6);
         }
         sb.append('_');
@@ -338,25 +264,19 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return sb.toString();
     }
 
-    private void mangleName(ViskitElement node)
-	{
-        do 
-		{
+    private void mangleName(ViskitElement node) {
+        do {
             node.setName(mangleName(node.getName()));
-        } 
-		while (!nameCheckSatisfactory());
+        } while (!nameCheck());
     }
 
-    private boolean nameCheckSatisfactory()
-	{
-        Set<String> hashSet = new HashSet<>(10);
-        for (AssemblyNode assemblyNode : getAssemblyNodeCacheMap().values())
-		{
-            if (!hashSet.add(assemblyNode.getName()))
-			{
-                assemblyController.messageToUser(JOptionPane.INFORMATION_MESSAGE,
-                        "XML file contains duplicate event name", assemblyNode.getName() +
-                        "\nUnique name substituted."); // TODO check, strictly speaking this is not true yet
+    private boolean nameCheck() {
+        Set<String> hs = new HashSet<>(10);
+        for (AssemblyNode n : getNodeCache().values()) {
+            if (!hs.add(n.getName())) {
+                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                        "XML file contains duplicate event name", n.getName() +
+                        "\nUnique name substituted.");
                 return false;
             }
         }
@@ -364,607 +284,531 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean nameExists(String name)
-	{
-        for (AssemblyNode assemblyNode : getAssemblyNodeCacheMap().values())
-		{
-            if (assemblyNode.getName().equals(name))
-			{
+    public boolean nameExists(String name) {
+        for (AssemblyNode n : getNodeCache().values()) {
+            if (n.getName().equals(name)) {
                 return true;
             }
         }
         return false;
     }
 
-	@Override
-    public void newEventGraph(String instanceName, String className, Point2D point, String description)
-	{
-		// re-use common code
-        newEventGraphFromXML (instanceName, className, point, description, null);
+    @Override
+    public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+        newEventGraph(widgetName, node.loadedClass, p);
     }
 
     @Override
-    public void newEventGraphFromXML(String instanceName, String className, Point2D point, String description, FileBasedAssemblyNode assemblyNode)
-	{
-		String derivedClassName = className;
-		if (assemblyNode != null)
-			derivedClassName = assemblyNode.loadedClass;
-		
-        EventGraphNode eventGraphNode = new EventGraphNode(instanceName, derivedClassName, description);
-        if (point == null)
-		{
-            eventGraphNode.setPosition(pointLess);
-        } 
-		else 
-		{
-            eventGraphNode.setPosition(point);
-        }
-
-        SimEntity newJaxbSimEntity = jaxbObjectFactory.createSimEntity();
-        newJaxbSimEntity.setName(ViskitGlobals.nullIfEmpty(instanceName));
-        newJaxbSimEntity.setType(className);
-        newJaxbSimEntity.setDescription(description);
-        eventGraphNode.opaqueModelObject = newJaxbSimEntity;
-
-        ViskitInstantiator viskitConstructor = new ViskitInstantiator.Construct(className,
-				null);  // null means undefined argument list // TODO ???
-        eventGraphNode.setInstantiator(viskitConstructor);
-        eventGraphNode.setVerboseMarked(true); // default for new SimEntity.  TODO use user preference
-
-        if (!nameCheckSatisfactory())
-		{
-            mangleName(eventGraphNode);
-        }
-
-        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
-
-        jaxbSimkitAssembly.getSimEntity().add(newJaxbSimEntity); // add the jaxbSimEntity to SimEntity List 
-
-        assemblyModelDirty = true; // the now-modified parent assembly is not yet saved, so mark as dirty
-		
-		// utilize passed XML information, if any (provided via drag+drop) - speculative code block, not in original codebase
-		if (assemblyNode != null)
-		{
-//			assemblyNode._ // TODO whassup?
-		}
-        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + eventGraphNode.getName()));
-    }
-
-    @Override
-    public void redoEventGraph(EventGraphNode eventGraphNode) 
-	{
-        SimEntity jaxbSimEntity = jaxbObjectFactory.createSimEntity();
-
-        jaxbSimEntity.setName(eventGraphNode.getName());
-        eventGraphNode.opaqueModelObject = jaxbSimEntity;
-        jaxbSimEntity.setType(eventGraphNode.getType());
-
-        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
-
-        jaxbSimkitAssembly.getSimEntity().add(jaxbSimEntity);
-
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.REDO_EVENT_GRAPH, "Event Graph action redone"));
-    }
-
-    @Override
-    public void deleteEventGraphNode(EventGraphNode eventNode) 
-	{
-        SimEntity simEntity = (SimEntity) eventNode.opaqueModelObject;
-        getAssemblyNodeCacheMap().remove(simEntity.getName());
-        jaxbSimkitAssembly.getSimEntity().remove(simEntity);
-
-        assemblyModelDirty = true;
-
-        if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENTGRAPH_DELETED, "Event Graph deleted"));
-        else
-            notifyChanged(new ModelEvent(eventNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph action undone"));
-    }
-
-    @Override
-    public void newPropertyChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D point, String description)
-	{
-        newPropertyChangeListener(widgetName, node.loadedClass, point, description);
-    }
-
-    @Override
-    public void newPropertyChangeListener(String widgetName, String className, Point2D point, String description)
-	{
-        PropertyChangeListenerNode propertyChangeListenerNode = new PropertyChangeListenerNode(widgetName, className, description);
-        if (point == null) {
-            propertyChangeListenerNode.setPosition(pointLess);
+    public void newEventGraph(String widgetName, String className, Point2D p) {
+        EvGraphNode node = new EvGraphNode(widgetName, className);
+        if (p == null) {
+            node.setPosition(pointLess);
         } else {
-            propertyChangeListenerNode.setPosition(point);
+            node.setPosition(p);
         }
 
-        PropertyChangeListener propertyChangeListener = jaxbObjectFactory.createPropertyChangeListener();
+        SimEntity jaxbEG = oFactory.createSimEntity();
 
-        propertyChangeListener.setName(ViskitGlobals.nullIfEmpty(widgetName));
-        propertyChangeListener.setType(className);
-        propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
+        jaxbEG.setName(nIe(widgetName));
+        jaxbEG.setType(className);
+        node.opaqueModelObject = jaxbEG;
 
-        List<Object> parametersList = propertyChangeListener.getParameters();
+        VInstantiator vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
+        node.setInstantiator(vc);
 
-        ViskitInstantiator viskitInstantiator = new ViskitInstantiator.Construct(propertyChangeListener.getType(), parametersList);
-        propertyChangeListenerNode.setInstantiator(viskitInstantiator);
-
-        if (!nameCheckSatisfactory()) 
-		{
-            mangleName(propertyChangeListenerNode);
+        if (!nameCheck()) {
+            mangleName(node);
         }
 
-        getAssemblyNodeCacheMap().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode); // key = PCL node name
+        getNodeCache().put(node.getName(), node);   // key = ev
 
-        jaxbSimkitAssembly.getPropertyChangeListener().add(propertyChangeListener);
+        jaxbRoot.getSimEntity().add(jaxbEG);
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.PCL_ADDED, "Property Change Node added to assembly"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
     }
 
     @Override
-    public void redoPropertyChangeListener(PropertyChangeListenerNode node) 
-	{
-        PropertyChangeListener jaxbPCL = jaxbObjectFactory.createPropertyChangeListener();
+    public void redoEventGraph(EvGraphNode node) {
+        SimEntity jaxbEG = oFactory.createSimEntity();
+
+        jaxbEG.setName(node.getName());
+        node.opaqueModelObject = jaxbEG;
+        jaxbEG.setType(node.getType());
+
+        getNodeCache().put(node.getName(), node);   // key = ev
+
+        jaxbRoot.getSimEntity().add(jaxbEG);
+
+        modelDirty = true;
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
+    }
+
+    @Override
+    public void deleteEvGraphNode(EvGraphNode evNode) {
+        SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
+        getNodeCache().remove(jaxbEv.getName());
+        jaxbRoot.getSimEntity().remove(jaxbEv);
+
+        modelDirty = true;
+
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event Graph deleted"));
+        else
+            notifyChanged(new ModelEvent(evNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
+    }
+
+    @Override
+    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+        newPropChangeListener(widgetName, node.loadedClass, p);
+    }
+
+    @Override
+    public void newPropChangeListener(String widgetName, String className, Point2D p) {
+        PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
+        if (p == null) {
+            pcNode.setPosition(pointLess);
+        } else {
+            pcNode.setPosition(p);
+        }
+
+        PropertyChangeListener pcl = oFactory.createPropertyChangeListener();
+
+        pcl.setName(nIe(widgetName));
+        pcl.setType(className);
+        pcNode.opaqueModelObject = pcl;
+
+        List<Object> lis = pcl.getParameters();
+
+        VInstantiator vc = new VInstantiator.Constr(pcl.getType(), lis);
+        pcNode.setInstantiator(vc);
+
+        if (!nameCheck()) {
+            mangleName(pcNode);
+        }
+
+        getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
+
+        jaxbRoot.getPropertyChangeListener().add(pcl);
+
+        modelDirty = true;
+        notifyChanged(new ModelEvent(pcNode, ModelEvent.PCLADDED, "Property Change Node added to assembly"));
+    }
+
+    @Override
+    public void redoPropChangeListener(PropChangeListenerNode node) {
+
+        PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
         jaxbPCL.setName(node.getName());
         jaxbPCL.setType(node.getType());
 
         node.opaqueModelObject = jaxbPCL;
 
-        jaxbSimkitAssembly.getPropertyChangeListener().add(jaxbPCL);
+        jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(node, ModelEvent.REDO_PCL, "Property Change Node action redone"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(node, ModelEvent.REDO_PCL, "Property Change Node redone"));
     }
 
     @Override
-    public void deletePropertyChangeListener(PropertyChangeListenerNode pclNode) 
-	{
+    public void deletePropChangeListener(PropChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
-        getAssemblyNodeCacheMap().remove(pclNode.getName());
-        jaxbSimkitAssembly.getPropertyChangeListener().remove(jaxbPcNode);
+        getNodeCache().remove(pclNode.getName());
+        jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
 
-        assemblyModelDirty = true;
+        modelDirty = true;
 
-        if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(pclNode, ModelEvent.PCL_DELETED, "Property Change Listener deleted"));
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
         else
-            notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL,    "Property Change Listener action undone"));
+            notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL, "Property Change Listener undone"));
     }
 
     @Override
-    public AdapterEdge newAdapterEdge(String adapterName, AssemblyNode sourceNode, AssemblyNode targetNode)
-	{
-        AdapterEdge adapterEdge = new AdapterEdge();
-        adapterEdge.setFromObject(sourceNode);
-        adapterEdge.setToObject(targetNode);
-        adapterEdge.setName(adapterName);
+    public AdapterEdge newAdapterEdge(String adName, AssemblyNode src, AssemblyNode target) {
+        AdapterEdge ae = new AdapterEdge();
+        ae.setFrom(src);
+        ae.setTo(target);
+        ae.setName(adName);
 
-        sourceNode.getConnections().add(adapterEdge);
-        targetNode.getConnections().add(adapterEdge);
+        src.getConnections().add(ae);
+        target.getConnections().add(ae);
 
-        Adapter jaxbAdapter = jaxbObjectFactory.createAdapter();
+        Adapter jaxbAdapter = oFactory.createAdapter();
 
-        adapterEdge.opaqueModelObject = jaxbAdapter;
-        jaxbAdapter.setTo(targetNode.getName());
-        jaxbAdapter.setFrom(sourceNode.getName());
+        ae.opaqueModelObject = jaxbAdapter;
+        jaxbAdapter.setTo(target.getName());
+        jaxbAdapter.setFrom(src.getName());
 
-        jaxbAdapter.setName(adapterName);
+        jaxbAdapter.setName(adName);
 
-        jaxbSimkitAssembly.getAdapter().add(jaxbAdapter);
-        assemblyModelDirty = true;
-        this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_ADDED, "new Adapter edge added"));
-        return adapterEdge;
+        jaxbRoot.getAdapter().add(jaxbAdapter);
+
+        modelDirty = true;
+
+        this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter edge added"));
+        return ae;
     }
 
     @Override
-    public void redoAdapterEdge(AdapterEdge adapterEdge)
-	{
-        AssemblyNode sourceNode, targetNode;
+    public void redoAdapterEdge(AdapterEdge ae) {
+        AssemblyNode src, target;
 
-        sourceNode = (AssemblyNode) adapterEdge.getFromObject();
-        targetNode = (AssemblyNode) adapterEdge.getToObject();
+        src = (AssemblyNode) ae.getFrom();
+        target = (AssemblyNode) ae.getTo();
 
-        Adapter jaxbAdapter = jaxbObjectFactory.createAdapter();
-        adapterEdge.opaqueModelObject = jaxbAdapter;
-        jaxbAdapter.setTo(targetNode.getName());
-        jaxbAdapter.setFrom(sourceNode.getName());
-        jaxbAdapter.setName(adapterEdge.getName());
+        Adapter jaxbAdapter = oFactory.createAdapter();
+        ae.opaqueModelObject = jaxbAdapter;
+        jaxbAdapter.setTo(target.getName());
+        jaxbAdapter.setFrom(src.getName());
+        jaxbAdapter.setName(ae.getName());
 
-        jaxbSimkitAssembly.getAdapter().add(jaxbAdapter);
+        jaxbRoot.getAdapter().add(jaxbAdapter);
 
-        assemblyModelDirty = true;
+        modelDirty = true;
 
-        this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.REDO_ADAPTER_EDGE, "Adapter edge added"));
+        this.notifyChanged(new ModelEvent(ae, ModelEvent.REDO_ADAPTER_EDGE, "Adapter edge added"));
     }
 
     @Override
-    public PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode sourceNode, AssemblyNode targetNode)
-	{
-        PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
-        propertyChangeListenerEdge.setFromObject(sourceNode);
-        propertyChangeListenerEdge.setToObject(targetNode);
+    public PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
+        PropChangeEdge pce = new PropChangeEdge();
+        pce.setFrom(src);
+        pce.setTo(target);
 
-        sourceNode.getConnections().add(propertyChangeListenerEdge);
-        targetNode.getConnections().add(propertyChangeListenerEdge);
+        src.getConnections().add(pce);
+        target.getConnections().add(pce);
 
-        PropertyChangeListenerConnection propertyChangeListenerConnection = jaxbObjectFactory.createPropertyChangeListenerConnection();
+        PropertyChangeListenerConnection pclc = oFactory.createPropertyChangeListenerConnection();
 
-        propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
+        pce.opaqueModelObject = pclc;
 
-        propertyChangeListenerConnection.setListener(targetNode.getName());
-        propertyChangeListenerConnection.setSource(sourceNode.getName());
+        pclc.setListener(target.getName());
+        pclc.setSource(src.getName());
 
-        jaxbSimkitAssembly.getPropertyChangeListenerConnection().add(propertyChangeListenerConnection);
-        assemblyModelDirty = true;
+        jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
+        modelDirty = true;
 
-        this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
-        return propertyChangeListenerEdge;
+        this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
+        return pce;
     }
 
     @Override
-    public void redoPropertyChangeListenerEdge(PropertyChangeListenerEdge propertyChangeListenerEdge)
-	{
-        AssemblyNode sourceNode, targetNode;
+    public void redoPropChangeEdge(PropChangeEdge pce) {
+        AssemblyNode src, target;
 
-        sourceNode = (AssemblyNode) propertyChangeListenerEdge.getFromObject();
-        targetNode = (AssemblyNode) propertyChangeListenerEdge.getToObject();
+        src = (AssemblyNode) pce.getFrom();
+        target = (AssemblyNode) pce.getTo();
 
-        PropertyChangeListenerConnection propertyChangeListenerConnection = jaxbObjectFactory.createPropertyChangeListenerConnection();
-        propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
-        propertyChangeListenerConnection.setListener(targetNode.getName());
-        propertyChangeListenerConnection.setSource(sourceNode.getName());
+        PropertyChangeListenerConnection pclc = oFactory.createPropertyChangeListenerConnection();
+        pce.opaqueModelObject = pclc;
+        pclc.setListener(target.getName());
+        pclc.setSource(src.getName());
 
-        jaxbSimkitAssembly.getPropertyChangeListenerConnection().add(propertyChangeListenerConnection);
-        assemblyModelDirty = true;
+        jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
+        modelDirty = true;
 
-        this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.REDO_PCL_EDGE, "PCL edge added"));
+        this.notifyChanged(new ModelEvent(pce, ModelEvent.REDO_PCL_EDGE, "PCL edge added"));
     }
 
     @Override
-    public void newSimEventListenerEdge(AssemblyNode sourceNode, AssemblyNode targetNode)
-	{
-        SimEventListenerEdge simEventListenerEdge = new SimEventListenerEdge();
-        simEventListenerEdge.setFromObject(sourceNode);
-        simEventListenerEdge.setToObject(targetNode);
+    public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) {
+        SimEvListenerEdge sele = new SimEvListenerEdge();
+        sele.setFrom(src);
+        sele.setTo(target);
 
-        sourceNode.getConnections().add(simEventListenerEdge);
-        targetNode.getConnections().add(simEventListenerEdge);
+        src.getConnections().add(sele);
+        target.getConnections().add(sele);
 
-        SimEventListenerConnection simEventListenerConnection = jaxbObjectFactory.createSimEventListenerConnection();
+        SimEventListenerConnection selc = oFactory.createSimEventListenerConnection();
 
-        simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
+        sele.opaqueModelObject = selc;
 
-        simEventListenerConnection.setListener(targetNode.getName());
-        simEventListenerConnection.setSource(sourceNode.getName());
+        selc.setListener(target.getName());
+        selc.setSource(src.getName());
 
-        jaxbSimkitAssembly.getSimEventListenerConnection().add(simEventListenerConnection);
+        jaxbRoot.getSimEventListenerConnection().add(selc);
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED, "SimEventListenerEdge added"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "SimEvList edge added"));
     }
 
     @Override
-    public void redoSimEventListenerEdge(SimEventListenerEdge simEventListenerEdge)
-	{
-        AssemblyNode sourceNode, targetNode;
+    public void redoSimEvLisEdge(SimEvListenerEdge sele) {
+        AssemblyNode src, target;
 
-        sourceNode = (AssemblyNode) simEventListenerEdge.getFromObject();
-        targetNode = (AssemblyNode) simEventListenerEdge.getToObject();
+        src = (AssemblyNode) sele.getFrom();
+        target = (AssemblyNode) sele.getTo();
 
-        SimEventListenerConnection simEventListenerConnection = jaxbObjectFactory.createSimEventListenerConnection();
-        simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
-        simEventListenerConnection.setListener(targetNode.getName());
-        simEventListenerConnection.setSource(sourceNode.getName());
+        SimEventListenerConnection selc = oFactory.createSimEventListenerConnection();
+        sele.opaqueModelObject = selc;
+        selc.setListener(target.getName());
+        selc.setSource(src.getName());
 
-        jaxbSimkitAssembly.getSimEventListenerConnection().add(simEventListenerConnection);
+        jaxbRoot.getSimEventListenerConnection().add(selc);
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.REDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge action redone"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(sele, ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE, "SimEvList Edge redone"));
     }
 
     @Override
-    public void deletePropChangeEdge(PropertyChangeListenerEdge propertyChangeListenerEdge) 
-	{
-        PropertyChangeListenerConnection propertyChangeListenerConnection = (PropertyChangeListenerConnection) propertyChangeListenerEdge.opaqueModelObject;
+    public void deletePropChangeEdge(PropChangeEdge pce) {
+        PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
-        jaxbSimkitAssembly.getPropertyChangeListenerConnection().remove(propertyChangeListenerConnection);
+        jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
 
-        assemblyModelDirty = true;
+        modelDirty = true;
 
-        if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_DELETED, "PCL edge deleted"));
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
         else
-            notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.UNDO_PCL_EDGE, "PCL edge action undone"));
+            notifyChanged(new ModelEvent(pce, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
     }
 
     @Override
-    public void deleteSimEventListenerEdge(SimEventListenerEdge simEventListenerEdge)
-	{
-        SimEventListenerConnection simEventListenerConnection = (SimEventListenerConnection) simEventListenerEdge.opaqueModelObject;
+    public void deleteSimEvLisEdge(SimEvListenerEdge sele) {
+        SimEventListenerConnection sel_c = (SimEventListenerConnection) sele.opaqueModelObject;
 
-        jaxbSimkitAssembly.getSimEventListenerConnection().remove(simEventListenerConnection);
+        jaxbRoot.getSimEventListenerConnection().remove(sel_c);
 
-        assemblyModelDirty = true;
+        modelDirty = true;
 
-        if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_DELETED, "SimEventListenerEdge deleted"));
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
         else
-            notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.UNDO_SIMEVENT_LISTENER_EDGE, "SimEventListenerEdge action undone"));
+            notifyChanged(new ModelEvent(sele, ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE, "SimEvList edge undone"));
     }
 
     @Override
-    public void deleteAdapterEdge(AdapterEdge adapterEdge)
-	{
-        Adapter jaxbAdapter = (Adapter) adapterEdge.opaqueModelObject;
-        jaxbSimkitAssembly.getAdapter().remove(jaxbAdapter);
+    public void deleteAdapterEdge(AdapterEdge ae) {
+        Adapter j_adp = (Adapter) ae.opaqueModelObject;
+        jaxbRoot.getAdapter().remove(j_adp);
 
-        assemblyModelDirty = true;
+        modelDirty = true;
 
-        if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_DELETED, "Adapter edge deleted"));
+        if (!controller.isUndo())
+            notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
         else
-            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge action undone"));
+            notifyChanged(new ModelEvent(ae, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
     }
 
     @Override
-    public void changePclEdge(PropertyChangeListenerEdge propertyChangeListenerEdge)
-	{
-        PropertyChangeListenerConnection PropertyChangeListenerConnection = (PropertyChangeListenerConnection) propertyChangeListenerEdge.opaqueModelObject;
-        PropertyChangeListenerConnection.setProperty(propertyChangeListenerEdge.getProperty());
-        PropertyChangeListenerConnection.setDescription(propertyChangeListenerEdge.getDescription());
+    public void changePclEdge(PropChangeEdge pclEdge) {
+        PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
+        pclc.setProperty(pclEdge.getProperty());
+        pclc.setDescription(pclEdge.getDescriptionString());
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_CHANGED, "PCL edge changed"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(pclEdge, ModelEvent.PCLEDGECHANGED, "PCL edge changed"));
     }
 
     @Override
-    public void changeAdapterEdge(AdapterEdge adapterEdge)
-	{
-        EventGraphNode sourceEvent = (EventGraphNode) adapterEdge.getFromObject();
-        EventGraphNode targetEvent = (EventGraphNode) adapterEdge.getToObject();
+    public void changeAdapterEdge(AdapterEdge ae) {
+        EvGraphNode src = (EvGraphNode) ae.getFrom();
+        EvGraphNode targ = (EvGraphNode) ae.getTo();
 
-        Adapter jaxbAE = (Adapter) adapterEdge.opaqueModelObject;
+        Adapter jaxbAE = (Adapter) ae.opaqueModelObject;
 
-        jaxbAE.setFrom(sourceEvent.getName());
-        jaxbAE.setTo(targetEvent.getName());
+        jaxbAE.setFrom(src.getName());
+        jaxbAE.setTo(targ.getName());
 
-        jaxbAE.setEventHeard(adapterEdge.getSourceEvent());
-        jaxbAE.setEventSent(adapterEdge.getTargetEvent());
+        jaxbAE.setEventHeard(ae.getSourceEvent());
+        jaxbAE.setEventSent(ae.getTargetEvent());
 
-        jaxbAE.setName(adapterEdge.getName());
-        jaxbAE.setDescription(adapterEdge.getDescription());
+        jaxbAE.setName(ae.getName());
+        jaxbAE.setDescription(ae.getDescriptionString());
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_CHANGED, "Adapter edge changed"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGECHANGED, "Adapter edge changed"));
     }
 
     @Override
-    public void changeSimEventListenerEdge(SimEventListenerEdge simEventListenerEdge)
-	{
-        EventGraphNode sourceEvent = (EventGraphNode) simEventListenerEdge.getFromObject();
-        EventGraphNode targetEvent = (EventGraphNode) simEventListenerEdge.getToObject();
-        SimEventListenerConnection simEventListenerConnection = (SimEventListenerConnection) simEventListenerEdge.opaqueModelObject;
+    public void changeSimEvEdge(SimEvListenerEdge seEdge) {
+        EvGraphNode src = (EvGraphNode) seEdge.getFrom();
+        EvGraphNode targ = (EvGraphNode) seEdge.getTo();
+        SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
 
-        simEventListenerConnection.setListener(targetEvent.getName());
-        simEventListenerConnection.setSource(sourceEvent.getName());
-        simEventListenerConnection.setDescription(simEventListenerEdge.getDescription());
+        selc.setListener(targ.getName());
+        selc.setSource(src.getName());
+        selc.setDescription(seEdge.getDescriptionString());
 
-        assemblyModelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_CHANGED, "SimEvListener edge changed"));
+        modelDirty = true;
+        notifyChanged(new ModelEvent(seEdge, ModelEvent.SIMEVLISTEDGECHANGED, "SimEvListener edge changed"));
     }
 
     @Override
-    public boolean changePclNode(PropertyChangeListenerNode pclNode) 
-	{
-        boolean returnValue = true;
-        if (!nameCheckSatisfactory())
-		{
+    public boolean changePclNode(PropChangeListenerNode pclNode) {
+        boolean retcode = true;
+        if (!nameCheck()) {
             mangleName(pclNode);
-            returnValue = false;
+            retcode = false;
         }
-        PropertyChangeListener propertyChangeListener = (PropertyChangeListener) pclNode.opaqueModelObject;
-        propertyChangeListener.setName(pclNode.getName());
-        propertyChangeListener.setType(pclNode.getType());
-        propertyChangeListener.setDescription(pclNode.getDescription());
+        PropertyChangeListener jaxBPcl = (PropertyChangeListener) pclNode.opaqueModelObject;
+        jaxBPcl.setName(pclNode.getName());
+        jaxBPcl.setType(pclNode.getType());
+        jaxBPcl.setDescription(pclNode.getDescriptionString());
 
         // Modes should be singular.  All new Assemblies will be with singular mode
-        if (pclNode.isSampleStatistics())
-		{
-            if (pclNode.isClearStatisticsAfterEachRun())
-			{
-                propertyChangeListener.setMode("replicationStat"); // TODO replicationStatistic
-            } 
-			else 
-			{
-                propertyChangeListener.setMode("designPointStat"); // TODO designPointStatistic
+        if (pclNode.isSampleStats()) {
+            if (pclNode.isClearStatsAfterEachRun()) {
+                jaxBPcl.setMode("replicationStat");
+            } else {
+                jaxBPcl.setMode("designPointStat");
             }
         }
 
         String statistics = pclNode.isGetCount() ? "true" : "false";
-        propertyChangeListener.setCountStatistics(statistics);
+        jaxBPcl.setCountStatistics(statistics);
 
         statistics = pclNode.isGetMean() ? "true" : "false";
-        propertyChangeListener.setMeanStatistics(statistics);
+        jaxBPcl.setMeanStatistics(statistics);
 
         double x = pclNode.getPosition().getX();
         double y = pclNode.getPosition().getY();
-        Coordinate coor = jaxbObjectFactory.createCoordinate();
+        Coordinate coor = oFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
         pclNode.getPosition().setLocation(x, y);
-        propertyChangeListener.setCoordinate(coor);
+        jaxBPcl.setCoordinate(coor);
 
-        List<Object> propertyChangeListenerParametersList = propertyChangeListener.getParameters();
-        propertyChangeListenerParametersList.clear();
+        List<Object> lis = jaxBPcl.getParameters();
+        lis.clear();
 
-        ViskitInstantiator pclNodeInstantiator = pclNode.getInstantiator();
+        VInstantiator inst = pclNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the
         // PropertyChangeListener object serves as "its own" MultiParameter.
-        List<Object> jaxbParameterList = getJaxbParameterList(pclNodeInstantiator);
+        List<Object> jlistt = getJaxbParamList(inst);
 
-        if (jaxbParameterList.size() != 1)
-		{
+        if (jlistt.size() != 1) {
             throw new RuntimeException("Design error in AssemblyModel");
         }
 
-        MultiParameter multiParameter = (MultiParameter) jaxbParameterList.get(0);
+        MultiParameter mp = (MultiParameter) jlistt.get(0);
 
-        for (Object o : multiParameter.getParameters())
-		{
-            propertyChangeListenerParametersList.add(o);
+        for (Object o : mp.getParameters()) {
+            lis.add(o);
         }
-        assemblyModelDirty = true;
-        this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCL_CHANGED, "Property Change Listener node changed"));
-        return returnValue;
+
+        modelDirty = true;
+        this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
+        return retcode;
     }
 
     @Override
-    public boolean changeEventGraphNode(EventGraphNode eventNode)
-	{
-        boolean returnValue = true;
-        if (!nameCheckSatisfactory())
-		{
-            mangleName(eventNode);
-            returnValue = false;
+    public boolean changeEvGraphNode(EvGraphNode evNode) {
+        boolean retcode = true;
+        if (!nameCheck()) {
+            mangleName(evNode);
+            retcode = false;
         }
-        SimEntity jaxbSimEntity = (SimEntity) eventNode.opaqueModelObject;
+        SimEntity jaxbSE = (SimEntity) evNode.opaqueModelObject;
 
-        jaxbSimEntity.setName       (eventNode.getName());
-        jaxbSimEntity.setType       (eventNode.getType());
-        jaxbSimEntity.setDescription(eventNode.getDescription());
+        jaxbSE.setName(evNode.getName());
+        jaxbSE.setType(evNode.getType());
+        jaxbSE.setDescription(evNode.getDescriptionString());
 
-        double x = eventNode.getPosition().getX();
-        double y = eventNode.getPosition().getY();
-        Coordinate coordinate = jaxbObjectFactory.createCoordinate();
-        coordinate.setX("" + x);
-        coordinate.setY("" + y);
-        eventNode.getPosition().setLocation(x, y);
-        jaxbSimEntity.setCoordinate(coordinate);
+        double x = evNode.getPosition().getX();
+        double y = evNode.getPosition().getY();
+        Coordinate coor = oFactory.createCoordinate();
+        coor.setX("" + x);
+        coor.setY("" + y);
+        evNode.getPosition().setLocation(x, y);
+        jaxbSE.setCoordinate(coor);
 
-        List<Object> parametersList = jaxbSimEntity.getParameters();
-        parametersList.clear();
+        List<Object> lis = jaxbSE.getParameters();
+        lis.clear();
 
-        ViskitInstantiator viskitInstantiator = eventNode.getInstantiator();
+        VInstantiator inst = evNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the SimEntity object
         // serves as "its own" MultiParameter.
-        List<Object> parameterList = getJaxbParameterList(viskitInstantiator);
+        List<Object> jlistt = getJaxbParamList(inst);
 
-        if (parameterList.size() != 1)
-		{
+        if (jlistt.size() != 1) {
             throw new RuntimeException("Design error in AssemblyModel");
         }
 
-        MultiParameter multiParameter = (MultiParameter) parameterList.get(0);
+        MultiParameter mp = (MultiParameter) jlistt.get(0);
 
-        for (Object o : multiParameter.getParameters())
-		{
-            parametersList.add(o);
+        for (Object o : mp.getParameters()) {
+            lis.add(o);
         }
 
-        if (eventNode.isOutputMarked())
-		{
-            addToOutputList(jaxbSimEntity);
-        } 
-		else 
-		{
-            removeFromOutputList(jaxbSimEntity);
+        if (evNode.isOutputMarked()) {
+            addToOutputList(jaxbSE);
+        } else {
+            removeFromOutputList(jaxbSE);
         }
 
-        if (eventNode.isVerboseMarked())
-		{
-            addToVerboseList(jaxbSimEntity);
-        } 
-		else
-		{
-            removeFromVerboseList(jaxbSimEntity);
+        if (evNode.isVerboseMarked()) {
+            addToVerboseList(jaxbSE);
+        } else {
+            removeFromVerboseList(jaxbSE);
         }
 
-        assemblyModelDirty = true;
-        this.notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENTGRAPH_CHANGED, "Event changed"));
-        return returnValue;
+        modelDirty = true;
+        this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHCHANGED, "Event changed"));
+        return retcode;
     }
 
-    private void removeFromOutputList(SimEntity jaxbSimEntity) 
-	{
-        List<Output> outTL = jaxbSimkitAssembly.getOutput();
-        for (Output o : outTL) 
-		{
-            if (o.getEntity().equals(jaxbSimEntity.getName())) 
-			{
+    private void removeFromOutputList(SimEntity se) {
+        List<Output> outTL = jaxbRoot.getOutput();
+        for (Output o : outTL) {
+            if (o.getEntity().equals(se.getName())) {
                 outTL.remove(o);
                 return;
             }
         }
     }
 
-    private void removeFromVerboseList(SimEntity jaxbSimEntity)
-	{
-        List<Verbose> vTL = jaxbSimkitAssembly.getVerbose();
-        for (Verbose v : vTL)
-		{
-            if (v.getEntity().equals(jaxbSimEntity.getName()))
-			{
+    private void removeFromVerboseList(SimEntity se) {
+        List<Verbose> vTL = jaxbRoot.getVerbose();
+        for (Verbose v : vTL) {
+            if (v.getEntity().equals(se.getName())) {
                 vTL.remove(v);
                 return;
             }
         }
     }
 
-    private void addToOutputList(SimEntity jaxbSimEntity)
-	{
-        List<Output> jaxbOutputList = jaxbSimkitAssembly.getOutput();
-        for (Output o : jaxbOutputList)
-		{
-            if (o.getEntity().equals(jaxbSimEntity.getName()))
-			{
-                return; // found it
+    private void addToOutputList(SimEntity se) {
+        List<Output> outTL = jaxbRoot.getOutput();
+        for (Output o : outTL) {
+            if (o.getEntity().equals(se.getName())) {
+                return;
             }
         }
-        Output jaxbOutputObject = jaxbObjectFactory.createOutput();
-        jaxbOutputObject.setEntity(jaxbSimEntity.getName());
-        jaxbOutputList.add(jaxbOutputObject);
+        Output op = oFactory.createOutput();
+        op.setEntity(se.getName());
+        outTL.add(op);
     }
 
-    private void addToVerboseList(SimEntity jaxbSimEntity)
-	{
-        List<Verbose> verboseList = jaxbSimkitAssembly.getVerbose();
-        for (Verbose v : verboseList)
-		{
-            if (v.getEntity().equals(jaxbSimEntity.getName()))
-			{
-                return; // found it already there
+    private void addToVerboseList(SimEntity se) {
+        List<Verbose> vTL = jaxbRoot.getVerbose();
+        for (Verbose v : vTL) {
+            if (v.getEntity().equals(se.getName())) {
+                return;
             }
         }
-        Verbose jaxbVerboseObject = jaxbObjectFactory.createVerbose();
-        jaxbVerboseObject.setEntity(jaxbSimEntity.getName());
-        verboseList.add(jaxbVerboseObject);
+        Verbose op = oFactory.createVerbose();
+        op.setEntity(se.getName());
+        vTL.add(op);
     }
 
     @Override
-    public Vector<String> getDetailedOutputEntityNames()
-	{
+    public Vector<String> getDetailedOutputEntityNames() {
         Vector<String> v = new Vector<>();
-        for (Output jaxbOutputObject : jaxbSimkitAssembly.getOutput())
-		{
-            Object jaxbEntity = jaxbOutputObject.getEntity();
-            if (jaxbEntity instanceof SimEntity)
-			{
-                v.add(((SimEntity) jaxbEntity).getName());
-            } 
-			else if (jaxbEntity instanceof PropertyChangeListener)
-			{
-                v.add(((PropertyChangeListener) jaxbEntity).getName());
+        for (Output ot : jaxbRoot.getOutput()) {
+            Object entity = ot.getEntity();
+            if (entity instanceof SimEntity) {
+                v.add(((SimEntity) entity).getName());
+            } else if (entity instanceof PropertyChangeListener) {
+                v.add(((PropertyChangeListener) entity).getName());
             }
-			else // added missing case, getEntity produces a string
-			{
-				v.add(jaxbEntity.toString()); // TODO confirm OK
-			}
         }
         return v;
     }
@@ -972,391 +816,326 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public Vector<String> getVerboseOutputEntityNames() {
         Vector<String> v = new Vector<>();
-        for (Verbose ot : jaxbSimkitAssembly.getVerbose()) {
-            Object jaxbEntity = ot.getEntity();
-            if (jaxbEntity instanceof SimEntity) {
-                v.add(((SimEntity) jaxbEntity).getName());
-            } else if (jaxbEntity instanceof PropertyChangeListener) {
-                v.add(((PropertyChangeListener) jaxbEntity).getName());
+        for (Verbose ot : jaxbRoot.getVerbose()) {
+            Object entity = ot.getEntity();
+            if (entity instanceof SimEntity) {
+                v.add(((SimEntity) entity).getName());
+            } else if (entity instanceof PropertyChangeListener) {
+                v.add(((PropertyChangeListener) entity).getName());
             }
         }
         return v;
     }
 
-   private List<Object> getInstantiatorListFromJaxbParameterList(List<Object> objectList) {
+   private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
 
        // To prevent java.util.ConcurrentModificationException
        List<Object> vi = new ArrayList<>();
-        for (Object o : objectList) {
+        for (Object o : lis) {
             vi.add(buildInstantiatorFromJaxbParameter(o));
         }
         return vi;
     }
 
-    private ViskitInstantiator buildInstantiatorFromJaxbParameter(Object jaxbObject)
-	{
-        if (jaxbObject instanceof TerminalParameter)
-		{
-            return buildFreeFormFromTerminalParameter((TerminalParameter) jaxbObject);
+    private VInstantiator buildInstantiatorFromJaxbParameter(Object o) {
+        if (o instanceof TerminalParameter) {
+            return buildFreeFormFromTermParameter((TerminalParameter) o);
         }
-        if (jaxbObject instanceof MultiParameter) // used for both arrays and Constr arg lists
-		{          
-            MultiParameter multiParameter = (MultiParameter) jaxbObject;
-            return (multiParameter.getType().contains("[")) ? buildArrayFromMultiParameter(multiParameter) : buildConstrFromMultiParameter(multiParameter);
+        if (o instanceof MultiParameter) {           // used for both arrays and Constr arg lists
+            MultiParameter mu = (MultiParameter) o;
+            return (mu.getType().contains("[")) ? buildArrayFromMultiParameter(mu) : buildConstrFromMultiParameter(mu);
         }
-		else return (jaxbObject instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) jaxbObject) : null;
+        return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
-    private ViskitInstantiator.FreeForm buildFreeFormFromTerminalParameter(TerminalParameter terminalParameter)
-	{
-		ViskitInstantiator.FreeForm viskitInstantiator = new ViskitInstantiator.FreeForm(terminalParameter.getType(), terminalParameter.getName());
-		viskitInstantiator.setValue      (terminalParameter.getValue());
-		viskitInstantiator.setDescription(terminalParameter.getDescription());
-        return viskitInstantiator;
+    private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
+        return new VInstantiator.FreeF(tp.getType(), tp.getValue());
     }
 
-    private ViskitInstantiator.Array buildArrayFromMultiParameter(MultiParameter multiParameter)
-	{
-        return new ViskitInstantiator.Array(multiParameter.getType(),
-                getInstantiatorListFromJaxbParameterList(multiParameter.getParameters()));
+    private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
+        return new VInstantiator.Array(o.getType(),
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
-    private ViskitInstantiator.Construct buildConstrFromMultiParameter(MultiParameter multiParameter)
-	{
-        return new ViskitInstantiator.Construct(multiParameter.getType(),
-                getInstantiatorListFromJaxbParameterList(multiParameter.getParameters()));
+    private VInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
+        return new VInstantiator.Constr(o.getType(),
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
-    private ViskitInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter factoryParameter)
-	{
-        return new ViskitInstantiator.Factory(factoryParameter.getType(),
-                factoryParameter.getFactory(),
-                ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
-                getInstantiatorListFromJaxbParameterList(factoryParameter.getParameters()));
+    private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
+        return new VInstantiator.Factory(o.getType(),
+                o.getFactory(),
+                VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
     // We know we will get a List<Object> one way or the other
     @SuppressWarnings("unchecked")
-    private List<Object> getJaxbParameterList(ViskitInstantiator viskitInstantiator)
-	{
-        Object jaxbObject = buildParameter(viskitInstantiator);
-        if (jaxbObject instanceof List<?>) 
-		{
-            return (List<Object>) jaxbObject;
+    private List<Object> getJaxbParamList(VInstantiator vi) {
+        Object o = buildParam(vi);
+        if (o instanceof List<?>) {
+            return (List<Object>) o;
         }
+
         Vector<Object> v = new Vector<>();
-        v.add(jaxbObject);
+        v.add(o);
         return v;
     }
 
-    private Object buildParameter(Object viskitInstantiator)
-	{
-        if (viskitInstantiator instanceof ViskitInstantiator.FreeForm) 
-		{
-            return buildParameterFromFreeForm((ViskitInstantiator.FreeForm) viskitInstantiator); //TerminalParameter
-        }
-		else if (viskitInstantiator instanceof ViskitInstantiator.Construct) 
-		{
-            return buildParamFromConstr((ViskitInstantiator.Construct) viskitInstantiator); // List of Pararameters
-        }
-        else if (viskitInstantiator instanceof ViskitInstantiator.Factory) 
-		{
-            return buildParamFromFactory((ViskitInstantiator.Factory) viskitInstantiator); // FactoryParameter
-        }
-        else if (viskitInstantiator instanceof ViskitInstantiator.Array) // MultiParameter
-		{
-            ViskitInstantiator.Array viskitInstantiatorArray = (ViskitInstantiator.Array) viskitInstantiator;
+    private Object buildParam(Object vi) {
+        if (vi instanceof VInstantiator.FreeF) {
+            return buildParamFromFreeF((VInstantiator.FreeF) vi);
+        } //TerminalParm
+        if (vi instanceof VInstantiator.Constr) {
+            return buildParamFromConstr((VInstantiator.Constr) vi);
+        } // List of Parms
+        if (vi instanceof VInstantiator.Factory) {
+            return buildParamFromFactory((VInstantiator.Factory) vi);
+        } // FactoryParam
+        if (vi instanceof VInstantiator.Array) {
+            VInstantiator.Array via = (VInstantiator.Array) vi;
 
-            if (ViskitGlobals.instance().isArray(viskitInstantiatorArray.getTypeName()))
-                return buildParameterFromArray(viskitInstantiatorArray);
-            else if (viskitInstantiatorArray.getTypeName().contains("..."))
-                return buildParameterFromVarargs(viskitInstantiatorArray);
-        }
-        //TODO review/resolve.   assert false : AssemblyModelImpl.buildJaxbParameter() received null;
-		
-		LOG.debug ("buildParameter failed to find type for " + viskitInstantiator); // TODO error condition?
+            if (VGlobals.instance().isArray(via.getType()))
+                return buildParamFromArray(via);
+            else if (via.getType().contains("..."))
+                return buildParamFromVarargs(via);
+        } // MultiParam
+
+        //assert false : AssemblyModelImpl.buildJaxbParameter() received null;
         return null;
     }
 
-    private TerminalParameter buildParameterFromFreeForm(ViskitInstantiator.FreeForm viskitInstantiatorFreeForm)
-	{
-        TerminalParameter terminalParameter = jaxbObjectFactory.createTerminalParameter();
+    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeF viff) {
+        TerminalParameter tp = oFactory.createTerminalParameter();
 
-        terminalParameter.setType (viskitInstantiatorFreeForm.getTypeName());
-        terminalParameter.setValue(viskitInstantiatorFreeForm.getValue());
-        terminalParameter.setName (viskitInstantiatorFreeForm.getName());
-        return terminalParameter;
+        tp.setType(viff.getType());
+        tp.setValue(viff.getValue());
+        tp.setName(viff.getName());
+        return tp;
     }
 
-    private MultiParameter buildParamFromConstr(ViskitInstantiator.Construct viskitInstantiatorConstruct)
-	{
-        MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
+    private MultiParameter buildParamFromConstr(VInstantiator.Constr vicon) {
+        MultiParameter mp = oFactory.createMultiParameter();
 
-        multiParameter.setType(viskitInstantiatorConstruct.getTypeName());
-        for (Object viskitInstantiator : viskitInstantiatorConstruct.getParameterTypesList()) 
-		{
-            multiParameter.getParameters().add(buildParameter(viskitInstantiator));
+        mp.setType(vicon.getType());
+        for (Object vi : vicon.getArgs()) {
+            mp.getParameters().add(buildParam(vi));
         }
-        return multiParameter;
+        return mp;
     }
 
-    private FactoryParameter buildParamFromFactory(ViskitInstantiator.Factory viskitInstantiatorFactory)
-	{
-        FactoryParameter factoryParameter = jaxbObjectFactory.createFactoryParameter();
+    private FactoryParameter buildParamFromFactory(VInstantiator.Factory vifact) {
+        FactoryParameter fp = oFactory.createFactoryParameter();
 
-        factoryParameter.setType(viskitInstantiatorFactory.getTypeName());
-        factoryParameter.setFactory(viskitInstantiatorFactory.getFactoryClass());
+        fp.setType(vifact.getType());
+        fp.setFactory(vifact.getFactoryClass());
 
-        for (Object viskitInstantiator : viskitInstantiatorFactory.getParametersList()) 
-		{
-            factoryParameter.getParameters().add(buildParameter(viskitInstantiator));
+        for (Object vi : vifact.getParams()) {
+            fp.getParameters().add(buildParam(vi));
         }
-        return factoryParameter;
+        return fp;
     }
 
-    private MultiParameter buildParameterFromArray(ViskitInstantiator.Array viskitInstantiatorArray) 
-	{
-        MultiParameter multiParameter = jaxbObjectFactory.createMultiParameter();
+    private MultiParameter buildParamFromArray(VInstantiator.Array viarr) {
+        MultiParameter mp = oFactory.createMultiParameter();
 
-        multiParameter.setType(viskitInstantiatorArray.getTypeName());
-        for (Object viskitInstantiator : viskitInstantiatorArray.getInstantiators()) 
-		{
-            multiParameter.getParameters().add(buildParameter(viskitInstantiator));
+        mp.setType(viarr.getType());
+        for (Object vi : viarr.getInstantiators()) {
+            mp.getParameters().add(buildParam(vi));
         }
-        return multiParameter;
+        return mp;
     }
 
-    private TerminalParameter buildParameterFromVarargs(ViskitInstantiator.Array viskitInstantiatorArray)
-	{
-        return buildParameterFromFreeForm((ViskitInstantiator.FreeForm) viskitInstantiatorArray.getInstantiators().get(0));
+    private TerminalParameter buildParamFromVarargs(VInstantiator.Array viarr) {
+        return buildParamFromFreeF((VInstantiator.FreeF) viarr.getInstantiators().get(0));
     }
 
-    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> propertyChangeListenerConnectionList)
-	{
-        for (PropertyChangeListenerConnection propertyChangeListenerConnection : propertyChangeListenerConnectionList)
-		{
-            PropertyChangeListenerEdge propertyChangeListenerEdge = new PropertyChangeListenerEdge();
-            propertyChangeListenerEdge.setProperty(propertyChangeListenerConnection.getProperty());
-            propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription());
-            AssemblyNode   toNode = getAssemblyNodeCacheMap().get(propertyChangeListenerConnection.getListener());
-            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(propertyChangeListenerConnection.getSource());
-            propertyChangeListenerEdge.opaqueModelObject = propertyChangeListenerConnection;
-            propertyChangeListenerEdge.setDescription(propertyChangeListenerConnection.getDescription()); // TODO check
-			
-			if (toNode != null)
-			{
-				propertyChangeListenerEdge.setToObject(toNode);
-                toNode.getConnections().add(propertyChangeListenerEdge);
-			}
-            if (fromNode != null)
-			{
-				propertyChangeListenerEdge.setFromObject(fromNode);
-				fromNode.getConnections().add(propertyChangeListenerEdge);
-			}
-            this.notifyChanged(new ModelEvent(propertyChangeListenerEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
+    private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
+        for (PropertyChangeListenerConnection pclc : pcconnsList) {
+            PropChangeEdge pce = new PropChangeEdge();
+            pce.setProperty(pclc.getProperty());
+            pce.setDescriptionString(pclc.getDescription());
+            AssemblyNode toNode = getNodeCache().get(pclc.getListener());
+            AssemblyNode frNode = getNodeCache().get(pclc.getSource());
+            pce.setTo(toNode);
+            pce.setFrom(frNode);
+            pce.opaqueModelObject = pclc;
+
+            toNode.getConnections().add(pce);
+            frNode.getConnections().add(pce);
+
+            this.notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEADDED, "PCL edge added"));
         }
     }
 
-    private void buildSimEventListenerConnectionsFromJaxb(List<SimEventListenerConnection> simEventListenerConnectionsList)
-	{
-        for (SimEventListenerConnection simEventListenerConnection : simEventListenerConnectionsList)
-		{
-            SimEventListenerEdge simEventListenerEdge = new SimEventListenerEdge();
-            AssemblyNode toNode = getAssemblyNodeCacheMap().get(simEventListenerConnection.getListener());
-            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(simEventListenerConnection.getSource());
-            simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
-            simEventListenerEdge.setDescription(simEventListenerConnection.getDescription());
-			
-			if (toNode != null)
-			{
-				simEventListenerEdge.setToObject(toNode);
-				toNode.getConnections().add(simEventListenerEdge);
-			}
-            if (fromNode != null)
-			{
-				simEventListenerEdge.setFromObject(fromNode);
-				fromNode.getConnections().add(simEventListenerEdge);
-			}
-            this.notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIMEVENT_LISTENER_EDGE_ADDED, "Sim event listener connection added"));
+    private void buildSimEvConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
+        for (SimEventListenerConnection selc : simevconnsList) {
+            SimEvListenerEdge sele = new SimEvListenerEdge();
+            AssemblyNode toNode = getNodeCache().get(selc.getListener());
+            AssemblyNode frNode = getNodeCache().get(selc.getSource());
+            sele.setTo(toNode);
+            sele.setFrom(frNode);
+            sele.opaqueModelObject = selc;
+            sele.setDescriptionString(selc.getDescription());
+
+            toNode.getConnections().add(sele);
+            frNode.getConnections().add(sele);
+            this.notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEADDED, "Sim event listener connection added"));
         }
     }
 
-    private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList)
-	{
+    private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList) {
         for (Adapter jaxbAdapter : adaptersList) {
-            AdapterEdge adapterEdge = new AdapterEdge();
-            AssemblyNode   toNode = getAssemblyNodeCacheMap().get(jaxbAdapter.getTo());
-            AssemblyNode fromNode = getAssemblyNodeCacheMap().get(jaxbAdapter.getFrom());
-			
-			if (toNode != null)
-			{
-				adapterEdge.setToObject  (  toNode);
-			}
-            if (fromNode != null)
-			{
-				adapterEdge.setFromObject(fromNode);
-			}
-            // Handle XML names with underscores (note XML IDREF issue)
+            AdapterEdge ae = new AdapterEdge();
+            AssemblyNode toNode = getNodeCache().get(jaxbAdapter.getTo());
+            AssemblyNode frNode = getNodeCache().get(jaxbAdapter.getFrom());
+            ae.setTo(toNode);
+            ae.setFrom(frNode);
+
+            // Handle XML names w/ underscores (XML IDREF issue)
             String event = jaxbAdapter.getEventHeard();
-			if ((event == null) || event.isEmpty())
-			{
-				LOG.error ("event name not found, buildAdapterConnectionsFromJaxb failed");
-				return;
-			}
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            adapterEdge.setSourceEvent(event);
+            ae.setSourceEvent(event);
 
             event = jaxbAdapter.getEventSent();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            adapterEdge.setTargetEvent(event);
-			
-            adapterEdge.setName(jaxbAdapter.getName());
-            adapterEdge.setDescription(jaxbAdapter.getDescription());
-            adapterEdge.opaqueModelObject = jaxbAdapter;
+            ae.setTargetEvent(event);
 
-			if ( toNode != null)
-                  toNode.getConnections().add(adapterEdge);
-			if (fromNode != null)
-                fromNode.getConnections().add(adapterEdge);
-            this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_ADDED, "Adapter connection added"));
+            ae.setName(jaxbAdapter.getName());
+            ae.setDescriptionString(jaxbAdapter.getDescription());
+            ae.opaqueModelObject = jaxbAdapter;
+
+            toNode.getConnections().add(ae);
+            frNode.getConnections().add(ae);
+            this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEADDED, "Adapter connection added"));
         }
     }
 
-    private void buildPropertyChangeListenersFromJaxb(List<PropertyChangeListener> propertyChangeListenerList)
-	{
-        for (PropertyChangeListener pcl : propertyChangeListenerList)
-		{
-            buildPropertyChangeListenerNodeFromJaxbPCL(pcl);
+    private void buildPCLsFromJaxb(List<PropertyChangeListener> pcLs) {
+        for (PropertyChangeListener pcl : pcLs) {
+            buildPclNodeFromJaxbPCL(pcl);
         }
     }
 
-    private void buildEventGraphsFromJaxb(List<SimEntity> jaxbSimEntitiesList, List<Output> jaxbOutputList, List<Verbose> jaxbVerboseList)
-	{
-        for (SimEntity jaxbSimEntity : jaxbSimEntitiesList)
-		{
-            boolean isOutput  = false;
+    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose> verboseList) {
+        for (SimEntity se : simEntities) {
+            boolean isOutput = false;
             boolean isVerbose = false;
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
-            for (Output jaxbOutput : jaxbOutputList)
-			{
-                String simEntityName = jaxbOutput.getEntity();
-                if (simEntityName.equals(jaxbSimEntity.getName()))
-				{
+            for (Output o : outputList) {
+                String simE = o.getEntity();
+                if (simE.equals(se.getName())) {
                     isOutput = true;
                     break;
                 }
             }
-            for (Verbose jaxbVerbose : jaxbVerboseList)
-			{
-                String simEntityName = jaxbVerbose.getEntity();
-                if (simEntityName.equals(jaxbSimEntity.getName()))
-				{
+
+            // Verbose shouldn't populated since the verbose check box has been disabled
+            for (Verbose v : verboseList) {
+                String simE = v.getEntity();
+                if (simE.equals(se.getName())) {
                     isVerbose = true;
                     break;
                 }
             }
-            buildEventGraphNodeFromJaxbSimEntity(jaxbSimEntity, isOutput, isVerbose);
+            buildEvgNodeFromJaxbSimEntity(se, isOutput, isVerbose);
         }
     }
 
-    private PropertyChangeListenerNode buildPropertyChangeListenerNodeFromJaxbPCL(PropertyChangeListener propertyChangeListener)
-	{
-        PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) getAssemblyNodeCacheMap().get(propertyChangeListener.getName());
-        if (propertyChangeListenerNode != null)
-		{
-            return propertyChangeListenerNode;
+    private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
+        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl.getName());
+        if (pNode != null) {
+            return pNode;
         }
-        propertyChangeListenerNode = new PropertyChangeListenerNode(propertyChangeListener.getName(), 
-				                                                    propertyChangeListener.getType(), 
-				                                                    propertyChangeListener.getDescription());
+        pNode = new PropChangeListenerNode(pcl.getName(), pcl.getType());
 
-        // For backwards compatibility
-        propertyChangeListenerNode.setClearStatisticsAfterEachRun(propertyChangeListener.getMode().contains("replicationStat"));
-        propertyChangeListenerNode.setGetMean(Boolean.parseBoolean(propertyChangeListener.getMeanStatistics()));
-        propertyChangeListenerNode.setGetCount(Boolean.parseBoolean(propertyChangeListener.getCountStatistics()));
-        propertyChangeListenerNode.setDescription(propertyChangeListener.getDescription());
-        Coordinate coordinate = propertyChangeListener.getCoordinate();
-        if (coordinate == null)
-		{
-            propertyChangeListenerNode.setPosition(pointLess);
+        // For backwards compatibility, bug 706
+        pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
+        pNode.setGetMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
+        pNode.setGetCount(Boolean.parseBoolean(pcl.getCountStatistics()));
+        pNode.setDescriptionString(pcl.getDescription());
+        Coordinate coor = pcl.getCoordinate();
+        if (coor == null) {
+            pNode.setPosition(pointLess);
             pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
-        } 
-		else 
-		{
-            propertyChangeListenerNode.setPosition(new Point2D.Double(Double.parseDouble(coordinate.getX()),
-                                                                      Double.parseDouble(coordinate.getY())));
+        } else {
+            pNode.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
         }
 
-        List<Object> propertyChangeListenerParameters = propertyChangeListener.getParameters();
-        ViskitInstantiator viskitInstantiatorConstructor = new ViskitInstantiator.Construct(propertyChangeListener.getType(),
-                getInstantiatorListFromJaxbParameterList(propertyChangeListenerParameters));
-        propertyChangeListenerNode.setInstantiator(viskitInstantiatorConstructor);
+        List<Object> lis = pcl.getParameters();
+        VInstantiator vc = new VInstantiator.Constr(pcl.getType(),
+                getInstantiatorListFromJaxbParmList(lis));
+        pNode.setInstantiator(vc);
 
-        propertyChangeListenerNode.opaqueModelObject = propertyChangeListener;
-        LogUtilities.getLogger(AssemblyModelImpl.class).debug("propertyChangeListenerNode name: " + propertyChangeListenerNode.getName());
+        pNode.opaqueModelObject = pcl;
+        LogUtils.getLogger(AssemblyModelImpl.class).debug("pNode name: " + pNode.getName());
 
-        getAssemblyNodeCacheMap().put(propertyChangeListenerNode.getName(), propertyChangeListenerNode); // key = PCL name
+        getNodeCache().put(pNode.getName(), pNode);   // key = se
 
-        if (!nameCheckSatisfactory())
-		{
-            mangleName(propertyChangeListenerNode);
+        if (!nameCheck()) {
+            mangleName(pNode);
         }
-        notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.PCL_ADDED, "propertyChangeListener added"));
-        return propertyChangeListenerNode;
+        notifyChanged(new ModelEvent(pNode, ModelEvent.PCLADDED, "PCL added"));
+        return pNode;
     }
 
-    private EventGraphNode buildEventGraphNodeFromJaxbSimEntity(SimEntity jaxbSimEntity, boolean isOutputNode, boolean isVerboseNode)
-	{
-        EventGraphNode eventGraphNode = (EventGraphNode) getAssemblyNodeCacheMap().get(jaxbSimEntity.getName());
-        if (eventGraphNode != null)
-		{
-            return eventGraphNode;
+    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
+        EvGraphNode en = (EvGraphNode) getNodeCache().get(se.getName());
+        if (en != null) {
+            return en;
         }
-        eventGraphNode = new EventGraphNode(jaxbSimEntity.getName(), jaxbSimEntity.getType(), ViskitStatics.DEFAULT_DESCRIPTION);
+        en = new EvGraphNode(se.getName(), se.getType());
 
-        Coordinate coordinate = jaxbSimEntity.getCoordinate();
-        if (coordinate == null) 
-		{
-            eventGraphNode.setPosition(pointLess);
+        Coordinate coor = se.getCoordinate();
+        if (coor == null) {
+            en.setPosition(pointLess);
             pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
-        } 
-		else 
-		{
-            eventGraphNode.setPosition(new Point2D.Double(Double.parseDouble(coordinate.getX()),
-                                                          Double.parseDouble(coordinate.getY())));
-        }
-        eventGraphNode.setDescription(jaxbSimEntity.getDescription()); // TODO get description properly, value is getting lost
-        eventGraphNode.setOutputMarked(isOutputNode);
-		boolean verbose = false;
-		if (jaxbSimEntity.isVerbose() != null)
-			    verbose = jaxbSimEntity.isVerbose();
-        eventGraphNode.setVerboseMarked(isVerboseNode || verbose);
-
-        List<Object> parameterList = jaxbSimEntity.getParameters();
-
-        ViskitInstantiator viskitInstantiatorConstructor = new ViskitInstantiator.Construct(parameterList, jaxbSimEntity.getType());
-        eventGraphNode.setInstantiator(viskitInstantiatorConstructor);
-
-        eventGraphNode.opaqueModelObject = jaxbSimEntity; // TODO not clear what this is for
-
-        if (!nameCheckSatisfactory())
-		{
-            mangleName(eventGraphNode);
+        } else {
+            en.setPosition(new Point2D.Double(Double.parseDouble(coor.getX()),
+                    Double.parseDouble(coor.getY())));
         }
 
-        getAssemblyNodeCacheMap().put(eventGraphNode.getName(), eventGraphNode); // key = event graph name
+        en.setDescriptionString(se.getDescription());
+        en.setOutputMarked(isOutputNode);
+        en.setVerboseMarked(isVerboseNode);
 
-        assemblyModelDirty = true; // this now-modified assembly is not yet saved, so mark as dirty
-		
-        notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENTGRAPH_ADDED, "New event graph added to assembly: " + jaxbSimEntity.getName()));
+        List<Object> lis = se.getParameters();
 
-        return eventGraphNode;
+        VInstantiator vc = new VInstantiator.Constr(lis, se.getType());
+        en.setInstantiator(vc);
+
+        en.opaqueModelObject = se;
+
+        getNodeCache().put(en.getName(), en);   // key = se
+
+        if (!nameCheck()) {
+            mangleName(en);
+        }
+        notifyChanged(new ModelEvent(en, ModelEvent.EVENTGRAPHADDED, "Event added"));
+
+        return en;
     }
 
-    public Map<String, AssemblyNode> getAssemblyNodeCacheMap() {
-        return assemblyNodeCacheMap;
+    /**
+     * "nullIfEmpty" Return the passed string if non-zero length, else null
+     * @param s the string to check for non-zero length
+     * @return the passed string if non-zero length, else null
+     */
+    private String nIe(String s) {
+        if (s != null) {
+            if (s.length() == 0) {
+                s = null;
+            }
+        }
+        return s;
     }
+
+    public Map<String, AssemblyNode> getNodeCache() {
+        return nodeCache;
+    }
+
 }

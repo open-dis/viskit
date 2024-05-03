@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -40,7 +40,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -105,12 +104,8 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         if (leftJsp != null) {
             content.add(leftJsp); //, BorderLayout.CENTER);
             JButton sv = new JButton("Save");
-            sv.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    controller.saveDoeParams();
-                }
+            sv.addActionListener((ActionEvent e) -> {
+                controller.saveDoeParams();
             });
             sv.setToolTipText("<html><center>Save experiment parameters<br>to assembly file<br>" +
                     "(not required to run job)");
@@ -144,16 +139,12 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
 
         @Override
         public void windowClosing(WindowEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    controller.actionPerformed(EXIT_APP);
-                }
+            SwingUtilities.invokeLater(() -> {
+                controller.actionPerformed(EXIT_APP);
             });
         }
     }
-    private String namePrefix = "Visual Simkit (Viskit) Design of Experiments";
+    private String namePrefix = "Viskit Design of Experiments";
     private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {

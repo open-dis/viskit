@@ -1,6 +1,5 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -10,10 +9,9 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitStatics;
-import viskit.model.ViskitInstantiator;
-import viskit.view.ObjectListPanel;
+import viskit.VStatics;
+import viskit.model.VInstantiator;
+import viskit.view.ObjListPanel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -25,33 +23,31 @@ import viskit.view.ObjectListPanel;
  * @since 3:27:42 PM
  * @version $Id$
  */
-public class ArrayInspector extends JDialog 
-{
-    static final Logger LOG = LogUtilities.getLogger(ArrayInspector.class);
+public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
-    private final JButton cancelButton,  okButton;
-    private final JPanel buttonPanel,  contentPanel;
-    private final JTextField typeTF,  sizeTF;
+    private JButton canButt,  okButt;
+    private JPanel buttPan,  contentP;
+    private JTextField typeTF,  sizeTF;
     private JPanel upPan;
-    private final enableApplyButtonListener listener;
+    private enableApplyButtonListener listnr;
 
     public ArrayInspector(JDialog parent) {
         super(parent, "Array Inspector", true);
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        setContentPane(contentPanel);
+        contentP = new JPanel();
+        contentP.setLayout(new BoxLayout(contentP, BoxLayout.Y_AXIS));
+        contentP.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setContentPane(contentP);
 
         upPan = new JPanel(new SpringLayout());
-        JLabel typeLabel = new JLabel("Array type", JLabel.TRAILING);
+        JLabel typeLab = new JLabel("Array type", JLabel.TRAILING);
         typeTF = new JTextField();
         typeTF.setEditable(false);
-        ViskitStatics.clampHeight(typeTF);
-        typeLabel.setLabelFor(typeTF);
+        VStatics.clampHeight(typeTF);
+        typeLab.setLabelFor(typeTF);
         JLabel countLab = new JLabel("Array length", JLabel.TRAILING);
-        sizeTF = new JTextField(50); // columns to initially grow the display
-        ViskitStatics.clampHeight(sizeTF);
+        sizeTF = new JTextField();
+        VStatics.clampHeight(sizeTF);
         countLab.setLabelFor(sizeTF);
 
         JLabel helpLab = new JLabel("");
@@ -59,7 +55,7 @@ public class ArrayInspector extends JDialog
         helpTextLabel.setFont(sizeTF.getFont());
         helpLab.setLabelFor(helpTextLabel);
 
-        upPan.add(typeLabel);
+        upPan.add(typeLab);
         upPan.add(typeTF);
         upPan.add(countLab);
         upPan.add(sizeTF);
@@ -68,39 +64,39 @@ public class ArrayInspector extends JDialog
 
         SpringUtilities.makeCompactGrid(upPan, 3, 2, 5, 5, 5, 5);
 
-        buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-            okButton = new JButton("Apply changes");
-        cancelButton = new JButton("Cancel");
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
+        buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
 
         // attach listeners
-        listener = new enableApplyButtonListener();
-        typeTF.addCaretListener(listener);
-        sizeTF.addCaretListener(listener);
+        listnr = new enableApplyButtonListener();
+        typeTF.addCaretListener(listnr);
+        sizeTF.addCaretListener(listnr);
         sizeTF.addActionListener(new sizeListener());
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
-        okButton.setEnabled(false);
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
+        okButt.setEnabled(false);
     }
-    ObjectListPanel olp;
+    ObjListPanel olp;
 
     public void setData(List<Object> lis) // of instantiators
     {
-        olp = new ObjectListPanel(listener);
+        olp = new ObjListPanel(listnr);
         olp.setDialogInfo((JDialog) getParent());
         olp.setData(lis, false); // don't show the type
 
-        contentPanel.removeAll();
-        contentPanel.add(upPan);
-        contentPanel.add(Box.createVerticalStrut(5));
+        contentP.removeAll();
+        contentP.add(upPan);
+        contentP.add(Box.createVerticalStrut(5));
         JScrollPane jsp = new JScrollPane(olp);
         jsp.getViewport().setPreferredSize(new Dimension(Integer.MAX_VALUE, 240));
-        contentPanel.add(jsp);
-        contentPanel.add(Box.createVerticalStrut(5));
-        contentPanel.add(buttonPanel);
+        contentP.add(jsp);
+        contentP.add(Box.createVerticalStrut(5));
+        contentP.add(buttPan);
 
         sizeTF.setText("" + lis.size());
         pack();
@@ -113,15 +109,15 @@ public class ArrayInspector extends JDialog
     String myTyp;
 
     public void setType(String typ) {
-        Class<?> c = ViskitStatics.getClassForInstantiatorType(typ);
+        Class<?> c = VStatics.getClassForInstantiatorType(typ);
 
-        myTyp = ViskitStatics.convertClassName(c.getComponentType().getName());
+        myTyp = VStatics.convertClassName(c.getComponentType().getName());
 
         typeTF.setText(typ);
     }
 
-    public ViskitInstantiator.Array getData() {
-        return new ViskitInstantiator.Array(typeTF.getText().trim(), olp.getData());
+    public VInstantiator.Array getData() {
+        return new VInstantiator.Array(typeTF.getText().trim(), olp.getData());
     }
 
     class sizeListener implements ActionListener {
@@ -145,17 +141,17 @@ public class ArrayInspector extends JDialog
         }
 
         Vector<Object> v = new Vector<>(sz);
-        if (myTyp.equals(ViskitStatics.RANDOM_VARIATE_CLASS_NAME)) {
+        if (myTyp.equals(VStatics.RANDOM_VARIATE_CLASS)) {
             for (int i = 0; i < sz; i++) {
-                v.add(new ViskitInstantiator.Factory(myTyp,
-                        ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS,
-                        ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                v.add(new VInstantiator.Factory(myTyp,
+                        VStatics.RANDOM_VARIATE_FACTORY_CLASS,
+                        VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                         new Vector<>()
                 ));
             }
         } else {
             for (int i = 0; i < sz; i++) {
-                v.add(new ViskitInstantiator.FreeForm(myTyp, ""));
+                v.add(new VInstantiator.FreeF(myTyp, ""));
             }
         }
         setData(v);
@@ -183,8 +179,8 @@ public class ArrayInspector extends JDialog
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override

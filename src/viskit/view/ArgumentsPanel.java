@@ -1,5 +1,6 @@
 package viskit.view;
 
+import java.util.List;
 import viskit.model.EventArgument;
 import viskit.model.ViskitElement;
 
@@ -15,43 +16,47 @@ import viskit.model.ViskitElement;
  */
 public class ArgumentsPanel extends ViskitTablePanel {
 
-    private final String[] columnTitles = {"name", "type", "description"};
+    private String[] mytitles = {"name", "type", "description"};
     private static int count = 0;
 
-    public ArgumentsPanel(int width) {
-        this(width, 0);
+    public ArgumentsPanel(int wid) {
+        this(wid, 0);
     }
 
-    public ArgumentsPanel(int width, int numRows) {
-        super(width, numRows);
+    public ArgumentsPanel(int wid, int numRows) {
+        super(wid, numRows);
         init(true);                       // separate constructor from initialization
     }
 
     @Override
     public String[] getColumnTitles() {
-        return columnTitles;
+        return mytitles;
     }
 
     @Override
-    public String[] getFields(ViskitElement viskitElemen, int rowNum) {
+    public String[] getFields(ViskitElement e, int rowNum) {
         String[] sa = new String[3];
-        sa[0] = viskitElemen.getName();
-        sa[1] = viskitElemen.getType();
-        sa[2] = viskitElemen.getDescription();
+        sa[0] = e.getName();
+        sa[1] = e.getType();
+        List<String> ar = ((EventArgument) e).getDescription();
+        if (ar.size() > 0) {
+            sa[2] = ((EventArgument) e).getDescription().get(0);
+        } else {
+            sa[2] = "";
+        }
         return sa;
     }
 
     @Override
-    public ViskitElement newRowObject()
-	{
-        EventArgument eventArgument = new EventArgument();
-        eventArgument.setName("argument_" + count++);
-        eventArgument.setType("int");
-        return eventArgument;
+    public ViskitElement newRowObject() {
+        EventArgument ea = new EventArgument();
+        ea.setName("arg_" + count++);
+        ea.setType("int");
+        return ea;
     }
 
     @Override
-    public int getNumberVisibleRows() {
+    public int getNumVisibleRows() {
         return 3;
     }
 }

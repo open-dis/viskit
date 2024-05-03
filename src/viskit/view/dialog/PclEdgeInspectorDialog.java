@@ -1,6 +1,5 @@
 package viskit.view.dialog;
 
-import edu.nps.util.LogUtilities;
 import edu.nps.util.SpringUtilities;
 
 import javax.swing.*;
@@ -18,14 +17,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
+import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.control.AssemblyController;
-import viskit.model.AssemblyEdge;
-import viskit.model.EventGraphNode;
-import viskit.model.PropertyChangeListenerEdge;
-import viskit.model.PropertyChangeListenerNode;
+import viskit.model.EvGraphNode;
+import viskit.model.PropChangeEdge;
+import viskit.model.PropChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -38,242 +35,159 @@ import viskit.model.ViskitElement;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class PclEdgeInspectorDialog extends JDialog
-{	
-    static final Logger LOG = LogUtilities.getLogger(PclEdgeInspectorDialog.class);
-	
-    private JLabel  sourceLabel,  propertyLabel,  descriptionLabel,  targetLabel;
-    private JTextField sourceTF,  propertyTF,     descriptionTF,     targetTF;
-    private JPanel propertyTFPanel;
-    private static PclEdgeInspectorDialog pclEdgeInspectorDialog;
+public class PclEdgeInspectorDialog extends JDialog {
+
+    private JLabel sourceLab,  targetLab,  propertyLab,  descLab;
+    private JTextField sourceTF,  targetTF,  propertyTF,  descTF;
+    private JPanel propertyTFPan;
+    private JLabel emptyLab,  emptyTF;
+    private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropertyChangeListenerEdge pclEdge;
-    private JButton okButton,  cancelButton;
-    private JButton findStateVariableButton;
-    private JPanel buttonPanel, contentPanel, containerPanel;
-    private enableApplyButtonListener listener;
-	
-	public static final String ALL_STATE_VARIABLES_NAME        = "(All state variables)";
-	public static final String ALL_STATE_VARIABLES_TYPE        = "(any type)";
-	public static final String ALL_STATE_VARIABLES_DESCRIPTION = "Property Change events from all state variables get heard";
+    private PropChangeEdge pclEdge;
+    private JButton okButt,  canButt;
+    private JButton propButt;
+    private JPanel buttPan;
+    private enableApplyButtonListener lis;
 
-    private PclEdgeInspectorDialog(JFrame parent, PropertyChangeListenerEdge pclEdge)
-	{
-        super(parent, "Property Change Connection", true);
-        this.pclEdge = pclEdge;
-		
-		initialize ();
-
-        setParameters(parent, this.pclEdge);
-    }
-	
-	private void initialize ()
-	{
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
-
-        listener = new enableApplyButtonListener();
-        findStateVariableButton = new JButton("...");
-        findStateVariableButton.addActionListener(new ChooseStateVariableAction());
-        findStateVariableButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-             sourceLabel = new JLabel("from: source event graph", JLabel.TRAILING);
-           propertyLabel = new JLabel("state variable",     JLabel.TRAILING); // originally labelled "property" but that seems misleading...
-        descriptionLabel = new JLabel("description",        JLabel.TRAILING);
-             targetLabel = new JLabel("to: property change listener", JLabel.TRAILING);
-			 
-		     sourceLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-	       propertyLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-		descriptionLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-	     	 targetLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
-
-             sourceTF = new JTextField();
-             targetTF = new JTextField();
-           propertyTF = new JTextField();
-        descriptionTF = new JTextField(ALL_STATE_VARIABLES_DESCRIPTION + "  "); // initialize width
-        propertyTFPanel = new JPanel();
-
-        propertyTFPanel = new JPanel();
-        propertyTFPanel.setLayout(new BoxLayout(propertyTFPanel, BoxLayout.X_AXIS));
-        propertyTFPanel.add(propertyTF);
-        propertyTFPanel.add(findStateVariableButton);
-        propertyTF.addCaretListener(listener);
-        pairWidgets(  sourceLabel, sourceTF, false);
-        pairWidgets(propertyLabel, propertyTFPanel, true);
-        pairWidgets(descriptionLabel, descriptionTF, true);
-        pairWidgets(  targetLabel, targetTF, false);
-
-           okButton = new JButton("Apply changes");
-       cancelButton = new JButton("Cancel");
-        buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(Box.createHorizontalStrut(5));
-
-        // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-            okButton.addActionListener(new applyButtonListener());
-
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-
-        containerPanel = new JPanel(new SpringLayout());
-        containerPanel.add(sourceLabel);
-        containerPanel.add(sourceTF);
-        containerPanel.add(propertyLabel);
-        containerPanel.add(propertyTFPanel);
-        containerPanel.add(targetLabel);
-        containerPanel.add(targetTF);
-        containerPanel.add(descriptionLabel);
-        containerPanel.add(descriptionTF);
-        SpringUtilities.makeCompactGrid(containerPanel, 4, 2, 10, 10, 10, 10);
-        contentPanel.add(containerPanel);
-
-        contentPanel.add(buttonPanel);
-        contentPanel.add(Box.createVerticalStrut(5));
-        setContentPane(contentPanel);
-
-        // Make the first display of this panel a minimum of 600 width
-        Dimension d = getSize();
-        d.width = Math.max(d.width, 600);
-        setSize(d);
-	}
-
-    public static boolean showDialog(JFrame parentFrame, PropertyChangeListenerEdge parm)
-	{
-        if (pclEdgeInspectorDialog == null)
-		{ 
-            pclEdgeInspectorDialog = new PclEdgeInspectorDialog(parentFrame, parm);
-        } 
-		else 
-		{
-            pclEdgeInspectorDialog.setParameters(parentFrame, parm);
+    public static boolean showDialog(JFrame f, PropChangeEdge parm) {
+        if (dialog == null) {
+            dialog = new PclEdgeInspectorDialog(f, parm);
+        } else {
+            dialog.setParams(f, parm);
         }
-        pclEdgeInspectorDialog.setVisible(true); // this call blocks while panel dialog is shown
-		
+
+        dialog.setVisible(true);
+        // above call blocks
         return modified;
     }
 
-    private void pairWidgets(JLabel label, JComponent textField, boolean editable)
-	{
-        ViskitStatics.clampHeight(textField);
-        label.setLabelFor(textField);
-        if (textField instanceof JTextField)
-		{
-            ((JTextComponent) textField).setEditable(editable);
-            if (editable)
-			{
-                ((JTextComponent) textField).addCaretListener(listener);
+    private PclEdgeInspectorDialog(JFrame parent, PropChangeEdge ed) {
+        super(parent, "Property Change Connection", true);
+        this.pclEdge = ed;
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new myCloseListener());
+
+        lis = new enableApplyButtonListener();
+        propButt = new JButton("...");
+        propButt.addActionListener(new findPropertiesAction());
+        propButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        sourceLab = new JLabel("source event graph", JLabel.TRAILING);
+        targetLab = new JLabel("property change listener", JLabel.TRAILING);
+        propertyLab = new JLabel("property", JLabel.TRAILING);
+        emptyLab = new JLabel();
+        descLab = new JLabel("description");
+
+        sourceTF = new JTextField();
+        targetTF = new JTextField();
+        propertyTF = new JTextField();
+        descTF = new JTextField();
+
+        emptyTF = new JLabel("(an empty entry signifies ALL properties in source)");
+        int fsz = emptyTF.getFont().getSize();
+        emptyTF.setFont(emptyTF.getFont().deriveFont(fsz - 2));
+        propertyTFPan = new JPanel();
+        propertyTFPan.setLayout(new BoxLayout(propertyTFPan, BoxLayout.X_AXIS));
+        propertyTFPan.add(propertyTF);
+        propertyTFPan.add(propButt);
+        pairWidgets(sourceLab, sourceTF, false);
+        pairWidgets(targetLab, targetTF, false);
+        pairWidgets(propertyLab, propertyTFPan, true);
+        propertyTF.addCaretListener(lis);
+        pairWidgets(emptyLab, emptyTF, false);
+        pairWidgets(descLab, descTF, true);
+
+        buttPan = new JPanel();
+        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        canButt = new JButton("Cancel");
+        okButt = new JButton("Apply changes");
+        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttPan.add(canButt);
+        buttPan.add(okButt);
+        buttPan.add(Box.createHorizontalStrut(5));
+
+        // Make the first display a minimum of 400 width
+        Dimension d = getSize();
+        d.width = Math.max(d.width, 400);
+        setSize(d);
+
+        // attach listeners
+        canButt.addActionListener(new cancelButtonListener());
+        okButt.addActionListener(new applyButtonListener());
+
+        setParams(parent, ed);
+    }
+
+    private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
+        VStatics.clampHeight(tf);
+        lab.setLabelFor(tf);
+        if (tf instanceof JTextField) {
+            ((JTextComponent) tf).setEditable(edit);
+            if (edit) {
+                ((JTextComponent) tf).addCaretListener(lis);
             }
         }
     }
 
-    public final void setParameters(Component c, PropertyChangeListenerEdge p)
-	{
+    public final void setParams(Component c, PropChangeEdge p) {
         pclEdge = p;
 
         fillWidgets();
 
         modified = (p == null);
-        okButton.setEnabled((p == null));
+        okButt.setEnabled((p == null));
 
-        getRootPane().setDefaultButton(cancelButton);
+        getRootPane().setDefaultButton(canButt);
         pack();
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets()
-	{
-        if (pclEdge != null)
-		{
-			String fromText, toText;
-			try
-			{
-				String fromClassName    = ((EventGraphNode) pclEdge.getFromObject()).getType();
-				if    (fromClassName == null)
-					   fromClassName    = "";
-				if    (fromClassName.contains("."))
-					   fromClassName    = fromClassName.substring(fromClassName.lastIndexOf(".")+1);
-				String fromInstanceName = ((EventGraphNode) pclEdge.getFromObject()).getName();
-				if    (fromInstanceName == null)
-					   fromInstanceName = "";
-				if   (!fromInstanceName.toLowerCase().contains(fromClassName.toLowerCase()))
-				{
-					 fromText = fromClassName + " " + fromInstanceName;
-				}
-				else fromText =                       fromInstanceName;
-			}
-			catch (Exception e)
-			{
-				fromText = pclEdge.getFromObject().toString();
-			}
-			
-			try
-			{
-				String toClassName    = ((PropertyChangeListenerNode) pclEdge.getToObject()).getType();
-				if    (toClassName == null)
-					   toClassName    = "";
-				if    (toClassName.contains("."))
-					   toClassName    = toClassName.substring(toClassName.lastIndexOf(".")+1);
-				String toInstanceName = ((PropertyChangeListenerNode) pclEdge.getToObject()).getName();
-				if    (toInstanceName == null)
-					   toInstanceName = "";
-				if   (!toInstanceName.toLowerCase().contains(toClassName.toLowerCase()))
-				{
-					 toText = toClassName + " " + toInstanceName;
-				}
-				else toText =                     toInstanceName;
-			}
-			catch (Exception e)
-			{
-				toText = pclEdge.getFromObject().toString();
-			}
-			
-			     sourceTF.setText(fromText);
-	   		     targetTF.setText(  toText);
-               propertyTF.setText(pclEdge.getProperty());
-            descriptionTF.setText(pclEdge.getDescription());
-			
-			if (pclEdge.getProperty().trim().isEmpty())
-			{
-               propertyTF.setText       (ALL_STATE_VARIABLES_NAME);
-               propertyTF.setToolTipText(ALL_STATE_VARIABLES_DESCRIPTION);
-            descriptionTF.setText       (ALL_STATE_VARIABLES_DESCRIPTION);
-			}
-			SpringUtilities.makeCompactGrid(containerPanel, 4, 2, 10, 10, 10, 10);
-			pack();
+    private void fillWidgets() {
+        if (pclEdge != null) {
+            sourceTF.setText(pclEdge.getFrom().toString());
+            targetTF.setText(pclEdge.getTo().toString());
+            propertyTF.setText(pclEdge.getProperty());
+            descTF.setText(pclEdge.getDescriptionString());
+        } else {
+            propertyTF.setText("listened-to property");
+            sourceTF.setText("unset...shouldn't see this");
+            targetTF.setText("unset...shouldn't see this");
+            descTF.setText("");
         }
-		else // why are we here?  presumably some code failure
-		{
-                 sourceTF.setText("unset...shouldn't see this");
-                 targetTF.setText("unset...shouldn't see this");
-                propertyTF.setText("listened-to property");
-            descriptionTF.setText("");
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+
+        JPanel cont = new JPanel(new SpringLayout());
+        cont.add(sourceLab);
+        cont.add(sourceTF);
+        cont.add(targetLab);
+        cont.add(targetTF);
+        cont.add(propertyLab);
+        cont.add(propertyTFPan);
+        cont.add(emptyLab);
+        cont.add(emptyTF);
+        cont.add(descLab);
+        cont.add(descTF);
+        SpringUtilities.makeCompactGrid(cont, 5, 2, 10, 10, 5, 5);
+        content.add(cont);
+
+        content.add(buttPan);
+        content.add(Box.createVerticalStrut(5));
+        setContentPane(content);
+    }
+
+    private void unloadWidgets() {
+        if (pclEdge != null) {
+            pclEdge.setProperty(propertyTF.getText().trim());
+            pclEdge.setDescriptionString(descTF.getText().trim());
         }
     }
 
-    private void unloadWidgets()
-	{
-        if (pclEdge != null)
-		{
-			String selectedName = propertyTF.getText().trim();
-			if (selectedName.equalsIgnoreCase(ALL_STATE_VARIABLES_NAME))
-			{
-				 pclEdge.setProperty ("");
-			}
-			else pclEdge.setProperty (selectedName);
-            
-            pclEdge.setDescription(descriptionTF.getText().trim());
-        }
-    }
+    class cancelButtonListener implements ActionListener {
 
-    class cancelButtonListener implements ActionListener
-	{
         @Override
-        public void actionPerformed(ActionEvent event)
-		{
+        public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
             dispose();
         }
@@ -282,24 +196,21 @@ public class PclEdgeInspectorDialog extends JDialog
     class applyButtonListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent event)
-		{
-            if (modified)
-			{
+        public void actionPerformed(ActionEvent event) {
+            if (modified) {
                 unloadWidgets();
             }
-            dispose(); // release screen resources for window
+            dispose();
         }
     }
 
     class enableApplyButtonListener implements CaretListener, ActionListener {
 
         @Override
-        public void caretUpdate(CaretEvent event)
-		{
+        public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            okButt.setEnabled(true);
+            getRootPane().setDefaultButton(okButt);
         }
 
         @Override
@@ -308,132 +219,84 @@ public class PclEdgeInspectorDialog extends JDialog
         }
     }
 
-	/**
-	 * Show parameterized generic types for user selection
-	 */
-    class ChooseStateVariableAction implements ActionListener
-	{
+    // TODO: Fix so that it will show parameterized generic types
+    class findPropertiesAction implements ActionListener {
+
         @Override
-        public void actionPerformed(ActionEvent e)
-		{
-            Object objectFromEdge = pclEdge.getFromObject();
-            String objectClassName = "";
-            if (objectFromEdge instanceof EventGraphNode)
-			{
-                objectClassName = ((ViskitElement) objectFromEdge).getType();
-            } 
-			else if (objectFromEdge instanceof PropertyChangeListenerNode)
-			{
-                objectClassName = ((ViskitElement) objectFromEdge).getType();
+        public void actionPerformed(ActionEvent e) {
+            Object o = pclEdge.getFrom();
+            String classname = null;
+            if (o instanceof EvGraphNode) {
+                classname = ((ViskitElement) o).getType();
+            } else if (o instanceof PropChangeListenerNode) {
+                classname = ((ViskitElement) o).getType();
             }
+
             try {
-                Class<?> objectBaseClass = ViskitStatics.ClassForName(objectClassName);
-                if (objectBaseClass == null)
-				{
-                    throw new ClassNotFoundException(objectClassName + " not found");
+                Class<?> c = VStatics.classForName(classname);
+                if (c == null) {
+                    throw new ClassNotFoundException(classname + " not found");
                 }
-				if (objectClassName.contains("."))
-				{
-					objectClassName = objectClassName.substring(objectClassName.lastIndexOf(".")+1);
-				}
-                Class<?> stopClass = ViskitStatics.ClassForName("simkit.BasicSimEntity");
-                BeanInfo beanInfo = Introspector.getBeanInfo(objectBaseClass, stopClass);
-                PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-                if (propertyDescriptors == null || propertyDescriptors.length <= 0)
-				{
-                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageToUser(
+
+                Class<?> stopClass = VStatics.classForName("simkit.BasicSimEntity");
+                BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
+                PropertyDescriptor[] pds = binf.getPropertyDescriptors();
+                if (pds == null || pds.length <= 0) {
+                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
-                            "No properties found in " + objectClassName,
+                            "No properties found in " + classname,
                             "Enter name manually.");
                     return;
                 }
-                Vector<String>        nameVector = new Vector<>();
-                Vector<String>        typeVector = new Vector<>();
-                Vector<String> descriptionVector = new Vector<>();
-                for (PropertyDescriptor propertyDescriptor : propertyDescriptors)
-				{
-                    if (propertyDescriptor.getWriteMethod() != null)
-					{
-                        continue; // want getters but not setters, go to next property
+                Vector<String> nams = new Vector<>();
+                Vector<String> typs = new Vector<>();
+                for (PropertyDescriptor pd : pds) {
+                    if (pd.getWriteMethod() != null) {
+                        // want getters but no setter
+                        continue;
                     }
-                    // Warning: the introspector will return property names in lower case, this error is then fixed
-					String correctedCaseName = propertyDescriptor.getName();
-					String       description = propertyDescriptor.getShortDescription();
-					for (AssemblyEdge connection : ((EventGraphNode) objectFromEdge).getConnections())
-					{
-						if (connection instanceof PropertyChangeListenerEdge)
-						{
-							if (correctedCaseName.equalsIgnoreCase(((PropertyChangeListenerEdge)connection).getProperty()))
-							{
-								correctedCaseName = ((PropertyChangeListenerEdge)connection).getProperty();
-								description       = ((PropertyChangeListenerEdge)connection).getDescription();
-								break;
-							}
-						}
-						else // unexpected problem
-						{
-							LOG.error ("Found connection of unexpected class: " + connection.toString());
-						}
-					}
-                           nameVector.add(correctedCaseName);
-                    descriptionVector.add(description);
 
-                    if  (propertyDescriptor.getPropertyType() != null)
-                         typeVector.add(propertyDescriptor.getPropertyType().getName());
-					else typeVector.add("");
+                    // NOTE: The introspector will return property names in lower case
+                    nams.add(pd.getName());
+
+                    if (pd.getPropertyType() != null)
+                        typs.add(pd.getPropertyType().getName());
+                    else
+                        typs.add("");
                 }
-				
-				// Build display
-                String[][] nameTypeDescriptionArray = new String[nameVector.size()+1][3];
-				nameTypeDescriptionArray[0][0] = ALL_STATE_VARIABLES_NAME;
-				nameTypeDescriptionArray[0][1] = ALL_STATE_VARIABLES_TYPE;
-				nameTypeDescriptionArray[0][2] = ALL_STATE_VARIABLES_DESCRIPTION;
-				
-                for (int i = 0; i < nameVector.size(); i++)
-				{
-                    nameTypeDescriptionArray[i+1][0] =        nameVector.get(i);
-                    nameTypeDescriptionArray[i+1][1] =    typeVector.get(i);
-                    nameTypeDescriptionArray[i+1][2] = descriptionVector.get(i);
+                String[][] nms = new String[nams.size()][2];
+                for (int i = 0; i < nams.size(); i++) {
+                    nms[i][0] = nams.get(i);
+                    nms[i][1] = typs.get(i);
                 }
-                int whichChoice = StateVariableListDialog.showDialog(PclEdgeInspectorDialog.this,
-                      "State Variables for event graph " + objectClassName,
-                      nameTypeDescriptionArray);
-                if (whichChoice != StateVariableListDialog.NO_SELECTION)
-				{
+                int which = PropertyListDialog.showDialog(PclEdgeInspectorDialog.this,
+                        classname + " Properties",
+                        nms);
+                if (which != -1) {
                     modified = true;
-                       propertyTF.setText(nameTypeDescriptionArray[whichChoice][0]);
-                    descriptionTF.setText(nameTypeDescriptionArray[whichChoice][2]);
+                    propertyTF.setText(nms[which][0]);
                 }
-            } 
-			catch (ClassNotFoundException | IntrospectionException | HeadlessException e1)
-			{
-                LOG.error ("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
-                LOG.error (System.getProperty("java.class.path"));
+            } catch (ClassNotFoundException | IntrospectionException | HeadlessException e1) {
+                System.err.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
+                System.err.println(System.getProperty("java.class.path"));
             }
         }
     }
 
-    class myCloseListener extends WindowAdapter
-	{
+    class myCloseListener extends WindowAdapter {
+
         @Override
-        public void windowClosing(WindowEvent e)
-		{
-            if (modified)
-			{
-                int returnValue = JOptionPane.showConfirmDialog(PclEdgeInspectorDialog.this, "Apply changes?",
+        public void windowClosing(WindowEvent e) {
+            if (modified) {
+                int ret = JOptionPane.showConfirmDialog(PclEdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (returnValue == JOptionPane.YES_OPTION)
-				{
-                    okButton.doClick();
-                } 
-				else
-				{
-                    cancelButton.doClick();
+                if (ret == JOptionPane.YES_OPTION) {
+                    okButt.doClick();
+                } else {
+                    canButt.doClick();
                 }
-            } 
-			else
-			{
-                cancelButton.doClick();
+            } else {
+                canButt.doClick();
             }
         }
     }

@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
-import viskit.util.FileBasedAssemblyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
 import viskit.mvc.mvcRecentFileListener;
@@ -20,40 +20,32 @@ import viskit.mvc.mvcRecentFileListener;
  * @since 9:27:13 AM
  * @version $Id$
  */
-public interface AssemblyController 
-{
+public interface AssemblyController {
+
     /** Initialize this controller upon startup */
     void begin();
 
     /** User has clicked a menu item */
     void newEventGraphNode();
 
-    void newPropertyChangeListenerNode();
+    void newPropChangeListenerNode();
 
     /** User has established some parameter, model can create object
      * @param name the name of the node
      * @param p the (x, y) point it will appear
      */
     void newEventGraphNode(String name, Point p);
-	
-    void newEventGraphNode(String name, Point p, String description);
 
-    void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
+    void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
 
-    void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p, String description);
+    void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
 
-    void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
-
-    void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p, String description);
-
-    void newPropertyChangeListenerNode(String name, Point p);
-
-    void newPropertyChangeListenerNode(String name, Point p, String description);
+    void newPropChangeListenerNode(String name, Point p);
 
     /**
      * Edit the properties (metadata) of the Assembly
      */
-    void editGraphMetadata();
+    void editGraphMetaData();
 
     /**
      * Create a new blank assembly graph model
@@ -68,17 +60,17 @@ public interface AssemblyController
     /** Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */
-    void mailZippedProjectFiles();
+    void zipAndMailProject();
 
     void showXML();
 
     /** A component, e.g., vAMod, wants to say something.
      *
-     * @param dialogType the type of dialog panel, i.e. WARN, ERROR, INFO, QUESTION, etc.
+     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
      * @param title the title of the message in the dialog frame
-     * @param message the message to transmit
+     * @param msg the message to transmit
      */
-    void messageToUser(int dialogType, String title, String message);    // typ is one of JOptionPane types
+    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
 
     /** Handles UI selection of nodes and edges
      *
@@ -95,21 +87,21 @@ public interface AssemblyController
 
     void newSimEvListArc(Object[] nodes);
 
-    void newPropertyChangeListArc(Object[] nodes);
+    void newPropChangeListArc(Object[] nodes);
 
-    void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode);
+    void pcListenerEdit(PropChangeListenerNode pclNode);
 
     /** Handles editing of Event Graph nodes
      *
-     * @param eventNode the node to edit
+     * @param evNode the node to edit
      */
-    void eventGraphEdit(EventGraphNode eventNode);
+    void evGraphEdit(EvGraphNode evNode);
 
     /** Edits the PropertyChangeListner edge
      *
      * @param pclEdge the PCL edite to edit
      */
-    void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge);
+    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *
@@ -121,7 +113,7 @@ public interface AssemblyController
      *
      * @param seEdge the SimEvent edge to edit
      */
-    void simEventListenerEdgeEdit(SimEventListenerEdge seEdge);
+    void simEvListenerEdgeEdit(SimEvListenerEdge seEdge);
 
     /** CMD-Z or CNTL-Z */
     void undo();
@@ -148,7 +140,7 @@ public interface AssemblyController
     /**
      * Opens a Viskit Project Assembly File
      */
-    void openAssembly();
+    void open();
 
     /**
      * Performs project clean up tasks before closing out the project
@@ -160,7 +152,7 @@ public interface AssemblyController
      *
      * @param file the project root file for an existing Viskit project
      */
-    void openProjectDirectory(File file);
+    void openProject(File file);
 
     void openRecentAssembly(File fullPath);
 
@@ -170,7 +162,7 @@ public interface AssemblyController
     void quit();
 
     /**
-     * Save the current Assembly file as is
+     * Save the current Assy file as is
      */
     void save();
 
@@ -185,7 +177,7 @@ public interface AssemblyController
      */
     void close();
 
-    /** Closes all open Assembly files and their corresponding EG files */
+    /** Closes all open Assy files and their corresponding EG files */
     void closeAll();
 
     /**
@@ -210,16 +202,16 @@ public interface AssemblyController
     void postQuit();
 
     /**
-     * @param lis the AssemblyChangeListener to add as a listener
+     * @param lis the AssyChangeListener to add as a listener
      */
-    void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
+    void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
     /**
-     * @param lis the AssemblyChangeListener to remove as a listener
+     * @param lis the AssyChangeListener to remove as a listener
      */
-    void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
+    void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
-    OpenAssembly.AssemblyChangeListener getAssemblyChangeListener();
+    OpenAssembly.AssyChangeListener getAssemblyChangeListener();
 
     /** @return a DirectoryChangeListener */
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
@@ -232,35 +224,31 @@ public interface AssemblyController
 
     /** Compile the Assembly and prepare the Simulation Runner for simulation
      * run.  This is called from the AssemblyView via reflection when the
-     * Assembly Initialization button is selected from the Assembly Editor panel.
+     * Initialize assembly run button is selected from the Assembly Editor panel.
      */
-    void compileAssemblyAndPrepareSimulationRunner();
+    void compileAssemblyAndPrepSimRunner();
 
     /** Generating java source and compilation are taken care of here */
-    void initializeAssemblyRun();
-	
-    /** Whether active Assembly is ready for Simulation Run 
-	 * @return Whether initializeAssemblyRun was successful */
-	public boolean isAssemblyReady ();
+    void initAssemblyRun();
 
     void export2grid();
 
-    /** Screen capture an image snapshot of the Assembly Editor frame */
-    void windowImageCapture();
+    /** Screen capture a snapshot of the Assembly View Frame */
+    void captureWindow();
 
-    void      addRecentAssemblyFileSetListener(mvcRecentFileListener listener);
+    void addRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    void   removeRecentAssemblyFileSetListener(mvcRecentFileListener listener);
+    void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    Set<File> getRecentAssemblyFileSet();
+    Set<File> getRecentAssyFileSet();
 
-    void    clearRecentAssemblyFileList();
+    void clearRecentAssyFileList();
 
-    void      addRecentProjectListener(mvcRecentFileListener listener);
+    void addRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    void   removeRecentProjectListener(mvcRecentFileListener listener);
+    void removeRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    Set<File> getRecentProjectFileSet();
+    Set<File> getRecentProjFileSet();
 
-    void    clearRecentProjectFileSet();
+    void clearRecentProjFileSet();
 }

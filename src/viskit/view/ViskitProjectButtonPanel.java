@@ -1,5 +1,5 @@
 /*
- Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+ Copyright (c) 1995-2009 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,14 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
-import edu.nps.util.LogUtilities;
 import java.awt.Dialog;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
+import viskit.VGlobals;
+import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
@@ -53,9 +51,7 @@ import viskit.view.dialog.ViskitProjectGenerationDialog3;
  * @since Aug 2008
  * @version $Id$
  */
-public class ViskitProjectButtonPanel extends javax.swing.JPanel 
-{
-    static final Logger LOG = LogUtilities.getLogger(ViskitProjectButtonPanel.class);
+public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 
     private static JDialog dialog;
 
@@ -78,8 +74,6 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
     /** Creates new form ViskitProjectButtonPanel */
     public ViskitProjectButtonPanel() {
         initComponents();
-		
-		openButton.setVisible(false); // TODO fix
     }
 
     /** This method is called from within the constructor to
@@ -89,13 +83,11 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         defaultButt = new javax.swing.JButton();
-        openButton = new javax.swing.JButton();
-        existingButton = new javax.swing.JButton();
-        createButton = new javax.swing.JButton();
-        exitButton = new javax.swing.JButton();
+        existingButt = new javax.swing.JButton();
+        createButt = new javax.swing.JButton();
+        exitButt = new javax.swing.JButton();
 
         defaultButt.setText("Open default project");
         defaultButt.addActionListener(new java.awt.event.ActionListener() {
@@ -104,63 +96,50 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
             }
         });
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Viskit Startup", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
-        setName("viskitProjectButtonPanel"); // NOI18N
-        setLayout(new java.awt.GridBagLayout());
-
-        openButton.setText("Open");
-        openButton.addActionListener(new java.awt.event.ActionListener() {
+        existingButt.setText("Open existing project");
+        existingButt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openButtonActionPerformed(evt);
+                existingButtActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
-        add(openButton, gridBagConstraints);
 
-        existingButton.setText("Open existing project");
-        existingButton.addActionListener(new java.awt.event.ActionListener() {
+        createButt.setText("Create new project");
+        createButt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                existingButtonActionPerformed(evt);
+                createButtActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
-        add(existingButton, gridBagConstraints);
 
-        createButton.setText("Create new project");
-        createButton.addActionListener(new java.awt.event.ActionListener() {
+        exitButt.setText("Exit Viskit");
+        exitButt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createButtonActionPerformed(evt);
+                exitButtActionPerformed(evt);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
-        add(createButton, gridBagConstraints);
 
-        exitButton.setText("Exit");
-        exitButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exitButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(20, 20, 20, 20);
-        add(exitButton, gridBagConstraints);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(existingButt)
+                    .addComponent(createButt)
+                    .addComponent(exitButt))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(existingButt)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(createButt)
+                .addGap(18, 18, 18)
+                .addComponent(exitButt)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
     }// </editor-fold>//GEN-END:initComponents
 
     static boolean firstTime = true;
@@ -171,44 +150,31 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
      *
      * @param evt the open an existing project event action
      */
-private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtonActionPerformed
-    File projectDirectory;
-    if (!firstTime)
-	{
-        mvcController assemblyController = ViskitGlobals.instance().getAssemblyController();
-        if (assemblyController != null)
-		{
-            AssemblyEditView assemblyView = (AssemblyEditView) assemblyController.getView();
+private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
+    File file;
+    if (!firstTime) {
+        mvcController vac = VGlobals.instance().getAssemblyController();
+        if (vac != null) {
 
-            if (assemblyView != null) 
-			{
-                assemblyView.openProject();
+            AssemblyView vaw = (AssemblyView) vac.getView();
+
+            if (vaw != null) {
+                vaw.openProject();
             }
         }
-    }
-	else // firstTime during this execution
-	{
-        projectDirectory = ViskitProject.openProjectDirectory(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
-		if ((projectDirectory.exists() && projectDirectory.isDirectory()))  // extra safety check
-		{
-  			ViskitStatics.setViskitProjectDirectory(projectDirectory);
-// TODO
-//            AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-//            assemblyController.openProject(projectDirectory);
-			
-			firstTime = !firstTime;
-		}
-		else
-		{
-			LOG.error("ViskitProjectButtonPanel illegal directory selected: " + projectDirectory.getAbsolutePath());
-		}
-        // TODO NOTE: We have no way of setting the first opened project here as the
+    } else {
+        file = ViskitProject.openProjectDir(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        VStatics.setViskitProjectFile(file);
+        firstTime = !firstTime;
+
+        // NOTE: We have no way of setting the first opened project here as the
         // controller hasn't been created yet to store that info when Viskit
         // first starts up
     }
+
     defaultButtActionPerformed(null);
 
-}//GEN-LAST:event_existingButtonActionPerformed
+}//GEN-LAST:event_existingButtActionPerformed
 
 private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
     // TODO setup differently, but for now...
@@ -216,32 +182,27 @@ private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     dialog = null;
 }//GEN-LAST:event_defaultButtActionPerformed
 
-private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-    File projectDirectory;
+private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
+    File projF;
 
     // What we wish to do here is force the user to create a new project space
     // before letting them move on, or, open and existing project, or the only
     // other option is to exit
     do {
         ViskitProjectGenerationDialog3.showDialog();
-        if (ViskitProjectGenerationDialog3.cancelled)
-		{
+        if (ViskitProjectGenerationDialog3.cancelled) {
             return;
         }
-        String projectPath = ViskitProjectGenerationDialog3.projectPath;
-        projectDirectory = new File(projectPath);
-		
-        if (projectDirectory.exists() && (projectDirectory.isFile() || projectDirectory.list().length > 0))
-		{
+        String projPath = ViskitProjectGenerationDialog3.projectPath;
+        projF = new File(projPath);
+        if (projF.exists() && (projF.isFile() || projF.list().length > 0)) {
             JOptionPane.showMessageDialog(this, "Chosen project name exists.");
-        } 
-		else
-		{
+        } else {
             break; // out of do
         }
     } while (true);
 
-    ViskitStatics.setViskitProjectDirectory(projectDirectory);
+    VStatics.setViskitProjectFile(projF);
 
     // NOTE: We have no way of setting the first opened project here as the
     // controller hasn't been created yet to store that info when Viskit first
@@ -250,36 +211,25 @@ private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
 
-    // The work directory will have already been created by default as ViskitGlobals.init
+    // The work directory will have already been created by default as VGlobals.init
     // was already called which creates the directory ${user.home}/.viskit
     // during constructor init
-}//GEN-LAST:event_createButtonActionPerformed
+}//GEN-LAST:event_createButtActionPerformed
 
-private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
+private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtActionPerformed
     defaultButtActionPerformed(null);
 
     // I don't like the idea of a SysExit call right here, but the way each
     // frame component needs to develop while starting Viskit; each has to
-    // finish before the ViskitGlobals.instance().systemExit(0) call will work
+    // finish before the VGlobals.instance().sysExit(0) call will work
     // properly, so, reluctantly...
     System.exit(0);
-}//GEN-LAST:event_exitButtonActionPerformed
-
-    private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-//        ViskitApplicationFrame viskitApplicationFrame = new ViskitApplicationFrame(""); // no file
-		
-		// TODO fix
-		
-//		SplashScreenFrame2 viskitApplication = new SplashScreenFrame2();
-//		String[] varArg = { };
-//		viskitApplication.main(varArg);
-    }//GEN-LAST:event_openButtonActionPerformed
+}//GEN-LAST:event_exitButtActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton createButton;
+    private javax.swing.JButton createButt;
     private javax.swing.JButton defaultButt;
-    private javax.swing.JButton existingButton;
-    private javax.swing.JButton exitButton;
-    private javax.swing.JButton openButton;
+    private javax.swing.JButton existingButt;
+    private javax.swing.JButton exitButt;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity extend="SimEntityBase" name="TransferLineComponent" package="examples" description="" version="0.0.2" xsi:noNamespaceSchemaLocation="http://eos.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter description="" name="totalNumberServers" type="int[]"/>
-    <Parameter description="" name="serviceTime" type="simkit.random.RandomVariate[]"/>
-    <StateVariable description="" name="numberAvailableServers" type="int[totalNumberServers.length]"/>
-    <StateVariable description="" name="numberInQueue" type="int[totalNumberServers.length]"/>
-    <Event name="Run" description="">
+<SimEntity extend="SimEntityBase" name="TransferLineComponent" package="examples" version="0.0.2" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="totalNumberServers" type="int[]"/>
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate[]"/>
+    <StateVariable name="numberAvailableServers" type="int[totalNumberServers.length]"/>
+    <StateVariable name="numberInQueue" type="int[totalNumberServers.length]"/>
+    <Event name="Run">
         <LocalVariable name="j" type="int" value="0">
             <Comment/>
         </LocalVariable>
@@ -25,8 +25,8 @@
         </Schedule>
         <Coordinate x="0" y="0"/>
     </Event>
-    <Event name="InitializeWorkcenter" description="">
-        <Argument description="" name="i" type="int"/>
+    <Event name="InitializeWorkcenter">
+        <Argument name="i" type="int"/>
         <LocalVariable name="_idxvar_26" type="int" value="i">
             <Comment>used internally</Comment>
         </LocalVariable>
@@ -44,8 +44,8 @@
         </Schedule>
         <Coordinate x="120" y="0"/>
     </Event>
-    <Event name="Arrival" description="">
-        <Argument description="" name="i" type="int"/>
+    <Event name="Arrival">
+        <Argument name="i" type="int"/>
         <LocalVariable name="_idxvar_47" type="int" value="i">
             <Comment>used internally</Comment>
         </LocalVariable>
@@ -57,8 +57,8 @@
         </Schedule>
         <Coordinate x="0" y="180"/>
     </Event>
-    <Event name="StartService" description="">
-        <Argument description="" name="i" type="int"/>
+    <Event name="StartService">
+        <Argument name="i" type="int"/>
         <LocalVariable name="_idxvar_48" type="int" value="i">
             <Comment>used internally</Comment>
         </LocalVariable>
@@ -76,8 +76,8 @@
         </Schedule>
         <Coordinate x="160" y="100"/>
     </Event>
-    <Event name="EndService" description="">
-        <Argument description="" name="i" type="int"/>
+    <Event name="EndService">
+        <Argument name="i" type="int"/>
         <LocalVariable name="_idxvar_50" type="int" value="i">
             <Comment>used internally</Comment>
         </LocalVariable>

@@ -2,7 +2,6 @@
 <project basedir=".." name="Viskit-IDE">
     <property file="nbproject/private/private.properties"/>
     <import file="../build.xml"/>
-
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#compilesingle) -->
     <target depends="init" name="compile-selected-files-in-src">
@@ -12,7 +11,6 @@
             <classpath refid="compile.classpath"/>
         </javac>
     </target>
-
     <!-- Can use this to perfrom manual Viskit XML -> Java translations -->
     <!-- EG translator is viskit.xsd.translator.eventgraph.SimkitXML2Java -->
     <!-- Assy translator is viskit.xsd.translator.assembly.SimkitAssemblyXML2Java -->
@@ -25,7 +23,6 @@
             <arg line="${translation.args}"/>
         </java>
     </target>
-
     <!-- Can use this to debug manual Viskit XML -> Java translations -->
     <!-- EG translator is viskit.xsd.translator.eventgraph.SimkitXML2Java -->
     <!-- Assy translator is viskit.xsd.translator.assembly.SimkitAssemblyXML2Java -->
@@ -36,13 +33,10 @@
         </nbjpdastart>
         <java classname="${debug.class}" fork="true">
             <classpath refid="runtime.classpath"/>
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Djava.compiler=none"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <arg line="${translation.args}"/>
         </java>
     </target>
-
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
     <target depends="compile.test" name="run-selected-file-in-test">

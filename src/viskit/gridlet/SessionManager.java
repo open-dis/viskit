@@ -12,14 +12,14 @@
  *
  * The cookie returned by the login call is a Unique Session ID (USID)
  * that must be used by subsequent calls during that session. An explicit
- * logout will delete a session, however a complete LOG of the experiment
- * is still stored in the user spool, and as well a LOG of login activity.
+ * logout will delete a session, however a complete log of the experiment
+ * is still stored in the user spool, and as well a log of login activity.
  * (TBD later retrieval post session).
  * Sessions may timeout due to inactivity (TBD).
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,12 +55,12 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @version $Id$
  * @author Rick Goldberg
  */
-public class SessionManager /* compliments DoeSessionDriver*/ 
-{
-    static final Logger LOG = LogUtilities.getLogger(SessionManager.class);
+public class SessionManager /* compliments DoeSessionDriver*/ {
 
     private Hashtable<String, String> sessions;
-    private JAXBContext jaxbContext;
+    private JAXBContext jaxbCtx;
+
+    Logger LOG = LogUtils.getLogger(SessionManager.class);
 
     private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";
@@ -71,10 +71,9 @@ public class SessionManager /* compliments DoeSessionDriver*/
     public SessionManager() { // public?
         sessions = new Hashtable<>();
         try {
-            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error(e);
-            e.printStackTrace();
         }
         LOG.info("SessionManager initialized");
     }
@@ -83,7 +82,7 @@ public class SessionManager /* compliments DoeSessionDriver*/
 
         try {
             FileInputStream is = new FileInputStream(PASSWD);
-            Unmarshaller u = jaxbContext.createUnmarshaller();
+            Unmarshaller u = jaxbCtx.createUnmarshaller();
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
             List<User> users = passwd.getUser();
             String passcrypt = null;
@@ -125,9 +124,9 @@ public class SessionManager /* compliments DoeSessionDriver*/
             }
         } catch (FileNotFoundException | JAXBException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException e) {
             LOG.error(e);
-            e.printStackTrace();
             return LOGIN_ERROR;
         }
+
         LOG.info("Unknown user "+username);
         return "UNKNOWN-USER";
     }
@@ -160,7 +159,7 @@ public class SessionManager /* compliments DoeSessionDriver*/
 
             try {
                 String passcrypt = null;
-                Unmarshaller u = jaxbContext.createUnmarshaller();
+                Unmarshaller u = jaxbCtx.createUnmarshaller();
                 ObjectFactory of = new ObjectFactory();
                 //JAXB feature(?)
                 //createPasswordFile returns an Object which
@@ -210,7 +209,7 @@ public class SessionManager /* compliments DoeSessionDriver*/
 
                     // write out to XML user database
                     try (FileOutputStream fos = new FileOutputStream(pwd)) {
-                        jaxbContext.createMarshaller().marshal(passwd,fos);
+                        jaxbCtx.createMarshaller().marshal(passwd,fos);
                         fos.flush();
                     }
                     LOG.info("New user created for "+newUser);
@@ -221,7 +220,6 @@ public class SessionManager /* compliments DoeSessionDriver*/
                 }
             } catch (JAXBException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
                 LOG.error(e);
-				e.printStackTrace();
                 return Boolean.FALSE;
             }
         }
@@ -233,7 +231,7 @@ public class SessionManager /* compliments DoeSessionDriver*/
         File pwd = new File(PASSWD);
         if ( getUser(usid).equals(username) || isAdmin(usid) ) {
             try {
-                Unmarshaller u = jaxbContext.createUnmarshaller();
+                Unmarshaller u = jaxbCtx.createUnmarshaller();
                 PasswordFile passwd;
                 try (FileInputStream is = new FileInputStream(pwd)) {
                     passwd = (PasswordFile) u.unmarshal(is);
@@ -260,12 +258,11 @@ public class SessionManager /* compliments DoeSessionDriver*/
                     }
                 }
                 try (FileOutputStream fos = new FileOutputStream(pwd)) {
-                    jaxbContext.createMarshaller().marshal(passwd,fos);
+                    jaxbCtx.createMarshaller().marshal(passwd,fos);
                     fos.flush();
                 }
             } catch (JAXBException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
                 LOG.error(e);
-				e.printStackTrace();
                 return Boolean.FALSE;
             }
             LOG.info("Password changed for "+username);
@@ -307,7 +304,7 @@ public class SessionManager /* compliments DoeSessionDriver*/
     private String getPasscrypt(String username) {
         try {
             String passcrypt = null;
-            Unmarshaller u = jaxbContext.createUnmarshaller();
+            Unmarshaller u = jaxbCtx.createUnmarshaller();
             File pwd = new File(PASSWD);
             FileInputStream is = new FileInputStream(pwd);
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
@@ -321,10 +318,8 @@ public class SessionManager /* compliments DoeSessionDriver*/
             }
             return passcrypt;
         } catch (JAXBException e) {
-            e.printStackTrace();
             return e.toString();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
             return e.toString();
         }
     }

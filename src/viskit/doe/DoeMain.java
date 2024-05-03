@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2016 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,10 +33,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
-import edu.nps.util.LogUtilities;
 import javax.swing.*;
-import org.apache.logging.log4j.Logger;
-import viskit.ViskitStatics;
+import viskit.VStatics;
 
 /**
  * MOVES Institute
@@ -47,9 +45,7 @@ import viskit.ViskitStatics;
  * @since 10:36:33 AM
  * @version $Id$
  */
-public class DoeMain implements DoeEvents 
-{
-    static final Logger LOG = LogUtilities.getLogger(DoeMain.class);
+public class DoeMain implements DoeEvents {
 
     private DoeController controller;
     private DoeMainFrame mainFrame;
@@ -114,12 +110,8 @@ public class DoeMain implements DoeEvents
         mainFrame.setBounds(100, 100, 800, 600);
 
         // Make frame visible in GUI thread to be strictly legal
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            mainFrame.setVisible(true);
         });
     }
 
@@ -127,7 +119,7 @@ public class DoeMain implements DoeEvents
     public static void setLookAndFeel() {
         String laf;
 
-        String os = ViskitStatics.OPERATING_SYSTEM.toLowerCase();
+        String os = VStatics.OPERATING_SYSTEM.toLowerCase();
         if (os.contains("windows")) {
             laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
         } else {
@@ -137,7 +129,7 @@ public class DoeMain implements DoeEvents
         try {
             UIManager.setLookAndFeel(laf);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            LOG.error("can't change LookAndFeel");
+            System.err.println("can't change l&f");
         }
     }
 

@@ -14,11 +14,11 @@ import java.util.List;
  */
 public abstract class Edge extends ViskitElement {
 
-    public EventNode toEventNode;
-    public EventNode fromEventNode;
-    public List<ViskitElement> parametersList;
-    public String condition;
-    public String conditionDescription;
+    public EventNode to;
+    public EventNode from;
+    public List<ViskitElement> parameters;
+    public String conditional;
+    public String conditionalDescription;
     public String delay;
 
     abstract Object copyShallow();

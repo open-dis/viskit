@@ -5,7 +5,7 @@
  */
 package viskit.reports;
 
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
@@ -21,7 +21,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import simkit.stat.SampleStatistics;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -34,7 +34,7 @@ import viskit.ViskitProject;
  * (replicationStatistics). After construction this object is passed to the BasicAssembly.java
  * object. The BasicAssembly strips the keyValues from the passed object and provides those
  * values to this class.  Using an underscore '_' as a deliberate separator this class extracts
- * the name of each SimEntity for each PropertyChangeListener.  These names are used to index output
+ * the name of each SimEntity for each PropChangeListener.  These names are used to index output
  * from the simulation.
  *
  * TODO: Remove the naming convention requirement and index the statistics object in either the
@@ -43,9 +43,9 @@ import viskit.ViskitProject;
  * @author Patrick Sullivan
  * @version $Id$
  */
-public class ReportStatisticsConfig 
-{
-    static final Logger LOG = LogUtilities.getLogger(ReportStatisticsConfig.class);
+public class ReportStatisticsConfig {
+
+    static final Logger LOG = LogUtils.getLogger(ReportStatisticsConfig.class);
 
     /**
      * The ordered list of Entities in the simulation that have property change
@@ -67,7 +67,7 @@ public class ReportStatisticsConfig
      * The DOM object this class uses to create an XML record of the simulation
      * statistics
      */
-    private ReportStatisticsDOM reportStatistics;
+    private ReportStatisticsDOM reportStats;
 
     /**
      * Report author (system username)
@@ -87,11 +87,11 @@ public class ReportStatisticsConfig
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setInfinity("inf");  // xml chokes on default
         form = new DecimalFormat("0.000", dfs);
-        reportStatistics = new ReportStatisticsDOM();
+        reportStats = new ReportStatisticsDOM();
     }
 
     public void reset() {
-        reportStatistics = new ReportStatisticsDOM();
+        reportStats = new ReportStatisticsDOM();
     }
 
     /**
@@ -123,7 +123,7 @@ public class ReportStatisticsConfig
                 idx++;
             }
         }
-        reportStatistics.initializeEntities(entityIndex, propertyIndex);
+        reportStats.initializeEntities(entityIndex, propertyIndex);
     }
 
     /**
@@ -148,29 +148,29 @@ public class ReportStatisticsConfig
     /**
      * Creates a replication record for each SampleStatistics object after each
      * run.
-     * @param replicaNumber replication number
-     * @param replicationStatistics  replication statistics
+     * @param repNumber replication number
+     * @param repStats  replication statistics
      */
-    public void processReplicationReport(int replicaNumber, PropertyChangeListener[] replicationStatistics) {
-        LogUtilities.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+    public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
+        LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
-        Element[] replicationUpdate = new Element[replicationStatistics.length];
+        Element[] replicationUpdate = new Element[repStats.length];
 
-        for (int i = 0; i < replicationStatistics.length; i++) {
+        for (int i = 0; i < repStats.length; i++) {
 
             Element replication = new Element("Replication");
 
-            replication.setAttribute("number", Integer.toString(replicaNumber));
-            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) replicationStatistics[i]).getCount()));
-            replication.setAttribute("minObs", form.format(((SampleStatistics) replicationStatistics[i]).getMinObs()));
-            replication.setAttribute("maxObs", form.format(((SampleStatistics) replicationStatistics[i]).getMaxObs()));
-            replication.setAttribute("mean", form.format(((SampleStatistics) replicationStatistics[i]).getMean()));
-            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) replicationStatistics[i]).getStandardDeviation()));
-            replication.setAttribute("variance", form.format(((SampleStatistics) replicationStatistics[i]).getVariance()));
+            replication.setAttribute("number", Integer.toString(repNumber));
+            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) repStats[i]).getCount()));
+            replication.setAttribute("minObs", form.format(((SampleStatistics) repStats[i]).getMinObs()));
+            replication.setAttribute("maxObs", form.format(((SampleStatistics) repStats[i]).getMaxObs()));
+            replication.setAttribute("mean", form.format(((SampleStatistics) repStats[i]).getMean()));
+            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
+            replication.setAttribute("variance", form.format(((SampleStatistics) repStats[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }
-        reportStatistics.storeReplicationData(replicationUpdate);
+        reportStats.storeReplicationData(replicationUpdate);
     }
 
     /**
@@ -198,14 +198,14 @@ public class ReportStatisticsConfig
 
             summaryUpdate[i] = summary;
         }
-        reportStatistics.storeSummaryData(summaryUpdate);
+        reportStats.storeSummaryData(summaryUpdate);
     }
 
     /**
-     * @return a statistics report in jdom.Document format; Naw...filename
+     * @return a stats report in jdom.Document format; Naw...filename
      */
     public String getReport() {
-        Document report = reportStatistics.getReport();
+        Document report = reportStats.getReport();
         return saveData(report);
     }
 
@@ -226,19 +226,19 @@ public class ReportStatisticsConfig
 
         FileWriter writer = null;
         try {
-            Format jdomFormat = Format.getPrettyFormat();
-            jdomFormat.setOmitDeclaration(false);
-            XMLOutputter xmlOutputter = new XMLOutputter(jdomFormat);
+            Format fmt = Format.getPrettyFormat();
+            fmt.setOmitDeclaration(false);
+            XMLOutputter outputter = new XMLOutputter(fmt);
 
             // Create a unique file name for each DTG/Location Pair
-            ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
-            File anStatDir = vkp.getAnalystReportStatisticsDirectory();
+            ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+            File anStatDir = vkp.getAnalystReportStatisticsDir();
 
             String outputFile = (author + assemblyName + "_" + output + ".xml");
             File f = new File(anStatDir, outputFile);
             writer = new FileWriter(f);
 
-            xmlOutputter.output(report, writer);
+            outputter.output(report, writer);
 
             return f.getAbsolutePath();
 

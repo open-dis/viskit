@@ -1,29 +1,41 @@
 package viskit.control;
 
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtilities;
+import edu.nps.util.LogUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.math.BigInteger;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import java.util.*;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.apache.commons.configuration.XMLConfiguration;
+
+import org.apache.commons.configuration2.XMLConfiguration;
+
 import org.apache.logging.log4j.Logger;
-import viskit.util.FileBasedAssemblyNode;
+
+import viskit.util.FileBasedAssyNode;
 import viskit.util.FindClassesForInterface;
-import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
-import viskit.ViskitStatics;
+
+import viskit.VGlobals;
+
+import viskit.ViskitConfig;
+
+import viskit.VStatics;
+
 import viskit.xsd.bindings.eventgraph.SimEntity;
-import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 /** A custom class manager to support finding EGs and PCLs in *.class form vice
- * XML.  Used to populate the LEGOs tree on the Assembly Editor.
+ * XML.  Used to populate the LEGOs tree on the Assy Editor.
  *
  * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -36,14 +48,14 @@ import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
  * @since 12:53:36 PM
  * @version $Id$
  */
-public class FileBasedClassManager 
-{
-    static final Logger LOG = LogUtilities.getLogger(FileBasedClassManager.class);
+public class FileBasedClassManager {
+
+    static final Logger LOG = LogUtils.getLogger(FileBasedClassManager.class);
 
     // Singleton:
     protected static FileBasedClassManager me;
     private static XMLConfiguration projectConfig;
-    private Map<String, FileBasedAssemblyNode> fileMap;
+    private Map<String, FileBasedAssyNode> fileMap;
     private Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
@@ -52,13 +64,13 @@ public class FileBasedClassManager
         }
 
         // This requires reinitializing everytime this FBM is called
-        projectConfig = ViskitConfiguration.instance().getProjectXMLConfiguration();
+        projectConfig = ViskitConfig.instance().getProjectXMLConfig();
         return me;
     }
 
     private FileBasedClassManager() {
         classMap = new HashMap<>();
-        fileMap = Collections.synchronizedMap(new HashMap<String, FileBasedAssemblyNode>());
+        fileMap = Collections.synchronizedMap(new HashMap<>());
     }
 
     public void addFileClass(Class<?> c) {
@@ -77,30 +89,30 @@ public class FileBasedClassManager
         return classMap.get(s);
     }
 
-    public void unloadFile(FileBasedAssemblyNode fban) {
+    public void unloadFile(FileBasedAssyNode fban) {
         removeFileClass(fban.loadedClass);
         fileMap.remove(fban.loadedClass);
     }
-    FileBasedAssemblyNode fban = null;
+    FileBasedAssyNode fban = null;
     Class<?> fclass = null;
     JAXBContext jaxbCtx = null;
     Unmarshaller um = null;
-    PackageAndFile paf = null;
+    PkgAndFile paf = null;
     File fXml = null;
     SimEntity simEntity = null;
 
     /** Known path for EventGraph Compilation
      *
      * @param f an event graph to compile
-     * @param implementsClass to test for extention of simkit.BasicSimEntity
+     * @param implementsClass to test for extension of simkit.BasicSimEntity
      * @return a node tree for viewing in the Assembly Editor
      * @throws java.lang.Throwable for a problem finding a class
      */
-    public FileBasedAssemblyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
+    public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
-            jaxbCtx = JAXBContext.newInstance(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS);
+            jaxbCtx = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             um = jaxbCtx.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?
@@ -110,7 +122,7 @@ public class FileBasedClassManager
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ViskitGlobals.instance().getAssemblyController().createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
@@ -139,14 +151,14 @@ public class FileBasedClassManager
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-                fban = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
+                fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
 
                 // If we have an annotated ParameterMap, then cacheXML it.  If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = ViskitStatics.resolveParametersUsingReflection(fclass);
+                List<Object>[] pMap = VStatics.resolveParameters(fclass);
                 if (pMap != null && pMap.length > 0)
-                    ViskitStatics.putParameterListInHashMap(fclass.getName(), pMap);
+                    VStatics.putParameterList(fclass.getName(), pMap);
             }
 
         // TODO: Check if this is really necessary and should be dealt with
@@ -167,7 +179,7 @@ public class FileBasedClassManager
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = ViskitGlobals.instance().getWorkClassLoader();
+        ClassLoader loader = VGlobals.instance().getWorkClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
@@ -180,23 +192,22 @@ public class FileBasedClassManager
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
             fban =  (fXml == null) ?
-                new FileBasedAssemblyNode(paf.file, fclass.getName(), f, paf.pkg) :
-                new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
+                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
+                new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
-            ViskitStatics.putParameterListInHashMap(fclass.getName(), pa);
+            VStatics.putParameterList(fclass.getName(), pa);
 
-//            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
+            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
         } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
             LOG.error(e);
-            e.printStackTrace();
         }
     }
 
     /**
-     * Cache the EG and it's .class file with good MD5 hash
+     * Cache the EG and its .class file with good MD5 hash
      * @param xmlEg the EG to cacheXML
      * @param classFile the classfile of this EG
      */
@@ -206,8 +217,8 @@ public class FileBasedClassManager
             return;
         }
         try {
-            List<String> cache = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
-            if (viskit.ViskitStatics.debug) {
+            List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+            if (viskit.VStatics.debug) {
                 if (cache == null) {
                     LOG.debug("cache " + cache);
                 } else {
@@ -217,13 +228,13 @@ public class FileBasedClassManager
 
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
-//                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
-//                if (viskit.ViskitStatics.debug) {
+//                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                if (viskit.VStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }
-//                projectConfig.setProperty(ViskitConfiguration.CACHED_WORKING_DIR_KEY, s);
+//                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
 //            }
-            if (viskit.ViskitStatics.debug) {
+            if (viskit.VStatics.debug) {
                 LOG.debug("Adding cache " + xmlEg + " " + classFile);
             }
 
@@ -248,12 +259,13 @@ public class FileBasedClassManager
      */
     public String createMessageDigest(File... files) {
 
-        String returnValue = "";
+        String retVal = "";
 
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] buf;
             for (File file : files) {
-                byte[] buf = new byte[(int) file.length()];
+                buf = new byte[(int) file.length()];
                 try {
                     try (InputStream is = file.toURI().toURL().openStream()) {
                         is.read(buf);
@@ -268,23 +280,23 @@ public class FileBasedClassManager
                 }
             }
             byte[] hash = md.digest();
-            if (viskit.ViskitStatics.debug)
-			{
-//                LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
+            if (viskit.VStatics.debug) {
+                LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
-            returnValue = new BigInteger(hash).toString(16);
+            retVal = new BigInteger(hash).toString(16);
         } catch (NoSuchAlgorithmException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
-        return returnValue;
+        return retVal;
     }
 
     public boolean isCached(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
-//            LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size() + ", cached " + cacheXML.contains(filePath));
+            LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
+            LOG.debug("chached " + cacheXML.contains(filePath));
             if (cacheXML.contains(filePath)) {
                 if (isStale(file)) {
                     deleteCache(file);
@@ -307,22 +319,23 @@ public class FileBasedClassManager
      * @return a cached class file given its cached XML file
      */
     public File getCachedClass(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.ViskitStatics.debug) 
-			{
-//                LOG.debug("getCached index at " + index + ", will return " + cacheClass.get(index));
+            if (viskit.VStatics.debug) {
+                LOG.debug("getCached index at " + index);
+                LOG.debug("will return " + cacheClass.get(index));
             }
         } catch (IOException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheClass.get(index));
-        if (viskit.ViskitStatics.debug) {
-//            LOG.debug("cachedFile index at " + index + ", will return " + cachedFile);
+        if (viskit.VStatics.debug) {
+            LOG.debug("cachedFile index at " + index);
+            LOG.debug("will return " + cachedFile);
         }
         return cachedFile;
     }
@@ -332,23 +345,23 @@ public class FileBasedClassManager
      * @return an XML file given its cached class file
      */
     public File getCachedXML(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.ViskitStatics.debug) 
-			{
-//                LOG.debug("getCachedXml index at " + index + ", will return " + cacheXML.get(index));
+            if (viskit.VStatics.debug) {
+                LOG.debug("getCachedXml index at " + index);
+                LOG.debug("will return " + cacheXML.get(index));
             }
         } catch (IOException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheXML.get(index));
-        if (viskit.ViskitStatics.debug) 
-		{
-//            LOG.debug("cachedFile index at " + index + ", will return " + cachedFile);
+        if (viskit.VStatics.debug) {
+            LOG.debug("cachedFile index at " + index);
+            LOG.debug("will return " + cachedFile);
         }
         return cachedFile;
     }
@@ -357,8 +370,8 @@ public class FileBasedClassManager
      * @param file the XML, or class file to delete from the cacheXML
      */
     public void deleteCache(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
         String filePath;
         File deletedCache = null;
         try {
@@ -380,7 +393,7 @@ public class FileBasedClassManager
                 boolean didDelete = false;
                 if (deletedCache != null)
                     didDelete = deletedCache.delete();
-                if (viskit.ViskitStatics.debug) {
+                if (viskit.VStatics.debug) {
                     LOG.debug(didDelete + ": cachedFile deleted index at " + index);
                 }
             }
@@ -396,8 +409,8 @@ public class FileBasedClassManager
      * @return an indication of miss caching
      */
     public boolean isCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_MISS_FILE_KEY));
-        List<String> digests = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_MISS_DIGEST_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
+        List<String> digests = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
         int index;
         try {
             index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
@@ -416,7 +429,7 @@ public class FileBasedClassManager
     public void addCacheMiss(File file) {
         deleteCache(file);
         removeCacheMiss(file); // remove any old ones
-        int index = ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_MISS_FILE_KEY).length;
+        int index = ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY).length;
         try {
             projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
             projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
@@ -427,7 +440,7 @@ public class FileBasedClassManager
     }
 
     public void removeCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_MISS_FILE_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
         int index;
         try {
             if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"))) > -1) {
@@ -446,8 +459,8 @@ public class FileBasedClassManager
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheDigest = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_DIGEST_KEY));
-        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigurationValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_DIGEST_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
         String filePath;
         try {
             filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");

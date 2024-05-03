@@ -1,5 +1,8 @@
 package viskit.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -12,14 +15,14 @@ package viskit.model;
  */
 public class AdapterEdge extends AssemblyEdge {
 
-    private String  targetEvent;
-    private String  sourceEvent;
+    private String targetEvent;
+    private String sourceEvent;
+    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
-    private String  operationOrAssignment;
-    private String  indexingExpression;
-    private String  value;
-    private String  comment;
-    private String  description = new String();
+    private String operationOrAssignment;
+    private String indexingExpression;
+    private String value;
+    private String comment;
 
     AdapterEdge() // package-limited
     {
@@ -42,6 +45,16 @@ public class AdapterEdge extends AssemblyEdge {
     }
 
     @Override
+    public List<String> getDescriptionArray() {
+        return descriptionArray;
+    }
+
+    @Override
+    public void setDescriptionArray(List<String> descriptionArray) {
+        this.descriptionArray = descriptionArray;
+    }
+
+    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -52,6 +65,11 @@ public class AdapterEdge extends AssemblyEdge {
     }
 
     @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
     public String getOperationOrAssignment() {
         return operationOrAssignment;
     }
@@ -59,40 +77,5 @@ public class AdapterEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
-    }
-
-    @Override
-    public String getDescription()
-	{
-		moveLegacyCommentsToDescription ();
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        this.description = newDescription;
-    }
-	
-	/**
-	 * "Comment" elements are earlier viskit constructs.
-	 * If found from an earlier model, append them as part of description and then delete.
-	 */
-	private void moveLegacyCommentsToDescription ()
-	{
-		if (description == null)
-			description = new String();
-		if ((comment != null) && !comment.isEmpty())
-		{
-			description = comment.trim();
-			comment     = "";
-		}
-	}
-
-    @Deprecated
-    @Override
-    public String getComment() 
-	{
-		moveLegacyCommentsToDescription ();
-        return description;
     }
 }
