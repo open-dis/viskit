@@ -225,7 +225,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
 //            adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
 
-            GraphMetaData gmd = ((Model) getModel()).getMetaData();
+            GraphMetadata gmd = ((Model) getModel()).getMetaData();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);

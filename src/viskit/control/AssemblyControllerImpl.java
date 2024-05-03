@@ -58,7 +58,7 @@ import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
-import viskit.view.dialog.AssemblyMetaDataDialog;
+import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
@@ -446,7 +446,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void saveAs() {
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView view = (AssemblyView) getView();
-        GraphMetaData gmd = model.getMetaData();
+        GraphMetadata gmd = model.getMetaData();
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
@@ -472,9 +472,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void editGraphMetaData() {
         AssemblyModel mod = (AssemblyModel) getModel();
         if (mod == null) {return;}
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetaData();
         boolean modified =
-                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -670,7 +670,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // not open
         if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
-        GraphMetaData oldGmd = null;
+        GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
         if (viskitAssemblyModel != null) {
             oldGmd = viskitAssemblyModel.getMetaData();
@@ -684,13 +684,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // when TabbedPane changelistener detects a tab change.
         ((AssemblyView) getView()).addTab(mod);
 
-        GraphMetaData gmd = new GraphMetaData(mod);   // build a new one, specific to Assy
+        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assy
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
 
         boolean modified =
-                AssemblyMetaDataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 

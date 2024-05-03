@@ -36,7 +36,7 @@ import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcRecentFileListener;
-import viskit.view.dialog.EventGraphMetaDataDialog;
+import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.view.AssemblyView;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.EventGraphView;
@@ -113,7 +113,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         // not open
         if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
-        GraphMetaData oldGmd = null;
+        GraphMetadata oldGmd = null;
         Model viskitModel = (Model) getModel();
         if (viskitModel != null) {
             oldGmd = viskitModel.getMetaData();
@@ -129,13 +129,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // If we have models already opened, then use their package names for
         // this new EG
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetaData();
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
 
         boolean modified =
-                EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
+                EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {
 
             // update title bar
@@ -564,7 +564,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void saveAs() {
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetaData();
 
         // Allow the user to type specific package names
         String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
@@ -1037,9 +1037,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void editGraphMetaData() {
         Model mod = (Model) getModel();
         if (mod == null) {return;}
-        GraphMetaData gmd = mod.getMetaData();
+        GraphMetadata gmd = mod.getMetaData();
         boolean modified =
-                EventGraphMetaDataDialog.showDialog((JFrame) getView(), gmd);
+                EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {
             ((Model) getModel()).changeMetaData(gmd);
 

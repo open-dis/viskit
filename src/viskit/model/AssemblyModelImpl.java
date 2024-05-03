@@ -41,7 +41,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private SimkitAssembly jaxbRoot;
     private File currentFile;
     private boolean modelDirty = false;
-    private GraphMetaData metaData;
+    private GraphMetadata metaData;
 
     /** We require specific order on this Map's contents */
     private Map<String, AssemblyNode> nodeCache;
@@ -52,7 +52,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
         controller = (AssemblyControllerImpl) cont;
-        metaData = new GraphMetaData(this);
+        metaData = new GraphMetadata(this);
         nodeCache = new LinkedHashMap<>();
     }
 
@@ -86,12 +86,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public GraphMetaData getMetaData() {
+    public GraphMetadata getMetaData() {
         return metaData;
     }
 
     @Override
-    public void changeMetaData(GraphMetaData gmd) {
+    public void changeMetaData(GraphMetadata gmd) {
         metaData = gmd;
         setDirty(true);
     }
@@ -121,7 +121,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetaData mymetaData = new GraphMetaData(this);
+                GraphMetadata mymetaData = new GraphMetadata(this);
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();
                 mymetaData.packageName = jaxbRoot.getPackage();

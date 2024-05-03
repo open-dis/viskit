@@ -55,14 +55,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     private String privateIdxVarPrefix = "_idxvar_";
     private String privateLocVarPrefix = "locvar_";
     private String stateVarPrefix = "state_";
-    private GraphMetaData metaData;
+    private GraphMetadata metaData;
     private EventGraphControllerImpl controller;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
     public ModelImpl(mvcController controller) {
         this.controller = (EventGraphControllerImpl) controller;
-        metaData = new GraphMetaData(this);
+        metaData = new GraphMetadata(this);
     }
 
     @Override
@@ -90,12 +90,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     @Override
-    public GraphMetaData getMetaData() {
+    public GraphMetadata getMetaData() {
         return metaData;
     }
 
     @Override
-    public void changeMetaData(GraphMetaData gmd) {
+    public void changeMetaData(GraphMetadata gmd) {
         metaData = gmd;
         setDirty(true);
         notifyChanged(new ModelEvent(gmd, ModelEvent.METADATA_CHANGED, "Metadata changed"));
@@ -116,7 +116,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(f);
 
-                GraphMetaData mymetaData = new GraphMetaData(this);
+                GraphMetadata mymetaData = new GraphMetadata(this);
                 mymetaData.author = jaxbRoot.getAuthor();
                 mymetaData.version = jaxbRoot.getVersion();
                 mymetaData.name = jaxbRoot.getName();

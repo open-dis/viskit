@@ -127,7 +127,7 @@ public interface Model {
      *
      * @param gmd the meta data that contains changes to record
      */
-    void changeMetaData(GraphMetaData gmd);
+    void changeMetaData(GraphMetadata gmd);
 
     /**
      * Notify of a change to an Event Node
@@ -150,7 +150,7 @@ public interface Model {
 
     void deleteSimParameter(vParameter p);
 
-    GraphMetaData getMetaData();
+    GraphMetadata getMetaData();
 
     /**
      * This is to allow the controller to stick in a Run event, but treat the graph as fresh.

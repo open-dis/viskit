@@ -233,7 +233,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
             }
 
-            GraphMetaData gmd = mod.getMetaData();
+            GraphMetadata gmd = mod.getMetaData();
             if (gmd != null) {
                 setSelectedAssemblyName(gmd.name);
             } else if (viskit.VStatics.debug) {
