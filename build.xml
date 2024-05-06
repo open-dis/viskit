@@ -185,6 +185,18 @@ their descpritions.
         <echo message="warning:  ANT_HOME not set!"/>
     </target>
 
+<property file="nbproject/private/private.properties"/>
+<condition property="isset.izpack.dist">
+    <isset property="izpack.dist"/>
+</condition> 
+<target name="izpack.help" unless="isset.izpack.dist">
+    <echo message="*** warning:  need to set property izpack.dir=${izpack.dist}"/>
+    <echo message="suggested approach: download izpack jar from http://izpack.org"/>
+    <echo message="create file private.properties in nbproject/private/private.properties"/>
+    <echo/>
+    <echo message="for example: izpack.dist=C:/languages/java/izpack-5.1.3"/>
+</target>
+
     <!--  === TARGET: init === -->
     <target name="init"
             depends="platformInitialize,check.JAVA_HOME,check.ANT_HOME"
@@ -259,7 +271,7 @@ their descpritions.
     </target>
 
     <!--  === TARGET: compile === -->
-    <target name="compile" depends="bindings.simkit,javahelp">
+    <target name="compile" depends="bindings.simkit,javahelp,izpack.help">
 
         <javac destdir="${dir.build.classes}"
                source="${javac.source}"
