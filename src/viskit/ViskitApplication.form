@@ -6,7 +6,7 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="fileMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="File"/>
+            <Property name="text" type="java.lang.String" value="File  "/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="newViskitProjectMI">
@@ -16,6 +16,28 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="New Viskit Project"/>
               </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openViskitProjectMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_O" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Event Graph"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openViskitProjectMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openRecentViskitProjectMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_R" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Recent Viskit Project"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openRecentViskitProjectMIActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="zipMailViskitProjectMI">
               <Properties>
@@ -28,6 +50,20 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zipMailViskitProjectMIActionPerformed"/>
               </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="closeViskitProjectMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_O" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Close Viskit Project"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close current project and all related files"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeViskitProjectMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="viewSavedXmlMI">
               <Properties>
@@ -54,13 +90,15 @@
                 <Property name="text" type="java.lang.String" value="Save Screen Image"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="settingsMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_S" type="code"/>
+                  <Connection code="KeyEvent.VK_U" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Settings"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="text" type="java.lang.String" value="User settings"/>
+                <Property name="toolTipText" type="java.lang.String" value="User settings for Viskit application"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMI">
@@ -75,29 +113,165 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="eventGraphMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Event Graph"/>
+            <Property name="text" type="java.lang.String" value="Event Graph    "/>
             <Property name="actionCommand" type="java.lang.String" value="Event Graph Editor"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="newEventGraphMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_N" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="New Event Graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openEventGraphMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_O" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Event Graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openRecentEventGraphMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_R" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Recent Event Graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="closeEventGraphMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_C" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Close Event Graph"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="closeAllEventGraphsMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_A" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Close All Event Graphs"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close all event graphs"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="undoEventEditMenuItem">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_U" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Undo"/>
+                <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="redoEventEditMenuItem">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_R" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Redo"/>
+                <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="assemblyMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Assembly"/>
+            <Property name="text" type="java.lang.String" value="Assembly             "/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="newAssemblyMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_N" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="New Assembly"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openAssemblyMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_O" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Assembly"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="openRecentAssemblyMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_R" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Open Recent Event Graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="closeAssemblyMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_C" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Close Event Graph"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="undoAssemblyEditMenuItem">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_U" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Undo"/>
+                <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="redoAssemblyEditMenuItem">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_R" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Redo"/>
+                <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator6">
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="designOfExperimentsMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Design of Experiments (DOE)   "/>
           </Properties>
         </Menu>
         <Menu class="javax.swing.JMenu" name="runAssemblyMenu">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Run Assembly"/>
+            <Property name="text" type="java.lang.String" value="Run Simulation  "/>
           </Properties>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="designOfExperimentsMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Design of Experiments"/>
-          </Properties>
-        </Menu>
-        <Menu class="javax.swing.JMenu" name="clusterRunMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Cluster Run"/>
-          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="saveSimulationConsoleMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_S" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Save Simulation Console"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="viewConsoleTextEditorMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_V" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="View Console in Text Editor"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="analystReportMenu">
           <Properties>
@@ -156,7 +330,8 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_A" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="About"/>
+                <Property name="text" type="java.lang.String" value="About Viskit"/>
+                <Property name="actionCommand" type="java.lang.String" value="About Viskit"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -222,7 +397,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -244,29 +419,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-        </Container>
-        <Container class="javax.swing.JPanel" name="runAssemblyPanel">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Run Assembly">
-                <Property name="tabTitle" type="java.lang.String" value="Run Assembly"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -288,35 +441,70 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
         </Container>
-        <Container class="javax.swing.JPanel" name="clusterRunPanel">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
+        <Container class="javax.swing.JTabbedPane" name="runSimulationTabbedPane">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Cluster Run">
-                <Property name="tabTitle" type="java.lang.String" value="Cluster Run"/>
+              <JTabbedPaneConstraints tabName="Run Simulation">
+                <Property name="tabTitle" type="java.lang.String" value="Run Simulation"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
 
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
-              </Group>
-            </DimensionLayout>
-          </Layout>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+          <SubComponents>
+            <Container class="javax.swing.JPanel" name="runLocalSimulationPanel">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Run Local Simulation">
+                    <Property name="tabTitle" type="java.lang.String" value="Run Local Simulation"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="0" pref="508" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+            </Container>
+            <Container class="javax.swing.JPanel" name="runClusterSimulationPanel">
+              <Properties>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Run Cluster Simulation">
+                    <Property name="tabTitle" type="java.lang.String" value="Run Cluster Simulation"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <EmptySpace min="0" pref="508" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+            </Container>
+          </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="analystReportPanel">
           <Constraints>
@@ -369,7 +557,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -391,7 +579,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -413,7 +601,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -435,7 +623,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -457,7 +645,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -479,7 +667,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -501,7 +689,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -523,7 +711,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="495" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="496" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
