@@ -4,10 +4,11 @@
  */
 package viskit;
 
+import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
 /**
- * New Viskit Aoplication Frame
+ * New Viskit Application Frame
  * tutorial: https://netbeans.apache.org/tutorial/main/kb/docs/java/quickstart-gui/
  * @author brutzman
  */
@@ -66,7 +67,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         designOfExperimentsMenu = new javax.swing.JMenu();
         clusterRunMenu = new javax.swing.JMenu();
         analystReportMenu = new javax.swing.JMenu();
-        displayAnalystReportXmlMI = new javax.swing.JMenuItem();
+        displayAnalystReportHtmlMI = new javax.swing.JMenuItem();
         openAnotherAnalystReportMI = new javax.swing.JMenuItem();
         saveAnalystReportXml = new javax.swing.JMenuItem();
         viewAnalystReportXmlMI = new javax.swing.JMenuItem();
@@ -270,26 +271,39 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         fileMenu.setText("File");
 
+        newViskitProjectMI.setMnemonic(KeyEvent.VK_N);
         newViskitProjectMI.setText("New Viskit Project");
         fileMenu.add(newViskitProjectMI);
 
+        zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
         zipMailViskitProjectMI.setText("New Viskit Project");
         zipMailViskitProjectMI.setActionCommand("Zip, Mail Viskit Project");
+        zipMailViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zipMailViskitProjectMIActionPerformed(evt);
+            }
+        });
         fileMenu.add(zipMailViskitProjectMI);
 
+        viewSavedXmlMI.setMnemonic(KeyEvent.VK_V);
         viewSavedXmlMI.setText("New Viskit Project");
         viewSavedXmlMI.setActionCommand("View Saved XML");
         fileMenu.add(viewSavedXmlMI);
 
+        generateJavaSourceMI.setMnemonic(KeyEvent.VK_G);
         generateJavaSourceMI.setText("Generate Java Source");
         fileMenu.add(generateJavaSourceMI);
 
+        saveScreenImageMI.setMnemonic(KeyEvent.VK_I);
         saveScreenImageMI.setText("Save Screen Image");
         fileMenu.add(saveScreenImageMI);
 
+        settingsMI.setMnemonic(KeyEvent.VK_S);
         settingsMI.setText("Settings");
+        settingsMI.setToolTipText("");
         fileMenu.add(settingsMI);
 
+        exitMI.setMnemonic(KeyEvent.VK_X);
         exitMI.setText("Exit");
         fileMenu.add(exitMI);
 
@@ -313,15 +327,19 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         analystReportMenu.setText("Analyst Report");
 
-        displayAnalystReportXmlMI.setText("Display Analyst Report XML");
-        analystReportMenu.add(displayAnalystReportXmlMI);
+        displayAnalystReportHtmlMI.setMnemonic(KeyEvent.VK_D);
+        displayAnalystReportHtmlMI.setText("Display Analyst Report XML");
+        analystReportMenu.add(displayAnalystReportHtmlMI);
 
+        openAnotherAnalystReportMI.setMnemonic(KeyEvent.VK_O);
         openAnotherAnalystReportMI.setText("Open another Analyst Report");
         analystReportMenu.add(openAnotherAnalystReportMI);
 
+        saveAnalystReportXml.setMnemonic(KeyEvent.VK_S);
         saveAnalystReportXml.setText("Save Analyst Report Xml");
         analystReportMenu.add(saveAnalystReportXml);
 
+        viewAnalystReportXmlMI.setMnemonic(KeyEvent.VK_V);
         viewAnalystReportXmlMI.setText("View Analyst Report XML");
         analystReportMenu.add(viewAnalystReportXmlMI);
 
@@ -329,9 +347,11 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         helpMenu.setText("Help");
 
+        tutorialMI.setMnemonic(KeyEvent.VK_T);
         tutorialMI.setText("Tutorial");
         helpMenu.add(tutorialMI);
 
+        aboutMI.setMnemonic(KeyEvent.VK_A);
         aboutMI.setText("About");
         helpMenu.add(aboutMI);
 
@@ -352,6 +372,10 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void zipMailViskitProjectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zipMailViskitProjectMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_zipMailViskitProjectMIActionPerformed
 
     /**
      * @param args the command line arguments
@@ -408,7 +432,7 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JPanel clusterRunPanel;
     private javax.swing.JMenu designOfExperimentsMenu;
     private javax.swing.JPanel designOfExperimentsPanel;
-    private javax.swing.JMenuItem displayAnalystReportXmlMI;
+    private javax.swing.JMenuItem displayAnalystReportHtmlMI;
     private javax.swing.JPanel eventGraphEditorPanel;
     private javax.swing.JMenu eventGraphMenu;
     private javax.swing.JMenuItem exitMI;

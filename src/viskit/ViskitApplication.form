@@ -11,38 +11,63 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="newViskitProjectMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_N" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="New Viskit Project"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="zipMailViskitProjectMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_Z" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="New Viskit Project"/>
                 <Property name="actionCommand" type="java.lang.String" value="Zip, Mail Viskit Project"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zipMailViskitProjectMIActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="viewSavedXmlMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_V" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="New Viskit Project"/>
                 <Property name="actionCommand" type="java.lang.String" value="View Saved XML"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="generateJavaSourceMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_G" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Generate Java Source"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="saveScreenImageMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_I" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Save Screen Image"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="settingsMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_S" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Settings"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_X" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Exit"/>
               </Properties>
             </MenuItem>
@@ -79,23 +104,35 @@
             <Property name="text" type="java.lang.String" value="Analyst Report"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="displayAnalystReportXmlMI">
+            <MenuItem class="javax.swing.JMenuItem" name="displayAnalystReportHtmlMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_D" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Display Analyst Report XML"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="openAnotherAnalystReportMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_O" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Open another Analyst Report"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="saveAnalystReportXml">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_S" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Save Analyst Report Xml"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="viewAnalystReportXmlMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_V" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="View Analyst Report XML"/>
               </Properties>
             </MenuItem>
@@ -108,11 +145,17 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="tutorialMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_T" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Tutorial"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="aboutMI">
               <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_A" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="About"/>
               </Properties>
             </MenuItem>
