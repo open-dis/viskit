@@ -58,34 +58,39 @@ public class ViskitApplication extends javax.swing.JFrame {
         newViskitProjectMI = new javax.swing.JMenuItem();
         openViskitProjectMI = new javax.swing.JMenuItem();
         openRecentViskitProjectMI = new javax.swing.JMenuItem();
-        zipMailViskitProjectMI = new javax.swing.JMenuItem();
         closeViskitProjectMI = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        viewSavedXmlMI = new javax.swing.JMenuItem();
-        generateJavaSourceMI = new javax.swing.JMenuItem();
-        saveScreenImageMI = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
-        settingsMI = new javax.swing.JMenuItem();
-        exitMI = new javax.swing.JMenuItem();
-        eventGraphMenu = new javax.swing.JMenu();
         newEventGraphMI = new javax.swing.JMenuItem();
         openEventGraphMI = new javax.swing.JMenuItem();
         openRecentEventGraphMI = new javax.swing.JMenuItem();
         closeEventGraphMI = new javax.swing.JMenuItem();
         closeAllEventGraphsMI = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JPopupMenu.Separator();
-        undoEventEditMenuItem = new javax.swing.JMenuItem();
-        redoEventEditMenuItem = new javax.swing.JMenuItem();
-        jSeparator5 = new javax.swing.JPopupMenu.Separator();
-        assemblyMenu = new javax.swing.JMenu();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
         newAssemblyMI = new javax.swing.JMenuItem();
         openAssemblyMI = new javax.swing.JMenuItem();
         openRecentAssemblyMI = new javax.swing.JMenuItem();
         closeAssemblyMI = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        zipMailViskitProjectMI = new javax.swing.JMenuItem();
+        exitMI = new javax.swing.JMenuItem();
+        eventGraphMenu = new javax.swing.JMenu();
+        undoEventEditMenuItem = new javax.swing.JMenuItem();
+        redoEventEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        cutEventEditMenuItem = new javax.swing.JMenuItem();
+        copyEventEditMenuItem = new javax.swing.JMenuItem();
+        pasteEventEditMenuItem = new javax.swing.JMenuItem();
+        deleteEventEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        assemblyMenu = new javax.swing.JMenu();
         undoAssemblyEditMenuItem = new javax.swing.JMenuItem();
         redoAssemblyEditMenuItem = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
+        cutAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        copyAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        pasteAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        deleteAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator8 = new javax.swing.JPopupMenu.Separator();
         designOfExperimentsMenu = new javax.swing.JMenu();
         runAssemblyMenu = new javax.swing.JMenu();
         saveSimulationConsoleMI = new javax.swing.JMenuItem();
@@ -95,8 +100,13 @@ public class ViskitApplication extends javax.swing.JFrame {
         openAnotherAnalystReportMI = new javax.swing.JMenuItem();
         saveAnalystReportXml = new javax.swing.JMenuItem();
         viewAnalystReportXmlMI = new javax.swing.JMenuItem();
+        viewMenu = new javax.swing.JMenu();
+        viewSavedXmlMI = new javax.swing.JMenuItem();
+        generateJavaSourceMI = new javax.swing.JMenuItem();
+        saveScreenImageMI = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
         tutorialMI = new javax.swing.JMenuItem();
+        settingsMI = new javax.swing.JMenuItem();
         aboutMI = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -319,16 +329,6 @@ public class ViskitApplication extends javax.swing.JFrame {
         });
         fileMenu.add(openRecentViskitProjectMI);
 
-        zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
-        zipMailViskitProjectMI.setText("New Viskit Project");
-        zipMailViskitProjectMI.setActionCommand("Zip, Mail Viskit Project");
-        zipMailViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                zipMailViskitProjectMIActionPerformed(evt);
-            }
-        });
-        fileMenu.add(zipMailViskitProjectMI);
-
         closeViskitProjectMI.setMnemonic(KeyEvent.VK_O);
         closeViskitProjectMI.setText("Close Viskit Project");
         closeViskitProjectMI.setToolTipText("Close current project and all related files");
@@ -340,24 +340,56 @@ public class ViskitApplication extends javax.swing.JFrame {
         fileMenu.add(closeViskitProjectMI);
         fileMenu.add(jSeparator1);
 
-        viewSavedXmlMI.setMnemonic(KeyEvent.VK_V);
-        viewSavedXmlMI.setText("New Viskit Project");
-        viewSavedXmlMI.setActionCommand("View Saved XML");
-        fileMenu.add(viewSavedXmlMI);
+        newEventGraphMI.setMnemonic(KeyEvent.VK_N);
+        newEventGraphMI.setText("New Event Graph");
+        fileMenu.add(newEventGraphMI);
 
-        generateJavaSourceMI.setMnemonic(KeyEvent.VK_G);
-        generateJavaSourceMI.setText("Generate Java Source");
-        fileMenu.add(generateJavaSourceMI);
+        openEventGraphMI.setMnemonic(KeyEvent.VK_O);
+        openEventGraphMI.setText("Open Event Graph");
+        fileMenu.add(openEventGraphMI);
 
-        saveScreenImageMI.setMnemonic(KeyEvent.VK_I);
-        saveScreenImageMI.setText("Save Screen Image");
-        fileMenu.add(saveScreenImageMI);
+        openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
+        openRecentEventGraphMI.setText("Open Recent Event Graph");
+        fileMenu.add(openRecentEventGraphMI);
+
+        closeEventGraphMI.setMnemonic(KeyEvent.VK_C);
+        closeEventGraphMI.setText("Close Event Graph");
+        closeEventGraphMI.setToolTipText("Close selected event graph");
+        fileMenu.add(closeEventGraphMI);
+
+        closeAllEventGraphsMI.setMnemonic(KeyEvent.VK_A);
+        closeAllEventGraphsMI.setText("Close All Event Graphs");
+        closeAllEventGraphsMI.setToolTipText("Close all event graphs");
+        fileMenu.add(closeAllEventGraphsMI);
         fileMenu.add(jSeparator2);
 
-        settingsMI.setMnemonic(KeyEvent.VK_U);
-        settingsMI.setText("User settings");
-        settingsMI.setToolTipText("User settings for Viskit application");
-        fileMenu.add(settingsMI);
+        newAssemblyMI.setMnemonic(KeyEvent.VK_N);
+        newAssemblyMI.setText("New Assembly");
+        fileMenu.add(newAssemblyMI);
+
+        openAssemblyMI.setMnemonic(KeyEvent.VK_O);
+        openAssemblyMI.setText("Open Assembly");
+        fileMenu.add(openAssemblyMI);
+
+        openRecentAssemblyMI.setMnemonic(KeyEvent.VK_R);
+        openRecentAssemblyMI.setText("Open Recent Event Graph");
+        fileMenu.add(openRecentAssemblyMI);
+
+        closeAssemblyMI.setMnemonic(KeyEvent.VK_C);
+        closeAssemblyMI.setText("Close Event Graph");
+        closeAssemblyMI.setToolTipText("Close selected event graph");
+        fileMenu.add(closeAssemblyMI);
+        fileMenu.add(jSeparator4);
+
+        zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
+        zipMailViskitProjectMI.setText("Zip, Mail Viskit Project");
+        zipMailViskitProjectMI.setActionCommand("Zip, Mail Viskit Project");
+        zipMailViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zipMailViskitProjectMIActionPerformed(evt);
+            }
+        });
+        fileMenu.add(zipMailViskitProjectMI);
 
         exitMI.setMnemonic(KeyEvent.VK_X);
         exitMI.setText("Exit");
@@ -368,29 +400,6 @@ public class ViskitApplication extends javax.swing.JFrame {
         eventGraphMenu.setText("Event Graph    ");
         eventGraphMenu.setActionCommand("Event Graph Editor");
 
-        newEventGraphMI.setMnemonic(KeyEvent.VK_N);
-        newEventGraphMI.setText("New Event Graph");
-        eventGraphMenu.add(newEventGraphMI);
-
-        openEventGraphMI.setMnemonic(KeyEvent.VK_O);
-        openEventGraphMI.setText("Open Event Graph");
-        eventGraphMenu.add(openEventGraphMI);
-
-        openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
-        openRecentEventGraphMI.setText("Open Recent Event Graph");
-        eventGraphMenu.add(openRecentEventGraphMI);
-
-        closeEventGraphMI.setMnemonic(KeyEvent.VK_C);
-        closeEventGraphMI.setText("Close Event Graph");
-        closeEventGraphMI.setToolTipText("Close selected event graph");
-        eventGraphMenu.add(closeEventGraphMI);
-
-        closeAllEventGraphsMI.setMnemonic(KeyEvent.VK_A);
-        closeAllEventGraphsMI.setText("Close All Event Graphs");
-        closeAllEventGraphsMI.setToolTipText("Close all event graphs");
-        eventGraphMenu.add(closeAllEventGraphsMI);
-        eventGraphMenu.add(jSeparator3);
-
         undoEventEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoEventEditMenuItem.setText("Undo");
         undoEventEditMenuItem.setToolTipText("Undo last action");
@@ -400,29 +409,32 @@ public class ViskitApplication extends javax.swing.JFrame {
         redoEventEditMenuItem.setText("Redo");
         redoEventEditMenuItem.setToolTipText("Redo last undo");
         eventGraphMenu.add(redoEventEditMenuItem);
+        eventGraphMenu.add(jSeparator3);
+
+        cutEventEditMenuItem.setMnemonic(KeyEvent.VK_X);
+        cutEventEditMenuItem.setText("Cut");
+        cutEventEditMenuItem.setToolTipText("Cut selected item");
+        eventGraphMenu.add(cutEventEditMenuItem);
+
+        copyEventEditMenuItem.setMnemonic(KeyEvent.VK_C);
+        copyEventEditMenuItem.setText("Copy");
+        copyEventEditMenuItem.setToolTipText("Copy selected item");
+        eventGraphMenu.add(copyEventEditMenuItem);
+
+        pasteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        pasteEventEditMenuItem.setText("Paste");
+        pasteEventEditMenuItem.setToolTipText("Paste selected item");
+        eventGraphMenu.add(pasteEventEditMenuItem);
+
+        deleteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        deleteEventEditMenuItem.setText("Delete");
+        deleteEventEditMenuItem.setToolTipText("Delete selected item");
+        eventGraphMenu.add(deleteEventEditMenuItem);
         eventGraphMenu.add(jSeparator5);
 
         viskitMenuBar.add(eventGraphMenu);
 
         assemblyMenu.setText("Assembly             ");
-
-        newAssemblyMI.setMnemonic(KeyEvent.VK_N);
-        newAssemblyMI.setText("New Assembly");
-        assemblyMenu.add(newAssemblyMI);
-
-        openAssemblyMI.setMnemonic(KeyEvent.VK_O);
-        openAssemblyMI.setText("Open Assembly");
-        assemblyMenu.add(openAssemblyMI);
-
-        openRecentAssemblyMI.setMnemonic(KeyEvent.VK_R);
-        openRecentAssemblyMI.setText("Open Recent Event Graph");
-        assemblyMenu.add(openRecentAssemblyMI);
-
-        closeAssemblyMI.setMnemonic(KeyEvent.VK_C);
-        closeAssemblyMI.setText("Close Event Graph");
-        closeAssemblyMI.setToolTipText("Close selected event graph");
-        assemblyMenu.add(closeAssemblyMI);
-        assemblyMenu.add(jSeparator4);
 
         undoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoAssemblyEditMenuItem.setText("Undo");
@@ -434,6 +446,32 @@ public class ViskitApplication extends javax.swing.JFrame {
         redoAssemblyEditMenuItem.setToolTipText("Redo last undo");
         assemblyMenu.add(redoAssemblyEditMenuItem);
         assemblyMenu.add(jSeparator6);
+
+        cutAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_X);
+        cutAssemblyEditMenuItem.setText("Cut");
+        cutAssemblyEditMenuItem.setToolTipText("Cut selected item");
+        cutAssemblyEditMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cutAssemblyEditMenuItemActionPerformed(evt);
+            }
+        });
+        assemblyMenu.add(cutAssemblyEditMenuItem);
+
+        copyAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_C);
+        copyAssemblyEditMenuItem.setText("Copy");
+        copyAssemblyEditMenuItem.setToolTipText("Copy selected item");
+        assemblyMenu.add(copyAssemblyEditMenuItem);
+
+        pasteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        pasteAssemblyEditMenuItem.setText("Paste");
+        pasteAssemblyEditMenuItem.setToolTipText("Paste selected item");
+        assemblyMenu.add(pasteAssemblyEditMenuItem);
+
+        deleteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        deleteAssemblyEditMenuItem.setText("Delete");
+        deleteAssemblyEditMenuItem.setToolTipText("Delete selected item");
+        assemblyMenu.add(deleteAssemblyEditMenuItem);
+        assemblyMenu.add(jSeparator8);
 
         viskitMenuBar.add(assemblyMenu);
 
@@ -472,11 +510,33 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         viskitMenuBar.add(analystReportMenu);
 
+        viewMenu.setText("View");
+
+        viewSavedXmlMI.setMnemonic(KeyEvent.VK_V);
+        viewSavedXmlMI.setText("View Saved XML");
+        viewSavedXmlMI.setActionCommand("View Saved XML");
+        viewMenu.add(viewSavedXmlMI);
+
+        generateJavaSourceMI.setMnemonic(KeyEvent.VK_G);
+        generateJavaSourceMI.setText("Generate Java Source");
+        viewMenu.add(generateJavaSourceMI);
+
+        saveScreenImageMI.setMnemonic(KeyEvent.VK_I);
+        saveScreenImageMI.setText("Save Screen Image");
+        viewMenu.add(saveScreenImageMI);
+
+        viskitMenuBar.add(viewMenu);
+
         helpMenu.setText("Help");
 
         tutorialMI.setMnemonic(KeyEvent.VK_T);
         tutorialMI.setText("Tutorial");
         helpMenu.add(tutorialMI);
+
+        settingsMI.setMnemonic(KeyEvent.VK_U);
+        settingsMI.setText("User settings");
+        settingsMI.setToolTipText("User settings for Viskit application");
+        helpMenu.add(settingsMI);
 
         aboutMI.setMnemonic(KeyEvent.VK_A);
         aboutMI.setText("About Viskit");
@@ -516,6 +576,10 @@ public class ViskitApplication extends javax.swing.JFrame {
     private void closeViskitProjectMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeViskitProjectMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_closeViskitProjectMIActionPerformed
+
+    private void cutAssemblyEditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutAssemblyEditMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cutAssemblyEditMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
@@ -572,6 +636,12 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem closeAssemblyMI;
     private javax.swing.JMenuItem closeEventGraphMI;
     private javax.swing.JMenuItem closeViskitProjectMI;
+    private javax.swing.JMenuItem copyAssemblyEditMenuItem;
+    private javax.swing.JMenuItem copyEventEditMenuItem;
+    private javax.swing.JMenuItem cutAssemblyEditMenuItem;
+    private javax.swing.JMenuItem cutEventEditMenuItem;
+    private javax.swing.JMenuItem deleteAssemblyEditMenuItem;
+    private javax.swing.JMenuItem deleteEventEditMenuItem;
     private javax.swing.JMenu designOfExperimentsMenu;
     private javax.swing.JPanel designOfExperimentsPanel;
     private javax.swing.JMenuItem displayAnalystReportHtmlMI;
@@ -587,6 +657,7 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
+    private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JMenuItem newAssemblyMI;
     private javax.swing.JMenuItem newEventGraphMI;
     private javax.swing.JMenuItem newViskitProjectMI;
@@ -597,6 +668,8 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem openRecentEventGraphMI;
     private javax.swing.JMenuItem openRecentViskitProjectMI;
     private javax.swing.JMenuItem openViskitProjectMI;
+    private javax.swing.JMenuItem pasteAssemblyEditMenuItem;
+    private javax.swing.JMenuItem pasteEventEditMenuItem;
     private javax.swing.JMenuItem redoAssemblyEditMenuItem;
     private javax.swing.JMenuItem redoEventEditMenuItem;
     private javax.swing.JMenu runAssemblyMenu;
@@ -612,6 +685,7 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JMenuItem undoEventEditMenuItem;
     private javax.swing.JMenuItem viewAnalystReportXmlMI;
     private javax.swing.JMenuItem viewConsoleTextEditorMI;
+    private javax.swing.JMenu viewMenu;
     private javax.swing.JMenuItem viewSavedXmlMI;
     private javax.swing.JMenuBar viskitMenuBar;
     private javax.swing.JTabbedPane viskitTabbedPane;
