@@ -127,8 +127,8 @@ public class vVertexRenderer
         defaultForeground = UIManager.getColor("Tree.textForeground");
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
-    private float[] dash = {5f, 5f};
-    private BasicStroke mySelectionStroke =
+    private final float[] dash = {5f, 5f};
+    private final BasicStroke mySelectionStroke =
             new BasicStroke(
             2, // change from default of 1
             BasicStroke.CAP_BUTT,

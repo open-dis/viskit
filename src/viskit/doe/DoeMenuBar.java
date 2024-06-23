@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.movesinstitute.org)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,6 +31,10 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+package viskit.doe;
+
+import javax.swing.*;
+import java.awt.event.ActionListener;
 
 /**
  * MOVES Institute
@@ -40,12 +44,6 @@ POSSIBILITY OF SUCH DAMAGE.
  * @since Jul 20, 2005
  * @since 10:36:33 AM
  */
-
-package viskit.doe;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
-
 public class DoeMenuBar extends JMenuBar implements DoeEvents
 {
   private DoeController controller;

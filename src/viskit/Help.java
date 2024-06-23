@@ -1,3 +1,36 @@
+/*
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer
+      in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the names of the Naval Postgraduate School (NPS)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
+      nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+*/
 package viskit;
 
 import edu.nps.util.LogUtils;
@@ -36,7 +69,7 @@ public class Help {
     public static final String VISKIT_URL = "https://github.com/terry-norbraten/viskit";
     public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
     public static final String DEVELOPERS =
-            "Copyright &copy; 2004-2022 under the Lesser GNU Public License (LGPL)" + CR + CR
+            "Copyright &copy; 2004-2024 under the Lesser GNU Public License (LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
@@ -64,13 +97,13 @@ public class Help {
     private HelpBroker hb;
 
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private Component TUTORIAL_COMPONENT;
-    private ActionListener TUTORIAL_LISTENER_LAUNCHER;
+    private final Component TUTORIAL_COMPONENT;
+    private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     private Component parent;
-    private Icon icon;
-    private JEditorPane aboutEGEditorPane;
-    private JEditorPane aboutAssemblyEditorPane;
+    private final Icon icon;
+    private final JEditorPane aboutEGEditorPane;
+    private final JEditorPane aboutAssemblyEditorPane;
 
     /** Creates a new instance of Help
      * @param parent main frame to center on

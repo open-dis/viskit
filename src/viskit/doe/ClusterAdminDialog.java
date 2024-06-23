@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,16 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Mar 16, 2006
- * @since 12:58:14 PM
- */
-
 package viskit.doe;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
@@ -56,6 +46,14 @@ import java.io.IOException;
 import java.util.Vector;
 import org.apache.xmlrpc.XmlRpcException;
 
+/**
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Mar 16, 2006
+ * @since 12:58:14 PM
+ */
 public class ClusterAdminDialog extends JDialog implements ActionListener
 {
   private JButton closeButt;

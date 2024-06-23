@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2008 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.movesinstitute.org)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -33,13 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Sep 19, 2005
- * @since 2:00:51 PM
- * @version $Id$
+ * 
  */
 package viskit.view.dialog;
 
@@ -51,7 +45,14 @@ import java.awt.event.*;
 import java.util.Collection;
 
 /** NOTE: Not used
- *
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Sep 19, 2005
+ * @since 2:00:51 PM
+ * @version $Id$
+ * 
  * A dialog class that lets the user add a new parameter to the document.
  * After the user clicks "OK", "Cancel", or closes the dialog via the
  * close box, the caller retrieves the "buttonChosen" variable from
@@ -64,10 +65,10 @@ public class RecentFilesDialog extends JDialog {
 
     private static RecentFilesDialog dialog;
     private Collection<String> lis;
-    private JList<String> jlist;
-    private JButton closeButt;
-    private Color defaultColor;
-    private MouseListener myRollOverHandler = new mHandler();
+    private final JList<String> jlist;
+    private final JButton closeButt;
+    private final Color defaultColor;
+    private final MouseListener myRollOverHandler = new mHandler();
 
     public static String showDialog(JFrame f, Collection<String> lis) {
         if (dialog == null) {
@@ -95,12 +96,8 @@ public class RecentFilesDialog extends JDialog {
         defaultColor = closeButt.getForeground();
         closeButt.setFocusable(false);
         closeButt.setBorder(new EmptyBorder(2, 2, 2, 2)); //null); //new LineBorder(Color.gray,1));
-        closeButt.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                RecentFilesDialog.this.dispose();
-            }
+        closeButt.addActionListener((ActionEvent e) -> {
+            RecentFilesDialog.this.dispose();
         });
         closeButt.addMouseListener(myRollOverHandler);
         JButton clearButt = new JButton("clear");

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2005 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.MovesInstitute.org)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,6 +31,7 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
+package viskit.doe;
 
 /**
  * MOVES Institute
@@ -40,18 +41,12 @@ POSSIBILITY OF SUCH DAMAGE.
  * @since Jul 20, 2005
  * @since 10:45:32 AM
  */
-
-package viskit.doe;
-
 public interface DoeEvents
 {
-  public static final char OPEN_FILE        = '\u0000';
-  public static final char OPEN_FILE_CHOOSE = '\u0001';
-  //public static final char IMPORT_ASSEMBLY  = '\u0002';
-  public static final char SAVE_FILE        = '\u0003';
-  public static final char SAVE_FILE_AS     = '\u0004';
-
-  public static final char EXIT_APP         = '\u0005';
-
-  public static final char RUN_JOB          = '\u0006';
+  char OPEN_FILE        = '\u0000';
+  char OPEN_FILE_CHOOSE = '\u0001';
+  char SAVE_FILE        = '\u0003';
+  char SAVE_FILE_AS     = '\u0004';
+  char EXIT_APP         = '\u0005';
+  char RUN_JOB          = '\u0006';
 }

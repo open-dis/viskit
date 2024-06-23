@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2007 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -12,8 +12,8 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
-      (http://www.nps.edu and http://www.movesinstitute.org)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
       prior written permission.
@@ -31,16 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Jul 20, 2005
- * @since 1:25:58 PM
- * @verion $Id$
- */
 package viskit.doe;
 
 import org.jdom.Element;
@@ -55,6 +45,15 @@ import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
 
+/**
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Jul 20, 2005
+ * @since 1:25:58 PM
+ * @verion $Id$
+ */
 public class ParamTree extends JTree {
 
     public ParamTree(List list) {

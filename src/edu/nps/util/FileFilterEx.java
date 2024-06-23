@@ -12,7 +12,7 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
       (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
@@ -31,7 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
 package edu.nps.util;
 
 /**

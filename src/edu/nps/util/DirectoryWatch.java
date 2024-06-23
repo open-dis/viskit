@@ -12,7 +12,7 @@ are met:
       in the documentation and/or other materials provided with the
       distribution.
     * Neither the names of the Naval Postgraduate School (NPS)
-      Modeling Virtual Environments and Simulation (MOVES) Institute
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
       (http://www.nps.edu and http://www.movesinstitute.org)
       nor the names of its contributors may be used to endorse or
       promote products derived from this software without specific
@@ -31,15 +31,6 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
-
-/**
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA
- * www.nps.edu
- * @author Mike Bailey
- * @since Sep 22, 2005
- * @since 10:04:25 AM
- */
 package edu.nps.util;
 
 import java.io.File;
@@ -50,7 +41,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-/**
+/** 
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Sep 22, 2005
+ * @since 10:04:25 AM
  * A class to observe a directory (tree) for changes and report them to listeners
  */
 public class DirectoryWatch {

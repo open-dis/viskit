@@ -116,11 +116,6 @@ public class vAssemblyPclVertexRenderer
     transient protected int borderWidth;
 
     /**
-     * Cached value of the double buffered state
-     */
-    transient boolean isDoubleBuffered = false;
-
-    /**
      * Constructs a renderer that may be used to render vertices.
      */
     public vAssemblyPclVertexRenderer() {
@@ -128,8 +123,8 @@ public class vAssemblyPclVertexRenderer
         defaultBackground = UIManager.getColor("Tree.textBackground");
     }
 
-    private float[] dash = {5f, 5f};
-    private BasicStroke mySelectionStroke =
+    private final float[] dash = {5f, 5f};
+    private final BasicStroke mySelectionStroke =
             new BasicStroke(
             2, // change from default of 1
             BasicStroke.CAP_BUTT,
@@ -168,7 +163,7 @@ public class vAssemblyPclVertexRenderer
             boolean focus,
             boolean preview) {
         this.graph = graph;
-        isDoubleBuffered = graph.isDoubleBuffered();
+        graph.isDoubleBuffered();
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
