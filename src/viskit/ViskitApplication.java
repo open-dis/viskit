@@ -392,7 +392,6 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
         zipMailViskitProjectMI.setText("Zip, Mail Viskit Project");
-        zipMailViskitProjectMI.setActionCommand("Zip, Mail Viskit Project");
         zipMailViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zipMailViskitProjectMIActionPerformed(evt);
@@ -449,7 +448,6 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         addCancellingEdgeMenuItem.setText("Add Cancelling Edge");
         addCancellingEdgeMenuItem.setToolTipText("");
-        addCancellingEdgeMenuItem.setActionCommand("Add Cancelling Edge");
         eventGraphMenu.add(addCancellingEdgeMenuItem);
 
         addSelfReferencingSchedulingEdgeMenuItem.setText("Add Self-Referencing Scheduling Edge");
@@ -564,7 +562,6 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         viewSavedXmlMI.setMnemonic(KeyEvent.VK_V);
         viewSavedXmlMI.setText("View Saved XML");
-        viewSavedXmlMI.setActionCommand("View Saved XML");
         viewMenu.add(viewSavedXmlMI);
 
         generateJavaSourceMI.setMnemonic(KeyEvent.VK_G);
@@ -590,7 +587,6 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         aboutMI.setMnemonic(KeyEvent.VK_A);
         aboutMI.setText("About Viskit");
-        aboutMI.setActionCommand("About Viskit");
         helpMenu.add(aboutMI);
 
         viskitMenuBar.add(helpMenu);
@@ -647,15 +643,14 @@ public class ViskitApplication extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ViskitApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ViskitApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ViskitApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } 
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) 
+        {
             java.util.logging.Logger.getLogger(ViskitApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        
         //</editor-fold>
         //</editor-fold>
 
@@ -710,7 +705,7 @@ public class ViskitApplication extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem generateJavaSourceMI;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;

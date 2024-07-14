@@ -138,7 +138,6 @@
                   <Connection code="KeyEvent.VK_Z" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Zip, Mail Viskit Project"/>
-                <Property name="actionCommand" type="java.lang.String" value="Zip, Mail Viskit Project"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zipMailViskitProjectMIActionPerformed"/>
@@ -229,7 +228,6 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Add Cancelling Edge"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
-                <Property name="actionCommand" type="java.lang.String" value="Add Cancelling Edge"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingSchedulingEdgeMenuItem">
@@ -431,7 +429,6 @@
                   <Connection code="KeyEvent.VK_V" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="View Saved XML"/>
-                <Property name="actionCommand" type="java.lang.String" value="View Saved XML"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="generateJavaSourceMI">
@@ -480,7 +477,6 @@
                   <Connection code="KeyEvent.VK_A" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="About Viskit"/>
-                <Property name="actionCommand" type="java.lang.String" value="About Viskit"/>
               </Properties>
             </MenuItem>
           </SubComponents>
