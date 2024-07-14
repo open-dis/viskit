@@ -615,6 +615,15 @@ their descpritions.
         </java>
     </target>
 
+    <target name="quick.run.ViskitApplication" description="new GUI">
+        <java classname="viskit.ViskitApplication"
+              classpathref="runtime.classpath"
+              fork="true">
+
+            <jvmarg line="${common.run.args}"/>
+        </java>
+    </target>
+
     <target name="debug.viskit.exe.jar"
             depends="jar.executable"
             description="Test the ${dist.exe.jar}">
