@@ -33,18 +33,20 @@ public class Help {
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String SIMKIT_URL = "https://github.com/ahbuss/Simkit/";
-    public static final String VISKIT_URL = "https://github.com/terry-norbraten/viskit";
+    public static final String VISKIT_URL = "https://gitlab.nps.edu/Savage/viskit";        // "https://github.com/terry-norbraten/viskit";
+    public static final String ISSUES_URL = "https://gitlab.nps.edu/Savage/viskit/issues"; // "https://github.com/terry-norbraten/viskit/issues";
     public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
     public static final String DEVELOPERS =
-            "Copyright &copy; 2004-2022 under the Lesser GNU Public License (LGPL)" + CR + CR
+            "Copyright &copy; 2004-2024 under the Lesser GNU Public License (LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
-            + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
+            + "&nbsp;&nbsp;&nbsp;Terry Norbraten" + CR
+            + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
+            + "with" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
+            + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR
             + "&nbsp;&nbsp;&nbsp;Rick Goldberg" + CR
             + "&nbsp;&nbsp;&nbsp;Don McGregor" + CR
-            + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
-            + "&nbsp;&nbsp;&nbsp;Patrick Sullivan" + CR
-            + "&nbsp;&nbsp;&nbsp;Terry Norbraten";
+            + "&nbsp;&nbsp;&nbsp;Patrick Sullivan";
     public static final String SIMKIT_PAGE =
             CR
             + "Visit the Simkit home page at" + CR
@@ -57,9 +59,9 @@ public class Help {
             + simkit.Version.getVersion()
             + CR + "Java version: "
             + System.getProperty("java.version");
-    public static final String BUGZILLA_PAGE = CR
-            + "Please register for the Viskit Issue tracker:" + CR
-            + LinkURLString(BUGZILLA_URL);
+    public static final String VISKIT_ISSUES_PAGE = CR
+            + "Viskit Issue tracker:" + CR
+            + LinkURLString(ISSUES_URL);
 
     private HelpBroker hb;
 
@@ -105,7 +107,7 @@ public class Help {
         aboutEGEditorPane.setContentType("text/html");
         aboutEGEditorPane.setEditable(false);
         aboutEGEditorPane.setText(ABOUT_EG_STRING
-                + DEVELOPERS + CR + VISKIT_PAGE //+ BUGZILLA_PAGE
+                + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
                 + SIMKIT_PAGE + VERSIONS);
 
         aboutAssemblyEditorPane = new JEditorPane();
@@ -113,7 +115,7 @@ public class Help {
         aboutAssemblyEditorPane.setContentType("text/html");
         aboutAssemblyEditorPane.setEditable(false);
         aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY_STRING
-                + DEVELOPERS + CR + VISKIT_PAGE //+ BUGZILLA_PAGE
+                + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
                 + SIMKIT_PAGE);
     }
 
