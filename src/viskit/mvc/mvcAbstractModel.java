@@ -18,7 +18,7 @@ import java.util.List;
  */
 public abstract class mvcAbstractModel implements mvcModel {
 
-    private List<mvcModelListener> listeners = new ArrayList<>(4);
+    private final List<mvcModelListener> listeners = new ArrayList<>(4);
 
     @Override
     public void notifyChanged(mvcModelEvent event) {
