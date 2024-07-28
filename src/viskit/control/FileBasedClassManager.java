@@ -55,8 +55,8 @@ public class FileBasedClassManager {
     // Singleton:
     protected static FileBasedClassManager me;
     private static XMLConfiguration projectConfig;
-    private Map<String, FileBasedAssyNode> fileMap;
-    private Map<String, Class<?>> classMap;
+    private final Map<String, FileBasedAssyNode> fileMap;
+    private final Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
         if (me == null) {
@@ -478,4 +478,4 @@ public class FileBasedClassManager {
         return false;
     }
 
-}
+} // end class FileBasedClassManager

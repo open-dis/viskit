@@ -1,11 +1,13 @@
 package viskit.control;
 
 import edu.nps.util.DirectoryWatch;
+
 import java.awt.Point;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+
 import viskit.model.*;
 import viskit.mvc.mvcRecentFileListener;
 
@@ -127,8 +129,13 @@ public interface EventGraphController {
      */
     void open();
 
+    /**
+     * Opens one of the recently opened EGs
+     * @param path to the recent EG
+     */
     void openRecentEventGraph(File path);
 
+    /** Closes an open Event Graph */
     void close();
 
     /**
@@ -136,10 +143,12 @@ public interface EventGraphController {
      */
     void closeAll();
 
-    /** CMD-Z or CNTL-Z */
+    /**
+     * Undo the last selected node or edge modified using CMD-Z or CNTL-Z 
+     */
     void undo();
 
-    /** CMD-Y or CNTL-Y */
+    /** Redo the last selected node or edge modified using CMD-Y or CNTL-Y */
     void redo();
 
     /** Perform a full delete */

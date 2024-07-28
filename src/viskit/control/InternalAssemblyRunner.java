@@ -76,19 +76,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     /** The name of the assy to run */
     String assemblyClassName;
     RunnerPanel2 runPanel;
-    ActionListener closer, saver;
+    ActionListener saver;
     JMenuBar myMenuBar;
-    BufferedReader backChan;
     Thread simRunner;
-    SimThreadMonitor swingThreadMonitor;
-    PipedOutputStream pos;
-    PipedInputStream pis;
     BasicAssembly assembly;
 
     /** external runner saves a file */
     private String analystReportTempFile = null;
-    FileOutputStream fos;
-    FileInputStream fis;
 
     /** The assembly to be run from java source */
     Class<?> assemblyClass;
@@ -96,12 +90,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     /** Instance of the assembly to run from java source */
     Object assemblyInstance;
     private static int mutex = 0;
-    private ClassLoader lastLoaderNoReset;
+    private final ClassLoader lastLoaderNoReset;
     private ClassLoader lastLoaderWithReset;
 
     /** Captures the original RNG seed state */
     private long[] seeds;
-    private stopListener assemblyRunStopListener;
+    private final stopListener assemblyRunStopListener;
 
     /**
      * The internal logic for the Assembly Runner panel
@@ -209,9 +203,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         setStopTime.invoke(assemblyInstance, stopTime);
         runPanel.vcrStopTime.setText("" + getStopTime.invoke(assemblyInstance));
     }
-
-    File tmpFile;
-    RandomAccessFile rTmpFile;
     JTextAreaOutputStream textAreaOutputStream;
 
     protected void initRun() {
@@ -369,7 +360,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
         return ret;
     }
-    PrintWriter pWriter;
 
     class startResumeListener implements ActionListener {
 
@@ -485,8 +475,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
         }
     }
-
-    String returnedSimTime;
 
     private void signalAnalystReportReady() {
         if (analystReportTempFile == null) {
@@ -675,7 +663,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-    private String namePrefix = "Viskit Assembly Runner";
+    private final String namePrefix = "Viskit Assembly Runner";
     private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {

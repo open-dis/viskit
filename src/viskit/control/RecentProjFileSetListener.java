@@ -57,7 +57,7 @@ import viskit.mvc.mvcRecentFileListener;
  */
 public class RecentProjFileSetListener implements mvcRecentFileListener {
 
-    private List<JMenu> openRecentProjMenus;
+    private final List<JMenu> openRecentProjMenus;
 
     public RecentProjFileSetListener() {
         openRecentProjMenus = new ArrayList<>();
@@ -76,6 +76,9 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
             m.removeAll();
         }
 
+        String nameOnly;
+        Action act;
+        JMenuItem mi;
         for (File fullPath : lis) {
 
             if (!fullPath.exists()) {
@@ -83,10 +86,10 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
             }
 
             for (JMenu m : openRecentProjMenus) {
-                String nameOnly = fullPath.getName();
-                Action act = new ParameterizedProjAction(nameOnly);
+                nameOnly = fullPath.getName();
+                act = new ParameterizedProjAction(nameOnly);
                 act.putValue(VStatics.FULL_PATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
+                mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath.getPath());
                 m.add(mi);
             }
@@ -95,9 +98,9 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
             for (JMenu m : openRecentProjMenus) {
                 m.add(new JSeparator());
-                Action act = new ParameterizedProjAction("clear");
+                act = new ParameterizedProjAction("clear");
                 act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
+                mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
                 m.add(mi);
             }
@@ -121,7 +124,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
             else
                 fullPath = (File) obj;
 
-            if (fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
+            if (fullPath != null && fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
                 acontroller.clearRecentProjFileSet();
             } else {
                 acontroller.doProjectCleanup();
@@ -132,4 +135,4 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
         }
     }
 
-} // end class file RecentProjFileSetListener.java
+} // end class RecentProjFileSetListener
