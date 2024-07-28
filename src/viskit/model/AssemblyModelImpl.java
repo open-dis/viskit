@@ -44,10 +44,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private GraphMetadata metaData;
 
     /** We require specific order on this Map's contents */
-    private Map<String, AssemblyNode> nodeCache;
-    private String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private final Map<String, AssemblyNode> nodeCache;
+    private final String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
-    private AssemblyControllerImpl controller;
+    private final AssemblyControllerImpl controller;
 
     public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);

@@ -7,14 +7,17 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Map;
+import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.UndoManager;
+
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
 import org.jgraph.event.GraphSelectionListener;
 import org.jgraph.graph.*;
+
 import viskit.view.AssemblyViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.AssemblyController;
@@ -42,41 +45,41 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         vGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         this.vGAModel = model;
-        vGraphAssemblyComponent.this.setSizeable(false);
-        vGraphAssemblyComponent.this.setGridVisible(true);
-        vGraphAssemblyComponent.this.setGridMode(JGraph.LINE_GRID_MODE);
-        vGraphAssemblyComponent.this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
-        vGraphAssemblyComponent.this.setGridEnabled(true); // means snap
-        vGraphAssemblyComponent.this.setGridSize(10);
-        vGraphAssemblyComponent.this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
-        vGraphAssemblyComponent.this.setAntiAliased(true);
-        vGraphAssemblyComponent.this.setLockedHandleColor(Color.red);
-        vGraphAssemblyComponent.this.setHighlightColor(Color.red);
+        this.setSizeable(false);
+        this.setGridVisible(true);
+        this.setGridMode(JGraph.LINE_GRID_MODE);
+        this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
+        this.setGridEnabled(true); // means snap
+        this.setGridSize(10);
+        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setAntiAliased(true);
+        this.setLockedHandleColor(Color.red);
+        this.setHighlightColor(Color.red);
 
-        // Set the Tolerance to 2 Pixel
-        vGraphAssemblyComponent.this.setTolerance(2);
+        // Set the Tolerance to 2 Pixels
+        this.setTolerance(2);
 
         // Jump to default port on connect
-        vGraphAssemblyComponent.this.setJumpToDefaultPort(true);
+        this.setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
         undoManager = new vGraphUndoManager(parent.getController());
-        vGraphAssemblyComponent.this.addGraphSelectionListener((GraphSelectionListener) undoManager);
+        this.addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
-        vGraphAssemblyComponent.this.getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
+        this.getGraphLayoutCache().setFactory(new DefaultCellViewFactory() {
 
             // To use circles, from the tutorial
             @Override
             protected VertexView createVertexView(Object v) {
                 VertexView view;
-                if (v instanceof AssemblyCircleCell) {
-                    view = new AssemblyCircleView(v);
-                } else if (v instanceof AssemblyPropListCell) {
-                    view = new AssemblyPropListView(v);
+                if (v instanceof vAssyCircleCell) {
+                    view = new vAssyCircleView(v);
+                } else if (v instanceof vAssyPropListCell) {
+                    view = new vAssyPropListView(v);
                 } else {
                     view = super.createVertexView(v);
                 }
@@ -87,7 +90,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             @Override
             protected EdgeView createEdgeView(Object e) {
                 EdgeView view = null;
-                if (e instanceof vAssemblyEdgeCell) {
+                if (e instanceof vAssyEdgeCell) {
                     Object o = ((DefaultMutableTreeNode) e).getUserObject();
                     if (o instanceof PropChangeEdge) {
                         view = new vAssyPclEdgeView(e);
@@ -107,8 +110,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             @Override
             protected PortView createPortView(Object p) {
                 PortView view;
-                if (p instanceof vAssemblyPortCell) {
-                    view = new vAssemblyPortView(p);
+                if (p instanceof vAssyPortCell) {
+                    view = new vAssyPortView(p);
                 } else {
                     view = super.createPortView(p);
                 }
@@ -121,8 +124,12 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     public void updateUI() {
         // Install a new UI
         setUI(new vGraphAssemblyUI());    // we use our own for node/edge inspector editting
-        //setUI(new BasicGraphUI());   // test
         invalidate();
+    }
+    
+    @Override // Prevents the NPE on macOS
+    public AccessibleContext getAccessibleContext() {
+        return parent.getCurrentJgraphComponent().getAccessibleContext();
     }
 
     private ModelEvent currentModelEvent = null;
@@ -225,24 +232,29 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         // bounds (position) might have changed:
         if (ch != null) {
+            vAssyCircleCell cc;
+            AttributeMap m;
+            Rectangle2D.Double r;
+            EvGraphNode en;
+            PropChangeListenerNode pcln;
             for (Object cell : ch) {
-                if (cell instanceof AssemblyCircleCell) {
-                    AssemblyCircleCell cc = (AssemblyCircleCell) cell;
-                    AttributeMap m = cc.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
+                if (cell instanceof vAssyCircleCell) {
+                    cc = (vAssyCircleCell) cell;
+                    m = cc.getAttributes();
+                    r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        EvGraphNode en = (EvGraphNode) cc.getUserObject();
+                        en = (EvGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
-                } else if (cell instanceof AssemblyPropListCell) {
-                    AssemblyPropListCell plc = (AssemblyPropListCell) cell;
+                } else if (cell instanceof vAssyPropListCell) {
+                    vAssyPropListCell plc = (vAssyPropListCell) cell;
 
-                    AttributeMap m = plc.getAttributes();
-                    Rectangle2D.Double r = (Rectangle2D.Double) m.get("bounds");
+                    m = plc.getAttributes();
+                    r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        PropChangeListenerNode pcln = (PropChangeListenerNode) plc.getUserObject();
+                        pcln = (PropChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent. getModel()).changePclNode(pcln);
                         m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
@@ -264,8 +276,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
             if (c != null) {
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vAssemblyEdgeCell) {
-                    vAssemblyEdgeCell vc = (vAssemblyEdgeCell) c;
+                if (c instanceof vAssyEdgeCell) {
+                    vAssyEdgeCell vc = (vAssyEdgeCell) c;
                     AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
                     Object to = se.getTo();
                     Object from = se.getFrom();
@@ -308,18 +320,18 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     sb.append("</center>");
                     sb.append("</html>");
                     return sb.toString();
-                } else if (c instanceof AssemblyCircleCell || c instanceof AssemblyPropListCell) {
+                } else if (c instanceof vAssyCircleCell || c instanceof vAssyPropListCell) {
                     String typ;
                     String name;
                     String desc;
-                    if (c instanceof AssemblyCircleCell) {
-                        AssemblyCircleCell cc = (AssemblyCircleCell) c;
+                    if (c instanceof vAssyCircleCell) {
+                        vAssyCircleCell cc = (vAssyCircleCell) c;
                         EvGraphNode en = (EvGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
                         desc = en.getDescriptionString();
-                    } else /*if (c instanceof AssemblyPropListCell)*/ {
-                        AssemblyPropListCell cc = (AssemblyPropListCell) c;
+                    } else /*if (c instanceof vAssyPropListCell)*/ {
+                        vAssyPropListCell cc = (vAssyPropListCell) c;
                         PropChangeListenerNode pcln = (PropChangeListenerNode) cc.getUserObject();
                         typ = pcln.getType();
                         name = pcln.getName();
@@ -375,8 +387,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        if (view instanceof AssemblyCircleView) {
-            AssemblyCircleCell cc = (AssemblyCircleCell) view.getCell();
+        if (view instanceof vAssyCircleView) {
+            vAssyCircleCell cc = (vAssyCircleCell) view.getCell();
             Object en = cc.getUserObject();
             if (en instanceof EvGraphNode) {
                 return ((ViskitElement) en).getName();
@@ -473,15 +485,15 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         DefaultGraphCell cell;
         if (node instanceof EvGraphNode) {
-            cell = new AssemblyCircleCell(node);
+            cell = new vAssyCircleCell(node);
         } else {
-            cell = new AssemblyPropListCell(node);
+            cell = new vAssyPropListCell(node);
         }
 
         node.opaqueViewObject = cell;
 
         // Add one Floating Port
-        cell.add(new vAssemblyPortCell(node.getName() + "/Center"));
+        cell.add(new vAssyPortCell(node.getName() + "/Center"));
         return cell;
     }
 
@@ -509,39 +521,35 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 /**
  * To mark our edges.
  */
-class vAssemblyEdgeCell extends DefaultEdge {
+class vAssyEdgeCell extends DefaultEdge {
 
-    public vAssemblyEdgeCell() {
+    public vAssyEdgeCell() {
         this(null);
     }
 
-    public vAssemblyEdgeCell(Object userObject) {
+    public vAssyEdgeCell(Object userObject) {
         super(userObject);
     }
 }
 
-class vAssemblyPortCell extends DefaultPort {
+class vAssyPortCell extends DefaultPort {
 
-    public vAssemblyPortCell() {
-        this(null);
-    }
-
-    public vAssemblyPortCell(Object o) {
+    public vAssyPortCell(Object o) {
         this(o, null);
     }
 
-    public vAssemblyPortCell(Object o, Port port) {
+    public vAssyPortCell(Object o, Port port) {
         super(o, port);
     }
 }
 
-class vAssemblyPortView extends PortView {
+class vAssyPortView extends PortView {
 
     static int mysize = 10;   // smaller than the circle
 
-    public vAssemblyPortView(Object o) {
+    public vAssyPortView(Object o) {
         super(o);
-        vAssemblyPortView.this.setPortSize(mysize);
+        vAssyPortView.this.setPortSize(mysize);
     }
 }
 
@@ -550,13 +558,9 @@ class vAssemblyPortView extends PortView {
 /**
  * To mark our nodes.
  */
-class AssemblyPropListCell extends DefaultGraphCell {
+class vAssyPropListCell extends DefaultGraphCell {
 
-    AssemblyPropListCell() {
-        this(null);
-    }
-
-    public AssemblyPropListCell(Object userObject) {
+    public vAssyPropListCell(Object userObject) {
         super(userObject);
     }
 }
@@ -564,11 +568,11 @@ class AssemblyPropListCell extends DefaultGraphCell {
 /**
  * Sub class VertexView to install our own vapvr.
  */
-class AssemblyPropListView extends VertexView {
+class vAssyPropListView extends VertexView {
 
     static vAssemblyPclVertexRenderer vapvr = new vAssemblyPclVertexRenderer();
 
-    public AssemblyPropListView(Object cell) {
+    public vAssyPropListView(Object cell) {
         super(cell);
     }
 
@@ -578,13 +582,9 @@ class AssemblyPropListView extends VertexView {
     }
 }
 
-class AssemblyCircleCell extends DefaultGraphCell {
+class vAssyCircleCell extends DefaultGraphCell {
 
-    AssemblyCircleCell() {
-        this(null);
-    }
-
-    public AssemblyCircleCell(Object userObject) {
+    public vAssyCircleCell(Object userObject) {
         super(userObject);
     }
 }
@@ -592,11 +592,11 @@ class AssemblyCircleCell extends DefaultGraphCell {
 /**
  * Sub class VertexView to install our own vapvr.
  */
-class AssemblyCircleView extends VertexView {
+class vAssyCircleView extends VertexView {
 
     static vAssemblyEgVertexRenderer vaevr = new vAssemblyEgVertexRenderer();
 
-    public AssemblyCircleView(Object cell) {
+    public vAssyCircleView(Object cell) {
         super(cell);
     }
 
@@ -771,4 +771,4 @@ class vAssyPclEdgeRenderer extends vEdgeRenderer {
     }
 }
 // End support for custom line ends and double adapter line on assembly edges
-// end class file vgraphAssemblyComponent.java
+// end class file vGraphAssemblyComponent.java

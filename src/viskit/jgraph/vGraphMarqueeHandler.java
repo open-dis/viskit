@@ -72,7 +72,7 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
      */
     protected JComponent highlight;
 
-    private JGraph graph;
+    private final JGraph graph;
 
     /** Default constructor to provide custom vertex connections
      * 

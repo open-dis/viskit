@@ -56,8 +56,8 @@ import viskit.mvc.mvcController;
  */
 public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
-    private Vector<Object> selected;
-    private mvcController controller;
+    private final Vector<Object> selected;
+    private final mvcController controller;
 
     public vGraphUndoManager(mvcController controller) {
         this.controller = controller;
@@ -86,9 +86,9 @@ public class vGraphUndoManager extends GraphUndoManager implements GraphSelectio
         for (Object o : oa) {
             if (e.isAddedCell(o)) {
 
-                // Prevent dups
-                if (!selected.contains(((DefaultMutableTreeNode) o).getUserObject()))
-                    selected.add(((DefaultMutableTreeNode) o).getUserObject());
+            // Prevent dups
+            if (!selected.contains(((DefaultMutableTreeNode) o).getUserObject()))
+                selected.add(((DefaultMutableTreeNode) o).getUserObject());
             } else {
                 selected.remove(((DefaultMutableTreeNode) o).getUserObject());
             }

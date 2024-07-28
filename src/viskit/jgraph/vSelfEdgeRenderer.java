@@ -39,7 +39,9 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
 import org.jgraph.graph.GraphConstants;
+
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.ViskitElement;
@@ -52,12 +54,12 @@ import viskit.model.ViskitElement;
  */
 class vSelfEdgeRenderer extends vEdgeRenderer {
 
-    private double circleDiam = 30.0d;
+    private final double circleDiam = 30.0d;
     private Arc2D arc;
 
     @Override
     protected Shape createShape() {
-        CircleView myCircle = (CircleView) view.getSource().getParentView();
+        vCircleView myCircle = (vCircleView) view.getSource().getParentView();
         Rectangle2D circBnds = myCircle.getBounds();
         double circCenterX = circBnds.getCenterX();
         double circCenterY = circBnds.getCenterY();
@@ -139,11 +141,12 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
         vEdgeCell vec = (vEdgeCell) view.getCell();
         Edge edg = (Edge) vec.getUserObject();
 
-        CircleCell vcc = (CircleCell) view.getSource().getParentView().getCell();
+        vCircleCell vcc = (vCircleCell) view.getSource().getParentView().getCell();
         EventNode en = (EventNode) vcc.getUserObject();
         double retd = ROT_INCR;
+        Edge e;
         for (ViskitElement ve : en.getConnections()) {
-            Edge e = (Edge) ve;
+            e = (Edge) ve;
             if (e.to == en && e.from == en) {
                 retd += (ROT_INCR * 3/8);
                 if (e == edg) {

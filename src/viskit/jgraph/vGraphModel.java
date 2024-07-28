@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
+
 import viskit.model.Edge;
 import viskit.model.EventNode;
 import viskit.model.SchedulingEdge;
@@ -71,7 +73,7 @@ public class vGraphModel extends DefaultGraphModel {
     }
 
     public void changeEvent(EventNode en) {
-        CircleCell c = (CircleCell) en.opaqueViewObject;
+        vCircleCell c = (vCircleCell) en.opaqueViewObject;
         c.setUserObject(en);
 
         reDrawNodes(); // jmb try...yes, I thought the stopEditing would do the same thing
@@ -93,7 +95,7 @@ public class vGraphModel extends DefaultGraphModel {
 
     // I don't think this is required anymore.  We don't change src/targets...we rebuild the edge
     private void changeEitherEdge(Edge ed) {
-        CircleCell newFromCC = (CircleCell) ed.from.opaqueViewObject;
+        vCircleCell newFromCC = (vCircleCell) ed.from.opaqueViewObject;
         vEdgeCell edgeC = (vEdgeCell) ed.opaqueViewObject;
 
         DefaultPort dpFrom = (DefaultPort) edgeC.getSource();
@@ -110,9 +112,10 @@ public class vGraphModel extends DefaultGraphModel {
     /** Ensures a clean JGraph tab for a new model */
     public void deleteAll() {
         Object[] localRoots = getRoots(this);
+        Object[] child;
         for (Object localRoot : localRoots) {
-            if (localRoot instanceof CircleCell) {
-                Object[] child = new Object[1];
+            if (localRoot instanceof vCircleCell) {
+                child = new Object[1];
                 child[0] = ((DefaultMutableTreeNode) localRoot).getFirstChild();
                 jGraph.getGraphLayoutCache().remove(child);
             }

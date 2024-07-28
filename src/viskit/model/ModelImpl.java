@@ -51,12 +51,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     Map<Object, Edge> edgeCache = new HashMap<>();
     Vector<ViskitElement> stateVariables = new Vector<>();
     Vector<ViskitElement> simParameters = new Vector<>();
-    private String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
-    private String privateIdxVarPrefix = "_idxvar_";
-    private String privateLocVarPrefix = "locvar_";
-    private String stateVarPrefix = "state_";
+    private final String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
+    private final String privateIdxVarPrefix = "_idxvar_";
+    private final String privateLocVarPrefix = "locvar_";
+    private final String stateVarPrefix = "state_";
     private GraphMetadata metaData;
-    private EventGraphControllerImpl controller;
+    private final EventGraphControllerImpl controller;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
@@ -348,10 +348,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         node.getLocalVariables().clear();
+        EventLocalVariable elv;
         for (LocalVariable lv : ev.getLocalVariable()) {
             if (!lv.getName().startsWith(privateIdxVarPrefix)) {    // only if it's a "public" one
-                EventLocalVariable elv = new EventLocalVariable(
-                        lv.getName(), lv.getType(), lv.getValue());
+                elv = new EventLocalVariable(lv.getName(), lv.getType(), lv.getValue());
                 elv.setComment(concatStrings(lv.getComment()));
                 elv.opaqueModelObject = lv;
 
@@ -360,24 +360,30 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         node.setCodeBLock(ev.getCode());
-
         node.getTransitions().clear();
+        
+        EventStateTransition est;
+        LocalVariableAssignment l;
+        StateVariable sv;
+        String idx;
+        LocalVariableInvocation lvi;
+        List<String> cmt;
         for (StateTransition st : ev.getStateTransition()) {
 
-            EventStateTransition est = new EventStateTransition();
+            est = new EventStateTransition();
 
-            LocalVariableAssignment l = st.getLocalVariableAssignment();
+            l = st.getLocalVariableAssignment();
             if (l != null && l.getValue() != null && !l.getValue().isEmpty()) {
                 est.setLocalVariableAssignment(l.getValue());
             }
 
-            StateVariable sv = (StateVariable) st.getState();
+            sv = (StateVariable) st.getState();
             est.setName(sv.getName());
             est.setType(sv.getType());
 
             // bug fix 1183
             if (VGlobals.instance().isArray(sv.getType())) {
-                String idx = st.getIndex();
+                idx = st.getIndex();
                 est.setIndexingExpression(idx);
             }
 
@@ -388,11 +394,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 est.setOperationOrAssignment(st.getAssignment().getValue());
             }
 
-            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
+            lvi = st.getLocalVariableInvocation();
             if (lvi != null && lvi.getMethod() != null && !lvi.getMethod().isEmpty())
                 est.setLocalVariableInvocation(st.getLocalVariableInvocation().getMethod());
 
-            List<String> cmt = new ArrayList<>();
+            cmt = new ArrayList<>();
             cmt.addAll(sv.getComment());
             est.setComments(cmt);
 
@@ -575,21 +581,17 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     @Override
     public Vector<ViskitElement> getAllNodes() {
-        return new Vector<ViskitElement>(evNodeCache.values());
+        return new Vector<>(evNodeCache.values());
     }
 
-    // TODO: Known unchecked cast to ViskitElement
-    @SuppressWarnings("unchecked")
     @Override
     public Vector<ViskitElement> getStateVariables() {
-        return (Vector<ViskitElement>) stateVariables.clone();
+        return new Vector<>(stateVariables);
     }
 
-    // TODO: Known unchecked cast to ViskitElement
-    @SuppressWarnings("unchecked")
     @Override
     public Vector<ViskitElement> getSimParameters() {
-        return (Vector<ViskitElement>) simParameters.clone();
+        return new Vector<>( simParameters);
     }
 
     // parameter mods
@@ -752,6 +754,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     @Override
     public void redoEvent(EventNode node) {
+        if (evNodeCache.containsValue(node))
+            return;
+        
         Event jaxbEv = oFactory.createEvent();
         evNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
         jaxbEv.setName(node.getName());
@@ -1019,6 +1024,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     @Override
     public void redoSchedulingEdge(Edge ed) {
+        if (edgeCache.containsValue(ed))
+            return;
+        
         EventNode src, target;
         src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
         target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
@@ -1066,6 +1074,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     @Override
     public void redoCancelingEdge(Edge ed) {
+        if (edgeCache.containsValue(ed))
+            return;
+        
         EventNode src, target;
         src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
         target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();

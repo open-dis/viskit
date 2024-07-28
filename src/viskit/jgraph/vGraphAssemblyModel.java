@@ -99,7 +99,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
     public void deleteAll() {
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
-            if (localRoot instanceof AssemblyCircleCell || localRoot instanceof AssemblyPropListCell) {
+            if (localRoot instanceof vAssyCircleCell || localRoot instanceof vAssyPropListCell) {
                 Object[] child = new Object[1];
                 child[0] = ((DefaultMutableTreeNode) localRoot).getFirstChild();
                 jGraph.getGraphLayoutCache().remove(child);
@@ -131,7 +131,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         from = (DefaultGraphCell) ((ViskitElement) frO).opaqueViewObject;
         to = (DefaultGraphCell) ((ViskitElement) toO).opaqueViewObject;
 
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        vAssyEdgeCell edge = new vAssyEdgeCell();
         ae.opaqueViewObject = edge;
         edge.setUserObject(ae);
 
@@ -181,7 +181,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         from = (DefaultGraphCell) ((ViskitElement) frO).opaqueViewObject;
         to = (DefaultGraphCell) ((ViskitElement) toO).opaqueViewObject;
 
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        vAssyEdgeCell edge = new vAssyEdgeCell();
         sele.opaqueViewObject = edge;
         edge.setUserObject(sele);
 
@@ -212,7 +212,7 @@ public class vGraphAssemblyModel extends DefaultGraphModel {
         AssemblyNode pcln = (AssemblyNode) pce.getTo();
         DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;
         DefaultGraphCell to = (DefaultGraphCell) pcln.opaqueViewObject;
-        vAssemblyEdgeCell edge = new vAssemblyEdgeCell();
+        vAssyEdgeCell edge = new vAssyEdgeCell();
         pce.opaqueViewObject = edge;
         edge.setUserObject(pce);
 

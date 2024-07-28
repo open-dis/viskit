@@ -60,7 +60,7 @@ public class vGraphUI extends BasicGraphUI {
             else
                 cntl.cancellingArcEdit(e);
             
-        } else if (cell instanceof CircleCell) {
+        } else if (cell instanceof vCircleCell) {
             EventNode en = (EventNode) ((DefaultMutableTreeNode) cell).getUserObject();
             cntl.nodeEdit(en);
         }

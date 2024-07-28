@@ -177,19 +177,19 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
     private Object getKey(PortView pv) {
         Object o = pv.getParentView();
 
-        if (o instanceof CircleView) {
-            CircleView cv = (CircleView) pv.getParentView();
-            CircleCell cc = (CircleCell) cv.getCell();
+        if (o instanceof vCircleView) {
+            vCircleView cv = (vCircleView) pv.getParentView();
+            vCircleCell cc = (vCircleCell) cv.getCell();
             EventNode en = (EventNode) cc.getUserObject();
             return en.getModelKey();
-        } else if (o instanceof AssemblyCircleView) {
-            AssemblyCircleView cv = (AssemblyCircleView) o;
-            AssemblyCircleCell cc = (AssemblyCircleCell) cv.getCell();
+        } else if (o instanceof vAssyCircleView) {
+            vAssyCircleView cv = (vAssyCircleView) o;
+            vAssyCircleCell cc = (vAssyCircleCell) cv.getCell();
             EvGraphNode egn = (EvGraphNode) cc.getUserObject();
             return egn.getModelKey();
-        } else if (o instanceof AssemblyPropListView) {
-            AssemblyPropListView apv = (AssemblyPropListView) o;
-            AssemblyPropListCell apc = (AssemblyPropListCell) apv.getCell();
+        } else if (o instanceof vAssyPropListView) {
+            vAssyPropListView apv = (vAssyPropListView) o;
+            vAssyPropListCell apc = (vAssyPropListCell) apv.getCell();
             PropChangeListenerNode pn = (PropChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
@@ -234,7 +234,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         if (ev.getCell() instanceof vEdgeCell) {
             vec = (DefaultEdge) ev.getCell();
             edg = (ViskitElement) vec.getUserObject();
-        } else if (ev.getCell() instanceof vAssemblyEdgeCell) {
+        } else if (ev.getCell() instanceof vAssyEdgeCell) {
             vec = (DefaultEdge) ev.getCell();
             edg = (ViskitElement) vec.getUserObject();
         }
