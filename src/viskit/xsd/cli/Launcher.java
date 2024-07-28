@@ -90,8 +90,9 @@ public class Launcher extends Thread implements Runnable {
                     URLConnection urlc = u.openConnection();
                     JarInputStream jis = new JarInputStream(urlc.getInputStream());
                     JarEntry je;
+                    String name;
                     while ((je = jis.getNextJarEntry()) != null) {
-                        String name = je.getName();
+                        name = je.getName();
 
                         // Assemblies are foreced to be identified with "Assembly" in the file name
                         if (name.contains(eventGraphDir) && name.endsWith("xml") && !name.contains("Assembly") ) {
@@ -218,7 +219,6 @@ public class Launcher extends Thread implements Runnable {
         assemblyName = (String) m.invoke(assemblyJaxb, new Object[]{});
         m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
         assemblyName += "." + m.invoke(assemblyJaxb, new Object[]{});
-
     }
 
     /**
@@ -337,11 +337,11 @@ public class Launcher extends Thread implements Runnable {
         try {
 
             Enumeration<String> e = eventGraphs.keys();
+            String eventGraphName, eventGraph, eventGraphJava;
             while (e.hasMoreElements()) {
-                String eventGraphName = e.nextElement();
-                String eventGraph = eventGraphs.get(eventGraphName);
-                String eventGraphJava;
-
+                eventGraphName = e.nextElement();
+                eventGraph = eventGraphs.get(eventGraphName);
+                
                 try {
                     // unmarshal eventGraph xml
                     bais = new ByteArrayInputStream(eventGraph.getBytes());
@@ -461,11 +461,11 @@ public class Launcher extends Thread implements Runnable {
 
         try {
             Enumeration<String> e = eventGraphs.keys();
+            String eventGraphName, eventGraph, eventGraphJava;
             while (e.hasMoreElements()) {
-                String eventGraphName = e.nextElement();
-                String eventGraph = eventGraphs.get(eventGraphName);
-                String eventGraphJava;
-
+                eventGraphName = e.nextElement();
+                eventGraph = eventGraphs.get(eventGraphName);
+                
                 // unmarshal eventGraph xml
                 bais = new ByteArrayInputStream(eventGraph.getBytes());
                 c = xml2jz.getConstructor(new Class<?>[]{InputStream.class});
@@ -618,7 +618,6 @@ public class Launcher extends Thread implements Runnable {
 
     void launchGridkit(String port) {
         try {
-
             if (inGridlet) {
                 launchGridlet();
             } else {

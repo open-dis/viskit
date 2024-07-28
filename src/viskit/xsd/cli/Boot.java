@@ -142,6 +142,11 @@ public class Boot extends URLClassLoader implements Runnable {
                 //should be hopefully invalid
                 super.addURL(jarURL);
 
+                File extJar;
+                int c;
+                ByteArrayOutputStream baos;
+                byte[] buff;
+                String systemClassPath;
                 while ( ( je = jis.getNextJarEntry() ) != null ) {
                     String name = je.getName();
 
@@ -150,13 +155,12 @@ public class Boot extends URLClassLoader implements Runnable {
 
                     if ( name.endsWith("jar") ) {
                         log.debug("Found internal jar externalizing " + name);
-                        File extJar = TempFileManager.createTempFile(name,".jar");
+                        extJar = TempFileManager.createTempFile(name,".jar");
 
                         // note this file gets created for the duration of the server, is ok to use deleteOnExit
                         try (FileOutputStream fos = new FileOutputStream(extJar)) {
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            int c;
-                            byte[] buff = new byte[512];
+                            baos = new ByteArrayOutputStream();
+                            buff = new byte[512];
                             while ((c = jis.read(buff)) > -1 ) {
                                 baos.write(buff,0,c);
                             }
@@ -167,7 +171,7 @@ public class Boot extends URLClassLoader implements Runnable {
                         addURL(extJar.toURI().toURL());
                         log.debug("File to new jar " + extJar.getCanonicalPath());
                         log.debug("Added jar " + extJar.toURI().toURL().toString());
-                        String systemClassPath = System.getProperty("java.class.path");
+                        systemClassPath = System.getProperty("java.class.path");
                         System.setProperty("java.class.path", systemClassPath+File.pathSeparator+extJar.getCanonicalPath());
                         log.debug("ClassPath " + System.getProperty("java.class.path"));
                     }
