@@ -168,7 +168,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphComponentWrapper getCurrentVgcw() {
+    public VgraphComponentWrapper getCurrentVgraphComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
@@ -179,7 +179,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphComponentWrapper vcw = getCurrentVgcw();
+        VgraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getLeftComponent();
     }
@@ -205,7 +205,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            VgraphComponentWrapper myVgcw = getCurrentVgcw();
+            VgraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
 
             if (myVgcw == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
@@ -388,7 +388,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void setSelectedEventGraphDescription(String description) {
-        JSplitPane jsp = getCurrentVgcw().stateParamSplitPane;
+        JSplitPane jsp = getCurrentVgraphComponentWrapper().stateParamSplitPane;
         JPanel jp = (JPanel) jsp.getTopComponent();
         Component[] components = jp.getComponents();
         for (Component c : components) {
@@ -644,9 +644,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // These start off being disabled, until something is selected
         ActionIntrospector.getAction(controller, "cut").setEnabled(false);
-        ActionIntrospector.getAction(controller, "remove").setEnabled(false);
         ActionIntrospector.getAction(controller, "copy").setEnabled(false);
         ActionIntrospector.getAction(controller, "paste").setEnabled(false);
+        ActionIntrospector.getAction(controller, "remove").setEnabled(false);
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(controller, "newNode", "Add Event Node", KeyEvent.VK_N,
@@ -821,10 +821,10 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getToolBar().setVisible(false);
 
         zoomIn.addActionListener((ActionEvent e) -> {
-            getCurrentVgcw().setScale(getCurrentVgcw().getScale() + 0.1d);
+            getCurrentVgraphComponentWrapper().setScale(getCurrentVgraphComponentWrapper().getScale() + 0.1d);
         });
         zoomOut.addActionListener((ActionEvent e) -> {
-            getCurrentVgcw().setScale(Math.max(getCurrentVgcw().getScale() - 0.1d, 0.1d));
+            getCurrentVgraphComponentWrapper().setScale(Math.max(getCurrentVgraphComponentWrapper().getScale() - 0.1d, 0.1d));
         });
 
         TransferHandler th = new TransferHandler("text");
@@ -841,13 +841,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
         selectMode.addActionListener((ActionEvent e) -> {
-            getCurrentVgcw().setPortsVisible(false);
+            getCurrentVgraphComponentWrapper().setPortsVisible(false);
         });
         arcMode.addActionListener((ActionEvent e) -> {
-            getCurrentVgcw().setPortsVisible(true);
+            getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
         cancelArcMode.addActionListener((ActionEvent e) -> {
-            getCurrentVgcw().setPortsVisible(true);
+            getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
 
     }
@@ -979,16 +979,16 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
                 case SELECT_MODE:
-                    getCurrentVgcw().setCursor(select);
+                    getCurrentVgraphComponentWrapper().setCursor(select);
                     break;
                 case ARC_MODE:
-                    getCurrentVgcw().setCursor(arc);
+                    getCurrentVgraphComponentWrapper().setCursor(arc);
                     break;
                 case CANCEL_ARC_MODE:
-                    getCurrentVgcw().setCursor(cancel);
+                    getCurrentVgraphComponentWrapper().setCursor(cancel);
                     break;
                 default:
-                    getCurrentVgcw().setCursor(select);
+                    getCurrentVgraphComponentWrapper().setCursor(select);
                     break;
             }
         }
@@ -1034,7 +1034,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             Point p = e.getLocation();  // subtract the size of the label
 
             // get the node in question from the jGraph
-            Object o = getCurrentVgcw().getViskitElementAt(p);
+            Object o = getCurrentVgraphComponentWrapper().getViskitElementAt(p);
 
             switch (dragger) {
                 case NODE_DRAG:
@@ -1218,7 +1218,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void modelChanged(mvcModelEvent event) {
-        VgraphComponentWrapper vgcw = getCurrentVgcw();
+        VgraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
         ParametersPanel pp = vgcw.paramPan;
         StateVariablesPanel vp = vgcw.varPan;
         switch (event.getID()) {
