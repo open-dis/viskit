@@ -67,14 +67,32 @@ Post release fixes / upgrades / issues:
   of generic containers. The compiler will notify of any errors at which time
   the user can investigate and fix during EG or Assy authoring.
 
+7/23/24 (Critical)
+    Can place more than one scheduling edge between nodes
+
+        (Minor)
+
+    Placing a scheduling edge between two nodes does not immediately populate
+    the scheduling priority. If priority was missing on startup, it gets placed
+    then
+
   ****** FIXES / UPGRADES:
+    (Critical)
+    Selection of edges on macOS was intermittent. Fix on 13 DEC 22 did not take.
+    Turns out all edges need a label, even if an empty string. Null strings
+    caused edge bounding box null issues.
+
+    (Critical)
+    Happening on macOS Sonoma 14.5
+    https://groove.cs.utwente.nl/mac.html
+    accessabilityContext is null in JGraph, so, needs a parent Component
 
     Updated most 3rd party libs, esp. Commons Config to fix File menu histories
     not being retained for next start of the application.
 
     Simkit updated to v1.5.6
 
-    Fixed unit tests to run independently in their own ant target, some were 
+    Fixed unit tests to run independently in their own ant target, some were
     dormant.
 
     Tested on JDK 22.0.1
@@ -85,19 +103,19 @@ Major changes since 1.0.15
 
     Fix to JAXB exception for not finding files from deleted project spaces.
 
-    Fixed not being able to select a scheduling or cancelling edge to invoke its
+    *** (it's back) *** Fixed not being able to select a scheduling or cancelling edge to invoke its
     inspector (editor). Event clicks were not happening in the EDT.
 
     Fixed NPE from version attempting to read SVN strings, which are no longer
     relevant since switching to git.
 
-    Upgraded to latest JAXB. Bumped src release to 11 and tested to run on 
+    Upgraded to latest JAXB. Bumped src release to 11 and tested to run on
     JDK17+.
 
-    In an attempt to maintain a clean/fresh classloader for each assy run (the 
-    idea being that we don't want any previous static references to interfere 
+    In an attempt to maintain a clean/fresh classloader for each assy run (the
+    idea being that we don't want any previous static references to interfere
     with independent runs), and since the inception of the Java Module Platform
-    System (JPMS), stripping out all but the "boot" class loader is accomplished 
+    System (JPMS), stripping out all but the "boot" class loader is accomplished
     in the LocalBootLoader, thus preserving our goal of isolated class loaders.
 
 Release: 1.0.15(June 08, 2015)
@@ -109,7 +127,7 @@ Major changes since 1.0.10:
   https://eos.nps.edu/wcm/Viskit. Due to the many refactorings that took place
   since R2900 (09 DEC 2015), R2900 marks the revision that was the last known
   functional build of Viskit. Rather than branch at the original SVN site, it
-  was decided to move to a more functional repository for version control w/ 
+  was decided to move to a more functional repository for version control w/
   Git.
 
   EventNodes that are similarly named can be achieved using an underscore
