@@ -260,8 +260,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
 
-        if (view.getCurrentVgcw() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        if (view.getCurrentVgraphComponentWrapper() != null) {
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -708,15 +708,15 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     public void remove() {
         if (!selectionVector.isEmpty()) {
             // first ask:
-            String msg = "";
+            String s, msg = "";
             int localNodeCount = 0;  // different msg for edge delete
             for (Object o : selectionVector) {
-                if (o instanceof EventNode) {
+                if (o != null && o instanceof EventNode) {
                     localNodeCount++;
+                    s = o.toString();
+                    s = s.replace('\n', ' ');
+                    msg += ", \n" + s;
                 }
-                String s = o.toString();
-                s = s.replace('\n', ' ');
-                msg += ", \n" + s;
             }
             if (msg.length() > 3) {
                 msg = msg.substring(3);
@@ -767,20 +767,25 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
         int x = 100, y = 100;
         int offset = 20;
+        String nm;
         // We only paste un-attached nodes (at first)
         for (Object o : copyVector) {
             if (o instanceof Edge) {
                 continue;
             }
-            String nm = ((ViskitElement) o).getName();
-            buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
-            bias++;
+            
+            if (o != null) {
+                nm = ((ViskitElement) o).getName();
+                buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
+                bias++;
+            }
         }
     }
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
     private void delete() {
+        EventNode en;
 
         // Prevent concurrent modification
         Vector<Object> v = (Vector<Object>) selectionVector.clone();
@@ -788,7 +793,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             if (elem instanceof Edge) {
                 removeEdge((Edge) elem);
             } else if (elem instanceof EventNode) {
-                EventNode en = (EventNode) elem;
+                en = (EventNode) elem;
                 for (ViskitElement ed : en.getConnections()) {
                     removeEdge((Edge) ed);
                 }
@@ -813,7 +818,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    /** Assume the last selected element is our candidate for a redo */
+    /** Match the selected element as our candidate for a redo */
     private DefaultGraphCell redoGraphCell;
 
     /** Inform the model that this in an undo, not full delete */
@@ -827,34 +832,29 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         return isUndo;
     }
 
-    /**
-     * Removes the last selected node or edge from the JGraph model
-     */
     @Override
     public void undo() {
+        if (selectionVector.isEmpty())
+            return;
 
         isUndo = true;
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        Object[] roots = view.getCurrentVgraphComponentWrapper().getRoots();
+        for (Object root : roots) {
+            if (root instanceof DefaultGraphCell)
+                redoGraphCell = ((DefaultGraphCell) root);
+            if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
+                break;
+        }
 
-        Object[] roots = view.getCurrentVgcw().getRoots();
-        redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
-
-        // Prevent dups
-        if (!selectionVector.contains(redoGraphCell.getUserObject()))
-            selectionVector.add(redoGraphCell.getUserObject());
-
-        remove();
-
-        if (!doRemove) {return;}
-
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentVgcw().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
-            LOG.error("Unable to undo: " + ex);
+            LOG.error("Unable to undo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
@@ -874,7 +874,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             if (redoGraphCell.getUserObject() instanceof SchedulingEdge) {
                 SchedulingEdge ed = (SchedulingEdge) redoGraphCell.getUserObject();
                 ((Model) getModel()).redoSchedulingEdge(ed);
-            } else {
+            } else if (redoGraphCell.getUserObject() instanceof CancelingEdge) {
                 CancelingEdge ed = (CancelingEdge) redoGraphCell.getUserObject();
                 ((Model) getModel()).redoCancelingEdge(ed);
             }
@@ -884,11 +884,11 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentVgcw().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
-            LOG.error("Unable to redo: " + ex);
+            LOG.error("Unable to redo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
@@ -897,10 +897,10 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgcw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgcw().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgcw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }
