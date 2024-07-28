@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleInventory" version="0.1" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter type="simkit.random.RandomVariate" name="timeBetweenDemands"/>
-    <Parameter type="simkit.random.RandomVariate" name="demand"/>
-    <Parameter type="simkit.random.RandomVariate" name="leadTime"/>
-    <Parameter type="double" name="timeBetweenReviews"/>
-    <Parameter type="double" name="initialInventory"/>
-    <Parameter type="double" name="triggerPoint"/>
-    <Parameter type="double" name="orderUpTo"/>
-    <StateVariable name="inventoryPosition" type="double" />
-    <StateVariable name="amountOnOrder" type="double" />
+<SimEntity name="SimpleInventory" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="timeBetweenDemands" type="simkit.random.RandomVariate"/>
+    <Parameter name="demand" type="simkit.random.RandomVariate"/>
+    <Parameter name="leadTime" type="simkit.random.RandomVariate"/>
+    <Parameter name="timeBetweenReviews" type="double"/>
+    <Parameter name="initialInventory" type="double"/>
+    <Parameter name="triggerPoint" type="double"/>
+    <Parameter name="orderUpTo" type="double"/>
+    <StateVariable name="inventoryPosition" type="double"/>
+    <StateVariable name="amountOnOrder" type="double"/>
     <Event name="Run">
         <StateTransition state="inventoryPosition">
             <Assignment value="initialInventory"/>
@@ -16,33 +16,33 @@
         <StateTransition state="amountOnOrder">
             <Assignment value="0"/>
         </StateTransition>
-        <Schedule delay="timeBetweenReviews" event="Review"/>
-        <Schedule delay="timeBetweenDemands.generate()" event="Demand"/>
-        <Coordinate y="20" x="10"/>
+        <Schedule delay="timeBetweenReviews" event="Review" priority="DEFAULT"/>
+        <Schedule delay="timeBetweenDemands.generate()" event="Demand" priority="DEFAULT"/>
+        <Coordinate x="10.0" y="20.0"/>
     </Event>
     <Event name="Demand">
         <StateTransition state="inventoryPosition">
             <Assignment value="inventoryPosition - demand.generate()"/>
         </StateTransition>
-        <Schedule delay="timeBetweenDemands.generate()" event="Demand"/>
-        <Coordinate y="20" x="160"/>
+        <Schedule delay="timeBetweenDemands.generate()" event="Demand" priority="DEFAULT"/>
+        <Coordinate x="160.0" y="20.0"/>
     </Event>
     <Event name="Review">
-        <Schedule condition="inventoryPosition + amountOnOrder &lt; triggerPoint" delay="0.0" event="PlaceOrder">
+        <Schedule delay="0.0" event="PlaceOrder" condition="inventoryPosition + amountOnOrder &lt; triggerPoint" priority="DEFAULT">
             <EdgeParameter value="(orderUpTo - inventoryPosition - amountOnOrder)"/>
         </Schedule>
-        <Schedule delay="timeBetweenReviews" event="Review"/>
-        <Coordinate y="140" x="80"/>
+        <Schedule delay="timeBetweenReviews" event="Review" priority="DEFAULT"/>
+        <Coordinate x="80.0" y="140.0"/>
     </Event>
     <Event name="PlaceOrder">
         <Argument name="newOrderAmount" type="double"/>
         <StateTransition state="amountOnOrder">
             <Assignment value="amountOnOrder + newOrderAmount"/>
         </StateTransition>
-        <Schedule delay="leadTime.generate()" event="ReceiveOrder">
+        <Schedule delay="leadTime.generate()" event="ReceiveOrder" priority="DEFAULT">
             <EdgeParameter value="newOrderAmount"/>
         </Schedule>
-        <Coordinate y="150" x="190"/>
+        <Coordinate x="190.0" y="150.0"/>
     </Event>
     <Event name="ReceiveOrder">
         <Argument name="receivedOrderAmount" type="double"/>
@@ -52,7 +52,6 @@
         <StateTransition state="inventoryPosition">
             <Assignment value="inventoryPosition + receivedOrderAmount"/>
         </StateTransition>
-        <Coordinate y="150" x="310"/>
+        <Coordinate x="310.0" y="150.0"/>
     </Event>
 </SimEntity>
-
