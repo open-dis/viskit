@@ -99,8 +99,9 @@ public class ViskitAssembly extends BasicAssembly {
         if(debug) {
             LOG.info("hookupSimEventListeners called " + listeners.length);
         }
+        List<String> simEventListenerConnects;
         for (String listener : listeners) {
-            List<String> simEventListenerConnects = simEventListenerConnections.get(listener);
+            simEventListenerConnects = simEventListenerConnections.get(listener);
             if (simEventListenerConnects != null) {
                 for(String source : simEventListenerConnects) {
                     connectSimEventListener(listener, source);
@@ -115,8 +116,9 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     public void hookupReplicationListeners() {
         String[] listeners = GenericConversion.toArray(replicationStatsListenerConnections.keySet(), new String[0]);
+        List<PropertyConnector> repStatsConnects;
         for (String listener : listeners) {
-            List<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
+            repStatsConnects = replicationStatsListenerConnections.get(listener);
             if (repStatsConnects != null) {
                 for (PropertyConnector pc : repStatsConnects) {
                     connectReplicationStats(listener, pc);
@@ -133,9 +135,10 @@ public class ViskitAssembly extends BasicAssembly {
         String[] listeners = GenericConversion.toArray(designPointStatsListenerConnections.keySet(), new String[0]);
         // if not the default case, need to really do this with
         // a Class to create instances selected by each ReplicationStats listener.
+        List<PropertyConnector> designPointConnects;
         if (listeners.length > 0) {
             for (String listener : listeners) {
-                List<PropertyConnector> designPointConnects = designPointStatsListenerConnections.get(listener);
+                designPointConnects = designPointStatsListenerConnections.get(listener);
                 if ( designPointConnects != null ) {
                     for (PropertyConnector pc : designPointConnects) {
                         connectDesignPointStats(listener, pc);
@@ -150,8 +153,9 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     protected void hookupPropertyChangeListeners() {
         String[] listeners = GenericConversion.toArray(propertyChangeListenerConnections.keySet(), new String[0]);
+        List<PropertyConnector> propertyConnects;
         for (String listener : listeners) {
-            List<PropertyConnector> propertyConnects = propertyChangeListenerConnections.get(listener);
+            propertyConnects = propertyChangeListenerConnections.get(listener);
             if (propertyConnects != null) {
                 for (PropertyConnector pc : propertyConnects) {
                     connectPropertyChangeListener(listener, pc);
@@ -228,7 +232,7 @@ public class ViskitAssembly extends BasicAssembly {
         entities.put(name, entity);
 
         // TODO: This will throw an IllegalArgumentException?
-//        LOG.debug("entity is: " + entity);
+//        LOG.debug("entity is: {}", entity);
     }
 
     public void addDesignPointStats(String listenerName, PropertyChangeListener pcl) {
@@ -323,4 +327,5 @@ public class ViskitAssembly extends BasicAssembly {
             this.source = s;
         }
     }
-}
+    
+} // end class ViskitAssembly

@@ -242,6 +242,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         String typeStat, nodeType;
         int ix = 0;
         boolean isCount;
+        SampleStatistics stat;
         for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
 
             LOG.debug("entry is: " + entry);
@@ -269,7 +270,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     typeStat = isCount ? ".count" : ".mean";
                     LOG.debug("typeStat is: " + typeStat);
 
-                    SampleStatistics stat = (SampleStatistics) getReplicationStats()[ix];
+                    stat = (SampleStatistics) getReplicationStats()[ix];
                     if (stat.getName().equals("%unnamed%")) {
                         stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
                     }
@@ -689,6 +690,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         runEntities = Schedule.getReruns();
 
+        Method setNumberOfReplications;
         // Convenience for Diskit if on the classpath
         for (ReRunnable entity : runEntities) {
 
@@ -697,7 +699,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
                 try {
-                    Method setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
+                    setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
                     setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error(ex);
@@ -770,6 +772,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 String typeStat;
                 int ix = 0;
                 boolean isCount;
+                SampleStatistics ss;
 
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
@@ -792,7 +795,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 }
                                 isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                                 typeStat = isCount ? ".count" : ".mean";
-                                SampleStatistics ss = (SampleStatistics) getReplicationStats()[ix];
+                                ss = (SampleStatistics) getReplicationStats()[ix];
                                 fireIndexedPropertyChange(ix, ss.getName(), ss);
                                 if (isCount) {
                                     fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());

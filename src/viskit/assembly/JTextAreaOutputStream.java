@@ -54,9 +54,9 @@ import javax.swing.Timer;
  */
 public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
-  private JTextArea jta;
-  private Timer swingTimer;
-  private int delay = 125; //250;   // Performance adjuster for slow machines
+  private final JTextArea jta;
+  private final Timer swingTimer;
+  private final int delay = 125; //250;   // Performance adjuster for slow machines
 
   final public static int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
   final public static int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
