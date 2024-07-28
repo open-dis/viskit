@@ -221,10 +221,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             openAlready = vaw.getOpenModels();
         }
         boolean isOpenAlready = false;
+        String path;
         if (openAlready != null) {
             for (AssemblyModel model : openAlready) {
                 if (model.getLastFile() != null) {
-                    String path = model.getLastFile().getAbsolutePath();
+                    path = model.getLastFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath())) {
                         isOpenAlready = true;
                     }
@@ -265,12 +266,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Mark every Assy file opened as "open" in the app config file */
     private void markAssyFilesOpened() {
+        String modelPath;
 
         // Mark every vAMod opened as "open"
         AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vAMod : openAlready) {
             if (vAMod.getLastFile() != null) {
-                String modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
+                modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
                 markAssyConfigOpen(modelPath);
             }
         }
@@ -1028,10 +1030,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     @Override
     public void pcListenerEdit(PropChangeListenerNode pclNode) {
-        boolean done;
+        boolean done, modified;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditPclNode(pclNode);
+            modified = ((AssemblyView) getView()).doEditPclNode(pclNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changePclNode(pclNode);
             }
@@ -1040,10 +1042,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void evGraphEdit(EvGraphNode evNode) {
-        boolean done;
+        boolean done, modified;
         do {
             done = true;
-            boolean modified = ((AssemblyView) getView()).doEditEvGraphNode(evNode);
+            modified = ((AssemblyView) getView()).doEditEvGraphNode(evNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changeEvGraphNode(evNode);
             }
@@ -1114,15 +1116,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void remove() {
         if (!selectionVector.isEmpty()) {
             // first ask:
-            String msg = "";
+            String s, msg = "";
             int nodeCount = 0;  // different msg for edge delete
             for (Object o : selectionVector) {
                 if (o instanceof AssemblyNode) {
                     nodeCount++;
+                    s = o.toString();
+                    s = s.replace('\n', ' ');
+                    msg += ", \n" + s;
                 }
-                String s = o.toString();
-                s = s.replace('\n', ' ');
-                msg += ", \n" + s;
             }
             String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
             doRemove = ((AssemblyView) getView()).genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
@@ -1246,29 +1248,31 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     @Override
     public void undo() {
+        if (selectionVector.isEmpty())
+            return;
 
         isUndo = true;
 
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
-
         Object[] roots = view.getCurrentVgacw().getRoots();
-        redoGraphCell = (DefaultGraphCell) roots[roots.length - 1];
+        for (Object root : roots) {
+            if (root instanceof DefaultGraphCell)
+                redoGraphCell = ((DefaultGraphCell) root);
+            if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
+                break;
+        }
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         // Prevent dups
         if (!selectionVector.contains(redoGraphCell.getUserObject()))
             selectionVector.add(redoGraphCell.getUserObject());
-
-        remove();
-
-        if (!doRemove) {return;}
 
         try {
 
             // This will clear the selectionVector via callbacks
             undoMgr.undo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
-            LOG.error("Unable to undo: " + ex);
+            LOG.error("Unable to undo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
@@ -1311,7 +1315,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
-            LOG.error("Unable to redo: " + ex);
+            LOG.error("Unable to redo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
@@ -1877,8 +1881,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
-    private Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -1886,9 +1890,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param file an assembly file to add to the list
      */
     private void adjustRecentAssySet(File file) {
+        File f;
         for (Iterator<File> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
 
-            File f = itr.next();
+            f = itr.next();
             if (file.getPath().equals(f.getPath())) {
                 itr.remove();
                 break;
@@ -1906,9 +1911,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param file a project file to add to the list
      */
     public void adjustRecentProjSet(File file) {
+        File f;
         for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
 
-            File f = itr.next();
+            f = itr.next();
             if (file.getPath().equals(f.getPath())) {
                 itr.remove();
                 break;
@@ -1929,9 +1935,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         List<Object> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
         LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
         int idx = 0;
+        String op;
         for (Object s : valueAr) {
             if (recentAssyFileSet.add(new File((String) s))) {
-                String op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
                     openAssemblies.add(new File((String) s));
