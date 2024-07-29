@@ -112,7 +112,6 @@
     <fileset dir="${dir.lib}" id="runtime.lib">
         <!-- could use restrictions in current runtime.classpath -->
         <include name="**/*.jar"/>
-        <exclude name="izpack/**"/>
         <exclude name="support/**"/>
         <exclude name="jaxb/jaxb-xjc.jar"/>
     </fileset>
@@ -798,8 +797,5 @@ their descpritions.
             <fileset dir="${dot.viskit.dir}" includes="vconfig.xml"/>
         </concat>
     </target>
-
-    <!-- add izpack installer task -->
-    <import file="buildInstallers.xml"/>
 
 </project>

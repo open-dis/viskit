@@ -30,6 +30,7 @@
             <author name="Pat Sullivan" email="pvsksullivan@gmail.com"/>
         </authors>
         <url>@{product.url}</url>
+        <uninstaller write="yes" name="@{product.Name}uninstaller.jar"/>
         <!-- Minimum JDK version required -->
         <javaversion>17</javaversion>
         <requiresjdk>yes</requiresjdk>
@@ -50,28 +51,26 @@
     </locale>
 
     <resources>
-        <res src="images/ViskitLogo.png" id="Installer.image"/>
-        <res src="stage/license/lgpl.txt" id="LicencePanel.licence"/>
-        <res src="stage/Introduction.html" id="HTMLInfoPanel.info"/>
-        <!--<res src="macosx/LegacyJava6.html" id="HTMLInfoPanel.java"/>-->
+        <res src="images/ViskitLogo.png"     id="Installer.image"/>
+        <res src="stage/license/license.txt" id="LicencePanel.licence"/>
+        <res src="stage/Introduction.html"   id="HTMLInfoPanel.info"/>
     </resources>
 
     <panels>
-        <panel classname="HelloPanel"         id="HelloPanel"/>
-        <panel classname="HTMLInfoPanel"      id="panel.html"/>
-        <panel classname="LicencePanel"       id="LicencePanel"/>
-        <panel classname="TargetPanel"        id="TargetPanel"/>
-        <panel classname="PacksPanel"         id="PacksPanel"/>
-        <panel classname="ShortcutPanel"      id="ShortcutPanel"/>
-        <panel classname="SummaryPanel"       id="SummaryPanel"/>
-        <panel classname="InstallPanel"       id="panel.install"/>
-        <panel classname="SimpleFinishPanel"  id="SimpleFinishPanel"/>
+        <panel classname="HelloPanel"/>
+        <panel classname="HTMLInfoPanel"        id="panel.html"/>
+        <panel classname="LicencePanel"/>
+        <panel classname="TargetPanel"/>
+        <panel classname="PacksPanel"/>
+        <panel classname="ShortcutPanel"/>
+        <panel classname="SummaryPanel"/>
+        <panel classname="InstallPanel"/>
+        <panel classname="SimpleFinishPanel"/>
     </panels>
     
     <listeners>
         <listener classname="SummaryLoggerInstallerListener" stage="install">
-            <os family="windows"/>
-            <os family="unix"/>
+            <os family="mac"/>
         </listener>
     </listeners>
 
@@ -89,15 +88,11 @@
               <include name="configuration/**"/>
               <exclude name="configuration/c_gui.xml"/>
               <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
-              <include name="doc/**"/>
               <include name="images/**"/>
               <exclude name="images/american-flag.gif"/>
               <include name="license/**"/>
               <include name="viskit/**"/>
               <include name="RELEASE_NOTES*"/>
-              <include name="ViskitOperation.txt"/>
-              <include name="Viskit-overview.docx"/>
-              <include name="NB-Project-Creation.txt"/>
           </fileset>
 
           <fileset dir="stage"               targetdir="$USER_HOME">
@@ -110,7 +105,6 @@
           </fileset>
 
           <!-- Apple specific files -->
-          <!--<file src="macosx/LegacyJava6.html"             targetdir="$INSTALL_PATH/Viskit.app"/>-->
           <file src="macosx/Info.plist"                   targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/PkgInfo"                      targetdir="$INSTALL_PATH/Viskit.app/Contents"/>
           <file src="macosx/ViskitLogo.icns"              targetdir="$INSTALL_PATH/Viskit.app/Contents/Resources"/>
@@ -119,6 +113,14 @@
           <!-- Sets +x attributes to the stub -->
           <executable targetfile="$INSTALL_PATH/Viskit.app/Contents/MacOS/universalJavaApplicationStub" stage="never" />
 
+        </pack>
+        
+        <!-- The documentation (1 directory) -->
+        <pack name="Documentation" required="no">
+            <description>Viskit documentation (HTML, ODT and TEXT).</description>
+            <fileset dir="stage" targetdir="$INSTALL_PATH">
+              <include name="doc/**"/>
+            </fileset>
         </pack>
     </packs>
     

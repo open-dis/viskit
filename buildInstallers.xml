@@ -36,8 +36,7 @@
     <!-- ===== Build Viskit installer jars into ./installer directory ===== -->
     
     <!-- Prerequisite for creating installer: you must have local izPack v5+ installed from http://izpack.org
-         Place ${izpack.dist} key in nbproject/private/private.properties pointing to local izPack 
-         Prerequisite: apply .jar fix in ${izpack.dist}/izpack-lang-fix to local ${izpack.dist}/lib -->
+         Place ${izpack.dist} key in nbproject/private/private.properties pointing to local izPack -->
     <path id="izpack.lib.path">
         <fileset dir="${izpack.dist}/lib" includes="*.jar"/>
     </path>
@@ -94,9 +93,9 @@
             depends="no.extensions,getLaunch4j,clean.installers"
             description="Build the installers with no runtime extensions">
 
-        <ant target="installers.common"/>
-        <ant target="make.win.unix.installer"/>
-        <ant target="make.mac.installer"/>
+        <antcall target="installers.common"/>
+        <antcall target="make.win.unix.installer"/>
+        <antcall target="make.mac.installer"/>
 
         <echo message="IzPack installer builds complete"/>
     </target>
@@ -114,14 +113,16 @@
                 <include name="Introduction.html"/>
             </fileset>
         </copy>
-        <ant target="installers.common"/>
-        <ant target="make.win.unix.installer"/>
-        <ant target="make.mac.installer"/>
+        
+        <antcall target="installers.common"/>
+        <antcall target="make.win.unix.installer"/>
+        <antcall target="make.mac.installer"/>
 
         <echo message="IzPack installer builds complete"/>
     </target>
 
     <target name="installers.common">
+        <mkdir dir="${installers.dir}/build"/>
         <copy todir="${installers.dir}/stage/Schemas">
             <fileset dir="${basedir}/Schemas"/>
         </copy>
@@ -153,8 +154,8 @@
         </copy>
         <copy todir="${installers.dir}/stage/doc">
             <fileset dir="${basedir}/doc">
-                <include name="ViskitOperation.txt"/>
-                <include name="Viskit-overview.pdf"/>
+                <include name="ViskitSoftwareDesignSummary.txt"/>
+                <include name="ViskitOverview.pdf"/>
                 <include name="NB-Project-Creation.txt"/>
                 <include name="references/Discrete Event Simulation Modeling.pdf"/>
             </fileset>
