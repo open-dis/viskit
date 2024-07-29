@@ -9,15 +9,15 @@ version #:
     product.version.level=0
 
 2) src/viskit/version.txt
-    version # only.  git-rcs-keywords will take care of the rest
+    version # only. git-rcs-keywords will take care of the rest
     After a commit of anything in the repo, perform a command line checkout
     of this file: git checkout src/viskit/version.txt
     NOTE: must have Perl installed and accessible from your $PATH
 
 3) installer/Unix_shortcutSpec.xml
    installer/launch4jConfig.xml
-        versionInfo
    installer/shortcutSpec.xml
+        versionInfo
    installer/macosx/Info.plist
         CFBundleVersion
         ClassPath
