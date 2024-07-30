@@ -16,7 +16,7 @@ import viskit.model.ViskitElement;
  */
 public class LocalVariablesPanel extends ViskitTablePanel
 {
-  private String[] mytitles = {"name","type","initial value","description"};
+  private final String[] mytitles = {"name","type","initial value","description"};
 
   public LocalVariablesPanel(int wid)
   {

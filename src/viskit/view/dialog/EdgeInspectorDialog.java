@@ -47,22 +47,30 @@ public class EdgeInspectorDialog extends JDialog {
     private static boolean allGood;
     private Edge edge;
     private boolean schedulingType = true; // true = scheduling, false = cancelling
-    private JButton canButt, okButt;
-    private JLabel srcEvent, targEvent;
+    private final JButton canButt;
+    private final JButton okButt;
+    private final JLabel srcEvent;
+    private final JLabel targEvent;
     private EdgeParametersPanel parameters;
-    private ConditionalExpressionPanel conditionalExpressionPanel;
-    private JPanel timeDelayPanel, priorityPanel, myParmPanel;
-    private Border delayPanBorder, delayPanDisabledBorder;
-    private JComboBox<String> priorityCB, timeDelayMethodsCB;
-    private JComboBox<ViskitElement> timeDelayVarsCB;
+    private final ConditionalExpressionPanel conditionalExpressionPanel;
+    private final JPanel timeDelayPanel;
+    private final JPanel priorityPanel;
+    private final JPanel myParmPanel;
+    private final Border delayPanBorder;
+    private final Border delayPanDisabledBorder;
+    private final JComboBox<String> priorityCB;
+    private final JComboBox<String> timeDelayMethodsCB;
+    private final JComboBox<ViskitElement> timeDelayVarsCB;
     private java.util.List<Priority> priorityList;  // matches combo box
     private Vector<String> priorityNames;
     private int priorityDefaultIndex = 3;      // set properly below
-    private JLabel schedulingLabel, cancellingLabel;
-    private JButton addConditionalButton, addDescriptionButton;
+    private final JLabel schedulingLabel;
+    private final JLabel cancellingLabel;
+    private final JButton addConditionalButton;
+    private final JButton addDescriptionButton;
     private JTextArea descriptionJta;
-    private JScrollPane descriptionJsp;
-    private JLabel dotLabel;
+    private final JScrollPane descriptionJsp;
+    private final JLabel dotLabel;
 
     /**
      * Set up and show the dialog. The first Component argument
@@ -166,13 +174,9 @@ public class EdgeInspectorDialog extends JDialog {
         Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
         descriptionJsp.setMinimumSize(descriptionJspDimension);
 
-        descriptionJta.addCaretListener(new CaretListener() {
-
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                if (changeListener != null) {
-                    changeListener.stateChanged(new ChangeEvent(descriptionJta));
-                }
+        descriptionJta.addCaretListener((CaretEvent e) -> {
+            if (changeListener != null) {
+                changeListener.stateChanged(new ChangeEvent(descriptionJta));
             }
         });
 
@@ -183,7 +187,8 @@ public class EdgeInspectorDialog extends JDialog {
         priorityPanel.setLayout(new BoxLayout(priorityPanel, BoxLayout.X_AXIS));
         priorityPanel.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
-                BorderFactory.createTitledBorder("Priority")));
+                BorderFactory.createTitledBorder("Priority"))
+        );
         priorityCB = buildPriorityComboBox();
         priorityPanel.add(Box.createHorizontalStrut(50));
         priorityPanel.add(priorityCB);
@@ -201,7 +206,8 @@ public class EdgeInspectorDialog extends JDialog {
                 null,
                 0,
                 timeDelayVarsCB,
-                dotLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD)));
+                dotLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "." + OneLinePanel.CLOSE_LABEL_BOLD))
+        );
         timeDelayPanel.setBorder(BorderFactory.createTitledBorder("Time Delay"));
         delayPanBorder = timeDelayPanel.getBorder();
         delayPanDisabledBorder = BorderFactory.createTitledBorder(
@@ -222,7 +228,6 @@ public class EdgeInspectorDialog extends JDialog {
 
             // NOTE: Apply and Cancel buttons are squished if we don't do this
             BoxLayoutUtils.clampHeight(timeDelayPanel);
-
             edgeInspectorPanel.add(timeDelayPanel);
         }
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
@@ -288,17 +293,13 @@ public class EdgeInspectorDialog extends JDialog {
         addConditionalButton.addActionListener(hideList);
         addDescriptionButton.addActionListener(hideList);
 
-        parameters.addDoubleClickedListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                vEdgeParameter ep = (vEdgeParameter) event.getSource();
-
-                boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this, ep);
-                if (wasModified) {
-                    parameters.updateRow(ep);
-                    chlis.actionPerformed(event);
-                }
+        parameters.addDoubleClickedListener((ActionEvent event) -> {
+            vEdgeParameter ep = (vEdgeParameter) event.getSource();
+            
+            boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this, ep);
+            if (wasModified) {
+                parameters.updateRow(ep);
+                chlis.actionPerformed(event);
             }
         });
 
@@ -778,4 +779,5 @@ public class EdgeInspectorDialog extends JDialog {
             }
         }
     }
-}
+    
+} // end class EdgeInspectorDialog

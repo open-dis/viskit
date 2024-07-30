@@ -28,16 +28,20 @@ import viskit.model.SimEvListenerEdge;
  */
 public class SimEventListenerConnectionInspectorDialog extends JDialog
 {
-  private JLabel sourceLab, targetLab, descLab;
-  private JTextField sourceTF, targetTF, descTF;
+
+    private final JLabel sourceLab;
+  private JLabel targetLab, descLab;
+    private final JTextField sourceTF;
+  private JTextField targetTF, descTF;
 
   private static SimEventListenerConnectionInspectorDialog dialog;
   private static boolean modified = false;
   private SimEvListenerEdge simEvEdge;
-  private JButton  okButt, canButt;
+    private final JButton okButt;
+    private JButton canButt;
 
-  private JPanel  buttPan;
-  private enableApplyButtonListener lis;
+  private final JPanel  buttPan;
+  private final enableApplyButtonListener lis;
   public static String xnewProperty;
   public static String newTarget,newTargetEvent,newSource,newSourceEvent;
 

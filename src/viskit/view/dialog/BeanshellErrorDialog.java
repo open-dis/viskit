@@ -19,10 +19,11 @@ import viskit.ViskitConfig;
  */
 public class BeanshellErrorDialog extends JDialog {
 
-    private JTextArea errorMsg;
+    private final JTextArea errorMsg;
     private boolean returnBool = false;
     private static BeanshellErrorDialog me;
-    private JCheckBox current,  permanent,  nullCB;
+    private final JCheckBox current;
+    private JCheckBox permanent,  nullCB;
     private JCheckBox selectedButt;
 
     public static boolean showDialog(String errMsg, Component locationComp) {

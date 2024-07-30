@@ -26,7 +26,8 @@ public class ConditionalExpressionPanel extends JPanel {
 
     JTextArea conditionalTA;
     Edge edge;
-    private JPanel conditionalPanel, ifTextPan;
+    private final JPanel conditionalPanel;
+    private JPanel ifTextPan;
 
     public ConditionalExpressionPanel(Edge edge, boolean schedulingType) {
         this.edge = edge;

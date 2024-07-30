@@ -60,7 +60,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  */
 public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssyChangeListener {
 
-    private JFileChooser openSaveFileChooser;
+    private final JFileChooser openSaveFileChooser;
     private DoeMainFrame doeFrame;
 
     public void setDoeFrame(DoeMainFrame frame) {
@@ -376,7 +376,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
         return myEGListener;
     }
-    private DirectoryWatch.DirectoryChangeListener myEGListener = new EGListener();
+    private final DirectoryWatch.DirectoryChangeListener myEGListener = new EGListener();
     Vector<File> loadedEventGraphs = new Vector<>();
 
     /* and here we hear about open event graphs */

@@ -79,7 +79,7 @@ public class RunnerPanel2 extends JPanel {
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     private JLabel titl;
-    private boolean aRPanelVisible;
+    private final boolean aRPanelVisible;
 
     /**
      * Create an Assembly Runner panel

@@ -38,7 +38,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     /**
      * Creates a new instance of QstatConsole
      */
-    private JPanel content;
+    private final JPanel content;
     
     public QstatConsole() {
         super("Viskit Grid Queue Status Console");
@@ -149,7 +149,7 @@ public class QstatConsole extends JFrame implements ActionListener, WindowListen
     
     class FrameRateSliderPanel extends JPanel implements ChangeListener {
         private JSlider slider;
-        private JLabel sliderLabel;
+        private final JLabel sliderLabel;
         
         FrameRateSliderPanel(int min, int max) {
             super();

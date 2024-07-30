@@ -33,9 +33,10 @@ public class PropertyListDialog extends JDialog {
     private static PropertyListDialog dialog;
     private static int selection = -1;
     private String[][] pnamesTypes;
-    private JButton okButt,  canButt;
-    private JTable table;
-    private JPanel buttPan;
+    private final JButton okButt;
+    private JButton canButt;
+    private final JTable table;
+    private final JPanel buttPan;
     public static String newProperty;
 
     public static int showDialog(Dialog f, String title, String[][] namesTypes) {

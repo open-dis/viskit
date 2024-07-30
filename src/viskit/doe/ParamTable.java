@@ -79,7 +79,7 @@ public class ParamTable extends JTable {
         setModel(ptm);
         setColumnWidths();
     }
-    private int[] colWidths = {175, 160, 125, 75, 90, 90};
+    private final int[] colWidths = {175, 160, 125, 75, 90, 90};
 
     private void setColumnWidths() {
         TableColumn column;

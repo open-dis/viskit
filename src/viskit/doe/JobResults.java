@@ -185,9 +185,9 @@ public class JobResults extends JFrame {
 class MyDataSet extends AbstractXYDataset implements XYDataset {
 
     private static int sequence = 0;
-    private Vector<JobLauncher.Gresults> v;
-    private int myseq;
-    private JobResults mom;
+    private final Vector<JobLauncher.Gresults> v;
+    private final int myseq;
+    private final JobResults mom;
 
     MyDataSet(JobResults mom, Vector<JobLauncher.Gresults> v) {
         this.v = v;

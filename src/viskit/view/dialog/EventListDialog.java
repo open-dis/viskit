@@ -33,9 +33,10 @@ public class EventListDialog extends JDialog {
     private static EventListDialog dialog;
     private static int selection = -1;
     private String[] names;
-    private JButton okButt,  canButt;
-    private JList<String> list;
-    private JPanel buttPan;
+    private final JButton okButt;
+    private JButton canButt;
+    private final JList<String> list;
+    private final JPanel buttPan;
     public static String newName;
 
     public static int showDialog(Dialog f, String title, String[] names) {

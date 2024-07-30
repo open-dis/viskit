@@ -39,7 +39,7 @@ public class ArgumentsPanel extends ViskitTablePanel {
         sa[0] = e.getName();
         sa[1] = e.getType();
         List<String> ar = ((EventArgument) e).getDescription();
-        if (ar.size() > 0) {
+        if (!ar.isEmpty()) {
             sa[2] = ((EventArgument) e).getDescription().get(0);
         } else {
             sa[2] = "";

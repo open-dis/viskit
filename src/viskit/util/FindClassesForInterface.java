@@ -76,7 +76,7 @@ public class FindClassesForInterface {
         private File f;
         private ByteBuffer buffer;
         private RandomAccessFile classFile;
-        private Map<String, Class<?>> found = new Hashtable<>();
+        private final Map<String, Class<?>> found = new Hashtable<>();
 
         Class<?> buildIt(File fil) throws java.lang.Throwable {
             f = fil;

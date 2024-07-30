@@ -29,16 +29,17 @@ import viskit.control.EventGraphController;
  */
 public class StateVariableDialog extends ViskitSmallDialog {
 
-    private JTextField stateVarNameField;    // Text field that holds the parameter name
-    private JTextField commentField;          // Text field that holds the comment
-    private JTextField arraySizeField;
-    private JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
-    private JLabel arrSizeLab;
+    private final JTextField stateVarNameField;    // Text field that holds the parameter name
+    private final JTextField commentField;          // Text field that holds the comment
+    private final JTextField arraySizeField;
+    private final JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
+    private final JLabel arrSizeLab;
     private vStateVariable stVar;
-    private JButton okButt, canButt;
+    private final JButton okButt;
+    private JButton canButt;
     public static String newName,  newType,  newComment;
-    private myFocusListener focList;
-    private Component myTyperComponent;       // i.e., the editor of the type JComboBox
+    private final myFocusListener focList;
+    private final Component myTyperComponent;       // i.e., the editor of the type JComboBox
 
     public static boolean showDialog(JFrame f, vStateVariable var) {
         return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var);

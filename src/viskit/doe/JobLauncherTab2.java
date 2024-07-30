@@ -127,8 +127,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private StatsGraph statsGraph;
     private Thread thread;
     private boolean outputDirty = false;
-    private String title;
-    private DoeController cntlr;
+    private final String title;
+    private final DoeController cntlr;
     private SimkitAssembly jaxbRoot;
     private Unmarshaller unmarshaller;
     private JPanel clusterConfigPanel;
@@ -1266,7 +1266,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     // This is code to manage server, port, user and password from CommonsConfig.
     private static XMLConfiguration appConfig;
-    private static String recentClusterKey = "history.Cluster.Account(0)";
+    private static final String recentClusterKey = "history.Cluster.Account(0)";
     private Key cryptoKey;
 
     private void initConfig() {

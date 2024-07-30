@@ -46,8 +46,9 @@ import java.awt.event.ActionListener;
  */
 public class DoeMenuBar extends JMenuBar implements DoeEvents
 {
-  private DoeController controller;
-  private JMenu file, run;
+  private final DoeController controller;
+    private final JMenu file;
+    private JMenu run;
 
   public DoeMenuBar(DoeController controller, boolean isSubComponent)
   {

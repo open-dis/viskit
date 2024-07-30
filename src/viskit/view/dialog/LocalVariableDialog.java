@@ -31,15 +31,17 @@ import viskit.VGlobals;
  */
 public class LocalVariableDialog extends JDialog {
 
-    private JTextField nameField;    // Text field that holds the parameter name
-    private JTextField valueField;       // Text field that holds the expression
-    private JTextField commentField;          // Text field that holds the comment
-    private JComboBox typeCombo;    // Editable combo box that lets us select a type
+    public static String newName,  newType,  newValue,  newComment;
+    
+    private final JTextField nameField;    // Text field that holds the parameter name
+    private final JTextField valueField;       // Text field that holds the expression
+    private final JTextField commentField;          // Text field that holds the comment
+    private final JComboBox typeCombo;    // Editable combo box that lets us select a type
     private static LocalVariableDialog dialog;
     private static boolean modified = false;
     private EventLocalVariable locVar;
-    private JButton okButt,  canButt;
-    public static String newName,  newType,  newValue,  newComment;
+    private final JButton okButt;
+    private final JButton canButt;
 
     public static boolean showDialog(JFrame f, EventLocalVariable parm) {
         if (dialog == null) {
@@ -84,10 +86,6 @@ public class LocalVariableDialog extends JDialog {
         setMaxHeight(commentField);
         typeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(typeCombo);
-        //typeCombo = new JComboBox();
-        //typeCombo.setModel(VGlobals.instance().getTypeCBModel(typeCombo));
-        //                                       setMaxHeight(typeCombo);
-        //typeCombo.setEditable(true);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
         fieldsPanel.add(new OneLinePanel(typeLab, w, typeCombo));

@@ -23,8 +23,8 @@ import java.io.PrintWriter;
  */
 public class GridletEventList extends EventList {
     
-    private PrintWriter printWriter;
-    private ByteArrayOutputStream buffer;
+    private final PrintWriter printWriter;
+    private final ByteArrayOutputStream buffer;
     
     public GridletEventList(int id) {
         super(id);

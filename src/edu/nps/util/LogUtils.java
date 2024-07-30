@@ -49,7 +49,7 @@ public class LogUtils {
     private static final Logger LOG;
 
     static {
-//        configureLog4j("log4j2.properties");
+//        configureLog4j("log4j2.properties"); // log4j2.xml will seen on the classpath
         LOG = getLogger(LogUtils.class);
     }
 

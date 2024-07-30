@@ -37,17 +37,22 @@ import viskit.model.ViskitElement;
  */
 public class PclEdgeInspectorDialog extends JDialog {
 
-    private JLabel sourceLab,  targetLab,  propertyLab,  descLab;
-    private JTextField sourceTF,  targetTF,  propertyTF,  descTF;
-    private JPanel propertyTFPan;
-    private JLabel emptyLab,  emptyTF;
+    private final JLabel sourceLab;
+
+    private JLabel targetLab,  propertyLab,  descLab;
+    private final JTextField sourceTF;
+    private JTextField targetTF,  propertyTF,  descTF;
+    private final JPanel propertyTFPan;
+    private final JLabel emptyLab;
+    private JLabel emptyTF;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeEdge pclEdge;
-    private JButton okButt,  canButt;
-    private JButton propButt;
-    private JPanel buttPan;
-    private enableApplyButtonListener lis;
+    private final JButton okButt;
+    private JButton canButt;
+    private final JButton propButt;
+    private final JPanel buttPan;
+    private final enableApplyButtonListener lis;
 
     public static boolean showDialog(JFrame f, PropChangeEdge parm) {
         if (dialog == null) {

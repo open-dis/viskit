@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -39,7 +38,7 @@ public abstract class ViskitTablePanel extends JPanel {
     private int defaultWidth = 0,  defaultNumRows = 3;
 
     // List has no implemented clone method
-    private ArrayList<ViskitElement> shadow = new ArrayList<>();
+    private final ArrayList<ViskitElement> shadow = new ArrayList<>();
     private ActionListener myEditLis,  myPlusLis,  myMinusLis;
     private final String plusToolTip = "Add a row to this table";
     private final String minusToolTip = "Delete the selected row from this table;";
@@ -132,17 +131,13 @@ public abstract class ViskitTablePanel extends JPanel {
         edButt.addActionListener(lis);
 
         // install the handler to enable delete and edit buttons only on row-select
-        tab.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent event) {
-                if (!event.getValueIsAdjusting()) {
-                    boolean yn = tab.getSelectedRowCount() > 0;
-                    if (plusMinusEnabled) {
-                        minusButt.setEnabled(yn);
-                    }
-                    edButt.setEnabled(yn);
+        tab.getSelectionModel().addListSelectionListener((ListSelectionEvent event) -> {
+            if (!event.getValueIsAdjusting()) {
+                boolean yn = tab.getSelectedRowCount() > 0;
+                if (plusMinusEnabled) {
+                    minusButt.setEnabled(yn);
                 }
+                edButt.setEnabled(yn);
             }
         });
 

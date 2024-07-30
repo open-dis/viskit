@@ -30,7 +30,7 @@ public class ViskitAssembly extends BasicAssembly {
     protected Map<String, List<PropertyConnector>> replicationStatsListenerConnections;
     protected Map<String, List<String>> simEventListenerConnections;
     protected Map<String, Adapter> adapters;
-    private static boolean debug = false;
+    private static final boolean DEBUG = false;
 
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {
@@ -96,7 +96,7 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     public void hookupSimEventListeners() {
         String[] listeners = GenericConversion.toArray(simEventListenerConnections.keySet(), new String[0]);
-        if(debug) {
+        if(DEBUG) {
             LOG.info("hookupSimEventListeners called " + listeners.length);
         }
         List<String> simEventListenerConnects;
@@ -105,7 +105,7 @@ public class ViskitAssembly extends BasicAssembly {
             if (simEventListenerConnects != null) {
                 for(String source : simEventListenerConnects) {
                     connectSimEventListener(listener, source);
-                    if (debug) {
+                    if (DEBUG) {
                         LOG.info("hooking up SimEvent source " + source + " to listener " + listener);
                     }
                 }
@@ -123,7 +123,7 @@ public class ViskitAssembly extends BasicAssembly {
                 for (PropertyConnector pc : repStatsConnects) {
                     connectReplicationStats(listener, pc);
                 }
-            } else if (debug) {
+            } else if (DEBUG) {
                 LOG.info("No replicationListeners");
             }
         }
@@ -145,7 +145,7 @@ public class ViskitAssembly extends BasicAssembly {
                     }
                 }
             }
-        } else if (debug) {
+        } else if (DEBUG) {
             LOG.info("No external designPointListeners to add");
         }
     }
@@ -160,7 +160,7 @@ public class ViskitAssembly extends BasicAssembly {
                 for (PropertyConnector pc : propertyConnects) {
                     connectPropertyChangeListener(listener, pc);
                 }
-            } else if (debug) {
+            } else if (DEBUG) {
                 LOG.info("No propertyConnectors");
             }
         }
@@ -179,7 +179,7 @@ public class ViskitAssembly extends BasicAssembly {
         } else {
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getPropertyChangeListenerByName(listener));
         }
-        if (debug) {
+        if (DEBUG) {
             LOG.info("connecting entity " + pc.source + " to " + listener + " property " + pc.property);
         }
     }
@@ -188,24 +188,24 @@ public class ViskitAssembly extends BasicAssembly {
         if ( "null".equals(pc.property) ) {
             pc.property = "";
         }
-        if (debug) {
+        if (DEBUG) {
             LOG.info("Connecting entity " + pc.source + " to replicationStat " + listener + " property " + pc.property);
         }
 
         if (pc.property.isEmpty()) {
             pc.property = getReplicationStatsByName(listener).getName().trim();
-            if (debug) {
+            if (DEBUG) {
                 LOG.info("Property unspecified, attempting with lookup " + pc.property);
             }
         }
 
         if (pc.property.isEmpty()) {
-            if (debug) {
+            if (DEBUG) {
                 LOG.info("Null property, replicationStats connecting "+pc.source+" to "+listener);
             }
             getSimEntityByName(pc.source).addPropertyChangeListener(getReplicationStatsByName(listener));
         } else {
-            if (debug) {
+            if (DEBUG) {
                 LOG.info("Connecting replicationStats from "+pc.source+" to "+listener);
             }
             getSimEntityByName(pc.source).addPropertyChangeListener(pc.property,getReplicationStatsByName(listener));
@@ -286,7 +286,7 @@ public class ViskitAssembly extends BasicAssembly {
             simEventListenerConnects = new LinkedList<>();
             simEventListenerConnections.put(listener, simEventListenerConnects);
         }
-        if (debug) {
+        if (DEBUG) {
             LOG.info("addSimEventListenerConnection source " + source + " to listener " + listener );
         }
         simEventListenerConnects.add(source);
@@ -312,7 +312,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     public SimEntity getSimEntityByName(String name) {
-        if (debug) {
+        if (DEBUG) {
             LOG.info("getSimEntityByName for " + name + " " + entities.get(name));
         }
         return entities.get(name);

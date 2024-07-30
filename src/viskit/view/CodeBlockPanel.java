@@ -56,9 +56,9 @@ import java.awt.event.*;
 public class CodeBlockPanel extends JPanel {
 
     private JTextComponent jtc;
-    private Window owner;
-    private String title;
-    private JButton editButt;
+    private final Window owner;
+    private final String title;
+    private final JButton editButt;
     private static final String TOOL_TIP = "Please remember to enter full Java statements including semi-colons";
 
     public CodeBlockPanel(Window owner, boolean multilined, String title) {

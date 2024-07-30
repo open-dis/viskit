@@ -34,13 +34,14 @@ import viskit.doe.FileHandler;
 public class ViskitConfig {
     
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
-    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
+    public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 
     public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File V_CONFIG_FILE = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
     public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
-    public static final File V_DEBUG_LOG = new File(VISKIT_CONFIG_DIR, "debug.log");
+    public static final File VISKIT_LOGS_DIR = new File("logs");
+    public static final File V_DEBUG_LOG = new File(VISKIT_LOGS_DIR, "debug.log.0");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";

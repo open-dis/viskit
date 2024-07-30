@@ -284,7 +284,7 @@ their descpritions.
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
-        <copy file="${configuration.dir}/log4j2.properties" todir="${dir.build.classes}"/>
+        <copy file="${configuration.dir}/log4j2.xml" todir="${dir.build.classes}"/>
 
         <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>

@@ -97,7 +97,7 @@ public class ClassPanel extends JPanel {
      */
     class ClassTypeFilter extends FileFilter {
 
-        private Class<?> targetClass;     // looking for classes of this kind (or jars or directories)
+        private final Class<?> targetClass;     // looking for classes of this kind (or jars or directories)
 
         ClassTypeFilter(Class<?> c) {
             this.targetClass = c;

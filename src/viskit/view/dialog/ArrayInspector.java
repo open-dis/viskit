@@ -26,11 +26,14 @@ import viskit.view.ObjListPanel;
 public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
-    private JButton canButt,  okButt;
-    private JPanel buttPan,  contentP;
-    private JTextField typeTF,  sizeTF;
-    private JPanel upPan;
-    private enableApplyButtonListener listnr;
+    private final JButton canButt;
+    private JButton okButt;
+    private final JPanel buttPan;
+    private JPanel contentP;
+    private final JTextField typeTF;
+    private JTextField sizeTF;
+    private final JPanel upPan;
+    private final enableApplyButtonListener listnr;
 
     public ArrayInspector(JDialog parent) {
         super(parent, "Array Inspector", true);

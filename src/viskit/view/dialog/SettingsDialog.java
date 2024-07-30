@@ -71,9 +71,9 @@ public class SettingsDialog extends JDialog {
 
     private static SettingsDialog dialog;
     private static boolean modified = false;
-    private JButton canButt;
-    private JButton okButt;
-    private JTabbedPane tabbedPane;
+    private final JButton canButt;
+    private final JButton okButt;
+    private final JTabbedPane tabbedPane;
     private JList<String> classPathJlist;
     private JCheckBox evGrCB;
     private JCheckBox assyCB;

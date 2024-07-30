@@ -34,15 +34,20 @@ public class EventInspectorDialog extends JDialog {
     private static EventInspectorDialog dialog;
     private EventNode node;
     private static boolean modified = false;
-    private JTextField name;
-    private JTextField description;
-    private JPanel descriptionPanel;
+    private final JTextField name;
+    private final JTextField description;
+    private final JPanel descriptionPanel;
     private TransitionsPanel transitions;
     private ArgumentsPanel arguments;
     private LocalVariablesPanel localVariables;
-    private CodeBlockPanel codeBlock;
-    private JButton cancelButton, okButton;
-    private JButton addDescriptionButton, addArgumentsButton, addLocalsButton, addCodeBlockButton, addStateTransitionsButton;
+    private final CodeBlockPanel codeBlock;
+    private final JButton cancelButton;
+    private final JButton okButton;
+    private final JButton addDescriptionButton;
+    private final JButton addArgumentsButton;
+    private final JButton addLocalsButton;
+    private final JButton addCodeBlockButton;
+    private final JButton addStateTransitionsButton;
 
     /**
      * Set up and show the dialog.  The first Component argument

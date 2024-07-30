@@ -285,7 +285,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setVerbose.invoke(assemblyInstance, getVerbose());
 
             setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl)VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl) VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListener.invoke(assemblyInstance, this);
             assemblyRunnable = (Runnable) assemblyInstance;
 

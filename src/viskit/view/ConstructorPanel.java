@@ -16,13 +16,13 @@ import java.util.List;
  */
 public class ConstructorPanel extends JPanel {
 
-    private JButton selectButt;
-    private ActionListener modLis;
-    private JPanel selectButtPan;
-    private boolean showButt;
-    private ActionListener selectButtListener;
+    private final JButton selectButt;
+    private final ActionListener modLis;
+    private final JPanel selectButtPan;
+    private final boolean showButt;
+    private final ActionListener selectButtListener;
     private ObjListPanel olp;
-    private JDialog parent;
+    private final JDialog parent;
 
     public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButt, ActionListener selectListener, JDialog parent) {
         modLis = modifiedListener;
@@ -47,7 +47,7 @@ public class ConstructorPanel extends JPanel {
         olp = new ObjListPanel(modLis); // may have to intercept
         olp.setDialogInfo(parent);
         olp.setData(args, true);
-        if (args.size() > 0) {
+        if (!args.isEmpty()) {
             add(olp);
         } else {
             JLabel lab = new JLabel("zero argument constructor");

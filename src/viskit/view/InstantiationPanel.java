@@ -85,12 +85,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         typeLab = new JLabel("type", JLabel.TRAILING);
         typeTF = new JTextField();
         typeTF.setEditable(typeEditable);
-        typeTF.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                methodCB.actionPerformed(e);
-            }
+        typeTF.addActionListener((ActionEvent e) -> {
+            methodCB.actionPerformed(e);
         });
         typeLab.setLabelFor(typeTF);
 
@@ -242,7 +238,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private JTextField value;
 
-        private InstantiationPanel ip;
+        private final InstantiationPanel ip;
 
         public FFPanel(InstantiationPanel ip) {
             this.ip = ip;
@@ -292,15 +288,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
      */
     class ConstrPanel extends JPanel implements ActionListener, CaretListener {
 
-        private JTabbedPane tp;
+        private final JTabbedPane tp;
 
         private ConstructorPanel[] constructorPanels;
 
-        private String noParamString = "(no parameters)";
+        private final String noParamString = "(no parameters)";
 
-        private ImageIcon checkMark;
+        private final ImageIcon checkMark;
 
-        private InstantiationPanel ip;
+        private final InstantiationPanel ip;
 
         public ConstrPanel(InstantiationPanel ip) {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -321,14 +317,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (parameters == null) {
                 tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface, "));
             } else {
-                constructorPanels = new ConstructorPanel[parameters.length];
                 VInstantiator.Constr constr;
+                String sign;
+                constructorPanels = new ConstructorPanel[parameters.length];
                 for (int i = 0; i < parameters.length; ++i) {
-
                     constr = new VInstantiator.Constr(parameters[i], clName);
-                    String sign = noParamString;
+                    sign = noParamString;
                     for (int j = 0; j < constr.getArgs().size(); j++) {
-                        sign += ((Parameter)parameters[i].get(j)).getType() + ", ";
+                        sign += ((Parameter) parameters[i].get(j)).getType() + ", ";
 
                         if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
                             ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
@@ -406,13 +402,13 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
      */
     class FactoryPanel extends JPanel {
 
-        private InstantiationPanel ip;
+        private final InstantiationPanel ip;
 
-        private JLabel factClassLab;
+        private final JLabel factClassLab;
 
         private JComboBox<Object> factClassCB;
 
-        private JPanel topP;
+        private final JPanel topP;
 
         private ObjListPanel olp;
 
@@ -561,13 +557,16 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 Vector<String> vn = new Vector<>();
                 Map<String, Method> hm = new HashMap<>();
 
+                int mods, strt;
+                Class<?> retCl;
+                String ts;
                 for (Method method : statMeths) {
-                    int mods = method.getModifiers();
-                    Class<?> retCl = method.getReturnType();
+                    mods = method.getModifiers();
+                    retCl = method.getReturnType();
                     if (Modifier.isStatic(mods)) {
                         if (retCl == myObjClass) {
-                            String ts = method.toString();
-                            int strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
+                            ts = method.toString();
+                            strt = ts.lastIndexOf('.', ts.indexOf('(')); // go to ( , back to .
                             ts = ts.substring(strt + 1, ts.length());
 
                             // Strip out java.lang

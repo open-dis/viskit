@@ -22,8 +22,10 @@ import viskit.view.InstantiationPanel;
 public class ObjectInspector extends JDialog
 {
   public boolean modified = false;
-  private JButton canButt,okButt;
-  private JPanel buttPan,contentP;
+    private final JButton canButt;
+    private JButton okButt;
+    private final JPanel buttPan;
+    private JPanel contentP;
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 

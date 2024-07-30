@@ -64,7 +64,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class FileHandler {
 
-    private static String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private static final String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
 
     public static DoeFileModel openFile(File f) throws Exception {
         SAXBuilder builder;

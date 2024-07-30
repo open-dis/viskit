@@ -31,12 +31,13 @@ public class ParameterDialog extends JDialog {
     public static String newName,  newType,  newComment;
     private static int count = 0;
 
-    private JTextField parameterNameField;    // Text field that holds the parameter name
-    private JTextField expressionField;       // Text field that holds the expression
-    private JTextField commentField;          // Text field that holds the comment
-    private JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
+    private final JTextField parameterNameField;    // Text field that holds the parameter name
+    private final JTextField expressionField;       // Text field that holds the expression
+    private final JTextField commentField;          // Text field that holds the comment
+    private final JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
     private vParameter param;
-    private JButton okButt, canButt;
+    private final JButton okButt;
+    private JButton canButt;
 
     public static boolean showDialog(JFrame f, vParameter parm) {
         if (dialog == null) {

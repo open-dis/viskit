@@ -96,7 +96,7 @@ public class AssemblyHandler implements XmlRpcHandler {
         }
 
         usid = "null";
-        if (arguments.size() > 0) {
+        if (!arguments.isEmpty()) {
             if (arguments.elementAt(0)!=null) {
                 usid = (String)arguments.elementAt(0);
             }

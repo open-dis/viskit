@@ -23,13 +23,14 @@ import java.awt.event.WindowEvent;
  */
 public class EdgeParameterDialog extends JDialog {
 
-    private JTextField valueField;       // Text field that holds the expression
-    private JLabel typeLabel;            // static type value passed in
+    private final JTextField valueField;       // Text field that holds the expression
+    private final JLabel typeLabel;            // static type value passed in
     private static EdgeParameterDialog dialog;
     private static boolean modified = false;
     private vEdgeParameter param;
     private String type;
-    private JButton okButt,  canButt;
+    private final JButton okButt;
+    private JButton canButt;
     public static String newValue;
 
     public static boolean showDialog(JDialog d, vEdgeParameter parm) {

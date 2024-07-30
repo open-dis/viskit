@@ -144,7 +144,7 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
             });
         }
     }
-    private String namePrefix = "Viskit Design of Experiments";
+    private final String namePrefix = "Viskit Design of Experiments";
     private String currentTitle = namePrefix;
 
     private void doTitle(String nm) {

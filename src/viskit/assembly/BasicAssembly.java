@@ -87,6 +87,7 @@ import viskit.reports.ReportStatisticsConfig;
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     static final Logger LOG = LogUtils.getLogger(BasicAssembly.class);
+    
     protected Map<Integer, List<SavedStats>> replicationData;
     protected PropertyChangeListener[] replicationStats;
     protected SampleStatistics[] designPointStats;
@@ -243,19 +244,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         int ix = 0;
         boolean isCount;
         SampleStatistics stat;
+        Object obj;
         for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
+            LOG.debug("entry is: {}", entry);
+            obj = pclNodeCache.get(entry.getKey());
+            if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+                LOG.debug("AssemblyNode is: {}", obj);
 
-            LOG.debug("entry is: " + entry);
-            Object obj;
-
-            if (entry.toString().contains("PropChangeListenerNode")) {
-
-                // Since the pclNodeCache was created under a previous ClassLoader
-                // we must use reflection to invoke the methods on the AssemblyNodes
-                // that it contains, otherwise we will throw ClassCastExceptions
                 try {
-                    obj = pclNodeCache.get(entry.getKey());
-                    LOG.debug("AssemblyNode key: " + obj);
+                    // Since the pclNodeCache was created under a previous ClassLoader
+                    // we must use reflection to invoke the methods on the AssemblyNodes
+                    // that it contains, otherwise we will throw ClassCastExceptions
                     nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                     // This is not a designPoint, so skip
@@ -277,9 +276,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                     designPointStats[ix] = new SimpleStatsTally(stat.getName() + typeStat);
 
-                    LOG.debug(designPointStats[ix]);
+                    LOG.debug("Design point stat: {}", designPointStats[ix]);
                     ix++;
-                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                     LOG.error(ex);
                 }
             }
@@ -769,24 +768,27 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 Schedule.startSimulation();
 
-                String typeStat;
+                String typeStat, nodeType;
                 int ix = 0;
                 boolean isCount;
                 SampleStatistics ss;
-
+                Object obj;
+                
                 // This should be unchecked if only listening with a SimplePropertyDumper
                 if (isSaveReplicationData()) {
+
                     // # of PropertyChangeListenerNodes is == to replicationStats.length
                     for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
-                        Object obj;
-                        if (entry.toString().contains("PropChangeListenerNode")) {
+                        LOG.debug("entry is: {}", entry);
 
-                            // Since the pclNodeCache was created under a previous ClassLoader
-                            // we must use reflection to invoke the methods on the AssemblyNodes
-                            // that it contains, otherwise we will throw ClassCastExceptions
+                        obj = pclNodeCache.get(entry.getKey());
+                        if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+
                             try {
-                                obj = pclNodeCache.get(entry.getKey());
-                                String nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
+                                // Since the pclNodeCache was created under a previous ClassLoader
+                                // we must use reflection to invoke the methods on the AssemblyNodes
+                                // that it contains, otherwise we will throw ClassCastExceptions
+                                nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                                 // This is not a designPoint, so skip
                                 if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
@@ -803,7 +805,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                     fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
                                 }
                                 ix++;
-                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                                 LOG.error(ex);
                             }
                         }

@@ -27,11 +27,11 @@ public class ReportStatisticsDOM {
     /**
      * The root element of the document
      */
-    private Element rootElement;
+    private final Element rootElement;
     /**
      * The collection of SimEntityRecords sorted by entityName
      */
-    private Map<String, SimEntityRecord> entities;
+    private final Map<String, SimEntityRecord> entities;
     /**
      *The names that correspond to the order of the data being sent
      */

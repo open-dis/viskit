@@ -67,7 +67,7 @@ public class XMLValidationTool {
 
     private FileWriter fWriter;
     private File xmlFile, schemaFile;
-    private boolean valid = true;
+    private boolean valid;
 
     /**
      * Creates a new instance of XMLValidationTool
@@ -103,49 +103,54 @@ public class XMLValidationTool {
         try {
             schemaDoc = factory.newSchema(getSchemaFile());
         } catch (SAXException ex) {
-            log.fatal("Unable to create Schema object: " + ex);
+            log.fatal("Unable to create Schema object: {}", ex);
         }
 
         // 3. Get a validator from the schemaFile object.
-        Validator validator = schemaDoc.newValidator();
+        if (schemaDoc != null) {
+            Validator validator = schemaDoc.newValidator();
 
-        // 4. Designate an error handler and an LSResourceResolver
-        validator.setErrorHandler(new MyHandler());
+            // 4. Designate an error handler and an LSResourceResolver
+            validator.setErrorHandler(new MyHandler());
 
-        // 5. Prepare to parse the document to be validated.
-        InputSource src = new InputSource(getXmlFile().getAbsolutePath());
-        SAXSource source = new SAXSource(src);
+            // 5. Prepare to parse the document to be validated.
+            InputSource src = new InputSource(getXmlFile().getAbsolutePath());
+            SAXSource source = new SAXSource(src);
 
-        // 6. Parse, validate and report any errors.
-        try {
-            log.info("Validating: " + source.getSystemId());
-
-            // Prepare error errorsLog with current DTG
-            File errorsLog = new File(ViskitConfig.VISKIT_CONFIG_DIR + "/validationErrors.log");
-            errorsLog.setWritable(true, false);
-
-            // New LogUtils.getLogger() each Viskit startup
-            if (errorsLog.exists()) {errorsLog.delete();}
-            fWriter = new FileWriter(errorsLog, true);
-            Calendar cal = Calendar.getInstance();
-            fWriter.write("****************************\n");
-            fWriter.write(cal.getTime().toString() + "\n");
-            fWriter.write("****************************\n\n");
-
-            validator.validate(source);
-
-        } catch (SAXException ex) {
-            log.fatal(source.getSystemId() + " is not well-formed XML");
-            log.fatal(ex);
-        } catch (IOException ex) {
-            log.fatal(ex);
-        } finally {
+            // 6. Parse, validate and report any errors.
             try {
-                // Space between file entries
-                fWriter.write("\n");
-                fWriter.close();
+                log.info("Validating: " + source.getSystemId());
+
+                // Prepare error errorsLog with current DTG
+                File errorsLog = new File(ViskitConfig.VISKIT_LOGS_DIR + "/validationErrors.log");
+                errorsLog.setWritable(true, false);
+
+                // New LogUtils.getLogger() each Viskit startup
+                if (errorsLog.exists()) {errorsLog.delete();}
+                fWriter = new FileWriter(errorsLog, true);
+                Calendar cal = Calendar.getInstance();
+                fWriter.write("****************************\n");
+                fWriter.write(cal.getTime().toString() + "\n");
+                fWriter.write("****************************\n\n");
+
+                validator.validate(source);
+                valid = true;
+
+            } catch (SAXException ex) {
+                log.fatal(source.getSystemId() + " is not well-formed XML");
+                log.fatal(ex);
+                valid = false;
             } catch (IOException ex) {
                 log.fatal(ex);
+                valid = false;
+            } finally {
+                try {
+                    // Space between file entries
+                    fWriter.write("\n");
+                    fWriter.close();
+                } catch (IOException ex) {
+                    log.fatal(ex);
+                }
             }
         }
         return valid;
@@ -175,7 +180,7 @@ public class XMLValidationTool {
      */
     class MyHandler implements ErrorHandler {
 
-        private MessageFormat message = new MessageFormat("({0}: row {1}, column {2}):\n{3}\n");
+        private final MessageFormat message = new MessageFormat("({0}: row {1}, column {2}):\n{3}\n");
         private String msg;
 
         /** Stores the particular message as the result of a SAXParseException

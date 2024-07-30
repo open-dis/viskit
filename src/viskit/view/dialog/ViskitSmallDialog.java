@@ -94,7 +94,7 @@ public abstract class ViskitSmallDialog extends JDialog {
 
     class enableApplyButtonListener implements ActionListener, DocumentListener {
 
-        private JButton applyButt;
+        private final JButton applyButt;
 
         enableApplyButtonListener(JButton applyButton) {
             this.applyButt = applyButton;
@@ -129,9 +129,9 @@ public abstract class ViskitSmallDialog extends JDialog {
 
     class WindowClosingListener extends WindowAdapter {
 
-        private Component parent;
-        private JButton okButt;
-        private JButton cancelButt;
+        private final Component parent;
+        private final JButton okButt;
+        private final JButton cancelButt;
 
         WindowClosingListener(Component parent, JButton okButt, JButton cancelButt) {
             this.parent = parent;

@@ -109,9 +109,9 @@ public class EventGraphCache {
      * The names and file locations of the the event graph files and image files
      * being linked to in the AnalystReport
      */
-    private List<String> eventGraphNamesList;
-    private List<File> eventGraphFilesList;
-    private List<File> eventGraphImageFilesList;
+    private final List<String> eventGraphNamesList;
+    private final List<File> eventGraphFilesList;
+    private final List<File> eventGraphImageFilesList;
 
     private final String EVENT_GRAPH_IMAGE_DIR =
             VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();

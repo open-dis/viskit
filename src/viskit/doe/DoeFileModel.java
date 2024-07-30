@@ -66,7 +66,7 @@ public class DoeFileModel {
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
 
     private List<SimEntity> simEntities;
-    private Map<String, Integer> nameSpace = new HashMap<>();
+    private final Map<String, Integer> nameSpace = new HashMap<>();
 
     public File marshallJaxb() throws Exception {
         File f = TempFileManager.createTempFile("DOEtemp", ".xml");

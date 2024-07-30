@@ -16,7 +16,7 @@ public class CompilerDiagnosticsListener implements DiagnosticListener<JavaFileO
     public long lineNumber;
     public long columnNumber = 0;
 
-    private StringBuilder messageString;
+    private final StringBuilder messageString;
 
     public CompilerDiagnosticsListener(StringBuilder messageString) {
         this.messageString = messageString;

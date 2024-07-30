@@ -61,7 +61,7 @@ public class ReportStatisticsConfig {
     /**
      * Used to truncate the precision of statistical results
      */
-    private DecimalFormat form;
+    private final DecimalFormat form;
 
     /**
      * The DOM object this class uses to create an XML record of the simulation
@@ -72,12 +72,12 @@ public class ReportStatisticsConfig {
     /**
      * Report author (system username)
      */
-    private String author = System.getProperty("user.name");
+    private final String author = System.getProperty("user.name");
 
     /**
      * Assembly name
      */
-    private String assemblyName;
+    private final String assemblyName;
 
     /** Creates a new instance of ReportStatisticsConfig
      * @param assemblyName name of assembly

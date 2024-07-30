@@ -374,10 +374,10 @@ class Searcher {
 class sysOutDialog extends JDialog implements ActionListener {
 
     private static sysOutDialog dialog;
-    private static String value = "";
+    private static final String value = "";
     private JList<Object> list;
-    private JTextArea jta;
-    private JScrollPane jsp;
+    private final JTextArea jta;
+    private final JScrollPane jsp;
 
     /**
      * Set up and show the dialog.  The first Component argument

@@ -99,13 +99,13 @@ public class Help {
     private HelpBroker hb;
 
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private Component TUTORIAL_COMPONENT;
-    private ActionListener TUTORIAL_LISTENER_LAUNCHER;
+    private final Component TUTORIAL_COMPONENT;
+    private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     private Component parent;
-    private Icon icon;
-    private JEditorPane aboutEGEditorPane;
-    private JEditorPane aboutAssemblyEditorPane;
+    private final Icon icon;
+    private final JEditorPane aboutEGEditorPane;
+    private final JEditorPane aboutAssemblyEditorPane;
 
     /** Creates a new instance of Help
      * @param parent main frame to center on

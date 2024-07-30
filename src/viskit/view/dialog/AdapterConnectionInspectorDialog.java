@@ -64,19 +64,27 @@ import viskit.VStatics;
  */
 public class AdapterConnectionInspectorDialog extends JDialog {
 
-    private JLabel sourceLab,  targetLab,  nameLab,  descLab;
-    private JTextField sourceTF,  targetTF,  nameTF,  descTF;
-    private JTextField sourceEventTF,  targetEventTF;
-    private JLabel sourceEventLab,  targetEventLab;
-    private JButton evSourceNavButt,  evTargetNavButt;
-    private JPanel sourceEventPan,  targetEventPan;
+    private final JLabel sourceLab;
+
+    private JLabel targetLab,  nameLab,  descLab;
+    private final JTextField sourceTF;
+    private JTextField targetTF,  nameTF,  descTF;
+    private final JTextField sourceEventTF;
+    private JTextField targetEventTF;
+    private final JLabel sourceEventLab;
+    private JLabel targetEventLab;
+    private final JButton evSourceNavButt;
+    private JButton evTargetNavButt;
+    private final JPanel sourceEventPan;
+    private JPanel targetEventPan;
     private static AdapterConnectionInspectorDialog dialog;
     private static boolean modified = false;
     private EvGraphNode sourceEVG,  targetEVG;
     private AdapterEdge adapterEdge;
-    private JButton okButt,  canButt;
-    private JPanel buttPan;
-    private enableApplyButtonListener lis;
+    private final JButton okButt;
+    private JButton canButt;
+    private final JPanel buttPan;
+    private final enableApplyButtonListener lis;
     public static String xnewProperty;
     public static String newTarget,  newTargetEvent,  newSource,  newSourceEvent;
 

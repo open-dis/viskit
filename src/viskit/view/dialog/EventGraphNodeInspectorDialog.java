@@ -32,18 +32,19 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
-    private JLabel handleLab; //,outputLab;
-    private JTextField handleField;
+    private final JLabel handleLab; //,outputLab;
+    private final JTextField handleField;
 
     // verboseCheck not used, does nothing for Viskit
-    private JCheckBox outputCheck /*, verboseCheck*/;
+    private final JCheckBox outputCheck /*, verboseCheck*/;
     private InstantiationPanel ip;
     private EvGraphNode egNode;
-    private JButton okButt, canButt;
-    private enableApplyButtonListener lis;
-    private JPanel buttPan;
-    private JTextField descField;
-    private JLabel descLab;
+    private final JButton okButt;
+    private JButton canButt;
+    private final enableApplyButtonListener lis;
+    private final JPanel buttPan;
+    private final JTextField descField;
+    private final JLabel descLab;
 
     public static boolean showDialog(JFrame f, EvGraphNode parm) {
         try {

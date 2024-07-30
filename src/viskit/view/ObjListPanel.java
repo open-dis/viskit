@@ -46,7 +46,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
     private JLabel typeLab[];
     private JTextField entryTF[];
     private VInstantiator shadow[];
-    private ActionListener changeListener;
+    private final ActionListener changeListener;
 
     public ObjListPanel(ActionListener changeListener) {
         setLayout(new SpringLayout());

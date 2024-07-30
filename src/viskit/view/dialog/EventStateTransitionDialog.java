@@ -38,22 +38,28 @@ public class EventStateTransitionDialog extends JDialog {
     private static EventStateTransitionDialog dialog;
     private static boolean modified = false;
     private static boolean allGood;
+    private final JTextField actionField;
 
-    private JTextField actionField, arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
+    private JTextField arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
-    private JComboBox<String> stateTranMethodsCB, localVarMethodsCB;
-    private JRadioButton assTo, opOn;
+    private final JComboBox<String> stateTranMethodsCB;
+    private JComboBox<String> localVarMethodsCB;
+    private final JRadioButton assTo;
+    private JRadioButton opOn;
     private EventStateTransition param;
-    private JButton okButt, canButt;
-    private JButton newSVButt;
-    private JLabel actionLab1, actionLab2, localInvokeDot;
-    private JPanel localAssignmentPanel, indexPanel, stateTransInvokePanel, localInvocationPanel;
+    private final JButton okButt;
+    private JButton canButt;
+    private final JButton newSVButt;
+    private final JLabel actionLab1;
+    private JLabel actionLab2, localInvokeDot;
+    private final JPanel localAssignmentPanel;
+    private JPanel indexPanel, stateTransInvokePanel, localInvocationPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
-    private ArgumentsPanel argPanel;
+    private final ArgumentsPanel argPanel;
 
     /** Required to get the type of any declared local variables */
-    private LocalVariablesPanel localVariablesPanel;
+    private final LocalVariablesPanel localVariablesPanel;
 
     public static boolean showDialog(JFrame f, EventStateTransition est, ArgumentsPanel ap, LocalVariablesPanel lvp) {
         if (dialog == null)

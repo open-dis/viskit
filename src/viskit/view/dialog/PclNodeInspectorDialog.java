@@ -27,21 +27,24 @@ import viskit.view.InstantiationPanel;
  */
 public class PclNodeInspectorDialog extends JDialog {
 
-    private JLabel nameLabel;
-    private JLabel typeLab;
-    private JTextField nameField;    // Text field that holds the parameter name
-    private JTextField typeField;
+    private final JLabel nameLabel;
+    private final JLabel typeLab;
+    private final JTextField nameField;    // Text field that holds the parameter name
+    private final JTextField typeField;
     private InstantiationPanel ip;
     private Class<?> myClass;
     private static PclNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropChangeListenerNode pclNode;
-    private JButton okButt, canButt;
-    private enableApplyButtonListener lis;
+    private final JButton okButt;
+    private final JButton canButt;
+    private final enableApplyButtonListener lis;
     JPanel buttPan;
-    private JCheckBox clearStatsCB, getMeanStatsCB, getCountStatsCB;
-    private JTextField descTF;
-    private JLabel descLab;
+    private final JCheckBox clearStatsCB;
+    private final JCheckBox getMeanStatsCB;
+    private final JCheckBox getCountStatsCB;
+    private final JTextField descTF;
+    private final JLabel descLab;
 
     public static boolean showDialog(JFrame f, PropChangeListenerNode parm) {
         try {
