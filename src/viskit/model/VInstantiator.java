@@ -1,14 +1,18 @@
 package viskit.model;
 
 import edu.nps.util.LogUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+
 import javax.swing.JOptionPane;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.assembly.FactoryParameter;
@@ -137,7 +141,7 @@ public abstract class VInstantiator {
             super(type);
 
             if (viskit.VStatics.debug) {
-                LOG.info("Building Constr for " + type);
+                LOG.info("Building Constr for: {}", type);
             }
             if (viskit.VStatics.debug) {
                 LOG.info("Required Parameters:");
@@ -180,39 +184,38 @@ public abstract class VInstantiator {
             // Assembly arguments
             if (eparams != null) {
                 while (indx < (eparams.length - 1)) {
-
                     if (paramsMatch(params, eparams[indx])) {
                         break;
                     } else {
                         indx++;
                     }
                 }
-                if (viskit.VStatics.debug) {
-                    LOG.info(type + " VInstantiator using constructor #" + indx);
-                }
+                if (viskit.VStatics.debug)
+                    LOG.info("{} VInstantiator using constructor #: {}", type, indx);
+                
                 // bug: weird case where params came in 0 length but no 0 length constuctors
                 // happens if external class used as parameter?
                 if (params.size() != eparams[indx].size()) {
                     args = buildInstantiators(eparams[indx]);
-                    if (viskit.VStatics.debug) {
+                    if (viskit.VStatics.debug)
                         LOG.info("Warning: VInstantiator.Constr tried 0 length when it was more");
-                    }
+                    
                 }
                 if (eparams[indx] != null) {
-                    // now that the values, types, etc set, grab names from eg parameters
+                    // now that the values, types, etc. set, grab names from eg parameters
                     if (viskit.VStatics.debug) {
                         LOG.info("args came back from buildInstantiators as: ");
-                        for (Object arg : args) {
+                        for (Object arg : args)
                             LOG.info(arg);
-                        }
+                    
                     }
                     if (args != null) {
                         for (int j = 0; j < eparams[indx].size(); j++) {
-                            if (viskit.VStatics.debug) {
-                                LOG.info("setting name " + ((Parameter)eparams[indx].get(j)).getName());
-                            }
-                            ((VInstantiator) args.get(j)).setName(((Parameter)eparams[indx].get(j)).getName());
-                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter)eparams[indx].get(j)).getComment()));
+                            if (viskit.VStatics.debug)
+                                LOG.info("setting name: {} ", ((Parameter) eparams[indx].get(j)).getName());
+                            
+                            ((VInstantiator) args.get(j)).setName(((Parameter) eparams[indx].get(j)).getName());
+                            ((VInstantiator) args.get(j)).setDescription(listToString(((Parameter) eparams[indx].get(j)).getComment()));
                         }
                     }
                 }

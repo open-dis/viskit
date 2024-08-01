@@ -26,7 +26,7 @@ public class Launcher extends Thread implements Runnable {
     String assembly = null;
     String assemblyName;
     Hashtable<String, String> eventGraphs = new Hashtable<>();
-    private static final boolean debug = true;
+    private static final boolean DEBUG = true; // TODO: tie to Vstatics.debug?
     private boolean compiled = true;
     private boolean inGridlet = false;
 
@@ -126,7 +126,7 @@ public class Launcher extends Thread implements Runnable {
                 String SGE = null;
                 String line;
                 while ((line = br.readLine()) != null) {
-                    if (debug) {
+                    if (DEBUG) {
                         System.out.println(line);
                     }
                     if (line.contains("SGE_TASK_ID")) {
@@ -504,7 +504,7 @@ public class Launcher extends Thread implements Runnable {
 
             // bsh eval the generated source
             m = bshz.getDeclaredMethod("eval", new Class<?>[]{String.class});
-            if (debug) {
+            if (DEBUG) {
                 m.invoke(bsh, new Object[]{"debug();"});
             }
             m.invoke(bsh, new Object[]{assemblyJava});
@@ -544,7 +544,7 @@ public class Launcher extends Thread implements Runnable {
     if (bsh.getClassManager().classExists("simkit.BasicAssembly")) System.out.println("simkit.BasicAssembly found");
     else System.out.println("simkit.BasicAssembly not found");
     try {
-    bsh.eval("debug();");
+    bsh.eval("DEBUG();");
     // load eventGraph XML as classes
     // since we've overridden the default bsh ClassLoader, need to
     // add the defined class in this ClassLoader
@@ -559,7 +559,7 @@ public class Launcher extends Thread implements Runnable {
     xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
     xml2j.unmarshal();
     bsh.eval(xml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(xml2j.translate());
     }
@@ -568,7 +568,7 @@ public class Launcher extends Thread implements Runnable {
     // and could conflict with the one beanshell last used to
     // eval the string (?)
     eventGraphs.put(eventGraphName, evgc);
-    if (debug) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
+    if (DEBUG) System.out.println("Eventgraph class added: "+eventGraphName+ " "+evgc);
     }
     // now any and all dependencies are loaded for the assembly
     bais = new ByteArrayInputStream(assembly.getBytes());
@@ -577,7 +577,7 @@ public class Launcher extends Thread implements Runnable {
     axml2j = (SimkitAssemblyXML2Java)cnstr.newInstance( new Object[] { bais } );
     axml2j.unmarshal();
     bsh.eval(axml2j.translate());
-    if (debug) {
+    if (DEBUG) {
     System.out.println("Bsh eval of:");
     System.out.println(axml2j.translate());
     }

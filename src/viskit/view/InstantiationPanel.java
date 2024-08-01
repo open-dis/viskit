@@ -100,7 +100,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         topP.add(typeLab);
         topP.add(typeTF);
         topP.add(methodLab);
-        if (onlyConstr) {
+        if (constructorOnly) {
             methodLab.setLabelFor(onlyConstrTF);
             topP.add(onlyConstrTF);
         } else {
@@ -263,11 +263,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         String typ;
 
-        public void setType(String typ) throws ClassNotFoundException {
-            this.typ = typ;
-            if (VStatics.classForName(typ) == null) // just to check exception
+        public void setType(String clName) throws ClassNotFoundException {
+            this.typ = clName;
+            if (VStatics.classForName(clName) == null) // just to check exception
             {
-                throw new ClassNotFoundException(typ);
+                throw new ClassNotFoundException(clName);
             }
         }
 
@@ -308,14 +308,15 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         String typ;
 
         public void setType(String clName) throws ClassNotFoundException {
-            LogUtils.getLogger(InstantiationPanel.class).debug("Constructor for class " + clName);
+            LogUtils.getLogger(InstantiationPanel.class).debug("Constructor for class: {}", clName);
+            
             List<Object>[] parameters = VStatics.resolveParameters(VStatics.classForName(clName));
             typ = clName;
             removeAll();
             tp.removeAll();
 
             if (parameters == null) {
-                tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface, "));
+                tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface"));
             } else {
                 VInstantiator.Constr constr;
                 String sign;
@@ -326,8 +327,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     for (int j = 0; j < constr.getArgs().size(); j++) {
                         sign += ((Parameter) parameters[i].get(j)).getType() + ", ";
 
-                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter)parameters[i].get(j)).getName()))
-                            ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter)parameters[i].get(j)).getName());
+                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter) parameters[i].get(j)).getName()))
+                            ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter) parameters[i].get(j)).getName());
                     }
                     sign = sign.substring(0, sign.length() - 2);
 
@@ -489,12 +490,11 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                     BorderFactory.createLineBorder(Color.black),
                     "Method arguments",
                     TitledBorder.CENTER,
-                    TitledBorder.DEFAULT_POSITION));
+                    TitledBorder.DEFAULT_POSITION)
+            );
             olp.setDialogInfo(packMe);
-
             olp.setData(params, showLabels);
             add(olp);
-
             add(Box.createVerticalGlue());
             revalidate();
         }
@@ -507,25 +507,25 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             return new VInstantiator.Factory(typ, fc, m, lis);
         }
 
-        class MyChangedListener implements ActionListener {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (ip.modifiedListener != null) {
-                    ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Button pressed"));
-                }
-            }
-        }
-
-        class MyCaretListener implements CaretListener {
-
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                if (ip.modifiedListener != null) {
-                    ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "TF edited pressed"));
-                }
-            }
-        }
+//        class MyChangedListener implements ActionListener {
+//
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (ip.modifiedListener != null) {
+//                    ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "Button pressed"));
+//                }
+//            }
+//        }
+//
+//        class MyCaretListener implements CaretListener {
+//
+//            @Override
+//            public void caretUpdate(CaretEvent e) {
+//                if (ip.modifiedListener != null) {
+//                    ip.modifiedListener.actionPerformed(new ActionEvent(this, 0, "TF edited pressed"));
+//                }
+//            }
+//        }
 
         class MyClassListener implements ActionListener {
 

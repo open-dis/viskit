@@ -23,9 +23,9 @@ public class ObjectInspector extends JDialog
 {
   public boolean modified = false;
     private final JButton canButt;
-    private JButton okButt;
+    private final JButton okButt;
     private final JPanel buttPan;
-    private JPanel contentP;
+    private final JPanel contentP;
   InstantiationPanel ip;
   enableApplyButtonListener lis;
 

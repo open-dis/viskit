@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity name="InventoryModel" package="examples" version="1.0" author="terry" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Implementation of an Event Graph for an Inventory Model employing an (s, S) ordering policy depicted on page 4-6 of the Discrete Event Simulation (DES) Modeling guide by Arnie Buss.</Comment>
+    <Parameter name="D" type="simkit.random.RandomVariate">
+        <Comment>Number of Parts demanded by a customer</Comment>
+    </Parameter>
+    <Parameter name="tL" type="simkit.random.RandomVariate">
+        <Comment>Lead time for orders received by the company</Comment>
+    </Parameter>
+    <Parameter name="tR" type="simkit.random.RandomVariate">
+        <Comment>Deterministic time between company reviews</Comment>
+    </Parameter>
+    <Parameter name="I0" type="int">
+        <Comment>Initial inventory of Parts</Comment>
+    </Parameter>
+    <Parameter name="bigS" type="int">
+        <Comment>Order up to amount (S)</Comment>
+    </Parameter>
+    <Parameter name="littleS" type="int">
+        <Comment>Order trigger amount (s)</Comment>
+    </Parameter>
+    <StateVariable name="I" type="int">
+        <Comment>Amount of Parts on hand</Comment>
+    </StateVariable>
+    <StateVariable name="B" type="int">
+        <Comment>Amount of Parts on backorder</Comment>
+    </StateVariable>
+    <StateVariable name="T" type="int">
+        <Comment>Total amount of Parts on order</Comment>
+    </StateVariable>
+    <StateVariable name="N" type="int">
+        <Comment>Number of Parts ordered</Comment>
+    </StateVariable>
+    <StateVariable name="NO" type="int">
+        <Comment>Number of orders placed</Comment>
+    </StateVariable>
+    <StateVariable name="immediatelyServedCustomers" type="int">
+        <Comment>Customers immediately served</Comment>
+    </StateVariable>
+    <Event name="Run" description="This event is fired first to facilitate initialization of all simulation state variables">
+        <Comment></Comment>
+        <StateTransition state="I">
+            <Assignment value="I0"/>
+        </StateTransition>
+        <StateTransition state="B">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="T">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="N">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="NO">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="immediatelyServedCustomers">
+            <Assignment value="0"/>
+        </StateTransition>
+        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT">
+            <Comment></Comment>
+        </Schedule>
+        <Code></Code>
+        <Coordinate x="40.0" y="200.0"/>
+    </Event>
+    <Event name="Arrival">
+        <Comment>Feeder event for schedulling the Demand event via Arrivals from the Arrival Process</Comment>
+        <Schedule delay="0.0" event="Demand" priority="DEFAULT">
+            <Comment>Passing along tA</Comment>
+        </Schedule>
+        <Code></Code>
+        <Coordinate x="40.0" y="100.0"/>
+    </Event>
+    <Event name="Demand">
+        <Comment></Comment>
+        <LocalVariable name="demand" type="int" value="((DiscreteRandomVariate) D).generateInt()">
+            <Comment></Comment>
+        </LocalVariable>
+        <LocalVariable name="net" type="int" value="I-B-demand">
+            <Comment></Comment>
+        </LocalVariable>
+        <StateTransition state="I">
+            <Assignment value="Math.max(0, net)"/>
+        </StateTransition>
+        <StateTransition state="B">
+            <Assignment value="Math.max(0, -net)"/>
+        </StateTransition>
+        <Code>firePropertyChange("demand", demand);
+
+if (net &gt;= 0) {
+   int oldImmediatelyServedCustomers = immediatelyServedCustomers;
+   immediatelyServedCustomers += 1;
+   firePropertyChange("immediatelyServedCustomers", oldImmediatelyServedCustomers, immediatelyServedCustomers);
+}</Code>
+        <Coordinate x="150.0" y="100.0"/>
+    </Event>
+    <Event name="Review">
+        <Comment></Comment>
+        <Schedule delay="0.0" event="PlaceOrder" condition="(I-B+T) &lt; littleS" priority="DEFAULT">
+            <Comment></Comment>
+            <EdgeParameter value="bigS - I + B - T"/>
+        </Schedule>
+        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT">
+            <Comment></Comment>
+        </Schedule>
+        <Code></Code>
+        <Coordinate x="140.0" y="290.0"/>
+    </Event>
+    <Event name="PlaceOrder">
+        <Comment></Comment>
+        <Argument name="A" type="int"/>
+        <StateTransition state="T">
+            <Assignment value="T+A"/>
+        </StateTransition>
+        <StateTransition state="N">
+            <Assignment value="N+A"/>
+        </StateTransition>
+        <StateTransition state="NO">
+            <Assignment value="NO + 1"/>
+        </StateTransition>
+        <Schedule delay="tL.generate()" event="OrderArrives" priority="DEFAULT">
+            <Comment></Comment>
+            <EdgeParameter value="A"/>
+        </Schedule>
+        <Code></Code>
+        <Coordinate x="280.0" y="300.0"/>
+    </Event>
+    <Event name="OrderArrives">
+        <Comment></Comment>
+        <Argument name="A" type="int"/>
+        <LocalVariable name="net" type="int" value="I - B + A">
+            <Comment></Comment>
+        </LocalVariable>
+        <StateTransition state="T">
+            <Assignment value="T - A"/>
+        </StateTransition>
+        <StateTransition state="I">
+            <Assignment value="Math.max(0, net)"/>
+        </StateTransition>
+        <StateTransition state="B">
+            <Assignment value="Math.max(0, -net)"/>
+        </StateTransition>
+        <Code></Code>
+        <Coordinate x="400.0" y="300.0"/>
+    </Event>
+</SimEntity>

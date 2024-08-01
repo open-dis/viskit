@@ -469,6 +469,7 @@ public class VStatics {
         Class<?> c = null;
         LocalBootLoader loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader();
         String[] classpaths = loader.getClassPath();
+        String clazz;
 
         for (String cpath : classpaths) {
 
@@ -486,7 +487,7 @@ public class VStatics {
 
             try {
                 if (finder.getPath() != null) {
-                    String clazz = finder.getPath().toString();
+                    clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
                     if (clazz.contains(userHome)) {
@@ -588,8 +589,16 @@ public class VStatics {
                 System.out.println("\t # constructors: " + constr.length);
             }
 
+            Class<?>[] ptypes;
+            ParameterMap param;
+            String[] names, types;
+            Parameter pt, p;
+            String[] params;
+            String[][] pMap;
+            int numConstrs;
+            String ptype, pname, ptType;
             for (int i = 0; i < constr.length; i++) {
-                Class<?>[] ptypes = constr[i].getParameterTypes();
+                ptypes = constr[i].getParameterTypes();
                 paramAnnots = constr[i].getDeclaredAnnotations();
                 plist[i] = new ArrayList<>();
                 if (viskit.VStatics.debug) {
@@ -602,15 +611,15 @@ public class VStatics {
                         throw new RuntimeException("Only one Annotation per constructor");
                     }
 
-                    ParameterMap param = constr[i].getAnnotation(viskit.ParameterMap.class);
+                    param = constr[i].getAnnotation(viskit.ParameterMap.class);
                     if (param != null) {
-                        String[] names = param.names();
-                        String[] types = param.types();
+                        names = param.names();
+                        types = param.types();
                         if (names.length != types.length) {
                             throw new RuntimeException("ParameterMap names and types length mismatch");
                         }
                         for (int k = 0; k < names.length; k++) {
-                            Parameter pt = of.createParameter();
+                            pt = of.createParameter();
                             pt.setName(names[k]);
                             pt.setType(types[k]);
 
@@ -629,18 +638,18 @@ public class VStatics {
                         //  { "type0","name0", ... }
                         //  ...
                         // }
-                        String[][] pMap = (String[][]) (f.get(new String[0][0]));
-                        int numConstrs = pMap.length;
+                        pMap = (String[][]) (f.get(new String[0][0]));
+                        numConstrs = pMap.length;
 
                         for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
-                            String[] params = pMap[n];
+                            params = pMap[n];
                             if (params != null) {
                                 plist[n] = new ArrayList<>();
                                 for (int k = 0; k < params.length; k += 2) {
                                     try {
-                                        Parameter p = of.createParameter();
-                                        String ptype = params[k];
-                                        String pname = params[k + 1];
+                                        p = of.createParameter();
+                                        ptype = params[k];
+                                        pname = params[k + 1];
 
                                         p.setName(pname);
                                         p.setType(ptype);
@@ -663,10 +672,10 @@ public class VStatics {
                     }
                 } else { // unknonws
                     int k = 0;
-                    for (Class<?> ptype : ptypes) {
+                    for (Class<?> ptyp : ptypes) {
                         try {
-                            Parameter p = of.createParameter();
-                            String ptType = VStatics.convertClassName(ptype.getName());
+                            p = of.createParameter();
+                            ptType = VStatics.convertClassName(ptyp.getName());
                             if (ptType.indexOf(".class") > 0) { //??
                                 ptType = ptType.split("\\.")[0];
                             }
@@ -810,4 +819,5 @@ public class VStatics {
 
         JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
-}
+    
+} // end class VStatics

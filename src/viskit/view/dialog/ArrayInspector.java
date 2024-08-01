@@ -27,11 +27,11 @@ public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
     private final JButton canButt;
-    private JButton okButt;
+    private final JButton okButt;
     private final JPanel buttPan;
-    private JPanel contentP;
+    private final JPanel contentP;
     private final JTextField typeTF;
-    private JTextField sizeTF;
+    private final JTextField sizeTF;
     private final JPanel upPan;
     private final enableApplyButtonListener listnr;
 

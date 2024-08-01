@@ -39,21 +39,27 @@ public class EventStateTransitionDialog extends JDialog {
     private static boolean modified = false;
     private static boolean allGood;
     private final JTextField actionField;
+    private final JTextField arrayIndexField;
+    private final JTextField localAssignmentField;
 
-    private JTextField arrayIndexField, localAssignmentField, localInvocationField, descriptionField;
+    private final JTextField localInvocationField;
+    private JTextField descriptionField;
     private JComboBox<ViskitElement> stateVarsCB;
     private final JComboBox<String> stateTranMethodsCB;
-    private JComboBox<String> localVarMethodsCB;
+    private final JComboBox<String> localVarMethodsCB;
     private final JRadioButton assTo;
-    private JRadioButton opOn;
+    private final JRadioButton opOn;
     private EventStateTransition param;
     private final JButton okButt;
-    private JButton canButt;
+    private final JButton canButt;
     private final JButton newSVButt;
     private final JLabel actionLab1;
-    private JLabel actionLab2, localInvokeDot;
+    private final JLabel actionLab2;
+    private final JLabel localInvokeDot;
     private final JPanel localAssignmentPanel;
-    private JPanel indexPanel, stateTransInvokePanel, localInvocationPanel;
+    private final JPanel indexPanel;
+    private final JPanel stateTransInvokePanel;
+    private final JPanel localInvocationPanel;
 
     /** Required to get the EventArgument for indexing a State Variable array */
     private final ArgumentsPanel argPanel;
@@ -214,51 +220,35 @@ public class EventStateTransitionDialog extends JDialog {
         actionField.addCaretListener(lis);
         localInvocationField.addCaretListener(lis);
 
-        stateVarsCB.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JComboBox cb = (JComboBox) e.getSource();
-                vStateVariable sv = (vStateVariable) cb.getSelectedItem();
-                descriptionField.setText(sv.getComment());
-                okButt.setEnabled(true);
-                indexPanel.setVisible(VGlobals.instance().isArray(sv.getType()));
-                modified = true;
-                pack();
-            }
+        stateVarsCB.addActionListener((ActionEvent e) -> {
+            JComboBox cb = (JComboBox) e.getSource();
+            vStateVariable sv = (vStateVariable) cb.getSelectedItem();
+            descriptionField.setText(sv.getComment());
+            okButt.setEnabled(true);
+            indexPanel.setVisible(VGlobals.instance().isArray(sv.getType()));
+            modified = true;
+            pack();
         });
-        newSVButt.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
-                if (nm != null) {
-                    stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
-                    for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-                        vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
-                        if (vsv.getName().contains(nm)) {
-                            stateVarsCB.setSelectedIndex(i);
-                            break;
-                        }
+        newSVButt.addActionListener((ActionEvent e) -> {
+            String nm = VGlobals.instance().getEventGraphEditor().addStateVariableDialog();
+            if (nm != null) {
+                stateVarsCB.setModel(VGlobals.instance().getStateVarsCBModel());
+                for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
+                    vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
+                    if (vsv.getName().contains(nm)) {
+                        stateVarsCB.setSelectedIndex(i);
+                        break;
                     }
                 }
             }
         });
-        stateTranMethodsCB.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okButt.setEnabled(true);
-                modified = true;
-            }
+        stateTranMethodsCB.addActionListener((ActionEvent e) -> {
+            okButt.setEnabled(true);
+            modified = true;
         });
-        localVarMethodsCB.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                okButt.setEnabled(true);
-                modified = true;
-            }
+        localVarMethodsCB.addActionListener((ActionEvent e) -> {
+            okButt.setEnabled(true);
+            modified = true;
         });
 
         // to start off:

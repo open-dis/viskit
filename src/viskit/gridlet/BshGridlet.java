@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.parseInt;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperties;
@@ -37,7 +36,6 @@ import static java.lang.System.setErr;
 import static java.lang.System.setOut;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -164,7 +162,7 @@ public class BshGridlet extends Thread {
         Iterator itd = designParams.iterator();
         Iterator itp = designArgs.iterator();
 
-        boolean debug_io = valueOf(exp.getDebug());
+        boolean debug_io = Boolean.parseBoolean(exp.getDebug());
 
         if(debug_io) {
             System.out.println(filename + " Grid Task ID " + taskID + " of " + numTasks + " tasks in jobID " + jobID + " which is DesignPoint " + designPtIndex + " of Sample " + sampleIndex);

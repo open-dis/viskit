@@ -35,7 +35,6 @@ package viskit.doe;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -187,15 +186,11 @@ public class ParamTable extends JTable {
             setBorderPainted(false);
 
             // This so we can change background of cells depending on the state of the checkboxes.
-            addItemListener(new ItemListener() {
-
-                @Override
-                public void itemStateChanged(ItemEvent e) {
-                    ListSelectionModel lsm = ParamTable.this.getSelectionModel();
-                    if (!lsm.isSelectionEmpty()) {
-                        int selectedRow = lsm.getMinSelectionIndex();
-                        ((AbstractTableModel) ParamTable.this.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
-                    }
+            addItemListener((ItemEvent e) -> {
+                ListSelectionModel lsm = ParamTable.this.getSelectionModel();
+                if (!lsm.isSelectionEmpty()) {
+                    int selectedRow = lsm.getMinSelectionIndex();
+                    ((AbstractTableModel) ParamTable.this.getModel()).fireTableRowsUpdated(selectedRow, selectedRow);
                 }
             });
         }

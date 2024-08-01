@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -25,12 +24,10 @@ import java.awt.*;
 public class ConditionalExpressionPanel extends JPanel {
 
     JTextArea conditionalTA;
-    Edge edge;
     private final JPanel conditionalPanel;
-    private JPanel ifTextPan;
+    private final JPanel ifTextPan;
 
     public ConditionalExpressionPanel(Edge edge, boolean schedulingType) {
-        this.edge = edge;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
@@ -79,13 +76,9 @@ public class ConditionalExpressionPanel extends JPanel {
 
         add(conditionalPanel);
 
-        conditionalTA.addCaretListener(new CaretListener() {
-
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                if (changeListener != null) {
-                    changeListener.stateChanged(new ChangeEvent(conditionalTA));
-                }
+        conditionalTA.addCaretListener((CaretEvent e) -> {
+            if (changeListener != null) {
+                changeListener.stateChanged(new ChangeEvent(conditionalTA));
             }
         });
     }

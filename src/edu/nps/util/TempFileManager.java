@@ -172,14 +172,8 @@ public class TempFileManager {
         // return only directories that start with your
         // prefix.
         FileFilter tmpDirFilter =
-            new FileFilter() {
-
-                @Override
-                public boolean accept(File pathname) {
-                    return (pathname.isDirectory() &&
-                            pathname.getName().startsWith(TEMP_DIR_PREFIX));
-                }
-            };
+            (File pathname) -> (pathname.isDirectory() &&
+                    pathname.getName().startsWith(TEMP_DIR_PREFIX));
 
         // Get the system temp directory and filter the files.
         String tmpDirName = System.getProperty("java.io.tmpdir");

@@ -111,8 +111,9 @@ public class CryptoMethods
   private static String getString(byte[] bytes)
   {
     StringBuilder sb = new StringBuilder();
+    byte b;
     for (int i = 0; i < bytes.length; i++) {
-      byte b = bytes[i];
+      b = bytes[i];
       sb.append(0x00FF & b);
       if (i + 1 < bytes.length) {
         sb.append("-");
@@ -125,8 +126,9 @@ public class CryptoMethods
   {
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
     StringTokenizer st = new StringTokenizer(str, "-", false);
+    int i;
     while (st.hasMoreTokens()) {
-      int i = Integer.parseInt(st.nextToken());
+      i = Integer.parseInt(st.nextToken());
       bos.write((byte) i);
     }
     return bos.toByteArray();

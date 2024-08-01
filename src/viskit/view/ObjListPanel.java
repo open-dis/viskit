@@ -1,6 +1,7 @@
 package viskit.view;
 
 import edu.nps.util.SpringUtilities;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+
 import viskit.VGlobals;
 import viskit.model.VInstantiator;
 import viskit.view.dialog.ArrayInspector;
@@ -70,12 +72,17 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
-        String jTFText;
+        String jTFText, s;
+        VInstantiator inst;
+        VInstantiator.Factory vif;
+        VInstantiator.FreeF viff;
+        JPanel tinyP;
+        JButton b;
         for (Iterator<Object> itr = lis.iterator(); itr.hasNext(); i++) {
-            VInstantiator inst = (VInstantiator) itr.next();
+            inst = (VInstantiator) itr.next();
             shadow[i] = inst;
             typeLab[i] = new JLabel("(" + inst.getType() + ")" + " " + inst.getName(), JLabel.TRAILING); // html screws up table sizing below
-            String s = inst.getName();
+            s = inst.getName();
             nameLab[i] = new JLabel(s);
             nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
             nameLab[i].setOpaque(true);
@@ -90,8 +97,8 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             }
 
             entryTF[i] = new JTextField(8);
-            entryTF[i].setToolTipText("Manually enter/override method "
-                    + "arguments here");
+            entryTF[i].setToolTipText("Manually enter/override arguments "
+                    + "here. Seperate vararg entries with commas");
             VStatics.clampHeight(entryTF[i]);
 
             // Show the formal parameter type in the TF
@@ -100,9 +107,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             // If we have a factory, then reflect the Object... input to the
             // getInstance() method of RVF
             if (inst instanceof VInstantiator.Factory) {
-                VInstantiator.Factory vif = (VInstantiator.Factory) inst;
+                vif = (VInstantiator.Factory) inst;
                 if (!vif.getParams().isEmpty() && vif.getParams().get(0) instanceof VInstantiator.FreeF) {
-                    VInstantiator.FreeF viff = (VInstantiator.FreeF) vif.getParams().get(0);
+                    viff = (VInstantiator.FreeF) vif.getParams().get(0);
                     jTFText = viff.getValue();
                 }
             }
@@ -117,31 +124,29 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 return;
             }
 
-            if (c != null) {
-                if (!c.isPrimitive() || c.isArray()) {
-                    JPanel tinyP = new JPanel();
-                    tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
-                    tinyP.add(entryTF[i]);
-                    JButton b = new JButton("...");
-                    b.setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createEtchedBorder(),
-                            BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-                    VStatics.clampSize(b, entryTF[i], b);
+            if (!c.isPrimitive() || c.isArray()) {
+                tinyP = new JPanel();
+                tinyP.setLayout(new BoxLayout(tinyP, BoxLayout.X_AXIS));
+                tinyP.add(entryTF[i]);
+                b = new JButton("...");
+                b.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createEtchedBorder(),
+                        BorderFactory.createEmptyBorder(0, 3, 0, 3)));
+                VStatics.clampSize(b, entryTF[i], b);
 
-                    tinyP.add(b);
-                    if (showLabels) {
-                        typeLab[i].setLabelFor(tinyP);
-                    }
-                    contentObj[i] = tinyP;
-                    b.setToolTipText("Edit with Instantiation Wizard");
-                    b.addActionListener(this);
-                    b.setActionCommand("" + i);
-                } else {
-                    if (showLabels) {
-                        typeLab[i].setLabelFor(entryTF[i]);
-                    }
-                    contentObj[i] = entryTF[i];
+                tinyP.add(b);
+                if (showLabels) {
+                    typeLab[i].setLabelFor(tinyP);
                 }
+                contentObj[i] = tinyP;
+                b.setToolTipText("Edit with Instantiation Wizard");
+                b.addActionListener(this);
+                b.setActionCommand("" + i);
+            } else {
+                if (showLabels) {
+                    typeLab[i].setLabelFor(entryTF[i]);
+                }
+                contentObj[i] = entryTF[i];
             }
         }
         if (showLabels) {
@@ -172,20 +177,23 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
      * @return a list of free form instantiators
      */
     public List<Object> getData() {
+        VInstantiator.Array via;
+        VInstantiator.Factory vif;
+        List<Object> insts, params;
         Vector<Object> v = new Vector<>();
         for (int i = 0; i < typeLab.length; i++) {
             if (shadow[i] instanceof VInstantiator.FreeF) {
                 ((VInstantiator.FreeF) shadow[i]).setValue(entryTF[i].getText().trim());
             } else if (shadow[i] instanceof VInstantiator.Array) {
-                VInstantiator.Array via = (VInstantiator.Array) shadow[i];
-                List<Object> insts = via.getInstantiators();
+                via = (VInstantiator.Array) shadow[i];
+                insts = via.getInstantiators();
 
                 // TODO: Limit one instantiator per Array?
                 if (insts.isEmpty())
                     insts.add(new VInstantiator.FreeF(via.getType(), entryTF[i].getText().trim()));
             } else if (shadow[i] instanceof VInstantiator.Factory) {
-                VInstantiator.Factory vif = (VInstantiator.Factory) shadow[i];
-                List<Object> params = vif.getParams();
+                vif = (VInstantiator.Factory) shadow[i];
+                params = vif.getParams();
 
                 // TODO: Limit one parameter per Factory?
                 if (params.isEmpty())
@@ -250,15 +258,15 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
                 // Prevent something like RVF.getInstance(RandomVariate) from
                 // being entered in the text field
-                if (vi instanceof VInstantiator.Factory) {
-                    VInstantiator.Factory fac = (VInstantiator.Factory) vi;
-                    if (!fac.getParams().isEmpty()) {
-                        return;
-                    }
-                }
+                VInstantiator.Factory fac = null;
+                if (vi instanceof VInstantiator.Factory)
+                    fac = (VInstantiator.Factory) vi;
 
                 shadow[idx] = vi;
-                entryTF[idx].setText(vi.toString());
+                if (fac != null)
+                    entryTF[idx].setText(fac.getParams().getFirst().toString());
+                else
+                    entryTF[idx].setText(vi.toString());
                 caretUpdate(null);
             }
         }

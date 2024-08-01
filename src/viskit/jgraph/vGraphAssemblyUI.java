@@ -30,7 +30,8 @@ public class vGraphAssemblyUI extends BasicGraphUI {
     @Override
     protected boolean startEditing(Object cell, MouseEvent event) {
 
-        // We're not concerned with the MouseEvent here
+        // We're not concerned with the MouseEvent here, but we can be assured
+        // we're here on the EDT
 
         completeEditing();
 

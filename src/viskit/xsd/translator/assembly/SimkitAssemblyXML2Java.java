@@ -28,7 +28,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 public class SimkitAssemblyXML2Java {
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
-    static final boolean debug = false;
+    static final boolean DEBUG = false; // TODO: tie to Vstatics.debug?
     static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
@@ -36,7 +36,6 @@ public class SimkitAssemblyXML2Java {
     final private String sp4 = sp+sp+sp+sp;
     final private String sp8 = sp4+sp4;
     final private String sp12 = sp8+sp4;
-    final private String sp16 = sp8+sp8;
     final private String ob  = SimkitXML2Java.OB;
     final private String cb  = SimkitXML2Java.CB;
     final private String sc  = SimkitXML2Java.SC;
@@ -96,7 +95,7 @@ public class SimkitAssemblyXML2Java {
             this.root = (SimkitAssembly) u.unmarshal(fileInputStream);
 
             // For debugging, make true
-            if (debug) {
+            if (DEBUG) {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
@@ -297,9 +296,10 @@ public class SimkitAssemblyXML2Java {
         List<String> exList = java.util.Arrays.asList(excludes);
 
         synchronized (list) {
+            String clazz;
             Iterator<String> listI = list.iterator();
             while (listI.hasNext()) {
-                String clazz = listI.next();
+                clazz = listI.next();
                 if (exList.contains(clazz)) {
                     listI.remove();
                     log.debug("Removed type \"" + clazz + "\" from the TreeSet");
@@ -570,8 +570,9 @@ public class SimkitAssemblyXML2Java {
         Map<String, List<PropertyChangeListenerConnection>> propertyChangeListenerConnections =
                 new LinkedHashMap<>();
 
+        String pclMode;
         for (PropertyChangeListener pcl : this.root.getPropertyChangeListener()) {
-            String pclMode = pcl.getMode();
+            pclMode = pcl.getMode();
 
             if (null != pclMode) // For backwards compatibility
                 switch (pclMode) {
@@ -589,9 +590,11 @@ public class SimkitAssemblyXML2Java {
                 }
         }
 
+        String name;
+        List<PropertyChangeListenerConnection> connections;
         for (PropertyChangeListenerConnection pclc : this.root.getPropertyChangeListenerConnection()) {
-            String name = pclc.getListener();
-            List<PropertyChangeListenerConnection> connections = propertyChangeListenerConnections.get(name);
+            name = pclc.getListener();
+            connections = propertyChangeListenerConnections.get(name);
             if (connections == null) {
                 connections = new ArrayList<>();
                 propertyChangeListenerConnections.put(name, connections);
@@ -602,8 +605,9 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createPropertyChangeListeners" + lp + rp + sp + ob);
 
+        List<Object> pl;
         for (PropertyChangeListener pcl : propertyChangeListeners.values()) {
-            List<Object> pl = pcl.getParameters();
+            pl = pcl.getParameters();
             pw.println(sp8 + "addPropertyChangeListener" + lp + qu + pcl.getName() + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
@@ -633,10 +637,11 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
 
-        String[] pcls = replicationStats.keySet().toArray(new String[0]);
-        for (String propChangeListener : pcls) {
-            PropertyChangeListener pcl = replicationStats.get(propChangeListener);
-            List<Object> pl = pcl.getParameters();
+        PropertyChangeListener pcl;
+        List<PropertyChangeListenerConnection> myConnections;
+        for (String propChangeListener : replicationStats.keySet()) {
+            pcl = replicationStats.get(propChangeListener);
+            pl = pcl.getParameters();
             pw.println(sp8 + "addReplicationStats" + lp + qu + propChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
@@ -652,8 +657,7 @@ public class SimkitAssemblyXML2Java {
 
             pw.println(sp8 + rp + sc);
             pw.println();
-            List<PropertyChangeListenerConnection> myConnections =
-                    propertyChangeListenerConnections.get(propChangeListener);
+            myConnections = propertyChangeListenerConnections.get(propChangeListener);
             if (myConnections != null) {
                 for (PropertyChangeListenerConnection pclc : myConnections) {
                     pw.print(sp8 + "addReplicationStatsListenerConnection" + lp + qu + propChangeListener + qu + cm + sp + qu + pclc.getProperty() + qu + cm + sp);
@@ -669,11 +673,9 @@ public class SimkitAssemblyXML2Java {
         pw.println(sp4 + "@Override");
         pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
 
-        pcls = designPointStats.keySet().toArray(new String[0]);
-
-        for (String propChangeListener : pcls) {
-            PropertyChangeListener pcl = designPointStats.get(propChangeListener);
-            List<Object> pl = pcl.getParameters();
+        for (String propChangeListener : designPointStats.keySet()) {
+            pcl = designPointStats.get(propChangeListener);
+            pl = pcl.getParameters();
             pw.println(sp8 + "addDesignPointStats" + lp + qu + propChangeListener + qu + cm);
             pw.print(sp12 + nw + sp + pcl.getType() + lp);
 
@@ -733,9 +735,11 @@ public class SimkitAssemblyXML2Java {
     private void dumpEntities(List<Output> lis, PrintWriter pw) {
         List<SimEntity> simEntities = getAssemblyRoot().getSimEntity();
         List<PropertyChangeListener> pcls = getAssemblyRoot().getPropertyChangeListener();
+        Object elem;
+        String name;
         for (Output output : lis) {
-            Object elem = output.getEntity();
-            String name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
+            elem = output.getEntity();
+            name = "<FIX: Output not of SimEntity or PropertyChangeListener>";
 
             for (SimEntity se : simEntities) {
                 if (se.getName().equals(elem.toString())) {

@@ -40,7 +40,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private InstantiationPanel ip;
     private EvGraphNode egNode;
     private final JButton okButt;
-    private JButton canButt;
+    private final JButton canButt;
     private final enableApplyButtonListener lis;
     private final JPanel buttPan;
     private final JTextField descField;

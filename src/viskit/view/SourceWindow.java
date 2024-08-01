@@ -1,6 +1,7 @@
 package viskit.view;
 
 import edu.nps.util.LogUtils;
+
 import javax.swing.*;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
@@ -11,7 +12,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.util.Compiler;
 import viskit.VGlobals;
 import viskit.VStatics;
@@ -32,7 +35,6 @@ public class SourceWindow extends JFrame {
     static final Logger LOGGER = LogUtils.getLogger(SourceWindow.class);
 
     public final String src;
-    Thread sysOutThread;
     JTextArea jta;
     private static JFileChooser saveChooser;
     private JPanel contentPane;
@@ -137,7 +139,6 @@ public class SourceWindow extends JFrame {
         compileButt.addActionListener(new ActionListener() {
 
             StringBuffer sb = new StringBuffer();
-            BufferedReader br;
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -374,7 +375,6 @@ class Searcher {
 class sysOutDialog extends JDialog implements ActionListener {
 
     private static sysOutDialog dialog;
-    private static final String value = "";
     private JList<Object> list;
     private final JTextArea jta;
     private final JScrollPane jsp;
@@ -403,7 +403,7 @@ class sysOutDialog extends JDialog implements ActionListener {
                 labelText,
                 title);
         dialog.setVisible(true);
-        return value;
+        return "";
     }
 
     private sysOutDialog(Frame frame,

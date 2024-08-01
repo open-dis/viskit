@@ -30,7 +30,7 @@ public class ViskitAssembly extends BasicAssembly {
     protected Map<String, List<PropertyConnector>> replicationStatsListenerConnections;
     protected Map<String, List<String>> simEventListenerConnections;
     protected Map<String, Adapter> adapters;
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = false; // TODO: tie to Vstatics.debug?
 
     /** Creates a new instance of ViskitAssembly */
     public ViskitAssembly() {

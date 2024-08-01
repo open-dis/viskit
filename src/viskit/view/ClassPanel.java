@@ -64,29 +64,21 @@ public class ClassPanel extends JPanel {
         buttPan.add(minus);
         buttPan.add(Box.createHorizontalGlue());
         add(buttPan);
-        minus.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tree.removeSelected();
-            }
+        minus.addActionListener((ActionEvent e) -> {
+            tree.removeSelected();
         });
 
-        plus.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jfc.setFileFilter(new ClassTypeFilter(tree.getTargetClass()));
-                jfc.setAcceptAllFileFilterUsed(false);
-                jfc.setMultiSelectionEnabled(true);
-                jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-
-                int retv = jfc.showOpenDialog(ClassPanel.this);
-                if (retv == JFileChooser.APPROVE_OPTION) {
-                    File[] fa = jfc.getSelectedFiles();
-                    for (File fa1 : fa) {
-                        tree.addContentRoot(fa1, fa1.isDirectory());
-                    }
+        plus.addActionListener((ActionEvent e) -> {
+            jfc.setFileFilter(new ClassTypeFilter(tree.getTargetClass()));
+            jfc.setAcceptAllFileFilterUsed(false);
+            jfc.setMultiSelectionEnabled(true);
+            jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            
+            int retv = jfc.showOpenDialog(ClassPanel.this);
+            if (retv == JFileChooser.APPROVE_OPTION) {
+                File[] fa = jfc.getSelectedFiles();
+                for (File fa1 : fa) {
+                    tree.addContentRoot(fa1, fa1.isDirectory());
                 }
             }
         });

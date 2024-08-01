@@ -484,9 +484,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
         }
     }
-    private final int egNodeCount = 0;
-    private final int adptrNodeCount = 0;
-    private final int pclNodeCount = 0;    // A little experiment in class introspection
+    
+    // These can not be final, else reflection with fail
+    private int egNodeCount = 0;
+    private int adptrNodeCount = 0;
+    private int pclNodeCount = 0;    // A little experiment in class introspection
+    
     private static Field egCountField;
     private static Field adptrCountField;
     private static Field pclCountField;
@@ -1392,10 +1395,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.LOG
+            // TODO: implement a Dialog pointing to the validationErrors.log
             return null;
         } else {
-            LOG.info(f + " is valid XML\n");
+            LOG.info("{} is valid XML\n", f);
         }
 
         SimkitAssemblyXML2Java x2j = null;
@@ -1429,14 +1432,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } else {
-            LOG.info(x2j.getEventGraphFile() + " is valid XML\n");
+            LOG.info("{} is valid XML\n", x2j.getEventGraphFile());
         }
 
         try {
             eventGraphSource = x2j.translate();
         } catch (Exception e) {
-            LOG.error("Error building Java from " + x2j.getFileBaseName() +
-                    ": " + e.getMessage() + ", erroneous event-graph xml found");
+            LOG.error("Error building Java from {}: {}, erroneous event-graph xml found", x2j.getFileBaseName(), e.getMessage());
         }
         return eventGraphSource;
     }

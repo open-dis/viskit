@@ -19,11 +19,13 @@ import viskit.ViskitConfig;
  */
 public class BeanshellErrorDialog extends JDialog {
 
+    private static BeanshellErrorDialog me;
+    
     private final JTextArea errorMsg;
     private boolean returnBool = false;
-    private static BeanshellErrorDialog me;
     private final JCheckBox current;
-    private JCheckBox permanent,  nullCB;
+    private final JCheckBox permanent;
+    private final JCheckBox nullCB;
     private JCheckBox selectedButt;
 
     public static boolean showDialog(String errMsg, Component locationComp) {
@@ -121,27 +123,19 @@ public class BeanshellErrorDialog extends JDialog {
         setContentPane(p);
         pack();
 
-        noButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                returnBool = false;
-                dispose();
-            }
+        noButton.addActionListener((ActionEvent e) -> {
+            returnBool = false;
+            dispose();
         });
 
-        yesButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (current.isSelected()) {
-                    ViskitConfig.instance().setSessionVal(ViskitConfig.BEANSHELL_WARNING, "false");
-                } else if (permanent.isSelected()) {
-                    ViskitConfig.instance().setVal(ViskitConfig.BEANSHELL_WARNING, "false");
-                }
-                returnBool = true;
-                dispose();
+        yesButton.addActionListener((ActionEvent e) -> {
+            if (current.isSelected()) {
+                ViskitConfig.instance().setSessionVal(ViskitConfig.BEANSHELL_WARNING, "false");
+            } else if (permanent.isSelected()) {
+                ViskitConfig.instance().setVal(ViskitConfig.BEANSHELL_WARNING, "false");
             }
+            returnBool = true;
+            dispose();
         });
     }
 

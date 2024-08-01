@@ -64,7 +64,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class FileHandler {
 
-    private static final String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private static final String SCHEMA_LOC = XMLValidationTool.ASSEMBLY_SCHEMA;
 
     public static DoeFileModel openFile(File f) throws Exception {
         SAXBuilder builder;
@@ -128,12 +128,18 @@ public class FileHandler {
         FileOutputStream fos = new FileOutputStream(of);
         Marshaller m = jaxbCtx.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
 
         //fillRoot();
         m.marshal(OpenAssembly.inst().jaxbRoot, fos);
     }
 
+    /** Called from the DoeController. Not currently used
+     * 
+     * @param fil the assy file to run
+     * @param title the title of the run
+     * @param mainFrame the parent frame
+     */
     public static void runFile(File fil, String title, JFrame mainFrame) {
         try {
             new JobLauncher(true, fil.getAbsolutePath(), title, mainFrame);      // broken
