@@ -53,13 +53,13 @@ Post release fixes / upgrades / issues:
 
   If a single Assy file was closed, it will close all open EGs file including
   non-associated EGs. This happens due to the EG caching system that relies on
-  parsing SimEntities of Assy files to know which EG to keep open
+  parsing SimEntities of Assy files to know which EG to keep open.
 
   If one strays from the Java Bean convention of naming variables by starting
   with a lower case letter, then be prepared to manually enter variable names
   of interest when parameterizing a PropertyChangeListener edge such as a
   SimplePropertyDumper as the PropertyDescriptor returned by the Introspector
-  will force lower case, i.e. variable int N will be returned as "n"
+  will force lower case, i.e. variable int N will be returned as "n".
 
   BeanShell checking of code snippets was a good idea in the beginning, but
   since we are only giving BeanShell a snippet and not the whole source file, it
@@ -77,15 +77,28 @@ Post release fixes / upgrades / issues:
     then
 
   ****** FIXES / UPGRADES:
+    Upgrade to JDOM v1.1.3
+
+    Fixed Log4j output to file. Using log4j2.xml config file. Console output is
+    now colorized per logging level.
+
     (Critical)
     Selection of edges on macOS was intermittent. Fix on 13 DEC 22 did not take.
     Turns out all edges need a label, even if an empty string. Null strings
-    caused edge bounding box null issues.
+    caused edge bounding box null issues. Issue remains that on MBP machines,
+    only the mid-control point is selectable on EG edges. Assy adapters are
+    selectable by dragging a cursor box around the shape. Dialog does not come
+    up. No issue when working on Mac Thunderbolt displays.
 
     (Critical)
-    Happening on macOS Sonoma 14.5
+    Fixed bad recursion happened when selecting PCL for edit
+
+    (Critical)
     https://groove.cs.utwente.nl/mac.html
-    accessabilityContext is null in JGraph, so, needs a parent Component
+    Fixed accessabilityContext was null in JGraph. Needed a parent's Component
+    accessabilityContext
+
+    On 05/03/24, moved main development work back to https://gitlab.nps.edu/Savage/viskit
 
     Updated most 3rd party libs, esp. Commons Config to fix File menu histories
     not being retained for next start of the application.
@@ -97,14 +110,12 @@ Post release fixes / upgrades / issues:
 
     Tested on JDK 22.0.1
 
+
 Release: 1.0.16(December 13, 2022)
 -----------------------------------
 Major changes since 1.0.15
 
     Fix to JAXB exception for not finding files from deleted project spaces.
-
-    *** (it's back) *** Fixed not being able to select a scheduling or cancelling edge to invoke its
-    inspector (editor). Event clicks were not happening in the EDT.
 
     Fixed NPE from version attempting to read SVN strings, which are no longer
     relevant since switching to git.
@@ -117,6 +128,7 @@ Major changes since 1.0.15
     with independent runs), and since the inception of the Java Module Platform
     System (JPMS), stripping out all but the "boot" class loader is accomplished
     in the LocalBootLoader, thus preserving our goal of isolated class loaders.
+
 
 Release: 1.0.15(June 08, 2015)
 -------------------------
