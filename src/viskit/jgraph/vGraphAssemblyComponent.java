@@ -549,7 +549,7 @@ class vAssyPortView extends PortView {
 
     public vAssyPortView(Object o) {
         super(o);
-        vAssyPortView.this.setPortSize(mysize);
+        setPortSize(mysize);
     }
 }
 

@@ -130,7 +130,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
     private final static double ROT_INCR = Math.PI;
 
     /**
-     * This class will determine if there are other self-referential edges
+     * This method will determine if there are other self-referential edges
      * attached to this node and try to return a different angle for different
      * edges, so they will be rendered at different "clock" points around the
      * node circle.
@@ -151,10 +151,10 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
                 retd += (ROT_INCR * 3/8);
                 if (e == edg) {
                     return retd;
-                 }
+                }
             }
         }
         return 0.0d;      // should always find one
     }
 
-} // end class file vSelfEdgeRenderer.java
+} // end class vSelfEdgeRenderer

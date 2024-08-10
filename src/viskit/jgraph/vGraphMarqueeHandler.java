@@ -54,7 +54,7 @@ import org.jgraph.graph.Port;
 import org.jgraph.graph.PortView;
 
 /**
- * Custom MarqueeHandler that Connects Vertices
+ * Custom MarqueeHandler that connects vertices
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vGraphMarqueeHandler">Terry Norbraten, NPS MOVES</a>
  */
@@ -337,13 +337,14 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
      */
     protected Rectangle getHighlightBounds(JGraph graph, CellView cellView) {
         boolean offset = (GraphConstants.getOffset(cellView.getAllAttributes()) != null);
-        Rectangle2D r = (offset) ? cellView.getBounds() : cellView
-                .getParentView().getBounds();
+        Rectangle2D r = (offset) ? cellView.getBounds() : cellView.getParentView().getBounds();
         r = graph.toScreen((Rectangle2D) r.clone());
         int s = 3;
 
-        return new Rectangle((int) (r.getX() - s), (int) (r.getY() - s),
-                (int) (r.getWidth() + 2 * s), (int) (r.getHeight() + 2 * s));
+        return new Rectangle((int) (r.getX() - s), 
+                (int) (r.getY() - s),
+                (int) (r.getWidth() + 2 * s), 
+                (int) (r.getHeight() + 2 * s));
     }
 
-} // end class file vGraphMarqueeHandler.java
+} // end class vGraphMarqueeHandler

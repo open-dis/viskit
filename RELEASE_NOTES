@@ -73,8 +73,12 @@ Post release fixes / upgrades / issues:
         (Minor)
 
     Placing a scheduling edge between two nodes does not immediately populate
-    the scheduling priority. If priority was missing on startup, it gets placed
-    then
+    the scheduling priority. If priority was missing on startup, or file
+    reopening, it gets placed then
+
+    Self referential edge control points are 30 degrees off of their rotated
+    rendered shape. No operational issue expect causing the marquee to shift to 
+    a cross pointer.
 
   ****** FIXES / UPGRADES:
     Upgrade to JDOM v1.1.3
@@ -83,12 +87,14 @@ Post release fixes / upgrades / issues:
     now colorized per logging level.
 
     (Critical)
-    Selection of edges on macOS was intermittent. Fix on 13 DEC 22 did not take.
-    Turns out all edges need a label, even if an empty string. Null strings
-    caused edge bounding box null issues. Issue remains that on MBP machines,
-    only the mid-control point is selectable on EG edges. Assy adapters are
-    selectable by dragging a cursor box around the shape. Dialog does not come
-    up. No issue when working on Mac Thunderbolt displays.
+    Selection of edges on macOS laptop displays was intermittent. Fix on 
+    13 DEC 22 did not take. Turns out all edges need a label, even if an empty 
+    string. Null strings caused edge bounding box null issues which interfered
+    with proper bounding box / edge shape intersections. Overrode JGraph
+    EdgeRenderer intersect method to back off of deep dive Graphics2D hits to 
+    find intersections between edge shape and their corresponding bounding 
+    boxes. Replaced with simpler shape.intersects(rectangle) calls. No issues 
+    now when working between MBP laptop displays and Mac Thunderbolt displays.
 
     (Critical)
     Fixed bad recursion happened when selecting PCL for edit

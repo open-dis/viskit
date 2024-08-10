@@ -46,21 +46,19 @@ public class vGraphAssemblyUI extends BasicGraphUI {
     private void createEditDialog(Object cell) {
 
         AssemblyController cntl = (AssemblyController) VGlobals.instance().getAssemblyController();
+        Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
         if (cell instanceof vAssyEdgeCell) {
-            Object edgeObj = ((DefaultMutableTreeNode) cell).getUserObject();
-            if (edgeObj instanceof AdapterEdge) {
-                cntl.adapterEdgeEdit((AdapterEdge) edgeObj);
-            } else if (edgeObj instanceof PropChangeEdge) {
-                cntl.pcListenerEdgeEdit((PropChangeEdge) edgeObj);
+            if (obj instanceof AdapterEdge) {
+                cntl.adapterEdgeEdit((AdapterEdge) obj);
+            } else if (obj instanceof PropChangeEdge) {
+                cntl.pcListenerEdgeEdit((PropChangeEdge) obj);
             } else {
-                cntl.simEvListenerEdgeEdit((SimEvListenerEdge) edgeObj);
+                cntl.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
             }
         } else if (cell instanceof vAssyCircleCell) {
-            Object nodeObj = ((DefaultMutableTreeNode) cell).getUserObject();
-            cntl.evGraphEdit((EvGraphNode) nodeObj);
+            cntl.evGraphEdit((EvGraphNode) obj);
         } else if (cell instanceof vAssyPropListCell) {
-            Object nodeObj = ((DefaultMutableTreeNode) cell).getUserObject();
-            cntl.pcListenerEdit((PropChangeListenerNode) nodeObj);
+            cntl.pcListenerEdit((PropChangeListenerNode) obj);
         }
     }
 }

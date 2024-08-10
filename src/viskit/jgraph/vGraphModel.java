@@ -55,7 +55,7 @@ public class vGraphModel extends DefaultGraphModel {
         // dup for cancel
         viskitCancelEdgeStyle = new AttributeMap();
         viskitCancelEdgeStyle.putAll(viskitEdgeStyle);
-        GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[]{3, 3});
+        GraphConstants.setDashPattern(viskitCancelEdgeStyle, new float[] {3, 3});
 
         // dup for self edge
         viskitSelfRefEdge = new AttributeMap();
@@ -126,7 +126,6 @@ public class vGraphModel extends DefaultGraphModel {
     }
 
     public void deleteEventNode(EventNode en) {
-
         DefaultGraphCell c = (DefaultGraphCell) en.opaqueViewObject;
         c.removeAllChildren();
         jGraph.getGraphLayoutCache().remove(new Object[]{c});
@@ -135,7 +134,6 @@ public class vGraphModel extends DefaultGraphModel {
     }
 
     public void deleteEdge(Edge edge) {
-
         DefaultEdge e = (DefaultEdge) edge.opaqueViewObject;
         jGraph.getGraphLayoutCache().remove(new Object[]{e});
 
@@ -188,7 +186,7 @@ public class vGraphModel extends DefaultGraphModel {
             atts.put(edge, edgeStyle);
         }
 
-        jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
+        jGraph.getGraphLayoutCache().insert(new Object[] {edge}, atts, cs, null, null);
 
         reDrawNodes();
     }

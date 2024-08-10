@@ -39,7 +39,7 @@ import viskit.model.Edge;
  * @version $Id$
  */
 public class vGraphComponent extends JGraph implements GraphModelListener {
-    
+
     private static final Logger LOG = LogUtils.getLogger(vGraphComponent.class);
 
     vGraphModel vGModel; // local copy for convenience
@@ -124,19 +124,19 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             }
         });
     }
-    
+
     @Override
     public void updateUI() {
         // Install a new UI
         setUI(new vGraphUI());    // we use our own for node/edge inspector editing
         invalidate();
     }
-    
+
     @Override // Prevents the NPE on macOS
     public AccessibleContext getAccessibleContext() {
         return parent.getCurrentJgraphComponent().getAccessibleContext();
     }
-    
+
     /**
      * Returns the Viskit element at the given point
      * @param p the point of the Viskit element
@@ -492,17 +492,17 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         if (view instanceof vCircleView) {
             vCircleCell cc = (vCircleCell) view.getCell();
             Object en = cc.getUserObject();
-            
+
             if (en instanceof EventNode) // should always be, except for our prototype examples
                 retVal = ((ViskitElement) en).getName();
-            
+
         } else if (view instanceof vEdgeView) {
             vEdgeCell cc = (vEdgeCell) view.getCell();
             Object e = cc.getUserObject();
-            
+
             if (e instanceof SchedulingEdge) {
                 SchedulingEdge se = (SchedulingEdge) e;
-                
+
                 if (se.conditional == null || se.conditional.isEmpty()) // put S only for conditional edges
                     retVal = "";
                 else
@@ -630,7 +630,7 @@ class vEdgeCell extends DefaultEdge {
     public vEdgeCell(Object userObject) {
         super(userObject);
     }
-    
+
     @Override
     public String toString() {
         return "";

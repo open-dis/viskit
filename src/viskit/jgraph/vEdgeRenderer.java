@@ -1,16 +1,23 @@
 package viskit.jgraph;
 
+import edu.nps.util.LogUtils;
+
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
-//import java.awt.geom.GeneralPath;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+
+import org.apache.logging.log4j.Logger;
+
+import org.jgraph.JGraph;
 import org.jgraph.graph.CellView;
 import org.jgraph.graph.EdgeRenderer;
 import org.jgraph.graph.EdgeView;
-//import org.jgraph.graph.GraphConstants;
-//import org.jgraph.util.Bezier;
-//import org.jgraph.util.Spline2D;
+import org.jgraph.graph.GraphConstants;
 
 /**
  * The guy that actually paints edges.
@@ -24,6 +31,8 @@ import org.jgraph.graph.EdgeView;
  * @version $Id$
  */
 public class vEdgeRenderer extends EdgeRenderer {
+    
+    private static final Logger LOG = LogUtils.getLogger(vEdgeRenderer.class);
 
     double[] coo = new double[6];
 
@@ -81,134 +90,146 @@ public class vEdgeRenderer extends EdgeRenderer {
             view = null;
         }
     }
+    
+    @Override
+    public boolean intersects(JGraph graph, CellView value, Rectangle rect) {
+        if (value instanceof EdgeView && graph != null) {
+            setView(value);
 
-//    TODO: Looks like an exact copy of super.createShape
-    // Returns the shape that represents the current edge in the context of the
-    // current graph.
-//    @Override
-//    protected Shape createShape() {
-//        int n = view.getPointCount();
-//        if (n > 1) {
-//			
-//            // Following block may modify static vars as side effect (Flyweight
-//            // Design)
-//            Point2D pt;
-//            EdgeView tmp = view;
-//            Point2D[] p = new Point2D[n];
-//            for (int i = 0; i < n; i++) {
-//                pt = tmp.getPoint(i);
-//                if (pt == null) {
-//                    return null; // exit
-//                }
-//                p[i] = new Point2D.Double(pt.getX(), pt.getY());
-//            }
-//
-//	    // End of Side-Effect Block
-//            // Undo Possible MT-Side Effects
-//            if (view != tmp) {
-//                view = tmp;
-//                installAttributes(view);
-//            }
-//            // End of Undo
-//            if (view.sharedPath == null) {
-//                view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
-//            } else {
-//                view.sharedPath.reset();
-//            }
-//            view.beginShape = view.lineShape = view.endShape = null;
-//            Point2D p0 = p[0];
-//            Point2D pe = p[n - 1];
-//            Point2D p1 = p[1];
-//            Point2D p2 = p[n - 2];
-//
-//            if (lineStyle == GraphConstants.STYLE_BEZIER && n > 2) {
-//                bezier = new Bezier(p);
-//                p2 = bezier.getPoint(bezier.getPointCount() - 1);
-//            } else if (lineStyle == GraphConstants.STYLE_SPLINE && n > 2) {
-//                spline = new Spline2D(p);
-//                double[] point = spline.getPoint(0.9875);
-//				// Extrapolate p2 away from the end point, pe, to avoid integer
-//                // rounding errors becoming too large when creating the line end
-//                double scaledX = pe.getX() - ((pe.getX() - point[0]) * 128);
-//                double scaledY = pe.getY() - ((pe.getY() - point[1]) * 128);
-//                p2.setLocation(scaledX, scaledY);
-//            }
-//
-//            if (beginDeco != GraphConstants.ARROW_NONE) {
-//                view.beginShape = createLineEnd(beginSize, beginDeco, p1, p0);
-//            }
-//            if (endDeco != GraphConstants.ARROW_NONE) {
-//                view.endShape = createLineEnd(endSize, endDeco, p2, pe);
-//            }
-//
-//            // Had to regenerate the sharedPath as it was going null here (TDN)
-//            if (view.sharedPath == null)
-//                view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
-//
-//            view.sharedPath.moveTo((float) p0.getX(), (float) p0.getY());
-//            /* THIS CODE WAS ADDED BY MARTIN KRUEGER 10/20/2003 */
-//            if (lineStyle == GraphConstants.STYLE_BEZIER && n > 2) {
-//                Point2D[] b = bezier.getPoints();
-//                view.sharedPath.quadTo((float) b[0].getX(),
-//                        (float) b[0].getY(), (float) p1.getX(), (float) p1.getY());
-//                
-//                Point2D b0, b1;
-//                for (int i = 2; i < n - 1; i++) {
-//                    b0 = b[2 * i - 3];
-//                    b1 = b[2 * i - 2];
-//                    view.sharedPath.curveTo((float) b0.getX(), (float) b0.getY(), 
-//                            (float) b1.getX(), (float) b1.getY(), 
-//                            (float) p[i].getX(), (float) p[i].getY());
-//                }
-//                // Had to regenerate the sharedPath as it was going null here (TDN)
-//                if (view.sharedPath == null)
-//                    view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
-//
-//                view.sharedPath.quadTo((float) b[b.length - 1].getX(),
-//                        (float) b[b.length - 1].getY(),
-//                        (float) p[n - 1].getX(), (float) p[n - 1].getY());
-//            } else if (lineStyle == GraphConstants.STYLE_SPLINE && n > 2) {
-//                
-//                double[] xy;
-//                for (double t = 0; t <= 1; t += 0.0125) {
-//                    xy = spline.getPoint(t);
-//                    view.sharedPath.lineTo((float) xy[0], (float) xy[1]);
-//                }
-//            } /* END */
-//            else {
-//                for (int i = 1; i < n - 1; i++) {
-//                    view.sharedPath.lineTo((float) p[i].getX(), (float) p[i].getY());
-//                }
-//
-//                // Had to regenerate the sharedPath as it was going null here (TDN)
-//                if (view.sharedPath == null)
-//                    view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
-//
-//                view.sharedPath.lineTo((float) pe.getX(), (float) pe.getY());
-//            }
-//
-//            // Had to regenerate the sharedPath as it was going null here (TDN)
-//            if (view.sharedPath == null)
-//                view.sharedPath = new GeneralPath(GeneralPath.WIND_NON_ZERO, n);
-//
-//            view.sharedPath.moveTo((float) pe.getX(), (float) pe.getY());
-//            if (view.endShape == null && view.beginShape == null) {
-//
-//                // With no end decorations the line shape is the same as the
-//                // shared path and memory
-//                view.lineShape = view.sharedPath;
-//            } else {
-//                view.lineShape = (Shape) view.sharedPath.clone();
-//                if (view.endShape != null) {
-//                    view.sharedPath.append(view.endShape, true);
-//                }
-//                if (view.beginShape != null) {
-//                    view.sharedPath.append(view.beginShape, true);
-//                }
-//            }
-//            return view.sharedPath;
-//        }
-//        return null;
-//    }
+            // If we have three control points, we can get rid of hit
+            // detection and do an intersection test on the two diagonals
+            // of rect and the line between the two end points
+            Graphics2D g2 = (Graphics2D) graph.getGraphics();
+            if (g2 == null || view.getPointCount() == 2) {
+                Point2D p0 = view.getPoint(0);
+                Point2D p1 = view.getPoint(1);
+                if (rect.intersectsLine(p0.getX(), p0.getY(), p1.getX(), p1.getY()))
+                    return true;
+                
+            } else if (view.getShape().intersects(rect)) // <- This finally fixes the edge/listener selection on MBP displays 8/8/24 tdn
+                return true;                               // Fixes Issue #1
+            
+            Rectangle2D r = getLabelBounds(graph, view);
+            if (r != null && r.intersects(rect) && g2 != null) {
+                boolean hits = true;
+
+                // Performs exact hit detection on rotated labels
+                if (EdgeRenderer.HIT_LABEL_EXACT) {
+                    AffineTransform tx = g2.getTransform();
+
+                    try {
+                        String lab = graph.convertValueToString(view);
+                        Point2D tmpPt = getLabelPosition(view);
+                        Dimension size = getLabelSize(view, lab);
+                        Rectangle2D tmp = new Rectangle((int) tmpPt.getX(), (int) tmpPt.getY(), size.width, size.height);
+
+                        double cx = tmp.getCenterX();
+                        double cy = tmp.getCenterY();
+
+                        g2.translate(-size.width / 2, -size.height * 0.75
+                                - metrics.getDescent());
+
+                        boolean applyTransform = isLabelTransform(lab);
+                        double angle;
+
+                        if (applyTransform) {
+                            angle = getLabelAngle(lab);
+                            g2.rotate(angle, cx, cy);
+                        }
+
+                        hits = g2.hit(rect, tmp, false);
+                    } finally {
+                        g2.setTransform(tx);
+                    }
+                }
+
+                if (hits)
+                    return true;
+                
+            }
+            Object[] labels = GraphConstants.getExtraLabels(view.getAllAttributes());
+            if (labels != null) {
+                for (int i = 0; i < labels.length; i++) {
+                    r = getExtraLabelBounds(graph, view, i);
+                    if (r != null && r.intersects(rect))
+                        return true;                
+                }
+            }
+        }
+        return false;
+    }
+        
+    /**
+     * Estimates whether the transform for label should be applied. With the
+     * transform, the label will be painted along the edge. To apply transform,
+     * rotate graphics by the angle returned from {@link #getLabelAngle}
+     *
+     * @return true, if transform can be applied, false otherwise
+     */
+    private boolean isLabelTransform(String label) {
+        if (!isLabelTransformEnabled()) {
+            return false;
+        }
+        Point2D p = getLabelPosition(view);
+        if (p != null && label != null && label.length() > 0) {
+            int sw = metrics.stringWidth(label);
+            Point2D p1 = view.getPoint(0);
+            Point2D p2 = view.getPoint(view.getPointCount() - 1);
+            double length = Math.sqrt((p2.getX() - p1.getX())
+                    * (p2.getX() - p1.getX()) + (p2.getY() - p1.getY())
+                    * (p2.getY() - p1.getY()));
+            if (!(length <= Double.NaN || length < sw)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isLabelTransformEnabled() {
+        return labelTransformEnabled;
+    }
+    
+    /**
+     * Calculates the angle at which graphics should be rotated to paint label
+     * along the edge. Before calling this method always check that transform
+     * should be applied using {
+     *
+     * @linkisLabelTransform}
+     *
+     * @return the value of the angle, 0 if the angle is zero or can't be
+     * calculated
+     */
+    private double getLabelAngle(String label) {
+        Point2D p = getLabelPosition(view);
+        double angle = 0;
+        if (p != null && label != null && label.length() > 0) {
+            int sw = metrics.stringWidth(label);
+            // Note: For control points you may want to choose other
+            // points depending on the segment the label is in.
+            Point2D p1 = view.getPoint(0);
+            Point2D p2 = view.getPoint(view.getPointCount() - 1);
+            // Length of the edge
+            double length = Math.sqrt((p2.getX() - p1.getX())
+                    * (p2.getX() - p1.getX()) + (p2.getY() - p1.getY())
+                    * (p2.getY() - p1.getY()));
+            if (!(length <= Double.NaN || length < sw)) { // Label fits into
+                // edge's length
+
+                // To calculate projections of edge
+                double cos = (p2.getX() - p1.getX()) / length;
+                double sin = (p2.getY() - p1.getY()) / length;
+
+                // Determine angle
+                angle = Math.acos(cos);
+                if (sin < 0) { // Second half
+                    angle = 2 * Math.PI - angle;
+                }
+            }
+            if (angle > Math.PI / 2 && angle <= Math.PI * 3 / 2) {
+                angle -= Math.PI;
+            }
+        }
+        return angle;
+    }
 
 } // end class file vEdgeRenderer.java
