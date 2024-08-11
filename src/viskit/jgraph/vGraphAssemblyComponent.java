@@ -483,17 +483,19 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
      */
     protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
 
-        DefaultGraphCell cell;
-        if (node instanceof EvGraphNode) {
-            cell = new vAssyCircleCell(node);
-        } else {
-            cell = new vAssyPropListCell(node);
+        DefaultGraphCell cell = null;
+        if (node != null) {
+            if (node instanceof EvGraphNode) {
+                cell = new vAssyCircleCell(node);
+            } else {
+                cell = new vAssyPropListCell(node);
+            }
+
+            node.opaqueViewObject = cell;
+
+            // Add one Floating Port
+            cell.add(new vAssyPortCell(node.getName() + "/Center"));
         }
-
-        node.opaqueViewObject = cell;
-
-        // Add one Floating Port
-        cell.add(new vAssyPortCell(node.getName() + "/Center"));
         return cell;
     }
 
@@ -512,7 +514,8 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         vGAModel.reDrawNodes();
     }
-}
+    
+} // end class vGraphAssemblyComponent
 
 /**        Extended JGraph Classes
  * ********************************************
@@ -566,11 +569,12 @@ class vAssyPropListCell extends DefaultGraphCell {
 }
 
 /**
- * Sub class VertexView to install our own vapvr.
+ * Sub class VertexView to install our own vvr.
  */
 class vAssyPropListView extends VertexView {
 
-    static vAssemblyPclVertexRenderer vapvr = new vAssemblyPclVertexRenderer();
+    // shared with vAssyCircleView
+    static vVertexRenderer vvr = new vVertexRenderer();
 
     public vAssyPropListView(Object cell) {
         super(cell);
@@ -578,7 +582,7 @@ class vAssyPropListView extends VertexView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vapvr;
+        return vvr;
     }
 }
 
@@ -589,12 +593,7 @@ class vAssyCircleCell extends DefaultGraphCell {
     }
 }
 
-/**
- * Sub class VertexView to install our own vapvr.
- */
 class vAssyCircleView extends VertexView {
-
-    static vAssemblyEgVertexRenderer vaevr = new vAssemblyEgVertexRenderer();
 
     public vAssyCircleView(Object cell) {
         super(cell);
@@ -602,7 +601,7 @@ class vAssyCircleView extends VertexView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vaevr;
+        return vAssyPropListView.vvr;
     }
 }
 
@@ -621,9 +620,13 @@ class vAssyAdapterEdgeView extends vEdgeView {
     }
 }
 
+/**
+ * Sub class vEdgeView to install our own vaer.
+ */
 class vAssySelEdgeView extends vEdgeView {
 
-    static vAssySelEdgeRenderer vaser = new vAssySelEdgeRenderer();
+    // shared with vAssyPclEdgeView
+    static vAssyEdgeRenderer vaer = new vAssyEdgeRenderer();
 
     public vAssySelEdgeView(Object cell) {
         super(cell);
@@ -631,13 +634,11 @@ class vAssySelEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vaser;
+        return vaer;
     }
 }
 
 class vAssyPclEdgeView extends vEdgeView {
-
-    static vAssyPclEdgeRenderer vaper = new vAssyPclEdgeRenderer();
 
     public vAssyPclEdgeView(Object cell) {
         super(cell);
@@ -645,7 +646,7 @@ class vAssyPclEdgeView extends vEdgeView {
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vaper;
+        return vAssySelEdgeView.vaer;
     }
 }
 
@@ -723,6 +724,7 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
         }
     }
 
+    // Shared with vAssyEdgeRenderer.createLineEnd
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
         double d = Math.max(1, dst.distance(src));
@@ -737,37 +739,11 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
     }
 }
 
-class vAssySelEdgeRenderer extends vEdgeRenderer {
+class vAssyEdgeRenderer extends vEdgeRenderer {
 
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
-        // Same as above
-        double d = Math.max(1, dst.distance(src));
-        double ax = -(size * (dst.getX() - src.getX()) / d);
-        double ay = -(size * (dst.getY() - src.getY()) / d);
-        GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 4);
-        path.moveTo(dst.getX() - ay / 3, dst.getY() + ax / 3);
-        path.lineTo(dst.getX() + ax / 2, dst.getY() + ay / 2);
-        path.lineTo(dst.getX() + ay / 3, dst.getY() - ax / 3);
-
-        return path;
-    }
-}
-
-class vAssyPclEdgeRenderer extends vEdgeRenderer {
-
-    @Override
-    protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
-        double d = Math.max(1, dst.distance(src));
-        double ax = -(size * (dst.getX() - src.getX()) / d);
-        double ay = -(size * (dst.getY() - src.getY()) / d);
-        GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 4);
-        path.moveTo(dst.getX() - ay / 3, dst.getY() + ax / 3);
-        path.lineTo(dst.getX() + ax / 2 - ay / 3, dst.getY() + ay / 2 + ax / 3);
-        path.lineTo(dst.getX() + ax / 2 + ay / 3, dst.getY() + ay / 2 - ax / 3);
-        path.lineTo(dst.getX() + ay / 3, dst.getY() - ax / 3);
-
-        return path;
+        return vAssyAdapterEdgeView.vaaer.createLineEnd(size, style, src, dst);
     }
 }
 // End support for custom line ends and double adapter line on assembly edges

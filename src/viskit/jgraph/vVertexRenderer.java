@@ -15,7 +15,7 @@ import org.jgraph.graph.*;
 
 /**
  * This overridden JGraph class's main purpose is to render customized text in
- * each of the CircleCell instances that represent nodes
+ * each of the Cell instances that represent nodes
  *
  * <p>
  * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects
@@ -25,7 +25,6 @@ import org.jgraph.graph.*;
  * @author Mike Bailey
  * @since Feb 23, 2004
  * @since 3:40:51 PM
- * @version $Id$
  */
 
 /*
@@ -149,8 +148,7 @@ public class vVertexRenderer
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
             this.hasFocus = focus;
-            this.childrenSelected =
-                    graph.getSelectionModel().isChildrenSelected(view.getCell());
+            this.childrenSelected = graph.getSelectionModel().isChildrenSelected(view.getCell());
             this.selected = sel;
             this.preview = preview;
             if (this.view.isLeaf() || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
@@ -216,7 +214,10 @@ public class vVertexRenderer
             // JDK Bug: Zero length string passed to TextLayout constructor
         }
     }
-    Color circColor = new Color(255, 255, 204); // pale yellow
+    Color egColor = new Color(0xCE, 0xCE, 0xFF); // pale blue
+    Color pclColor = new Color(0xFF, 0xC8, 0xC8); // pale pink
+    Color enColor = new Color(255, 255, 204); // pale yellow
+    Color circColor;
     Font myfont = new Font("Verdana", Font.PLAIN, 10);
 
     // jmb
@@ -224,11 +225,33 @@ public class vVertexRenderer
     protected void paintComponent(Graphics g) {
         Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
-        // jmb test  g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        if (view instanceof vAssyCircleView) // EGN
+            circColor = egColor;
+        if (view instanceof vAssyPropListView) // PCL
+            circColor = pclColor;
+        if (view instanceof vCircleView) // EN
+            circColor = enColor;
+        
         g2.setColor(circColor);
         int myoff = 2;
+        
+        if (view instanceof vAssyCircleView) // EGN
+            g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
+        if (view instanceof vAssyPropListView) // PCL
+            g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+        if (view instanceof vCircleView) // EN
         g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
+            
         g2.setColor(Color.darkGray);
+        
+        if (view instanceof vAssyCircleView) // EGN
+            g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
+        if (view instanceof vAssyPropListView) { // PCL
+            g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
+            g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+        }
+        if (view instanceof vCircleView) // EN
         g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
 
         // Draw the text in the circle
@@ -238,11 +261,14 @@ public class vVertexRenderer
         FontMetrics metrics = g2.getFontMetrics();
         nm = breakName(nm, 50, metrics);
 
-        // Show event node names w/ corresponding parameters if any
-        String[] arr = nm.split("_");
+        if (view instanceof vAssyCircleView) { // EGN
+        
+            // Show event node names w/ corresponding parameters if any
+            String[] arr = nm.split("_");
 
-        if (arr.length > 1)
-            nm = arr[0] + "\n(" + arr[1] + ")";
+            if (arr.length > 1)
+                nm = arr[0] + "\n(" + arr[1] + ")";
+        }
 
         String[] lns = nm.split("\n"); // handle multi-line titles
 

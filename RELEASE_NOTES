@@ -77,6 +77,8 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    Consolidated VertexRenderers for efficiency
+
     Control points for self scheduling edges now outline the offset edge shape
 
     Upgrade to JDOM v1.1.3
