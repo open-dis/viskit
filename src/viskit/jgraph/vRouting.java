@@ -34,17 +34,20 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.jgraph;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
 import org.jgraph.graph.CellView;
 import org.jgraph.graph.DefaultEdge;
 import org.jgraph.graph.EdgeView;
 import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.PortView;
+
 import viskit.model.EvGraphNode;
 import viskit.model.EventNode;
 import viskit.model.PropChangeListenerNode;

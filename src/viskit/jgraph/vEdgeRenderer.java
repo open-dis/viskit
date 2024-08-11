@@ -32,21 +32,20 @@ import org.jgraph.graph.GraphConstants;
  */
 public class vEdgeRenderer extends EdgeRenderer {
     
-    private static final Logger LOG = LogUtils.getLogger(vEdgeRenderer.class);
+    protected static final Logger LOG = LogUtils.getLogger(vEdgeRenderer.class);
 
     double[] coo = new double[6];
 
     // Override only to use a different way of positioning the label on the edge
     @Override
     public Point2D getLabelPosition(EdgeView view) {
-
-        setView(view);
-
-        Shape s = view.sharedPath;
         Point2D src = null, aim;
         int ret;
         double theta, newX, newY;
 
+        setView(view);
+        
+        Shape s = view.sharedPath;
         if (s == null) {
             return super.getLabelPosition(view);
         }
@@ -232,4 +231,4 @@ public class vEdgeRenderer extends EdgeRenderer {
         return angle;
     }
 
-} // end class file vEdgeRenderer.java
+} // end class vEdgeRenderer

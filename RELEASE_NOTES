@@ -76,11 +76,9 @@ Post release fixes / upgrades / issues:
     the scheduling priority. If priority was missing on startup, or file
     reopening, it gets placed then
 
-    Self referential edge control points are 30 degrees off of their rotated
-    rendered shape. No operational issue expect causing the marquee to shift to 
-    a cross pointer.
-
   ****** FIXES / UPGRADES:
+    Control points for self scheduling edges now outline the offset edge shape
+
     Upgrade to JDOM v1.1.3
 
     Fixed Log4j output to file. Using log4j2.xml config file. Console output is
@@ -97,7 +95,7 @@ Post release fixes / upgrades / issues:
     now when working between MBP laptop displays and Mac Thunderbolt displays.
 
     (Critical)
-    Fixed bad recursion happened when selecting PCL for edit
+    Fixed bad recursion when selecting PCL for edit
 
     (Critical)
     https://groove.cs.utwente.nl/mac.html

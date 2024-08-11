@@ -9,6 +9,7 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
+
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 
@@ -58,6 +59,7 @@ import org.jgraph.graph.*;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 /**
  * This renderer displays entries that implement the CellView interface
  * and supports the following attributes. If the cell view is not a leaf,
@@ -85,48 +87,24 @@ public class vVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
-    /**
-     * Use this flag to control if groups should appear transparent.
-     */
-    protected boolean hideGroups = true;
-
-    /**
-     * Cache the current graph for drawing.
-     */
+    /** Cache the current graph for drawing. */
     transient protected JGraph graph;
 
-    /**
-     * Cache the current shape for drawing.
-     */
+    /** Cache the current shape for drawing. */
     transient protected VertexView view;
 
-    /**
-     * Cached hasFocus and selected value.
-     */
-    transient protected boolean hasFocus, selected, preview, opaque, childrenSelected;
+    /** Cached hasFocus and selected value. */
+    transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
 
-    /**
-     * Cached default foreground and default background.
-     */
-    transient protected Color defaultForeground, defaultBackground, bordercolor;
+    /** Cached default foreground and default background. */
+    transient protected Color defaultForeground,  defaultBackground,  bordercolor;
 
-    /**
-     * Cached borderwidth.
-     */
+    /** Cached borderwidth. */
     transient protected int borderWidth;
 
-    /**
-     * Cached value of the double buffered state
-     */
+    /** Cached value of the double buffered state */
     transient boolean isDoubleBuffered = false;
-
-    /**
-     * Constructs a renderer that may be used to render vertices.
-     */
-    public vVertexRenderer() {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
-    }
+    
     private final float[] dash = {5f, 5f};
     private final BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -139,11 +117,10 @@ public class vVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
-     * @param hideGroups
      */
-    public vVertexRenderer(boolean hideGroups) {
-        this();
-        this.hideGroups = hideGroups;
+    public vVertexRenderer() {
+        defaultForeground = UIManager.getColor("Tree.textForeground");
+        defaultBackground = UIManager.getColor("Tree.textBackground");
     }
 
     /**
@@ -171,24 +148,30 @@ public class vVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-
-            this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
                     graph.getSelectionModel().isChildrenSelected(view.getCell());
             this.selected = sel;
             this.preview = preview;
-            if (this.view.isLeaf() || !hideGroups) {
+            if (this.view.isLeaf() || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
                 installAttributes(view);
             } else {
-                // jmb setText(null);
-                setBorder(null);
-                setOpaque(false);
-            // jmb setIcon(null);
+                resetAttributes();
             }
             return this;
         }
         return null;
+    }
+    
+    /**
+     * Hook for subclassers that is invoked when the installAttributes is not
+     * called to reset all attributes to the defaults. <br>
+     * Subclassers must invoke the superclass implementation.
+     * 
+     */
+    protected void resetAttributes() {
+        setBorder(null);
+        setOpaque(false);
     }
 
     /**
@@ -227,7 +210,7 @@ public class vVertexRenderer
         try {
             //if (preview && !isDoubleBuffered)
             //	setOpaque(false);
-            super.paint(g);   // jmb this will come down to paintCompoent
+            super.paint(g);   // jmb this will come down to paintComponent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
             // JDK Bug: Zero length string passed to TextLayout constructor
@@ -266,9 +249,10 @@ public class vVertexRenderer
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord
 
+        int xp, y;
         for (int i = 0; i < lns.length; i++) {
-            int xp = metrics.stringWidth(lns[i]); // length of string fragment
-            int y = ytop + (hgt * i);
+            xp = metrics.stringWidth(lns[i]); // length of string fragment
+            y = ytop + (hgt * i);
             g2.drawString(lns[i], (54 - xp) / 2, y);
         }
     }
@@ -276,8 +260,9 @@ public class vVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
+        String[] nn;
         for (String n1 : n) {
-            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            nn = splitIfNeeded(n1, maxW, metrics);
             for (String nn1 : nn) {
                 sb.append(nn1);
                 sb.append("\n");
@@ -367,26 +352,26 @@ public class vVertexRenderer
     }
 
     /**
+     * TODO: Not currently used.
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
      *
-     * TODO: Not currently used
      * @param view
      * @param source
      * @param p
      * @return
      */
-    public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
+    public Point2D getPerimeterPoint(VertexView view, Point2D source, Point2D p) {
         Rectangle2D bounds = view.getBounds();
         double x = bounds.getX();
         double y = bounds.getY();
         double width = bounds.getWidth();
         double height = bounds.getHeight();
-        double xCenter = bounds.getCenterX();
-        double yCenter = bounds.getCenterY();
-        double dx = p.x - xCenter; // Compute Angle
-        double dy = p.y - yCenter;
+        double xCenter = x + width / 2;
+        double yCenter = y + height / 2;
+        double dx = p.getX() - xCenter; // Compute Angle
+        double dy = p.getY() - yCenter;
         double alpha = Math.atan2(dy, dx);
         double xout, yout;
         double pi = Math.PI;
@@ -395,23 +380,24 @@ public class vVertexRenderer
         double t = Math.atan2(height, width);
         if (alpha < -pi + t || alpha > pi - t) { // Left edge
             xout = x;
-            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter - width * Math.tan(alpha) / 2;
         } else if (alpha < -t) { // Top Edge
             yout = y;
-            xout = xCenter - (int) (height * Math.tan(beta) / 2);
+            xout = xCenter - height * Math.tan(beta) / 2;
         } else if (alpha < t) { // Right Edge
             xout = x + width;
-            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter + width * Math.tan(alpha) / 2;
         } else { // Bottom Edge
             yout = y + height;
-            xout = xCenter + (int) (height * Math.tan(beta) / 2);
+            xout = xCenter + height * Math.tan(beta) / 2;
         }
         return new Point2D.Double(xout, yout);
     }
 
     /**
-     * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a>
+     * for more information.
      */
     @Override
     public void validate() {
@@ -451,9 +437,8 @@ public class vVertexRenderer
             Object oldValue,
             Object newValue) {
         // Strings get interned...
-        if (propertyName.equals("text")) {
+	if ("text".equals(propertyName))
             super.firePropertyChange(propertyName, oldValue, newValue);
-        }
     }
 
     /**
@@ -543,22 +528,5 @@ public class vVertexRenderer
             boolean oldValue,
             boolean newValue) {
     }
-
-    /**
-     * Returns the hideGroups.
-     *
-     * @return boolean
-     */
-    public boolean isHideGroups() {
-        return hideGroups;
-    }
-
-    /**
-     * Sets the hideGroups.
-     *
-     * @param hideGroups The hideGroups to set
-     */
-    public void setHideGroups(boolean hideGroups) {
-        this.hideGroups = hideGroups;
-    }
-}
+    
+} // end class vVertexRender

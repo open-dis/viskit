@@ -174,7 +174,7 @@ public class vGraphModel extends DefaultGraphModel {
         ConnectionSet cs = new ConnectionSet();
         cs.connect(edge, source.getFirstChild(), target.getFirstChild());
 
-        Map atts = new Hashtable();
+        Map atts = new AttributeMap();
 
         if (enfrom == ento) {// self referential overwrite
             if (ed instanceof SchedulingEdge) {

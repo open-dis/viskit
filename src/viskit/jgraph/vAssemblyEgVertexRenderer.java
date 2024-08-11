@@ -6,9 +6,13 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
+
 import viskit.model.ViskitElement;
 
 /**
@@ -51,6 +55,7 @@ import viskit.model.ViskitElement;
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
 /**
  * This renderer displays entries that implement the CellView interface
  * and supports the following attributes. If the cell view is not a leaf,
@@ -78,9 +83,6 @@ public class vAssemblyEgVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
-    /** Use this flag to control if groups should appear transparent. */
-    protected boolean hideGroups = true;
-
     /** Cache the current graph for drawing. */
     transient protected JGraph graph;
 
@@ -98,14 +100,7 @@ public class vAssemblyEgVertexRenderer
 
     /** Cached value of the double buffered state */
     transient boolean isDoubleBuffered = false;
-
-    /**
-     * Constructs a renderer that may be used to render vertices.
-     */
-    public vAssemblyEgVertexRenderer() {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
-    }
+    
     private final float[] dash = {5f, 5f};
     private final BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -118,25 +113,23 @@ public class vAssemblyEgVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
-     * @param hideGroups whether or not to hide groups
      */
-    public vAssemblyEgVertexRenderer(boolean hideGroups) {
-        this();
-        this.hideGroups = hideGroups;
+    public vAssemblyEgVertexRenderer() {
+        defaultForeground = UIManager.getColor("Tree.textForeground");
+        defaultBackground = UIManager.getColor("Tree.textBackground");
     }
 
     /**
-     * Configure and return the renderer based on the passed in
-     * components. The value is typically set from messaging the
-     * graph with <code>convertValueToString</code>.
-     * We recommend you check the value's class and throw an
-     * illegal argument exception if it's not correct.
+     * Configure and return the renderer based on the passed in components. The
+     * value is typically set from messaging the graph with
+     * <code>convertValueToString</code>. We recommend you check the value's
+     * class and throw an illegal argument exception if it's not correct.
      *
-     * @param   graph the graph that that defines the rendering context.
-     * @param   view the object that should be rendered.
-     * @param   sel whether the object is selected.
-     * @param   focus whether the object has the focus.
-     * @param   preview whether we are drawing a preview.
+     * @param graph the graph that that defines the rendering context.
+     * @param view the object that should be rendered.
+     * @param sel whether the object is selected.
+     * @param focus whether the object has the focus.
+     * @param preview whether we are drawing a preview.
      * @return	the component used to render the value.
      */
     @Override
@@ -151,20 +144,15 @@ public class vAssemblyEgVertexRenderer
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-
-            this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
                     graph.getSelectionModel().isChildrenSelected(view.getCell());
             this.selected = sel;
             this.preview = preview;
-            if (this.view.isLeaf() || !hideGroups) {
+            if (this.view.isLeaf() || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
                 installAttributes(view);
             } else {
-                // jmb setText(null);
-                setBorder(null);
-                setOpaque(false);
-            // jmb setIcon(null);
+                resetAttributes();
             }
             return this;
         }
@@ -172,10 +160,20 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Install the attributes of specified cell in this
-     * renderer instance. This means, retrieve every published
-     * key from the cells hashtable and set global variables
-     * or superclass properties accordingly.
+     * Hook for subclassers that is invoked when the installAttributes is not
+     * called to reset all attributes to the defaults. <br>
+     * Subclassers must invoke the superclass implementation.
+     *
+     */
+    protected void resetAttributes() {
+        setBorder(null);
+        setOpaque(false);
+    }
+
+    /**
+     * Install the attributes of specified cell in this renderer instance. This
+     * means, retrieve every published key from the cells hashtable and set
+     * global variables or superclass properties accordingly.
      *
      * @param view cell to retrieve the attribute values from.
      */
@@ -201,8 +199,7 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Paint the renderer. Overrides superclass paint
-     * to add specific painting.
+     * Paint the renderer. Overrides superclass paint to add specific painting.
      */
     @Override
     public void paint(Graphics g) {
@@ -244,9 +241,10 @@ public class vAssemblyEgVertexRenderer
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord
 
+        int xp, y;
         for (int i = 0; i < lns.length; i++) {
-            int xp = metrics.stringWidth(lns[i]); // length of string fragment
-            int y = ytop + (hgt * i);
+            xp = metrics.stringWidth(lns[i]); // length of string fragment
+            y = ytop + (hgt * i);
             g2.drawString(lns[i], (54 - xp) / 2, y);
         }
     }
@@ -254,8 +252,9 @@ public class vAssemblyEgVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
+        String[] nn;
         for (String n1 : n) {
-            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            nn = splitIfNeeded(n1, maxW, metrics);
             for (String nn1 : nn) {
                 sb.append(nn1);
                 sb.append("\n");
@@ -364,7 +363,7 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Provided for subclass users to paint a selection border.
+     * Provided for subclasses to paint a selection border.
      * @param g
      */
     protected void paintSelectionBorder(Graphics g) {
@@ -394,16 +393,16 @@ public class vAssemblyEgVertexRenderer
      * @param p
      * @return
      */
-    public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
+    public Point2D getPerimeterPoint(VertexView view, Point2D source, Point2D p) {
         Rectangle2D bounds = view.getBounds();
         double x = bounds.getX();
         double y = bounds.getY();
         double width = bounds.getWidth();
         double height = bounds.getHeight();
-        double xCenter = bounds.getCenterX();
-        double yCenter = bounds.getCenterY();
-        double dx = p.x - xCenter; // Compute Angle
-        double dy = p.y - yCenter;
+        double xCenter = x + width / 2;
+        double yCenter = y + height / 2;
+        double dx = p.getX() - xCenter; // Compute Angle
+        double dy = p.getY() - yCenter;
         double alpha = Math.atan2(dy, dx);
         double xout, yout;
         double pi = Math.PI;
@@ -412,16 +411,16 @@ public class vAssemblyEgVertexRenderer
         double t = Math.atan2(height, width);
         if (alpha < -pi + t || alpha > pi - t) { // Left edge
             xout = x;
-            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter - width * Math.tan(alpha) / 2;
         } else if (alpha < -t) { // Top Edge
             yout = y;
-            xout = xCenter - (int) (height * Math.tan(beta) / 2);
+            xout = xCenter - height * Math.tan(beta) / 2;
         } else if (alpha < t) { // Right Edge
             xout = x + width;
-            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter + width * Math.tan(alpha) / 2;
         } else { // Bottom Edge
             yout = y + height;
-            xout = xCenter + (int) (height * Math.tan(beta) / 2);
+            xout = xCenter + height * Math.tan(beta) / 2;
         }
         return new Point2D.Double(xout, yout);
     }
@@ -436,36 +435,32 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void revalidate() {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void repaint(Rectangle r) {
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     protected void firePropertyChange(
@@ -473,15 +468,13 @@ public class vAssemblyEgVertexRenderer
             Object oldValue,
             Object newValue) {
         // Strings get interned...
-        if (propertyName.equals("text")) {
+	if ("text".equals(propertyName))
             super.firePropertyChange(propertyName, oldValue, newValue);
-        }
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -490,7 +483,10 @@ public class vAssemblyEgVertexRenderer
             byte newValue) {
     }
 
-    // Overridden for performance reasons
+    /**
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
+     */
     @Override
     public void firePropertyChange(
             String propertyName,
@@ -499,9 +495,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -511,9 +506,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -523,9 +517,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -535,9 +528,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -547,9 +539,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -559,9 +550,8 @@ public class vAssemblyEgVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note</a> for more information.
      */
     @Override
     public void firePropertyChange(
@@ -570,19 +560,4 @@ public class vAssemblyEgVertexRenderer
             boolean newValue) {
     }
 
-    /**
-     * Returns the hideGroups.
-     * @return boolean
-     */
-    public boolean isHideGroups() {
-        return hideGroups;
-    }
-
-    /**
-     * Sets the hideGroups.
-     * @param hideGroups The hideGroups to set
-     */
-    public void setHideGroups(boolean hideGroups) {
-        this.hideGroups = hideGroups;
-    }
-}
+} // end class vAssemblyEgVertexRender

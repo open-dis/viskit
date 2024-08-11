@@ -9,8 +9,10 @@ import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
+
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
+
 import viskit.model.ViskitElement;
 
 /**
@@ -81,48 +83,24 @@ public class vAssemblyPclVertexRenderer
         extends JComponent // JLabel jmb
         implements CellViewRenderer, Serializable {
 
-    /**
-     * Use this flag to control if groups should appear transparent.
-     */
-    protected boolean hideGroups = true;
-
-    /**
-     * Cache the current graph for drawing.
-     */
+    /** Cache the current graph for drawing. */
     transient protected JGraph graph;
 
-    /**
-     * Cache the current shape for drawing.
-     */
+    /** Cache the current shape for drawing. */
     transient protected VertexView view;
 
-    /**
-     * Cached hasFocus and selected value.
-     */
-    transient protected boolean hasFocus,
-            selected,
-            preview,
-            opaque,
-            childrenSelected;
+    /** Cached hasFocus and selected value. */
+    transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
 
-    /**
-     * Cached default foreground and default background.
-     */
-    transient protected Color defaultForeground, defaultBackground, bordercolor;
+    /** Cached default foreground and default background. */
+    transient protected Color defaultForeground,  defaultBackground,  bordercolor;
 
-    /**
-     * Cached borderwidth.
-     */
+    /** Cached borderwidth. */
     transient protected int borderWidth;
-
-    /**
-     * Constructs a renderer that may be used to render vertices.
-     */
-    public vAssemblyPclVertexRenderer() {
-        defaultForeground = UIManager.getColor("Tree.textForeground");
-        defaultBackground = UIManager.getColor("Tree.textBackground");
-    }
-
+    
+    /** Cached value of the double buffered state */
+    transient boolean isDoubleBuffered = false;
+    
     private final float[] dash = {5f, 5f};
     private final BasicStroke mySelectionStroke =
             new BasicStroke(
@@ -135,11 +113,10 @@ public class vAssemblyPclVertexRenderer
 
     /**
      * Constructs a renderer that may be used to render vertices.
-     * @param hideGroups
      */
-    public vAssemblyPclVertexRenderer(boolean hideGroups) {
-        this();
-        this.hideGroups = hideGroups;
+    public vAssemblyPclVertexRenderer() {
+        defaultForeground = UIManager.getColor("Tree.textForeground");
+        defaultBackground = UIManager.getColor("Tree.textBackground");
     }
 
     /**
@@ -163,24 +140,19 @@ public class vAssemblyPclVertexRenderer
             boolean focus,
             boolean preview) {
         this.graph = graph;
-        graph.isDoubleBuffered();
+        isDoubleBuffered = graph.isDoubleBuffered();
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
-
-            this.graph = graph;
             this.hasFocus = focus;
             this.childrenSelected =
                     graph.getSelectionModel().isChildrenSelected(view.getCell());
             this.selected = sel;
             this.preview = preview;
-            if (this.view.isLeaf() || !hideGroups) {
+            if (this.view.isLeaf() || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
                 installAttributes(view);
             } else {
-                // jmb setText(null);
-                setBorder(null);
-                setOpaque(false);
-                // jmb setIcon(null);
+                resetAttributes();
             }
             return this;
         }
@@ -188,11 +160,22 @@ public class vAssemblyPclVertexRenderer
     }
 
     /**
+     * Hook for subclassers that is invoked when the installAttributes is not
+     * called to reset all attributes to the defaults. <br>
+     * Subclassers must invoke the superclass implementation.
+     *
+     */
+    protected void resetAttributes() {
+        setBorder(null);
+        setOpaque(false);
+    }
+
+    /**
      * Install the attributes of specified cell in this renderer instance. This
      * means, retrieve every published key from the cells hashtable and set
      * global variables or superclass properties accordingly.
      *
-     * @param view to retrieve the attribute values from.
+     * @param view cell to retrieve the attribute values from.
      */
     protected void installAttributes(CellView view) {
         Map map = view.getAllAttributes();
@@ -223,7 +206,7 @@ public class vAssemblyPclVertexRenderer
         try {
             //if (preview && !isDoubleBuffered)
             //	setOpaque(false);
-            super.paint(g);   // jmb this will come down to paintCompoent
+            super.paint(g);   // jmb this will come down to paintComponent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
             // JDK Bug: Zero length string passed to TextLayout constructor
@@ -259,9 +242,10 @@ public class vAssemblyPclVertexRenderer
         int hgt = metrics.getHeight();  // height of a line of text
         int ytop = 54 / 2 - (hgt * (lns.length - 1) / 2) + hgt / 4;    // start y coord
 
+        int xp, y;
         for (int i = 0; i < lns.length; i++) {
-            int xp = metrics.stringWidth(lns[i]); // length of string fragment
-            int y = ytop + (hgt * i);
+            xp = metrics.stringWidth(lns[i]); // length of string fragment
+            y = ytop + (hgt * i);
             g2.drawString(lns[i], (54 - xp) / 2, y);
         }
     }
@@ -269,8 +253,9 @@ public class vAssemblyPclVertexRenderer
     private String breakName(String name, int maxW, FontMetrics metrics) {
         StringBuilder sb = new StringBuilder();
         String[] n = name.split("\n");
+        String[] nn;
         for (String n1 : n) {
-            String[] nn = splitIfNeeded(n1, maxW, metrics);
+            nn = splitIfNeeded(n1, maxW, metrics);
             for (String nn1 : nn) {
                 sb.append(nn1);
                 sb.append("\n");
@@ -313,8 +298,9 @@ public class vAssemblyPclVertexRenderer
             }
         }
         if (i <= 0) {
-            return ra;    // couldn't get small enough...?
-        }
+            return ra;
+        }    // couldn't get small enough...?
+
         // ws is now a small piece of string less than our max
 
         int j;
@@ -325,8 +311,9 @@ public class vAssemblyPclVertexRenderer
             }
         }
         if (j <= 0) {
-            return ra; // couldn't find a break
-        }
+            return ra;
+        } // couldn't find a break
+
         ra[0] = ws.substring(0, j + 1);
         ra[1] = ws.substring(j + 1) + s.substring(i);
         return ra;
@@ -359,7 +346,6 @@ public class vAssemblyPclVertexRenderer
 
     /**
      * TODO: Not currently used.
-     *
      * Returns the intersection of the bounding rectangle and the
      * straight line between the source and the specified point p.
      * The specified point is expected not to intersect the bounds.
@@ -369,16 +355,16 @@ public class vAssemblyPclVertexRenderer
      * @param p
      * @return
      */
-    public Point2D getPerimeterPoint(VertexView view, Point source, Point p) {
+    public Point2D getPerimeterPoint(VertexView view, Point2D source, Point2D p) {
         Rectangle2D bounds = view.getBounds();
         double x = bounds.getX();
         double y = bounds.getY();
         double width = bounds.getWidth();
         double height = bounds.getHeight();
-        double xCenter = bounds.getCenterX();
-        double yCenter = bounds.getCenterY();
-        double dx = p.x - xCenter; // Compute Angle
-        double dy = p.y - yCenter;
+        double xCenter = x + width / 2;
+        double yCenter = y + height / 2;
+        double dx = p.getX() - xCenter; // Compute Angle
+        double dy = p.getY() - yCenter;
         double alpha = Math.atan2(dy, dx);
         double xout, yout;
         double pi = Math.PI;
@@ -387,23 +373,24 @@ public class vAssemblyPclVertexRenderer
         double t = Math.atan2(height, width);
         if (alpha < -pi + t || alpha > pi - t) { // Left edge
             xout = x;
-            yout = yCenter - (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter - width * Math.tan(alpha) / 2;
         } else if (alpha < -t) { // Top Edge
             yout = y;
-            xout = xCenter - (int) (height * Math.tan(beta) / 2);
+            xout = xCenter - height * Math.tan(beta) / 2;
         } else if (alpha < t) { // Right Edge
             xout = x + width;
-            yout = yCenter + (int) (width * Math.tan(alpha) / 2);
+            yout = yCenter + width * Math.tan(alpha) / 2;
         } else { // Bottom Edge
             yout = y + height;
-            xout = xCenter + (int) (height * Math.tan(beta) / 2);
+            xout = xCenter + height * Math.tan(beta) / 2;
         }
         return new Point2D.Double(xout, yout);
     }
 
     /**
-     * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * Overridden for performance reasons.
+     * See the <a href="#override">Implementation Note</a>
+     * for more information.
      */
     @Override
     public void validate() {
@@ -443,9 +430,8 @@ public class vAssemblyPclVertexRenderer
             Object oldValue,
             Object newValue) {
         // Strings get interned...
-        if ("text".equals(propertyName)) {
+	if ("text".equals(propertyName))
             super.firePropertyChange(propertyName, oldValue, newValue);
-        }
     }
 
     /**
@@ -536,22 +522,4 @@ public class vAssemblyPclVertexRenderer
             boolean newValue) {
     }
 
-    /**
-     * Returns the hideGroups.
-     *
-     * @return boolean
-     */
-    public boolean isHideGroups() {
-        return hideGroups;
-    }
-
-    /**
-     * Sets the hideGroups.
-     *
-     * @param hideGroups The hideGroups to set
-     */
-    public void setHideGroups(boolean hideGroups) {
-        this.hideGroups = hideGroups;
-    }
-
-}
+} // end class vAssemblyPclVertexRender
