@@ -368,9 +368,9 @@ public class VStatics {
         return retVal;
     }
 
-    static Class<?> tryPrimitive(String s) {
-        return tryPrimitive(s, new retrnChar());
-    }
+//    static Class<?> tryPrimitive(String s) {
+//        return tryPrimitive(s, new retrnChar());
+//    }
 
     static Class<?> tryPrimitive(String s, retrnChar rc) {
         switch (s) {
@@ -808,7 +808,7 @@ public class VStatics {
                     Desktop.getDesktop().mail(url.toURI());
                     
                     if (showLog)
-                        Desktop.getDesktop().browse(ViskitConfig.V_DEBUG_LOG.toURI());
+                        Desktop.getDesktop().browse(ViskitConfig.V_ERROR_LOG.toURI());
                 }
             } catch (IOException | URISyntaxException ex) {
                 LOG.error(ex);
