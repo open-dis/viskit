@@ -7,11 +7,11 @@ package viskit.reports;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.jdom.Document;
 import org.jdom.Element;
 
 /**
- *
  * This class is used by viskit.reports.ReportStatsConfig to construct an XML
  * document out of the replication and summary stats objects that are passed to it.
  *
@@ -81,8 +81,9 @@ public class ReportStatisticsDOM {
      */
     public void storeReplicationData(Element[] repData) {
 
+        SimEntityRecord temp;
         for (int i = 0; i < repData.length; i++) {
-            SimEntityRecord temp = entities.get(entityNames[i]);
+            temp = entities.get(entityNames[i]);
             temp.addReplicationRecord(properties[i], repData[i]);
         }
     }
@@ -94,8 +95,9 @@ public class ReportStatisticsDOM {
      */
     public void storeSummaryData(Element[] summaryData) {
 
+        SimEntityRecord temp;
         for (int i = 0; i < summaryData.length; i++) {
-            SimEntityRecord temp = entities.get(entityNames[i]);
+            temp = entities.get(entityNames[i]);
             temp.addSummaryRecord(summaryData[i]);
         }
     }
@@ -107,9 +109,9 @@ public class ReportStatisticsDOM {
      *        form
      */
     public Document getReport() {
-        for (SimEntityRecord record : entities.values()) {
+        for (SimEntityRecord record : entities.values())
             rootElement.addContent(record.getEntityRecord());
-        }
+        
         reportStatistics.setRootElement(rootElement);
         return reportStatistics;
     }
@@ -121,7 +123,6 @@ public class ReportStatisticsDOM {
     protected class SimEntityRecord {
 
         String entityName;
-        String property;
         Element simEntity, sumReport;
         Map<String, Element> dataPointMap = new HashMap<>();
 
@@ -152,9 +153,9 @@ public class ReportStatisticsDOM {
          * @return simEntity returns this entity in jdom.Element form
          */
         protected Element getEntityRecord() {
-            for (Element temp : dataPointMap.values()) {
+            for (Element temp : dataPointMap.values())
                 simEntity.addContent(temp);
-            }
+            
             simEntity.addContent(sumReport);
             return simEntity;
         }
@@ -172,13 +173,14 @@ public class ReportStatisticsDOM {
          * Adds a properly formatted replication record as it is added to this
          * SimEntities record.
          *
-         * @param property the property to udpate
+         * @param property the property to update
          * @param repData the replication data in jdom.Element form
          */
         protected void addReplicationRecord(String property, Element repData) {
+            Element dataPoint;
             for (String propertyKey : dataPointMap.keySet()) {
                 if (propertyKey.equals(property)) {
-                    Element dataPoint = dataPointMap.get(propertyKey);
+                    dataPoint = dataPointMap.get(propertyKey);
                     dataPoint.getChild("ReplicationReport").addContent(repData);
                 }
             }

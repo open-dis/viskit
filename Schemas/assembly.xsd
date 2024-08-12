@@ -203,7 +203,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="saveReplicationData" default="true">
+      <xs:attribute name="saveReplicationData" default="false">
         <xs:simpleType>
           <xs:restriction base="xs:token">
             <xs:enumeration value="true"/>

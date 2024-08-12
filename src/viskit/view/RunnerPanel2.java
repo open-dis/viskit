@@ -201,17 +201,22 @@ public class RunnerPanel2 extends JPanel {
             flowPan.add(closeButt);
         }
 
-        printRepReportsCB = new JCheckBox("Print replication reports");
+        printRepReportsCB = new JCheckBox("Print replication report(s)");
+        printRepReportsCB.setToolTipText("Print Output Report for Replication(s) to console");
         flowPan.add(printRepReportsCB);
-        printSummReportsCB = new JCheckBox("Print summary reports");
+        printSummReportsCB = new JCheckBox("Print summary report");
+        printSummReportsCB.setToolTipText("Print out the Summary Output Report to console");
         flowPan.add(printSummReportsCB);
-        saveRepDataCB = new JCheckBox("Print replication stats");
-        saveRepDataCB.setToolTipText("If using only a SimplePropertyDumper, no need to check this");
-        flowPan.add(saveRepDataCB);
 
         /* DIFF between OA3302 branch and trunk */
+        saveRepDataCB = new JCheckBox("Save replication data to XML");
+        saveRepDataCB.setToolTipText("Use in conjuction with Enable Analyst Reports to save replication data to XML");
+        saveRepDataCB.setSelected(aRPanelVisible);
+        saveRepDataCB.setEnabled(aRPanelVisible);
+        flowPan.add(saveRepDataCB);
         analystReportCB = new JCheckBox("Enable Analyst Reports");
-        analystReportCB.setSelected(false);
+        analystReportCB.setToolTipText("When enabled, replication data saved to XML will be used to generate HTML reports");
+        analystReportCB.setSelected(aRPanelVisible);
         analystReportCB.setEnabled(aRPanelVisible);
         flowPan.add(analystReportCB);
 

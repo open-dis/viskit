@@ -117,7 +117,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     private final ReportStatisticsConfig statsConfig;
     private int designPointID;
-    private final DecimalFormat form;
+    private final DecimalFormat df1, df4;
     private List<String> entitiesWithStats;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
@@ -126,14 +126,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Default constructor sets parameters of BasicAssembly to their
      * default values.  These are:
      * <pre>
-     * printReplicationReports = false
+     * printReplicationReports = true
      * printSummaryReport = true
      * saveReplicationData = false
      * numberReplications = 1
      * </pre>
      */
     public BasicAssembly() {
-        form = new DecimalFormat("0.0000");
+        df1 = new DecimalFormat("0.0; -0.0");
+        df4 = new DecimalFormat("0.0000; -0.000");
         setPrintReplicationReports(false);
         setPrintSummaryReport(true);
         replicationData = new LinkedHashMap<>();
@@ -270,10 +271,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     LOG.debug("typeStat is: " + typeStat);
 
                     stat = (SampleStatistics) getReplicationStats()[ix];
-                    if (stat.getName().equals("%unnamed%")) {
+                    
+                    if (stat.getName().equals("%unnamed%"))
                         stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
-                    }
-
+                    
                     designPointStats[ix] = new SimpleStatsTally(stat.getName() + typeStat);
 
                     LOG.debug("Design point stat: {}", designPointStats[ix]);
@@ -435,9 +436,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         SampleStatistics[] stats = null;
 
         List<SavedStats> reps = replicationData.get(id);
-        if (reps != null) {
+        if (reps != null)
             stats = GenericConversion.toArray(reps, new SavedStats[0]);
-        }
+        
         return stats;
     }
 
@@ -462,45 +463,45 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-    private void saveState(int lastRepNum) {
-        boolean midRun = !Schedule.getDefaultEventList().isFinished();
-        boolean midReps = lastRepNum < getNumberReplications();
+//    private void saveState(int lastRepNum) {
+//        boolean midRun = !Schedule.getDefaultEventList().isFinished();
+//        boolean midReps = lastRepNum < getNumberReplications();
+//
+//        if (midReps) {
+//            // middle of some rep, fell out because of GUI stop
+//            startRepNumber = lastRepNum;
+//        } else if (!midReps && !midRun) {
+//            // done with all reps
+//            startRepNumber = 0;
+//        } else if (!midReps && midRun) {
+//            // n/a can't be out of reps but in a run
+//            throw new RuntimeException("Bad state in ViskitAssembly");
+//        }
+//    }
 
-        if (midReps) {
-            // middle of some rep, fell out because of GUI stop
-            startRepNumber = lastRepNum;
-        } else if (!midReps && !midRun) {
-            // done with all reps
-            startRepNumber = 0;
-        } else if (!midReps && midRun) {
-            // n/a can't be out of reps but in a run
-            throw new RuntimeException("Bad state in ViskitAssembly");
-        }
-    }
-
-    /**
-     * Called at top of rep loop;  This will support "pause", but the GUI
-     * is not taking advantage of it presently.
-     * <p/>
-     * rg - try using Schedule.pause() directly from GUI?
-     */
-    private void maybeReset() {
-        // We reset if we're not in the middle of a run
-
-        // but, isFinished didn't happen for the 0th
-        // replication
-        if (Schedule.getDefaultEventList().isFinished()) {
-            try {
-                Schedule.reset();
-            } catch (java.util.ConcurrentModificationException cme) {
-                System.err.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
-            }
-        }
-    }
+//    /**
+//     * Called at top of rep loop;  This will support "pause", but the GUI
+//     * is not taking advantage of it presently.
+//     * <p/>
+//     * rg - try using Schedule.pause() directly from GUI?
+//     */
+//    private void maybeReset() {
+//        // We reset if we're not in the middle of a run
+//
+//        // but, isFinished didn't happen for the 0th
+//        // replication
+//        if (Schedule.getDefaultEventList().isFinished()) {
+//            try {
+//                Schedule.reset();
+//            } catch (java.util.ConcurrentModificationException cme) {
+//                System.err.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
+//            }
+//        }
+//    }
 
     /**
      * For each inner stats, print to console name, count, min, max, mean,
-     * standard deviation and variance.  This can be done generically.
+     * standard deviation and variance. This can be done generically.
      *
      * @param rep The replication number (one off) for this report
      * @return a replication report section for the analyst report
@@ -511,51 +512,44 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         int i = 0;
 
         // Outputs raw replication statistics to XML report
-        if (isSaveReplicationData()) {
-            statsConfig.processReplicationReport((rep + 1), clonedReplicationStats);
-        }
+        if (isSaveReplicationData())
+            statsConfig.processReplicationStats((rep + 1), clonedReplicationStats);
+        
+        // Borrowed from https://howtodoinjava.com/java/string/align-text-in-columns/#:~:text=One%20of%20the%20most%20straightforward,column%20within%20the%20format%20string.
+        // Define column widths (CW)
+        int nameCW   = 24;
+        int countCW  =  6;
+        int minCW    =  6;
+        int maxCW    =  9;
+        int meanCW   = 12;
+        int stdDevCW = 12;
+        int varCW    = 16;
 
         // Report header
         StringBuilder buf = new StringBuilder("\nOutput Report for Replication #");
         buf.append(rep + 1);
         buf.append(System.getProperty("line.separator"));
-        buf.append("name");
-        buf.append('\t');
-        buf.append('\t');
-        buf.append("count");
-        buf.append('\t');
-        buf.append("min");
-        buf.append('\t');
-        buf.append("max");
-        buf.append('\t');
-        buf.append("mean");
-        buf.append('\t');
-        buf.append("std dev");
-        buf.append('\t');
-        buf.append("var");
+        buf.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
+                + minCW + "s%" + maxCW + "s%" + meanCW + "s%" + stdDevCW 
+                + "s%" + varCW + "s", 
+                "Name", "Count", "Min", 
+                "Max", "Mean", "Std Dev", "Var"));
+        buf.append(System.getProperty("line.separator"));
+        buf.append("-".repeat(nameCW+countCW+minCW+maxCW+meanCW+stdDevCW+varCW));
 
         SampleStatistics stat;
 
-        // Report data
+        // Report data (stats) in aligned columns
         for (PropertyChangeListener pcl : clonedReplicationStats) {
             stat = (SampleStatistics) pcl;
             buf.append(System.getProperty("line.separator"));
-            buf.append(stat.getName());
-            if (!(stat.getName().length() > 20)) {
-                buf.append('\t');
-            }
-            buf.append('\t');
-            buf.append(stat.getCount());
-            buf.append('\t');
-            buf.append(form.format(stat.getMinObs()));
-            buf.append('\t');
-            buf.append(form.format(stat.getMaxObs()));
-            buf.append('\t');
-            buf.append(form.format(stat.getMean()));
-            buf.append('\t');
-            buf.append(form.format(stat.getStandardDeviation()));
-            buf.append('\t');
-            buf.append(form.format(stat.getVariance()));
+            buf.append(String.format("%-" + nameCW   + "s",stat.getName()));
+            buf.append(String.format("%"  + countCW  + "d",stat.getCount()));
+            buf.append(String.format("%"  + minCW    + "s",df1.format(stat.getMinObs())));
+            buf.append(String.format("%"  + maxCW    + "s",df1.format(stat.getMaxObs())));
+            buf.append(String.format("%"  + meanCW   + "s",df4.format(stat.getMean())));
+            buf.append(String.format("%"  + stdDevCW + "s",df4.format(stat.getStandardDeviation())));
+            buf.append(String.format("%"  + varCW    + "s",df4.format(stat.getVariance())));
 
             ((SampleStatistics) replicationStats[i++]).reset();
         }
@@ -565,15 +559,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /**
      * For each outer stats, print to console output name, count, min, max,
-     * mean, standard deviation and variance.  This can be done generically.
+     * mean, standard deviation and variance. This can be done generically.
      * @return the summary report section of the analyst report
      */
     protected String getSummaryReport() {
 
         // Outputs raw summary statistics to XML report
-        if (isSaveReplicationData()) {
+        if (isSaveReplicationData())
             statsConfig.processSummaryReport(getDesignPointStats());
-        }
 
         StringBuilder buf = new StringBuilder("Summary Output Report:");
         buf.append(System.getProperty("line.separator"));
@@ -606,8 +599,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
-        // send debug message directy to System.out.
-        // ie, one thread sets System.out then another
+        // send debug messages directy to System.out.
+        // i.e., one thread sets System.out then another
         // takes it mid thread.
 
         // This is possibly what causes output to dump to a console
@@ -638,7 +631,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
                 String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
                     + "email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
@@ -653,32 +646,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             return;
         }
 
-        printInfo();    // subclasses may display what they wish at the top of the run.
+        printInfo(); // subclasses may display what they wish at the top of the run.
 
         // reset the document with
         // existing parameters.
         // might have run before
         statsConfig.reset();
         statsConfig.setEntityIndex(entitiesWithStats);
-        if (!hookupsCalled) {
+        if (!hookupsCalled)
             throw new RuntimeException("performHookups() hasn't been called!");
-        }
 
         System.out.println("\nStopping at time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
 
-        if (isSingleStep()) {
+        if (isSingleStep())
             Schedule.setSingleStep(isSingleStep());
-        }
-
+       
         // This should be unchecked if only listening with a SimplePropertyDumper
         if (isSaveReplicationData()) {
             replicationData.clear();
             int repStatsLength = getReplicationStats().length;
-            for (int i = 0; i < repStatsLength; i++) {
+            for (int i = 0; i < repStatsLength; i++)
                 replicationData.put(i, new ArrayList<>());
-            }
         }
 
         // TBD: there should be a pluggable way to have Viskit
@@ -741,9 +731,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LOG.info("Stopped in Replication # " + (replication + 1));
                 break;
             } else {
-                if (Schedule.isRunning()) {
+                if (Schedule.isRunning())
                     System.out.println("Already running.");
-                }
+                
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 LOG.info("Starting Replication #" + (replication + 1) + " with RNG seed state of: " + seed);
                 try {
@@ -774,40 +764,38 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 SampleStatistics ss;
                 Object obj;
                 
-                // This should be unchecked if only listening with a SimplePropertyDumper
-                if (isSaveReplicationData()) {
+                // Outer stats output
+                // # of PropertyChangeListenerNodes is == to replicationStats.length
+                for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
+                    LOG.debug("entry is: {}", entry);
 
-                    // # of PropertyChangeListenerNodes is == to replicationStats.length
-                    for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
-                        LOG.debug("entry is: {}", entry);
+                    obj = pclNodeCache.get(entry.getKey());
+                    if (obj.getClass().toString().contains("PropChangeListenerNode")) {
 
-                        obj = pclNodeCache.get(entry.getKey());
-                        if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+                        try {
+                            // Since the pclNodeCache was created under a previous ClassLoader
+                            // we must use reflection to invoke the methods on the AssemblyNodes
+                            // that it contains, otherwise we will throw ClassCastExceptions
+                            nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
-                            try {
-                                // Since the pclNodeCache was created under a previous ClassLoader
-                                // we must use reflection to invoke the methods on the AssemblyNodes
-                                // that it contains, otherwise we will throw ClassCastExceptions
-                                nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
-
-                                // This is not a designPoint, so skip
-                                if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
-                                    LOG.debug("SimplePropertyDumper encountered");
-                                    continue;
-                                }
-                                isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                                typeStat = isCount ? ".count" : ".mean";
-                                ss = (SampleStatistics) getReplicationStats()[ix];
-                                fireIndexedPropertyChange(ix, ss.getName(), ss);
-                                if (isCount) {
-                                    fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
-                                } else {
-                                    fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
-                                }
-                                ix++;
-                            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
-                                LOG.error(ex);
+                            // This is not a designPoint, so skip
+                            if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
+                                LOG.debug("SimplePropertyDumper encountered");
+                                continue;
                             }
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                            typeStat = isCount ? ".count" : ".mean";
+                            ss = (SampleStatistics) getReplicationStats()[ix];
+                            fireIndexedPropertyChange(ix, ss.getName(), ss);
+
+                            if (isCount)
+                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
+                            else
+                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
+
+                            ix++;
+                        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
+                            LOG.error(ex);
                         }
                     }
                 }
@@ -845,9 +833,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * This gets called at the top of every run.  It builds a tempFile and saves the path.  That path is what
-     * is used at the bottom of run to write out the analyst report file.  We report the path back to the caller
-     * immediately, and it is the caller's responsibility to dispose of the file once he is done with it.
+     * This gets called at the top of every run. It builds a tempFile and saves the path. That path is what
+     * is used at the bottom of the run to write out the analyst report file. We report the path back to the caller
+     * immediately, and it is the caller's responsibility to dispose of the file once they are done with it.
      */
     private void initReportFile() {
         try {
@@ -874,6 +862,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
      * createObject() at run time.
      */
-    public void printInfo() {}
+    protected void printInfo() {}
 
 } // end class file BasicAssembly.java

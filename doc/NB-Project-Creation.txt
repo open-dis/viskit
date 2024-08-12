@@ -15,9 +15,9 @@ detailed here:
 
 In the constructor under setNumberReplications(1), paste:
         setVerboseReplication(-1);
-        setSaveReplicationData(false);
         setPrintReplicationReports(true);
         setPrintSummaryReport(true);
+        setSaveReplicationData(false);
         setOutputStream(System.out);
 
 These are all Viskit Runtime specific and will cause errors to be thrown when

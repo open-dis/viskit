@@ -256,14 +256,14 @@ public class SimkitAssemblyXML2Java {
             pw.print(sp8 + "setNumberReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
 
-            pw.print(sp8 + "setSaveReplicationData");
-            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
-
             pw.print(sp8 + "setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
 
             pw.print(sp8 + "setPrintSummaryReport");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
+
+            pw.print(sp8 + "setSaveReplicationData");
+            pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
         }
 
         pw.println(sp4 + cb);
@@ -820,7 +820,7 @@ public class SimkitAssemblyXML2Java {
      */
     public static void main(String[] arg) {
 
-        int port = -1;
+        int port;
         String fileName = null;
         SimkitAssemblyXML2Java sax2j = null;
         List<String> args = java.util.Arrays.asList(arg);

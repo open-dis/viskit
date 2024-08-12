@@ -178,7 +178,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         /* in order to resolve the assy as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
-         * it.  Used in the verboseListener within the working Viskit
+         * it. Used in the verboseListener within the working Viskit
          * ClassLoader
          */
         assembly = (BasicAssembly) assemblyInstance;
@@ -193,9 +193,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method getStopTime = assemblyClass.getMethod("getStopTime");
 
         runPanel.numRepsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
-        runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
         runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
+        runPanel.saveRepDataCB.setSelected((Boolean) isSaveReplicationData.invoke(assemblyInstance));
 
         // Set the run panel according to what the assy XML value is
         setVerbose.invoke(assemblyInstance, verbose);
@@ -204,16 +204,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrStopTime.setText("" + getStopTime.invoke(assemblyInstance));
     }
     JTextAreaOutputStream textAreaOutputStream;
+    Runnable assemblyRunnable;
 
     protected void initRun() {
 
         // Prevent multiple pushes of the sim run button
         mutex++;
-        if (mutex > 1) {
+        if (mutex > 1)
             return;
-        }
-        Runnable assemblyRunnable;
-
+       
         try {
 
             VGlobals.instance().resetFreshClassLoader();
@@ -232,9 +231,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             Method setOutputStream = assemblyClass.getMethod("setOutputStream", OutputStream.class);
             Method setNumberReplications = assemblyClass.getMethod("setNumberReplications", int.class);
-            Method setSaveReplicationData = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
             Method setPrintReplicationReports = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
             Method setPrintSummaryReport = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
+            Method setSaveReplicationData = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
             Method setEnableAnalystReports = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
             Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
             Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
@@ -272,11 +271,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numRepsTF.getText().trim()));
-            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
             setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
+            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
             setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
@@ -704,4 +703,4 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-}  // end class file InternalAssemblyRunner.java
+}  // end class InternalAssemblyRunner

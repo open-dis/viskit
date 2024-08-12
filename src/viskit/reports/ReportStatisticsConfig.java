@@ -6,6 +6,7 @@
 package viskit.reports;
 
 import edu.nps.util.LogUtils;
+
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,11 +16,14 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.logging.log4j.Logger;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import simkit.stat.SampleStatistics;
 import viskit.VGlobals;
 import viskit.ViskitProject;
@@ -61,7 +65,7 @@ public class ReportStatisticsConfig {
     /**
      * Used to truncate the precision of statistical results
      */
-    private final DecimalFormat form;
+    private final DecimalFormat df1, df3;
 
     /**
      * The DOM object this class uses to create an XML record of the simulation
@@ -86,7 +90,8 @@ public class ReportStatisticsConfig {
         this.assemblyName = assemblyName;
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setInfinity("inf");  // xml chokes on default
-        form = new DecimalFormat("0.000", dfs);
+        df1 = new DecimalFormat("0.", dfs);
+        df3 = new DecimalFormat("0.000", dfs);
         reportStats = new ReportStatisticsDOM();
     }
 
@@ -113,12 +118,12 @@ public class ReportStatisticsConfig {
 
                 // TODO: verify this logic works with/without underscores present
                 entityIndex[idx] = key.substring(0, seperator);
-                if (seperator > 0) {
+                
+                if (seperator > 0)
                     propertyIndex[idx] = key.substring(seperator + 1, key.length());
-                }
-                else {
+                else
                     propertyIndex[idx] = key.substring(seperator, key.length());
-                }
+                
                 System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
                 idx++;
             }
@@ -151,22 +156,22 @@ public class ReportStatisticsConfig {
      * @param repNumber replication number
      * @param repStats  replication statistics
      */
-    public void processReplicationReport(int repNumber, PropertyChangeListener[] repStats) {
+    public void processReplicationStats(int repNumber, PropertyChangeListener[] repStats) {
         LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[repStats.length];
-
+        Element replication;
         for (int i = 0; i < repStats.length; i++) {
 
-            Element replication = new Element("Replication");
+            replication = new Element("Replication");
 
             replication.setAttribute("number", Integer.toString(repNumber));
             replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) repStats[i]).getCount()));
-            replication.setAttribute("minObs", form.format(((SampleStatistics) repStats[i]).getMinObs()));
-            replication.setAttribute("maxObs", form.format(((SampleStatistics) repStats[i]).getMaxObs()));
-            replication.setAttribute("mean", form.format(((SampleStatistics) repStats[i]).getMean()));
-            replication.setAttribute("stdDeviation", form.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
-            replication.setAttribute("variance", form.format(((SampleStatistics) repStats[i]).getVariance()));
+            replication.setAttribute("minObs", df1.format(((SampleStatistics) repStats[i]).getMinObs()));
+            replication.setAttribute("maxObs", df1.format(((SampleStatistics) repStats[i]).getMaxObs()));
+            replication.setAttribute("mean", df3.format(((SampleStatistics) repStats[i]).getMean()));
+            replication.setAttribute("stdDeviation", df3.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
+            replication.setAttribute("variance", df3.format(((SampleStatistics) repStats[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }
@@ -183,18 +188,18 @@ public class ReportStatisticsConfig {
     public void processSummaryReport(SampleStatistics[] sum) {
 
         Element[] summaryUpdate = new Element[sum.length];
-
+        Element summary;
         for (int i = 0; i < sum.length; i++) {
 
-            Element summary = new Element("Summary");
+            summary = new Element("Summary");
 
             summary.setAttribute("property", propertyIndex[i]);
             summary.setAttribute("numRuns", new DecimalFormat("0").format(sum[i].getCount()));
-            summary.setAttribute("minObs", form.format(sum[i].getMinObs()));
-            summary.setAttribute("maxObs", form.format(sum[i].getMaxObs()));
-            summary.setAttribute("mean", form.format(sum[i].getMean()));
-            summary.setAttribute("stdDeviation", form.format(sum[i].getStandardDeviation()));
-            summary.setAttribute("variance", form.format(sum[i].getVariance()));
+            summary.setAttribute("minObs", df1.format(sum[i].getMinObs()));
+            summary.setAttribute("maxObs", df1.format(sum[i].getMaxObs()));
+            summary.setAttribute("mean", df3.format(sum[i].getMean()));
+            summary.setAttribute("stdDeviation", df3.format(sum[i].getStandardDeviation()));
+            summary.setAttribute("variance", df3.format(sum[i].getVariance()));
 
             summaryUpdate[i] = summary;
         }
@@ -253,4 +258,5 @@ public class ReportStatisticsConfig {
             } catch (IOException ioe) {}
         }
     }
-}
+    
+} // end class ReportStatisticsConfig

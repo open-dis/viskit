@@ -33,11 +33,16 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.assembly;
 
+import edu.nps.util.LogUtils;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
+
+import org.apache.logging.log4j.Logger;
 
 /**
  * JTextAreaOutputStream.java
@@ -54,13 +59,14 @@ import javax.swing.Timer;
  */
 public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
+  public static final int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
+  public static final int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
+  
+  private static final Logger LOG = LogUtils.getLogger(JTextAreaOutputStream.class);
+  
   private final JTextArea jta;
   private final Timer swingTimer;
   private final int delay = 125; //250;   // Performance adjuster for slow machines
-
-  final public static int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
-  final public static int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
-
   private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
                                     "----------------------------------------------\n";
   public JTextAreaOutputStream(JTextArea ta, int buffSize)
@@ -87,6 +93,11 @@ public class JTextAreaOutputStream extends ByteArrayOutputStream implements Acti
       jta.append(inputString);
       jta.setCaretPosition(jta.getDocument().getLength()-1);
      }
+    try {
+        close();
+    } catch (IOException ex) {
+        LOG.error(ex);
+    }
   }
 
   public void kill()
