@@ -580,8 +580,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 try {
 
-                    // First, copy the debug.log to the project dir
-                    Files.copy(ViskitConfig.V_DEBUG_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // First, copy the error.log to the project dir
+                    Files.copy(ViskitConfig.V_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -1862,7 +1862,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
-        File tempFile = null;
+        File tempFile = f;
         try {
             List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
             for (File file : eGFiles) {
