@@ -1,11 +1,28 @@
+/*
+ * @(#)VertexRenderer.java	1.0 03-JUL-04
+ * 
+ * Copyright (c) 2001-2004 Gaudenz Alder
+ *  
+ */
 package viskit.jgraph;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+//import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
@@ -13,7 +30,7 @@ import javax.swing.UIManager;
 import org.jgraph.JGraph;
 import org.jgraph.graph.*;
 
-/**
+/*
  * This overridden JGraph class's main purpose is to render customized text in
  * each of the Cell instances that represent nodes
  *
@@ -27,57 +44,16 @@ import org.jgraph.graph.*;
  * @since 3:40:51 PM
  */
 
-/*
- * @(#)VertexRenderer.java	1.0 1/1/02
- *
- * Copyright (c) 2001-2004, Gaudenz Alder
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of JGraph nor the names of its contributors may be used
- *   to endorse or promote products derived from this software without specific
- *   prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
 /**
- * This renderer displays entries that implement the CellView interface
- * and supports the following attributes. If the cell view is not a leaf,
- * this object is only visible if it is selected.
- * <pre>
- * GraphConstants.BOUNDS
- * GraphConstants.ICON
- * GraphConstants.FONT
- * GraphConstants.OPAQUE
- * GraphConstants.BORDER
- * GraphConstants.BORDERCOLOR
- * GraphConstants.LINEWIDTH
- * GraphConstants.FOREGROUND
- * GraphConstants.BACKGROUND
- * GraphConstants.VERTICAL_ALIGNMENT
- * GraphConstants.HORIZONTAL_ALIGNMENT
- * GraphConstants.VERTICAL_TEXT_POSITION
- * GraphConstants.HORIZONTAL_TEXT_POSITION
- * </pre>
+ * This renderer displays entries that implement the CellView interface and
+ * supports the following attributes. If the cell view is not a leaf, this
+ * object is only visible if it is selected.
+ * <li>GraphConstants.BOUNDS GraphConstants.ICON GraphConstants.FONT
+ * GraphConstants.OPAQUE GraphConstants.BORDER GraphConstants.BORDERCOLOR
+ * GraphConstants.LINEWIDTH GraphConstants.FOREGROUND GraphConstants.BACKGROUND
+ * GraphConstants.VERTICAL_ALIGNMENT GraphConstants.HORIZONTAL_ALIGNMENT
+ * GraphConstants.VERTICAL_TEXT_POSITION GraphConstants.HORIZONTAL_TEXT_POSITION
+ * </li>
  *
  * @version 1.0 1/1/02
  * @author Gaudenz Alder
@@ -89,23 +65,52 @@ public class vVertexRenderer
     /** Cache the current graph for drawing. */
     transient protected JGraph graph;
 
-    /** Cache the current shape for drawing. */
+    /**
+     * Cache the current shape for drawing.
+     */
     transient protected VertexView view;
 
-    /** Cached hasFocus and selected value. */
-    transient protected boolean hasFocus,  selected,  preview,  opaque,  childrenSelected;
+    /**
+     * Cached hasFocus and selected value.
+     */
+    transient protected boolean hasFocus, selected, preview, childrenSelected;
 
-    /** Cached default foreground and default background. */
-    transient protected Color defaultForeground,  defaultBackground,  bordercolor;
+    /**
+     * Cached default foreground and default background.
+     */
+    transient protected Color defaultForeground, defaultBackground,
+            bordercolor;
 
-    /** Cached borderwidth. */
+    /**
+     * Cached borderwidth.
+     */
     transient protected int borderWidth;
 
-    /** Cached value of the double buffered state */
-    transient boolean isDoubleBuffered = false;
+    /**
+     * Cached value of the double buffered state
+     */
+    transient protected boolean isDoubleBuffered = false;
+    
+    /**
+     * Cached value of whether the label is to be displayed
+     */
+    transient protected boolean labelEnabled;
+    
+    /**
+     * Caches values of the colors to be used for painting the cell. The values
+     * for gridColor, highlightColor and lockedHandleColor are updated with the
+     * respective values from JGraph in getRendererComponent each time a vertex
+     * is rendered. To render the selection border, the highlightColor or the
+     * lockedHandleColor are used depending on the focused state of the vertex.
+     * The gridColor is used to draw the selection border if any child cells are
+     * selected. To change these color values, please use the respective setters
+     * in JGraph.
+     */
+    transient protected Color gradientColor = null, gridColor = Color.black,
+            highlightColor = Color.black, lockedHandleColor = Color.black;
     
     private final float[] dash = {5f, 5f};
-    private final BasicStroke mySelectionStroke =
+    private final Stroke mySelectionStroke =
             new BasicStroke(
             2, // change from default of 1
             BasicStroke.CAP_BUTT,
@@ -123,35 +128,46 @@ public class vVertexRenderer
     }
 
     /**
-     * Configure and return the renderer based on the passed in components. The
-     * value is typically set from messaging the graph with
+     * Configure and return the renderer component based on the passed in cell.
+     * The value is typically set from messaging the graph with
      * <code>convertValueToString</code>. We recommend you check the value's
      * class and throw an illegal argument exception if it's not correct.
      *
      * @param graph the graph that that defines the rendering context.
-     * @param view the object that should be rendered.
+     * @param view the cell view that should be rendered.
      * @param sel whether the object is selected.
      * @param focus whether the object has the focus.
      * @param preview whether we are drawing a preview.
-     * @return	the component used to render the value.
+     * @return the component used to render the value.
      */
     @Override
-    public Component getRendererComponent(
-            JGraph graph,
-            CellView view,
-            boolean sel,
-            boolean focus,
-            boolean preview) {
-        this.graph = graph;
+    public Component getRendererComponent(JGraph graph, CellView view,
+            boolean sel, boolean focus, boolean preview) {
+        this.graph = graph;       
+        gridColor = graph.getGridColor();
+        highlightColor = graph.getHighlightColor();
+        lockedHandleColor = graph.getLockedHandleColor();
         isDoubleBuffered = graph.isDoubleBuffered();
         if (view instanceof VertexView) {
             this.view = (VertexView) view;
             setComponentOrientation(graph.getComponentOrientation());
+            if (graph.getEditingCell() != view.getCell()) {
+                Object label = graph.convertValueToString(view);
+                if (label != null) {
+//                    setText(label.toString());
+                } else {
+//                    setText(null);
+                }
+            } else {
+//                setText(null);
+            }
             this.hasFocus = focus;
-            this.childrenSelected = graph.getSelectionModel().isChildrenSelected(view.getCell());
+            this.childrenSelected = graph.getSelectionModel()
+                    .isChildrenSelected(view.getCell());
             this.selected = sel;
             this.preview = preview;
-            if (this.view.isLeaf() || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
+            if (this.view.isLeaf()
+                    || GraphConstants.isGroupOpaque(view.getAllAttributes())) {
                 installAttributes(view);
             } else {
                 resetAttributes();
@@ -168,8 +184,11 @@ public class vVertexRenderer
      * 
      */
     protected void resetAttributes() {
+//        setText(null);
         setBorder(null);
         setOpaque(false);
+//        setGradientColor(null);
+//        setIcon(null);
     }
 
     /**
@@ -177,7 +196,7 @@ public class vVertexRenderer
      * means, retrieve every published key from the cells hashtable and set
      * global variables or superclass properties accordingly.
      *
-     * @param view cell to retrieve the attribute values from.
+     * @param view the cell view to retrieve the attribute values from.
      */
     protected void installAttributes(CellView view) {
         Map map = view.getAllAttributes();
@@ -195,9 +214,12 @@ public class vVertexRenderer
         }
         Color foreground = GraphConstants.getForeground(map);
         setForeground((foreground != null) ? foreground : defaultForeground);
+        gradientColor = GraphConstants.getGradientColor(map);
+//        setGradientColor(gradientColor);
         Color background = GraphConstants.getBackground(map);
         setBackground((background != null) ? background : defaultBackground);
         setFont(GraphConstants.getFont(map));
+        labelEnabled = GraphConstants.isLabelEnabled(map);
     }
 
     /**
@@ -206,8 +228,13 @@ public class vVertexRenderer
     @Override
     public void paint(Graphics g) {
         try {
-            //if (preview && !isDoubleBuffered)
-            //	setOpaque(false);
+//            if (gradientColor != null && !preview && isOpaque()) {
+//                setOpaque(false);
+//                Graphics2D g2d = (Graphics2D) g;
+//                g2d.setPaint(new GradientPaint(0, 0, getBackground(),
+//                        getWidth(), getHeight(), gradientColor, true));
+//                g2d.fillRect(0, 0, getWidth(), getHeight());
+//            }
             super.paint(g);   // jmb this will come down to paintComponent
             paintSelectionBorder(g);
         } catch (IllegalArgumentException e) {
@@ -241,7 +268,7 @@ public class vVertexRenderer
         if (view instanceof vAssyPropListView) // PCL
             g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         if (view instanceof vCircleView) // EN
-        g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
+            g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
             
         g2.setColor(Color.darkGray);
         
@@ -252,7 +279,7 @@ public class vVertexRenderer
             g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         }
         if (view instanceof vCircleView) // EN
-        g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+            g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
 
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
@@ -358,35 +385,36 @@ public class vVertexRenderer
     }
 
     /**
-     * Provided for subclasses to paint a selection border.
+     * Provided for subclassers to paint a selection border.
      * @param g
      */
     protected void paintSelectionBorder(Graphics g) {
-        //((Graphics2D) g).setStroke(GraphConstants.SELECTION_STROKE);
-        ((Graphics2D) g).setStroke(this.mySelectionStroke);
-        if (childrenSelected) {
-            g.setColor(graph.getGridColor());
-        } else if (hasFocus && selected) {
-            g.setColor(graph.getLockedHandleColor());
-        } else if (selected) {
-            g.setColor(graph.getHighlightColor());
-        }
+        Graphics2D g2 = (Graphics2D) g;
+//        Stroke previousStroke = g2.getStroke();
+//        g2.setStroke(GraphConstants.SELECTION_STROKE);  
+        g2.setStroke(this.mySelectionStroke);
         if (childrenSelected || selected) {
+            if (childrenSelected) {
+                g.setColor(gridColor);
+            } else if (hasFocus && selected) {
+                g.setColor(lockedHandleColor);
+            } else if (selected) {
+                g.setColor(highlightColor);
+            }
             Dimension d = getSize();
             g.drawRect(0, 0, d.width - 1, d.height - 1);
         }
+//        g2.setStroke(previousStroke);
     }
 
     /**
-     * TODO: Not currently used.
-     * Returns the intersection of the bounding rectangle and the
-     * straight line between the source and the specified point p.
-     * The specified point is expected not to intersect the bounds.
-     *
+     * Returns the intersection of the bounding rectangle and the straight line
+     * between the source and the specified point p. The specified point is
+     * expected not to intersect the bounds.
      * @param view
      * @param source
      * @param p
-     * @return
+     * @return 
      */
     public Point2D getPerimeterPoint(VertexView view, Point2D source, Point2D p) {
         Rectangle2D bounds = view.getBounds();
@@ -421,9 +449,8 @@ public class vVertexRenderer
     }
 
     /**
-     * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a>
-     * for more information.
+     * Overridden for performance reasons. See the <a
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
     public void validate() {
@@ -431,7 +458,7 @@ public class vVertexRenderer
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
     public void revalidate() {
@@ -439,7 +466,7 @@ public class vVertexRenderer
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
@@ -447,7 +474,7 @@ public class vVertexRenderer
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
     public void repaint(Rectangle r) {
@@ -455,104 +482,103 @@ public class vVertexRenderer
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    protected void firePropertyChange(
-            String propertyName,
-            Object oldValue,
+    protected void firePropertyChange(String propertyName, Object oldValue,
             Object newValue) {
         // Strings get interned...
-	if ("text".equals(propertyName))
+        if ("text".equals(propertyName)) {
             super.firePropertyChange(propertyName, oldValue, newValue);
+        }
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            byte oldValue,
+    public void firePropertyChange(String propertyName, byte oldValue,
             byte newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
+     * @param propertyName
+     * @param oldValue
+     * @param newValue
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            char oldValue,
+    public void firePropertyChange(String propertyName, char oldValue,
             char newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            short oldValue,
+    public void firePropertyChange(String propertyName, short oldValue,
             short newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            int oldValue,
+    public void firePropertyChange(String propertyName, int oldValue,
             int newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            long oldValue,
+    public void firePropertyChange(String propertyName, long oldValue,
             long newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            float oldValue,
+    public void firePropertyChange(String propertyName, float oldValue,
             float newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            double oldValue,
+    public void firePropertyChange(String propertyName, double oldValue,
             double newValue) {
     }
 
     /**
      * Overridden for performance reasons. See the <a
-     * href="#override">Implementation Note</a> for more information.
+     * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void firePropertyChange(
-            String propertyName,
-            boolean oldValue,
+    public void firePropertyChange(String propertyName, boolean oldValue,
             boolean newValue) {
     }
     
-} // end class vVertexRender
+    /**
+     * @return Returns the gradientColor.
+     */
+    public Color getGradientColor() {
+        return gradientColor;
+    }
+
+    /**
+     * @param gradientColor The gradientColor to set.
+     */
+    public void setGradientColor(Color gradientColor) {
+        this.gradientColor = gradientColor;
+    }
+}
