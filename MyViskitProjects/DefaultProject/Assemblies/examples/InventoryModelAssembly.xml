@@ -25,6 +25,31 @@
         <TerminalParameter name="littleS" value="5" type="int"/>
         <Coordinate x="410.0" y="200.0"/>
     </SimEntity>
+    <PropertyChangeListener name="numArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
+        <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
+        <Coordinate x="100.0" y="310.0"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener name="demandStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+        <TerminalParameter name="p[0] : " value="demand" type="java.lang.String"/>
+        <Coordinate x="410.0" y="90.0"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener name="inventoryOnHandStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+        <TerminalParameter name="p[0] : " value="I" type="java.lang.String"/>
+        <Coordinate x="290.0" y="90.0"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener name="inventoryOnBackOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+        <TerminalParameter name="p[0] : " value="B" type="java.lang.String"/>
+        <Coordinate x="540.0" y="90.0"/>
+    </PropertyChangeListener>
+    <PropertyChangeListener name="inventoryOnOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+        <TerminalParameter name="p[0] : " value="T" type="java.lang.String"/>
+        <Coordinate x="610.0" y="200.0"/>
+    </PropertyChangeListener>
     <SimEventListenerConnection listener="inventoryModel_1" source="arrivalProcess_0"/>
+    <PropertyChangeListenerConnection property="numberArrivals" listener="numArrivalsStat" source="arrivalProcess_0" description=""/>
+    <PropertyChangeListenerConnection property="demand" listener="demandStat" source="inventoryModel_1" description=""/>
+    <PropertyChangeListenerConnection property="I" listener="inventoryOnHandStat" source="inventoryModel_1" description=""/>
+    <PropertyChangeListenerConnection property="B" listener="inventoryOnBackOrderStat" source="inventoryModel_1" description=""/>
+    <PropertyChangeListenerConnection property="T" listener="inventoryOnOrderStat" source="inventoryModel_1" description=""/>
     <Schedule stopTime="100000.0" verbose="true"/>
 </SimkitAssembly>
