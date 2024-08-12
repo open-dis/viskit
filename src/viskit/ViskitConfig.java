@@ -32,7 +32,7 @@ import viskit.doe.FileHandler;
  * @version $Id$
  */
 public class ViskitConfig {
-    
+
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 
@@ -41,7 +41,7 @@ public class ViskitConfig {
     public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
     public static final File VISKIT_LOGS_DIR = new File("logs");
-    public static final File V_DEBUG_LOG = new File(VISKIT_LOGS_DIR, "debug.log.0");
+    public static final File V_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";
@@ -112,27 +112,27 @@ public class ViskitConfig {
                 VISKIT_CONFIG_DIR.mkdirs();
                 LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
             }
-            
+
             // NOTE: Due to the chages in the latest Commons Configuration v2-2.10.1
             // V_CONFIG_FILE is irrelvant for this application of the config.
             // APP and GUI will be loaded each directly into a combined config
             File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
-            if (!V_CONFIG_FILE.exists()) {
+            if (!V_CONFIG_FILE.exists())
                 Files.copy(vconfigSrc.toPath(), V_CONFIG_FILE.toPath());
-            }
+
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
-            if (!C_APP_FILE.exists()) {
+            if (!C_APP_FILE.exists())
                 Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
-            }
+
             File cGuiSrc;
             if (VStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
                 cGuiSrc = new File("configuration/c_gui_mac.xml");
             else
                 cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
 
-            if (!C_GUI_FILE.exists()) {
+            if (!C_GUI_FILE.exists())
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
-            }
+
         } catch (IOException ex) {
             LOG.error(ex);
         }
@@ -150,13 +150,13 @@ public class ViskitConfig {
                         .configure(params.xml()
                         .setFileName(C_GUI_FILE.getAbsolutePath()));
             bldr1.setAutoSave(true);
-            
+
             FileBasedConfigurationBuilder<XMLConfiguration> bldr2
                     = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
                         .configure(params.xml()
                         .setFileName(C_APP_FILE.getAbsolutePath()));
             bldr2.setAutoSave(true);
-            
+
             NodeCombiner combiner = new UnionCombiner();
             cc = new CombinedConfiguration(combiner);
             cc.addConfiguration(bldr1.getConfiguration(), "gui");
