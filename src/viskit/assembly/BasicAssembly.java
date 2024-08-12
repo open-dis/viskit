@@ -516,10 +516,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             statsConfig.processReplicationStats((rep + 1), clonedReplicationStats);
         
         // Borrowed from https://howtodoinjava.com/java/string/align-text-in-columns/#:~:text=One%20of%20the%20most%20straightforward,column%20within%20the%20format%20string.
-        // Define column widths (CW)
-        int nameCW   = 24;
+        // Define column widths (CW). These may have to be slightly adjusted for
+        // long property names and large counts/means
+        int nameCW   = 26;
         int countCW  =  6;
-        int minCW    =  6;
+        int minCW    =  5;
         int maxCW    =  9;
         int meanCW   = 12;
         int stdDevCW = 12;
@@ -663,13 +664,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (isSingleStep())
             Schedule.setSingleStep(isSingleStep());
        
-        // This should be unchecked if only listening with a SimplePropertyDumper
-        if (isSaveReplicationData()) {
-            replicationData.clear();
-            int repStatsLength = getReplicationStats().length;
-            for (int i = 0; i < repStatsLength; i++)
-                replicationData.put(i, new ArrayList<>());
-        }
+        // Used by the Gridlet(s)
+        replicationData.clear();
+        int repStatsLength = getReplicationStats().length;
+        for (int i = 0; i < repStatsLength; i++)
+            replicationData.put(i, new ArrayList<>());
 
         // TBD: there should be a pluggable way to have Viskit
         // directly modify entities. One possible way is to enforce
