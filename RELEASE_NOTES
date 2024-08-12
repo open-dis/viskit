@@ -77,6 +77,8 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    We now have a unicode character displayed on conditional scheduling edges
+
     (Critical)
     Fixed runaway recursion when selecting a PCL for edit
 
