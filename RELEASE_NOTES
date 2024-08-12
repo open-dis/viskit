@@ -77,12 +77,19 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    (Critical)
+    Fixed runaway recursion when selecting a PCL for edit
+
+    Better formatting on the Local run panel console output of rep. stats and
+    rep. summary report.
+
     Consolidated VertexRenderers for efficiency
 
     Control points for self scheduling edges now outline the offset edge shape
 
     Upgrade to JDOM v1.1.3
 
+    (Critical)
     Fixed Log4j output to file. Using log4j2.xml config file. Console output is
     now colorized per logging level.
 
@@ -95,9 +102,6 @@ Post release fixes / upgrades / issues:
     find intersections between edge shape and their corresponding bounding 
     boxes. Replaced with simpler shape.intersects(rectangle) calls. No issues 
     now when working between MBP laptop displays and Mac Thunderbolt displays.
-
-    (Critical)
-    Fixed bad recursion when selecting PCL for edit
 
     (Critical)
     https://groove.cs.utwente.nl/mac.html
