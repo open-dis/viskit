@@ -39,7 +39,7 @@ public class vEdgeRenderer extends EdgeRenderer {
     // Override only to use a different way of positioning the label on the edge
     @Override
     public Point2D getLabelPosition(EdgeView view) {
-        Point2D src = null, aim;
+        Point2D src = null, aim, labelPosn = null;
         int ret;
         double theta, newX, newY;
 
@@ -47,31 +47,37 @@ public class vEdgeRenderer extends EdgeRenderer {
         
         Shape s = view.sharedPath;
         if (s == null) {
-            return super.getLabelPosition(view);
-        }
+            labelPosn = super.getLabelPosition(view);
+        } else {
+            for (PathIterator pi = s.getPathIterator(null); !pi.isDone();) {
+                ret = pi.currentSegment(coo);
+                if (ret == PathIterator.SEG_MOVETO)
+                    src = new Point2D.Double(coo[0], coo[1]);
 
-        for (PathIterator pi = s.getPathIterator(null); !pi.isDone();) {
-            ret = pi.currentSegment(coo);
-            if (ret == PathIterator.SEG_MOVETO) {
-                src = new Point2D.Double(coo[0], coo[1]);
-            }
+                if (ret == PathIterator.SEG_CUBICTO) {
+                    aim = new Point2D.Double(coo[4], coo[5]);
 
-            if (ret == PathIterator.SEG_CUBICTO) {
-                aim = new Point2D.Double(coo[4], coo[5]);
-
-                if (src != null) {
-                    theta = Math.atan2(aim.getY() - src.getY(), aim.getX() - src.getX());
-                    newX = src.getX() + (Math.cos(theta) * 25);
-                    newY = src.getY() + (Math.sin(theta) * 25);
-                    return new Point2D.Double(newX, newY);
+                    if (src != null) {
+                        theta = Math.atan2(aim.getY() - src.getY(), aim.getX() - src.getX());
+                        newX = src.getX() + (Math.cos(theta) * 25);
+                        newY = src.getY() + (Math.sin(theta) * 25);
+                        labelPosn = new Point2D.Double(newX, newY);
+                        break;
+                    }
                 }
-            }
 
-            pi.next();
+                pi.next();
+            }
         }
 
-        Rectangle2D tr = getPaintBounds(view);
-        return new Point2D.Double(tr.getCenterX(), tr.getCenterY()); // just use the center of the clip
+        if (labelPosn == null) {
+            Rectangle2D tr = getPaintBounds(view);
+            labelPosn = new Point2D.Double(tr.getCenterX(), tr.getCenterY()); // just use the center of the clip
+        }
+        
+        GraphConstants.setLabelPosition(view.getAttributes(), labelPosn);
+        
+        return labelPosn;
     }
 
     /**

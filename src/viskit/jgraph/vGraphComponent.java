@@ -488,7 +488,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        String retVal = "";
+        String retVal = null;
         if (view instanceof vCircleView) {
             vCircleCell cc = (vCircleCell) view.getCell();
             Object en = cc.getUserObject();
@@ -503,10 +503,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             if (e instanceof SchedulingEdge) {
                 SchedulingEdge se = (SchedulingEdge) e;
 
-                if (se.conditional == null || se.conditional.isEmpty()) // put S only for conditional edges
+                if (se.conditional == null || se.conditional.isEmpty())
                     retVal = "";
                 else
-                    retVal = "";  // bug 675 "S"; <- throws NPE in JGraph EdgeView.mousePressed
+                    retVal = "\u01A7"; // https://www.compart.com/en/unicode/U+01A7
             } else if (e instanceof CancelingEdge) // should always be one of these 2 except for proto examples
                 retVal = "";
         }
