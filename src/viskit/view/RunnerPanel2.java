@@ -201,13 +201,13 @@ public class RunnerPanel2 extends JPanel {
             flowPan.add(closeButt);
         }
 
-        saveRepDataCB = new JCheckBox("Save replication data");
-        saveRepDataCB.setToolTipText("If using only a SimplePropertyDumper, no need to check this");
-        flowPan.add(saveRepDataCB);
         printRepReportsCB = new JCheckBox("Print replication reports");
         flowPan.add(printRepReportsCB);
         printSummReportsCB = new JCheckBox("Print summary reports");
         flowPan.add(printSummReportsCB);
+        saveRepDataCB = new JCheckBox("Print replication stats");
+        saveRepDataCB.setToolTipText("If using only a SimplePropertyDumper, no need to check this");
+        flowPan.add(saveRepDataCB);
 
         /* DIFF between OA3302 branch and trunk */
         analystReportCB = new JCheckBox("Enable Analyst Reports");
