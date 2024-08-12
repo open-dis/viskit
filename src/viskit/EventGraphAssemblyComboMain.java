@@ -102,7 +102,7 @@ public class EventGraphAssemblyComboMain {
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
                 
                 String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                        + "navigate to " + ViskitConfig.V_DEBUG_LOG.getPath() + " and "
+                        + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
                         + "email the log to "
                         + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
