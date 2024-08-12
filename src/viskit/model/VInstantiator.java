@@ -547,7 +547,7 @@ public abstract class VInstantiator {
             VInstantiator vi;
             for (Object o : args) {
                 vi = (VInstantiator) o;
-                lis.add(vi.vcopy());
+                lis.add(vi);
             }
             VInstantiator rv = new VInstantiator.Constr(getType(), lis);
             rv.setName(this.getName());
@@ -584,9 +584,9 @@ public abstract class VInstantiator {
         @Override
         public VInstantiator vcopy() {
             Vector<Object> lis = new Vector<>();
-            for (Object vi : instantiators) {
-                lis.add(((VInstantiator) vi).vcopy());
-            }
+            for (Object vi : instantiators)
+                lis.add((VInstantiator) vi);
+            
             VInstantiator rv = new VInstantiator.Array(getType(), lis);
             rv.setName(getName());
             rv.setDescription(getDescription());
@@ -721,7 +721,7 @@ public abstract class VInstantiator {
 
                 if (o instanceof VInstantiator) {
                     vi = (VInstantiator) o;
-                    lis.add(vi.vcopy());
+                    lis.add(vi);
                 } else if (o instanceof String) {
                     lis.add(o);
                 }
