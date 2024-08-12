@@ -86,9 +86,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
             List<User> users = passwd.getUser();
             String passcrypt = null;
-            Iterator<User> it = users.iterator();
-            while (it.hasNext()) {
-                User user = it.next();
+            for (User user : users) {
                 if (user.getName().equals(username)) {
                     passcrypt = user.getPassword();
                 }
@@ -176,9 +174,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
                     // TODO: upgrade to generic JWSDP
                     users = passwd.getUser();
-                    Iterator<User> it = users.iterator();
-                    while (it.hasNext()) {
-                        User user = it.next();
+                    for (User user : users) {
                         if (user.getName().equals(newUser)) {
                             passcrypt = user.getPassword();
                         }
@@ -237,9 +233,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     passwd = (PasswordFile) u.unmarshal(is);
                 }
                 List<User> users = passwd.getUser();
-                Iterator<User> it = users.iterator();
-                while (it.hasNext()) {
-                    User user = it.next();
+                for (User user : users) {
                     if (user.getName().equals(username)) {
                         //TBD could refactor out the crypto stuff
                         byte[] salt = SALT.getBytes();
@@ -309,9 +303,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
             FileInputStream is = new FileInputStream(pwd);
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
             List<User> users = passwd.getUser();
-            Iterator<User> it = users.iterator();
-            while (it.hasNext()) {
-                User user = it.next();
+            for (User user : users) {
                 if (user.getName().equals(username)) {
                     passcrypt = user.getPassword();
                 }
