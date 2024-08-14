@@ -43,8 +43,8 @@ public class ObjectInspector extends JDialog
     okButt = new JButton("Apply changes");
     okButt.setEnabled(false);
     buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttPan.add(canButt);
     buttPan.add(okButt);
+    buttPan.add(canButt);
 
     // attach listeners
     lis = new enableApplyButtonListener();

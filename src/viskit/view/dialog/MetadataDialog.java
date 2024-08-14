@@ -145,8 +145,8 @@ abstract public class MetadataDialog extends JDialog {
         okButt = new JButton("Apply changes");
         getRootPane().setDefaultButton(okButt);
         buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(canButt);
         buttPan.add(okButt);
+        buttPan.add(canButt);
         c.add(buttPan);
 
         // attach listeners

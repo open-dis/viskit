@@ -264,8 +264,8 @@ public class EdgeInspectorDialog extends JDialog {
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(canButt);
         buttPan.add(okButt);
+        buttPan.add(canButt);
         twoRowButtonPanel.add(buttPan);
 
         edgeInspectorPanel.add(twoRowButtonPanel);

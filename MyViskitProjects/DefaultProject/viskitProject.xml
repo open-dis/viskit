@@ -9,6 +9,18 @@
   </BuildDirectory>
   <DistDirectory name="dist" />
   <LibDirectory name="lib" />
-  <Cached/>
+  <Cached>
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/ArrayTester.class" digest="5884ba856e65fb8e62649f22bcdc28af" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ArrayTester.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/ArrivalProcess.class" digest="-19bf05fde0bc481799a5f4b09f97644b" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ArrivalProcess.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/Creator.class" digest="32ec99438999aba57ddebb8e2796041b" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/Creator.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/EntityCreator.class" digest="-4b1ad6ade616ebfa08c4e5f31838e90f" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/EntityCreator.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/InventoryModel.class" digest="-3abd66c67ae9c9891744ba6b08f4e07b" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/InventoryModel.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/ServerGeneric.class" digest="-2f61d15915799f1d34755f30b0e1accc" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ServerGeneric.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/ServerWithReneges.class" digest="-54516a48a90118042b6a5c20efa74b6e" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/ServerWithReneges.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleInventory.class" digest="545cd370ff9974c4bae5aaec5db15be1" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleInventory.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleMachineFailure.class" digest="-7311144a0b12da3d9dedf116e4bbf4bf" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleMachineFailure.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleServer.class" digest="3481f1cbf45936494f8f212479513e23" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml" />
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/TransferLineComponent.class" digest="74f6156ab6e8db3dcfa4335e536f765e" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/TransferLineComponent.xml" />
+  </Cached>
 </ViskitProject>
 

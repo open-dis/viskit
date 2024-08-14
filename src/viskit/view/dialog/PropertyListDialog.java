@@ -66,8 +66,8 @@ public class PropertyListDialog extends JDialog {
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
         buttPan.add(okButt);
+        buttPan.add(canButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
         // attach listeners

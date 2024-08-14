@@ -119,8 +119,8 @@ public class SettingsDialog extends JDialog {
         canButt = new JButton("Cancel");
         okButt = new JButton("Close");
         buttPan.add(Box.createHorizontalGlue());
-        //buttPan.add(canButt);
         buttPan.add(okButt);
+        //buttPan.add(canButt);
         //buttPan.add(Box.createHorizontalGlue());
 
         content.add(tabbedPane);

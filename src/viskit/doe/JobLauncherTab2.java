@@ -217,8 +217,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         buttPan.add(Box.createHorizontalGlue());
         JButton cancelButt = new JButton("Cancel");
         JButton okButt = new JButton("Apply changes");
-        buttPan.add(cancelButt);
         buttPan.add(okButt);
+        buttPan.add(cancelButt);
 
         JPanel allPan = new JPanel();
         allPan.setLayout(new BoxLayout(allPan, BoxLayout.Y_AXIS));

@@ -81,8 +81,8 @@ public class EdgeParameterDialog extends JDialog {
         canButt = new JButton("Cancel");
         okButt = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(canButt);
         buttPan.add(okButt);
+        buttPan.add(canButt);
         con.add(buttPan);
         con.add(Box.createVerticalGlue());           // takes up space when dialog is expanded vertically
         cont.add(con);
