@@ -77,6 +77,11 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    (Critical)
+    Fix issue where if another project was opened, lingering recent proj. file
+    references were maintained causing a NPE due to a recent class from the old
+    project which is no longer found on the current classpath.
+
     We now have a unicode character displayed on conditional scheduling edges
 
     (Critical)

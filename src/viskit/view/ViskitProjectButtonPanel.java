@@ -33,10 +33,15 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
+import edu.nps.util.LogUtils;
+
 import java.awt.Dialog;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
@@ -68,7 +73,15 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 
         // Dialog will appear in center screen
         dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        
+        try {
+            Runnable r = () -> {
+                dialog.setVisible(true);
+            };
+            SwingUtilities.invokeAndWait(r);
+        } catch (InterruptedException | InvocationTargetException ex) {
+            LogUtils.getLogger(ViskitProjectButtonPanel.class).error(ex);
+        }
     }
 
     /** Creates new form ViskitProjectButtonPanel */
@@ -158,9 +171,8 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
             AssemblyView vaw = (AssemblyView) vac.getView();
 
-            if (vaw != null) {
+            if (vaw != null)
                 vaw.openProject();
-            }
         }
     } else {
         file = ViskitProject.openProjectDir(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
@@ -190,16 +202,16 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     // other option is to exit
     do {
         ViskitProjectGenerationDialog3.showDialog();
-        if (ViskitProjectGenerationDialog3.cancelled) {
+        if (ViskitProjectGenerationDialog3.cancelled)
             return;
-        }
+        
         String projPath = ViskitProjectGenerationDialog3.projectPath;
         projF = new File(projPath);
-        if (projF.exists() && (projF.isFile() || projF.list().length > 0)) {
+        if (projF.exists() && (projF.isFile() || projF.list().length > 0))
             JOptionPane.showMessageDialog(this, "Chosen project name exists.");
-        } else {
+        else
             break; // out of do
-        }
+        
     } while (true);
 
     VStatics.setViskitProjectFile(projF);
