@@ -294,11 +294,14 @@ their descpritions.
             depends="init"
             description="build the help search database">
 
+        <copy todir="${build.javahelp}">
+            <fileset dir="${javahelp}"/>
+        </copy>
         <java classname="com.sun.java.help.search.Indexer"
               fork="true">
 
             <!-- turn this on to make sure it's working -->
-            <!--arg value="-verbose"/-->
+            <!--<arg value="-verbose"/>-->
             <arg value="-db"/>
             <arg value="${build.javahelp}/JavaHelpSearch"/>
             <arg value="${javahelp}/Pages"/>
@@ -306,9 +309,6 @@ their descpritions.
                 <pathelement location="${dir.lib}/jhall.jar"/>
             </classpath>
         </java>
-        <copy todir="${build.javahelp}">
-            <fileset dir="${javahelp}"/>
-        </copy>
     </target>
 
     <!--  === TARGET: jar === -->
