@@ -26,22 +26,22 @@ run from a standalone (non-Viskit) context if set otherwise.
 Modify setStopTime(1000); to the desired # of milliseconds of runtime
 
 3) In the method createDesignPointStats(), comment out
-super.createDesignPointStats().  Again, we are not in the Viskit Runtime
+super.createDesignPointStats(). Again, we are not in the Viskit Runtime
 environment. We are only using some of Viskit's classpath for standalone
 operation.
 
-4) Copy over Viskit's configuration, Schemas and lib directories into your
-standalone project directory. It will help to modify two configuration files
-found in the /configuration directory, c_app.xml -> modify the projecthome.path
-and projecthome.name attributes to be the parent directory (use full path names)
-and the project directory name. For c_gui.xml, modify the projecttitle.name
-attribute to be the same name as the project.name. This will ensure correct
-viskit.jar use for your standalone project.
+4) Copy over Viskit's configuration, Schemas and lib directories (lib/support
+can be omitted) into your standalone project directory. It will help to modify 
+two configuration files found in the /configuration directory, c_app.xml -> 
+modify the projecthome.path and projecthome.name attributes to be the parent 
+directory (use full path names) and the project directory name. For c_gui.xml, 
+modify the projecttitle.name attribute to be the same name as the project.name. 
+This will ensure seamless viskit.jar use for your standalone project.
 
-5) Next, create a new NetBeans Java project stating "with source code."  Set up
+5) Next, create a new NetBeans Java project stating "with source code." Set up
 the classpath to point to the project's "lib" directory. The viskit.jar will
 also be required in the classpath, but you will not be running Viskit. It is
-found in Viskit's build/lib directory.  The Assembly source will be your
+found in Viskit's build/lib directory. The Assembly source will be your
 project's "Main."
 
 Select "Run" from Netbeans, or type: java -jar YourProjectName.jar into the CLI
