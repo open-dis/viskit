@@ -1,10 +1,12 @@
 package viskit.control;
 
 import actions.ActionIntrospector;
+
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtils;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -39,9 +41,12 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
+
 import org.jgraph.graph.DefaultGraphCell;
+
 import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
@@ -1401,14 +1406,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             LOG.info("{} is valid XML\n", f);
         }
 
-        SimkitAssemblyXML2Java x2j = null;
+        SimkitAssemblyXML2Java x2j;
+        String retVal;
         try {
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
+            retVal = x2j.translate();
         } catch (FileNotFoundException e) {
             LOG.error(e);
+            retVal = "";
         }
-        return x2j.translate();
+        return retVal;
     }
 
     // NOTE: above are routines to operate on current assembly
@@ -1430,7 +1438,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if ((xvt == null) || !xvt.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            return null;
+            return eventGraphSource;
         } else {
             LOG.info("{} is valid XML\n", x2j.getEventGraphFile());
         }
@@ -1548,8 +1556,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph) {
-                LOG.debug("Is an Assembly: " + !isEventGraph);
-                return null;
+                LOG.debug("Is an Assembly: {}", !isEventGraph);
+                return paf;
             }
 
             String src = buildJavaEventGraphSource(x2j);
@@ -1557,9 +1565,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             /* We may have forgotten a parameter required for a super class */
             if (src == null) {
                 String msg = xmlFile + " did not compile.\n" +
-                        "Please check that you have provided parameters in \n" +
-                        "identical order declared for any super classes";
-                LOG.error(xmlFile + " " + msg);
+                        "Please check that you have provided parameters in "
+                        + "identical order declared for any super classes";
+                LOG.error(msg);
                 messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
                 return null;
             }
@@ -1584,7 +1592,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 paf = compileJavaClassAndSetPackage(src);
             }
         } catch (FileNotFoundException e) {
-            LOG.error("Error creating Java class file from " + xmlFile + ": " + e.getMessage() + "\n");
+            LOG.error("Error creating Java class file from {}: {}\n", xmlFile , e.getMessage());
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
         }
         return paf;

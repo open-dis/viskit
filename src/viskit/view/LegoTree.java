@@ -26,7 +26,7 @@ import viskit.control.AssemblyController;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
- * Assy Editor. Used for dragging and dropping EG and PCL nodes to the pallete
+ * Assy Editor. Used for dragging and dropping EG and PCL nodes to the pallette
  * for creating Assy files.
  *
  * <pre>
@@ -342,7 +342,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             } catch (Throwable t) {
 
                 // Uncomment to reveal common reason for Exceptions
-                t.printStackTrace();
+//                t.printStackTrace();
                 LOG.error(t);
             }
         } // directory
@@ -477,7 +477,10 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 {
                     setLeafIcon(LegoTree.this.standardNonLeafIcon);
                 }
-                setToolTipText(uo.toString());
+                
+                if (uo != null)
+                    setToolTipText(uo.toString());
+                
                 value = value.toString();
                 sel = false;
             }
@@ -496,15 +499,15 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         @Override
         public boolean accept(File f) {
             if (f.isDirectory()) {
-                if (!dirsToo) {
+                if (!dirsToo)
                     return false;
-                }
+                
                 // TBD add an ignore in SettingsDialog, and in history file
-                if (f.getName().contains("svn") || f.getName().contains("Assemblies") || f.getName().contains("Assembly") || f.getName().contains("Scenario") || f.getName().contains("Locations")) {
+                if (f.getName().contains("Assembl") || f.getName().contains("Scenario") || f.getName().contains("Locations"))
                     return false;
-                }
+                
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
-                return (fa != null || fa.length != 0);
+                return (fa != null || fa != null && fa.length != 0);
             }
 
             return f.isFile()

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  *
  * The Parameter Map is also parsed from source code at runtime to allow Viskit
  * to properly identify constructors of EGs classes on the classpath whether
- * they are from generated source, or contained in third party libraries.  The
+ * they are from generated source, or contained in third party libraries. The
  * importance of this feature is that when Assemblies are constructed from
  * iconized EGs, the Assembly can be constructed such that each EG parameter is
  * identified and properly initialized at runtime from generated Assembly source

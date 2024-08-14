@@ -286,11 +286,11 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             else
                 fullPath = (File) obj;
 
-            if (fullPath.getPath().equals(CLEARPATHFLAG)) {
-                acontroller.clearRecentAssyFileList();
-            } else {
-                acontroller.openRecentAssembly(fullPath);
-            }
+            if (fullPath != null)
+                if (fullPath.getPath().equals(CLEARPATHFLAG))
+                    acontroller.clearRecentAssyFileList();
+                else
+                    acontroller.openRecentAssembly(fullPath);
         }
     }
 
@@ -707,14 +707,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 if (!file.exists()) {
 
                     // Allow a relative path for Diskit-Test (Diskit)
-                    if (path.contains("..")) {
+                    if (path.contains(".."))
                         file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
-                    }
                 }
 
-                if (file.exists()) {
+                if (file.exists()) 
                     addEventGraphsToLegoTree(file, file.isDirectory());
-                }
             }
         }
 

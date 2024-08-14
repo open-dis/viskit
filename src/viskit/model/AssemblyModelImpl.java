@@ -243,8 +243,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     public static String _fourHexDigits(int i) {
         char[] ca = new char[4];
+        int idx;
         for (int j = 3; j >= 0; j--) {
-            int idx = i & 0xF;
+            idx = i & 0xF;
             i >>= 4;
             ca[j] = HEX_DIGITS[idx];
         }
@@ -286,9 +287,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public boolean nameExists(String name) {
         for (AssemblyNode n : getNodeCache().values()) {
-            if (n.getName().equals(name)) {
+            if (n.getName().equals(name))
                 return true;
-            }
         }
         return false;
     }
@@ -316,9 +316,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         VInstantiator vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
         node.setInstantiator(vc);
 
-        if (!nameCheck()) {
+        if (!nameCheck())
             mangleName(node);
-        }
 
         getNodeCache().put(node.getName(), node);   // key = ev
 
@@ -366,11 +365,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
         PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
-        if (p == null) {
+        if (p == null)
             pcNode.setPosition(pointLess);
-        } else {
+        else
             pcNode.setPosition(p);
-        }
 
         PropertyChangeListener pcl = oFactory.createPropertyChangeListener();
 
@@ -383,9 +381,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         VInstantiator vc = new VInstantiator.Constr(pcl.getType(), lis);
         pcNode.setInstantiator(vc);
 
-        if (!nameCheck()) {
+        if (!nameCheck())
             mangleName(pcNode);
-        }
 
         getNodeCache().put(pcNode.getName(), pcNode);   // key = ev
 
@@ -651,11 +648,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
         // Modes should be singular.  All new Assemblies will be with singular mode
         if (pclNode.isSampleStats()) {
-            if (pclNode.isClearStatsAfterEachRun()) {
+            if (pclNode.isClearStatsAfterEachRun())
                 jaxBPcl.setMode("replicationStat");
-            } else {
+            else
                 jaxBPcl.setMode("designPointStat");
-            }
         }
 
         String statistics = pclNode.isGetCount() ? "true" : "false";
@@ -682,15 +678,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         // PropertyChangeListener object serves as "its own" MultiParameter.
         List<Object> jlistt = getJaxbParamList(inst);
 
-        if (jlistt.size() != 1) {
+        if (jlistt.size() != 1)
             throw new RuntimeException("Design error in AssemblyModel");
-        }
 
         MultiParameter mp = (MultiParameter) jlistt.get(0);
 
-        for (Object o : mp.getParameters()) {
+        for (Object o : mp.getParameters()) 
             lis.add(o);
-        }
 
         modelDirty = true;
         this.notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLCHANGED, "Property Change Listener node changed"));
@@ -728,15 +722,13 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         // serves as "its own" MultiParameter.
         List<Object> jlistt = getJaxbParamList(inst);
 
-        if (jlistt.size() != 1) {
+        if (jlistt.size() != 1)
             throw new RuntimeException("Design error in AssemblyModel");
-        }
 
         MultiParameter mp = (MultiParameter) jlistt.get(0);
 
-        for (Object o : mp.getParameters()) {
+        for (Object o : mp.getParameters())
             lis.add(o);
-        }
 
         if (evNode.isOutputMarked()) {
             addToOutputList(jaxbSE);
@@ -802,8 +794,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public Vector<String> getDetailedOutputEntityNames() {
         Vector<String> v = new Vector<>();
+        Object entity;
         for (Output ot : jaxbRoot.getOutput()) {
-            Object entity = ot.getEntity();
+            entity = ot.getEntity();
             if (entity instanceof SimEntity) {
                 v.add(((SimEntity) entity).getName());
             } else if (entity instanceof PropertyChangeListener) {
@@ -816,8 +809,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     @Override
     public Vector<String> getVerboseOutputEntityNames() {
         Vector<String> v = new Vector<>();
+        Object entity;
         for (Verbose ot : jaxbRoot.getVerbose()) {
-            Object entity = ot.getEntity();
+            entity = ot.getEntity();
             if (entity instanceof SimEntity) {
                 v.add(((SimEntity) entity).getName());
             } else if (entity instanceof PropertyChangeListener) {
@@ -951,12 +945,14 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
+        PropChangeEdge pce;
+        AssemblyNode toNode, frNode;
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            PropChangeEdge pce = new PropChangeEdge();
+            pce = new PropChangeEdge();
             pce.setProperty(pclc.getProperty());
             pce.setDescriptionString(pclc.getDescription());
-            AssemblyNode toNode = getNodeCache().get(pclc.getListener());
-            AssemblyNode frNode = getNodeCache().get(pclc.getSource());
+            toNode = getNodeCache().get(pclc.getListener());
+            frNode = getNodeCache().get(pclc.getSource());
             pce.setTo(toNode);
             pce.setFrom(frNode);
             pce.opaqueModelObject = pclc;
@@ -969,10 +965,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private void buildSimEvConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
+        SimEvListenerEdge sele;
+        AssemblyNode toNode, frNode;
         for (SimEventListenerConnection selc : simevconnsList) {
-            SimEvListenerEdge sele = new SimEvListenerEdge();
-            AssemblyNode toNode = getNodeCache().get(selc.getListener());
-            AssemblyNode frNode = getNodeCache().get(selc.getSource());
+            sele = new SimEvListenerEdge();
+            toNode = getNodeCache().get(selc.getListener());
+            frNode = getNodeCache().get(selc.getSource());
             sele.setTo(toNode);
             sele.setFrom(frNode);
             sele.opaqueModelObject = selc;
@@ -985,15 +983,18 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList) {
+        AdapterEdge ae;
+        AssemblyNode toNode, frNode;
+        String event;
         for (Adapter jaxbAdapter : adaptersList) {
-            AdapterEdge ae = new AdapterEdge();
-            AssemblyNode toNode = getNodeCache().get(jaxbAdapter.getTo());
-            AssemblyNode frNode = getNodeCache().get(jaxbAdapter.getFrom());
+            ae = new AdapterEdge();
+            toNode = getNodeCache().get(jaxbAdapter.getTo());
+            frNode = getNodeCache().get(jaxbAdapter.getFrom());
             ae.setTo(toNode);
             ae.setFrom(frNode);
 
             // Handle XML names w/ underscores (XML IDREF issue)
-            String event = jaxbAdapter.getEventHeard();
+            event = jaxbAdapter.getEventHeard();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
             ae.setSourceEvent(event);
@@ -1025,8 +1026,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             boolean isVerbose = false;
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
+            String simE;
             for (Output o : outputList) {
-                String simE = o.getEntity();
+                simE = o.getEntity();
                 if (simE.equals(se.getName())) {
                     isOutput = true;
                     break;
@@ -1035,7 +1037,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
             // Verbose shouldn't be populated since the verbose check box has been disabled
             for (Verbose v : verboseList) {
-                String simE = v.getEntity();
+                simE = v.getEntity();
                 if (simE.equals(se.getName())) {
                     isVerbose = true;
                     break;
@@ -1138,4 +1140,4 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return nodeCache;
     }
 
-}
+} // end class AssemblyModelImpl

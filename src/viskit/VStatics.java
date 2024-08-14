@@ -635,8 +635,8 @@ public class VStatics {
                     try {
                         // parameters are in the following order
                         // {
-                        //  { "type0","name0","type1","name1",... }
-                        //  { "type0","name0", ... }
+                        //  { "type0","name0","type1","name1",... },
+                        //  { "type0","name0", ... },
                         //  ...
                         // }
                         pMap = (String[][]) (f.get(new String[0][0]));
@@ -685,9 +685,9 @@ public class VStatics {
                             p.setName("p[" + k++ + "] : ");
                             p.setType(ptType);
                             plist[i].add(p);
-                            if (viskit.VStatics.debug) {
-                                System.out.println("\t " + p.getName() + p.getType());
-                            }
+                            if (viskit.VStatics.debug)
+                                LOG.info("\t {}{}", p.getName(), p.getType());
+                            
                         } catch (Exception ex) {
                             LOG.error(ex);
 //                            ex.printStackTrace();

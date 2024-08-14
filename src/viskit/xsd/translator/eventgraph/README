@@ -3,7 +3,7 @@ The SimkitXML2Java class translates simkit.xsd or simkit.dtd files into Java cla
 This class uses JAXB XML Bindings for Java based on simkit.xsd which is in turn
 generated from simkit.dtd.
 
-See simkit/xml for code generation of the JAXB for details.
+See viskit/xsd/bindings for code generation of the JAXB for details.
 
 To run, see sample run script. The class may also be used by other classes.
 

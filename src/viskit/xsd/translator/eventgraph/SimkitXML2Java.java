@@ -1,6 +1,7 @@
 package viskit.xsd.translator.eventgraph;
 
 import edu.nps.util.LogUtils;
+
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -8,7 +9,9 @@ import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.control.AssemblyControllerImpl;
 import viskit.VGlobals;
 import viskit.VStatics;
@@ -22,7 +25,7 @@ import viskit.xsd.bindings.eventgraph.*;
  */
 public class SimkitXML2Java {
 
-    static Logger log = LogUtils.getLogger(SimkitXML2Java.class);
+    static final Logger LOG = LogUtils.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
     public final static String SP = " ";
@@ -71,7 +74,7 @@ public class SimkitXML2Java {
         try {
             jaxbCtx = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             error(ex.getMessage());
         }
     }
@@ -113,7 +116,7 @@ public class SimkitXML2Java {
         } catch (JAXBException ex) {
 
             // Silence attempting to unmarshal an Assembly here
-            log.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
+            LOG.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
         }
     }
 
@@ -242,9 +245,9 @@ public class SimkitXML2Java {
             if (!superParams.contains(p)) {
                 if (!p.getComment().isEmpty()) {
                     pw.print(SP_4 + JDO + SP);
-                    for (String comment : p.getComment()) {
+                    for (String comment : p.getComment())
                         pw.print(comment);
-                    }
+                    
                     pw.println(SP + JDC);
                 }
                 pw.println(SP_4 + PRIVATE + SP + p.getType() + SP + p.getName() + SC);
@@ -253,11 +256,10 @@ public class SimkitXML2Java {
             }
             pw.println();
 
-            if (extendz.contains(SIM_ENTITY_BASE)) {
+            if (extendz.contains(SIM_ENTITY_BASE))
                 buildParameterModifierAndAccessor(p, accessorBlock);
-            } else if (!superParams.contains(p)) {
+            else if (!superParams.contains(p))
                 buildParameterModifierAndAccessor(p, accessorBlock);
-            }
         }
         if (liParams.isEmpty()) {
             pw.println(SP_4 + "/* None */");
@@ -322,7 +324,7 @@ public class SimkitXML2Java {
                     try {
                         cst = c.getConstructor(new Class<?>[]{});
                     } catch (NoSuchMethodException nsme) {
-//                    log.error(nsme);
+//                    LOG.error(nsme);
 
                         // reset
                         cst = null;
@@ -577,9 +579,10 @@ public class SimkitXML2Java {
 
             // skip over any sets that would get done in the superclass, or
             // call super.set*()
+            Parameter pt;
             for (int l = superParams.size(); l < liParams.size(); l++) {
 
-                Parameter pt = liParams.get(l);
+                pt = liParams.get(l);
                 if (methods != null) {
                     for (Method m : methods) {
                         if (("set" + capitalize(pt.getName())).equals(m.getName())) {
@@ -598,11 +601,9 @@ public class SimkitXML2Java {
                 superParam = null;
             }
 
-            for (StateVariable st : liStateV) {
-                if (isArray(st.getType())) {
+            for (StateVariable st : liStateV)
+                if (isArray(st.getType()))
                     pw.println(SP_8 + st.getName() + SP + EQ + SP + "new" + SP + stripGenerics(st.getType()) + SC);
-                }
-            }
 
             pw.println(SP_4 + CB);
             pw.println();
@@ -655,20 +656,24 @@ public class SimkitXML2Java {
             pw.println(SP_8 + "/* local variable decarlations */");
         }
 
-        for (LocalVariable local : liLocalV) {
+        for (LocalVariable local : liLocalV)
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
-        }
 
         if (!liLocalV.isEmpty()) {pw.println();}
 
+        StateVariable sv;
+        Assignment asg;
+        Operation ops;
+        boolean isar;
+        String sps, in;
         for (StateTransition st : liStateT) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
+            sv = (StateVariable) st.getState();
+            asg = st.getAssignment();
+            ops = st.getOperation();
 
-            boolean isar = isArray(sv.getType());
-            String sps = isar ? SP_12 : SP_8;
-            String in = indexFrom(st);
+            isar = isArray(sv.getType());
+            sps = isar ? SP_12 : SP_8;
+            in = indexFrom(st);
 
             if (isar) {
                 pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
@@ -724,12 +729,10 @@ public class SimkitXML2Java {
 
         pw.println();
 
-        if (!liLocalV.isEmpty()) {
+        if (!liLocalV.isEmpty())
             pw.println(SP_8 + "/* local variable decarlations */");
-        }
-        for (LocalVariable local : liLocalV) {
+        for (LocalVariable local : liLocalV)
             pw.println(SP_8 + local.getType() + SP + local.getName() + SC);
-        }
 
         if (!liLocalV.isEmpty()) {pw.println();}
 
@@ -745,14 +748,19 @@ public class SimkitXML2Java {
 
         List<StateTransition> liStateT = run.getStateTransition();
 
+        StateVariable sv;
+        Assignment asg;
+        Operation ops;
+        boolean isar;
+        String sps, in, stateVariableName, stateVariableGetter;
         for (StateTransition st : liStateT) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
+            sv = (StateVariable) st.getState();
+            asg = st.getAssignment();
+            ops = st.getOperation();
 
-            boolean isar = isArray(sv.getType());
-            String sps = isar ? SP_12 : SP_8;
-            String in = indexFrom(st);
+            isar = isArray(sv.getType());
+            sps = isar ? SP_12 : SP_8;
+            in = indexFrom(st);
 
             if (isar) {
                 pw.println(SP_8 + "for " + LP + in + SP + EQ + SP + "0; " + in + " < " + sv.getName() + PD + "length"+ SC + SP + in + "++" + RP + SP + OB);
@@ -762,8 +770,8 @@ public class SimkitXML2Java {
             }
 
             // Give these FPCs "getters" as arguments
-            String stateVariableName = capitalize(sv.getName());
-            String stateVariableGetter = "get" + stateVariableName + LP;
+            stateVariableName = capitalize(sv.getName());
+            stateVariableGetter = "get" + stateVariableName + LP;
 
             if (isar) {
                 if (ops != null) {
@@ -802,7 +810,7 @@ public class SimkitXML2Java {
      * @param eventBlock the StringWriter assigned to write the Event
      */
     void doEventBlock(Event e, StringWriter eventBlock) {
-        log.debug("Event is: " + e.getName());
+        LOG.debug("Event is: " + e.getName());
         PrintWriter pw = new PrintWriter(eventBlock);
         List<StateTransition> liStateT = e.getStateTransition();
         List<Argument> liArgs = e.getArgument();
@@ -824,9 +832,8 @@ public class SimkitXML2Java {
             }
         }
 
-        if (doEvent != null) {
+        if (doEvent != null)
             pw.println(SP_4 + "@Override");
-        }
 
         // Strip out name mangling artifacts imposed by the EventGraph Model.
         // This is done to keep XML happy with no identical IDREFs, but let's
@@ -837,9 +844,8 @@ public class SimkitXML2Java {
 
         for (Argument a : liArgs) {
             pw.print(a.getType() + SP + a.getName());
-            if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+            if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1)
                 pw.print(CM + SP);
-            }
         }
 
         // finish the method decl
@@ -849,9 +855,8 @@ public class SimkitXML2Java {
             pw.print(SP_8 + "super." + doEvent + LP);
             for (Argument a : liArgs) {
                 pw.print(a.getName());
-                if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1) {
+                if (liArgs.size() > 1 && liArgs.indexOf(a) < liArgs.size() - 1)
                     pw.print(CM + SP);
-                }
             }
 
             // finish the super decl
@@ -860,12 +865,14 @@ public class SimkitXML2Java {
 
         pw.println();
 
-        if (!liLocalV.isEmpty()) {
+        if (!liLocalV.isEmpty())
             pw.println(SP_8 + "/* local variable decarlations */");
-        }
+
+        String[] lines;
+        String value;
         for (LocalVariable local : liLocalV) {
-            String[] lines = {" "};
-            String value = local.getValue();
+            lines = new String[] {" "};
+            value = local.getValue();
             if (!("".equals(value))) {
                 lines = value.split("\\;");
             }
@@ -884,29 +891,36 @@ public class SimkitXML2Java {
 
         if (e.getCode() != null && !e.getCode().isEmpty()) {
             pw.println(SP_8 + "/* Code insertion for Event " + eventName + " */");
-            String[] lines = e.getCode().split("\\n");
-            for (String line : lines) {
+            lines = e.getCode().split("\\n");
+            for (String line : lines)
                 pw.println(SP_8 + line);
-            }
+
             pw.println(SP_8 + "/* End Code insertion */");
             pw.println();
         }
 
         List<String> decls = new LinkedList<>();
+        StateVariable sv;
+        Assignment asg;
+        Operation ops;
+        LocalVariableAssignment lva;
+        LocalVariableInvocation lvi;
+        String change, olds, oldName, getter, invoke;
         for (StateTransition st : liStateT) {
-            StateVariable sv = (StateVariable) st.getState();
-            Assignment asg = st.getAssignment();
-            Operation ops = st.getOperation();
-            LocalVariableAssignment lva = st.getLocalVariableAssignment();
-            LocalVariableInvocation lvi = st.getLocalVariableInvocation();
-            String change = "";
-            String olds = ""; // old decl line Bar oldFoo ...
-            String oldName = sv.getName(); // oldFoo
-            if (ops != null) {
+            sv = (StateVariable) st.getState();
+            asg = st.getAssignment();
+            ops = st.getOperation();
+            lva = st.getLocalVariableAssignment();
+            lvi = st.getLocalVariableInvocation();
+            change = "";
+            olds = ""; // old decl line Bar oldFoo ...
+            oldName = sv.getName(); // oldFoo
+
+            if (ops != null)
                 change = PD + ops.getMethod() + SC;
-            } else if (asg != null) {
+            else if (asg != null)
                 change = SP + EQ + SP + asg.getValue() + SC;
-            }
+
             oldName = "_old_" + capitalize(oldName);
             if (!decls.contains(oldName)) {
                 olds = sv.getType();
@@ -923,12 +937,11 @@ public class SimkitXML2Java {
             // by now, olds is "Bar" ( not Bar[] )
             // or nothing if already Decld
             // now build up "Bar oldFoo = getFoo()"
-            String getter = oldName + SP + EQ + SP + "get" + oldName.substring(5) + LP;
-            if ("".equals(olds)) {
+            getter = oldName + SP + EQ + SP + "get" + oldName.substring(5) + LP;
+            if ("".equals(olds))
                 olds = getter;
-            } else {
+            else
                 olds += getter;
-            }
 
             if (isArray(sv.getType())) {
                 olds += indexFrom(st);
@@ -938,7 +951,7 @@ public class SimkitXML2Java {
             // now olds is Bar oldFoo = getFoo(<idxvar>?);
             // add this to the pre-formatted block
             olds += sv.getName() + (isArray(sv.getType()) ? LB + indexFrom(st) + RB : "") + change;
-            String[] lines = olds.split("\\;");
+            lines = olds.split("\\;");
 
             // format it
             for (int i = 0; i < lines.length; i++) {
@@ -969,10 +982,9 @@ public class SimkitXML2Java {
             // Now, print out any any void return type, zero parameter methods
             // as part of this state transition
             if (lvi != null) {
-                String invoke = lvi.getMethod();
-                if (invoke != null && !invoke.isEmpty()) {
+                invoke = lvi.getMethod();
+                if (invoke != null && !invoke.isEmpty())
                     pw.println(SP_8 + invoke + SC);
-                }
             }
 
             pw.println();
@@ -1017,10 +1029,11 @@ public class SimkitXML2Java {
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
+        String epValue;
         for (EdgeParameter ep : s.getEdgeParameter()) {
             pw.print(CM + " (Object) ");
 
-            String epValue = ep.getValue();
+            epValue = ep.getValue();
 
             // Cover case where there is a "+ 1" increment, or "-1" decrement on a value
             if (epValue.contains("+") || epValue.contains("-")) {
@@ -1057,15 +1070,13 @@ public class SimkitXML2Java {
         // Note: The following loop covers all possibilities with the
         // interim "fix" that all parameters are cast to (Object) whether
         // they need to be or not.
-        for (EdgeParameter ep : liEdgeP) {
+        for (EdgeParameter ep : liEdgeP)
             pw.print(CM + SP + "(Object) " + ep.getValue());
-        }
 
         pw.println(RP + SC);
 
-        if (c.getCondition() != null && !c.getCondition().equals("true")) {
+        if (c.getCondition() != null && !c.getCondition().equals("true"))
             pw.println(SP_8 + CB);
-        }
     }
 
     void buildToString(StringWriter toStringBlock) {
@@ -1085,9 +1096,10 @@ public class SimkitXML2Java {
     void buildCodeBlock(StringWriter t) {
         PrintWriter pw = new PrintWriter(t);
         String code = root.getCode();
+        String[] lines;
         if (code != null) {
             pw.println(SP_4 + "/* Inserted code for " + root.getName() + " */");
-            String[] lines = code.split("\\n");
+            lines = code.split("\\n");
             for (String codeLines : lines) {
                 pw.println(SP_4 + codeLines);
             }
@@ -1156,9 +1168,8 @@ public class SimkitXML2Java {
     // parameters and maybe some more
     private List<Parameter> resolveSuperParams(List<Parameter> params) {
         List<Parameter> localSuperParams = new ArrayList<>();
-        if (extendz.contains(SIM_ENTITY_BASE) || extendz.contains("BasicSimEntity")) {
+        if (extendz.contains(SIM_ENTITY_BASE) || extendz.contains("BasicSimEntity"))
             return localSuperParams;
-        }
 
         // the extendz field may also contain an implements
         // codeBlock.
@@ -1169,10 +1180,11 @@ public class SimkitXML2Java {
             Constructor[] ca = c.getConstructors();
             int maxIndex = 0;
             int maxParamCount = 0;
+            int tmpCount;
             for (int i = 0; i < ca.length; i++) {
 
                 // find largest fitting array of super parameters constructor
-                int tmpCount = (ca[i].getParameterTypes()).length;
+                tmpCount = (ca[i].getParameterTypes()).length;
                 if (tmpCount > maxParamCount && tmpCount <= params.size()) {
                     maxParamCount = tmpCount;
                     maxIndex = i;
@@ -1195,7 +1207,7 @@ public class SimkitXML2Java {
 
             localSuperParams = Arrays.asList(parray);
         } else {
-            log.error(extendz + " was not found on the working classpath");
+            LOG.error("{} was not found on the working classpath", extendz);
         }
 
         return localSuperParams;
@@ -1245,7 +1257,7 @@ public class SimkitXML2Java {
         try {
             aClass = VGlobals.instance().getWorkClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
-//            log.error(cnfe);
+//            LOG.error(cnfe);
         }
 
         if (aClass != null) {
@@ -1263,7 +1275,7 @@ public class SimkitXML2Java {
      * @param desc a description of the encountered error
      */
     private void error(String desc) {
-        log.error(desc);
+        LOG.error(desc);
         System.exit(1);
     }
 
@@ -1276,13 +1288,13 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        log.info("EventGraph (EG) file is: " + xmlFile);
-        log.info("Generating Java Source...");
+        LOG.info("EventGraph (EG) file is: {}", xmlFile);
+        LOG.info("Generating Java Source...");
 
         InputStream is = null;
         try {
             is = new FileInputStream(xmlFile);
-        } catch (FileNotFoundException fnfe) {log.error(fnfe);}
+        } catch (FileNotFoundException fnfe) {LOG.error(fnfe);}
 
         SimkitXML2Java sx2j = new SimkitXML2Java(is);
         File baseName = new File(sx2j.baseNameOf(xmlFile));
@@ -1291,21 +1303,21 @@ public class SimkitXML2Java {
         sx2j.unmarshal();
         String dotJava = sx2j.translate();
         if (dotJava != null && !dotJava.isEmpty()) {
-            log.info("Done.");
+            LOG.info("Done.");
         } else {
-            log.warn("Compile error on: " + xmlFile);
+            LOG.warn("Compile error on: {}", xmlFile);
             return;
         }
 
         // also write out the .java to a file and compile it
         // to a .class
-        log.info("Generating Java Bytecode...");
+        LOG.info("Generating Java Bytecode...");
         try {
             if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
-                log.info("Done.");
+                LOG.info("Done.");
             }
         } catch (NullPointerException npe) {
-            log.error(npe);
+            LOG.error(npe);
 //            npe.printStackTrace();
         }
     }

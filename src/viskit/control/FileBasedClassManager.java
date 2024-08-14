@@ -153,7 +153,7 @@ public class FileBasedClassManager {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
                 fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
 
-                // If we have an annotated ParameterMap, then cacheXML it.  If not,
+                // If we have an annotated ParameterMap, then cacheXML it. If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
                 List<Object>[] pMap = VStatics.resolveParameters(fclass);
