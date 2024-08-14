@@ -52,7 +52,7 @@
     <property environment="env"/>
 
     <path id="jaxb.compile.path">
-        <fileset dir="${dir.lib.xml}" includes="codemodel.jar istack-commons-runtime.jar istack-commons-tools.jar jaxb-api.jar jaxb-runtime.jar jaxb-xjc.jar relaxng-datatype.jar rngom.jar xsom.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="codemodel.jar istack-commons-runtime.jar istack-commons-tools.jar javax.activation-api.jar jaxb-api.jar jaxb-runtime.jar jaxb-xjc.jar relaxng-datatype.jar rngom.jar xsom.jar"/>
     </path>
 
     <path id="jaxb.runtime.path">
