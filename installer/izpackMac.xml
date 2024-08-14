@@ -91,16 +91,15 @@
               <include name="images/**"/>
               <exclude name="images/american-flag.gif"/>
               <include name="license/**"/>
-              <include name="viskit/**"/>
               <include name="RELEASE_NOTES*"/>
           </fileset>
 
-          <fileset dir="stage"               targetdir="$USER_HOME">
+          <fileset dir="stage"               targetdir="$INSTALL_PATH">
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
           </fileset>
 
-          <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">
+          <fileset dir="stage/configuration" targetdir="$INSTALL_PATH/MyViskitProjects/DefaultProject">
               <include name="viskitProject.xml"/>
           </fileset>
 

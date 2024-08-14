@@ -129,8 +129,13 @@
         <copy todir="${installers.dir}/stage/configuration">
             <fileset dir="${configuration.dir}"/>
         </copy>
-        <copy todir="${installers.dir}/stage/MyViskitProjects/DefaultProject">
-            <fileset dir="${examples.lib}"/>
+        <copy todir="${installers.dir}/stage/doc">
+            <fileset dir="${basedir}/doc">
+                <include name="ViskitSoftwareDesignSummary.txt"/>
+                <include name="ViskitOverview.pdf"/>
+                <include name="NB-Project-Creation.txt"/>
+                <include name="references/Discrete Event Simulation Modeling.pdf"/>
+            </fileset>
         </copy>
         <copy todir="${installers.dir}/stage/images">
             <fileset dir="${installers.dir}/images"/>
@@ -141,8 +146,8 @@
         <copy todir="${installers.dir}/stage/license">
             <fileset dir="${basedir}/license"/>
         </copy>
-        <copy todir="${installers.dir}/stage/viskit/javahelp">
-            <fileset dir="${dir.src}/viskit/javahelp"/>
+        <copy todir="${installers.dir}/stage/MyViskitProjects/DefaultProject">
+            <fileset dir="${examples.lib}"/>
         </copy>
         <copy todir="${installers.dir}/stage/">
             <fileset dir="${dir.src}/viskit/javahelp/Pages">
@@ -152,14 +157,12 @@
                 <include name="RELEASE_NOTES*"/>
             </fileset>
         </copy>
-        <copy todir="${installers.dir}/stage/doc">
-            <fileset dir="${basedir}/doc">
-                <include name="ViskitSoftwareDesignSummary.txt"/>
-                <include name="ViskitOverview.pdf"/>
-                <include name="NB-Project-Creation.txt"/>
-                <include name="references/Discrete Event Simulation Modeling.pdf"/>
-            </fileset>
+        <copy todir="${installers.dir}/stage">
+            <fileset refid="runtime.viskit.exe"/>
         </copy>
+        <delete>
+            <fileset refid="runtime.viskit.exe"/>
+        </delete>
     </target>
 
     <target name="make.win.unix.installer">
@@ -170,13 +173,6 @@
 
          Associate the viskit-exe.jar with a native win executable 
         <launch4j configFile="${installers.dir}/launch4jConfig.xml"/>-->
-
-        <copy todir="${installers.dir}/stage">
-            <fileset refid="runtime.viskit.exe"/>
-        </copy>
-        <delete>
-            <fileset refid="runtime.viskit.exe"/>
-        </delete>
 
         <echo message="Running IzPack to build the installers..."/>
 

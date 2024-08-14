@@ -97,25 +97,20 @@
                 <include name="configuration/**"/>
                 <exclude name="configuration/c_gui_mac.xml"/>
                 <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
-                <include name="doc/**"/>
                 <include name="images/**"/>
                 <exclude name="images/american-flag.gif"/>
                 <include name="lib/**" />
                 <include name="license/**" />
-                <include name="viskit/**"/>
-                <include name="viskit-exe.jar"/>
                 <include name="RELEASE_NOTES*"/>
-                <include name="ViskitOperation.txt"/>
-                <include name="Viskit-overview.docx"/>
-                <include name="NB-Project-Creation.txt"/>
+                <include name="viskit-exe.jar"/>
             </fileset>
-            <fileset dir="stage" targetdir="$USER_HOME">
+            <fileset dir="stage" targetdir="$INSTALL_PATH">
               <os family="windows"/>
               <os family="unix"/>
               <include name="MyViskitProjects/DefaultProject/Assemblies/**"/>
               <include name="MyViskitProjects/DefaultProject/EventGraphs/**"/>
             </fileset>
-            <fileset dir="stage/configuration" targetdir="$USER_HOME/MyViskitProjects/DefaultProject">
+            <fileset dir="stage/configuration" targetdir="$INSTALL_PATH/MyViskitProjects/DefaultProject">
                 <os family="windows"/>
                 <os family="unix"/>
                 <include name="viskitProject.xml"/>
@@ -131,6 +126,14 @@
                 <os family="windows"/>
                 <os family="unix"/>
             </executable>
+        </pack>
+        
+        <!-- The documentation (1 directory) -->
+        <pack name="Documentation" required="no">
+            <description>Viskit documentation (HTML, ODT and TEXT).</description>
+            <fileset dir="stage" targetdir="$INSTALL_PATH">
+              <include name="doc/**"/>
+            </fileset>
         </pack>
     </packs>
 
