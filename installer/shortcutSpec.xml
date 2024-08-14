@@ -1,7 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-
-<shortcuts>
-  <skipIfNotSupported />
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+<izpack:shortcuts version="5.0"
+                  xmlns:izpack="http://izpack.org/schema/shortcuts"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://izpack.org/schema/shortcuts http://izpack.org/schema/5.0/izpack-shortcuts-5.0.xsd">
+    
+  <skipIfNotSupported/>
+  
   <programGroup defaultName="Viskit\Viskit-1.0.16" location="applications"/>
 
   <shortcut
@@ -37,4 +41,4 @@
      <createForPack name="Core" />
    </shortcut>
 
-</shortcuts>
+</izpack:shortcuts>

@@ -135,12 +135,14 @@
     </packs>
 
     <!-- Don't forget 64 bit Windows O/Ss -->
-    <native type="izpack" name="ShellLink_x64.dll" uninstaller="true">
-        <os family="windows"/>
-    </native>
+    <natives>
+        <native type="izpack" name="ShellLink_x64.dll" uninstaller="true">
+            <os family="windows"/>
+        </native>
 
-    <native type="3rdparty" name="COIOSHelper_x64.dll" uninstaller="true">
-        <os family="windows"/>
-    </native>
+        <native type="3rdparty" name="COIOSHelper_x64.dll" uninstaller="true">
+            <os family="windows"/>
+        </native>
+    </natives>
 
 </izpack:installation>
