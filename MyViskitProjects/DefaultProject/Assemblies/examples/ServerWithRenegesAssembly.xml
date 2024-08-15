@@ -54,6 +54,6 @@
     <Output entity="creator"/>
     <Output entity="arrivalProcess"/>
     <Output entity="serverWithReneges"/>
-    <Schedule stopTime="100.0" verbose="true"/>
+    <Schedule stopTime="100.0" verbose="false"/>
     <Experiment replicationsPerDesignPoint="1" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
