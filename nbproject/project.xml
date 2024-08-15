@@ -13,7 +13,7 @@
             </properties>
             <folders>
                 <source-folder>
-                    <label>Viskit</label>
+                    <label>${app.name}</label>
                     <location>.</location>
                     <encoding>ISO-8859-1</encoding>
                 </source-folder>

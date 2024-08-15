@@ -51,16 +51,9 @@
     <!-- access to local environment variables -->
     <property environment="env"/>
 
+    <!-- Compile time classpaths -->
     <path id="jaxb.compile.path"> <!-- On WIN machines, javax.activation-api.jar has to be up here -->
         <fileset dir="${dir.lib.xml}" includes="codemodel.jar istack-commons-runtime.jar istack-commons-tools.jar javax.activation-api.jar jaxb-api.jar jaxb-runtime.jar jaxb-xjc.jar relaxng-datatype.jar rngom.jar xsom.jar"/>
-    </path>
-
-    <path id="jaxb.runtime.path">
-        <fileset dir="${dir.lib.xml}" includes="istack-commons-runtime.jar javax.activation-api.jar jaxb-runtime.jar" id="jaxb.classes"/>
-    </path>
-
-    <path id="runtime.extension.classes.path">
-        <fileset dir="${dir.lib.ext}" includes="**/*.jar"/>
     </path>
 
     <path id="compile.classpath">
@@ -79,45 +72,52 @@
         <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
     </path>
 
+    <!-- Runtime classpaths -->
+    <path id="runtime.extension.path">
+        <fileset dir="${dir.lib.ext}" includes="**/*.jar"/>
+    </path>
+    <path id="jaxb.runtime.path">
+        <fileset dir="${dir.lib.xml}" includes="istack-commons-runtime.jar javax.activation-api.jar jaxb-api.jar jaxb-runtime.jar"/>
+    </path>
+    
     <path id="runtime.classpath">
-        <pathelement location="${dist.jar}"/>
+        <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/batik-ext.jar"/>
+        <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
         <pathelement location="${dir.lib}/commons-beanutils-1.9.4.jar"/>
         <pathelement location="${dir.lib}/commons-collections4-4.1.jar"/>
+        <pathelement location="${dir.lib}/commons-configuration2-2.10.1.jar"/>
         <pathelement location="${dir.lib}/commons-digester3-3.2.jar"/>
-        <pathelement location="${dir.lib}/commons-jxpath-1.3.jar"/>
+        <!--<pathelement location="${dir.lib}/commons-jxpath-1.3.jar"/>-->
         <pathelement location="${dir.lib}/commons-lang3-3.14.0.jar"/>
         <pathelement location="${dir.lib}/commons-logging-1.3.1.jar"/>
         <pathelement location="${dir.lib}/commons-text-1.12.0.jar"/>
+        <path refid="runtime.extension.path"/>
+        <path refid="jaxb.runtime.path"/>
         <pathelement location="${jcommon.jar}"/>
+        <pathelement location="${dir.lib}/jdom-1.1.3.jar"/>
+        <pathelement location="${jfreechart.jar}"/>
+        <pathelement location="${dir.lib}/jgraph5.jar"/>
+        <pathelement location="${dir.lib}/jhall.jar"/>
+        <pathelement path="${log4j.jars}"/>
         <pathelement location="${dir.lib}/resolver.jar"/>
         <pathelement location="${dir.lib}/serializer.jar"/>
+        <pathelement location="${dir.lib}/simkit.jar"/>
+        <pathelement location="${dist.jar}"/>
         <pathelement location="${dir.lib}/xalan.jar"/>
         <pathelement location="${dir.lib}/xercesImpl.jar"/>
-        <path refid="compile.classpath"/>
-        <path refid="jaxb.runtime.path"/>
-        <path refid="runtime.extension.classes.path"/>
     </path>
 
+    <!-- Test classpath -->
     <path id="runtime.test.classpath">
+        <path path="${dir.build.classes}"/>
+        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <path refid="runtime.classpath"/>
         <pathelement location="${dir.lib}/support/junit.jar"/>
-        <path path="${dir.build.classes}"/>
     </path>
 
     <!-- For the launch4j installers -->
     <fileset file="${dist.exe.jar}" id="runtime.viskit.exe"/>
-
-    <!-- The following filesets are used for the IzPack installer routine -->
-    <fileset dir="${dir.lib}" id="runtime.lib">
-        <!-- could use restrictions in current runtime.classpath -->
-        <include name="**/*.jar"/>
-        <exclude name="support/**"/>
-        <exclude name="jaxb/jaxb-xjc.jar"/>
-    </fileset>
-    <fileset dir="${dir.lib.ext}" id="runtime.lib.ext" >
-        <include name="**/*.jar"/>
-    </fileset>
 
     <!-- TaskDefs -->
     <taskdef classname="com.sun.tools.xjc.XJCTask"
@@ -132,7 +132,7 @@
     </taskdef>
 
     <!--  === TARGET: all === -->
-    <target name="all" description="clean then build everything" depends="dist" />
+    <target name="all" description="clean then build everything" depends="dist"/>
 
     <!--  === TARGET: build === -->
     <target name="build" depends="build.no.extensions" description="default build, no run"/>
@@ -421,9 +421,8 @@ their descpritions.
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/>
         <copy todir="${dir.lib.ext}">
             <fileset dir="${dir.diskit}/lib">
-                <include name="open-dis_4.08.jar"/>
-                <include name="dis-enums_1.1.jar"/>
-                <include name="hibernate-jpa-2.0-api-1.0.0.Final.jar"/>
+                <include name="opendis7-pdus-classes"/>
+                <include name="opendis7-enumerations-classes.jar"/>
             </fileset>
         </copy>
     </target>
@@ -458,7 +457,7 @@ their descpritions.
             <!-- Include all the jar files in the lib directory; this prevents some
             javadoc warnings about classes not being found. -->
             <classpath>
-                <fileset refid="jaxb.classes"/>
+                <fileset refid="jaxb.runtime.path"/>
                 <fileset dir="${dir.lib}" includes="*.jar"/>
             </classpath>
             <package name="edu.nps.util"/>
@@ -531,7 +530,7 @@ their descpritions.
                 <include name="xmlrpc-2.0.jar"/>
             </fileset>
             <fileset dir="${dir.lib.ext}" includes="*.jar"/>
-            <fileset refid="jaxb.classes"/>
+            <fileset refid="jaxb.runtime.path"/>
         </copy>
 
         <mkdir dir="${dir.dist}/gridkit-stage"/>
