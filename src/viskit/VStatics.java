@@ -560,6 +560,14 @@ public class VStatics {
     @SuppressWarnings("unchecked")
     public static List<Object>[] resolveParameters(Class<?> type) {
         
+        if (type == null) {
+            String msg = "It is possible that a 3rd party library is missing from the classpath.\n"
+                            + "\t\t\t\t\t\t\t\t\t     Please check File->Settings for additional classpath entries (jars) that may be missing";
+            LOG.warn(msg);
+            JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, "Compile Error", JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+        
         // Ben Cheng NPE fix
         Object testResult = parameterMap.get(type.getName());
         List<Object>[] resolved = null;
