@@ -738,10 +738,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (ConcurrentModificationException cme) {
-                    JOptionPane.showMessageDialog(null,
-                            cme + "\nSimulation will terminate",
+                    VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                             "Assembly Run Error",
-                            JOptionPane.ERROR_MESSAGE);
+                            cme + "\nSimulation will terminate"
+                    );
                     int newEventListId = Schedule.addNewEventList();
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
                     for (SimEntity entity : simEntity) {

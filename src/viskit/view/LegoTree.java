@@ -172,14 +172,16 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     public void removeSelected() {
         TreePath[] selections;
+        TreePath currentSelection;
+        DefaultMutableTreeNode currentNode;
+        MutableTreeNode parent;
         while ((selections = getSelectionPaths()) != null) {
-            TreePath currentSelection = selections[0];
+            currentSelection = selections[0];
             if (currentSelection != null) {
-                DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
-                MutableTreeNode parent = (MutableTreeNode) (currentNode.getParent());
-                if (parent != null) {
+                currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                parent = (MutableTreeNode) (currentNode.getParent());
+                if (parent != null)
                     mod.removeNodeFromParent(currentNode);
-                }
             }
         }
     }
@@ -197,16 +199,19 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
+        DefaultMutableTreeNode n;
+        Object uo;
+        FileBasedAssyNode fban;
         for (int i = 0; i < dmtn.getChildCount(); i++) {
-            DefaultMutableTreeNode n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
+            n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
             if (n != null) {
-                Object uo = n.getUserObject();
+                uo = n.getUserObject();
                 if (!(uo instanceof FileBasedAssyNode)) {
 
                     // Keep looking for a FBAN in the root branches
                     _removeNode(n, f);
                 } else {
-                    FileBasedAssyNode fban = (FileBasedAssyNode) uo;
+                    fban = (FileBasedAssyNode) uo;
 
                     try {
                         if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
@@ -234,13 +239,10 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * @param recurse if true, recurse the directory
      */
     public void addContentRoot(File f, boolean recurse) {
-        if (!f.getName().contains("svn")) {
-
-            if (f.getName().toLowerCase().endsWith(".jar")) {
-                addJarFile(f.getPath());
-            } else if (!f.getName().endsWith(".java")) {
-                _addContentRoot(f, recurse);
-            }
+        if (f.getName().toLowerCase().endsWith(".jar")) {
+            addJarFile(f.getPath());
+        } else if (!f.getName().endsWith(".java")) {
+            _addContentRoot(f, recurse);
         }
     }
 
@@ -349,7 +351,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     Map<String, DefaultMutableTreeNode> directoryRoots;
-
     Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
 
     DefaultMutableTreeNode getParent(String pkg, DefaultMutableTreeNode lroot) {

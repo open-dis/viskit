@@ -754,12 +754,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         return treePanels;
     }
-
-    @Override
-    public void genericReport(int type, String title, String msg)
-    {
-        JOptionPane.showMessageDialog(this, msg, title, type);
-    }
     Transferable dragged;
 
     @Override
@@ -917,6 +911,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         return JOptionPane.showOptionDialog(this, msg, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
                 new String[]{butt1, butt2}, butt1);
+    }
+
+    @Override
+    public void genericReport(int type, String title, String msg)
+    {
+        JOptionPane.showMessageDialog(this, msg, title, type);
     }
 
     @Override

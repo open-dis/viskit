@@ -201,10 +201,10 @@ public class SourceWindow extends JFrame {
                 }
                 SourceWindow.this.dispose();
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "Exception on source file write" +
-                        "\n" + f.getName() +
-                        "\n" + ex.getMessage(),
-                        "File I/O Error", JOptionPane.ERROR_MESSAGE);
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
+                        "File I/O Error", 
+                        "\n" + f.getName() + "\n" + ex.getMessage()
+                );
             }
         });
     }

@@ -36,6 +36,7 @@ package viskit;
 import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
+
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -60,9 +61,10 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
+
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
-import viskit.control.EventGraphController;
+
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
@@ -303,7 +305,7 @@ public class VStatics {
                 }
             }
         } catch (NoClassDefFoundError e) {
-            ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+            VGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s
@@ -564,7 +566,7 @@ public class VStatics {
             String msg = "It is possible that a 3rd party library is missing from the classpath.\n"
                             + "\t\t\t\t\t\t\t\t\t     Please check File->Settings for additional classpath entries (jars) that may be missing\n";
             LOG.warn(msg);
-            JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, "Compile Error", JOptionPane.WARNING_MESSAGE);
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.WARNING_MESSAGE,"Compile Error", msg);
             return null;
         }
         
@@ -783,7 +785,7 @@ public class VStatics {
     }
 
     /** Utility method to bring up a hyperlinked message to allow the user to
-     * email the debug.log to the Viskit mailing list if the user's machine has
+     * email the error.log to the Viskit mailing list if the user's machine has
      * an installed email client
      *
      * @param parent the parent component to center the JOptionPane panel

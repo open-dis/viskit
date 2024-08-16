@@ -1048,9 +1048,10 @@ public final class AnalystReportModel extends mvcAbstractModel {
         // NOTE: This method may be called with the classloader set during Assy
         // Run initialization, so, we can't center this dialog via reference to
         // the main app frame.
-        JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
-                "Analyst Report is loaded and is now ready for further editing.</p></body></html>",
-                "Analyst Report Ready", JOptionPane.INFORMATION_MESSAGE);
+        VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE, 
+                "Analyst Report Ready", "<html><body><p align='center'>" +
+                "Analyst Report is loaded and is now ready for further editing.</p></body></html>"
+        );
         // TODO consider inserting loaded filename into message above as a user confirmation
     }
 

@@ -117,7 +117,7 @@ public class Compiler {
                 String msg = "Your environment variable for Path likely has the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
                                 + "Please reset your Path to have the JDK's "
-                                + "java.exe first in the Path";
+                                + "java.exe as first entry in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
                 VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,

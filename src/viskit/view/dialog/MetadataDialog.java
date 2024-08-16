@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import viskit.VGlobals;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -226,8 +227,7 @@ abstract public class MetadataDialog extends JDialog {
             modified = true;
             if (modified) {
                 if (nameTf.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(MetadataDialog.this, "Must have a non-zero length name.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                    VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
                     nameTf.requestFocus();
                     return;
                 }

@@ -469,12 +469,13 @@ public abstract class VInstantiator {
                         pClazz = VStatics.classForName(pType);
 
                         if (pClazz == null) {
-                            JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
+                            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
+                                    "Basic Java Class Name Found",
+                                    "<html><body><p align='center'>" +
                                     "Please check Event Graph <b>" + type + "</b> parameter(s) for compliance using" +
                                     " fully qualified Java class names.  " + pType + " should be a " +
-                                    vType + ".</p></body></html>",
-                                    "Basic Java Class Name Found",
-                                    JOptionPane.ERROR_MESSAGE);
+                                    vType + ".</p></body></html>"
+                            );
                             match = false;
                         } else {
 

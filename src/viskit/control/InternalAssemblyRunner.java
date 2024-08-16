@@ -157,10 +157,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         try {
             fillRepWidgetsFromPreRunAssy(defaultVerbose, defaultStopTime);
         } catch (Throwable throwable) {
-            ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
+            VGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
-                    "Error initializing Assembly:\n" + throwable.getMessage());
+                    "Error initializing Assembly:\n" + throwable.getMessage()
+            );
             twiddleButtons(OFF);
 //            throwable.printStackTrace();
             return;
@@ -470,7 +471,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     bw.write(runPanel.soutTA.getText());
                 }
             } catch (IOException e1) {
-                JOptionPane.showMessageDialog(null, e1.getMessage(), "I/O Error,", JOptionPane.ERROR_MESSAGE);
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
         }
     }
@@ -493,12 +494,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 analystReportModel.setReportReady(false);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "<html><body><p align='center'>" +
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                    "Analyst Report Panel not visible",
+                    "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +
                     "view on next Viskit opening, select File -> Settings -> " +
                     "Tab visibility -> Select Analyst report -> Close, then Exit" +
-                    " the application.  On re-startup, it will appear.</p></body></html>",
-                    "Analyst Report Panel not visible", JOptionPane.INFORMATION_MESSAGE);
+                    " the application.  On re-startup, it will appear.</p></body></html>"
+            );
         }
     }
 

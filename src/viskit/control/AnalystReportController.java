@@ -181,12 +181,14 @@ public class AnalystReportController extends mvcAbstractController {
 
     public void generateHtmlReport() {
         if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
-            JOptionPane.showMessageDialog(null, "<html><body><p align='center'>"
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                    "Enable Analyst Reports not selected",
+                    "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
                     + " currently selected.  Please select on the <code>Assembly Run </code>panel,"
                     + " re-run the experiment and the report will then be available to "
-                    + "view.</p></body></html>", "Enable Analyst Reports not selected",
-                    JOptionPane.INFORMATION_MESSAGE);
+                    + "view.</p></body></html>"
+            );
             return;
         }
 
@@ -281,10 +283,10 @@ public class AnalystReportController extends mvcAbstractController {
         try {
             Desktop.getDesktop().browse(f.toURI());
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame,
-                    "<html><center>Error displaying HTML:<br>" + ex.getMessage(),
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
-                    JOptionPane.ERROR_MESSAGE);
+                    "<html><center>Error displaying HTML:<br>" + ex.getMessage()
+            );
         }
     }
 
