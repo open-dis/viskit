@@ -328,13 +328,16 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
-                    LOG.info(f.getName() + " will not be listed in the LEGOs tree\n");
+                    LOG.warn( "Possible that {} has been cached missed. "
+                            + "Manually check for good compilation. If so, then "
+                            + "manually remove digests from project's cached "
+                            + "element to fix.\n", f.getName());
                 }
 
-                // Note:
+                // Note
                 // On initial startup with valid XML, but bad compilation,
                 // dirty won't get set b/c the graph model is null until the
-                // model tab is created and the EG file is opened.  First pass
+                // model tab is created and the EG file is opened. First pass
                 // is only for inclusion in the LEGOs tree
                 if (VGlobals.instance().getActiveEventGraphModel() != null) {
                     VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
@@ -426,8 +429,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         }
 
         if (list.isEmpty()) {
-            LOG.warn("No classes of type " + targetClassName + " found in " + name);
-            LOG.info(name + " will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n");
+            LOG.warn("No classes of type {} found in {}", targetClassName, name);
+            LOG.info("{} will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n", name);
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
