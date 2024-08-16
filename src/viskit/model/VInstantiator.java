@@ -330,11 +330,10 @@ public abstract class VInstantiator {
                 if (tmp.isEmpty())
 
                     // Likely, Diskit, or another library is not on the classpath
-                    if (VStatics.resolveParameters(VStatics.classForName(p.getType())) == null) {
+                    if (VStatics.resolveParameters(VStatics.classForName(p.getType())) == null)
                         return null;
-                    } else {
+                    else
                         tmp = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
-                    }
                 
                 if (VStatics.debug) {
                     Iterator<Object> li = tmp.iterator();
