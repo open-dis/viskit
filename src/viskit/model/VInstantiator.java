@@ -317,32 +317,31 @@ public abstract class VInstantiator {
         }
 
         VInstantiator buildMultiParameter(MultiParameter p) {
-            VInstantiator vAorC = null;
+            VInstantiator vAorC;
 
             // Check for special case of varargs
-            if (VGlobals.instance().isArray(p.getType()) || p.getType().contains("...")) {
+            if (VGlobals.instance().isArray(p.getType()) || p.getType().contains("..."))
                 vAorC = buildMultiParameter(p, true);
-            } else {
+            else {
                 if (VStatics.debug)
                     LOG.info("Trying to build MultiParameter: {}", p.getType());
 
                 List<Object> tmp = p.getParameters();
-                if (tmp.isEmpty()) {
+                if (tmp.isEmpty())
 
                     // Likely, Diskit, or another library is not on the classpath
                     if (VStatics.resolveParameters(VStatics.classForName(p.getType())) == null) {
-                        vAorC = null;
+                        return null;
                     } else {
-                        if (VStatics.debug) {
-                            tmp = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
-                            Iterator<Object> li = tmp.iterator();
-                            while (li.hasNext()) {
-                                LOG.info("Parameter: {}", li.next());
-                            }
-                        }
-                        vAorC = this;
+                        tmp = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
                     }
+                
+                if (VStatics.debug) {
+                    Iterator<Object> li = tmp.iterator();
+                    while (li.hasNext())
+                        LOG.info("Parameter: {}", li.next());
                 }
+                vAorC = new VInstantiator.Constr(tmp, p.getType());
             }
             return vAorC;
         }
