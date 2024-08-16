@@ -1,6 +1,7 @@
 package viskit.util;
 
 import edu.nps.util.LogUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -131,20 +132,22 @@ public class FindClassesForInterface {
         } catch (MalformedURLException e) {
             e.printStackTrace(System.err);
         }
+        JarEntry nextEntry;
+        Class<?> c;
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
-            JarEntry nextEntry = (JarEntry) entries.nextElement();
+            nextEntry = (JarEntry) entries.nextElement();
             if (nextEntry.getName().startsWith("META")) {
                 continue;
             }
             try {
-                Class<?> c = loader.loadClass(getClassName(nextEntry.getName()));
+                c = loader.loadClass(getClassName(nextEntry.getName()));
                 if (c.isInterface()) {
                     continue;
                 }
                 if (implementing.isAssignableFrom(c) && isConcrete(c)) {
                     found.add(c);
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | NoClassDefFoundError e) {
                 // do nothing
             }
         }
