@@ -520,7 +520,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         // long property names and large counts/means
         int nameCW   = 26;
         int countCW  =  6;
-        int minCW    =  5;
+        int minCW    =  7;
         int maxCW    =  9;
         int meanCW   = 12;
         int stdDevCW = 12;
