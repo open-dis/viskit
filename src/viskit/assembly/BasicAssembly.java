@@ -637,7 +637,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-                VStatics.showHyperlinkedDialog(null, t.toString(), url, msg, true);
+                VStatics.showHyperlinkedDialog(null, t.getMessage(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
                 LOG.error(ex);
             }
@@ -765,6 +765,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 
                 // Outer stats output
                 // # of PropertyChangeListenerNodes is == to replicationStats.length
+                if (pclNodeCache == null) // <- Headless mode
+                    return;
+                
                 for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
                     LOG.debug("entry is: {}", entry);
 
