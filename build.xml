@@ -407,8 +407,8 @@ their descpritions.
             <manifest>
 
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2" />
-                <attribute name="Class-Path" value="${launcher.classpath}" />
+                <attribute name="Main-Class" value="viskit.Splash2"/>
+                <attribute name="Class-Path" value="${launcher.classpath}"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
@@ -568,7 +568,7 @@ their descpritions.
             description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
     </target>
     <target name="build.run.no.extensions"
-            depends="jar,quick.run"
+            depends="build.no.extensions,quick.run"
             description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
     </target>
 
@@ -766,6 +766,16 @@ their descpritions.
             <fileset dir="logs" includes="debug.log*"/>
         </concat>
     </target>
+    <target name="show.error.log" depends="init">
+        <concat>
+            <fileset dir="logs" includes="error.log*"/>
+        </concat>
+    </target>
+    <target name="show.validation.errors" depends="init">
+        <concat>
+            <fileset dir="logs" includes="validationErrors.log"/>
+        </concat>
+    </target>
 
     <target name="show.app.xml" depends="init">
         <concat>
@@ -782,12 +792,6 @@ their descpritions.
     <target name="show.passwd.xml" depends="init">
         <concat>
             <fileset dir="${dot.viskit.dir}" includes="passwd.xml"/>
-        </concat>
-    </target>
-
-    <target name="show.validation.errors" depends="init">
-        <concat>
-            <fileset dir="logs" includes="validationErrors.log"/>
         </concat>
     </target>
 
