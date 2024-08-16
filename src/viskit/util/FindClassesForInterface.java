@@ -20,9 +20,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
- * XML.  Used to populate the LEGOs tree on the Assy Editor.
+ * XML. Used to populate the LEGOs tree on the Assy Editor.
  *
- * @version $Id$
  * @author  ahbuss
  */
 public class FindClassesForInterface {
@@ -130,26 +129,27 @@ public class FindClassesForInterface {
         try {
             loader = new URLClassLoader(new URL[] {new File(jarFile.getName()).toURI().toURL()});
         } catch (MalformedURLException e) {
-            e.printStackTrace(System.err);
+            LogUtils.getLogger(FindClassesForInterface.class).debug(e);
         }
         JarEntry nextEntry;
         Class<?> c;
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
             nextEntry = (JarEntry) entries.nextElement();
-            if (nextEntry.getName().startsWith("META")) {
+            if (nextEntry.getName().startsWith("META"))
                 continue;
-            }
-            try {
-                c = loader.loadClass(getClassName(nextEntry.getName()));
-                if (c.isInterface()) {
-                    continue;
+            
+            if (loader != null)
+                try {
+                    c = loader.loadClass(getClassName(nextEntry.getName()));
+                    if (c.isInterface())
+                        continue;
+                    
+                    if (implementing.isAssignableFrom(c) && isConcrete(c))
+                        found.add(c);
+                    
+                } catch (ClassNotFoundException | NoClassDefFoundError e) {
+                    // do nothing
                 }
-                if (implementing.isAssignableFrom(c) && isConcrete(c)) {
-                    found.add(c);
-                }
-            } catch (ClassNotFoundException | NoClassDefFoundError e) {
-                // do nothing
-            }
         }
         return found;
     }
