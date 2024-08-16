@@ -421,7 +421,7 @@ their descpritions.
         <copy file="${dir.diskit}/dist/lib/diskit.jar" todir="${dir.lib.ext}"/>
         <copy todir="${dir.lib.ext}">
             <fileset dir="${dir.diskit}/lib">
-                <include name="opendis7-pdus-classes"/>
+                <include name="opendis7-pdus-classes.jar"/>
                 <include name="opendis7-enumerations-classes.jar"/>
             </fileset>
         </copy>
