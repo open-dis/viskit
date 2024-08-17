@@ -29,7 +29,7 @@ public class SimkitAssemblyXML2Java {
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean DEBUG = false; // TODO: tie to Vstatics.debug?
-    static Logger log = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
+    static final Logger LOG = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
     final private String sp  = SimkitXML2Java.SP;
@@ -57,7 +57,7 @@ public class SimkitAssemblyXML2Java {
         try {
             this.jaxbCtx = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
             error(ex.getMessage());
         }
     }
@@ -99,7 +99,7 @@ public class SimkitAssemblyXML2Java {
                 marshalRoot();
             }
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
 //            ex.printStackTrace();
         }
     }
@@ -132,7 +132,7 @@ public class SimkitAssemblyXML2Java {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(this.root, System.out);
         } catch (JAXBException ex) {
-            log.error(ex);
+            LOG.error(ex);
         }
     }
 
@@ -156,7 +156,7 @@ public class SimkitAssemblyXML2Java {
             m.marshal(jaxb,pw);
             s = sw.toString();
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
 //            e.printStackTrace();
         }
         return s;
@@ -172,7 +172,7 @@ public class SimkitAssemblyXML2Java {
             fos = new FileOutputStream(f);
             marshal(root, fos);
         } catch (FileNotFoundException e) {
-            log.error(e);
+            LOG.error(e);
 //            e.printStackTrace();
         }
     }
@@ -184,7 +184,7 @@ public class SimkitAssemblyXML2Java {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(node,o);
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
 //            e.printStackTrace();
         }
     }
@@ -302,7 +302,7 @@ public class SimkitAssemblyXML2Java {
                 clazz = listI.next();
                 if (exList.contains(clazz)) {
                     listI.remove();
-                    log.debug("Removed type \"" + clazz + "\" from the TreeSet");
+                    LOG.debug("Removed type \"" + clazz + "\" from the TreeSet");
                 }
             }
         }
@@ -807,85 +807,36 @@ public class SimkitAssemblyXML2Java {
      * @param desc a description of the encountered error
      */
     private void error(String desc) {
-        log.error(desc);
+        LOG.error(desc);
         System.exit(1);
     }
 
     /**
-     * @param arg the command line arguments
-     * arg[0] - -f | -file | -p | -port
-     * arg[1] - filename | port
-     * arg[2] - -p | -port | -f | -file
-     * arg[3] - port | filename
+     * @param args the command line arguments
      */
-    public static void main(String[] arg) {
+    public static void main(String[] args) {
 
-        int port;
-        String fileName = null;
-        SimkitAssemblyXML2Java sax2j = null;
-        List<String> args = java.util.Arrays.asList(arg);
-        Iterator<String> lit = args.listIterator();
+        String xmlFile = args[0].replaceAll("\\\\", "/");
 
-        for (String a : args) {
+        LOG.info("Assembly file is: {}", xmlFile);
+        LOG.info("Generating Java Source...");
 
-            switch (a) {
-                case "-p":
-                case "-port":
-                    // Dummy forward looking next()
-                    lit.next();
-                    if (lit.hasNext()) {
-                        a = lit.next();
-                        port = Integer.parseInt(a);
-                    } else {
-                        usage();
-                    }
-                    break;
-                case "-f":
-                case "-file":
-                    // Dummy forward looking next()
-                    lit.next();
-                    if (lit.hasNext()) {
-                        fileName = lit.next();
-                        fileName = fileName.replaceAll("\\\\", "/");
-                    } else {
-                        usage();
-                    }
-                    break;
-            }
-        }
+        try (InputStream is = new FileInputStream(xmlFile)) {
 
-        log.info("Assembly file is: " + fileName);
-        log.info("Generating Java Source...");
+            SimkitAssemblyXML2Java sax2j = new SimkitAssemblyXML2Java(is);
+            sax2j.unmarshal();
+            String dotJava = sax2j.translate();
+            LOG.info("Done.");
 
-        if (fileName == null) {
-            usage();
-        } else {
-
-            try {
-                sax2j = new SimkitAssemblyXML2Java(new File(fileName));
-            } catch (FileNotFoundException ex) {
-                log.error(ex);
-            }
-
-            if (sax2j != null) {
-
-                sax2j.unmarshal();
-                String dotJava = sax2j.translate();
-                log.info("Done.");
-
-                // also write out the .java to a file and compile it
-                // to a .class
-                log.info("Generating Java Bytecode...");
-                if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
-                    log.info("Done.");
-                }
-            }
+            // also write out the .java to a file and compile it
+            // to a .class
+            LOG.info("Generating Java Bytecode...");
+            if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null)
+                LOG.info("Done.");
+            
+        } catch (IOException fnfe) {
+            LOG.error(fnfe);
         }
     }
 
-    static void usage() {
-        System.err.println("Check args, you need at least a port or a file in grid mode");
-        System.err.println("usage: Assembly [-p port | -port port | -f file | -file file]");
-        System.exit(1);
-    }
-}
+} // end class file SimkitAssemblyXML2Java.java
