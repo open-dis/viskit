@@ -31,7 +31,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
