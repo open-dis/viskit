@@ -1291,34 +1291,35 @@ public class SimkitXML2Java {
         LOG.info("EventGraph (EG) file is: {}", xmlFile);
         LOG.info("Generating Java Source...");
 
-        InputStream is = null;
-        try {
-            is = new FileInputStream(xmlFile);
-        } catch (FileNotFoundException fnfe) {LOG.error(fnfe);}
+        try (InputStream is = new FileInputStream(xmlFile)) {
 
-        SimkitXML2Java sx2j = new SimkitXML2Java(is);
-        File baseName = new File(sx2j.baseNameOf(xmlFile));
-        sx2j.setFileBaseName(baseName.getName());
-        sx2j.setEventGraphFile(new File(xmlFile));
-        sx2j.unmarshal();
-        String dotJava = sx2j.translate();
-        if (dotJava != null && !dotJava.isEmpty()) {
-            LOG.info("Done.");
-        } else {
-            LOG.warn("Compile error on: {}", xmlFile);
-            return;
-        }
-
-        // also write out the .java to a file and compile it
-        // to a .class
-        LOG.info("Generating Java Bytecode...");
-        try {
-            if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null) {
+            SimkitXML2Java sx2j = new SimkitXML2Java(is);
+            File baseName = new File(sx2j.baseNameOf(xmlFile));
+            sx2j.setFileBaseName(baseName.getName());
+            sx2j.setEventGraphFile(new File(xmlFile));
+            sx2j.unmarshal();
+            String dotJava = sx2j.translate();
+            if (dotJava != null && !dotJava.isEmpty()) {
                 LOG.info("Done.");
+            } else {
+                LOG.warn("Compile error on: {}", xmlFile);
+                return;
             }
-        } catch (NullPointerException npe) {
-            LOG.error(npe);
+
+            // also write out the .java to a file and compile it
+            // to a .class
+            LOG.info("Generating Java Bytecode...");
+            try {
+                if (AssemblyControllerImpl.compileJavaClassFromString(dotJava) != null)
+                    LOG.info("Done.");
+                
+            } catch (NullPointerException npe) {
+                LOG.error(npe);
 //            npe.printStackTrace();
+            }
+        } catch (IOException fnfe) {
+            LOG.error(fnfe);
         }
     }
-}
+    
+} // end class file SimkitXML2Java.java
