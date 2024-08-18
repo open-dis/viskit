@@ -86,7 +86,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
-    private String initialFile;
+    
+    /** The path to an assembly file if given from the command line */
+    private String initialAssyFile;
 
     /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
@@ -99,17 +101,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /**
      * Sets an initial assy file to open upon Viskit startup supplied by the
      * command line
-     * @param fil the assy file to initially open upon startup
+     * @param f the assy file to initially open upon startup
      */
-    public void setInitialFile(String fil) {
+    public void setInitialAssyFile(String f) {
         if (viskit.VStatics.debug) {
-            System.out.println("Initial file set: " + fil);
+            LOG.info("Initial file set: {}", f);
         }
-        initialFile = fil;
+        initialAssyFile = f;
     }
 
     /** This method is for introducing Assemblies to compile from outside of
-     * Viskit.  This method is not used from Viskit and must is required for
+     * Viskit. This method is not used from Viskit and must is required for
      * third party access.
      *
      * @param assyPath an assembly file to compile
@@ -117,7 +119,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void compileAssembly(String assyPath) {
         LOG.debug("Compiling assembly: {}", assyPath);
         File f = new File(assyPath);
-        initialFile = assyPath;
+        initialAssyFile = assyPath;
         _doOpen(f);
         compileAssemblyAndPrepSimRunner();
     }
@@ -125,11 +127,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void begin() {
 
-        // The initialFile is set if we have stated a file "arg" upon startup
+        // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialFile != null) {
-            LOG.debug("Loading initial file: {}", initialFile);
-            compileAssembly(initialFile);
+        if (initialAssyFile != null) {
+            LOG.debug("Loading initial file: {}", initialAssyFile);
+            compileAssembly(initialAssyFile);
         } else {
             List<File> lis = getOpenAssyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", lis.size());
@@ -676,7 +678,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newAssembly() {
 
-        // Don't allow a new event graph to be created is a current project is
+        // Don't allow a new event graph to be created if a current project is
         // not open
         if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
