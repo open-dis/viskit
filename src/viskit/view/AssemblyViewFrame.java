@@ -1116,17 +1116,17 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         });
     }
 
-    void clampHeight(JComponent comp) {
-        Dimension d = comp.getPreferredSize();
-        comp.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
-        comp.setMinimumSize(new Dimension(Integer.MAX_VALUE, d.height));
-    }
-
-    void clampSize(JComponent comp) {
-        Dimension d = comp.getPreferredSize();
-        comp.setMaximumSize(d);
-        comp.setMinimumSize(d);
-    }
+//    void clampHeight(JComponent comp) {
+//        Dimension d = comp.getPreferredSize();
+//        comp.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
+//        comp.setMinimumSize(new Dimension(Integer.MAX_VALUE, d.height));
+//    }
+//
+//    void clampSize(JComponent comp) {
+//        Dimension d = comp.getPreferredSize();
+//        comp.setMaximumSize(d);
+//        comp.setMinimumSize(d);
+//    }
 
 } // end class file AssemblyViewFrame.java
 
