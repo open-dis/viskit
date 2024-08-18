@@ -136,11 +136,10 @@ public class EventGraphAssemblyComboMain {
     private static void createGUI(String[] args) {
 
         boolean isMac = VStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
-        String initialFile = null;
+        String initialAssyFile = null;
 
-        if (args.length > 0) {
-            initialFile = args[0];
-        }
+        if (args.length > 0)
+            initialAssyFile = args[0];
 
         if (viskit.VStatics.debug) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("***Inside EventGraphAssembly main: " + args.length);
@@ -151,7 +150,7 @@ public class EventGraphAssemblyComboMain {
         ToolTipManager ttm = ToolTipManager.sharedInstance();
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
-        JFrame mainFrame = new MainFrame(initialFile);
+        JFrame mainFrame = new MainFrame(initialAssyFile);
         VGlobals.instance().setMainAppWindow(mainFrame);
 
         if (isMac) {
