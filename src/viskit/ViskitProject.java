@@ -70,7 +70,7 @@ public class ViskitProject {
     public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
     /** This static variable will be set by the user upon first Viskit startup
-     * to determine a project location space on the user's machine.  A default
+     * to determine a project location space on the user's machine. A default
      * location will be in the user's profile, or home directory.
      */
     public static String DEFAULT_PROJECT_NAME = "DefaultProject";
@@ -495,7 +495,6 @@ public class ViskitProject {
     public void setProjectFile(File projectFile) {
         this.projectFile = projectFile;
     }
-
 
     /**
      * @return the analystReportChartsDir
