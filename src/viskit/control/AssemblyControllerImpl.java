@@ -1918,7 +1918,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
-    public void adjustRecentProjSet(File file) {
+    private void adjustRecentProjSet(File file) {
         File f;
         for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
 
