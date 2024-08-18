@@ -115,7 +115,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param assyPath an assembly file to compile
      */
     public void compileAssembly(String assyPath) {
-        LOG.debug("Compiling assembly: " + assyPath);
+        LOG.debug("Compiling assembly: {}", assyPath);
         File f = new File(assyPath);
         initialFile = assyPath;
         _doOpen(f);
@@ -128,11 +128,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // The initialFile is set if we have stated a file "arg" upon startup
         // from the command line
         if (initialFile != null) {
-            LOG.debug("Loading initial file: " + initialFile);
+            LOG.debug("Loading initial file: {}", initialFile);
             compileAssembly(initialFile);
         } else {
             List<File> lis = getOpenAssyFileList(false);
-            LOG.debug("Inside begin() and lis.size() is: " + lis.size());
+            LOG.debug("Inside begin() and lis.size() is: {}", lis.size());
 
             for (File f : lis) {
                 
@@ -1960,7 +1960,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void recordProjFiles() {
         if (historyConfig == null) {initConfig();}
         List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
-        LOG.debug("recordProjFile valueAr size is: " + valueAr.size());
+        LOG.debug("recordProjFile valueAr size is: {}", valueAr.size());
         for (Object value : valueAr) {
             adjustRecentProjSet(new File((String) value));
         }
@@ -2035,7 +2035,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            LOG.error("Error loading history file: " + e.getMessage());
+            LOG.error("Error loading history file: {}", e.getMessage());
             LOG.warn("Recent file saving disabled");
             historyConfig = null;
         }
