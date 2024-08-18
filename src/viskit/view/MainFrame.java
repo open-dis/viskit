@@ -84,7 +84,7 @@ public class MainFrame extends JFrame {
     private DoeMain doeMain;
 
     /** The initial assembly to load. */
-    private final String initialFile;
+    private final String initialAssyFile;
     private final int TAB0_EVENTGRAPH_EDITOR_IDX = 0;
     private final int TAB0_ASSEMBLY_EDITOR_IDX = 1;
     private final int TAB0_ASSEMBLYRUN_SUBTABS_IDX = 2;
@@ -99,10 +99,10 @@ public class MainFrame extends JFrame {
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
 
-    public MainFrame(String initialFile) {
+    public MainFrame(String initialAssyFile) {
         super(ViskitConfig.VISKIT_FULL_APPLICATION_NAME);
 
-        this.initialFile = initialFile;
+        this.initialAssyFile = initialAssyFile;
 
         initUI();
 
@@ -252,7 +252,7 @@ public class MainFrame extends JFrame {
         assyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
         jamQuitHandler(assyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assyFrame.getController());
-        controller.setInitialFile(initialFile);
+        controller.setInitialAssyFile(initialAssyFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
 
         /* DIFF between OA3302 branch and trunk */
