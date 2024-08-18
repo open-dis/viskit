@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtils;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -42,8 +43,10 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.filechooser.FileView;
+
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -93,7 +96,7 @@ public class ViskitProject {
     public static final String DIST_DIRECTORY_NAME = "dist";
     public static final String LIB_DIRECTORY_NAME = "lib";
 
-    static Logger log = LogUtils.getLogger(ViskitProject.class);
+    static final Logger LOG = LogUtils.getLogger(ViskitProject.class);
 
     private File projectRoot;
     private File projectFile;
@@ -108,7 +111,6 @@ public class ViskitProject {
     private File buildDir;
     private File classesDir;
     private File srcDir;
-    private File distDir;
     private File libDir;
     private boolean projectFileExists = false;
     private boolean dirty;
@@ -117,9 +119,8 @@ public class ViskitProject {
 
     public ViskitProject(File projectRoot) {
         if (projectRoot.exists() && !projectRoot.isDirectory()) {
-            throw new IllegalArgumentException(
-                    "Project root must be directory: " +
-                    projectRoot);
+            LOG.warn("Project root must be directory, not: {}",projectRoot);
+            return;
         }
         setProjectRoot(projectRoot);
     }
@@ -136,7 +137,7 @@ public class ViskitProject {
             try {
                 Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
         }
 
@@ -181,7 +182,7 @@ public class ViskitProject {
 
         // NOTE: If the project's build directory got nuked and we have
         // cached our EGs and classes with MD5 hash, we'll throw a
-        // ClassNotFoundException.  Caching of EGs is a convenience for large
+        // ClassNotFoundException. Caching of EGs is a convenience for large
         // directories of EGs that take time to compile the first time
 
         setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
@@ -205,7 +206,7 @@ public class ViskitProject {
             try {
                 getProjectFile().createNewFile();
             } catch (IOException e) {
-                log.error(e.getMessage());
+                LOG.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
             writeProjectFile();
@@ -267,13 +268,13 @@ public class ViskitProject {
             xmlOutputter.output(projectDocument, fileOutputStream);
             projectFileExists = true;
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         } finally {
             try {
                 if (fileOutputStream != null)
                     fileOutputStream.close();
             } catch (IOException ex) {
-                log.error(ex);
+                LOG.error(ex);
             }
         }
     }
@@ -293,7 +294,7 @@ public class ViskitProject {
             }
             projectFileExists = true;
         } catch (JDOMException | IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
             throw new RuntimeException(ex);
         }
     }
@@ -309,11 +310,11 @@ public class ViskitProject {
             for (File f : getLibDir().listFiles()) {
                 if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
                     String file = f.getCanonicalPath().replaceAll("\\\\", "/");
-                    log.debug(file);
+                    LOG.debug(file);
                     cp.add(file);
                 }
             }
-            log.debug(getEventGraphsDir().getCanonicalPath());
+            LOG.debug(getEventGraphsDir().getCanonicalPath());
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = ViskitConfig.instance().getConfigValues(ViskitConfig.X_CLASS_PATHS_KEY);
@@ -322,7 +323,7 @@ public class ViskitProject {
             }
 
         } catch (IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
         } catch (NullPointerException npe) {
             return null;
         }
@@ -566,7 +567,7 @@ public class ViskitProject {
         try {
             xmlOutputter.output(projectDocument, stringWriter);
         } catch (IOException e) {
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
         }
         return stringWriter.toString();
     }
@@ -632,7 +633,7 @@ public class ViskitProject {
      * @param startingDirPath a path to start looking from in the chooser
      * @return a path to a valid project directory
      */
-    public static File openProjectDir(JFrame parent, String startingDirPath) {
+    public static File openProjectDir(JComponent parent, String startingDirPath) {
         File projectDir = null;
         initializeProjectChooser(startingDirPath);
 
