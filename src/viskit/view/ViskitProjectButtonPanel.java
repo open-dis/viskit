@@ -74,14 +74,17 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
         // Dialog will appear in center screen
         dialog.setLocationRelativeTo(null);
         
-        try {
-            Runnable r = () -> {
-                dialog.setVisible(true);
-            };
-            SwingUtilities.invokeAndWait(r);
-        } catch (InterruptedException | InvocationTargetException ex) {
-            LogUtils.getLogger(ViskitProjectButtonPanel.class).error(ex);
-        }
+        if (!SwingUtilities.isEventDispatchThread())
+            try {
+                Runnable r = () -> {
+                    dialog.setVisible(true);
+                };
+                SwingUtilities.invokeAndWait(r);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                LogUtils.getLogger(ViskitProjectButtonPanel.class).error(ex);
+            }
+        else
+            dialog.setVisible(true);
     }
 
     /** Creates new form ViskitProjectButtonPanel */
@@ -175,7 +178,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
                 vaw.openProject();
         }
     } else {
-        file = ViskitProject.openProjectDir(null, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         VStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
 
