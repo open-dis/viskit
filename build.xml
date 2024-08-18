@@ -158,14 +158,14 @@ their descpritions.
 
     <target name="platformInitialize" depends="platformType"/>
     <target name="platformType">
-        <condition property="isWindows" >
+        <condition property="isWin" >
             <os family="windows"/>
         </condition>
         <condition property="isMac" >
             <os family="mac"/>
         </condition>
         <!-- Based on Apache Ant user-manual example -->
-        <condition property="isUnixNotMac">
+        <condition property="isUnix">
             <and>
                 <os family="unix"/>
 
@@ -177,10 +177,10 @@ their descpritions.
         </condition>
     </target>
 
-    <target name="check.JAVA_HOME" unless="env.JAVA_HOME" if="isWindows">
+    <target name="check.JAVA_HOME" unless="env.JAVA_HOME" if="isWin">
         <echo message="warning:  JAVA_HOME not set!"/>
     </target>
-    <target name="check.ANT_HOME" unless="env.ANT_HOME" if="isWindows">
+    <target name="check.ANT_HOME" unless="env.ANT_HOME" if="isWin">
         <echo message="warning:  ANT_HOME not set!"/>
     </target>
 
@@ -337,9 +337,19 @@ their descpritions.
             <section name="viskit.doe"/>
             <section name="viskit.gridlet"/>
             <section name="viskit.images"/>
+            <section name="viskit.javahelp"/>
+            <section name="viskit.javahelp.Images"/>
+            <section name="viskit.javahelp.Images.icons"/>
+            <section name="viskit.javahelp.Pages"/>
+            <section name="viskit.javahelp.Pages.Menus"/>
+            <section name="viskit.javahelp.Pages.Tabs"/>
+            <section name="viskit.javahelp.Pages.Tutorial_files"/>
+            <section name="viskit.javahelp.Pages.images"/>
+            <section name="viskit.javahelp.References"/>
             <section name="viskit.jgraph"/>
             <section name="viskit.model"/>
             <section name="viskit.mvc"/>
+            <section name="viskit.reports"/>
             <section name="viskit.util"/>
             <section name="viskit.view"/>
             <section name="viskit.view.dialog"/>
@@ -367,7 +377,7 @@ their descpritions.
             depends="make.classpath.win,make.classpath.unix,make.classpath.mac"
             description="Platform specific Class-Path header for the executable jar"/>
 
-    <target name="make.classpath.win" if="isWindows">
+    <target name="make.classpath.win" if="isWin">
         <pathconvert dirsep="/"
                      pathsep=" "
                      property="launcher.classpath"
@@ -379,7 +389,7 @@ their descpritions.
         </pathconvert>
     </target>
 
-    <target name="make.classpath.unix" depends="common.unix.classpath" if="isUnixNotMac"/>
+    <target name="make.classpath.unix" depends="common.unix.classpath" if="isUnix"/>
 
     <target name="make.classpath.mac" depends="common.unix.classpath" if="isMac"/>
 
@@ -574,25 +584,32 @@ their descpritions.
 
     <!-- TARGET: Quick Run, doesn't check dependencies, or compile -->
     <target name="quick.run"
-            depends="init,quick.run.not.mac,quick.run.mac"
+            depends="init,quick.run.win,quick.run.mac,quick.run.unix"
             description="Run Viskit, don't check dependencies, don't rebuild"/>
-
-    <target name="quick.run.not.mac" unless="isMac">
+    <target name="quick.run.win" if="isWin">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
 
-            <jvmarg line="${common.run.args}"/>
+            <jvmarg line="${win.run.args}"/>
             <arg value="${main.class}"/>
         </java>
     </target>
-
     <target name="quick.run.mac" if="isMac">
         <java classname="viskit.Splash2"
               classpathref="runtime.classpath"
               fork="true">
 
-	    <jvmarg line="${common.run.args} ${mac.run.args}"/>
+	    <jvmarg line="${mac.run.args}"/>
+            <arg value="${main.class}"/>
+        </java>
+    </target>
+    <target name="quick.run.unix" if="isUnix">
+        <java classname="viskit.Splash2"
+              classpathref="runtime.classpath"
+              fork="true">
+
+	    <jvmarg line="${unix.run.args}"/>
             <arg value="${main.class}"/>
         </java>
     </target>
@@ -611,7 +628,7 @@ their descpritions.
             description="Test the ${dist.exe.jar}">
 
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
+        <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
 
@@ -624,7 +641,7 @@ their descpritions.
               failonerror="true">
 
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${common.run.args}"/>
+            <jvmarg line="${mac.run.args}"/>
         </java>
 
     </target>
@@ -635,18 +652,19 @@ their descpritions.
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
 
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
-        <nbjpdastart addressproperty="jpda.address" name="Viskit" transport="dt_socket">
+        <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <antcall target="quick.debug.not.mac"/>
+        <antcall target="quick.debug.win"/>
         <antcall target="quick.debug.mac"/>
+        <antcall target="quick.debug.unix"/>
     </target>
-    <target name="quick.debug.not.mac" unless="isMac">
+    <target name="quick.debug.win" if="isWin">
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${common.run.args}"/>
+            <jvmarg line="${win.run.args}"/>
 
             <!-- Any debug args can go here -->
             <!--arg value="localhost" />
@@ -654,11 +672,24 @@ their descpritions.
         </java>
     </target>
     <target name="quick.debug.mac" if="isMac">
+        <echo message="jdpa address=${jpda.address}"/>
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${common.run.args} ${mac.run.args}"/>
+            <jvmarg line="${mac.run.args}"/>
+
+            <!-- Any debug args can go here -->
+            <!--arg value="localhost" />
+            <arg value="4444" /-->
+        </java>
+    </target>
+    <target name="quick.debug.unix" if="isUnix">
+        <java classname="${debug.class}"
+              classpathref="runtime.classpath"
+              fork="true">
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+            <jvmarg line="${unix.run.args}"/>
 
             <!-- Any debug args can go here -->
             <!--arg value="localhost" />
