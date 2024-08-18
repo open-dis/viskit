@@ -800,7 +800,8 @@ public class VGlobals {
         if (currentViskitProject.initProject()) {
             SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
         } else {
-            throw new RuntimeException("Unable to create project directory");
+            LOG.warn("Unable to create project directory, returning");
+            return;
         }
         workDirectory = currentViskitProject.getClassesDir();
     }
@@ -853,7 +854,7 @@ public class VGlobals {
                references to the loaded module system. 
             */
             LocalBootLoader loader = new LocalBootLoader(urlArray,
-                ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the interal boot loader
+                ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the internal boot loader
                 getWorkDirectory());
 
             // Allow Assembly files in the ClassLoader
