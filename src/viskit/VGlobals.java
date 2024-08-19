@@ -197,9 +197,9 @@ public class VGlobals {
 
     /** This method starts the chain of various Viskit startup steps.  By
      * calling for a new EventGraphControllerImpl(), in its constructor is a call
-     * to initConfig() which is the first time that the viskitConfig.xml is
-     * looked for, or if one is not there, to create one from the template.  The
-     * viskitConfig.xml is an important file that holds information on recent
+     * to initConfig() which is the first time that the vConfig.xml is
+     * looked for, or if one is not there, to create one from the template. The
+     * vConfig.xml is an important file that holds information on recent
      * assembly and event graph openings, and caching of compiled source from
      * EventGraphs.
      *
