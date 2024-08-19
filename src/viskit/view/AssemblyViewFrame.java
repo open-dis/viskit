@@ -992,7 +992,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     @Override
     public void showProjectName() {
         super.showProjectName();
-        VGlobals.instance().getEventGraphEditor().showProjectName();
     }
 
     private File getUniqueName(String suggName) {
