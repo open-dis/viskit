@@ -164,7 +164,8 @@ public class FileBasedClassManager {
         // TODO: Check if this is really necessary and should be dealt with
         // upstream
         } else if (!f.getName().toLowerCase().endsWith(".java")) {
-            throw new Exception("Unsupported file type.");
+            LOG.warn("Unsupported file type: {}", f);
+            return null;
         }
 
         if (fclass != null) {

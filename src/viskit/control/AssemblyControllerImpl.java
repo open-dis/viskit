@@ -1553,7 +1553,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /**
-     * Known modelPath for EventGraph compilation.  Called whenever an XML file
+     * Known modelPath for EventGraph compilation. Called whenever an XML file
      * loads for the first time, or is saved during an edit
      *
      * @param xmlFile the EventGraph to package up
@@ -1575,33 +1575,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             /* We may have forgotten a parameter required for a super class */
             if (src == null) {
-                String msg = xmlFile + " did not compile.\n" +
-                        "Please check that you have provided parameters in "
-                        + "identical order declared for any super classes";
+                String msg = xmlFile + " did not translate to source code.\n" +
+                        "Please recheck that you have declared all parameters "
+                        + "in the @parameterMap";
                 LOG.error(msg);
-                messageUser(JOptionPane.ERROR_MESSAGE, "Source code compilation error", msg);
+                messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", msg);
                 return null;
             }
-
-            // If using plain Vanilla Viskit, don't compile diskit extended EGs
-            // as diskit.jar won't be available
-            String[] classPath = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader()).getClassPath();
-            boolean foundDiskit = false;
-            for (String path : classPath) {
-                if (path.contains("diskit.jar")) {
-                    foundDiskit = !foundDiskit;
-                    break;
-                }
-            }
-
-            if (src.contains("diskit") && !foundDiskit) {
-                FileBasedClassManager.instance().addCacheMiss(xmlFile);
-
-                // TODO: Need to announce/recommend to the user to place
-                // diskit.jar in the classpath, then restart Viskit
-            } else {
-                paf = compileJavaClassAndSetPackage(src);
-            }
+            
+            paf = compileJavaClassAndSetPackage(src);
+            
         } catch (FileNotFoundException e) {
             LOG.error("Error creating Java class file from {}: {}\n", xmlFile , e.getMessage());
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
