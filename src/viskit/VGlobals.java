@@ -795,7 +795,11 @@ public class VGlobals {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
         projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
+        
+        if (currentViskitProject == null)
+            currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
+        else
+            currentViskitProject.setProjectRoot(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (currentViskitProject.initProject()) {
             SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
