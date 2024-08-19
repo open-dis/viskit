@@ -226,7 +226,8 @@ public class ViskitConfig {
         } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
-        cc.addConfiguration(projectXMLConfig, "proj");
+        if (cc.getConfiguration("proj") == null || cc.getConfiguration("proj").isEmpty())
+            cc.addConfiguration(projectXMLConfig, "proj");
         xmlConfigurations.put("proj", projectXMLConfig);
     }
 
