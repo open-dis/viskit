@@ -67,6 +67,7 @@ import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
+import viskit.view.EventGraphViewFrame;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -86,7 +87,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
-    
+
     /** The path to an assembly file if given from the command line */
     private String initialAssyFile;
 
@@ -131,13 +132,25 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // from the command line
         if (initialAssyFile != null) {
             LOG.debug("Loading initial file: {}", initialAssyFile);
+
+            // Switch to the project that this Assy file is located in if paths do not coincide
+            File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+
+            if (projPath.exists() && !initialAssyFile.contains(projPath.getPath())) {
+                doProjectCleanup();
+                projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
+                openProject(projPath);
+                ((AssemblyViewFrame) getView()).showProjectName();
+                VGlobals.instance().getEventGraphEditor().showProjectName();
+            }
+
             compileAssembly(initialAssyFile);
         } else {
             List<File> lis = getOpenAssyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", lis.size());
 
             for (File f : lis) {
-                
+
                 // Prevent project mismatch
                 if (f.exists())
                     _doOpen(f);
@@ -491,12 +504,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
         }
     }
-    
+
     // These can not be final, else reflection with fail
     private int egNodeCount = 0;
     private int adptrNodeCount = 0;
     private int pclNodeCount = 0;    // A little experiment in class introspection
-    
+
     private static Field egCountField;
     private static Field adptrCountField;
     private static Field pclCountField;
@@ -718,7 +731,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
-    {   
+    {
         ((AssemblyView) getView()).genericReport(typ, title, msg);
     }
 
@@ -1669,7 +1682,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         Runnable r = () -> {
             ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
         };
-        
+
         try {
             SwingUtilities.invokeLater(r);
         } catch (Exception e) {
@@ -1692,7 +1705,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "Please open an Assembly file");
                     } else {
                         String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
-                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation failure", msg);
+                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error", msg);
                     }
                 } else {
 
@@ -1745,7 +1758,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     private String[] buildExecStrings(String className) {
         List<String> v = new ArrayList<>();
-        
+
         v.add(className);                                               // 0
         v.add("" + ((AssemblyModel) getModel()).getMetaData().verbose); // 1
         v.add(((AssemblyModel) getModel()).getMetaData().stopTime);     // 2
@@ -1864,7 +1877,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Opens each EG associated with this Assembly
-     * 
+     *
      * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
