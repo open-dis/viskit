@@ -16,11 +16,17 @@
     <target depends="-jdk-init" name="quick.run">
         <ant inheritall="false" target="quick.run"/>
     </target>
+    <target depends="-jdk-init" name="build.run.no.extensions">
+        <ant inheritall="false" target="build.run.no.extensions"/>
+    </target>
     <target depends="-jdk-init" name="test">
         <ant inheritall="false" target="test"/>
     </target>
     <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="quick.debug">
         <ant inheritall="false" target="quick.debug"/>
+    </target>
+    <target depends="-jdk-init,-jdk-presetdef-nbjpdastart" name="debug">
+        <ant inheritall="false" target="debug"/>
     </target>
     <target depends="-jdk-init" name="compile-selected-files-in-src">
         <ant antfile="nbproject/ide-file-targets.xml" inheritall="false" target="compile-selected-files-in-src"/>

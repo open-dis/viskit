@@ -77,6 +77,9 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    If a user submits a path to an assy file, and the file and current project
+    path do not coincide, then open the project that the assy belongs in.
+
     (Critical)
     Fix issue where if another project was opened, lingering recent proj. file
     references were maintained causing a NPE due to a recent class from the old

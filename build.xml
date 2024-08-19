@@ -417,7 +417,7 @@ their descpritions.
             <manifest>
 
                 <!-- used by native launcher, see launch4j -->
-                <attribute name="Main-Class" value="viskit.Splash2"/>
+                <attribute name="Main-Class" value="${main.class}"/>
                 <attribute name="Class-Path" value="${launcher.classpath}"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
@@ -572,14 +572,13 @@ their descpritions.
 
     </target>
 
-    <!-- TARGET: Run w/Viskit custom splash -->
     <target name="build.run.with.extensions"
             depends="build.with.extensions,quick.run"
-            description="Build and Run Viskit extended, include external runtime modules, Viskit custom Splash">
+            description="Build and Run Viskit extended by including external runtime modules">
     </target>
     <target name="build.run.no.extensions"
             depends="build.no.extensions,quick.run"
-            description="Build and Run Viskit only, no module dependencies, Viskit custom Splash">
+            description="Build and Run Viskit only, no module dependencies">
     </target>
 
     <!-- TARGET: Quick Run, doesn't check dependencies, or compile -->
@@ -587,30 +586,24 @@ their descpritions.
             depends="init,quick.run.win,quick.run.mac,quick.run.unix"
             description="Run Viskit, don't check dependencies, don't rebuild"/>
     <target name="quick.run.win" if="isWin">
-        <java classname="viskit.Splash2"
+        <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
-
             <jvmarg line="${win.run.args}"/>
-            <arg value="${main.class}"/>
         </java>
     </target>
     <target name="quick.run.mac" if="isMac">
-        <java classname="viskit.Splash2"
+        <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
-
 	    <jvmarg line="${mac.run.args}"/>
-            <arg value="${main.class}"/>
         </java>
     </target>
     <target name="quick.run.unix" if="isUnix">
-        <java classname="viskit.Splash2"
+        <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
-
 	    <jvmarg line="${unix.run.args}"/>
-            <arg value="${main.class}"/>
         </java>
     </target>
 
@@ -646,7 +639,7 @@ their descpritions.
 
     </target>
 
-    <target depends="compile,quick.debug" description="Debug Project" name="debug"/>
+    <target depends="compile,quick.debug" description="Debug Viskit" name="debug"/>
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
@@ -667,21 +660,20 @@ their descpritions.
             <jvmarg line="${win.run.args}"/>
 
             <!-- Any debug args can go here -->
-            <!--arg value="localhost" />
-            <arg value="4444" /-->
+            <arg value="${viskit.args}"/>
         </java>
     </target>
     <target name="quick.debug.mac" if="isMac">
         <echo message="jdpa address=${jpda.address}"/>
+        <echo message="viskit.args=${viskit.args}"/>
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${mac.run.args}"/>
-
+            
             <!-- Any debug args can go here -->
-            <!--arg value="localhost" />
-            <arg value="4444" /-->
+            <arg value="${viskit.args}"/>
         </java>
     </target>
     <target name="quick.debug.unix" if="isUnix">
@@ -692,8 +684,7 @@ their descpritions.
             <jvmarg line="${unix.run.args}"/>
 
             <!-- Any debug args can go here -->
-            <!--arg value="localhost" />
-            <arg value="4444" /-->
+            <arg value="${viskit.args}"/>
         </java>
     </target>
 
