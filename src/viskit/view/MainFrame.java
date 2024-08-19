@@ -134,8 +134,8 @@ public class MainFrame extends JFrame {
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
     private void initUI() {
-        VGlobals.instance().setAssemblyQuitHandler(null);
-        VGlobals.instance().setEventGraphQuitHandler(null);
+//        VGlobals.instance().setAssemblyQuitHandler(null);
+//        VGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
         JMenuBar menuBar;
 
         tabbedPane = new JTabbedPane();
