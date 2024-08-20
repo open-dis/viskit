@@ -102,7 +102,7 @@
                 <include name="lib/**" />
                 <include name="license/**" />
                 <include name="RELEASE_NOTES*"/>
-                <include name="viskit-exe.jar"/>
+                <include name="viskit-editor.jar"/>
             </fileset>
             <fileset dir="stage" targetdir="$INSTALL_PATH">
               <os family="windows"/>
@@ -121,8 +121,8 @@
                 <os family="windows"/>
             </executable>-->
 
-            <executable targetfile="$INSTALL_PATH/viskit-exe.jar" type="jar" 
-                        keep="true" stage="never" failure="warn" class="viskit.Splash2">
+            <executable targetfile="$INSTALL_PATH/viskit-editor.jar" type="jar" 
+                        keep="true" stage="never" failure="warn" class="viskit.EventGraphAssemblyComboMain">
                 <os family="windows"/>
                 <os family="unix"/>
             </executable>

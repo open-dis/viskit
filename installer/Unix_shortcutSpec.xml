@@ -10,7 +10,7 @@
                   location="applications"/>
     <shortcut
         name="Viskit"
-        target="$INSTALL_PATH/viskit-exe.jar"
+        target="$INSTALL_PATH/viskit-editor.jar"
         commandLine=""
         workingDirectory="$INSTALL_PATH"
         description="Viskit DES Application"

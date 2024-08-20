@@ -10,7 +10,7 @@
     <!-- Header types: 0-GUI, 1-console -->
     <headerType>console</headerType>
     <outfile>stage/Viskit.exe</outfile>
-    <jar>viskit-exe.jar</jar>
+    <jar>viskit-editor.jar</jar>
     <dontWrapJar>true</dontWrapJar>
     <errTitle>Viskit Install Error</errTitle>
     <chdir>.</chdir>
