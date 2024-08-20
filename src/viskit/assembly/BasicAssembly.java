@@ -625,7 +625,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             performHookups();
         } catch (Throwable t) {
 
-            LOG.error(t);
+            LOG.error("Comment in stack trace & recompile to drill down into: {}", t);
+            // Comment in to see what the matter is
+//            t.printStackTrace();
 
             try {
                 URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST
@@ -641,9 +643,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             } catch (MalformedURLException | URISyntaxException ex) {
                 LOG.error(ex);
             }
-
-            // Comment in to see what the matter is
-//            t.printStackTrace();
             return;
         }
 
