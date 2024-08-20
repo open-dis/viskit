@@ -363,9 +363,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JComponent buildCodeBlockComponent(CodeBlockPanel cbp) {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        JLabel lab = new JLabel("Code Block");
-        lab.setToolTipText("Use of the code block will cause code to run first" +
-                " in the top of the Event's \"do\" method");
+        JLabel lab = new JLabel("Global Code Block");
+        lab.setToolTipText("Use of this code block will be for setting imports, "
+                + "declaring global variables, etc.");
         lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         p.add(lab);
         cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
