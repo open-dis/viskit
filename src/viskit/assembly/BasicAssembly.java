@@ -637,7 +637,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
                     + "email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
-                    + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
+                    + "<br/><br/>Click the link to open up an email form, then attach the log. Would "
+                    + "be good to have your project attached as well to replicate: File -> Zip/Mail Viskit Project";
 
                 VStatics.showHyperlinkedDialog(null, t.getMessage(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
