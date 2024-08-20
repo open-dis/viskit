@@ -323,7 +323,7 @@ public class EventInspectorDialog extends JDialog {
             // Bug 1373: This is how we will now sync up any SchedulingEdge
             // parameters with corresponding EventNode parameters
 
-            // TODO: Recheck bug and verify this isn't don't elsewhere.  W/O
+            // TODO: Recheck bug and verify this isn't done elsewhere.  W/O
             // the continue statement, it nukes edge values that were already
             // there if we modify a node
             for (ViskitElement ve : en.getConnections()) {
