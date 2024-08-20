@@ -59,7 +59,7 @@ public class CodeBlockPanel extends JPanel {
     private final Window owner;
     private final String title;
     private final JButton editButt;
-    private static final String TOOL_TIP = "Please remember to enter full Java statements including semi-colons";
+    private static final String TOOL_TIP = "Please remember to enter fullly qualified class names and include terminating semi-colons";
 
     public CodeBlockPanel(Window owner, boolean multilined, String title) {
         this.owner = owner;
