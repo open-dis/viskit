@@ -55,7 +55,6 @@ import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import viskit.doe.LocalBootLoader;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
@@ -67,7 +66,6 @@ import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
-import viskit.view.EventGraphViewFrame;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -130,7 +128,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialAssyFile != null) {
+        if (initialAssyFile != null && !initialAssyFile.isBlank()) {
             LOG.debug("Loading initial file: {}", initialAssyFile);
 
             // Switch to the project that this Assy file is located in if paths do not coincide
@@ -1959,9 +1957,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (historyConfig == null) {initConfig();}
         List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFile valueAr size is: {}", valueAr.size());
-        for (Object value : valueAr) {
+        for (Object value : valueAr)
             adjustRecentProjSet(new File((String) value));
-        }
     }
 
     private void saveAssyHistoryXML(Set<File> recentFiles) {
