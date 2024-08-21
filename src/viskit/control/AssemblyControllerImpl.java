@@ -109,13 +109,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         initialAssyFile = f;
     }
 
-    /** This method is for introducing Assemblies to compile from outside of
-     * Viskit. This method is not used from Viskit and must is required for
-     * third party access.
+    /** This method is for Assembly compilation
      *
      * @param assyPath an assembly file to compile
      */
-    public void compileAssembly(String assyPath) {
+    private void compileAssembly(String assyPath) {
         LOG.debug("Compiling assembly: {}", assyPath);
         File f = new File(assyPath);
         initialAssyFile = assyPath;
@@ -128,13 +126,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialAssyFile != null && !initialAssyFile.isBlank()) {
+        if (initialAssyFile != null && new File(initialAssyFile).exists()) {
             LOG.debug("Loading initial file: {}", initialAssyFile);
 
             // Switch to the project that this Assy file is located in if paths do not coincide
             File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
-            if (projPath.exists() && !initialAssyFile.contains(projPath.getPath())) {
+            if (projPath.exists()  && !initialAssyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
                 openProject(projPath);
