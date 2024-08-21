@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  * @since 9:19:25 AM
  *
  * Based on code posted by Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
- * @deprecated invoke with viskit.EventGraphAssemblyComboMain directly
+ * @deprecated invoke with {@link viskit.EventGraphAssemblyComboMain} directly
  */
 @Deprecated(since = "1.0.16", forRemoval = true)
 public class Splash2 extends JFrame {
