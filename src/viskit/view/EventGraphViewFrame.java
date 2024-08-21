@@ -364,8 +364,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         JLabel lab = new JLabel("Global Code Block");
-        lab.setToolTipText("Use of this code block will be for setting imports, "
-                + "declaring global variables, etc.");
+        lab.setToolTipText("Use of this code block will be for delcaring imports, "
+                + "global variables, etc.");
         lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         p.add(lab);
         cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
