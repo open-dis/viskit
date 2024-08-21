@@ -134,8 +134,8 @@ public class EventInspectorDialog extends JDialog {
 
         // code block
         codeBlock = new CodeBlockPanel(this, true, "Event Code Block");
-        codeBlock.setToolTipText("Use of the code block will cause code to run first" +
-                " in the top of the Event's \"do\" method");
+        codeBlock.setToolTipText("Use of this code block will cause code to run first" +
+                " at the top of the Event's \"do\" method");
         codeBlock.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Code block")));
         panel.add(codeBlock);
 
