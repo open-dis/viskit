@@ -110,9 +110,8 @@
 
     <!-- Test classpath -->
     <path id="runtime.test.classpath">
-        <path path="${dir.build.classes}"/>
-        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <path refid="runtime.classpath"/>
+        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <pathelement location="${dir.lib}/support/junit.jar"/>
     </path>
 
@@ -498,7 +497,7 @@ their descpritions.
     </target>
 
     <!-- === TARGET: dist === -->
-    <target name="dist" depends="clean,jar,javadoc">
+    <target name="dist" depends="clean,build,javadoc">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/examples"/>
@@ -573,7 +572,7 @@ their descpritions.
             description="Build and Run Viskit extended by including external runtime modules">
     </target>
     <target name="build.run.no.extensions"
-            depends="build.no.extensions,quick.run"
+            depends="build,quick.run"
             description="Build and Run Viskit only, no module dependencies">
     </target>
 
