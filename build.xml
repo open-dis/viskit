@@ -81,6 +81,7 @@
     </path>
     
     <path id="runtime.classpath">
+        <pathelement location="${dir.build.classes}"/>
         <pathelement location="${dir.lib}/actions.jar"/>
         <pathelement location="${dir.lib}/batik-ext.jar"/>
         <pathelement location="${dir.lib}/bsh-2.0b4.jar"/>
@@ -103,7 +104,6 @@
         <pathelement location="${dir.lib}/resolver.jar"/>
         <pathelement location="${dir.lib}/serializer.jar"/>
         <pathelement location="${dir.lib}/simkit.jar"/>
-        <pathelement location="${dist.jar}"/>
         <pathelement location="${dir.lib}/xalan.jar"/>
         <pathelement location="${dir.lib}/xercesImpl.jar"/>
     </path>
@@ -635,7 +635,7 @@ their descpritions.
 
     </target>
 
-    <target depends="jar,quick.debug" description="Debug Viskit" name="debug"/>
+    <target depends="compile,quick.debug" description="Debug Viskit" name="debug"/>
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
