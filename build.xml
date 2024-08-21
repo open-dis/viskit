@@ -260,8 +260,7 @@ their descpritions.
     <target name="compile" depends="bindings.simkit,javahelp">
 
         <javac destdir="${dir.build.classes}"
-               source="${javac.source}"
-               target="${javac.target}"
+               release="${javac.release}"
                debug="true"
                fork="true"
                includeantruntime="false">
@@ -687,8 +686,7 @@ their descpritions.
             description="Build the JUnit test harness">
 
         <javac destdir="${dir.build.test.classes}"
-               source="${javac.source}"
-               target="${javac.target}"
+               release="${javac.release}"
                debug="true"
                includeantruntime="false">
 
