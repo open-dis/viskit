@@ -22,7 +22,6 @@ import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
 import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.control.AssemblyController;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
@@ -387,10 +386,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         try {
             jf = new JarFile(jarFilePath);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(LegoTree.this, 
-                    "Error reading " + jarFilePath, "I/O Error", 
-                    JOptionPane.ERROR_MESSAGE
-            );
+            LOG.error(e);
             return;
         }
         jarFileCommon(jf);
