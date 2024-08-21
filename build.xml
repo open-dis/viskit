@@ -376,7 +376,6 @@ their descpritions.
     <target name="make.classpath"
             depends="make.classpath.win,make.classpath.unix,make.classpath.mac"
             description="Platform specific Class-Path header for the editor jar"/>
-
     <target name="make.classpath.win" if="isWin">
         <pathconvert dirsep="/"
                      pathsep=" "
@@ -388,11 +387,8 @@ their descpritions.
             </mapper>
         </pathconvert>
     </target>
-
     <target name="make.classpath.unix" depends="common.unix.classpath" if="isUnix"/>
-
     <target name="make.classpath.mac" depends="common.unix.classpath" if="isMac"/>
-
     <target name="common.unix.classpath">
         <pathconvert dirsep="/"
                      pathsep=" "
@@ -639,7 +635,7 @@ their descpritions.
 
     </target>
 
-    <target depends="compile,quick.debug" description="Debug Viskit" name="debug"/>
+    <target depends="jar,quick.debug" description="Debug Viskit" name="debug"/>
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
@@ -753,7 +749,7 @@ their descpritions.
     </target>
 
     <target name="runDOE"
-            depends="jar, runtime.extensions"
+            depends="jar,runtime.extensions"
             description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
