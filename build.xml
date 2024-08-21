@@ -413,9 +413,11 @@ their descpritions.
                 <!-- used by native launcher, see launch4j -->
                 <attribute name="Main-Class" value="${main.class}"/>
                 <attribute name="Class-Path" value="${launcher.classpath}"/>
+                <attribute name="SplashScreen-Image" value="META-INF/ViskitSplash2.png"/>
             </manifest>
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
+            <metainf file="src/viskit/images/ViskitSplash2.png"/>
         </jar>
     </target>
 
