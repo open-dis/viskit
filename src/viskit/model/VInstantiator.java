@@ -340,7 +340,11 @@ public abstract class VInstantiator {
                     while (li.hasNext())
                         LOG.info("Parameter: {}", li.next());
                 }
-                vAorC = new VInstantiator.Constr(tmp, p.getType());
+                
+                if (!p.getType().contains("simkit.stat")) // a PCL
+                    vAorC = new VInstantiator.Constr(tmp, p.getType());
+                else
+                    vAorC = this;
             }
             return vAorC;
         }
