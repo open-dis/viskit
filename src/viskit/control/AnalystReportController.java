@@ -176,7 +176,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         outFile = outFile.substring(0, idx) + ".html";
         XsltUtility.runXslt(analystReportFile.getAbsolutePath(),
-                outFile, "configuration/AnalystReportXMLtoHTML.xslt");
+                outFile, "config/AnalystReportXMLtoHTML.xslt");
     }
 
     public void generateHtmlReport() {
@@ -216,7 +216,7 @@ public class AnalystReportController extends mvcAbstractController {
         // TODO:  change XML input to temp file, rather than final file, if possible
         XsltUtility.runXslt(analystReportFile.getAbsolutePath(), // XML  input
                 genChooser.getSelectedFile().getAbsolutePath(), // HTML output
-                "configuration/AnalystReportXMLtoHTML.xslt");  // stylesheet
+                "config/AnalystReportXMLtoHTML.xslt");  // stylesheet
 
         // always show latest report, they asked for it
         showHtmlViewer(genChooser.getSelectedFile());
