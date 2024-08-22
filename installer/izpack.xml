@@ -95,8 +95,11 @@
                 <include name="Schemas/**"/>
                 <exclude name="Schemas/legacyDTDs/**"/>
                 <include name="configuration/**"/>
-                <exclude name="configuration/c_gui_mac.xml"/>
                 <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
+                <exclude name="configuration/ClassFinder.properties"/>
+                <exclude name="configuration/ClassFinderReadme"/>
+                <exclude name="configuration/c_gui_mac.xml"/>
+                <exclude name="configuration/log4j2.xml"/>
                 <include name="images/**"/>
                 <exclude name="images/american-flag.gif"/>
                 <include name="lib/**" />
