@@ -424,7 +424,7 @@ their descpritions.
             </manifest>
             <metainf file="license/lgpl.txt"/>
             <metainf file="license/license.txt"/>
-            <metainf file="src/viskit/images/ViskitSplash2.png"/>
+            <metainf file="${splash.image}"/>
         </jar>
     </target>
 
@@ -589,6 +589,9 @@ their descpritions.
             depends="init,quick.run.win,quick.run.mac,quick.run.unix"
             description="Run Viskit, don't check dependencies, don't rebuild"/>
     <target name="quick.run.win" if="isWin">
+        <splash imageurl="file:${basedir}/${splash.image}"
+                useproxy="true"
+                showduration="5000"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
@@ -596,6 +599,9 @@ their descpritions.
         </java>
     </target>
     <target name="quick.run.mac" if="isMac">
+        <splash imageurl="file:${basedir}/${splash.image}"
+                useproxy="true"
+                showduration="5000"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
@@ -603,6 +609,9 @@ their descpritions.
         </java>
     </target>
     <target name="quick.run.unix" if="isUnix">
+        <splash imageurl="file:${basedir}/${splash.image}"
+                useproxy="true"
+                showduration="5000"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
