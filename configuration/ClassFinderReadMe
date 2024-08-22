@@ -1,0 +1,10 @@
+A requirement of Simkit is that if a user requires certain jars from being found 
+on the classpath, then they must be listed in a config/ClassFinder.properties 
+file in this manner:
+
+log4j-api-2.17.0.jar=skip
+...
+
+This is especially true when Simkit searches the entire classpath for external
+RandomVariate instances while running on <= JDK8 and a project dependency 
+contains a jar entry, i.e. META-INF.versions.9/module-info
