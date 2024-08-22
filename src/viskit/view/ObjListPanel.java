@@ -72,7 +72,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             System.out.println("really has " + sz + "parameters");
         }
         int i = 0;
-        String jTFText, s;
+        String jTFText = "", s;
         VInstantiator inst;
         VInstantiator.Factory vif;
         VInstantiator.FreeF viff;
@@ -101,9 +101,6 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     + "here. Seperate vararg entries with commas");
             VStatics.clampHeight(entryTF[i]);
 
-            // Show the formal parameter type in the TF
-            jTFText = inst.toString();
-
             // If we have a factory, then reflect the Object... input to the
             // getInstance() method of RVF
             if (inst instanceof VInstantiator.Factory) {
@@ -112,6 +109,9 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                     viff = (VInstantiator.FreeF) vif.getParams().get(0);
                     jTFText = viff.getValue();
                 }
+            } else {
+                // Show the formal parameter type in the TF
+                jTFText = inst.toString();
             }
 
             entryTF[i].setText(jTFText);
