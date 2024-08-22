@@ -106,12 +106,12 @@
         <pathelement location="${dir.lib}/simkit.jar"/>
         <pathelement location="${dir.lib}/xalan.jar"/>
         <pathelement location="${dir.lib}/xercesImpl.jar"/>
+        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
     </path>
 
     <!-- Test classpath -->
     <path id="runtime.test.classpath">
         <path refid="runtime.classpath"/>
-        <pathelement location="${dir.lib}/xmlrpc-2.0.jar"/>
         <pathelement location="${dir.lib}/support/junit.jar"/>
     </path>
 
@@ -278,11 +278,18 @@ their descpritions.
                 <include name="viskit/images/*.gif"/>
                 <include name="viskit/images/*.jpg"/>
             </fileset>
-            <fileset dir="${basedir}">
+            <fileset dir="${configuration.dir}">
+                <include name="log4j2.xml"/>
+            </fileset>
+        </copy>
+        
+        <!-- ClassFinder prop for Simkit class skipping -->
+        <copy todir="${dir.build.classes}/config">
+            <fileset dir="${configuration.dir}">
+                <include name="ClassFinder.properties"/>
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
-        <copy file="${configuration.dir}/log4j2.xml" todir="${dir.build.classes}"/>
 
         <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>
