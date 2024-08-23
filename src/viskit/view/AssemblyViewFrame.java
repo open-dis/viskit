@@ -228,16 +228,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
-            if (mod.getLastFile() != null) {
+            if (mod.getLastFile() != null)
                 ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
-            }
 
             GraphMetadata gmd = mod.getMetaData();
-            if (gmd != null) {
+            if (gmd != null)
                 setSelectedAssemblyName(gmd.name);
-            } else if (viskit.VStatics.debug) {
+            else if (viskit.VStatics.debug)
                 System.err.println("error: AssemblyViewFrame gmd null..");
-            }
         }
     }
 
@@ -418,18 +416,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         Action a = ActionIntrospector.getAction(source, method);
 
         Map<String, Object> map = new HashMap<>();
-        if (mn != null) {
+        if (mn != null)
             map.put(Action.MNEMONIC_KEY, mn);
-        }
-        if (accel != null) {
+        if (accel != null)
             map.put(Action.ACCELERATOR_KEY, accel);
-        }
-        if (name != null) {
+        if (name != null)
             map.put(Action.NAME, name);
-        }
-        if (!map.isEmpty()) {
+        if (!map.isEmpty())
             ActionUtilities.decorateAction(a, map);
-        }
 
         return ActionUtilities.createMenuItem(a);
     }
@@ -441,18 +435,14 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // Use the button's selected status to figure out what mode
         // we are in.
 
-        if (selectMode.isSelected()) {
+        if (selectMode.isSelected())
             return SELECT_MODE;
-        }
-        if (adapterMode.isSelected()) {
+        if (adapterMode.isSelected())
             return ADAPTER_MODE;
-        }
-        if (simEventListenerMode.isSelected()) {
+        if (simEventListenerMode.isSelected())
             return SIMEVLIS_MODE;
-        }
-        if (propChangeListenerMode.isSelected()) {
+        if (propChangeListenerMode.isSelected())
             return PCL_MODE;
-        }
         LogUtils.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
     }
@@ -463,31 +453,49 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         // Buttons for what mode we are in
 
-        selectMode = makeJTButton(null, "viskit/images/selectNode.png",
-                "Select items on the graph");
+        selectMode = makeJTButton(
+                null, 
+                "viskit/images/selectNode.png",
+                "Select items on the graph"
+        );
         Border defBor = selectMode.getBorder();
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        adapterMode = makeJTButton(null, new AdapterIcon(24, 24),
-                "Connect SimEntities with adapter pattern");
+        adapterMode = makeJTButton(
+                null, 
+                new AdapterIcon(24, 24),
+                "Connect SimEntities with adapter pattern"
+        );
         defBor = adapterMode.getBorder();
         adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        simEventListenerMode = makeJTButton(null, new SimEventListenerIcon(24, 24),
-                "Connect SimEntities through a SimEvent listener pattern");
+        simEventListenerMode = makeJTButton(
+                null, 
+                new SimEventListenerIcon(24, 24),
+                "Connect SimEntities through a SimEvent listener pattern"
+        );
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeJTButton(null, new PropChangeListenerIcon(24, 24),
-                "Connect a property change listener to a SimEntity");
+        propChangeListenerMode = makeJTButton(
+                null, 
+                new PropChangeListenerIcon(24, 24),
+                "Connect a property change listener to a SimEntity"
+        );
         defBor = propChangeListenerMode.getBorder();
         propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
-        JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
-                "Zoom in on the graph");
+        JButton zoomIn = makeButton(
+                null, 
+                "viskit/images/ZoomIn24.gif",
+                "Zoom in on the graph"
+        );
 
-        JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
-                "Zoom out on the graph");
+        JButton zoomOut = makeButton(
+                null, 
+                "viskit/images/ZoomOut24.gif",
+                "Zoom out on the graph"
+        );
 
         Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
         runButt = makeButton(runAction, "viskit/images/Play24.gif",
@@ -517,7 +525,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
         
-        JLabel initializeLabel = new JLabel ("  Initialize assembly runner: ");
+        JLabel initializeLabel = new JLabel ("  Initialize Assembly Run: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
         getToolBar().add(runButt);
@@ -560,32 +568,31 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private JToggleButton makeJTButton(Action a, String icPath, String tt) {
         JToggleButton jtb;
-        if (a != null) {
+        
+        if (a != null) 
             jtb = new JToggleButton(a);
-        } else {
+        else
             jtb = new JToggleButton();
-        }
+        
         return (JToggleButton) buttonCommon(jtb, icPath, tt);
     }
 
     private JToggleButton makeJTButton(Action a, Icon ic, String tt) {
         JToggleButton jtb;
-        if (a != null) {
+        if (a != null)
             jtb = new JToggleButton(a);
-        } else {
+        else
             jtb = new JToggleButton();
-        }
         jtb.setIcon(ic);
         return (JToggleButton) buttonCommon2(jtb, tt);
     }
 
     private JButton makeButton(Action a, String icPath, String tt) {
         JButton b;
-        if (a != null) {
+        if (a != null)
             b = new JButton(a);
-        } else {
+        else
             b = new JButton();
-        }
         return (JButton) buttonCommon(b, icPath, tt);
     }
 
@@ -647,10 +654,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void delTab(AssemblyModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
+        JSplitPane jsplt;
+        JScrollPane jsp;
+        VgraphAssemblyComponentWrapper vgacw;
         for (int i = 0; i < ca.length; i++) {
-            JSplitPane jsplt = (JSplitPane) ca[i];
-            JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            jsplt = (JSplitPane) ca[i];
+            jsp = (JScrollPane) jsplt.getRightComponent();
+            vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgacw.assyModel == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
@@ -671,10 +681,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public AssemblyModel[] getOpenModels() {
         Component[] ca = tabbedPane.getComponents();
         AssemblyModel[] vm = new AssemblyModel[ca.length];
+        JSplitPane jsplt;
+        JScrollPane jsp;
+        VgraphAssemblyComponentWrapper vgacw;
         for (int i = 0; i < vm.length; i++) {
-            JSplitPane jsplt = (JSplitPane) ca[i];
-            JScrollPane jsp = (JScrollPane) jsplt.getRightComponent();
-            VgraphAssemblyComponentWrapper vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            jsplt = (JSplitPane) ca[i];
+            jsp = (JScrollPane) jsplt.getRightComponent();
+            vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgacw.assyModel;
         }
         return vm;
@@ -875,9 +888,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void addEventGraphsToLegoTree(File f, boolean b) {
-        if (f.exists()) {
+        if (f.exists())
             lTree.addContentRoot(f, b);
-        }
     }
 
     @Override
@@ -914,8 +926,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void genericReport(int type, String title, String msg)
-    {
+    public void genericReport(int type, String title, String msg) {
         JOptionPane.showMessageDialog(this, msg, title, type);
     }
 
@@ -929,11 +940,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
-        if (VGlobals.instance().getCurrentViskitProject() != null) {
+        if (VGlobals.instance().getCurrentViskitProject() != null)
             return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
-        } else {
+        else
             return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
-        }
     }
 
     @Override
@@ -956,11 +966,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         String fn = RecentFilesDialog.showDialog(this, lis);
         if (fn != null) {
             File f = new File(fn);
-            if (f.exists()) {
+            if (f.exists())
                 return f;
-            } else {
+            else
                 genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
-            }
         }
         return null;
     }
@@ -968,9 +977,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     @Override
     public void setSelectedAssemblyName(String s) {
         boolean nullString = !(s != null && !s.isEmpty());
-        if (!nullString) {
+        if (!nullString)
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
-        }
     }
 
     @Override
@@ -1013,26 +1021,22 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-        if (jfc == null) {
+        if (jfc == null)
             jfc = buildOpenSaveChooser();
-        }
 
         jfc.setDialogTitle("Save Assembly File");
         File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
-        if (!fil.getParentFile().isDirectory()) {
+        if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
-        }
-        if (showUniqueName) {
+        if (showUniqueName)
             fil = getUniqueName(suggName);
-        }
 
         jfc.setSelectedFile(fil);
         int retv = jfc.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (jfc.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
+                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm"))
                     return null;
-                }
             }
             return jfc.getSelectedFile();
         }
@@ -1050,9 +1054,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir())) {
+                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
                     deleteCanceledSave(file.getParentFile());
-                }
             }
         }
     }
