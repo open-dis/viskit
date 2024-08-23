@@ -977,14 +977,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void openProject() {
         AssemblyControllerImpl aController = ((AssemblyControllerImpl) getController());
 
-        if (!aController.handleProjectClosing()) {
+        if (!aController.handleProjectClosing())
             return;
-        }
 
         File file = ViskitProject.openProjectDir(this.getContent(), ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        if (file != null) {
+        if (file != null)
             aController.openProject(file);
-        }
 
         showProjectName();
     }
