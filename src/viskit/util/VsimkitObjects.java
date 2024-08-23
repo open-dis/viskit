@@ -37,8 +37,10 @@ public class VsimkitObjects {
         try {
             Class<?> c = VStatics.classForName("viskit.VsimkitObjects");
             Method[] meths = c.getDeclaredMethods();
+            String name, noPackageName;
+            Object m, o;
             for (Method method : meths) {
-                String name = method.getName();
+                name = method.getName();
 
                 // we can skip these
                 if (name.equals(VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD) || name.equals("getFullName")) {
@@ -50,11 +52,11 @@ public class VsimkitObjects {
                 name = "simkit." + name.replace('_', '.');
 
                 // with no package
-                String noPackageName = name.substring(name.lastIndexOf('.') + 1);
+                noPackageName = name.substring(name.lastIndexOf('.') + 1);
 
                 // TODO: this breaks on AR1Variate instance "getting"
-                Object m = method.invoke(null, (Object[]) null);
-                Object o = new FullNameAndInstance(name, m);
+                m = method.invoke(null, (Object[]) null);
+                o = new FullNameAndInstance(name, m);
                 LogUtils.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
                 HASH_MAP.put(name, o);
                 HASH_MAP.put(noPackageName, o);

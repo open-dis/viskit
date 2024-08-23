@@ -74,7 +74,7 @@ import viskit.VGlobals;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
- * @version $Id$
+ * 
  * <p>
  *   <b>History:</b>
  *   <pre><b>
@@ -170,10 +170,12 @@ public class EventGraphCache {
         Element localRootElement = assemblyDocument.getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
 
+        Element tableEntry;
+        List<Element> entityParams;
         // Only those entities defined via SMAL
         for (Element temp : simEntityList) {
-            Element tableEntry = new Element("SimEntity");
-            List<Element> entityParams = temp.getChildren("MultiParameter");
+            tableEntry = new Element("SimEntity");
+            entityParams = temp.getChildren("MultiParameter");
 
             for (Element param : entityParams) {
                 if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
@@ -183,7 +185,6 @@ public class EventGraphCache {
                 }
             }
         }
-
     }
 
     /**
