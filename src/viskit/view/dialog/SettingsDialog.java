@@ -634,7 +634,7 @@ public class SettingsDialog extends JDialog {
             path = path.replaceAll("\\\\", "/");
             file = new File(path);
             
-            // Allow a relative paths
+            // Allow relative paths
             if (path.contains("..")) {
                 itr = Path.of(file.toURI()).iterator();
                 file = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
