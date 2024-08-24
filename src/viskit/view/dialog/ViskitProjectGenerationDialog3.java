@@ -219,9 +219,8 @@ private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     File file = ViskitProject.newProjectPath(this, System.getProperty("user.home"));
 
-    if (file != null) {
+    if (file != null)
         locationTF.setText(file.getAbsolutePath().replaceAll("\\\\", "/"));
-    }
 }//GEN-LAST:event_browseButtActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButt;
