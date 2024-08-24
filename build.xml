@@ -591,6 +591,7 @@ their descpritions.
               fork="true">
             <classpath path="${extra.classpath}"/>
             <jvmarg line="${run.args}"/>
+            <arg value="${viskit.args}"/>
         </java>
     </target>
 
