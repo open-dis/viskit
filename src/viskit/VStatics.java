@@ -475,7 +475,6 @@ public class VStatics {
         String clazz;
 
         for (String cpath : classpaths) {
-            cpath = cpath.replaceAll("\\\\", "/");
 
             // We can deal with jars w/the SimpleDirectoriesAndJarsClassLoader
             if (cpath.contains(".jar")) {continue;}
