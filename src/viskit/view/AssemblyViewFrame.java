@@ -47,6 +47,8 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -597,7 +599,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(icPath)));
+        b.setIcon(new ImageIcon(getClass().getClassLoader().getResource(icPath)));
         return buttonCommon2(b, tt);
     }
 
@@ -711,22 +713,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
-        String[] extraCP = SettingsDialog.getExtraClassPath();
-
-        if (extraCP != null) {
-            File file;
-            for (String path : extraCP) { // tbd same for pcls
-                file = new File(path);
-                if (!file.exists()) {
-
-                    // Allow a relative path for Diskit-Test (Diskit)
-                    if (path.contains(".."))
-                        file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+        try {
+            URL[] extraCP = SettingsDialog.getExtraClassPathArraytoURLArray();
+            if (extraCP != null) {
+                File file;
+                for (URL path : extraCP) { // tbd same for pcls
+                    file = new File(path.toURI());
+                    if (file.exists()) 
+                        addEventGraphsToLegoTree(file, file.isDirectory());
                 }
-
-                if (file.exists()) 
-                    addEventGraphsToLegoTree(file, file.isDirectory());
             }
+        } catch (URISyntaxException ex) {
+            LogUtils.getLogger(getClass()).error(ex);
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
