@@ -1,6 +1,7 @@
 package viskit.view;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -13,10 +14,11 @@ import java.util.*;
 import java.util.jar.JarFile;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.*;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
@@ -81,7 +83,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * @param tooltip description for this LEGO tree
      */
     LegoTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
-        this(className, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource(iconPath)), dslis, tooltip);
+        this(className, new ImageIcon(dslis.getClass().getClassLoader().getResource(iconPath)), dslis, tooltip);
     }
 
     /**
@@ -261,9 +263,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 mod.nodesWereInserted(rootNode, new int[]{idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
-                for (File file : fa) {
+                for (File file : fa)
                     _addContentRoot(file, file.isDirectory());
-                }
+                
             } else { // recurse = true
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
@@ -327,6 +329,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
+                    // TODO: .class files come here if a directory is listed on
+                    // the additional classpath element
                     LOG.warn( "Possible that {} has been cached missed. "
                             + "Manually check for good compilation. If so, then "
                             + "manually remove digests from project's cached "
