@@ -1,6 +1,7 @@
 package viskit.util;
 
 import edu.nps.util.LogUtils;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,8 +14,11 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.VGlobals;
+import viskit.doe.LocalBootLoader;
 
 /** Using the java compiler, now part of javax.tools, we no longer have to
  * ship tools.jar from the JDK install.
@@ -28,7 +32,7 @@ public class Compiler {
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
 
-    static Logger log = LogUtils.getLogger(Compiler.class);
+    static final Logger LOG = LogUtils.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;
@@ -71,10 +75,10 @@ public class Compiler {
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
-            String[] workClassPath = ((viskit.doe.LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
+            String[] workClassPath = ((LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
             int wkpLength = workClassPath.length;
             classPaths = new StringBuilder(wkpLength);
-
+            
             for (String cPath : workClassPath) {
                 classPaths.append(cPath);
                 classPaths.append(File.pathSeparator);
@@ -83,7 +87,7 @@ public class Compiler {
             // Get rid of the last ";" or ":" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
             cp = classPaths.toString();
-            log.debug("cp is: " + cp);
+            LOG.debug("{} cp is: {}", className,cp);
 
             String[] options = {
                 "-Xlint:unchecked",
@@ -96,9 +100,8 @@ public class Compiler {
             };
             java.util.List<String> optionsList = Arrays.asList(options);
 
-            if (baosOut == null) {
+            if (baosOut == null)
                 baosOut = new ByteArrayOutputStream();
-            }
 
             compiler.getTask(new BufferedWriter(new OutputStreamWriter(baosOut)),
                     sjfm,
@@ -108,9 +111,8 @@ public class Compiler {
                     fileObjects).call();
 
             // Check for errors
-            if (diagnosticMessages.toString().isEmpty()) {
+            if (diagnosticMessages.toString().isEmpty())
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
-            }
         } catch (Exception ex) {
             if (ex instanceof NullPointerException) {
 
@@ -120,21 +122,22 @@ public class Compiler {
                                 + "java.exe as first entry in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
-                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                        "Incorrect Path", msg);
-
-                log.error(msg);
+                VGlobals.instance().getAssemblyEditor().genericReport(
+                        JOptionPane.INFORMATION_MESSAGE,
+                        "Incorrect Path", 
+                        msg
+                );
+                LOG.error(msg);
             }
-            log.error(ex);
-//            log.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
-//            log.info("Classpath is: " + cp);
+            LOG.error(ex);
+//            LOG.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+//            LOG.info("Classpath is {}: ", cp);
         } finally {
-
             if (sjfm != null) {
                 try {
                     sjfm.close();
                 } catch (IOException ex) {
-                    log.error(ex);
+                    LOG.error(ex);
                 }
             }
         }
