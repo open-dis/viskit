@@ -1408,7 +1408,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         if ((xvt == null) || !xvt.isValidXML()) {
 
-            // TODO: implement a Dialog pointing to the validationErrors.log
+            // TODO: implement a Dialog pointing to the validationErrors.LOG
             return null;
         } else {
             LOG.info("{} is valid XML\n", f);
@@ -1506,9 +1506,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             // Create, or find the project's java source and package
             File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
-            if (!srcPkg.isDirectory()) {
+            if (!srcPkg.isDirectory())
                 srcPkg.mkdirs();
-            }
             File javaFile = new File(srcPkg, baseName + ".java");
             javaFile.createNewFile();
 
@@ -1527,15 +1526,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
             if (compileSuccess) {
-
                 LOG.info(diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
             } else {
-
                 LOG.error(diagnostic + "\n");
-                if (!baosOut.toString().isEmpty()) {
+                if (!baosOut.toString().isEmpty())
                     LOG.error(baosOut.toString() + "\n");
-                }
             }
 
         } catch (IOException ioe) {
@@ -1601,17 +1597,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             Matcher m = p.matcher(source);
             if (m.find()) {
                 String nuts = m.group();
-                if (nuts.endsWith(";")) {
+                if (nuts.endsWith(";"))
                     nuts = nuts.substring(0, nuts.length() - 1);
-                }
 
                 String[] sa = nuts.split("\\s");
                 pkg = sa[1];
             }
             File f = compileJavaClassFromString(source);
-            if (f != null) {
+            if (f != null)
                 return new PkgAndFile(pkg, f);
-            }
         }
         return null;
     }
