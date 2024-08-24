@@ -145,7 +145,7 @@ public class LocalBootLoader extends URLClassLoader {
             try {
                 tempUrl = new File(ext.toURI());
                 tempClasspath[tempClasspath.length - 1] = tempUrl.getPath();
-                LOG.info("Extra path: {}",tempUrl.getPath());
+                LOG.debug("Extra path: {}",tempUrl.getPath());
                 classPath = tempClasspath;
             } catch (URISyntaxException ex) {
                 LOG.error(ex);
