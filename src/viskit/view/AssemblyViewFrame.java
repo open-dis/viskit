@@ -713,15 +713,15 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
+        File file;
         try {
             URL[] extraCP = SettingsDialog.getExtraClassPathArraytoURLArray();
-            if (extraCP != null) {
-                File file;
-                for (URL path : extraCP) { // tbd same for pcls
-                    file = new File(path.toURI());
-                    if (file.exists()) 
-                        addEventGraphsToLegoTree(file, file.isDirectory());
-                }
+            for (URL path : extraCP) { // tbd same for pcls
+                if (path == null)
+                    continue; // can happen if extraClassPaths.path[@value] is null or erroneous
+                file = new File(path.toURI());
+                if (file.exists()) 
+                    addEventGraphsToLegoTree(file, file.isDirectory());
             }
         } catch (URISyntaxException ex) {
             LogUtils.getLogger(getClass()).error(ex);
@@ -740,6 +740,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
+            path = path.replaceAll("\\\\", "/");
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);
                 addPCLsToLegoTree(new File(path), false);
