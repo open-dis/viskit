@@ -389,22 +389,7 @@ their descpritions.
     </target>
 
     <target name="make.classpath"
-            depends="make.classpath.win,make.classpath.unix,make.classpath.mac"
-            description="Platform specific Class-Path header for the editor jar"/>
-    <target name="make.classpath.win" if="isWin">
-        <pathconvert dirsep="/"
-                     pathsep=" "
-                     property="launcher.classpath"
-                     refid="runtime.classpath">
-            <map from="*${dir.build.classes}" to=""/>
-            <mapper>
-                <globmapper from="${basedir}\lib\*" to="lib/*"/>
-            </mapper>
-        </pathconvert>
-    </target>
-    <target name="make.classpath.unix" depends="common.unix.classpath" if="isUnix"/>
-    <target name="make.classpath.mac" depends="common.unix.classpath" if="isMac"/>
-    <target name="common.unix.classpath">
+            description="Class-Path header for the editor jar">
         <pathconvert dirsep="/"
                      pathsep=" "
                      property="launcher.classpath"
