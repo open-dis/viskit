@@ -125,7 +125,7 @@ public class LocalBootLoader extends URLClassLoader {
 
     /** @return a custom ClassLoader */
     public LocalBootLoader init() {
-        File jar = null;
+        File jar = null, tempUrl;
         String[] tempClasspath;
 
         // Capture the current runtime classpath
@@ -141,9 +141,11 @@ public class LocalBootLoader extends URLClassLoader {
 
             stage1.addURL(ext);
             tempClasspath = new String[getClassPath().length + 1];
-            System.arraycopy(classPath, 0, tempClasspath, 0, classPath.length);
+            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPath.length);
             try {
-                tempClasspath[tempClasspath.length - 1] = ext.toURI().getPath();
+                tempUrl = new File(ext.toURI());
+                tempClasspath[tempClasspath.length - 1] = tempUrl.getPath();
+                LOG.info("Extra path: {}",tempUrl.getPath());
                 classPath = tempClasspath;
             } catch (URISyntaxException ex) {
                 LOG.error(ex);
@@ -163,7 +165,7 @@ public class LocalBootLoader extends URLClassLoader {
 
             stage1.addURL(getWorkDir().toURI().toURL());
             tempClasspath = new String[getClassPath().length + 1];
-            System.arraycopy(classPath, 0, tempClasspath, 0, classPath.length);
+            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPath.length);
             try {
                 tempClasspath[tempClasspath.length - 1] = getWorkDir().getCanonicalPath();
                 classPath = tempClasspath;
@@ -205,8 +207,8 @@ public class LocalBootLoader extends URLClassLoader {
         // Now normalize all the paths in the classpath variable[]
         tempClasspath = new String[getClassPath().length];
         int idx = 0;
-        for (String path : classPath) {
-            tempClasspath[idx] = path.replaceAll("\\\\", "/");
+        for (String path : getClassPath()) {
+            tempClasspath[idx] = path;
             idx++;
         }
 
@@ -278,7 +280,7 @@ public class LocalBootLoader extends URLClassLoader {
             Attributes attr;
             try {
                 url = new URI("jar:file:" + classPathProp + "!/").toURL();
-                uc = (JarURLConnection)url.openConnection();
+                uc = (JarURLConnection) url.openConnection();
                 attr = uc.getMainAttributes();
                 cPath.append(classPathProp);
                 for (String path : attr.getValue(Attributes.Name.CLASS_PATH).split(" ")) {
@@ -304,7 +306,7 @@ public class LocalBootLoader extends URLClassLoader {
         // a file, then each instance of the loader will have its own
         // context in terms of static variables from the read-in classes,
         // e.g. simkit.Schedule.reset() in one thread which will not reset
-        // another.  See sample case StaticsTest
+        // another. See sample case StaticsTest
         while (loop) {
             try {
                 if (reloadSimkit) {
