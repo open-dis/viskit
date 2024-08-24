@@ -728,7 +728,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
     {
-        ((AssemblyView) getView()).genericReport(typ, title, msg);
+        if (((AssemblyView) getView()) != null)
+            ((AssemblyView) getView()).genericReport(typ, title, msg);
     }
 
     @Override
