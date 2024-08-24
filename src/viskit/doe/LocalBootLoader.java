@@ -230,13 +230,15 @@ public class LocalBootLoader extends URLClassLoader {
         return extUrls;
     }
 
-    /** @return a custom classpath String [] */
+    /** @return a custom String[] with our classpath */
     public String[] getClassPath() {
 
         // very verbose when "debug" mode
-//        for (String line : classPath)
-//            log.debug(line);
-//        log.debug("End ClassPath entries\n");
+        for (String path : classPath) {
+            path = path.replaceAll("\\\\", "/");
+            LOG.debug(path);
+        }
+        LOG.debug("End ClassPath entries\n");
         return classPath;
     }
 
@@ -320,7 +322,6 @@ public class LocalBootLoader extends URLClassLoader {
 
         // build up stage1 libs
         for (String path : getClassPath()) {
-            path = path.replaceAll("\\\\", "/");
             try {
                 stage1.addURL(new File(path).toURI().toURL());
             } catch (MalformedURLException ex) {
