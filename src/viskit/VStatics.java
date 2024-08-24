@@ -554,7 +554,8 @@ public class VStatics {
     }
 
     /**
-     * For the given EG class type, return its specific ParameterMap contents
+     * For the given EG class type, return its specific ParameterMap contents.
+     * A LOG error will report if something is missing on the classpath
      *
      * @param type the EG class type to resolve
      * @return a List of parameter map object arrays
@@ -578,13 +579,17 @@ public class VStatics {
             LOG.debug("parameter {} already resolved", type);
         }
         if (resolved == null) {
-
-            Constructor<?>[] constr = type.getConstructors();
-            Annotation[] paramAnnots;
+            Constructor<?>[] constr;
+            try {
+                constr = type.getConstructors();
+            } catch (NoClassDefFoundError er) {
+                LOG.error(er);
+                return null;
+            }
             List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
             ObjectFactory of = new ObjectFactory();
             Field f = null;
-
+            
             try {
                 f = type.getField("parameterMap");
             } catch (SecurityException ex) {
@@ -604,28 +609,27 @@ public class VStatics {
             String[] params;
             String[][] pMap;
             int numConstrs;
+            Annotation[] paramAnnots;
             String ptype, pname, ptType;
             for (int i = 0; i < constr.length; i++) {
                 ptypes = constr[i].getParameterTypes();
                 paramAnnots = constr[i].getDeclaredAnnotations();
                 plist[i] = new ArrayList<>();
-                if (viskit.VStatics.debug) {
-                    System.out.println("\t # params " + ptypes.length + " in constructor " + i);
-                }
+                if (viskit.VStatics.debug)
+                    LOG.debug("\t # params {} in constructor {}", ptypes.length, i);
 
                 // possible that a class inherited a parameterMap, check if annotated first
                 if (paramAnnots != null && paramAnnots.length > 0) {
-                    if (paramAnnots.length > 1) {
-                        throw new RuntimeException("Only one Annotation per constructor");
-                    }
+                    if (paramAnnots.length > 1)
+                        throw new RuntimeException("Only one Annotation per constructor"); // TODO: harsh
 
                     param = constr[i].getAnnotation(viskit.ParameterMap.class);
                     if (param != null) {
                         names = param.names();
                         types = param.types();
-                        if (names.length != types.length) {
-                            throw new RuntimeException("ParameterMap names and types length mismatch");
-                        }
+                        if (names.length != types.length)
+                            throw new RuntimeException("ParameterMap names and types length mismatch"); // TODO: harsh
+                        
                         for (int k = 0; k < names.length; k++) {
                             pt = of.createParameter();
                             pt.setName(names[k]);
@@ -636,9 +640,9 @@ public class VStatics {
                     }
 
                 } else if (f != null) {
-                    if (viskit.VStatics.debug) {
-                        System.out.println(f + " is a parameterMap");
-                    }
+                    if (viskit.VStatics.debug)
+                        LOG.debug("{} is a parameterMap", f);
+                    
                     try {
                         // parameters are in the following order
                         // {
@@ -663,9 +667,9 @@ public class VStatics {
                                         p.setType(ptype);
 
                                         plist[n].add(p);
-                                        if (viskit.VStatics.debug) {
-                                            System.out.println("\tfrom compiled parameterMap" + p.getName() + p.getType());
-                                        }
+                                        if (viskit.VStatics.debug)
+                                            LOG.debug("\tfrom compiled parameterMap {}", p.getName() + p.getType());
+                                        
                                     } catch (Exception ex) {
                                         LOG.error(ex);
 //                                        ex.printStackTrace();
