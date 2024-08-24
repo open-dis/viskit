@@ -37,7 +37,6 @@ public class ViskitConfig {
     public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 
     public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
-    public static final File V_CONFIG_FILE = new File(VISKIT_CONFIG_DIR, "vconfig.xml");
     public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
     public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
     public static final File VISKIT_LOGS_DIR = new File("logs");
@@ -113,23 +112,11 @@ public class ViskitConfig {
                 LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
             }
 
-            // NOTE: Due to the chages in the latest Commons Configuration v2-2.10.1
-            // V_CONFIG_FILE is irrelvant for this application of the config.
-            // APP and GUI will be loaded each directly into a combined config
-            File vconfigSrc = new File("configuration/" + V_CONFIG_FILE.getName());
-            if (!V_CONFIG_FILE.exists())
-                Files.copy(vconfigSrc.toPath(), V_CONFIG_FILE.toPath());
-
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists())
                 Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
 
-            File cGuiSrc;
-            if (VStatics.OPERATING_SYSTEM.toLowerCase().contains("os x"))
-                cGuiSrc = new File("configuration/c_gui_mac.xml");
-            else
-                cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
-
+            File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists())
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
 
@@ -284,10 +271,6 @@ public class ViskitConfig {
             // For c_gui.xml
             doc = FileHandler.unmarshallJdom(C_GUI_FILE);
             xout.output(doc, new FileWriter(C_GUI_FILE));
-
-            // For vconfig.xml
-            doc = FileHandler.unmarshallJdom(V_CONFIG_FILE);
-            xout.output(doc, new FileWriter(V_CONFIG_FILE));
 
             // For the current Viskit project file
             doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
