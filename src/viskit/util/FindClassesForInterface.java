@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
@@ -18,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import viskit.VGlobals;
+import viskit.VStatics;
+import viskit.doe.LocalBootLoader;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
  * XML. Used to populate the LEGOs tree on the Assy Editor.
@@ -35,7 +38,8 @@ public class FindClassesForInterface {
     public static Class<?> classFromFile(File f, Class<?> implementing) {
         Class<?> c = null;
         try {
-            c = classFromFile(f);
+//            c = classFromFile(f);
+            c = VStatics.classForName(f.getPath());
 
             if (c.isInterface() || !isConcrete(c)) {
                 c = null;
@@ -125,12 +129,7 @@ public class FindClassesForInterface {
      */
     public static List<Class<?>> findClasses(JarFile jarFile, Class<?> implementing) {
         List<Class<?>> found = new ArrayList<>();
-        URLClassLoader loader = null;
-        try {
-            loader = new URLClassLoader(new URL[] {new File(jarFile.getName()).toURI().toURL()});
-        } catch (MalformedURLException e) {
-            LogUtils.getLogger(FindClassesForInterface.class).debug(e);
-        }
+        URLClassLoader loader = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader());
         JarEntry nextEntry;
         Class<?> c;
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
