@@ -326,23 +326,23 @@ public abstract class VInstantiator {
                 if (VStatics.debug)
                     LOG.info("Trying to build MultiParameter: {}", p.getType());
 
-                List<Object> tmp = p.getParameters();
-                if (tmp.isEmpty())
+                List<Object> tmpParams = p.getParameters();
+                if (tmpParams.isEmpty())
 
                     // Likely, Diskit, or another library is not on the classpath
                     if (VStatics.resolveParameters(VStatics.classForName(p.getType())) == null)
                         return null;
                     else
-                        tmp = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
+                        tmpParams = VStatics.resolveParameters(VStatics.classForName(p.getType()))[0];
                 
                 if (VStatics.debug) {
-                    Iterator<Object> li = tmp.iterator();
+                    Iterator<Object> li = tmpParams.iterator();
                     while (li.hasNext())
                         LOG.info("Parameter: {}", li.next());
                 }
                 
                 if (!p.getType().contains("simkit.stat")) // a PCL
-                    vAorC = new VInstantiator.Constr(tmp, p.getType());
+                    vAorC = new VInstantiator.Constr(tmpParams, p.getType());
                 else
                     vAorC = this;
             }
