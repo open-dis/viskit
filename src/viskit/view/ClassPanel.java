@@ -40,7 +40,7 @@ public class ClassPanel extends JPanel {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         buttPan.add(Box.createHorizontalGlue());
-        plus = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/plus.png")));
+        plus = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/plus.png")));
         plus.setBorder(null);
         plus.setText(null);
         plus.setToolTipText(plusTT); //"Add event graph class file or directory root to this list");
@@ -50,8 +50,8 @@ public class ClassPanel extends JPanel {
         buttPan.add(plus);
         buttPan.add(Box.createHorizontalStrut(10));
 
-        minus = new JButton(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/minus.png")));
-        minus.setDisabledIcon(new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/minusGrey.png")));
+        minus = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/minus.png")));
+        minus.setDisabledIcon(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/minusGrey.png")));
         minus.setBorder(null);
         minus.setText(null);
         minus.setToolTipText(minusTT); //"Remove event graph class file or directory from this list");

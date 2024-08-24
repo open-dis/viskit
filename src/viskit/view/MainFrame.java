@@ -122,7 +122,7 @@ public class MainFrame extends JFrame {
                 myQuitAction.actionPerformed(null);
             }
         });
-        ImageIcon icon = new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/ViskitSplash2.png"));
+        ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         MainFrame.this.setIconImage(icon.getImage());
     }
 
@@ -265,7 +265,7 @@ public class MainFrame extends JFrame {
             doeFrame = doeMain.getMainFrame();
             runTabbedPane.add(doeFrame.getContent(), TAB1_DOE_IDX);
             runTabbedPane.setTitleAt(TAB1_DOE_IDX, "Design of Experiments");
-            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_DOE_IDX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
             menuBar = doeMain.getMenus();
             if (menuBar == null) {
                 menuBar = new JMenuBar();
@@ -286,7 +286,7 @@ public class MainFrame extends JFrame {
                 doeFrame.getController().setJobLauncher(runGridComponent);
             runTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_IDX);
             runTabbedPane.setTitleAt(TAB1_CLUSTERUN_IDX, "LaunchClusterJob");
-            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(VGlobals.instance().getWorkClassLoader().getResource("viskit/images/grid.png")));
+            runTabbedPane.setIconAt(TAB1_CLUSTERUN_IDX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
             menuBar = new JMenuBar();
             menuBar.add(new JMenu("File"));
             jamQuitHandler(null, myQuitAction, menuBar);
