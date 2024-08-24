@@ -39,6 +39,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
@@ -320,8 +321,8 @@ public class ViskitProject {
 
             // Now list any paths outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = SettingsDialog.getExtraClassPath();
-            for (String classPath : classPaths)
-                cp.add(classPath.replaceAll("\\\\", "/"));
+            cp.addAll(Arrays.asList(classPaths));
+            LOG.debug("Project cp: {}", cp);
 
         } catch (IOException ex) {
             LOG.error(ex);
