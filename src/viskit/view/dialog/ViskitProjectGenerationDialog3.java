@@ -72,9 +72,9 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
             sb.append(locationTF.getText().trim());
             int len;
             while ((len = sb.length()) > 0) {
-                if (sb.charAt(len - 1) != '/') {
+                if (sb.charAt(len - 1) != '/') 
                     break;
-                }
+                
                 sb.setLength(len - 1);
             }
 
