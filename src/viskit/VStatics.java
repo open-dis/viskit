@@ -298,7 +298,7 @@ public class VStatics {
                 c = tryCommonClasses(s, clsLoader);
                 if (c == null) {
                     try {
-                        c = VGlobals.instance().getWorkClassLoader().loadClass(s);
+                        c = clsLoader.loadClass(s);
                     } catch (ClassNotFoundException cnfe) {
                         // sometimes happens, ignore
                     }
@@ -470,11 +470,12 @@ public class VStatics {
         Path startingDir;
         String pattern = name + "\\.class";
         Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader)VGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
         String[] classpaths = loader.getClassPath();
         String clazz;
 
         for (String cpath : classpaths) {
+            cpath = cpath.replaceAll("\\\\", "/");
 
             // We can deal with jars w/the SimpleDirectoriesAndJarsClassLoader
             if (cpath.contains(".jar")) {continue;}
@@ -493,13 +494,12 @@ public class VStatics {
                     clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
-                    if (clazz.contains(userHome)) {
+                    if (clazz.contains(userHome))
                         clazz = clazz.substring(userHome.length() + 1, clazz.length());
-                    } else if (clazz.contains(userDir)) {
+                    else if (clazz.contains(userDir))
                         clazz = clazz.substring(userDir.length() + 1, clazz.length());
-                    } else if (clazz.contains(workDir)) {
+                    else if (clazz.contains(workDir))
                         clazz = clazz.substring(workDir.length() + 1, clazz.length());
-                    }
 
                     // Strip off .class and replace File.separatorChar w/ a "."
                     clazz = clazz.substring(0, clazz.lastIndexOf(".class"));
