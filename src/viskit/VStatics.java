@@ -573,14 +573,11 @@ public class VStatics {
         // Ben Cheng NPE fix
         Object testResult = parameterMap.get(type.getName());
         List<Object>[] resolved = null;
-        if (debug) 
-        {
-            if (testResult != null) {
-                resolved = (List<Object>[]) testResult;
-                System.out.println("parameters already resolved");
-            }
+        if (testResult != null) {
+            resolved = (List<Object>[]) testResult;
+            LOG.debug("parameter {} already resolved", type);
         }
-        if (testResult == null) {
+        if (resolved == null) {
 
             Constructor<?>[] constr = type.getConstructors();
             Annotation[] paramAnnots;
