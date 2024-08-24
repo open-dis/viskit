@@ -2,6 +2,7 @@ package viskit.doe;
 
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,7 +18,9 @@ import java.net.URLClassLoader;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.VGlobals;
 import viskit.VStatics;
 
@@ -85,10 +88,12 @@ import viskit.VStatics;
 public class LocalBootLoader extends URLClassLoader {
 
     private final static Logger LOG = LogUtils.getLogger(LocalBootLoader.class);
+    
     String[] classPath;
     LocalBootLoader stage1;
     File workDir;
     URL[] extUrls;
+    
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
 
@@ -121,6 +126,7 @@ public class LocalBootLoader extends URLClassLoader {
     /** @return a custom ClassLoader */
     public LocalBootLoader init() {
         File jar = null;
+        String[] tempClasspath;
 
         // Capture the current runtime classpath
         initStage1();
@@ -135,11 +141,11 @@ public class LocalBootLoader extends URLClassLoader {
             if (ext == null) {continue;}
 
             stage1.addURL(ext);
-            String[] tmp = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            tempClasspath = new String[getClassPath().length + 1];
+            System.arraycopy(classPath, 0, tempClasspath, 0, classPath.length);
             try {
-                tmp[tmp.length - 1] = ext.toURI().getPath();
-                classPath = tmp;
+                tempClasspath[tempClasspath.length - 1] = ext.toURI().getPath();
+                classPath = tempClasspath;
             } catch (URISyntaxException ex) {
                 LOG.error(ex);
             }
@@ -150,18 +156,18 @@ public class LocalBootLoader extends URLClassLoader {
         // mitigate with the buildCleanWorkJar call below, but something doesn't
         // go quite right if we are building a project from scratch where
         // we have no build/classes compiled, and/or have no cached EGs in the
-        // viskitProject.xml.  So, leaving commeted out for now. Will need
+        // viskitProject.xml. So, leaving commeted out for now. Will need
         // to reopen this issue when we need strict design points for DOE.
 
         // Now add our project's working directory, i.e. build/classes
         try {
 
             stage1.addURL(getWorkDir().toURI().toURL());
-            String[] tmp = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
+            tempClasspath = new String[getClassPath().length + 1];
+            System.arraycopy(classPath, 0, tempClasspath, 0, classPath.length);
             try {
-                tmp[tmp.length - 1] = getWorkDir().getCanonicalPath();
-                classPath = tmp;
+                tempClasspath[tempClasspath.length - 1] = getWorkDir().getCanonicalPath();
+                classPath = tempClasspath;
             } catch (IOException ex) {
                 LOG.error(ex);
             }
@@ -198,7 +204,7 @@ public class LocalBootLoader extends URLClassLoader {
 //        }
 
         // Now normalize all the paths in the classpath variable[]
-        String[] tempClasspath = new String[getClassPath().length];
+        tempClasspath = new String[getClassPath().length];
         int idx = 0;
         for (String path : classPath) {
             tempClasspath[idx] = path.replaceAll("\\\\", "/");
@@ -228,11 +234,10 @@ public class LocalBootLoader extends URLClassLoader {
     /** @return a custom classpath String [] */
     public String[] getClassPath() {
 
-        // very verbose when "info" mode
-//        for (String line : classPath) {
-//            log.info(line);
-//        }
-//        log.info("End ClassPath entries\n");
+        // very verbose when "debug" mode
+//        for (String line : classPath)
+//            log.debug(line);
+//        log.debug("End ClassPath entries\n");
         return classPath;
     }
 
@@ -260,10 +265,11 @@ public class LocalBootLoader extends URLClassLoader {
     private void initStage1() {
 
         String classPathProp = System.getProperty("java.class.path");
+        classPathProp = classPathProp.replaceAll("\\\\", "/");
         String sep = System.getProperty("path.separator");
         StringBuilder cPath = new StringBuilder();
 
-        // Handle case where we launch a viskit-exe.jar with a Class-Path header
+        // Handle case where we launch a viskit-editor.jar with a Class-Path header
         // defined in order to find simkit.jar
         if (!classPathProp.toLowerCase().contains("simkit.jar")) {
             URL url;
@@ -273,14 +279,11 @@ public class LocalBootLoader extends URLClassLoader {
                 url = new URI("jar:file:" + classPathProp + "!/").toURL();
                 uc = (JarURLConnection)url.openConnection();
                 attr = uc.getMainAttributes();
-
                 cPath.append(classPathProp);
-
                 for (String path : attr.getValue(Attributes.Name.CLASS_PATH).split(" ")) {
                     cPath.append(sep);
                     cPath.append(path);
                 }
-
             } catch (IOException | NullPointerException | URISyntaxException ex) {
                 LOG.error(ex);
             }
@@ -359,9 +362,8 @@ public class LocalBootLoader extends URLClassLoader {
             jarOut = TempFileManager.createTempFile("eventGraphs", ".jar");
             OutputStream fos = new FileOutputStream(jarOut);
             jos = new JarOutputStream(fos);
-            if (dir2jar.isDirectory()) {
+            if (dir2jar.isDirectory())
                 makeJarFileFromDir(dir2jar, dir2jar, jos);
-            }
 
             jos.flush();
         } catch (java.util.zip.ZipException ze) {
@@ -383,6 +385,11 @@ public class LocalBootLoader extends URLClassLoader {
         File[] dirList = newDir.listFiles();
         InputStream fis = null;
         JarEntry je;
+        String entryName;
+        String entryClass;
+        Class<?> clz, vzClz;
+        byte[] buf;
+        int c;
         for (File file : dirList) {
 
             // Recurse until we get to .class files
@@ -390,8 +397,6 @@ public class LocalBootLoader extends URLClassLoader {
                 makeJarFileFromDir(baseDir, file, jos);
             } else {
 
-                String entryName;
-                String entryClass;
                 entryName = file.getParentFile().getName() + "/" + file.getName();
                 entryClass = entryName.replace('/', '.');
 
@@ -412,11 +417,11 @@ public class LocalBootLoader extends URLClassLoader {
                     // loading the original directory.
                     boolean isEventGraph = true;
                     try {
-                        Class<?> clz = stage1.loadClass(entryClass);
-                        Class<?> vzClz = stage1.loadClass("viskit.assembly.ViskitAssembly");
-                        if (vzClz.isAssignableFrom(clz)) {
+                        clz = stage1.loadClass(entryClass);
+                        vzClz = stage1.loadClass("viskit.assembly.ViskitAssembly");
+                        if (vzClz.isAssignableFrom(clz))
                             isEventGraph = false;
-                        }
+                        
                     } catch (ClassNotFoundException ex) {
                         System.err.println("Check that viskit.jar has jaxb bindings, or: " + entryClass);
                         LOG.error(ex);
@@ -427,11 +432,10 @@ public class LocalBootLoader extends URLClassLoader {
                             je = new JarEntry(entryName);
                             jos.putNextEntry(je);
                             fis = new FileInputStream(file);
-                            byte[] buf = new byte[256];
-                            int c;
-                            while ((c = fis.read(buf)) > 0) {
+                            buf = new byte[256];
+                            while ((c = fis.read(buf)) > 0)
                                 jos.write(buf, 0, c);
-                            }
+                            
                             jos.closeEntry();
                         } catch (IOException ex) {
                             LOG.error(ex);
@@ -446,4 +450,5 @@ public class LocalBootLoader extends URLClassLoader {
             }
         }
     }
-}
+    
+} // end class file LocalBootLoader.java
