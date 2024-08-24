@@ -175,6 +175,16 @@ their descpritions.
             </and>
         </condition>
     </target>
+    <target name="initWin" if="isWin">
+        <property name="run.args" value="${win.run.args}"/>
+    </target>
+    <target name="initUnix" if="isUnix">
+        <property name="run.args" value="${unix.run.args}"/>
+    </target>
+    <target name="initMac" if="isMac">
+        <property name="run.args" value="${mac.run.args}"/>
+    </target>
+    <target name="initializeAll" depends="platformInitialize,initWin,initUnix,initMac"/>
 
     <target name="check.JAVA_HOME" unless="env.JAVA_HOME" if="isWin">
         <echo message="warning:  JAVA_HOME not set!"/>
@@ -185,7 +195,7 @@ their descpritions.
 
     <!--  === TARGET: init === -->
     <target name="init"
-            depends="platformInitialize,check.JAVA_HOME,check.ANT_HOME"
+            depends="initializeAll,check.JAVA_HOME,check.ANT_HOME"
             description="Preparatory actions required for all targets">
 
         <tstamp/>
@@ -586,36 +596,15 @@ their descpritions.
 
     <!-- TARGET: Quick Run, doesn't check dependencies, or compile -->
     <target name="quick.run"
-            depends="init,quick.run.win,quick.run.mac,quick.run.unix"
-            description="Run Viskit, don't check dependencies, don't rebuild"/>
-    <target name="quick.run.win" if="isWin">
+            depends="init"
+            description="Run Viskit, don't check dependencies, don't rebuild">
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
                 showduration="5000"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
-            <jvmarg line="${win.run.args}"/>
-        </java>
-    </target>
-    <target name="quick.run.mac" if="isMac">
-        <splash imageurl="file:${basedir}/${splash.image}"
-                useproxy="true"
-                showduration="5000"/>
-        <java classname="${main.class}"
-              classpathref="runtime.classpath"
-              fork="true">
-	    <jvmarg line="${mac.run.args}"/>
-        </java>
-    </target>
-    <target name="quick.run.unix" if="isUnix">
-        <splash imageurl="file:${basedir}/${splash.image}"
-                useproxy="true"
-                showduration="5000"/>
-        <java classname="${main.class}"
-              classpathref="runtime.classpath"
-              fork="true">
-	    <jvmarg line="${unix.run.args}"/>
+            <jvmarg line="${run.args}"/>
         </java>
     </target>
 
@@ -624,7 +613,7 @@ their descpritions.
               classpathref="runtime.classpath"
               fork="true">
 
-            <jvmarg line="${common.run.args}"/>
+            <jvmarg line="${run.args}"/>
         </java>
     </target>
 
@@ -646,7 +635,10 @@ their descpritions.
               failonerror="true">
 
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${mac.run.args}"/>
+            <jvmarg line="${run.args}"/>
+            
+            <!-- Any debug args can go here -->
+            <arg value="${viskit.args}"/>
         </java>
 
     </target>
@@ -654,46 +646,17 @@ their descpritions.
     <target depends="compile,quick.debug" description="Debug Viskit" name="debug"/>
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
-    <target depends="init" name="quick.debug" description="Debug Viskit, don't check dependencies, don't rebuild">
+    <target name="quick.debug" depends="init" description="Debug Viskit, don't check dependencies, don't rebuild">
 
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <antcall target="quick.debug.win"/>
-        <antcall target="quick.debug.mac"/>
-        <antcall target="quick.debug.unix"/>
-    </target>
-    <target name="quick.debug.win" if="isWin">
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${win.run.args}"/>
-
-            <!-- Any debug args can go here -->
-            <arg value="${viskit.args}"/>
-        </java>
-    </target>
-    <target name="quick.debug.mac" if="isMac">
-        <echo message="jdpa address=${jpda.address}"/>
-        <echo message="viskit.args=${viskit.args}"/>
-        <java classname="${debug.class}"
-              classpathref="runtime.classpath"
-              fork="true">
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${mac.run.args}"/>
-            
-            <!-- Any debug args can go here -->
-            <arg value="${viskit.args}"/>
-        </java>
-    </target>
-    <target name="quick.debug.unix" if="isUnix">
-        <java classname="${debug.class}"
-              classpathref="runtime.classpath"
-              fork="true">
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <jvmarg line="${unix.run.args}"/>
+            <jvmarg line="${run.args}"/>
 
             <!-- Any debug args can go here -->
             <arg value="${viskit.args}"/>
