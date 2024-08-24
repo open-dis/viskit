@@ -33,6 +33,6 @@
     <Adapter name="adptr_3" eventHeard="Arrival" eventSent="Arrival" from="arrival" to="server"/>
     <Output entity="arrival"/>
     <Output entity="server"/>
-    <Schedule stopTime="1000.0" verbose="false"/>
+    <Schedule stopTime="1000.0" verbose="false" saveReplicationData="false"/>
     <Experiment replicationsPerDesignPoint="2" totalSamples="5" timeout="5000"/>
 </SimkitAssembly>

@@ -56,5 +56,5 @@
     <PropertyChangeListenerConnection property="B" listener="inventoryOnBackOrderStat" source="inventoryModel_1" description=""/>
     <PropertyChangeListenerConnection property="T" listener="inventoryOnOrderStat" source="inventoryModel_1" description=""/>
     <PropertyChangeListenerConnection property="immediatelyServedCustomers" listener="immedServedCustStat" source="inventoryModel_1" description=""/>
-    <Schedule stopTime="100000.0" verbose="false"/>
+    <Schedule stopTime="100000.0" verbose="false" saveReplicationData="false"/>
 </SimkitAssembly>
