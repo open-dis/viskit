@@ -732,9 +732,8 @@ public class VStatics {
     public static String makeVarArgs(String s) {
 
         // Show varargs symbol vice []
-        if (s.contains("[]")) {
+        if (s.contains("[]"))
             s = s.replaceAll("\\[\\]", "...");
-        }
         return s;
     }
 
