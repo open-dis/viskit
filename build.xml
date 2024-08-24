@@ -589,6 +589,7 @@ their descpritions.
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
+            <classpath path="${extra.classpath}"/>
             <jvmarg line="${run.args}"/>
         </java>
     </target>
@@ -618,6 +619,7 @@ their descpritions.
         <java jar="viskit-editor.jar"
               fork="true"
               failonerror="true">
+            <classpath path="${extra.classpath}"/>
 
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${run.args}"/>
@@ -637,9 +639,11 @@ their descpritions.
         <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
+        <echo message="viskit.args=${viskit.args}"/>
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true">
+            <classpath path="${extra.classpath}"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${run.args}"/>
 
