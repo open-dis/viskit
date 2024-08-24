@@ -786,9 +786,8 @@ public class VGlobals {
      */
     public final void createWorkDirectory() {
         ViskitConfig vConfig = ViskitConfig.instance();
-        if (vConfig.getViskitAppConfig() == null) {
+        if (vConfig.getViskitAppConfig() == null)
             return;
-        }
 
         String projectName = vConfig.getVal(ViskitConfig.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
