@@ -813,7 +813,7 @@ public class VGlobals {
     private ClassLoader workLoader, freshLoader;
 
     /**
-     * Retrieve Viskit's working ClassLoader.  It may be reset from time to
+     * Retrieve Viskit's working ClassLoader. It may be reset from time to
      * time if extra classpaths are loaded
      *
      * @return Viskit's working ClassLoader
