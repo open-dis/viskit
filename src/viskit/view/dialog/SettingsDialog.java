@@ -370,19 +370,17 @@ public class SettingsDialog extends JDialog {
     static JProgressBar progress = new JProgressBar(0, 100);
 
     /** Method to facilitate putting project/lib entries on the classpath
-     * @param lis a list of classpath (jar) entries to include on the classpath
+     * @param lis a list of classpath (jar) entries to include in extraClassPaths.path[@value]
      */
     public static void saveExtraClassPathEntries(String[] lis) {
         clearClassPathEntries();
 
         int ix = 0;
-        if (lis != null) {
-            for (String s : lis) {
-                s = s.replaceAll("\\\\", "/");
-                LogUtils.getLogger(SettingsDialog.class).debug("lis[" + ix + "]: " + s);
-                projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
-                ix++;
-            }
+        for (String s : lis) {
+            s = s.replaceAll("\\\\", "/");
+            LogUtils.getLogger(SettingsDialog.class).debug("lis[" + ix + "]: " + s);
+            projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
+            ix++;
         }
 
         if (dialog != null) {
