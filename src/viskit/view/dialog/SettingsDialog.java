@@ -55,6 +55,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.Logger;
 
 import viskit.control.EventGraphController;
 import viskit.VGlobals;
@@ -73,6 +74,8 @@ import viskit.control.AssemblyController;
  * @version $Id$
  */
 public class SettingsDialog extends JDialog {
+    
+    static final Logger LOG = LogUtils.getLogger(SettingsDialog.class);
 
     private static SettingsDialog dialog;
     private static boolean modified = false;
@@ -378,7 +381,7 @@ public class SettingsDialog extends JDialog {
         int ix = 0;
         for (String s : lis) {
             s = s.replaceAll("\\\\", "/");
-            LogUtils.getLogger(SettingsDialog.class).debug("lis[" + ix + "]: " + s);
+            LOG.debug("lis[" + ix + "]: " + s);
             projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
             ix++;
         }
@@ -644,10 +647,13 @@ public class SettingsDialog extends JDialog {
                 try {
                     extClassPathsUrls[i++] = file.toURI().toURL();
                 } catch (MalformedURLException ex) {
-                    LogUtils.getLogger(SettingsDialog.class).error(ex);
+                    LOG.error(ex);
                 }
             }
         }
+        
+        for (URL url : extClassPathsUrls)
+            LOG.debug("URL: {}", url);
         return extClassPathsUrls;
     }
 
