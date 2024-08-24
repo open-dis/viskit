@@ -77,6 +77,10 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    (Critical)
+    Fix issue where a leading "/" of a URL was hiding an additional classpath
+    jar on WIN.
+
     If a user submits a path to an assy file, and the file and current project
     path do not coincide, then open the project that the assy belongs in.
 
