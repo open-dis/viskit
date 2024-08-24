@@ -740,7 +740,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
         for (String path : classPath) {
-            path = path.replaceAll("\\\\", "/");
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);
                 addPCLsToLegoTree(new File(path), false);
