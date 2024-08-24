@@ -122,7 +122,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
