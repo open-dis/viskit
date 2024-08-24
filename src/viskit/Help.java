@@ -129,8 +129,9 @@ public class Help {
         CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
 
         icon = new ImageIcon(
-                VGlobals.instance().getWorkClassLoader().getResource(
-                "viskit/images/ViskitLogo.png"));
+                getClass().getClassLoader().getResource(
+                "viskit/images/ViskitLogo.png")
+        );
 
         BrowserLauncher bl = new BrowserLauncher(null);
         SwingHelpUtilities.setContentViewerUI("viskit.util.BrowserLauncher");
