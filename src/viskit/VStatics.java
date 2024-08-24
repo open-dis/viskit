@@ -261,7 +261,7 @@ public class VStatics {
     }
 
     /**
-     * Call this method to instantiate a class representation of an entity.  We'll try first
+     * Call this method to instantiate a class representation of an entity. We'll try first
      * the "standard" classpath-classloader, then try to instantiate any that were loaded by file.
      * @param s the name of the class to instantiate
      * @return an instantiated class given by s if available from the loader
