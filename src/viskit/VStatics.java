@@ -580,7 +580,7 @@ public class VStatics {
                 System.out.println("parameters already resolved");
             }
         }
-        if (resolved == null) {
+        if (testResult == null) {
 
             Constructor<?>[] constr = type.getConstructors();
             Annotation[] paramAnnots;
