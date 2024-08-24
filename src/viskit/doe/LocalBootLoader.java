@@ -136,8 +136,7 @@ public class LocalBootLoader extends URLClassLoader {
         // Now add any external classpaths
         for (URL ext : extUrls) {
 
-            // Can happen if a path is present in the viskitProject.xml, but the
-            // jar was removed from where is was supposed to be
+            // can happen if extraClassPaths.path[@value] is null or erroneous
             if (ext == null) {continue;}
 
             stage1.addURL(ext);
@@ -321,6 +320,7 @@ public class LocalBootLoader extends URLClassLoader {
 
         // build up stage1 libs
         for (String path : getClassPath()) {
+            path = path.replaceAll("\\\\", "/");
             try {
                 stage1.addURL(new File(path).toURI().toURL());
             } catch (MalformedURLException ex) {
