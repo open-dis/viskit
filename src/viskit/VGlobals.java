@@ -819,9 +819,8 @@ public class VGlobals {
      */
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
-            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
-
-            LocalBootLoader loader = new LocalBootLoader(urlArray,
+            URL[] urls = SettingsDialog.getExtraClassPathArraytoURLArray();
+            LocalBootLoader loader = new LocalBootLoader(urls,
                     Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());
 
