@@ -431,7 +431,6 @@ public class SettingsDialog extends JDialog {
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
             for (String s : sa) {
-                s = s.replaceAll("\\\\", "/");
                 if (!mod.contains(s))
                     mod.addElement(s);
             }
@@ -629,7 +628,6 @@ public class SettingsDialog extends JDialog {
         File file;
         Iterator<Path> itr;
         for (String path : extClassPaths) {
-            path = path.replaceAll("\\\\", "/");
             file = new File(path);
             
             // Allow relative paths
