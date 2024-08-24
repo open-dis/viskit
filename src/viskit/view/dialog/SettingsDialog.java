@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view.dialog;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,12 +46,16 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
+
 import org.apache.commons.configuration2.XMLConfiguration;
+
 import viskit.control.EventGraphController;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
@@ -429,9 +434,8 @@ public class SettingsDialog extends JDialog {
             String[] sa = getExtraClassPath();
             for (String s : sa) {
                 s = s.replaceAll("\\\\", "/");
-                if (!mod.contains(s)) {
+                if (!mod.contains(s))
                     mod.addElement(s);
-                }
             }
             classPathJlist.setModel(mod);
         }
@@ -613,9 +617,8 @@ public class SettingsDialog extends JDialog {
 
     /** @return a String array containing the extra classpaths to consider */
     public static String[] getExtraClassPath() {
-        if ((appConfig == null) || (projectConfig == null)) {
+        if ((appConfig == null) || (projectConfig == null))
             initConfigs();
-        }
         return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATHS_KEY);
     }
 
@@ -626,14 +629,20 @@ public class SettingsDialog extends JDialog {
         URL[] extClassPathsUrls = new URL[extClassPaths.length];
         int i = 0;
         File file;
+        Iterator<Path> itr;
         for (String path : extClassPaths) {
+            path = path.replaceAll("\\\\", "/");
             file = new File(path);
-            if (!file.exists()) {
-
-                // Allow a relative path for Diskit-Test (Diskit)
-                if (path.contains("..")) {
-                    file = new File(VGlobals.instance().getCurrentViskitProject().getProjectRoot().getParent() + "/" + path.replaceFirst("../", ""));
+            
+            // Allow a relative paths
+            if (path.contains("..")) {
+                itr = Path.of(file.toURI()).iterator();
+                file = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                while (itr.hasNext() && path.contains("..")) {
+                    file = file.getParentFile();
+                    path = path.replaceFirst("../", "");
                 }
+                file = new File(file, path);
             }
             if (file.exists()) {
                 try {
