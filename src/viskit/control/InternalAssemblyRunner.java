@@ -34,8 +34,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.control;
 
 import viskit.view.RunnerPanel2;
+
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
+import java.awt.Desktop;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -48,8 +51,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import javax.swing.*;
+
 import org.apache.logging.log4j.Logger;
+
 import simkit.Schedule;
+
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.VStatics;
@@ -498,7 +504,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     "Analyst Report Panel not visible",
                     "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +
-                    "view on next Viskit opening, select File -> Settings -> " +
+                    "view on next Viskit opening, select File -> Viskit Settings -> " +
                     "Tab visibility -> Select Analyst report -> Close, then Exit" +
                     " the application.  On re-startup, it will appear.</p></body></html>"
             );
@@ -587,7 +593,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         file.add(view);
 
         file.addSeparator();
-        file.add(new JMenuItem("Settings"));
+        file.add(new JMenuItem("Viskit Settings"));
 
         edit.add(copy);
         edit.add(selAll);
@@ -649,7 +655,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     bw.append(s);
                 }
                 filePath = f.getCanonicalPath();
-                java.awt.Desktop.getDesktop().open(new File(filePath));
+                Desktop.getDesktop().open(new File(filePath));
               }
             catch (IOException ex) {
             }

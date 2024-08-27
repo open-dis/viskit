@@ -307,13 +307,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
-        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Mail Viskit Project", KeyEvent.VK_Z,
+        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/E-Mail Viskit Project", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "open", "Open", KeyEvent.VK_O,
+        fileMenu.add(buildMenuItem(controller, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
@@ -326,18 +326,18 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
 
         // Bug fix: 1195
-        fileMenu.add(buildMenuItem(controller, "close", "Close", null,
+        fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All", null, null));
-        fileMenu.add(buildMenuItem(controller, "save", "Save", KeyEvent.VK_S,
+        fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Assemblies", null, null));
+        fileMenu.add(buildMenuItem(controller, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
         fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved XML", KeyEvent.VK_X, null));
-        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Java Source", KeyEvent.VK_J,
+        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved Assembly XML", KeyEvent.VK_X, null));
+        fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Assembly Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Screen Image", KeyEvent.VK_I,
+        fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
@@ -347,7 +347,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         ActionIntrospector.getAction(controller, "export2grid").setEnabled(false);
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "settings", "Settings", null, null));
+        fileMenu.add(buildMenuItem(controller, "settings", "Viskit Settings", null, null));
         fileMenu.addSeparator();
 
         fileMenu.add(quitMenuItem = buildMenuItem(controller, "quit", "Exit", KeyEvent.VK_Q,

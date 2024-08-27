@@ -9,8 +9,8 @@ import java.util.List;
  * @since Apr 1, 2004
  * @since 3:57:26 PM
  * @version $Id$
- *
- * To change this template use File | Settings | File Templates.
+ * 
+ * TODO: Not currently used
  */
 public class ConstructorArgument extends ViskitElement {
 

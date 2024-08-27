@@ -564,7 +564,7 @@ public class VStatics {
         
         if (type == null) {
             String msg = "It is possible that a 3rd party library is missing from the classpath.\n"
-                            + "\t\t\t\t\t\t\t\t\t     Please check File->Settings for additional classpath entries (jars) that may be missing\n";
+                            + "\t\t\t\t\t\t\t\t\t     Please check File->Viskit Settings for additional classpath entries (jars) that may be missing\n";
             LOG.warn(msg);
             VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.WARNING_MESSAGE,"Compile Error", msg);
             return null;

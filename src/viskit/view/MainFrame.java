@@ -408,7 +408,7 @@ public class MainFrame extends JFrame {
                     Component c = men.getMenuComponent(j);
                     if (c instanceof JMenuItem) {
                         JMenuItem jmi = (JMenuItem) c;
-                        if (jmi.getText().equalsIgnoreCase("settings")) {
+                        if (jmi.getText().toLowerCase().contains("settings")) {
                             jmi.addActionListener(mySettingsHandler);
                             return;
                         }
