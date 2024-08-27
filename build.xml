@@ -740,7 +740,7 @@ their descpritions.
         </delete>
     </target>
 
-    <target name="clean.dot.viskit" description="Abolish an out-of-synch configuration and metadata directory">
+    <target name="reset.dot.viskit" description="Replace an out-of-synch configuration with known good defaults">
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
         <mkdir dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" file="${c_app.xml}"/>
