@@ -1937,12 +1937,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
         int idx = 0;
         String op;
+        File assemblyFile;
         for (Object s : valueAr) {
-            if (recentAssyFileSet.add(new File((String) s))) {
+            assemblyFile = new File((String) s);
+            if (recentAssyFileSet.add(assemblyFile)) {
                 op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openAssemblies.add(new File((String) s));
+                    openAssemblies.add(assemblyFile);
                 }
 
                 notifyRecentAssyFileListeners();
