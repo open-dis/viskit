@@ -313,7 +313,7 @@ public class ViskitAssembly extends BasicAssembly {
 
     public SimEntity getSimEntityByName(String name) {
         if (DEBUG) {
-            LOG.info("getSimEntityByName for " + name + " " + entities.get(name));
+            LOG.info("getSimEntityByName for {}: {}",name, entities.get(name));
         }
         return entities.get(name);
     }
