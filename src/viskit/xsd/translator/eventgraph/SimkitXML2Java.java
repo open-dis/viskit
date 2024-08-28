@@ -1089,7 +1089,7 @@ public class SimkitXML2Java {
         pw.println(SP_4 + "@Override");
         pw.print(SP_4 + "public String toString");
         pw.println(LP + RP + SP + OB);
-        pw.println(SP_8 + "return" + SP + "getClass().getName()" + SC);
+        pw.println(SP_8 + "return" + SP + "getName()" + SC); // <- TODO: What more info can we provide?
         pw.println(SP_4 + CB);
     }
 
