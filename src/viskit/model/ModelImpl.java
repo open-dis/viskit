@@ -144,8 +144,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     um.unmarshal(f);
                     // If we get here, they've tried to load an assembly.
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                            "Wrong File Format",
-                            "Use the assembly editor to" +
+                            "This file is an Assembly",
+                            "Use the Assembly Editor to" +
                             "\n" + "work with this file."
                             );
                 } catch (JAXBException e) {
