@@ -146,7 +146,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
                             "This file is an Assembly",
                             "Use the Assembly Editor to" +
-                            "\n" + "work with this file."
+                            "\n" + "work with this file: " + f.getName()
                             );
                 } catch (JAXBException e) {
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
