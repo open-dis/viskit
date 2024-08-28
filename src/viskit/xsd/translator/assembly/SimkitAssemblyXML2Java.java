@@ -58,7 +58,6 @@ public class SimkitAssemblyXML2Java {
             this.jaxbCtx = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
             LOG.error(ex);
-            error(ex.getMessage());
         }
     }
 
