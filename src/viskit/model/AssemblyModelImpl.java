@@ -114,9 +114,9 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
                 } catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
-                            "Wrong File Format",
-                            "Use the event graph editor to" +
-                            "\n" + "work with this file."
+                            "This is an Event Graph",
+                            "Use the Event Graph Editor to" +
+                            "\n" + "work with this file: " + f.getName()
                             );
                     return false;
                 }
