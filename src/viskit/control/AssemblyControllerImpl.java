@@ -1931,12 +1931,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
         int idx = 0;
         String op;
+        File assemblyFile;
         for (Object s : valueAr) {
-            if (recentAssyFileSet.add(new File((String) s))) {
+            assemblyFile = new File((String) s);
+            if (recentAssyFileSet.add(assemblyFile)) {
                 op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openAssemblies.add(new File((String) s));
+                    openAssemblies.add(assemblyFile);
                 }
 
                 notifyRecentAssyFileListeners();
@@ -1960,7 +1962,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The value's modelPath is already delimited with "/"
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath());
+            String filePath = value.getPath();
+            String projectPath, projectName;
+            if (VGlobals.instance().getCurrentViskitProject().getProjectRoot().exists())
+            {
+                projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+                projectName = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
+                filePath = projectPath + filePath.substring(projectPath.length(),filePath.length()); // everything before projectName
+                filePath = filePath.replaceAll("\\\\","/");
+            }
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", filePath); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1971,10 +1982,19 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param recentFiles a Set of recently opened projects
      */
     private void saveProjHistoryXML(Set<File> recentFiles) {
-        int ix = 0;
+        int idx = 0;
         for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + ix + ")[@value]", value.getPath());
-            ix++;
+            String filePath = value.getPath();
+            String projectPath, projectName;
+            if (VGlobals.instance().getCurrentViskitProject().getProjectRoot().exists())
+            {
+                projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+                projectName = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
+                filePath = projectPath + filePath.substring(projectPath.length(),filePath.length()); // everything before projectName
+                filePath = filePath.replaceAll("\\\\","/");
+            }
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", filePath); // set relative path if available
+            idx++;
         }
         historyConfig.getDocument().normalize();
     }
