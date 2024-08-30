@@ -1,9 +1,11 @@
 package viskit.control;
 
 import actions.ActionIntrospector;
+
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Image;
@@ -25,9 +27,12 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
+
 import org.jgraph.graph.DefaultGraphCell;
+
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
@@ -214,7 +219,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
     void _doOpen(File file) {
-
         EventGraphView viskitView = (EventGraphView) getView();
         ModelImpl mod = new ModelImpl(this);
         mod.init();
@@ -235,7 +239,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (mod.newModel(file) && !isOpenAlready) {
 
             // We may find one or more simkit.Priority(s) with numeric values vice
-            // eneumerations in the EG XML.  Modify and save the EG XML silently
+            // eneumerations in the EG XML. Modify and save the EG XML silently
             if (mod.isNumericPriority()) {
                 save();
                 mod.setNumericPriority(false);
@@ -257,7 +261,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
     private void resetRedoUndoStatus() {
-
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
 
         if (view.getCurrentVgraphComponentWrapper() != null) {
@@ -272,16 +275,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         Model[] openAlready = ((EventGraphView) getView()).getOpenModels();
         for (Model vMod : openAlready) {
-            if (vMod.getLastFile() != null) {
-                String modelPath = vMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                markConfigOpen(modelPath);
-            }
+            if (vMod.getLastFile() != null)
+                markConfigOpen(vMod.getLastFile());
         }
     }
 
     // Support for informing listeners about open eventgraphs
     // Methods to implement a scheme where other modules will be informed of file changes
-    // (Would Java Beans do this with more or less effort?
+    // Would Java Beans do this with more or less effort?
     private DirectoryWatch dirWatch;
     private File watchDir;
 
@@ -392,38 +393,37 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (historyConfig == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
         List<Object> valueAr = historyConfig.getList(ViskitConfig.EG_HISTORY_KEY + "[@value]");
-        int i = 0;
+        int idx = 0;
         String op;
+        File egFile;
         for (Object s : valueAr) {
-            if (recentEGFileSet.add(new File((String) s))) {
-                op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + i + ")[@open]");
+            egFile = new File((String) s);
+            if (recentEGFileSet.add(egFile)) {
+                op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]");
 
-                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
-                    openEventGraphs.add(new File((String) s));
-                }
+                if (op != null && (op.toLowerCase().equals("true")))
+                    openEventGraphs.add(egFile);
 
                 notifyRecentFileListeners();
             }
-            i++;
+            idx++;
         }
     }
 
     private void saveEgHistoryXML(Set<File> recentFiles) {
         historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         int idx = 0;
+        String userDir = System.getProperty("user.dir");
+        String egPath;
 
-        // The value's modelPath is already delimited with "/"
+        // The value's path is already delimited with "/"
         for (File value : recentFiles) {
-            String filePath = value.getPath();
-            String projectPath, projectName;
-            if (VGlobals.instance().getCurrentViskitProject().getProjectRoot().exists())
-            {
-                projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
-                projectName = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
-                filePath = projectPath + filePath.substring(projectPath.length(),filePath.length()); // everything before projectName
-                filePath = filePath.replaceAll("\\\\","/");
-            }
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", filePath); // set relative path if available
+            if (!value.getPath().contains(userDir))
+                egPath = userDir + File.separator + value.getPath();
+            else
+                egPath = value.getPath();
+            
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", egPath); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -442,16 +442,16 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private Set<File> getRecentEGFileSet(boolean refresh) {
-        if (refresh || recentEGFileSet == null) {
+        if (refresh || recentEGFileSet == null)
             recordEgFiles();
-        }
+        
         return recentEGFileSet;
     }
 
     private List<File> getOpenFileSet(boolean refresh) {
-        if (refresh || openEventGraphs == null) {
+        if (refresh || openEventGraphs == null)
             recordEgFiles();
-        }
+        
         return openEventGraphs;
     }
 
@@ -539,21 +539,21 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         int idx = 0;
         for (File key : recentEGFileSet) {
-            if (key.getPath().contains(f.getName())) {
+            if (key.getPath().contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
-            }
+            
             idx++;
         }
     }
 
     // NOTE: The open attribute is zeroed out for all recent files the first
     // time a file is opened
-    private void markConfigOpen(String path) {
+    private void markConfigOpen(File f) {
         int idx = 0;
         for (File key : recentEGFileSet) {
-            if (key.getPath().contains(path)) {
+            if (key.getPath().contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-            }
+            
             idx++;
         }
     }
@@ -1225,7 +1225,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         try {
             historyConfig = ViskitConfig.instance().getViskitAppConfig();
         } catch (Exception e) {
-            LOG.error("Error loading history file: " + e.getMessage());
+            LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");
             historyConfig = null;
         }

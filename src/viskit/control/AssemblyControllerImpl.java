@@ -162,9 +162,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
     public final List<File> getOpenAssyFileList(boolean refresh) {
-        if (refresh || openAssemblies == null) {
+        if (refresh || openAssemblies == null)
             recordAssyFiles();
-        }
+        
         return openAssemblies;
     }
 
@@ -210,20 +210,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void open() {
 
         File[] files = ((AssemblyView) getView()).openFilesAsk();
-        if (files == null) {
+        if (files == null)
             return;
-        }
+        
         for (File file : files) {
-            if (file != null) {
+            if (file != null)
                 _doOpen(file);
-            }
         }
     }
 
     private void _doOpen(File file) {
-        if (!file.exists()) {
+        if (!file.exists())
             return;
-        }
 
         AssemblyView vaw = (AssemblyView) getView();
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
@@ -233,18 +231,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // these may init to null on startup, check
         // before doing any openAlready lookups
         AssemblyModel[] openAlready = null;
-        if (vaw != null) {
+        if (vaw != null)
             openAlready = vaw.getOpenModels();
-        }
+        
         boolean isOpenAlready = false;
         String path;
         if (openAlready != null) {
             for (AssemblyModel model : openAlready) {
                 if (model.getLastFile() != null) {
                     path = model.getLastFile().getAbsolutePath();
-                    if (path.equals(file.getAbsolutePath())) {
+                    if (path.equals(file.getAbsolutePath()))
                         isOpenAlready = true;
-                    }
+                    
                 }
             }
         }
@@ -270,7 +268,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
     private void resetRedoUndoStatus() {
-
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
 
         if (view.getCurrentVgacw() != null) {
@@ -282,15 +279,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Mark every Assy file opened as "open" in the app config file */
     private void markAssyFilesOpened() {
-        String modelPath;
 
         // Mark every vAMod opened as "open"
         AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vAMod : openAlready) {
-            if (vAMod.getLastFile() != null) {
-                modelPath = vAMod.getLastFile().getAbsolutePath().replaceAll("\\\\", "/");
-                markAssyConfigOpen(modelPath);
-            }
+            if (vAMod.getLastFile() != null)
+                markAssyConfigOpen(vAMod.getLastFile());
         }
     }
 
@@ -322,9 +316,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
-                    if (isLocalDirty.isEmpty()) {
+                    if (isLocalDirty.isEmpty())
                         localDirty = false;
-                    }
 
                     ((AssemblyModel) getModel()).setDirty(true);
                     break;
@@ -362,9 +355,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(vAMod)) {
+                            if (!mod.equals(vAMod))
                                 openEventGraphs(mod.getLastFile());
-                            }
+                            
                         }
                     }
 
@@ -416,9 +409,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssyFileListeners() {
-        for (mvcRecentFileListener lis : recentAssyListeners) {
+        for (mvcRecentFileListener lis : recentAssyListeners)
             lis.listChanged();
-        }
     }
 
     Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
@@ -807,22 +799,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         int idx = 0;
         for (File key : recentAssyFileSet) {
-            if (key.getPath().contains(f.getName())) {
+            if (key.getPath().contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
-            }
+            
             idx++;
         }
     }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
-    private void markAssyConfigOpen(String path) {
+    private void markAssyConfigOpen(File f) {
 
         int idx = 0;
-        for (File tempPath : recentAssyFileSet) {
-
-            if (tempPath.getPath().equals(path)) {
+        for (File key : recentAssyFileSet) {
+            if (key.getPath().contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-            }
+            
             idx++;
         }
     }
@@ -1403,28 +1394,30 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @return a string of Assembly source code
      */
     public String buildJavaAssemblySource(File f) {
+        String assySource = null;
+        
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(f, new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
+        XMLValidationTool xvt = new XMLValidationTool(f, 
+                new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
-        if ((xvt == null) || !xvt.isValidXML()) {
+        if (!xvt.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            return null;
+            return assySource;
         } else {
             LOG.info("{} is valid XML\n", f);
         }
 
         SimkitAssemblyXML2Java x2j;
-        String retVal;
         try {
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
-            retVal = x2j.translate();
+            assySource = x2j.translate();
         } catch (FileNotFoundException e) {
             LOG.error(e);
-            retVal = "";
+            assySource = "";
         }
-        return retVal;
+        return assySource;
     }
 
     // NOTE: above are routines to operate on current assembly
@@ -1443,7 +1436,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(),
                 new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
 
-        if ((xvt == null) || !xvt.isValidXML()) {
+        if (!xvt.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
             return eventGraphSource;
@@ -1865,7 +1858,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
             }
         } catch (Exception ex) {
-            LOG.error("Opening EventGraph file: " + tempFile + " caused error: " + ex);
+            LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
@@ -1880,7 +1873,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private final Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
-     * If passed file is in the list, move it to the top.  Else insert it;
+     * If passed file is in the list, move it to the top. Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an assembly file to add to the list
      */
@@ -1928,7 +1921,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (historyConfig == null) {initConfig();}
         openAssemblies = new ArrayList<>(4);
         List<Object> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
-        LOG.debug("_setAssyFileLists() valueAr size is: " + valueAr.size());
+        LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
         int idx = 0;
         String op;
         File assemblyFile;
@@ -1937,9 +1930,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (recentAssyFileSet.add(assemblyFile)) {
                 op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
-                if (op != null && (op.toLowerCase().equals("true") || op.toLowerCase().equals("yes"))) {
+                if (op != null && (op.toLowerCase().equals("true")))
                     openAssemblies.add(assemblyFile);
-                }
 
                 notifyRecentAssyFileListeners();
             }
@@ -1951,7 +1943,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void recordProjFiles() {
         if (historyConfig == null) {initConfig();}
         List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
-        LOG.debug("recordProjFile valueAr size is: {}", valueAr.size());
+        LOG.debug("recordProjFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)
             adjustRecentProjSet(new File((String) value));
     }
@@ -1960,18 +1952,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         historyConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
         int idx = 0;
 
-        // The value's modelPath is already delimited with "/"
+        // The value's path is already delimited with "/"
         for (File value : recentFiles) {
-            String filePath = value.getPath();
-            String projectPath, projectName;
-            if (VGlobals.instance().getCurrentViskitProject().getProjectRoot().exists())
-            {
-                projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
-                projectName = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
-                filePath = projectPath + filePath.substring(projectPath.length(),filePath.length()); // everything before projectName
-                filePath = filePath.replaceAll("\\\\","/");
-            }
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", filePath); // set relative path if available
+            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath()); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1984,16 +1967,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void saveProjHistoryXML(Set<File> recentFiles) {
         int idx = 0;
         for (File value : recentFiles) {
-            String filePath = value.getPath();
-            String projectPath, projectName;
-            if (VGlobals.instance().getCurrentViskitProject().getProjectRoot().exists())
-            {
-                projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
-                projectName = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getName();
-                filePath = projectPath + filePath.substring(projectPath.length(),filePath.length()); // everything before projectName
-                filePath = filePath.replaceAll("\\\\","/");
-            }
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", filePath); // set relative path if available
+            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath()); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -2012,9 +1986,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private Set<File> getRecentAssyFileSet(boolean refresh) {
-        if (refresh || recentAssyFileSet == null) {
+        if (refresh || recentAssyFileSet == null)
             recordAssyFiles();
-        }
+        
         return recentAssyFileSet;
     }
 
@@ -2031,9 +2005,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private Set<File> getRecentProjFileSet(boolean refresh) {
-        if (refresh || recentProjFileSet == null) {
+        if (refresh || recentProjFileSet == null)
             recordProjFiles();
-        }
+        
         return recentProjFileSet;
     }
 
