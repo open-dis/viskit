@@ -59,17 +59,19 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.util;
 
 import edu.nps.util.LogUtils;
-import java.io.File;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+
 import viskit.VGlobals;
 
 /**
@@ -155,15 +157,12 @@ public class EventGraphCache {
         entityTable = new Element("EntityTable");
 
         // Clear the cache if currently full
-        if (!getEventGraphNamesList().isEmpty()) {
+        if (!getEventGraphNamesList().isEmpty())
             getEventGraphNamesList().clear();
-        }
-        if (!getEventGraphFilesList().isEmpty()) {
+        if (!getEventGraphFilesList().isEmpty())
             getEventGraphFilesList().clear();
-        }
-        if (!getEventGraphImageFilesList().isEmpty()) {
+        if (!getEventGraphImageFilesList().isEmpty())
             getEventGraphImageFilesList().clear();
-        }
 
         setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
 
