@@ -724,7 +724,7 @@ their descpritions.
 
     <!--  === TARGET: clean === -->
     <target name="clean"
-            depends="reset.dot.viskit"
+            depends="reset.viskit"
             description="Deletes build directory, xsd bindings, dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
         <delete dir="${dir.build}"/>
@@ -740,7 +740,7 @@ their descpritions.
         </delete>
     </target>
 
-    <target name="reset.dot.viskit" description="Replace an out-of-synch configuration with known good defaults">
+    <target name="reset.viskit" description="Replace an out-of-synch configuration with known good defaults">
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
         <mkdir dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" file="${c_app.xml}"/>
