@@ -69,15 +69,6 @@ public class ViskitProject {
      */
     public static final String DEFAULT_VISKIT_PROJECTS_DIR =
             System.getProperty("user.home").replaceAll("\\\\", "/") + "/MyViskitProjects";
-
-    public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
-
-    /** This static variable will be set by the user upon first Viskit startup
-     * to determine a project location space on the user's machine. A default
-     * location will be in the user's profile, or home directory.
-     */
-    public static String DEFAULT_PROJECT_NAME = "DefaultProject";
-
     public static final String VISKIT_ROOT_NAME = "ViskitProject";
     public static final String PROJECT_FILE_NAME = "viskitProject.xml";
     public static final String ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
@@ -101,6 +92,14 @@ public class ViskitProject {
 
     static final Logger LOG = LogUtils.getLogger(ViskitProject.class);
 
+    public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
+
+    /** This static variable will be set by the user upon first Viskit startup
+     * to determine a project location space on the user's machine. A default
+     * location will be in the user's profile, or home directory.
+     */
+    public static String DEFAULT_PROJECT_NAME = "DefaultProject";
+    
     private File projectRoot;
     private File projectFile;
     private File analystReportsDir;
