@@ -760,11 +760,11 @@ public class VGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public RunnerPanel2 getRunPanel() {
+    public RunnerPanel2 getSimRunnerPanel() {
         return runPanel;
     }
 
-    public void setRunPanel(RunnerPanel2 runPanel) {
+    public void setSimRunnerPanel(RunnerPanel2 runPanel) {
         this.runPanel = runPanel;
     }
 
@@ -782,7 +782,7 @@ public class VGlobals {
 
     /**
      * Not the best Java Bean convention, but performs as a no argument setter
-     * for the an open project's working directory (build/classes)
+     * for an open project's working directory (build/classes)
      */
     public final void createWorkDirectory() {
         ViskitConfig vConfig = ViskitConfig.instance();
