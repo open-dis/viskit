@@ -43,6 +43,7 @@ import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+
 import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -70,7 +71,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
     @Override
     public void listChanged() {
         AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
-        Set<File> lis = acontroller.getRecentProjFileSet();
+        Set<String> lis = acontroller.getRecentProjFileSet();
 
         for (JMenu m : openRecentProjMenus) {
             m.removeAll();
@@ -79,18 +80,18 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
         String nameOnly;
         Action act;
         JMenuItem mi;
-        for (File fullPath : lis) {
+        for (String fullPath : lis) {
 
-            if (!fullPath.exists()) {
+            if (!new File(fullPath).exists()) {
                 continue;
             }
 
             for (JMenu m : openRecentProjMenus) {
-                nameOnly = fullPath.getName();
+                nameOnly = new File(fullPath).getName();
                 act = new ParameterizedProjAction(nameOnly);
                 act.putValue(VStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath.getPath());
+                mi.setToolTipText(fullPath);
                 m.add(mi);
             }
         }

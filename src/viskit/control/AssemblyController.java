@@ -240,7 +240,7 @@ public interface AssemblyController {
 
     void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    Set<File> getRecentAssyFileSet();
+    Set<String> getRecentAssyFileSet();
 
     void clearRecentAssyFileList();
 
@@ -248,7 +248,7 @@ public interface AssemblyController {
 
     void removeRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    Set<File> getRecentProjFileSet();
+    Set<String> getRecentProjFileSet();
 
     void clearRecentProjFileSet();
 }

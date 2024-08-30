@@ -136,14 +136,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
             compileAssembly(initialAssyFile);
         } else {
-            List<File> lis = getOpenAssyFileList(false);
-            LOG.debug("Inside begin() and lis.size() is: {}", lis.size());
-
-            for (File f : lis) {
-
+            List<String> files = getOpenAssyFileList(false);
+            LOG.debug("Inside begin() and lis.size() is: {}", files.size());
+            File file;
+            for (String f : files) {
+                file = new File(f);
                 // Prevent project mismatch
-                if (f.exists())
-                    _doOpen(f);
+                if (file.exists())
+                    _doOpen(file);
             }
         }
 
@@ -153,11 +153,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     /** Information required by the EventGraphControllerImpl to see if an Assembly
-     * file is already open.  Also checked internally by this class.
+     * file is already open. Also checked internally by this class.
      * @param refresh flag to refresh the list from viskitConfig.xml
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
-    public final List<File> getOpenAssyFileList(boolean refresh) {
+    public final List<String> getOpenAssyFileList(boolean refresh) {
         if (refresh || openAssemblies == null)
             recordAssyFiles();
         
@@ -796,8 +796,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (f == null) {return;}
 
         int idx = 0;
-        for (File key : recentAssyFileSet) {
-            if (key.getPath().contains(f.getName()))
+        for (String key : recentAssyFileSet) {
+            if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             
             idx++;
@@ -808,8 +808,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void markAssyConfigOpen(File f) {
 
         int idx = 0;
-        for (File key : recentAssyFileSet) {
-            if (key.getPath().contains(f.getName()))
+        for (String key : recentAssyFileSet) {
+            if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             
             idx++;
@@ -1863,8 +1863,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** Recent open file support */
     private static final int RECENTLISTSIZE = 15;
-    private final Set<File> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
-    private final Set<File> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<String> recentAssyFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
+    private final Set<String> recentProjFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);
 
     /**
      * If passed file is in the list, move it to the top. Else insert it;
@@ -1872,43 +1872,43 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param file an assembly file to add to the list
      */
     private void adjustRecentAssySet(File file) {
-        File f;
-        for (Iterator<File> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
+        String f;
+        for (Iterator<String> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
 
             f = itr.next();
-            if (file.getPath().equals(f.getPath())) {
+            if (file.getPath().equals(f)) {
                 itr.remove();
                 break;
             }
         }
 
-        recentAssyFileSet.add(file); // to the top
+        recentAssyFileSet.add(file.getPath()); // to the top
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();
     }
 
     /**
-     * If passed file is in the list, move it to the top.  Else insert it;
+     * If passed file is in the list, move it to the top. Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
     private void adjustRecentProjSet(File file) {
-        File f;
-        for (Iterator<File> itr = recentProjFileSet.iterator(); itr.hasNext();) {
+        String f;
+        for (Iterator<String> itr = recentProjFileSet.iterator(); itr.hasNext();) {
 
             f = itr.next();
-            if (file.getPath().equals(f.getPath())) {
+            if (file.getPath().equals(f)) {
                 itr.remove();
                 break;
             }
         }
 
-        recentProjFileSet.add(file); // to the top
+        recentProjFileSet.add(file.getPath()); // to the top
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
 
-    private List<File> openAssemblies;
+    private List<String> openAssemblies;
 
     @SuppressWarnings("unchecked")
     private void recordAssyFiles() {
@@ -1917,9 +1917,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
         int idx = 0;
         String op;
-        File assemblyFile;
+        String assemblyFile;
         for (Object s : valueAr) {
-            assemblyFile = new File((String) s);
+            assemblyFile = (String) s;
             if (recentAssyFileSet.add(assemblyFile)) {
                 op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
@@ -1940,13 +1940,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             adjustRecentProjSet(new File((String) value));
     }
 
-    private void saveAssyHistoryXML(Set<File> recentFiles) {
+    private void saveAssyHistoryXML(Set<String> recentFiles) {
         historyConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
-        for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath()); // set relative path if available
+        for (String value : recentFiles) {
+            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1956,10 +1956,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      *
      * @param recentFiles a Set of recently opened projects
      */
-    private void saveProjHistoryXML(Set<File> recentFiles) {
+    private void saveProjHistoryXML(Set<String> recentFiles) {
         int idx = 0;
-        for (File value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value.getPath()); // set relative path if available
+        for (String value : recentFiles) {
+            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1973,11 +1973,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public Set<File> getRecentAssyFileSet() {
+    public Set<String> getRecentAssyFileSet() {
         return getRecentAssyFileSet(false);
     }
 
-    private Set<File> getRecentAssyFileSet(boolean refresh) {
+    private Set<String> getRecentAssyFileSet(boolean refresh) {
         if (refresh || recentAssyFileSet == null)
             recordAssyFiles();
         
@@ -1992,11 +1992,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public Set<File> getRecentProjFileSet() {
+    public Set<String> getRecentProjFileSet() {
         return getRecentProjFileSet(false);
     }
 
-    private Set<File> getRecentProjFileSet(boolean refresh) {
+    private Set<String> getRecentProjFileSet(boolean refresh) {
         if (refresh || recentProjFileSet == null)
             recordProjFiles();
         

@@ -33,10 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
-import viskit.jgraph.VgraphAssemblyComponentWrapper;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
+
 import edu.nps.util.LogUtils;
+
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -57,6 +58,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
@@ -71,6 +73,7 @@ import viskit.images.AdapterIcon;
 import viskit.images.PropChangListenerImageIcon;
 import viskit.images.PropChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
+import viskit.jgraph.VgraphAssemblyComponentWrapper;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -246,19 +249,19 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
-            Set<File> lis = acontroller.getRecentAssyFileSet();
+            Set<String> files = acontroller.getRecentAssyFileSet();
             openRecentAssyMenu.removeAll();
-            lis.stream().filter(fullPath -> !(!fullPath.exists())).map(fullPath -> {
-                String nameOnly = fullPath.getName();
+            files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
+                String nameOnly = new File(fullPath).getName();
                 Action act = new ParameterizedAssyAction(nameOnly);
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath.getPath());
+                mi.setToolTipText(fullPath);
                 return mi;
             }).forEachOrdered(mi -> {
                 openRecentAssyMenu.add(mi);
             });
-            if (!lis.isEmpty()) {
+            if (!files.isEmpty()) {
                 openRecentAssyMenu.add(new JSeparator());
                 Action act = new ParameterizedAssyAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
@@ -456,7 +459,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // Buttons for what mode we are in
 
         selectMode = makeJTButton(
-                null, 
+                null,
                 "viskit/images/selectNode.png",
                 "Select items on the graph"
         );
@@ -464,7 +467,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
         adapterMode = makeJTButton(
-                null, 
+                null,
                 new AdapterIcon(24, 24),
                 "Connect SimEntities with adapter pattern"
         );
@@ -472,7 +475,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
         simEventListenerMode = makeJTButton(
-                null, 
+                null,
                 new SimEventListenerIcon(24, 24),
                 "Connect SimEntities through a SimEvent listener pattern"
         );
@@ -480,7 +483,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
         propChangeListenerMode = makeJTButton(
-                null, 
+                null,
                 new PropChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity"
         );
@@ -488,13 +491,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         JButton zoomIn = makeButton(
-                null, 
+                null,
                 "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph"
         );
 
         JButton zoomOut = makeButton(
-                null, 
+                null,
                 "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph"
         );
@@ -526,7 +529,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
-        
+
         JLabel initializeLabel = new JLabel ("  Initialize Assembly Run: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
@@ -570,12 +573,12 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private JToggleButton makeJTButton(Action a, String icPath, String tt) {
         JToggleButton jtb;
-        
-        if (a != null) 
+
+        if (a != null)
             jtb = new JToggleButton(a);
         else
             jtb = new JToggleButton();
-        
+
         return (JToggleButton) buttonCommon(jtb, icPath, tt);
     }
 
@@ -720,7 +723,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 if (path == null)
                     continue; // can happen if extraClassPaths.path[@value] is null or erroneous
                 file = new File(path.toURI());
-                if (file.exists()) 
+                if (file.exists())
                     addEventGraphsToLegoTree(file, file.isDirectory());
             }
         } catch (URISyntaxException ex) {
