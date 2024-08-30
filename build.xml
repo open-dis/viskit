@@ -745,6 +745,7 @@ their descpritions.
         <mkdir dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" file="${c_app.xml}"/>
         <copy todir="${dot.viskit.dir}" file="${c_gui.xml}"/>
+        <copy todir="MyViskitProjects/DefaultProject" file="${proj.xml}" overwrite="true"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
