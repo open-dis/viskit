@@ -952,7 +952,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
         jfc.setFileFilter(filter);
-
         jfc.setMultiSelectionEnabled(true);
 
         int returnVal = jfc.showOpenDialog(this);
