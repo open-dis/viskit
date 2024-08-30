@@ -48,9 +48,7 @@ public abstract class mvcAbstractJFrameView extends JFrame implements mvcView, m
      * Shows the project name in the frame title bar
      */
     public void showProjectName() {
-
         String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
-        setTitle(ttl);
         if (this.titlList != null) {
             titlList.setTitle(ttl, titlKey);
         }

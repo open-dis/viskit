@@ -74,7 +74,7 @@ import viskit.control.AssemblyController;
  * @version $Id$
  */
 public class SettingsDialog extends JDialog {
-    
+
     static final Logger LOG = LogUtils.getLogger(SettingsDialog.class);
 
     private static SettingsDialog dialog;
@@ -364,8 +364,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private static void clearClassPathEntries() {
-        // Always reinitialize the config instances.  We may have changed projects
-        initConfigs();
+        if (projectConfig == null)
+            initConfigs();
         projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
 
@@ -617,7 +617,7 @@ public class SettingsDialog extends JDialog {
 
     /** @return a String array containing the extra classpaths to consider */
     public static String[] getExtraClassPath() {
-        if ((appConfig == null) || (projectConfig == null))
+        if (projectConfig == null)
             initConfigs();
         return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATHS_KEY);
     }
@@ -632,7 +632,7 @@ public class SettingsDialog extends JDialog {
         Iterator<Path> itr;
         for (String path : extClassPaths) {
             file = new File(path);
-            
+
             // Allow relative paths
             if (path.contains("..")) {
                 itr = Path.of(file.toURI()).iterator();
@@ -651,7 +651,7 @@ public class SettingsDialog extends JDialog {
                 }
             }
         }
-        
+
         for (URL url : extClassPathsUrls)
             LOG.debug("URL: {}", url);
         return extClassPathsUrls;
@@ -671,6 +671,8 @@ public class SettingsDialog extends JDialog {
      * @return the value for tab visibility
      */
     public static boolean getVisibilitySense(String prop) {
+        if (appConfig == null)
+            initConfigs();
         return appConfig.getBoolean(prop);
     }
 

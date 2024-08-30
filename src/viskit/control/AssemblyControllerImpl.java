@@ -63,7 +63,6 @@ import viskit.mvc.mvcRecentFileListener;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
-import viskit.view.RunnerPanel2;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
@@ -116,13 +115,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void compileAssembly(String assyPath) {
         LOG.debug("Compiling assembly: {}", assyPath);
         File f = new File(assyPath);
-        initialAssyFile = assyPath;
         _doOpen(f);
-        compileAssemblyAndPrepSimRunner();
+        prepSimRunner();
     }
 
     @Override
     public void begin() {
+        File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -130,14 +129,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             LOG.debug("Loading initial file: {}", initialAssyFile);
 
             // Switch to the project that this Assy file is located in if paths do not coincide
-            File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
-
             if (projPath.exists()  && !initialAssyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projPath);
-                ((AssemblyViewFrame) getView()).showProjectName();
-                VGlobals.instance().getEventGraphEditor().showProjectName();
             }
 
             compileAssembly(initialAssyFile);
@@ -153,6 +147,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
 
+        openProject(projPath); // calls EGVF showProjectName
+        ((AssemblyViewFrame) getView()).showProjectName();
         recordProjFiles();
     }
 
@@ -674,6 +670,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        VGlobals.instance().getEventGraphEditor().showProjectName();
+        runner.resetRunner();
     }
 
     @Override
@@ -1378,7 +1376,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     private String produceJavaAssemblyClass() {
-
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
             return null;
@@ -1637,7 +1634,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void compileAssemblyAndPrepSimRunner() {
+    public void prepSimRunner() {
 
         // Prevent multiple pushes of the initialize sim run button
         mutex++;
@@ -1671,18 +1668,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
                     } else {
-                        String msg = "Please locate and correct the source of the error in assembly XML for proper compilation";
+                        String msg = "Please locate and correct the source of the error in the assembly XML for proper compilation";
                         messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error", msg);
                     }
                 } else {
 
                     // Ensure a cleared Assembly Run panel upon every Assembly compile
-                    RunnerPanel2 rp2 = VGlobals.instance().getRunPanel();
-                    rp2.soutTA.setText(null);
-                    rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
-                            + "----------------------" + rp2.lineEnd);
+                    runner.resetRunner();
 
-                    // Ensure changes to the Assembly Properties dialog get saved
+                    // Ensure any changes to the Assembly Properties dialog get saved
                     save();
 
                     // Initializes a fresh class loader
@@ -1918,7 +1912,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @SuppressWarnings("unchecked")
     private void recordAssyFiles() {
-        if (historyConfig == null) {initConfig();}
         openAssemblies = new ArrayList<>(4);
         List<Object> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
@@ -1941,7 +1934,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @SuppressWarnings("unchecked")
     private void recordProjFiles() {
-        if (historyConfig == null) {initConfig();}
         List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)

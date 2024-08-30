@@ -201,7 +201,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
-            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(VGlobals.instance().getRunPanel().analystReportCB.isSelected()));
+            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);

@@ -1,16 +1,19 @@
 package viskit.assembly;
 
 /**
- * Handles a pre-run init for an assembly
+ * Internal access for the Assembly Runner
+ * 
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.assembly.AssemblyRunnerPlug">Terry Norbraten, NPS MOVES</a>
- * @version $Id:$
  */
 public interface AssemblyRunnerPlug {
 
     /**
-     * Execute an assembly with the given args
+     * Provide execution arguments for running an assembly
      * @param execStrings the args to supply for execution
      */
     void exec(String[] execStrings);
+    
+    /** Resets the runner upon project change */
+    void resetRunner();
 
 } // end class file AssemblyRunnerPlug.java

@@ -39,7 +39,7 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.VGlobals;
+
 import viskit.ViskitConfig;
 import viskit.VStatics;
 
@@ -62,9 +62,9 @@ public class RunnerPanel2 extends JPanel {
     public JScrollPane jsp;
     public JTextArea soutTA;
     public JSplitPane xsplPn;
-    public JButton vcrStop,  vcrPlay,  vcrRewind,  vcrStep,  closeButt;
+    public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButt;
     public JCheckBox vcrVerbose;
-    public JTextField vcrSimTime,  vcrStopTime;
+    public JTextField vcrSimTime, vcrStopTime;
     public JCheckBox saveRepDataCB;
     public JCheckBox printRepReportsCB;
     public JCheckBox searchCB;
@@ -103,7 +103,8 @@ public class RunnerPanel2 extends JPanel {
 
         soutTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
-        soutTA.setEditable(true); //false);
+        soutTA.setEditable(true); // to allow for additional manual input for saving out
+        soutTA.setToolTipText("This text area space is editable");
         soutTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         soutTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller soutTA.setRows(100);
@@ -132,9 +133,6 @@ public class RunnerPanel2 extends JPanel {
         leftRightSplit.setDividerLocation((w/2) - (w/4));
 
         add(leftRightSplit, BorderLayout.CENTER);
-
-        // Provide access to Enable Analyst Report checkbox
-        VGlobals.instance().setRunPanel(RunnerPanel2.this);
     }
 
     private JPanel makeVCRPanel(boolean skipCloseButt) {

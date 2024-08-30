@@ -339,7 +339,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "compileAssemblyAndPrepSimRunner", "Initialize Assembly", KeyEvent.VK_C,
+        fileMenu.add(buildMenuItem(controller, "prepSimRunner", "Initialize Assembly Run", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
 
         // TODO: Unknown as to what this does exactly
@@ -499,7 +499,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                 "Zoom out on the graph"
         );
 
-        Action runAction = ActionIntrospector.getAction(getController(), "compileAssemblyAndPrepSimRunner");
+        Action runAction = ActionIntrospector.getAction(getController(), "prepSimRunner");
         runButt = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
@@ -987,14 +987,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
         File file = ViskitProject.openProjectDir(this.getContent(), ViskitProject.MY_VISKIT_PROJECTS_DIR);
         if (file != null)
-            aController.openProject(file);
+            aController.openProject(file); // calls EGVF showProjectName
 
         showProjectName();
-    }
-
-    @Override
-    public void showProjectName() {
-        super.showProjectName();
     }
 
     private File getUniqueName(String suggName) {

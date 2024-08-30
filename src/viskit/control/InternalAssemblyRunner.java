@@ -113,7 +113,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
-        // false will enable all VCR buttons.  Currently, only start and stop work
+        // false will enable all VCR buttons. Currently, only start and stop work
         runPanel = new RunnerPanel2("Assembly Runner", true, analystReportPanelVisible);
         doMenus();
         runPanel.vcrStop.addActionListener(assemblyRunStopListener = new stopListener());
@@ -125,13 +125,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrPlay.setEnabled(false);
         runPanel.vcrRewind.setEnabled(false);
         runPanel.vcrStep.setEnabled(false);
-        twiddleButtons(OFF);
 
         // Viskit's current working ClassLoader
         lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
-    }
 
-    public JComponent getRunnerPanel() {return runPanel;}
+        // Provide access to Enable Analyst Report checkbox
+        VGlobals.instance().setSimRunnerPanel(runPanel);
+    }
 
     public JMenuBar getMenus() {
         return myMenuBar;
@@ -168,11 +168,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
-            twiddleButtons(OFF);
+            twiddleButtons(Event.OFF);
 //            throwable.printStackTrace();
             return;
         }
-        twiddleButtons(REWIND);
+        twiddleButtons(Event.REWIND);
     }
 
     private void fillRepWidgetsFromPreRunAssy(boolean verbose, double stopTime) throws Throwable {
@@ -372,7 +372,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             runPanel.vcrSimTime.setText("0.0");    // because no pausing
-            twiddleButtons(START);
+            twiddleButtons(Event.START);
             initRun();
         }
     }
@@ -381,7 +381,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            twiddleButtons(STEP);
+            twiddleButtons(Event.STEP);
         }
     }
 
@@ -424,7 +424,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //                ex.printStackTrace();
             }
 
-            twiddleButtons(STOP);
+            twiddleButtons(Event.STOP);
         }
     }
 
@@ -432,7 +432,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            twiddleButtons(REWIND);
+            twiddleButtons(Event.REWIND);
         }
     }
 
@@ -524,13 +524,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     boolean getVerbose() {
         return runPanel.vcrVerbose.isSelected();
     }
-    public static final int START = 0;
-    public static final int STOP = 1;
-    public static final int STEP = 2;
-    public static final int REWIND = 3;
-    public static final int OFF = 4;
+    
+    public enum Event {
+        START, STOP, STEP, REWIND, OFF
+    }
 
-    private void twiddleButtons(int evnt) {
+    public void twiddleButtons(Event evnt) {
         switch (evnt) {
             case START:
                 //System.out.println("twbutt start");
@@ -568,7 +567,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 runPanel.vcrRewind.setEnabled(false);
                 break;
             default:
-                System.err.println("Bad event in InternalAssemblyRunner");
+                LOG.warn("Unrecognized event {}", evnt);
                 break;
         }
     }
@@ -672,16 +671,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     }
 
     private final String namePrefix = "Viskit Assembly Runner";
-    private String currentTitle = namePrefix;
+    private StringBuilder currentTitle = new StringBuilder();
 
-    private void doTitle(String nm) {
+    public void doTitle(String nm) {
+        currentTitle.append(namePrefix);
         if (nm != null && nm.length() > 0) {
-            currentTitle = namePrefix + ": " + nm;
+            currentTitle = currentTitle.append(": ").append(nm);
         }
 
         if (titlList != null) {
-            titlList.setTitle(currentTitle, titlkey);
+            titlList.setTitle(currentTitle.toString(), titlkey);
         }
+        currentTitle.setLength(0); // reset
     }
     private TitleListener titlList;
     private int titlkey;

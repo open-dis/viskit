@@ -180,7 +180,7 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     public void generateHtmlReport() {
-        if (!VGlobals.instance().getRunPanel().analystReportCB.isSelected()) {
+        if (!VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()) {
             VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"

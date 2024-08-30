@@ -73,14 +73,16 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class MainFrame extends JFrame {
 
-    private JTabbedPane tabbedPane;
-    private JTabbedPane runTabbedPane;
-    EventGraphViewFrame egFrame;
-    AssemblyViewFrame assyFrame;
+    public Action myQuitAction;
+    
+    mvcAbstractJFrameView egFrame;
+    mvcAbstractJFrameView assyFrame;
+    mvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
-    mvcAbstractJFrameView reportPanel;
-    public Action myQuitAction;
+    
+    private JTabbedPane tabbedPane;
+    private JTabbedPane runTabbedPane;
     private DoeMain doeMain;
 
     /** The initial assembly to load. */
@@ -144,41 +146,38 @@ public class MainFrame extends JFrame {
         myQuitAction = new ExitAction("Exit");
 
         // Tabbed event graph editor
-        egFrame = (EventGraphViewFrame) VGlobals.instance().buildEventGraphViewFrame();
+        egFrame = VGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
-            tabbedPane.add(egFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(egFrame.getContent());
+            tabbedPane.add(((EventGraphViewFrame) egFrame).getContent());
+            int idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) egFrame).getContent());
             tabbedPane.setTitleAt(idx, "Event Graph Editor");
-            tabbedPane.setToolTipTextAt(idx, "Visual editor for object class definitions");
-            menuBar = egFrame.getMenus();
+            tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation entity definitions");
+            menuBar = ((EventGraphViewFrame) egFrame).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
             egFrame.setTitleListener(myTitleListener, idx);
             setJMenuBar(menuBar);
-            jamQuitHandler(egFrame.getQuitMenuItem(), myQuitAction, menuBar);
+            jamQuitHandler(((EventGraphViewFrame) egFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
 
         // Assembly editor
-        assyFrame = (AssemblyViewFrame) VGlobals.instance().buildAssemblyViewFrame();
+        assyFrame = VGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
-            tabbedPane.add(assyFrame.getContent());
-            int idx = tabbedPane.indexOfComponent(assyFrame.getContent());
+            tabbedPane.add(((AssemblyViewFrame) assyFrame).getContent());
+            int idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assyFrame).getContent());
             tabbedPane.setTitleAt(idx, "Assembly Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
-
-            menuBar = assyFrame.getMenus();
+            menuBar = ((AssemblyViewFrame) assyFrame).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
-            if (getJMenuBar() == null) {
-                setJMenuBar(menuBar);
-            }
             assyFrame.setTitleListener(myTitleListener, idx);
-            jamQuitHandler(assyFrame.getQuitMenuItem(), myQuitAction, menuBar);
+            setJMenuBar(menuBar);
+            jamQuitHandler(((AssemblyViewFrame) assyFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
@@ -189,8 +188,8 @@ public class MainFrame extends JFrame {
 
         // Now set the recent open project's file listener for the egFrame now
         // that we have an assyFrame reference
-        RecentProjFileSetListener listener = assyFrame.getRecentProjFileSetListener();
-        listener.addMenuItem(egFrame.getOpenRecentProjMenu());
+        RecentProjFileSetListener listener = ((AssemblyViewFrame) assyFrame).getRecentProjFileSetListener();
+        listener.addMenuItem(((EventGraphViewFrame) egFrame).getOpenRecentProjMenu());
 
         // Now setup the assembly and event graph file change listener(s)
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
@@ -242,7 +241,7 @@ public class MainFrame extends JFrame {
 
         // Assembly runner
         assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
-        runTabbedPane.add(assyRunComponent.getRunnerPanel(), TAB1_LOCALRUN_IDX);
+        runTabbedPane.add(VGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
         menuBar = assyRunComponent.getMenus();
@@ -341,11 +340,10 @@ public class MainFrame extends JFrame {
 
             // Make sure we save modified EGs if we wander off to the Assy tab
             for (Model mod : mods) {
-
                 if (mod.isDirty()) {
                     dirtyMod = mod;
                     VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
-                    ((EventGraphController)VGlobals.instance().getEventGraphController()).save();
+                    ((EventGraphController) VGlobals.instance().getEventGraphController()).save();
                 }
             }
 
@@ -363,12 +361,8 @@ public class MainFrame extends JFrame {
             if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX]) {
                 i = tabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
                 tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "Run simulation defined by assembly");
-
-                // Resets the Viskit ClassLoader
-//                assyRunComponent.getAssemblyRunStopListener().actionPerformed(null);
             } else {
                 tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
-//                tabbedPane.setEnabledAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], false);
             }
 
             getJMenuBar().remove(hmen);
@@ -376,7 +370,6 @@ public class MainFrame extends JFrame {
             newMB.add(hmen);
             setJMenuBar(newMB);
             myTitleListener.setTitle(titles[i], i);
-
         }
     }
 
@@ -456,7 +449,7 @@ public class MainFrame extends JFrame {
 
             // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
-            ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).setCloseAll(true);
+            ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).setCloseAll(true);
 
             outer:
             {
@@ -546,6 +539,23 @@ public class MainFrame extends JFrame {
                 // initializes a fresh class loader
                 assyRunComponent.preInitRun(execStrings);
             }
+        }
+        
+        @Override
+        public void resetRunner() {
+            RunnerPanel2 rp2 = VGlobals.instance().getSimRunnerPanel();
+            rp2.soutTA.setText(null);
+            rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
+                    + "----------------------" + rp2.lineEnd);
+            rp2.vcrSimTime.setText("");
+            rp2.vcrStopTime.setText("");
+            rp2.numRepsTF.setText("");
+            rp2.vcrVerbose.setSelected(false);
+            rp2.printRepReportsCB.setSelected(false);
+            rp2.printSummReportsCB.setSelected(false);
+                    
+            assyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
+            assyRunComponent.doTitle(null);
         }
     }
 

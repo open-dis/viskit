@@ -505,12 +505,11 @@ public class VGlobals {
      * create a new project space, or open another existing one, or exit Viskit
      */
     public final void initProjectHome() {
-
         ViskitConfig vConfig = ViskitConfig.instance();
         String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
         LOG.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
-            ViskitProjectButtonPanel.showDialog();
+            ViskitProjectButtonPanel.showDialog(); // hopefully, void this
         } else {
             ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
         }
