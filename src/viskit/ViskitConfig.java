@@ -1,12 +1,13 @@
 package viskit;
 
 import edu.nps.util.LogUtils;
+
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.configuration2.*;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
@@ -16,9 +17,10 @@ import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.configuration2.tree.NodeModel;
 import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.logging.log4j.Logger;
+
 import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom.JDOMException;
+
 import viskit.doe.FileHandler;
 
 /**
@@ -83,6 +85,8 @@ public class ViskitConfig {
     public static final String PROJECT_TITLE_NAME = "gui.projecttitle.name[@value]";
     public static final String LAF_DEFAULT = "default";
     public static final String LAF_PLATFORM = "platform";
+    
+    public static final String VISKIT_PROJ_NAME = "Project[@name]";
 
     private static ViskitConfig me;
 
@@ -123,6 +127,7 @@ public class ViskitConfig {
         } catch (IOException ex) {
             LOG.error(ex);
         }
+        
         xmlConfigurations = new HashMap<>();
         sessionHM = new HashMap<>();
         setDefaultConfig();
@@ -148,23 +153,23 @@ public class ViskitConfig {
             cc = new CombinedConfiguration(combiner);
             cc.addConfiguration(bldr1.getConfiguration(), "gui");
             cc.addConfiguration(bldr2.getConfiguration(), "app");
-
-            // Save off the indiv XML config for each prefix so we can write back
-            Object obj;
-            XMLConfiguration xc;
-            NodeModel m;
-            for (String name : cc.getConfigurationNames()) {
-                obj = cc.getConfiguration(name);
-                if (obj instanceof XMLConfiguration) {
-                    xc = (XMLConfiguration) obj;
-                    m = xc.getNodeModel();
-                    for (ImmutableNode o : m.getInMemoryRepresentation().getChildren()) {
-                        xmlConfigurations.put((o.getNodeName()), xc);
-                    }
-                }
-            }
         } catch (ConfigurationException e) {
             LOG.error(e);
+        }
+        
+        // Save off the indiv XML config for each prefix so we can write back
+        Object obj;
+        XMLConfiguration xc;
+        NodeModel m;
+        for (String name : cc.getConfigurationNames()) {
+            obj = cc.getConfiguration(name);
+            if (obj instanceof XMLConfiguration) {
+                xc = (XMLConfiguration) obj;
+                m = xc.getNodeModel();
+                for (ImmutableNode o : m.getInMemoryRepresentation().getChildren()) {
+                    xmlConfigurations.put((o.getNodeName()), xc);
+                }
+            }
         }
     }
 
@@ -250,7 +255,7 @@ public class ViskitConfig {
         getViskitAppConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         getViskitAppConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
 
-        // TODO: Other clears?
+        // Retain the recent projects list
     }
 
     public void resetViskitConfig() {
@@ -260,23 +265,21 @@ public class ViskitConfig {
     public void cleanup() {
         // Lot of hoops to pretty-fy config xml files
         Document doc;
-        Format form = Format.getPrettyFormat();
-        XMLOutputter xout = new XMLOutputter(form);
         try {
 
             // For c_app.xml
             doc = FileHandler.unmarshallJdom(C_APP_FILE);
-            xout.output(doc, new FileWriter(C_APP_FILE));
+            FileHandler.marshallJdom(C_APP_FILE, doc, false);
 
             // For c_gui.xml
             doc = FileHandler.unmarshallJdom(C_GUI_FILE);
-            xout.output(doc, new FileWriter(C_GUI_FILE));
+            FileHandler.marshallJdom(C_GUI_FILE, doc, false);
 
-            // For the current Viskit project file
+            // For the current viskitProject.xml file
             doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
-            xout.output(doc, new FileWriter(VGlobals.instance().getCurrentViskitProject().getProjectFile()));
-        } catch (Exception e) {
-            LOG.error("Bad jdom op: " + e.getMessage());
+            FileHandler.marshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile(), doc, false);
+        } catch (IOException | JDOMException e) {
+            LOG.error("Bad JDOM cleanup {}: ", e);
         }
     }
 }
