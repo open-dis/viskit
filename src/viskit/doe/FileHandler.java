@@ -34,8 +34,9 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.doe;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
@@ -47,6 +48,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import viskit.util.OpenAssembly;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -108,30 +110,33 @@ public class FileHandler {
         return dfm;
     }
 
-    public static Document unmarshallJdom(File f) throws Exception {
+    public static Document unmarshallJdom(File f) throws IOException, JDOMException {
         SAXBuilder builder = new SAXBuilder();
         return builder.build(f);
     }
 
-    public static void marshallJdom(File of, Document doc) throws Exception {
+    public static void marshallJdom(File of, Document doc, boolean omit) throws IOException, JDOMException {
         XMLOutputter xmlOut = new XMLOutputter();
         Format form = Format.getPrettyFormat();
-        form.setOmitDeclaration(true); // lose the <?xml at the top
+        
+        if (omit)
+            form.setOmitDeclaration(true); // lose the <?xml at the top
+        
         xmlOut.setFormat(form);
 
-        FileOutputStream fow = new FileOutputStream(of);
-        xmlOut.output(doc, fow);
+        try (Writer fw = new FileWriter(of)) {
+            xmlOut.output(doc, fw);
+        }
     }
 
     public static void marshallJaxb(File of) throws Exception {
         JAXBContext jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-        FileOutputStream fos = new FileOutputStream(of);
-        Marshaller m = jaxbCtx.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
-
-        //fillRoot();
-        m.marshal(OpenAssembly.inst().jaxbRoot, fos);
+        try (Writer fw = new FileWriter(of)) {
+            Marshaller m = jaxbCtx.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
+            m.marshal(OpenAssembly.inst().jaxbRoot, fw);
+        }
     }
 
     /** Called from the DoeController. Not currently used
@@ -144,7 +149,7 @@ public class FileHandler {
         try {
             new JobLauncher(true, fil.getAbsolutePath(), title, mainFrame);      // broken
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(System.err);
         }
     }
 

@@ -55,6 +55,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Text;
 import viskit.util.TitleListener;
 
@@ -69,7 +70,6 @@ import viskit.util.TitleListener;
  */
 public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener {
 
-    String inputFileString;
     File inputFile;
     File filteredFile;
     FileReader fr;
@@ -120,7 +120,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             try {
                 getParams();
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace(System.err);
             }
 
             pack();
@@ -209,12 +209,10 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     public void setFile(String file, String title) {
         if (file == null) {
-            inputFileString = null;
             inputFile = null;
             filteredFile = null;
             return;
         }
-        inputFileString = file;
         inputFile = new File(file);
         filteredFile = inputFile;      // will be possibly changed
 
@@ -286,7 +284,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         exp.setAttribute("timeout", tmo.getText().trim());
         //exp.setAttribute("debug","false");
 
-        FileHandler.marshallJdom(filteredFile, doc);
+        FileHandler.marshallJdom(filteredFile, doc, true);
     }
 
     private void doListeners() {
@@ -564,8 +562,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         Document document;
         try {
             document = FileHandler.unmarshallJdom(f);
-        } catch (Exception e) {
-            System.out.println("Error unmarshalling results: " + e.getMessage());
+        } catch (IOException | JDOMException e) {
+            System.err.println("Error unmarshalling results: " + e.getMessage());
             return null;
         }
         Element el = document.getRootElement();
