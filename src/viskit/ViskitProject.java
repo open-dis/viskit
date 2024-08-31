@@ -51,10 +51,10 @@ import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import viskit.doe.FileHandler;
 import viskit.view.dialog.SettingsDialog;
 
 /** The base class for management of all Viskit Projects
@@ -216,6 +216,10 @@ public class ViskitProject {
             loadProjectFromFile(getProjectFile());
         }
         ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        
+        XMLConfiguration config = ViskitConfig.instance().getProjectXMLConfig();
+        config.setProperty(ViskitConfig.VISKIT_PROJ_NAME, getProjectRoot().getName());
+        
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }
@@ -287,8 +291,7 @@ public class ViskitProject {
      */
     private void loadProjectFromFile(File inputProjectFile) {
         try {
-            SAXBuilder saxBuilder = new SAXBuilder();
-            projectDocument = saxBuilder.build(inputProjectFile);
+            projectDocument = FileHandler.unmarshallJdom(inputProjectFile);
             Element root = projectDocument.getRootElement();
             if (!root.getName().equals(VISKIT_ROOT_NAME)) {
                 projectDocument = null;
