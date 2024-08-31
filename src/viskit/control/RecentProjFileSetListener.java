@@ -80,14 +80,15 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
         String nameOnly;
         Action act;
         JMenuItem mi;
+        File f;
         for (String fullPath : lis) {
-
-            if (!new File(fullPath).exists()) {
+            f = new File(fullPath);
+            if (!f.exists()) {
                 continue;
             }
 
             for (JMenu m : openRecentProjMenus) {
-                nameOnly = new File(fullPath).getName();
+                nameOnly = f.getName();
                 act = new ParameterizedProjAction(nameOnly);
                 act.putValue(VStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
