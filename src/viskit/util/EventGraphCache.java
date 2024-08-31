@@ -70,9 +70,9 @@ import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 import viskit.VGlobals;
+import viskit.doe.FileHandler;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
@@ -199,8 +199,7 @@ public class EventGraphCache {
     public Document loadXML(File xmlFile) {
         Document doc = null;
         try {
-            SAXBuilder builder = new SAXBuilder();
-            doc = builder.build(xmlFile);
+            doc = FileHandler.unmarshallJdom(xmlFile);
         } catch (JDOMException | IOException ex) {
             log.error(ex);
         }

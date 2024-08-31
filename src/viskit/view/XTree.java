@@ -1,5 +1,7 @@
 package viskit.view;
 
+import edu.nps.util.LogUtils;
+
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.*;
@@ -8,12 +10,15 @@ import java.io.*;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-import org.jdom.input.SAXBuilder;
+import org.apache.logging.log4j.Logger;
+
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.*;
+
 import viskit.VGlobals;
 import viskit.VStatics;
+import viskit.doe.FileHandler;
 
 /**
  * A class to present an XML file in a JTree widget
@@ -22,6 +27,8 @@ import viskit.VStatics;
  * @version $Id$
  */
 public class XTree extends JTree {
+    
+    static final Logger LOG = LogUtils.getLogger(XTree.class);
 
     DefaultTreeModel mod;
 
@@ -36,20 +43,18 @@ public class XTree extends JTree {
     XMLOutputter xmlOut;
     Document doc = null;
 
-    public final void setFile(File xmlF) throws Exception {
-        SAXBuilder builder;
+    public final void setFile(File xmlF) {
         Format form;
         try {
-            builder = new SAXBuilder();
-            doc = builder.build(xmlF);
+            doc = FileHandler.unmarshallJdom(xmlF);
             xmlOut = new XMLOutputter();
             form = Format.getPrettyFormat();
             xmlOut.setFormat(form);
         } catch (JDOMException | IOException e) {
             doc = null;
             xmlOut = null;
-
-            throw new Exception("Error parsing or finding file " + xmlF.getAbsolutePath());
+            LOG.error("Error parsing or finding file {}", xmlF.getAbsolutePath());
+            return;
         }
 
         // throw existing away here?

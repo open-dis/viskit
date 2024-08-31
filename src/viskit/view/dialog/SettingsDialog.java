@@ -364,8 +364,8 @@ public class SettingsDialog extends JDialog {
     }
 
     private static void clearClassPathEntries() {
-        if (projectConfig == null)
-            initConfigs();
+        // Always reinitialize the prop config.  We may have changed projects
+        initConfigs();
         projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
 
@@ -617,8 +617,8 @@ public class SettingsDialog extends JDialog {
 
     /** @return a String array containing the extra classpaths to consider */
     public static String[] getExtraClassPath() {
-        if (projectConfig == null)
-            initConfigs();
+        // Always reinitialize the prop config.  We may have changed projects
+        initConfigs();
         return projectConfig.getStringArray(ViskitConfig.X_CLASS_PATHS_KEY);
     }
 
@@ -671,8 +671,6 @@ public class SettingsDialog extends JDialog {
      * @return the value for tab visibility
      */
     public static boolean getVisibilitySense(String prop) {
-        if (appConfig == null)
-            initConfigs();
         return appConfig.getBoolean(prop);
     }
 

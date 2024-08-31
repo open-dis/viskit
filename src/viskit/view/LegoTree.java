@@ -265,7 +265,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa)
                     _addContentRoot(file, file.isDirectory());
-                
+
             } else { // recurse = true
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
@@ -350,7 +350,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             } catch (Throwable t) {
 
                 // Uncomment to reveal common reason for Exceptions
-//                t.printStackTrace();
+                t.printStackTrace(System.err);
                 LOG.error(t);
             }
         } // directory
@@ -482,10 +482,10 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 {
                     setLeafIcon(LegoTree.this.standardNonLeafIcon);
                 }
-                
+
                 if (uo != null)
                     setToolTipText(uo.toString());
-                
+
                 value = value.toString();
                 sel = false;
             }
@@ -506,11 +506,11 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             if (f.isDirectory()) {
                 if (!dirsToo)
                     return false;
-                
+
                 // TBD add an ignore in SettingsDialog, and in history file
                 if (f.getName().contains("Assembl") || f.getName().contains("Scenario") || f.getName().contains("Locations"))
                     return false;
-                
+
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
                 return (fa != null || fa != null && fa.length != 0);
             }
