@@ -125,16 +125,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialAssyFile != null && new File(initialAssyFile).exists()) {
+        if (initialAssyFile != null && !initialAssyFile.isBlank()) {
             LOG.debug("Loading initial file: {}", initialAssyFile);
 
             // Switch to the project that this Assy file is located in if paths do not coincide
-            if (projPath.exists()  && !initialAssyFile.contains(projPath.getPath())) {
+            if (!initialAssyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
             }
 
-            compileAssembly(initialAssyFile);
         } else {
             List<String> files = getOpenAssyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
@@ -146,9 +145,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     _doOpen(file);
             }
         }
-
+        
         openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
+        
+        if (initialAssyFile != null && !initialAssyFile.isBlank())
+            compileAssembly(initialAssyFile);
+
         recordProjFiles();
     }
 
@@ -342,18 +345,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     AssemblyView view = (AssemblyView) getView();
                     view.delTab(vAMod);
 
-                    // NOTE: This doesn't work quite right.  If no Assy is open,
+                    // NOTE: This doesn't work quite right. If no Assy is open,
                     // then any non-associated EGs that were also open will
-                    // annoyingly close from the closeAll call above.  We are
+                    // annoyingly close from the closeAll call above. We are
                     // using an open EG cache system that relies on parsing an
                     // Assy file to find its associated EGs to open
                     if (!isCloseAll()) {
-
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
                             if (!mod.equals(vAMod))
                                 openEventGraphs(mod.getLastFile());
-                            
                         }
                     }
 
@@ -754,7 +755,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void closeAll() {
-
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vmod : modAr) {
             setModel((mvcModel) vmod);
