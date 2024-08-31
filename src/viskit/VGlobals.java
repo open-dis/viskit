@@ -154,7 +154,7 @@ public class VGlobals {
 
     /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
     public void rebuildLEGOTreePanels() {
-        ((AssemblyViewFrame)avf).rebuildLEGOTreePanels();
+        ((AssemblyViewFrame) avf).rebuildLEGOTreePanels();
     }
 
     public AssemblyModel getActiveAssemblyModel() {
