@@ -109,7 +109,7 @@ public class ViskitConfig {
         try {
             if (!VISKIT_CONFIG_DIR.exists()) {
                 VISKIT_CONFIG_DIR.mkdirs();
-                LOG.info("Created dir: " + VISKIT_CONFIG_DIR);
+                LOG.info("Created dir: {}", VISKIT_CONFIG_DIR);
             }
 
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
