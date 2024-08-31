@@ -114,7 +114,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void newEventGraph() {
 
-        // Don't allow a new event graph to be created is a current project is
+        // Don't allow a new event graph to be created if a current project is
         // not open
         if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
