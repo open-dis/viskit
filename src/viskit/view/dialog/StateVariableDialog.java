@@ -1,8 +1,5 @@
 package viskit.view.dialog;
 
-import viskit.model.Model;
-import viskit.model.vStateVariable;
-
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -15,9 +12,12 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.control.EventGraphController;
+import viskit.model.Model;
+import viskit.model.vStateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -36,7 +36,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
     private final JLabel arrSizeLab;
     private vStateVariable stVar;
     private final JButton okButt;
-    private JButton canButt;
+    private final JButton canButt;
     public static String newName,  newType,  newComment;
     private final myFocusListener focList;
     private final Component myTyperComponent;       // i.e., the editor of the type JComboBox
