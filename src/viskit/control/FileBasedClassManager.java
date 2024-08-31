@@ -248,7 +248,7 @@ public class FileBasedClassManager {
             removeCacheMiss(xmlEg);
         } catch (IOException ex) {
             LOG.error(ex);
-//            ex.printStackTrace();
+            ex.printStackTrace(System.err);
         }
     }
 
@@ -326,8 +326,8 @@ public class FileBasedClassManager {
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
             if (viskit.VStatics.debug) {
-                LOG.debug("getCached index at " + index);
-                LOG.debug("will return " + cacheClass.get(index));
+                LOG.debug("getCached index at {}", index);
+                LOG.debug("will return {}", cacheClass.get(index));
             }
         } catch (IOException ex) {
             LOG.error(ex);
@@ -335,8 +335,8 @@ public class FileBasedClassManager {
         }
         File cachedFile = new File(cacheClass.get(index));
         if (viskit.VStatics.debug) {
-            LOG.debug("cachedFile index at " + index);
-            LOG.debug("will return " + cachedFile);
+            LOG.debug("cachedFile index at {}", index);
+            LOG.debug("will return {}", cachedFile);
         }
         return cachedFile;
     }
