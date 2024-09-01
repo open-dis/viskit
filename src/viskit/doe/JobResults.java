@@ -65,10 +65,10 @@ public class JobResults extends JFrame {
     Vector<JobLauncher.Gresults> data;
     MyDataSet dset;
     XYPlot plot;
-    NumberAxis repAxis;
+//    NumberAxis repAxis;
 
     public JobResults(JFrame mother, String title) {
-        this(mother, title, new Vector<JobLauncher.Gresults>()); // empty data
+        this(mother, title, new Vector<>()); // empty data
     }
 
     public JobResults(JFrame mother, String title, Vector<JobLauncher.Gresults> data) {
