@@ -25,7 +25,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+
 import org.apache.logging.log4j.Logger;
+
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -33,6 +35,7 @@ import org.xml.sax.SAXParseException;
 
 // Local imports
 import edu.nps.util.LogUtils;
+
 import viskit.ViskitConfig;
 
 /**
@@ -63,7 +66,7 @@ public class XMLValidationTool {
     public static final String LOCAL_EVENT_GRAPH_SCHEMA =
             System.getProperty("user.dir") + "/Schemas/simkit.xsd";
 
-    static Logger log = LogUtils.getLogger(XMLValidationTool.class);
+    static final Logger LOG = LogUtils.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
     private File xmlFile, schemaFile;
@@ -84,7 +87,7 @@ public class XMLValidationTool {
          */
         System.setProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema",
                 "org.apache.xerces.jaxp.validation.XMLSchemaFactory");
-        log.debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
+        LOG.debug("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema = " +
                 System.getProperty("javax.xml.validation.SchemaFactory:http://www.w3.org/2001/XMLSchema"));
     }
 
@@ -103,7 +106,7 @@ public class XMLValidationTool {
         try {
             schemaDoc = factory.newSchema(getSchemaFile());
         } catch (SAXException ex) {
-            log.fatal("Unable to create Schema object: {}", ex);
+            LOG.fatal("Unable to create Schema object: {}", ex);
         }
 
         // 3. Get a validator from the schemaFile object.
@@ -119,7 +122,7 @@ public class XMLValidationTool {
 
             // 6. Parse, validate and report any errors.
             try {
-                log.info("Validating: " + source.getSystemId());
+                LOG.info("Validating: " + source.getSystemId());
 
                 // Prepare error errorsLog with current DTG
                 File errorsLog = new File(ViskitConfig.VISKIT_LOGS_DIR + "/validationErrors.log");
@@ -137,11 +140,11 @@ public class XMLValidationTool {
                 valid = true;
 
             } catch (SAXException ex) {
-                log.fatal(source.getSystemId() + " is not well-formed XML");
-                log.fatal(ex);
+                LOG.fatal(source.getSystemId() + " is not well-formed XML");
+                LOG.fatal(ex);
                 valid = false;
             } catch (IOException ex) {
-                log.fatal(ex);
+                LOG.fatal(ex);
                 valid = false;
             } finally {
                 try {
@@ -149,7 +152,7 @@ public class XMLValidationTool {
                     fWriter.write("\n");
                     fWriter.close();
                 } catch (IOException ex) {
-                    log.fatal(ex);
+                    LOG.fatal(ex);
                 }
             }
         }
@@ -201,7 +204,7 @@ public class XMLValidationTool {
             try {
                 fWriter.write(level + msg + "\n");
             } catch (IOException ex) {
-                log.fatal(ex);
+                LOG.fatal(ex);
             }
 
             // if we got here, there is something wrong
@@ -212,7 +215,7 @@ public class XMLValidationTool {
         public void warning(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Warning: ");
-            log.warn(msg);
+            LOG.warn(msg);
         }
 
         /** Recoverable errors such as violations of validity constraints are
@@ -223,7 +226,7 @@ public class XMLValidationTool {
         public void error(SAXParseException ex) {
             setMessage(ex);
             writeMessage("Error: ");
-            log.error(msg);
+            LOG.error(msg);
         }
 
         /**
@@ -233,7 +236,7 @@ public class XMLValidationTool {
         public void fatalError(SAXParseException ex) throws SAXParseException {
             setMessage(ex);
             writeMessage("Fatal: ");
-            log.fatal(msg);
+            LOG.fatal(msg);
             throw ex;
         }
     }
