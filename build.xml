@@ -296,7 +296,7 @@ their descpritions.
         <!-- ClassFinder prop for Simkit class skipping -->
         <copy todir="${dir.build.classes}/config">
             <fileset dir="${configuration.dir}">
-                <include name="ClassFinder.properties"/>
+                <include name="${class.finder.props}"/>
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
         </copy>
