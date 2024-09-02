@@ -145,10 +145,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     _doOpen(file);
             }
         }
-        
+
         openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
-        
+
         if (initialAssyFile != null && !initialAssyFile.isBlank())
             compileAssembly(initialAssyFile);
 
@@ -163,7 +163,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public final List<String> getOpenAssyFileList(boolean refresh) {
         if (refresh || openAssemblies == null)
             recordAssyFiles();
-        
+
         return openAssemblies;
     }
 
@@ -211,7 +211,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         File[] files = ((AssemblyView) getView()).openFilesAsk();
         if (files == null)
             return;
-        
+
         for (File file : files) {
             if (file != null)
                 _doOpen(file);
@@ -232,7 +232,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyModel[] openAlready = null;
         if (vaw != null)
             openAlready = vaw.getOpenModels();
-        
+
         boolean isOpenAlready = false;
         String path;
         if (openAlready != null) {
@@ -241,7 +241,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     path = model.getLastFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath()))
                         isOpenAlready = true;
-                    
+
                 }
             }
         }
@@ -799,7 +799,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
-            
+
             idx++;
         }
     }
@@ -811,7 +811,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-            
+
             idx++;
         }
     }
@@ -1392,9 +1392,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public String buildJavaAssemblySource(File f) {
         String assySource = null;
-        
+
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(f, 
+        XMLValidationTool xvt = new XMLValidationTool(f,
                 new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
 
         if (!xvt.isValidXML()) {
@@ -1565,9 +1565,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", msg);
                 return null;
             }
-            
+
             paf = compileJavaClassAndSetPackage(src);
-            
+
         } catch (FileNotFoundException e) {
             LOG.error("Error creating Java class file from {}: {}\n", xmlFile , e.getMessage());
             FileBasedClassManager.instance().addCacheMiss(xmlFile);
@@ -1980,7 +1980,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private Set<String> getRecentAssyFileSet(boolean refresh) {
         if (refresh || recentAssyFileSet == null)
             recordAssyFiles();
-        
+
         return recentAssyFileSet;
     }
 
@@ -1999,7 +1999,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private Set<String> getRecentProjFileSet(boolean refresh) {
         if (refresh || recentProjFileSet == null)
             recordProjFiles();
-        
+
         return recentProjFileSet;
     }
 
