@@ -149,9 +149,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
 
-        if (initialAssyFile != null && !initialAssyFile.isBlank())
-            compileAssembly(initialAssyFile);
-
+        if (initialAssyFile != null && !initialAssyFile.isBlank() && !initialAssyFile.contains("$")) // Check for $ makes sure that a property
+            compileAssembly(initialAssyFile);                                                   // pointing to a assembly path isn't commented
+                                                                                                       // out
         recordProjFiles();
     }
 
