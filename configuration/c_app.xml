@@ -13,7 +13,8 @@
         </mainframe>
         <projecthome>
             <!-- These two attributes MUST always be at least zero-length Strings -->
-            <!-- DefaultProject is included in this template for convenience -->
+            <!-- A default project path and name (DefaultProject) are included 
+                 in this template for convenience -->
             <path dir="./MyViskitProjects"/>
             <name value="DefaultProject"/>
         </projecthome>
