@@ -125,9 +125,9 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialAssyFile != null && !initialAssyFile.isBlank()) {
-            LOG.debug("Loading initial file: {}", initialAssyFile);
-
+        if (initialAssyFile != null && !initialAssyFile.isBlank() && !initialAssyFile.contains("$")) { // Check for $ makes sure that a property
+            LOG.debug("Loading initial file: {}", initialAssyFile);                             // pointing to a assembly path isn't commented
+                                                                                                         // out
             // Switch to the project that this Assy file is located in if paths do not coincide
             if (!initialAssyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
