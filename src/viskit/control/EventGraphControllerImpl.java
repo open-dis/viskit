@@ -74,16 +74,17 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void begin() {
-        List<File> lis = getOpenFileSet(false);
+        List<String> files = getOpenFileSet(false);
 
-        if (!lis.isEmpty()) {
-
-            // Open whatever EG were marked open on last closing
-            for (File f : lis) {
-                
+        if (!files.isEmpty()) {
+            File file;
+            
+            // Open whatever EGs were marked open on last closing
+            for (String f : files) {
+                file = new File(f);
                 // Prevent project mismatch
-                if (f.exists())
-                    _doOpen(f);
+                if (file.exists())
+                    _doOpen(file);
             }
 
         } else {
@@ -364,7 +365,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     private static final int RECENTLISTSIZE = 15;
-    private final Set<File> recentEGFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
+    private final Set<String> recentEGFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
@@ -372,21 +373,21 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * @param file an event graph file to add to the list
      */
     private void adjustRecentEGFileSet(File file) {
-        for (Iterator<File> itr = recentEGFileSet.iterator(); itr.hasNext();) {
-
-            File f = itr.next();
-            if (file.getPath().equals(f.getPath())) {
+        String f;
+        for (Iterator<String> itr = recentEGFileSet.iterator(); itr.hasNext();) {
+            f = itr.next();
+            if (file.getPath().equals(f)) {
                 itr.remove();
                 break;
             }
         }
 
-        recentEGFileSet.add(file); // to the top
+        recentEGFileSet.add(file.getPath()); // to the top
         saveEgHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
 
-    private List<File> openEventGraphs;
+    private List<String> openEventGraphs;
 
     @SuppressWarnings("unchecked")
     private void recordEgFiles() {
@@ -395,9 +396,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         List<Object> valueAr = historyConfig.getList(ViskitConfig.EG_HISTORY_KEY + "[@value]");
         int idx = 0;
         String op;
-        File egFile;
+        String egFile;
         for (Object s : valueAr) {
-            egFile = new File((String) s);
+            egFile = (String) s;
             if (recentEGFileSet.add(egFile)) {
                 op = historyConfig.getString(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]");
 
@@ -410,20 +411,13 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
     }
 
-    private void saveEgHistoryXML(Set<File> recentFiles) {
+    private void saveEgHistoryXML(Set<String> recentFiles) {
         historyConfig.clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
         int idx = 0;
-        String userDir = System.getProperty("user.dir");
-        String egPath;
 
         // The value's path is already delimited with "/"
-        for (File value : recentFiles) {
-            if (!value.getPath().contains(userDir))
-                egPath = userDir + File.separator + value.getPath();
-            else
-                egPath = value.getPath();
-            
-            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", egPath); // set relative path if available
+        for (String value : recentFiles) {
+            historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -437,18 +431,18 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public Set<File> getRecentEGFileSet() {
+    public Set<String> getRecentEGFileSet() {
         return getRecentEGFileSet(false);
     }
 
-    private Set<File> getRecentEGFileSet(boolean refresh) {
+    private Set<String> getRecentEGFileSet(boolean refresh) {
         if (refresh || recentEGFileSet == null)
             recordEgFiles();
         
         return recentEGFileSet;
     }
 
-    private List<File> getOpenFileSet(boolean refresh) {
+    private List<String> getOpenFileSet(boolean refresh) {
         if (refresh || openEventGraphs == null)
             recordEgFiles();
         
@@ -538,8 +532,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (f == null) {return;}
 
         int idx = 0;
-        for (File key : recentEGFileSet) {
-            if (key.getPath().contains(f.getName()))
+        for (String key : recentEGFileSet) {
+            if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
             
             idx++;
@@ -550,8 +544,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     // time a file is opened
     private void markConfigOpen(File f) {
         int idx = 0;
-        for (File key : recentEGFileSet) {
-            if (key.getPath().contains(f.getName()))
+        for (String key : recentEGFileSet) {
+            if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
             
             idx++;
@@ -610,12 +604,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         if (m.saveModel(f)) {
 
             // We don't need to recurse since we know this is a file, but make sure
-            // it's re-compiled and re-validated.  model.isDirty will be set from
+            // it's re-compiled and re-validated. model.isDirty will be set from
             // this call.
             VGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
         }
 
-        // Don't watch a an XML file whose source couldn't be compiled correctly
+        // Don't watch an XML file whose source couldn't be compiled correctly
         if (!m.isDirty()) {
             fileWatchSave(f);
         }

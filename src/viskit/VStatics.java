@@ -110,7 +110,6 @@ public class VStatics {
     @SuppressWarnings("unchecked")
     public static void setViskitProjectFile(File projFile) {
         ViskitProject.MY_VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfig.instance().clearViskitConfig();
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);

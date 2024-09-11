@@ -207,7 +207,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void open() {
-
         File[] files = ((AssemblyView) getView()).openFilesAsk();
         if (files == null)
             return;
@@ -1874,7 +1873,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void adjustRecentAssySet(File file) {
         String f;
         for (Iterator<String> itr = recentAssyFileSet.iterator(); itr.hasNext();) {
-
             f = itr.next();
             if (file.getPath().equals(f)) {
                 itr.remove();

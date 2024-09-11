@@ -2,7 +2,9 @@ package viskit.view;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
+
 import edu.nps.util.LogUtils;
+
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDragEvent;
@@ -18,6 +20,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
+
 import viskit.control.EventGraphController;
 import viskit.Help;
 import viskit.model.ModelEvent;
@@ -43,7 +46,7 @@ import viskit.view.dialog.EventInspectorDialog;
 import viskit.view.dialog.SettingsDialog;
 
 /**
- * Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
+ Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
  a jgraph on the left and state variables and sim parameters panels on the
  right, with menus and a toolbar. To fully implement application-level MVC,
  events like the dragging and dropping of a node on the screen are first
@@ -62,11 +65,11 @@ import viskit.view.dialog.SettingsDialog;
 
  OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
  Naval Postgraduate School, Monterey CA www.nps.edu
- *
- * @author Mike Bailey
- * @since Mar 2, 2004
- * @since 12:52:59 PM
- * @version $Id$
+ 
+  @author Mike Bailey
+  @since Mar 2, 2004
+  @since 12:52:59 PM
+  @version $Id$
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
 
@@ -446,17 +449,21 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void delTab(Model mod) {
+        JSplitPane jsplt;
+        JScrollPane jsp;
+        VgraphComponentWrapper vgcw;
+        Runnable r;
         for (Component c : tabbedPane.getComponents()) {
-            JSplitPane jsplt = (JSplitPane) c;
-            JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            jsplt = (JSplitPane) c;
+            jsp = (JScrollPane) jsplt.getLeftComponent();
+            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgcw.model == mod) {
                 tabbedPane.remove(c);
                 vgcw.isActive = false;
 
                 // Don't allow operation of tools with no Event Graph tab in view (NPEs)
                 if (tabbedPane.getTabCount() == 0) {
-                    Runnable r = () -> {
+                    r = () -> {
                         getToolBar().setVisible(false);
                     };
                     SwingUtilities.invokeLater(r);
@@ -468,12 +475,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public Model[] getOpenModels() {
+        JSplitPane jsplt;
+        JScrollPane jsp;
+        VgraphComponentWrapper vgcw;
         Component[] ca = tabbedPane.getComponents();
         Model[] vm = new Model[ca.length];
         for (int i = 0; i < vm.length; i++) {
-            JSplitPane jsplt = (JSplitPane) ca[i];
-            JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-            VgraphComponentWrapper vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            jsplt = (JSplitPane) ca[i];
+            jsp = (JScrollPane) jsplt.getLeftComponent();
+            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgcw.model;
         }
         return vm;
@@ -504,37 +514,34 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return null;
     }
 
-    /**
-     * Do menu layout work here
-     * @param mod the current model of our EG view
-     */
-//    private void adjustMenus(Model mod) {
-//        //todo
-//    }
-
     class RecentEgFileListener implements mvcRecentFileListener {
 
         @Override
         public void listChanged() {
+            String nameOnly;
+            Action act;
+            JMenuItem mi;
             EventGraphController vcontroller = (EventGraphController) getController();
-            Set<File> lis = vcontroller.getRecentEGFileSet();
+            Set<String> files = vcontroller.getRecentEGFileSet();
             openRecentEGMenu.removeAll();
-            for (File fullPath : lis) {
-                if (!fullPath.exists()) {
+            File file;
+            for (String fullPath : files) {
+                file = new File(fullPath);
+                if (!file.exists()) {
                     continue;
                 }
-                String nameOnly = fullPath.getName();
-                Action act = new ParameterizedAction(nameOnly);
+                nameOnly = file.getName();
+                act = new ParameterizedAction(nameOnly);
                 act.putValue(VStatics.FULL_PATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath.getPath());
+                mi = new JMenuItem(act);
+                mi.setToolTipText(file.getPath());
                 openRecentEGMenu.add(mi);
             }
-            if (!lis.isEmpty()) {
+            if (!files.isEmpty()) {
                 openRecentEGMenu.add(new JSeparator());
-                Action act = new ParameterizedAction("clear");
+                act = new ParameterizedAction("clear");
                 act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
+                mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
                 openRecentEGMenu.add(mi);
             }
@@ -973,8 +980,6 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             }
         }
 
-        // TODO: The cursors don't always set unless it's been moved up to the
-        // frame's title bar.  Mac OS X 10.10.3 & JDK 1.8.0_45
         @Override
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
