@@ -34,6 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view;
 
 import edu.nps.util.LogUtils;
+import edu.nps.util.SysExitHandler;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -42,7 +44,6 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.nps.util.SysExitHandler;
 import viskit.util.TitleListener;
 import viskit.VGlobals;
 import viskit.ViskitConfig;
@@ -139,17 +140,22 @@ public class MainFrame extends JFrame {
 //        VGlobals.instance().setAssemblyQuitHandler(null);
 //        VGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
         JMenuBar menuBar;
+        int idx;
+        
+        ChangeListener tabChangeListener = new myTabChangeListener();
+        myQuitAction = new ExitAction("Exit");
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
 
-        myQuitAction = new ExitAction("Exit");
+        // Swing:
+        getContentPane().add(tabbedPane);
+        tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
 
         // Tabbed event graph editor
         egFrame = VGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(((EventGraphViewFrame) egFrame).getContent());
-            int idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) egFrame).getContent());
+            idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) egFrame).getContent());
             tabbedPane.setTitleAt(idx, "Event Graph Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation entity definitions");
             menuBar = ((EventGraphViewFrame) egFrame).getMenus();
@@ -163,12 +169,15 @@ public class MainFrame extends JFrame {
         } else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
-
+        
+        // Ensures EG editor is the selected tab for menu function
+        tabbedPane.addChangeListener(tabChangeListener);
+        
         // Assembly editor
         assyFrame = VGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(((AssemblyViewFrame) assyFrame).getContent());
-            int idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assyFrame).getContent());
+            idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assyFrame).getContent());
             tabbedPane.setTitleAt(idx, "Assembly Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
             menuBar = ((AssemblyViewFrame) assyFrame).getMenus();
@@ -197,6 +206,7 @@ public class MainFrame extends JFrame {
 
         // Assembly Run
         runTabbedPane = new JTabbedPane();
+        runTabbedPane.addChangeListener(tabChangeListener);
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
         runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
         runTabbedPanePanel.add(runTabbedPane, BorderLayout.CENTER);
@@ -204,7 +214,7 @@ public class MainFrame extends JFrame {
         // Always selected as visible
         if (SettingsDialog.isAssemblyRunVisible()) {
             tabbedPane.add(runTabbedPanePanel);
-            int idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
+            idx = tabbedPane.indexOfComponent(runTabbedPanePanel);
             tabbedPane.setTitleAt(idx, "Assembly Run");
             tabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
             menus.add(null); // placeholder
@@ -219,7 +229,7 @@ public class MainFrame extends JFrame {
         if (analystReportPanelVisible) {
             reportPanel = VGlobals.instance().buildAnalystReportFrame();
             tabbedPane.add(reportPanel.getContentPane());
-            int idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
+            idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
             tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
             menuBar = ((AnalystReportFrame)reportPanel).getMenus();
@@ -238,7 +248,7 @@ public class MainFrame extends JFrame {
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
-
+        
         // Assembly runner
         assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
         runTabbedPane.add(VGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
@@ -305,13 +315,6 @@ public class MainFrame extends JFrame {
         runLater(500L, () -> {
             assyCntlr.begin();
         });
-
-        // Swing:
-        getContentPane().add(tabbedPane);
-
-        ChangeListener tabChangeListener = new myTabChangeListener();
-        tabbedPane.addChangeListener(tabChangeListener);
-        runTabbedPane.addChangeListener(tabChangeListener);
     }
 
     private void runLater(final long ms, final Runnable runr) {
@@ -365,26 +368,27 @@ public class MainFrame extends JFrame {
                 tabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_IDX], "First initialize assembly runner from Assembly tab");
             }
 
-            getJMenuBar().remove(hmen);
+            getJMenuBar().remove(helpMenu);
             JMenuBar newMB = menus.get(i);
-            newMB.add(hmen);
+            newMB.add(helpMenu);
             setJMenuBar(newMB);
             myTitleListener.setTitle(titles[i], i);
         }
     }
 
-    private JMenu hmen;
+    private JMenu helpMenu;
 
     /**
      * Stick the first Help menu we see into all the following ones.
      * @param mb
      */
     private void doCommonHelp(JMenuBar mb) {
+        JMenu men;
         for (int i = 0; i < mb.getMenuCount(); i++) {
-            JMenu men = mb.getMenu(i);
+            men = mb.getMenu(i);
             if (men.getText().equalsIgnoreCase("Help")) {
-                if (hmen == null) {
-                    hmen = men;
+                if (helpMenu == null) {
+                    helpMenu = men;
                 } else {
                     mb.remove(i);
                 }
@@ -394,13 +398,16 @@ public class MainFrame extends JFrame {
     }
 
     private void jamSettingsHandler(JMenuBar mb) {
+        JMenu men;
+        Component c;
+        JMenuItem jmi;
         for (int i = 0; i < mb.getMenuCount(); i++) {
-            JMenu men = mb.getMenu(i);
+            men = mb.getMenu(i);
             if (men.getText().equalsIgnoreCase("File")) {
                 for (int j = 0; j < men.getMenuComponentCount(); j++) {
-                    Component c = men.getMenuComponent(j);
+                    c = men.getMenuComponent(j);
                     if (c instanceof JMenuItem) {
-                        JMenuItem jmi = (JMenuItem) c;
+                        jmi = (JMenuItem) c;
                         if (jmi.getText().toLowerCase().contains("settings")) {
                             jmi.addActionListener(mySettingsHandler);
                             return;
