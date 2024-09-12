@@ -227,12 +227,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         Model[] openAlready = viskitView.getOpenModels();
         boolean isOpenAlready = false;
+        String path;
         if (openAlready != null) {
             for (Model model : openAlready) {
                 if (model.getLastFile() != null) {
-                    String path = model.getLastFile().getAbsolutePath();
+                    path = model.getLastFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath())) {
                         isOpenAlready = true;
+                        break;
                     }
                 }
             }
@@ -254,7 +256,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // Check for good compilation
             handleCompileAndSave(mod, file);
         } else {
-            viskitView.delTab(mod);   // Not a good open, tell view
+            viskitView.delTab(mod); // Not a good open, tell view
         }
 
         resetRedoUndoStatus();
@@ -273,7 +275,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     /** Mark every EG file opened as "open" in the app config file */
     private void markEgFilesAsOpened() {
-
         Model[] openAlready = ((EventGraphView) getView()).getOpenModels();
         for (Model vMod : openAlready) {
             if (vMod.getLastFile() != null)
@@ -600,7 +601,6 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
      * @param f the XML file name to save to
      */
     private void handleCompileAndSave(Model m, File f) {
-
         if (m.saveModel(f)) {
 
             // We don't need to recurse since we know this is a file, but make sure

@@ -133,7 +133,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
             }
-
+            compileAssembly(initialAssyFile);
         } else {
             List<String> files = getOpenAssyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
@@ -148,10 +148,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
-
-        if (initialAssyFile != null && !initialAssyFile.isBlank() && !initialAssyFile.contains("$")) // Check for $ makes sure that a property
-            compileAssembly(initialAssyFile);                                                   // pointing to a assembly path isn't commented
-                                                                                                       // out
         recordProjFiles();
     }
 
@@ -238,13 +234,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             for (AssemblyModel model : openAlready) {
                 if (model.getLastFile() != null) {
                     path = model.getLastFile().getAbsolutePath();
-                    if (path.equals(file.getAbsolutePath()))
+                    if (path.equals(file.getAbsolutePath())){
                         isOpenAlready = true;
-
+                        break;
+                    }
                 }
             }
         }
-
         if (mod.newModel(file) && !isOpenAlready) {
 
             vaw.setSelectedAssemblyName(mod.getMetaData().name);
@@ -256,7 +252,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             // replaces old fileWatchOpen(file);
             initOpenAssyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
-
         } else {
             vaw.delTab(mod);
         }
