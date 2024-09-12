@@ -329,12 +329,10 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         mod.nodesWereInserted(rootNode, new int[] {idx});
                     }
                 } else {
-                    // TODO: .class files come here if a directory is listed on
+                    // NOTE: .class files come here if a directory is listed on
                     // the additional classpath element
-                    LOG.warn( "Possible that {} has been cached missed. "
-                            + "Manually check for good compilation. If so, then "
-                            + "manually remove digests from project's cached "
-                            + "element to fix.\n", f.getName());
+                    LOG.warn("No classes of type {} found in {}", targetClassName, f.getName());
+                    LOG.info("{} will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n", f.getName());
                 }
 
                 // Note
