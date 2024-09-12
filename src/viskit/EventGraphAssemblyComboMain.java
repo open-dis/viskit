@@ -177,7 +177,6 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void setupMacGUI() {
-        
         Desktop.getDesktop().setAboutHandler(e -> {
             Help help = VGlobals.instance().getHelp();
             help.aboutEventGraphEditor();
