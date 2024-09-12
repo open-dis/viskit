@@ -239,7 +239,6 @@ public class EventGraphCache {
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
     private void setEventGraphFiles(File dir) {
-
         Element localRootElement;
         List<Element> simEntityList;
         String egName;
