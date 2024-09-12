@@ -33,19 +33,14 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import viskit.control.EventGraphControllerImpl;
-import viskit.control.AssemblyControllerImpl;
-import viskit.view.ViskitProjectButtonPanel;
-import viskit.view.RunnerPanel2;
-import viskit.view.dialog.SettingsDialog;
-import viskit.view.AssemblyViewFrame;
-import viskit.view.EventGraphViewFrame;
 import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.NameSpace;
+
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import edu.nps.util.SysExitHandler;
+
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -64,17 +59,26 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.*;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.control.AnalystReportController;
+import viskit.control.AssemblyControllerImpl;
+import viskit.control.EventGraphControllerImpl;
 import viskit.doe.LocalBootLoader;
-import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModel;
+import viskit.model.AnalystReportModel;
 import viskit.model.EventNode;
-import viskit.model.ViskitElement;
 import viskit.model.Model;
+import viskit.model.ViskitElement;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
 import viskit.view.AnalystReportFrame;
+import viskit.view.AssemblyViewFrame;
+import viskit.view.EventGraphViewFrame;
+import viskit.view.RunnerPanel2;
+import viskit.view.ViskitProjectButtonPanel;
+import viskit.view.dialog.SettingsDialog;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -500,7 +504,7 @@ public class VGlobals {
         return type.contains(">");
     }
 
-    /** The entry point for Viskit startup.  This method will either identify a
+    /** The entry point for Viskit startup. This method will either identify a
      * recorded project space, or launch a dialog asking the user to either
      * create a new project space, or open another existing one, or exit Viskit
      */
