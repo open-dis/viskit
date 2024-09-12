@@ -383,7 +383,9 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             }
         }
 
-        recentEGFileSet.add(file.getPath()); // to the top
+        if (!recentEGFileSet.contains(file.getPath()))
+            recentEGFileSet.add(file.getPath()); // to the top
+        
         saveEgHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
