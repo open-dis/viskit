@@ -148,7 +148,6 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         }
      
-//        openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
         recordProjFiles();
     }
@@ -1876,10 +1875,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 break;
             }
         }
-        
+
         if (!recentAssyFileSet.contains(file.getPath()))
             recentAssyFileSet.add(file.getPath()); // to the top
-        
+
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();
     }
@@ -1898,10 +1897,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 break;
             }
         }
-        
+
         if (!recentProjFileSet.contains(file.getPath()))
             recentProjFileSet.add(file.getPath()); // to the top
-        
+
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
