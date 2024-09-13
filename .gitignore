@@ -7,8 +7,10 @@
 /MyViskitProjects/DefaultProject/build/
 /MyViskitProjects/DefaultProject/lib/
 /MyViskitProjects/DefaultProject/AnalystReports/
+/MyViskitProjects/DefaultProject/viskitProject.xml
 /MANIFEST.MF
 /logs/
+/pduLogs/
 /viskit-exe.jar
 /lib/ext/
 /viskit-editor.jar
