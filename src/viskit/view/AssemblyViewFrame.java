@@ -62,7 +62,6 @@ import javax.swing.tree.TreePath;
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
-import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.VGlobals;
 import viskit.VStatics;
@@ -128,6 +127,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjFileSetListener recentProjFileSetListener;
+    private RecentAssyFileListener recentAssyFileListener;
 
     private int untitledCount = 0;
 
@@ -299,8 +299,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
-
-        controller.addRecentAssyFileSetListener(new RecentAssyFileListener());
+        recentAssyFileListener = new RecentAssyFileListener();
+        controller.addRecentAssyFileSetListener(getRecentAssyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -1111,6 +1111,13 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 //        comp.setMaximumSize(d);
 //        comp.setMinimumSize(d);
 //    }
+
+    /**
+     * @return the recentAsyFileListener
+     */
+    public RecentAssyFileListener getRecentAssyFileListener() {
+        return recentAssyFileListener;
+    }
 
 } // end class file AssemblyViewFrame.java
 
