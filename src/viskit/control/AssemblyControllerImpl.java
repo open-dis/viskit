@@ -147,7 +147,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     _doOpen(file);
             }
         }
-     
+
         ((AssemblyViewFrame) getView()).showProjectName();
         recordProjFiles();
     }
@@ -431,7 +431,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
-        return egListener;
+        return egListener; // A live listener, but currently doing nothing (tdn) 9/13/24
     }
 
     @Override
