@@ -35,7 +35,7 @@ package viskit.doe;
 
 import edu.nps.util.CryptoMethods;
 import edu.nps.util.SpringUtilities;
-import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
 import java.awt.*;
@@ -927,7 +927,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                     ret = doe.getDesignPointStats(sampleIndex, designPtIndex);
 
                                     if (statsGraphSet == false) {
-                                        String[] properties = toArray(ret.keySet(), new String[0]);
+                                        String[] properties = GenericConversion.toArray(ret.keySet(), new String[0]);
                                         statsGraph.setProperties(properties, designPoints, samples);
                                         statsGraphSet = true;
                                     }
@@ -944,7 +944,6 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                 }
                                 i++;
                                 System.gc();
-                                System.runFinalization();
                             }
                         }
 

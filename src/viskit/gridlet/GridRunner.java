@@ -6,7 +6,7 @@
  */
 package viskit.gridlet;
 
-import static edu.nps.util.LogUtils.getLogger;
+import edu.nps.util.LogUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,7 +20,7 @@ import static java.lang.Integer.valueOf;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.gc;
 import static java.lang.System.getProperty;
-import static java.lang.System.runFinalization;
+//import static java.lang.System.runFinalization;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +81,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
     Integer jobID;
     int port;
-    static Logger log = getLogger(GridRunner.class);
+    static Logger LOG = LogUtils.getLogger(GridRunner.class);
     Vector<String> eventGraphs;
     Map<String, Object> thirdPartyJars;
     File experimentFile;
@@ -120,18 +120,19 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     List<Boolean> resultsNotifiers;
     List<String> status;
 
+    private static final Object LOCK_OBJ = new Object();
+
     public GridRunner() {
         this.eventGraphs = new Vector<>();
         this.thirdPartyJars = new Hashtable<>();
         try {
             assemblyFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
 
         this.usid = "LOCAL-RUN";
         this.port = 0;
-
     }
 
     /** Creates a new instance of GridRunner
@@ -158,8 +159,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         Unmarshaller u;
         InputStream inputStream;
 
-        log.debug("Setting assembly");
-        log.debug(assembly);
+        LOG.debug("Setting assembly");
+        LOG.debug(assembly);
 
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
@@ -167,7 +168,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             u = jaxbCtx.createUnmarshaller();
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -217,7 +218,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         ByteArrayOutputStream jarData;
         try {
             if ( !thirdPartyJars.containsKey(filename) ) {
-                log.debug("Accepting jar transfer: " + filename + " of " + sequence);
+                LOG.debug("Accepting jar transfer: " + filename + " of " + sequence);
                 lastSequence = sequence;
                 jarData = new ByteArrayOutputStream();
                 jarData.write(data);
@@ -243,12 +244,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     // in no transfer. URL will be retrieved by Gridlets
                     // later.
                     thirdPartyJars.put(filename, u);
-                    log.debug("Cached jar " + u);
+                    LOG.debug("Cached jar " + u);
                 }
             }
             return valueOf(""+data.length);
         } catch (IOException | NumberFormatException e) {
-            log.error(e);
+            LOG.error(e);
             return valueOf("-1");
         }
     }
@@ -295,7 +296,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             List<DesignPoint> designPoints = samples.get(sample).getDesignPoint();
             int index = sample*designPointCount + designPt;
             Boolean notifier = resultsNotifiers.get(index);
-            synchronized(notifier) {
+            synchronized(LOCK_OBJ) {
                 DesignPoint designPoint = designPoints.get(designPt);
                 designPoint.setResults(r);
                 // notice these get swapped, the Boolean
@@ -308,7 +309,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         } catch (NumberFormatException | JAXBException e) {
             error = true;
-            log.error(e);
+            LOG.error(e);
         }
 
         return error;
@@ -368,12 +369,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     r.setSample(""+sample);
 
                 } catch (Exception e) {
-                    log.error(e);
+                    LOG.error(e);
                 }
             }
             return (new SimkitAssemblyXML2Java()).marshalFragmentToString(r);
         } catch (Exception e) {
-            log.error(e); // do nothing, the request came before design was in
+            LOG.error(e); // do nothing, the request came before design was in
         }
 
         return "WAIT";
@@ -466,7 +467,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             int index = (sampleIndex*designPointCount) + designPtIndex;
             Boolean notifier = designPointStatsNotifiers.get(index);
 
-            synchronized(notifier) {
+            synchronized(LOCK_OBJ) {
                 designPoint.getStatistics().add(stats);
                 designPointStatsNotifiers.set(index,true);
                 notifier.notify();
@@ -475,7 +476,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
 
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -493,7 +494,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             int index = ((sampleIndex*designPointCount + designPtIndex) * replicationsPerDesignPoint) + replicationIndex;
             Boolean notifier = replicationStatsNotifiers.get(index);
 
-            synchronized(notifier) {
+            synchronized(LOCK_OBJ) {
                 rep.getStatistics().add(stats);
                 replicationStatsNotifiers.set(index,true);
                 notifier.notify();
@@ -501,7 +502,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 System.out.println("addReplicationStat "+stat);
             }
         } catch (JAXBException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -530,7 +531,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             addResult((new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
             System.out.println("addResult for "+(new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
         return taskID;
     }
@@ -540,7 +541,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public synchronized Integer removeTask(int jobID, int taskID) {
         try {
-            log.debug("qdel: " + jobID + "." + taskID);
+            LOG.debug("qdel: " + jobID + "." + taskID);
             if (!usid.equals("LOCAL-RUN")) {
                 getRuntime().exec( new String[] {"qdel",""+jobID+"."+taskID} ) ;
             } else {
@@ -616,9 +617,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
         }
-        runFinalization();
+
         gc();
         return taskID;
     }
@@ -634,13 +635,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         try {
             getRuntime().exec( new String[] {"qdel",jobID.toString()} ) ;
         } catch (IOException e) {
-            log.debug(e);
+            LOG.debug(e);
         }
         if (root != null) {
             try {
                 new SimkitAssemblyXML2Java().marshal(root, new FileOutputStream(new File(root.getName() + "Exp.xml")));
             } catch (FileNotFoundException e) {
-                log.error(e);
+                LOG.error(e);
             }
         }
 
@@ -727,7 +728,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 }
                 return sw.toString();
             } catch (IOException e) {
-                log.error(e);
+                LOG.error(e);
                 return "QSTAT-ERROR";
             }
         }
@@ -749,7 +750,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             }
             return sw.toString();
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return "QSTAT-ERROR";
         }
     }
@@ -779,7 +780,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 experimentFile = createTempFile(root.getName()+"Exp",".xml");
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -794,13 +795,13 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         try {
             new SimkitAssemblyXML2Java().marshal(root, new FileOutputStream(experimentFile));
         } catch (FileNotFoundException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
         // spawn Gridlets
         int totalTasks = designPointCount*totalSamples;
-        log.info("usid is: " + usid);
+        LOG.info("usid is: " + usid);
         try {
             if (!usid.equals("LOCAL-RUN")) {
                 getRuntime().exec( new String[] {"qsub","-cwd","-v","FILENAME="+experimentFile.getName(),"-v","PORT="+port,"-v","USID="+usid,"-t","1-"+totalTasks,"-S","/bin/bash","./gridrun.sh"});
@@ -808,7 +809,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 localRun(experimentFile,totalTasks);
             }
         } catch (IOException e) {
-            log.error(e);
+            LOG.error(e);
             return Boolean.FALSE;
         }
 
@@ -837,7 +838,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             // TODO: fix generics
             queue = new LocalTaskQueue(this,experimentFile,totalTasks);
         } catch (DoeException e) {
-            log.error(e);
+            LOG.error(e);
         }
 
         // this shouldn't block on the very first call
@@ -947,7 +948,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         List<TerminalParameter> params = root.getDesignParameters();
         Map<TerminalParameter, Object> values = new HashMap<>();
         for (TerminalParameter t : params) {
-            log.debug("Batch Mode " + t);
+            LOG.debug("Batch Mode " + t);
             JAXBElement<ValueRange> range = t.getValueRange();
             Object returns;
             if (range.getName().toString().contains("DoubleRange")) {
