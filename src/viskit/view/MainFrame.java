@@ -233,7 +233,7 @@ public class MainFrame extends JFrame {
             idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
             tabbedPane.setToolTipTextAt(idx, "Supports analyst assessment and report generation");
-            menuBar = ((AnalystReportFrame)reportPanel).getMenus();
+            menuBar = ((AnalystReportFrame) reportPanel).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
@@ -531,6 +531,10 @@ public class MainFrame extends JFrame {
                 // Pretty-fy all xml docs used for configuration
                 ViskitConfig.instance().cleanup();
 
+                // All other "Frames" were setVisible(false) above
+                setVisible(false);
+
+                // This will dispose all "Frames" and interrupt any non-daemon threads
                 VGlobals.instance().sysExit(0);  // quit application
             } //outer
 
