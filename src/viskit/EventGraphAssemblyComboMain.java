@@ -144,13 +144,10 @@ public class EventGraphAssemblyComboMain {
         ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
 
         JFrame mainFrame = new MainFrame(initialAssyFile);
-        VGlobals.instance().setMainAppWindow(mainFrame);
-
         if (isMac) {
             aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
             setupMacGUI();
         }
-
         mainFrame.setVisible(true);
     }
 
