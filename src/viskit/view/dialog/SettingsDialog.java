@@ -396,7 +396,6 @@ public class SettingsDialog extends JDialog {
             progressDialog.pack();
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             progressDialog.setLocation((d.width - progressDialog.getWidth()) / 2, (d.height - progressDialog.getHeight()) / 2);
-            progressDialog.setVisible(true);
             progressDialog.setResizable(false);
         }
         Task t = new Task();
