@@ -34,14 +34,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.Desktop;
-
 import java.awt.Taskbar;
-
 import java.io.File;
-
 import java.lang.reflect.InvocationTargetException;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -90,17 +87,13 @@ public class EventGraphAssemblyComboMain {
                 // Apache Commons config files have behaved rather well and don't
                 // need to be nuked as of late: 03 DEC 2014.
 //                nukeDotViskit();
-
-                // If we encounter this case, then uncomment printStackTrace() to
-                // drill down on the cause.  Easier than setting a breakpoint and
-                // debugging!
                 e.printStackTrace(System.err);
             }
 
             try {
                 URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
-                
+
                 String msg = "Viskit has experienced a startup glitch.  <br/>Please "
                         + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
                         + "email the log to "
@@ -181,7 +174,7 @@ public class EventGraphAssemblyComboMain {
             Help help = VGlobals.instance().getHelp();
             help.aboutEventGraphEditor();
         });
-        
+
         if (aboutIcon != null)
             Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
     }
