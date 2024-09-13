@@ -338,7 +338,7 @@ their descpritions.
             <attribute name="Implementation-Title"
                        value="${impl.title}"/>
             <attribute name="Implementation-Version"
-                       value="${product.Version} built on ${TODAY} at ${TSTAMP} hrs"/>
+                       value="${product.Version} built on ${TODAY} at ${TSTAMP} local"/>
             <attribute name="Implementation-Vendor"
                        value="${nps}, ${moves.institute}, ${savage.research.group}"/>
             <attribute name="Implementation-URL"
