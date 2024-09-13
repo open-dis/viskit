@@ -48,6 +48,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -421,11 +422,16 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void done() {
-            if (dialog != null && progressDialog != null) {
-                progress.setIndeterminate(false);
-                progress.setValue(100);
-                setProgress(100);
-                progressDialog.dispose();
+            try {
+                get(); // waits
+                if (dialog != null && progressDialog != null) {
+                    progress.setIndeterminate(false);
+                    progress.setValue(100);
+                    setProgress(100);
+                    progressDialog.dispose();
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                LOG.error(ex);
             }
         }
     }
