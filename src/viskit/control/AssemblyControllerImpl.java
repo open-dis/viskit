@@ -132,9 +132,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (!initialAssyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
+                openProject(projPath); // calls EGVF showProjectName
             }
             compileAssembly(initialAssyFile);
         } else {
+            openProject(projPath); // calls EGVF showProjectName
             List<String> files = getOpenAssyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -145,8 +147,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     _doOpen(file);
             }
         }
-
-        openProject(projPath); // calls EGVF showProjectName
+     
+//        openProject(projPath); // calls EGVF showProjectName
         ((AssemblyViewFrame) getView()).showProjectName();
         recordProjFiles();
     }
@@ -1874,8 +1876,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 break;
             }
         }
-
-        recentAssyFileSet.add(file.getPath()); // to the top
+        
+        if (!recentAssyFileSet.contains(file.getPath()))
+            recentAssyFileSet.add(file.getPath()); // to the top
+        
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();
     }
@@ -1888,15 +1892,16 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void adjustRecentProjSet(File file) {
         String f;
         for (Iterator<String> itr = recentProjFileSet.iterator(); itr.hasNext();) {
-
             f = itr.next();
             if (file.getPath().equals(f)) {
                 itr.remove();
                 break;
             }
         }
-
-        recentProjFileSet.add(file.getPath()); // to the top
+        
+        if (!recentProjFileSet.contains(file.getPath()))
+            recentProjFileSet.add(file.getPath()); // to the top
+        
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
