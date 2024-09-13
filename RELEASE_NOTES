@@ -17,15 +17,6 @@ Post release fixes / upgrades / issues:
   the platform L&F is not the best choice as the background coloring for tabs is
   quite quirky. The default L&F for Win machines is recommended.
 
-  On Mac OS X 10.10.3 & JDK 1.8.0_45, the cancel and scheduling cursors on the
-  JGraph palette will revert back to the select cursor (arrow) when a node or
-  edge inspector pops up. If the user selects cancel or schedule mode again,
-  the cursor will not change (remains in select) mode until the user moves the
-  cursor out of the JPanel containing the JGraph component and menu bar up to
-  the parent Frame's title bar. Then it will change as expected. UPDATE: Haven't
-  seen this issue occur in later versions of JDK 17+ and later macOS versions.
-  TDN 19 FEB 2023.
-
   Due to the way the SimkitXML2Java generates EG extensions of super
   SimEntities, a default constructor will not be generated in subclasses
   accordingly. When it is time to parameterize EG constructors at Assy creation
@@ -46,10 +37,6 @@ Post release fixes / upgrades / issues:
   signatures. As such, subclassing is still possible, but the user will have
   to manually name Events in this manner using an underscore character, i.e.
   Arrival, Arrival_e (where the "e" hints at the type argument of the event).
-
-  If the CNTL key is held down while attempting to drag an edge control point
-  a IOOBE will be thrown by JGraph v5.14.0. This may be fixed in a subsequent
-  release of JGraphX (new code base name) should we decide to upgrade to v6+.
 
   If a single Assy file was closed, it will close all open EGs file including
   non-associated EGs. This happens due to the EG caching system that relies on
@@ -78,16 +65,20 @@ Post release fixes / upgrades / issues:
 
   ****** FIXES / UPGRADES:
     (Critical)
-    Fix issue where a leading "/" of a URL was hiding an additional classpath
-    jar on WIN.
+    Restored creation of the Analyst Report
 
-    If a user submits a path to an assy file, and the file and current project
-    path do not coincide, then open the project that the assy belongs in.
+    (Critical)
+    Fix issue where a leading "/" of a URL was hiding an additional classpath
+    jar on WIN
+
+    If a user submits a path to an assy file, and the assy does not reside in
+    the current project, Viskit will then close the current project and open the
+    project that the assy belongs in
 
     (Critical)
     Fix issue where if another project was opened, lingering recent proj. file
     references were maintained causing a NPE due to a recent class from the old
-    project which is no longer found on the current classpath.
+    project which is no longer found on the current classpath
 
     We now have a unicode character displayed on conditional scheduling edges
 
@@ -95,7 +86,7 @@ Post release fixes / upgrades / issues:
     Fixed runaway recursion when selecting a PCL for edit
 
     Better formatting on the Local run panel console output of rep. stats and
-    rep. summary report.
+    rep. summary report
 
     Consolidated VertexRenderers for efficiency
 
@@ -108,13 +99,13 @@ Post release fixes / upgrades / issues:
     now colorized per logging level.
 
     (Critical)
-    Selection of edges on macOS laptop displays was intermittent. Fix on 
-    13 DEC 22 did not take. Turns out all edges need a label, even if an empty 
+    Selection of edges on macOS laptop displays was intermittent. Fix on
+    13 DEC 22 did not take. Turns out all edges need a label, even if an empty
     string. Null strings caused edge bounding box null issues which interfered
     with proper bounding box / edge shape intersections. Overrode JGraph
-    EdgeRenderer intersect method to back off of deep dive Graphics2D hits to 
-    find intersections between edge shape and their corresponding bounding 
-    boxes. Replaced with simpler shape.intersects(rectangle) calls. No issues 
+    EdgeRenderer intersect method to back off of deep dive Graphics2D hits to
+    find intersections between edge shape and their corresponding bounding
+    boxes. Replaced with simpler shape.intersects(rectangle) calls. No issues
     now when working between MBP laptop displays and Mac Thunderbolt displays.
 
     (Critical)
