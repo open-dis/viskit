@@ -101,6 +101,9 @@ public class MainFrame extends JFrame {
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
 
+    private AssemblyController assyCntlr;
+    private EventGraphController egCntlr;
+
     public MainFrame(String initialAssyFile) {
         super(ViskitConfig.VISKIT_FULL_APPLICATION_NAME);
         this.initialAssyFile = initialAssyFile;
@@ -190,8 +193,8 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
         }
 
-        final EventGraphController egCntlr = (EventGraphController) egFrame.getController();
-        final AssemblyController assyCntlr = (AssemblyController) assyFrame.getController();
+        assyCntlr = (AssemblyController) assyFrame.getController();
+        egCntlr = (EventGraphController) egFrame.getController();
 
         // Now set the recent open project's file listener for the egFrame now
         // that we have an assyFrame reference
@@ -488,9 +491,21 @@ public class MainFrame extends JFrame {
                 VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
+                    egCntlr.removeEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
+                    egCntlr.removeRecentEgFileListener(VGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
+
+                    // TODO: Need doe listener removal (tdn) 9/13/24
+
                     ((EventGraphController) egFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
+                    assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
+                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssyChangeListener) reportPanel);
+                    assyCntlr.removeRecentAssyFileSetListener(VGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
+                    assyCntlr.removeRecentProjFileSetListener(VGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
+
+                    // TODO: Need grid and doe listener removal (tdn) 9/13/24
+
                     ((AssemblyController) assyFrame.getController()).postQuit();
                 }
 
