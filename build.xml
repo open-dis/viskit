@@ -79,7 +79,7 @@
     <path id="jaxb.runtime.path">
         <fileset dir="${dir.lib.xml}" includes="istack-commons-runtime.jar javax.activation-api.jar jaxb-api.jar jaxb-runtime.jar"/>
     </path>
-    
+
     <path id="runtime.classpath">
         <pathelement location="${dir.build.classes}"/>
         <pathelement location="${dir.lib}/actions.jar"/>
@@ -292,7 +292,7 @@ their descpritions.
                 <include name="log4j2.xml"/>
             </fileset>
         </copy>
-        
+
         <!-- ClassFinder prop for Simkit class skipping -->
         <copy todir="${dir.build.classes}/config">
             <fileset dir="${configuration.dir}">
@@ -624,7 +624,7 @@ their descpritions.
 
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${run.args}"/>
-            
+
             <!-- Any debug args can go here -->
             <arg value="${viskit.args}"/>
         </java>
@@ -733,6 +733,8 @@ their descpritions.
             <include name="*.jar"/>
         </delete>
         <delete file="viskit-editor.jar"/>
+        <delete dir="logs"/>
+        <delete dir="pduLog"/>
 
         <!-- This one is scary -->
         <delete dir=".">
