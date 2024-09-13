@@ -22,7 +22,6 @@ public abstract class mvcAbstractModel implements mvcModel {
 
     @Override
     public void notifyChanged(mvcModelEvent event) {
-
         for (mvcModelListener ml : listeners) {
             ml.modelChanged(event);
         }
