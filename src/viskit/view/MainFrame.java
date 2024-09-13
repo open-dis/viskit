@@ -74,14 +74,13 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class MainFrame extends JFrame {
 
-    public Action myQuitAction;
-
     mvcAbstractJFrameView egFrame;
     mvcAbstractJFrameView assyFrame;
     mvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
 
+    private Action myQuitAction;
     private JTabbedPane tabbedPane;
     private JTabbedPane runTabbedPane;
     private DoeMain doeMain;
@@ -104,15 +103,14 @@ public class MainFrame extends JFrame {
 
     public MainFrame(String initialAssyFile) {
         super(ViskitConfig.VISKIT_FULL_APPLICATION_NAME);
-
         this.initialAssyFile = initialAssyFile;
+        VGlobals.instance().setMainAppWindow(MainFrame.this);
 
         initUI();
 
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         MainFrame.this.setLocation((d.width - w) / 2, (d.height - h) / 2);
         MainFrame.this.setSize(w, h);
 
@@ -202,7 +200,7 @@ public class MainFrame extends JFrame {
 
         // Now setup the assembly and event graph file change listener(s)
         assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
+        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener()); // A live listener, but currently doing nothing (tdn) 9/13/24
 
         // Assembly Run
         runTabbedPane = new JTabbedPane();
