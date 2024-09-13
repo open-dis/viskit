@@ -75,13 +75,13 @@ import viskit.view.dialog.SettingsDialog;
 public class MainFrame extends JFrame {
 
     public Action myQuitAction;
-    
+
     mvcAbstractJFrameView egFrame;
     mvcAbstractJFrameView assyFrame;
     mvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
-    
+
     private JTabbedPane tabbedPane;
     private JTabbedPane runTabbedPane;
     private DoeMain doeMain;
@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
     private final int TAB0_ASSEMBLYRUN_SUBTABS_IDX = 2;
     private final int TAB0_ANALYST_REPORT_IDX = 3;
     private final int[] tabIndices = {
-        TAB0_EVENTGRAPH_EDITOR_IDX, 
+        TAB0_EVENTGRAPH_EDITOR_IDX,
         TAB0_ASSEMBLY_EDITOR_IDX,
         TAB0_ASSEMBLYRUN_SUBTABS_IDX,
         TAB0_ANALYST_REPORT_IDX
@@ -141,7 +141,7 @@ public class MainFrame extends JFrame {
 //        VGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
         JMenuBar menuBar;
         int idx;
-        
+
         ChangeListener tabChangeListener = new myTabChangeListener();
         myQuitAction = new ExitAction("Exit");
 
@@ -169,10 +169,10 @@ public class MainFrame extends JFrame {
         } else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
-        
+
         // Ensures EG editor is the selected tab for menu function
         tabbedPane.addChangeListener(tabChangeListener);
-        
+
         // Assembly editor
         assyFrame = VGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
@@ -248,7 +248,7 @@ public class MainFrame extends JFrame {
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
-        
+
         // Assembly runner
         assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
         runTabbedPane.add(VGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
@@ -306,11 +306,13 @@ public class MainFrame extends JFrame {
         }
         /* End DIFF between OA3302 branch and trunk */
 
-        // let the event graph controller establish the Viskit classpath and open
-        // EventGraphs first
-        runLater(0L, () -> {
-            egCntlr.begin();
-        });
+        // let the event graph controller establish Viskit's classpath and open
+        // EventGraphs first if an assy file has not been submitted at startup
+        if (initialAssyFile == null || initialAssyFile.isBlank() || initialAssyFile.contains("$")) {
+            runLater(0L, () -> {
+                egCntlr.begin();
+            });
+        }
 
         runLater(500L, () -> {
             assyCntlr.begin();
@@ -547,7 +549,7 @@ public class MainFrame extends JFrame {
                 assyRunComponent.preInitRun(execStrings);
             }
         }
-        
+
         @Override
         public void resetRunner() {
             RunnerPanel2 rp2 = VGlobals.instance().getSimRunnerPanel();
@@ -560,7 +562,7 @@ public class MainFrame extends JFrame {
             rp2.vcrVerbose.setSelected(false);
             rp2.printRepReportsCB.setSelected(false);
             rp2.printSummReportsCB.setSelected(false);
-                    
+
             assyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
             assyRunComponent.doTitle(null);
         }
