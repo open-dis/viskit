@@ -610,18 +610,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                                 + "<br/><br/>Click the link to open up an email "
                                 + "form, then attach the zip file";
                         VStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
-
                     } catch (MalformedURLException | URISyntaxException e) {
                         LOG.error(e);
                     }
 
-                    try {
-                        Desktop.getDesktop().open(projZip.getParentFile());
-                    } catch (IOException e) {
-                        LOG.error(e);
-                    }
+                    Desktop.getDesktop().open(projZip.getParentFile());
 
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException | ExecutionException | IOException e) {
                     LOG.error(e);
                 }
             }
