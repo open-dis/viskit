@@ -92,7 +92,7 @@ public class AnalystReportController extends mvcAbstractController {
         try {
             Files.copy(srcFil.toPath(), targetFile.toPath());
         } catch (IOException ioe) {
-            LOG.fatal(ioe);
+            LOG.warn(ioe);
         }
 
         if (frame == null) {
