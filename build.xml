@@ -268,10 +268,9 @@ their descpritions.
 
     <!--  === TARGET: compile === -->
     <target name="compile" depends="bindings.simkit,javahelp">
-
         <javac destdir="${dir.build.classes}"
                release="${javac.release}"
-               debug="true"
+               debug="${javac.debug}"
                fork="true"
                includeantruntime="false">
 
