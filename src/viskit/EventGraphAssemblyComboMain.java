@@ -37,14 +37,14 @@ import edu.nps.util.LogUtils;
 
 import java.awt.Desktop;
 import java.awt.Taskbar;
+import java.awt.desktop.QuitEvent;
+import java.awt.desktop.QuitResponse;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 
@@ -61,8 +61,6 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class EventGraphAssemblyComboMain {
 
-    private static ImageIcon aboutIcon = null;
-
     /**
      * Viskit entry point from the command line, or introspection
      * @param args command line arguments if any
@@ -71,8 +69,6 @@ public class EventGraphAssemblyComboMain {
 
         // Launch all GUI stuff on, or within the EDT
         try {
-//            throw new InvocationTargetException(new Throwable("mail this error"));
-
             SwingUtilities.invokeLater(() -> {
                 createGUI(args);
             });
@@ -102,7 +98,7 @@ public class EventGraphAssemblyComboMain {
 
                 VStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
-                Logger.getLogger(EventGraphAssemblyComboMain.class.getName()).log(Level.SEVERE, null, ex);
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).fatal(ex);
             }
         }
     }
@@ -120,7 +116,7 @@ public class EventGraphAssemblyComboMain {
                 file.delete();
             }
             if (dotViskit.delete())
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info(dotViskit.getName() + " was found and deleted from your system.");
+                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("{} was found and deleted from your system.", dotViskit.getName());
 
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
         }
@@ -135,18 +131,17 @@ public class EventGraphAssemblyComboMain {
             initialAssyFile = args[0];
 
         if (viskit.VStatics.debug) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("***Inside EventGraphAssembly main: " + args.length);
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
         }
         setLandFandFonts();
 
         // Leave tooltips on the screen until mouse movement causes removal
         ToolTipManager ttm = ToolTipManager.sharedInstance();
-        ttm.setDismissDelay(Integer.MAX_VALUE);  // never remove automatically
+        ttm.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
 
         JFrame mainFrame = new MainFrame(initialAssyFile);
         if (isMac) {
-            aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
-            setupMacGUI();
+            setupMacUI();
         }
         mainFrame.setVisible(true);
     }
@@ -162,18 +157,24 @@ public class EventGraphAssemblyComboMain {
                 UIManager.setLookAndFeel(s);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error("Error setting Look and Feel to " + s);
+            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error("Error setting {} Look and Feel", s);
         }
     }
 
-    private static void setupMacGUI() {
+    private static void setupMacUI() {
         Desktop.getDesktop().setAboutHandler(e -> {
             Help help = VGlobals.instance().getHelp();
-            help.aboutEventGraphEditor();
+            help.aboutViskit();
         });
 
-        if (aboutIcon != null)
-            Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
+        // CMD Q for macOS, but some thread hangs preventing a full JVM shutdown
+//        Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {
+//            MainFrame mf = (MainFrame) VGlobals.instance().getMainAppWindow();
+//            mf.getMyQuitAction().actionPerformed(null);
+//        });
+
+        ImageIcon aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
+        Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
     }
 
 } // end class file EventGraphAssemblyComboMain.java
