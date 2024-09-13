@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-/** 
+/**
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
@@ -58,6 +58,7 @@ public class DirectoryWatch {
     private Map<File, Long> lastFiles;
     private Thread thread;
     private File root;
+    private boolean running;
 
     public DirectoryWatch(File root) throws FileNotFoundException {
         this(root, false);
@@ -79,12 +80,13 @@ public class DirectoryWatch {
         thread = new Thread(new Runner(), "DirectoryWatch-" + sequenceNum++);
         thread.setPriority(Thread.NORM_PRIORITY);
         thread.setDaemon(true);
+        running = true;
         thread.start();
     }
 
     public void stopWatcher() {
         if (thread != null) {
-            thread.interrupt();
+            running = false;
             thread = null;
         }
     }
@@ -133,7 +135,7 @@ public class DirectoryWatch {
             }
         }
     }
-    private Set<DirectoryChangeListener> listeners = new HashSet<>();
+    private final Set<DirectoryChangeListener> listeners = new HashSet<>();
 
     /**
      * @param listener listener for this directory
@@ -163,9 +165,8 @@ public class DirectoryWatch {
 
         @Override
         public void run() {
-            while (true) {
+            while (running) {
                 workingHM.clear();
-
                 added.clear();
                 changed.clear();
 
