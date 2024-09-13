@@ -398,18 +398,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = VGlobals.instance().getHelp();
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
-
-        helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-        helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
-        helpMenu.addSeparator();
-
-        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutAssemblyEditor", "About...", KeyEvent.VK_A, null));
-
-        myMenuBar.add(helpMenu);
+        // Help editor created by the EGVF for all of Viskit's UIs
     }
 
     private JMenu buildMenu(String name) {
@@ -928,7 +917,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        JOptionPane.showMessageDialog(this, msg, title, type);
+        JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, title, type);
     }
 
     @Override
