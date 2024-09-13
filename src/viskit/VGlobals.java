@@ -797,7 +797,7 @@ public class VGlobals {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
         projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
-        
+
         if (currentViskitProject == null)
             currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
         else
@@ -855,8 +855,8 @@ public class VGlobals {
                (JPMS) rules and as such we need to retain certain modules, i.e.
                java.sql. With retaining the boot class loader, not sure if that
                causes sibling classloader static variables to be retained. In
-               any case we must retain the original bootloader as it has 
-               references to the loaded module system. 
+               any case we must retain the original bootloader as it has
+               references to the loaded module system.
             */
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                 ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the internal boot loader
@@ -885,52 +885,49 @@ public class VGlobals {
         return sb.toString();
     }
 
+    /** All of this to avoid a SysExit call explicitly */
     private SysExitHandler sysexithandler = (int status) -> {
-        LOG.debug("Viskit is exiting with status: " + status);
-        
+        LOG.debug("Viskit is exiting with status {}: ", status);
+
         /* If an application launched a JVM, and is still running, this will
-        * only make Viskit disappear.  If Viskit is running standalone,
+        * only make Viskit disappear. If Viskit is running standalone,
         * then then all JFrames created by Viskit will dispose, and the JVM
         * will then cease.
         * @see http://java.sun.com/docs/books/jvms/second_edition/html/Concepts.doc.html#19152
         * @see http://72.5.124.55/javase/6/docs/api/java/awt/doc-files/AWTThreadIssues.html
         */
         Frame[] frames = Frame.getFrames();
-        int count = 0;
         for (Frame f : frames) {
-            LOG.debug("Frame count in Viskit: " + (++count));
-            
+            LOG.debug("Frame is {}: ", f);
+
             /* Prevent non-viskit created components from disposing if
-             * launched from another application.  SwingUtilities is a
-             * little "ify" though as it's not Viskit specific.  Viskit,
+             * launched from another application. SwingUtilities is a
+             * little "ify" though as it's not Viskit specific. Viskit,
              * however, spawns a lot of anonymous Runnables with
              * SwingUtilities
              */
             if (f.toString().toLowerCase().contains("viskit")) {
-                LOG.debug("Frame is: " + f);
                 f.dispose();
             }
             if (f.toString().contains("SwingUtilities")) {
-                LOG.debug("Frame is: " + f);
                 f.dispose();
             }
-            
+
             // Case for XMLTree JFrames
             if (f.getTitle().contains("xml")) {
-                LOG.debug("Frame is: " + f);
                 f.dispose();
             }
         }
-        
+
         /* The SwingWorker Thread is active when the assembly runner is
-        * running and will subsequently block a JVM exit due to its "wait"
-        * state.  Must interrupt it in order to cause the JVM to exit
-        * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
-        */
+         * running and will subsequently block a JVM exit due to its "wait"
+         * state.  Must interrupt it in order to cause the JVM to exit
+         * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
+         */
         Thread[] threads = new Thread[Thread.activeCount()];
         Thread.enumerate(threads);
         for (Thread t : threads) {
-            LOG.debug("Thread is: " + t);
+            LOG.debug("Thread is {}: ", t);
             if (t.getName().contains("SwingWorker")) {
                 t.interrupt();
             }
@@ -1027,7 +1024,7 @@ public class VGlobals {
                         if (cb.isShowing())
                             popup.show(cb, 0, 0);
                     };
-                    
+
                     try {
                         SwingUtilities.invokeLater(r);
                     } catch (Exception ex) {
