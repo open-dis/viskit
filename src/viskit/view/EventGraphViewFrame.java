@@ -65,7 +65,7 @@ import viskit.view.dialog.SettingsDialog;
 
  OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
  Naval Postgraduate School, Monterey CA www.nps.edu
- 
+
   @author Mike Bailey
   @since Mar 2, 2004
   @since 12:52:59 PM
@@ -856,17 +856,15 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         cancelArcMode.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
-
     }
 
     /** Changes the background color of EG tabs depending on model.isDirty()
      * status to give the user an indication of a good/bad save &amp; compile
-     * operation.  Of note is that the default L&amp;F on must be selected for
-     * Windoze machines, else no color will be visible.  On Macs, the platform
+     * operation. Of note is that the default L&amp;F must be selected for
+     * WIN machines, else no color will be visible. On Macs, the platform
      * L&amp;F works best.
      */
     public void toggleEgStatusIndicators() {
-
         int selectedTab = tabbedPane.getSelectedIndex();
 
         for (Component c : tabbedPane.getComponents()) {
@@ -876,13 +874,11 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
             tabbedPane.setSelectedComponent(c);
 
             if (((Model) getModel()).isDirty()) {
-
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
             } else {
-
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
@@ -1053,14 +1049,14 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                         EventNode en = (EventNode) o;
                         // We're making a self-referential arc
                         ((EventGraphController) getController()).buildNewCancelingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
-                    }   
+                    }
                     break;
                 default:
                     if (o != null && o instanceof EventNode) {
                         EventNode en = (EventNode) o;
                         // We're making a self-referential arc
                         ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
-                    }   
+                    }
                     break;
             }
         }
