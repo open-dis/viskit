@@ -78,7 +78,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         if (!files.isEmpty()) {
             File file;
-            
+
             // Open whatever EGs were marked open on last closing
             for (String f : files) {
                 file = new File(f);
@@ -385,7 +385,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         if (!recentEGFileSet.contains(file.getPath()))
             recentEGFileSet.add(file.getPath()); // to the top
-        
+
         saveEgHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
@@ -441,14 +441,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private Set<String> getRecentEGFileSet(boolean refresh) {
         if (refresh || recentEGFileSet == null)
             recordEgFiles();
-        
+
         return recentEGFileSet;
     }
 
     private List<String> getOpenFileSet(boolean refresh) {
         if (refresh || openEventGraphs == null)
             recordEgFiles();
-        
+
         return openEventGraphs;
     }
 
@@ -484,6 +484,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     @Override
     public void postQuit() {
         VGlobals.instance().quitEventGraphEditor();
+        dirWatch.stopWatcher();
     }
 
     @Override
@@ -538,7 +539,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         for (String key : recentEGFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
-            
+
             idx++;
         }
     }
@@ -550,7 +551,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         for (String key : recentEGFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfig.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
-            
+
             idx++;
         }
     }
@@ -778,7 +779,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             if (o instanceof Edge) {
                 continue;
             }
-            
+
             if (o != null) {
                 nm = ((ViskitElement) o).getName();
                 buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
