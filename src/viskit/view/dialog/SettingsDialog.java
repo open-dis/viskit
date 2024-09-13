@@ -408,6 +408,8 @@ public class SettingsDialog extends JDialog {
         public Void doInBackground() {
             if (dialog != null) {
                 progressDialog.setVisible(true);
+                progress.setValue(0);
+                setProgress(0);
                 progressDialog.toFront();
             }
 
@@ -422,6 +424,7 @@ public class SettingsDialog extends JDialog {
             if (dialog != null && progressDialog != null) {
                 progress.setIndeterminate(false);
                 progress.setValue(100);
+                setProgress(100);
                 progressDialog.dispose();
             }
         }
