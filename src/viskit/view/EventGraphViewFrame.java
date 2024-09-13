@@ -217,7 +217,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
             // NOTE: Although a somewhat good idea, perhaps the user does not
             // wish to have work saved when merely switching between tabs on
-            // the EG pallete.  However, when switching to the Assy pallete, we
+            // the EG pallete. However, when switching to the Assy pallete, we
             // will save all EGs that have been modified
 //            if (((Model)getModel()).isDirty()) {
 //                ((EventGraphController)getController()).save();
@@ -678,9 +678,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(this);
-        help.mainFrameLocated(this.getBounds());
-        VGlobals.instance().setHelp(help);
+        Help help = new Help(VGlobals.instance().getMainAppWindow());
+        help.mainFrameLocated(VGlobals.instance().getMainAppWindow().getBounds());
+        VGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -690,7 +690,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         helpMenu.addSeparator();
 
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutEventGraphEditor", "About...", KeyEvent.VK_A, null));
+        helpMenu.add(buildMenuItem(help, "aboutViskit", "About...", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
     }
