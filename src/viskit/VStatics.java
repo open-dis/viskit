@@ -113,20 +113,6 @@ public class VStatics {
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.MY_VISKIT_PROJECTS_DIR);
         ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
         ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
-
-        XMLConfiguration historyConfig = ViskitConfig.instance().getViskitAppConfig();
-        List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
-        boolean match = false;
-        for (Object s : valueAr) {
-            if (s.equals(projFile.getPath())) {
-                match = true;
-                break;
-            }
-        }
-        if (!match) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + valueAr.size() + ")[@value]", projFile.getPath());
-            historyConfig.getDocument().normalize();
-        }
     }
 
     /**
@@ -266,7 +252,6 @@ public class VStatics {
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-
         Class<?> c = cForName(s, VGlobals.instance().getWorkClassLoader());
 
         if (c == null) {
@@ -561,13 +546,10 @@ public class VStatics {
     @SuppressWarnings("unchecked")
     public static List<Object>[] resolveParameters(Class<?> type) {
         
-        if (type == null) {
-            String msg = "It is possible that a 3rd party library is missing from the classpath.\n"
-                            + "\t\t\t\t\t\t\t\t\t     Please check File->Viskit Settings for additional classpath entries (jars) that may be missing\n";
-            LOG.warn(msg);
-            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.WARNING_MESSAGE,"Compile Error", msg);
+        // nulls can occur when staring Viskit pointing to an assy in another
+        // project space. In this case we can be silent
+        if (type == null)
             return null;
-        }
         
         // Ben Cheng NPE fix
         Object testResult = parameterMap.get(type.getName());
