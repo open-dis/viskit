@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +48,7 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
+
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 
@@ -55,12 +57,11 @@ import viskit.util.Version;
  * @author  ahbuss
  */
 public class Help {
-
     public static final Version VERSION = new Version("version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
     public static final String ABOUT_EG_STRING =
-            "Viskit Event Graph Editor" + CR + "   version " + VERSION_STRING + CR
+            "Viskit Event Graph and Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String ABOUT_ASSEMBLY_STRING =
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
@@ -104,8 +105,7 @@ public class Help {
 
     private Component parent;
     private final Icon icon;
-    private final JEditorPane aboutEGEditorPane;
-    private final JEditorPane aboutAssemblyEditorPane;
+    private final JEditorPane aboutViskitEditorPane;
 
     /** Creates a new instance of Help
      * @param parent main frame to center on
@@ -136,33 +136,22 @@ public class Help {
         BrowserLauncher bl = new BrowserLauncher(null);
         SwingHelpUtilities.setContentViewerUI("viskit.util.BrowserLauncher");
 
-        aboutEGEditorPane = new JEditorPane();
-        aboutEGEditorPane.addHyperlinkListener(bl);
-        aboutEGEditorPane.setContentType("text/html");
-        aboutEGEditorPane.setEditable(false);
-        aboutEGEditorPane.setText(ABOUT_EG_STRING
+        aboutViskitEditorPane = new JEditorPane();
+        aboutViskitEditorPane.addHyperlinkListener(bl);
+        aboutViskitEditorPane.setContentType("text/html");
+        aboutViskitEditorPane.setEditable(false);
+        aboutViskitEditorPane.setText(ABOUT_EG_STRING
                 + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
                 + SIMKIT_PAGE + VERSIONS);
-
-        aboutAssemblyEditorPane = new JEditorPane();
-        aboutAssemblyEditorPane.addHyperlinkListener(bl);
-        aboutAssemblyEditorPane.setContentType("text/html");
-        aboutAssemblyEditorPane.setEditable(false);
-        aboutAssemblyEditorPane.setText(ABOUT_ASSEMBLY_STRING
-                + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
-                + SIMKIT_PAGE);
     }
 
-    public void aboutEventGraphEditor() {
-        JOptionPane.showMessageDialog(parent, aboutEGEditorPane,
-                "About Viskit Event Graph Editor...",
-                JOptionPane.OK_OPTION, icon);
-    }
-
-    public void aboutAssemblyEditor() {
-        JOptionPane.showMessageDialog(parent, aboutAssemblyEditorPane,
-                "About Viskit Assembly Editor...",
-                JOptionPane.OK_OPTION, icon);
+    public void aboutViskit() {
+        JOptionPane.showMessageDialog(parent,
+                aboutViskitEditorPane,
+                "About Viskit...",
+                JOptionPane.OK_OPTION,
+                icon
+        );
     }
 
     public void doContents() {
