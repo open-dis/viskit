@@ -29,6 +29,9 @@
     <projecttitle>
         <name value="DefaultProject"/>
     </projecttitle>
-    <lookandfeel>platform</lookandfeel>
+    <!-- macOS works best w/ the platform L&F -->
+    <lookandfeel>default</lookandfeel>
+    <!-- WIN machines work best w/ the default L&F in order to get a colorized
+         status of EG compilation outcomes -->
   </gui>
 </ViskitConfig>

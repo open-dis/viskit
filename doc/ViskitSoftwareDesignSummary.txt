@@ -18,9 +18,12 @@ ${user.home}.  Here, configuration files are placed that can be modified from
 Viskit by selecting File -> Settings.  Things such as what panels to expose, the
 "look and feel" of the UI, size of the UI frame, what project space was last
 opened, what files were recently opened, and other project history data are
-recorded.  Various logging output files are also generated and placed there for
-later reference should an error have occurred.  All of these can be accessed for
-content review by running any of the "ant show.*" targets from the command line.
+recorded. If note is that macOS works best with the platform L&F while WIN
+machines work best with the default L&F. The colorization of EG compilation
+status only work on WIN when using the default L&F. Various logging output files
+are also generated and placed in a logs directory for later reference should an
+error have occurred. All of these can be accessed for content review by running
+any of the "ant show.*" targets from the command line.
 
 After the .viskit directory is populated, Viskit will popup a dialog to either
 open an existing Viskit project, create a new one, or exit. A default Viskit
