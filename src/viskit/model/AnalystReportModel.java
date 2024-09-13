@@ -35,24 +35,28 @@ package viskit.model;
 
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
+
 import java.io.File;
-import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+
 import org.apache.logging.log4j.Logger;
+
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+
 import viskit.util.EventGraphCache;
 import viskit.VGlobals;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
+import viskit.doe.FileHandler;
 import viskit.mvc.mvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
@@ -187,8 +191,8 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * @throws java.lang.Exception general catchall
      */
     public File writeToXMLFile(File fil) throws Exception {
-        if (fil == null) {return writeToXMLFile();}
-
+        if (fil == null)
+            fil = writeToXMLFile();
         _writeCommon(fil);
         return fil;
     }
@@ -197,18 +201,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * @throws java.lang.Exception general catchall
      */
     public File writeToXMLFile() throws Exception {
-        File fil = TempFileManager.createTempFile("AnalystReport", ".xml");
-        _writeCommon(fil);
-        return fil;
+        return TempFileManager.createTempFile("AnalystReport", ".xml");
     }
 
-    private void _writeCommon(File fil) throws Exception {
-        XMLOutputter outputter = new XMLOutputter();
-        Format form = Format.getPrettyFormat();
-        outputter.setFormat(form);
-
-        try (FileWriter writer = new FileWriter(fil)) {
-            outputter.output(reportJdomDocument, writer);
+    private void _writeCommon(File fil) {
+        try {
+            FileHandler.marshallJdom(fil, reportJdomDocument, false);
+        } catch (IOException | JDOMException e) {
+            LOG.error("Bad JDOM op {}: ", e);
         }
     }
 
@@ -322,14 +322,16 @@ public final class AnalystReportModel extends mvcAbstractModel {
 
             Element sumReport = new Element("SummaryReport");
             List<Element> itr = statsReport.getRootElement().getChildren("SimEntity");
+            List<Element> summItr;
+            Element temp, summaryRecord, summStats;
             for (Element entity : itr) {
-                Element temp = (Element) entity.clone();
+                temp = (Element) entity.clone();
                 temp.removeChildren("SummaryReport");
 
-                Element summStats = entity.getChild("SummaryReport");
-                List<Element> summItr = summStats.getChildren("Summary");
+                summStats = entity.getChild("SummaryReport");
+                summItr = summStats.getChildren("Summary");
                 for (Element temp2 : summItr) {
-                    Element summaryRecord = new Element("SummaryRecord");
+                    summaryRecord = new Element("SummaryRecord");
                     summaryRecord.setAttribute("entity", entity.getAttributeValue("name"));
                     summaryRecord.setAttribute("property", temp2.getAttributeValue("property"));
                     summaryRecord.setAttribute("numRuns", temp2.getAttributeValue("numRuns"));
@@ -351,19 +353,21 @@ public final class AnalystReportModel extends mvcAbstractModel {
     @SuppressWarnings("unchecked")
     public List<Object> unMakeReplicationList(Element statisticalResults) {
         Vector<Object> v = new Vector<>();
-
+        Vector<Object> se;
+        Vector<String[]> r;
+        String[] sa;
         Element repReports = statisticalResults.getChild("ReplicationReports");
         List<Element> simEnts = repReports.getChildren("SimEntity");
         for (Element sEnt : simEnts) {
 
-            Vector<Object> se = new Vector<>(3);
+            se = new Vector<>(3);
             se.add(sEnt.getAttributeValue("name"));
             se.add(sEnt.getAttributeValue("property"));
 
-            Vector<String[]> r = new Vector<>();
+            r = new Vector<>();
             List<Element> repLis = sEnt.getChildren("Replication");
             for(Element rep : repLis) {
-                String[] sa = new String[7];
+                sa = new String[7];
                 sa[0] = rep.getAttributeValue("number");
                 sa[1] = rep.getAttributeValue("count");
                 sa[2] = rep.getAttributeValue("minObs");
@@ -386,8 +390,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
 
         Element sumReports = statisticalResults.getChild("SummaryReport");
         List<Element> recs = sumReports.getChildren("SummaryRecord");
+        String[] sa;
         for (Element rec : recs) {
-            String[] sa = new String[8];
+            sa = new String[8];
             sa[0] = rec.getAttributeValue("entity");
             sa[1] = rec.getAttributeValue("property");
             sa[2] = rec.getAttributeValue("numRuns");
@@ -423,28 +428,29 @@ public final class AnalystReportModel extends mvcAbstractModel {
     @SuppressWarnings("unchecked")
     private Element processBehaviors(boolean descript, boolean image, boolean details) {
         Element behaviorList = new Element("BehaviorList");
-
+        Element behavior, localRootElement, description, param, stvar, evtGraphImage;
+        String descriptText, imgPath;
+        Document tmp;
+        List<Element> lre, lre2;
         for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) {
-            Element behavior = new Element("Behavior");
-            Element localRootElement;
-            String descriptText;
+            behavior = new Element("Behavior");
             behavior.setAttribute("name", EventGraphCache.instance().getEventGraphNamesList().get(i));
 
             if (descript) {
-                Document tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
+                tmp = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
                 localRootElement = tmp.getRootElement();
 
                 // prevent returning a null if there was no attribute value
                 descriptText = (localRootElement.getChildText("Comment") == null) ? "no comment provided" : localRootElement.getChildText("Comment");
 
-                Element description = new Element("description");
+                description = new Element("description");
                 description.setAttribute("text", descriptText);
                 behavior.addContent(description);
 
                 if (details) {
-                    List<Element> lre = localRootElement.getChildren("Parameter");
+                    lre = localRootElement.getChildren("Parameter");
                     for (Element temp : lre) {
-                        Element param = new Element("parameter");
+                        param = new Element("parameter");
                         param.setAttribute("name", temp.getAttributeValue("name"));
                         param.setAttribute("type", temp.getAttributeValue("type"));
 
@@ -452,9 +458,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
                         param.setAttribute("description", (temp.getChildText("Comment") == null) ? "no comment provided" : temp.getChildText("Comment"));
                         behavior.addContent(param);
                     }
-                    List<Element> lre2 = localRootElement.getChildren("StateVariable");
+                    lre2 = localRootElement.getChildren("StateVariable");
                     for (Element temp : lre2) {
-                        Element stvar = new Element("stateVariable");
+                        stvar = new Element("stateVariable");
                         stvar.setAttribute("name", temp.getAttributeValue("name"));
                         stvar.setAttribute("type", temp.getAttributeValue("type"));
 
@@ -465,10 +471,10 @@ public final class AnalystReportModel extends mvcAbstractModel {
                 }
             }
             if (image) {
-                Element evtGraphImage = new Element("EventGraphImage");
+                evtGraphImage = new Element("EventGraphImage");
 
                 // Set relative path only
-                String imgPath = EventGraphCache.instance().getEventGraphImageFilesList().get(i).getPath();
+                imgPath = EventGraphCache.instance().getEventGraphImageFilesList().get(i).getPath();
                 imgPath = imgPath.substring(imgPath.indexOf("images"), imgPath.length());
                 evtGraphImage.setAttribute("dir", imgPath);
                 behavior.addContent(evtGraphImage);
@@ -487,41 +493,47 @@ public final class AnalystReportModel extends mvcAbstractModel {
         Element listEl = localRoot.getChild("BehaviorList");
         if (listEl != null) {
             List<Element> behElms = listEl.getChildren("Behavior");
+            String nm, desctxt, pnm, pty, pdsc, snm, sty, sdsc;
+            String[] pa, sa;
+            Vector<Object> b;
+            Vector<String[]> p, s;
+            Element desc, evtGrImg;
+            List<Element> parms, stvars;
             for (Element behavior : behElms) {
 
-                Vector<Object> b = new Vector<>();
-                String nm = behavior.getAttributeValue("name");
+                b = new Vector<>();
+                nm = behavior.getAttributeValue("name");
                 b.add(nm);
 
-                Element desc = behavior.getChild("description");
-                String desctxt = desc.getAttributeValue("text");
+                desc = behavior.getChild("description");
+                desctxt = desc.getAttributeValue("text");
                 b.add(desctxt);
 
-                List<Element> parms = behavior.getChildren("parameter");
+                parms = behavior.getChildren("parameter");
 
-                Vector<String[]> p = new Vector<>();
+                p = new Vector<>();
                 for (Element param : parms) {
-                    String pnm = param.getAttributeValue("name");
-                    String pty = param.getAttributeValue("type");
-                    String pdsc = param.getAttributeValue("description");
-                    String[] pa = new String[]{pnm, pty, pdsc};
+                    pnm = param.getAttributeValue("name");
+                    pty = param.getAttributeValue("type");
+                    pdsc = param.getAttributeValue("description");
+                    pa = new String[]{pnm, pty, pdsc};
                     p.add(pa);
                 }
                 b.add(p);
 
-                List<Element> stvars = behavior.getChildren("stateVariable");
+                stvars = behavior.getChildren("stateVariable");
 
-                Vector<String[]> s = new Vector<>();
+                s = new Vector<>();
                 for (Element svar : stvars) {
-                    String snm = svar.getAttributeValue("name");
-                    String sty = svar.getAttributeValue("type");
-                    String sdsc = svar.getAttributeValue("description");
-                    String[]sa = new String[]{snm, sty, sdsc};
+                    snm = svar.getAttributeValue("name");
+                    sty = svar.getAttributeValue("type");
+                    sdsc = svar.getAttributeValue("description");
+                    sa = new String[]{snm, sty, sdsc};
                     s.add(sa);
                 }
                 b.add(s);
 
-                Element evtGrImg = behavior.getChild("EventGraphImage");
+                evtGrImg = behavior.getChild("EventGraphImage");
                 b.add(evtGrImg.getAttributeValue("dir"));
 
                 v.add(b);
@@ -536,18 +548,20 @@ public final class AnalystReportModel extends mvcAbstractModel {
         Element elm = rootOfTabs.getChild("ParameterTables");
         List<Element> lis = elm.getChildren("EntityParameterTable");
         Vector<Object[]> v = new Vector<>(lis.size());   // list of entpartab elms
-
+        List<Element> lis_0, lis_1;
+        Vector<Object[]> v_0, v_1;
+        String name, val;
         for(Element e_0 : lis) {
-            List<Element> lis_0 = e_0.getChildren();       //list of parts: class/id/phys/dynam
-            Vector<Object[]> v_0 = new Vector<>(lis_0.size());
+            lis_0 = e_0.getChildren();       //list of parts: class/id/phys/dynam
+            v_0 = new Vector<>(lis_0.size());
             for(Element e_1 : lis_0) {
-                List<Element> lis_1 = e_1.getChildren("parameter");     // list of param elms
+                lis_1 = e_1.getChildren("parameter");     // list of param elms
 
-                Vector<String[]> v_1 = new Vector<>(lis_1.size());
+                v_1 = new Vector<>(lis_1.size());
                 for(Element e_2 : lis_1) {
-                    String name = e_2.getAttributeValue("name");
-                    String val  = e_2.getAttributeValue("value");
-                    v_1.add(new String[]{name,val});
+                    name = e_2.getAttributeValue("name");
+                    val  = e_2.getAttributeValue("value");
+                    v_1.add(new String[]{name, val});
                 }
                 v_0.add(new Object[]{e_1.getName(),v_1});
             }
@@ -569,16 +583,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
     private Element makeTablesCommon(String tableName) {
-
         Element table = new Element(tableName);
-
         Element localRootElement = EventGraphCache.instance().getAssemblyDocument().getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
         String entityName;
-
+        List<Element> entityParams;
         for (Element temp : simEntityList) {
             entityName = temp.getAttributeValue("name");
-            List<Element> entityParams = temp.getChildren("MultiParameter");
+            entityParams = temp.getChildren("MultiParameter");
             for (Element param : entityParams) {
                 if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
                     table.addContent(extractSMAL(entityName, param));
@@ -604,9 +616,11 @@ public final class AnalystReportModel extends mvcAbstractModel {
         ElementFilter multiParam = new ElementFilter("MultiParameter");
         Iterator<Element> itr = entityDef.getDescendants(multiParam);
         table.setAttribute("name", entityName);
+        Element temp;
+        String category;
         while (itr.hasNext()) {
-            Element temp = itr.next();
-            String category = temp.getAttributeValue("type");
+            temp = itr.next();
+            category = temp.getAttributeValue("type");
             if (category.equals("diskit.SMAL.Classification")) {
                 table.addContent(makeTableEntry("Classification", temp));
             }
@@ -638,10 +652,10 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private Element makeTableEntry(String category, Element data) {
         Element tableEntry = new Element(category);
         List<Element> dataList = data.getChildren("TerminalParameter");
-
+        Element param;
         for (Element temp : dataList) {
             if (!temp.getAttributeValue("value").equals("0")) {
-                Element param = new Element("parameter");
+                param = new Element("parameter");
                 param.setAttribute("name", temp.getAttributeValue("name"));
                 param.setAttribute("value", temp.getAttributeValue("value"));
 
@@ -682,50 +696,44 @@ public final class AnalystReportModel extends mvcAbstractModel {
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
         LinearRegressionChart linearRegressionChart = new LinearRegressionChart();
-        String chartTitle;
-        String axisLabel;
-        String typeStat = "";
+        String chartTitle, axisLabel, typeStat = "", dataPointProperty;
+        List<Element> dataPoints, replicationReports, replications;
         boolean isCount;
+        Object obj;
+        Element entity, histogramChartURL, linearRegressionChartURL, repRecord;
+        double[] data;
+        int idx;
         for (Element simEntity : simEntities) {
-            List<Element> dataPoints = simEntity.getChildren("DataPoint");
+            dataPoints = simEntity.getChildren("DataPoint");
             for (Element dataPoint : dataPoints) {
-                String dataPointProperty = dataPoint.getAttributeValue("property");
+                dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
-                    LOG.debug("entry is: " + entry);
-                    Object obj;
-                    if (entry.toString().contains("PropChangeListenerNode")) {
-
-                        obj = getPclNodeCache().get(entry.getKey());
+                    obj = getPclNodeCache().get(entry.getKey());
+                    if (obj.getClass().toString().contains("PropChangeListenerNode")) {
                         try {
-                            LOG.debug("AR obj is: " + obj);
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStat = isCount ? "count" : "mean";
-                            LOG.debug("AR typeStat is: " + typeStat);
                             break;
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                             LOG.error(ex);
                         }
                     }
                 }
-                Element entity = new Element("SimEntity");
+                entity = new Element("SimEntity");
                 entity.setAttribute("name", simEntity.getAttributeValue("name"));
                 entity.setAttribute("property", dataPointProperty);
-                List<Element> replicationReports = dataPoint.getChildren("ReplicationReport");
+                replicationReports = dataPoint.getChildren("ReplicationReport");
 
                 // Chart title and label
                 chartTitle = simEntity.getAttributeValue("name");
                 axisLabel  = dataPoint.getAttributeValue("property") ;
 
-                Element histogramChartURL;
-                Element linearRegressionChartURL;
-                double[] data;
-                Element repRecord;
                 for (Element replicationReport : replicationReports) {
-                    List<Element> replications = replicationReport.getChildren("Replication");
+                    replications = replicationReport.getChildren("Replication");
 
                     // Create a data set instance and histogramChart for each replication report
                     data = new double[replicationReport.getChildren().size()];
-                    int idx = 0;
+                    idx = 0;
                     for (Element replication : replications) {
                         repRecord = new Element("Replication");
                         repRecord.setAttribute("number", replication.getAttributeValue("number"));
@@ -880,12 +888,14 @@ public final class AnalystReportModel extends mvcAbstractModel {
     private String _unMakeContent(Element e, String suffix, String attrName) {
         if (e == null) {return "";}
         List content = e.getContent();
+        Object o;
+        Element celem;
         for (Iterator itr = content.iterator(); itr.hasNext();) {
-            Object o = itr.next();
+            o = itr.next();
             if (!(o instanceof Element)) {
                 continue;
             }
-            Element celem = (Element) o;
+            celem = (Element) o;
             if (celem.getName().endsWith(suffix)) {
                 return celem.getAttributeValue(attrName);
             }
@@ -1044,11 +1054,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     private void announceAnalystReportReadyToView() {
-
-        // NOTE: This method may be called with the classloader set during Assy
-        // Run initialization, so, we can't center this dialog via reference to
-        // the main app frame.
-        VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE, 
+        VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Analyst Report Ready", "<html><body><p align='center'>" +
                 "Analyst Report is loaded and is now ready for further editing.</p></body></html>"
         );
