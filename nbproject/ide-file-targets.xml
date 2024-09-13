@@ -45,7 +45,6 @@
             <classpath refid="runtime.test.classpath"/>
         </java>
     </target>
-    
     <!-- TODO: edit the following target according to your needs -->
     <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#runsingle) -->
     <target depends="compile.test" name="debug-selected-file-in-test">
@@ -57,6 +56,19 @@
             <classpath refid="runtime.test.classpath"/>
             <jvmarg value="-agentlib:jdwp=transport=dt_socket,address=${jpda.address}"/>
             <arg line="${translation.args}"/>
+        </java>
+    </target>
+    <import file="jdk.xml"/>
+    <target name="-profile-check">
+        <startprofiler freeform="true"/>
+    </target>
+    <target depends="-jdk-init,-profile-check,build" if="profiler.configured" name="profile-nb">
+        <java classname="${main.class}"
+              classpathref="runtime.classpath"
+              fork="true">
+            <classpath path="${extra.classpath}"/>
+            <jvmarg line="${agent.jvmargs} ${run.args}"/>
+            <arg value="${viskit.args}"/>
         </java>
     </target>
 </project>
