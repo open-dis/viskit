@@ -95,6 +95,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
+    private RecentEgFileListener recentEgFileListener;
 
     /**
      * Constructor; lays out initial GUI objects
@@ -577,8 +578,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     private void buildMenus() {
         EventGraphController controller = (EventGraphController) getController();
-
-        controller.addRecentEgFileListener(new RecentEgFileListener());
+        recentEgFileListener = new RecentEgFileListener();
+        controller.addRecentEgFileListener(getRecentEgFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -1259,6 +1260,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
         // Let model.isDirty() determine status color
         toggleEgStatusIndicators();
+    }
+
+    /**
+     * @return the recentEgFileListener
+     */
+    public RecentEgFileListener getRecentEgFileListener() {
+        return recentEgFileListener;
     }
 
 } // end class file EventGraphViewFrame.java
