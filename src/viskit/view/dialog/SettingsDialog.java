@@ -167,7 +167,7 @@ public class SettingsDialog extends JDialog {
         classpathP.setLayout(new BoxLayout(classpathP, BoxLayout.Y_AXIS));
         classPathJlist = new JList<>(new DefaultListModel<>());
         JScrollPane jsp = new JScrollPane(classPathJlist);
-        jsp.setPreferredSize(new Dimension(70, 70));  // don't want it to control size of dialog
+        jsp.setPreferredSize(new Dimension(70, 70)); // don't want it to control size of dialog
         classpathP.add(jsp);
         JPanel bPan = new JPanel();
         bPan.setLayout(new BoxLayout(bPan, BoxLayout.X_AXIS));
@@ -245,12 +245,15 @@ public class SettingsDialog extends JDialog {
         lAndFeelInnerP.setLayout(new BoxLayout(lAndFeelInnerP, BoxLayout.Y_AXIS));
         lAndFeelInnerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         defaultLafRB = new JRadioButton("Default");
+        defaultLafRB.setToolTipText("Best for WIN to render EG editor status color");
         defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(defaultLafRB);
         platformLafRB = new JRadioButton("Platform");
+        platformLafRB.setToolTipText("Best for macOS to render EG editor status color");
         platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(platformLafRB);
         otherLafRB = new JRadioButton("Other");
+        otherLafRB.setToolTipText("Set to a supported L&F for your platform");
         JPanel otherPan = new JPanel();
         otherPan.setLayout(new BoxLayout(otherPan,BoxLayout.X_AXIS));
         otherPan.add(otherLafRB);
