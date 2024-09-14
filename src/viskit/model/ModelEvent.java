@@ -14,6 +14,8 @@ import viskit.mvc.mvcModelEvent;
  *
  * This defines every event with which the application Model informs its listeners. Typically
  * this is the view.
+ *
+ * TODO: Implement enums for this (tdn) 9/14/24
  */
 public class ModelEvent extends mvcModelEvent
 {
