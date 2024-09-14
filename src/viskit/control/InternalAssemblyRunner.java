@@ -219,7 +219,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         mutex++;
         if (mutex > 1)
             return;
-       
+
         try {
 
             VGlobals.instance().resetFreshClassLoader();
@@ -506,7 +506,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                     "The Analyst Report tab has not been set to be visible.<br>To " +
                     "view on next Viskit opening, select File -> Viskit Settings -> " +
                     "Tab visibility -> Select Analyst report -> Close, then Exit" +
-                    " the application.  On re-startup, it will appear.</p></body></html>"
+                    " the application. On re-startup, it will appear.</p></body></html>"
             );
         }
     }
@@ -524,7 +524,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     boolean getVerbose() {
         return runPanel.vcrVerbose.isSelected();
     }
-    
+
     public enum Event {
         START, STOP, STEP, REWIND, OFF
     }
