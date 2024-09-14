@@ -99,7 +99,7 @@ public class ViskitProject {
      * location will be in the user's profile, or home directory.
      */
     public static String DEFAULT_PROJECT_NAME = "DefaultProject";
-    
+
     private File projectRoot;
     private File projectFile;
     private File analystReportsDir;
@@ -216,10 +216,10 @@ public class ViskitProject {
             loadProjectFromFile(getProjectFile());
         }
         ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
-        
+
         XMLConfiguration config = ViskitConfig.instance().getProjectXMLConfig();
         config.setProperty(ViskitConfig.VISKIT_PROJ_NAME, getProjectRoot().getName());
-        
+
         setProjectOpen(projectFileExists);
         return projectFileExists;
     }
@@ -304,8 +304,8 @@ public class ViskitProject {
         }
     }
 
-    /** @return an array of a project's external resources */
-    public String[] getProjectContents() {
+    /** @return an array of a project's extra classpaths */
+    public String[] getProjectAdditionalClasspaths() {
 
         // Prevent duplicate entries
         Set<String> cp = new HashSet<>();
@@ -713,7 +713,7 @@ public class ViskitProject {
                 if (dir.getName().equals(VISKIT_CONFIG_DIR)) {
                     return false;
                 }
-                
+
                 // Be brutally specific to reduce looking for any *.xml
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             });
