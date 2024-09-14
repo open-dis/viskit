@@ -55,7 +55,6 @@ public class FileBasedClassManager {
     // Singleton:
     protected static FileBasedClassManager me;
     private static XMLConfiguration projectConfig;
-    private final Map<String, FileBasedAssyNode> fileMap;
     private final Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
@@ -69,8 +68,7 @@ public class FileBasedClassManager {
     }
 
     private FileBasedClassManager() {
-        classMap = new HashMap<>();
-        fileMap = Collections.synchronizedMap(new HashMap<>());
+        classMap = Collections.synchronizedMap(new HashMap<>());
     }
 
     public void addFileClass(Class<?> c) {
@@ -91,7 +89,6 @@ public class FileBasedClassManager {
 
     public void unloadFile(FileBasedAssyNode fban) {
         removeFileClass(fban.loadedClass);
-        fileMap.remove(fban.loadedClass);
     }
     FileBasedAssyNode fban = null;
     Class<?> fclass = null;
@@ -170,7 +167,6 @@ public class FileBasedClassManager {
 
         if (fclass != null) {
             addFileClass(fclass);
-            fileMap.put(fclass.getName(), fban);
         } else {
             fban = null;
         }
