@@ -870,16 +870,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * platform L&amp;F works best.
      */
     public void toggleEgStatusIndicators() {
-        Model mod = (Model) getModel();
-        LOG.debug("Current model file: {}", mod.getLastFile());
-
         int selectedTab = tabbedPane.getSelectedIndex();
         for (Component c : tabbedPane.getComponents()) {
 
             // This will fire a call to stateChanged() which also sets the
             // current model
             tabbedPane.setSelectedComponent(c);
-            if (mod.isDirty()) {
+            if (((Model) getModel()).isDirty()) {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
