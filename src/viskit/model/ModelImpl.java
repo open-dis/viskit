@@ -107,10 +107,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         simParameters.removeAllElements();
         evNodeCache.clear();
         edgeCache.clear();
-        this.notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
 
         if (f == null) {
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
+            notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
         } else {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
@@ -248,8 +248,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private void buildEventsFromJaxb(List<Event> lis) {
+        EventNode en;
         for (Event ev : lis) {
-            EventNode en = buildNodeFromJaxbEvent(ev);
+            en = buildNodeFromJaxbEvent(ev);
             buildEdgesFromJaxb(en, ev.getScheduleOrCancel());
         }
     }
@@ -540,14 +541,17 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private void buildStateVariablesFromJaxb(List<StateVariable> lis) {
+        String c;
+        List<String> varCom;
+        vStateVariable v;
         for (StateVariable var : lis) {
-            List<String> varCom = var.getComment();
-            String c = " ";
+            varCom = var.getComment();
+            c = " ";
             for (String comment : varCom) {
                 c += comment;
                 c += " ";
             }
-            vStateVariable v = new vStateVariable(var.getName(), var.getType(), c.trim());
+            v = new vStateVariable(var.getName(), var.getType(), c.trim());
             v.opaqueModelObject = var;
 
             stateVariables.add(v);
@@ -561,14 +565,17 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private void buildParametersFromJaxb(List<Parameter> lis) {
+        List<String> pCom;
+        String c;
+        vParameter vp;
         for (Parameter p : lis) {
-            List<String> pCom = p.getComment();
-            String c = " ";
+            pCom = p.getComment();
+            c = " ";
             for (String comment : pCom) {
                 c += comment;
                 c += " ";
             }
-            vParameter vp = new vParameter(p.getName(), p.getType(), c.trim());
+            vp = new vParameter(p.getName(), p.getType(), c.trim());
             vp.opaqueModelObject = p;
 
             simParameters.add(vp);
@@ -823,6 +830,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     private boolean isUniqueLVorIdxVname(String nm) {
+        String ie;
         for (EventNode event : evNodeCache.values()) {
             for (ViskitElement lv : event.getLocalVariables()) {
                 if (lv.getName().equals(nm)) {
@@ -830,7 +838,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 }
             }
             for (ViskitElement transition : event.getTransitions()) {
-                String ie = transition.getIndexingExpression();
+                ie = transition.getIndexingExpression();
                 if (ie != null && ie.equals(nm)) {
                     return false;
                 }
@@ -866,22 +874,29 @@ public class ModelImpl extends mvcAbstractModel implements Model {
      */
     private void cloneTransitions(List<StateTransition> targ, List<ViskitElement> local) {
         targ.clear();
+        StateTransition st;
+        String localV, assign, localI, invoke;
+        LocalVariableAssignment l;
+        StateVariable sv;
+        Operation o;
+        Assignment a;
+        LocalVariableInvocation lvi;
         for (ViskitElement transition : local) {
-            StateTransition st = oFactory.createStateTransition();
+            st = oFactory.createStateTransition();
 
             // Various locally declared variable ops
-            String localV = ((EventStateTransition)transition).getLocalVariableAssignment();
+            localV = ((EventStateTransition)transition).getLocalVariableAssignment();
             if (localV != null && !localV.isEmpty()) {
 
-                String assign = ((EventStateTransition)transition).getLocalVariableAssignment();
+                assign = ((EventStateTransition)transition).getLocalVariableAssignment();
                 if (assign != null && !assign.isEmpty()) {
-                    LocalVariableAssignment l = oFactory.createLocalVariableAssignment();
+                    l = oFactory.createLocalVariableAssignment();
                     l.setValue(assign);
                     st.setLocalVariableAssignment(l);
                 }
             }
 
-            StateVariable sv = findStateVariable(transition.getName());
+            sv = findStateVariable(transition.getName());
 
             if (sv == null) {continue;}
 
@@ -894,23 +909,23 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
 
             if (transition.isOperation()) {
-                Operation o = oFactory.createOperation();
+                o = oFactory.createOperation();
                 o.setMethod(transition.getOperationOrAssignment());
                 st.setOperation(o);
             } else {
-                Assignment a = oFactory.createAssignment();
+                a = oFactory.createAssignment();
                 a.setValue(transition.getOperationOrAssignment());
                 st.setAssignment(a);
             }
 
             // If we have any void return type, zero parameter methods to
             // call on local vars, or args, do it now
-            String localI = ((EventStateTransition)transition).getLocalVariableInvocation();
+            localI = ((EventStateTransition)transition).getLocalVariableInvocation();
             if (localI != null && !localI.isEmpty()) {
 
-                String invoke = ((EventStateTransition) transition).getLocalVariableInvocation();
+                invoke = ((EventStateTransition) transition).getLocalVariableInvocation();
                 if (invoke != null && !invoke.isEmpty()) {
-                    LocalVariableInvocation lvi = oFactory.createLocalVariableInvocation();
+                    lvi = oFactory.createLocalVariableInvocation();
                     lvi.setMethod(invoke);
                     st.setLocalVariableInvocation(lvi);
                 }
@@ -928,8 +943,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     private void cloneArguments(List<Argument> targ, List<ViskitElement> local) {
         targ.clear();
+        Argument arg;
         for (ViskitElement eventArguments : local) {
-            Argument arg = oFactory.createArgument();
+            arg = oFactory.createArgument();
             arg.setName(nIe(eventArguments.getName()));
             arg.setType(nIe(eventArguments.getType()));
             arg.getComment().clear();
@@ -941,8 +957,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     private void cloneLocalVariables(List<LocalVariable> targ, List<ViskitElement> local) {
         targ.clear();
+        LocalVariable lvar;
         for (ViskitElement eventLocalVariables : local) {
-            LocalVariable lvar = oFactory.createLocalVariable();
+            lvar = oFactory.createLocalVariable();
             lvar.setName(nIe(eventLocalVariables.getName()));
             lvar.setType(nIe(eventLocalVariables.getType()));
             lvar.setValue(nIe(eventLocalVariables.getValue()));
@@ -1008,8 +1025,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
+        List<ViskitElement> edgeParameters;
         if (!args.isEmpty()) {
-            List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
+            edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
@@ -1060,8 +1078,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         // Put in dummy edge parameters to match the target arguments
         List<ViskitElement> args = target.getArguments();
+        List<ViskitElement> edgeParameters;
         if (!args.isEmpty()) {
-            List<ViskitElement> edgeParameters = new ArrayList<>(args.size());
+            edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
                 edgeParameters.add(new vEdgeParameter(arg.getValue()));
             }
@@ -1116,8 +1135,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         Object jaxbEdge = edg.opaqueModelObject;
 
         List<Event> nodes = jaxbRoot.getEvent();
+        List<Object> edges;
         for (Event ev : nodes) {
-            List<Object> edges = ev.getScheduleOrCancel();
+            edges = ev.getScheduleOrCancel();
             edges.remove(jaxbEdge);
         }
 
@@ -1137,9 +1157,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         sch.setPriority(((SchedulingEdge)e).priority);
         sch.getEdgeParameter().clear();
 
+        EdgeParameter p;
         // Bug 1373: This is where an edge parameter gets written out to XML
         for (ViskitElement edgeParameter : e.parameters) {
-            EdgeParameter p = oFactory.createEdgeParameter();
+            p = oFactory.createEdgeParameter();
             p.setValue(nIe(edgeParameter.getValue()));
             sch.getEdgeParameter().add(p);
         }
@@ -1157,8 +1178,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         can.getComment().add(e.conditionalDescription);
 
         can.getEdgeParameter().clear();
+        EdgeParameter p;
         for (ViskitElement edgeParameter : e.parameters) {
-            EdgeParameter p = oFactory.createEdgeParameter();
+            p = oFactory.createEdgeParameter();
             p.setValue(nIe(edgeParameter.getValue()));
             can.getEdgeParameter().add(p);
         }
@@ -1168,7 +1190,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     }
 
     /**
-     * "nullIfEmpty" Return the passed string if non-zero length, else null
+     * "nullIfEmpty" returns the passed string if non-zero length, else null
      * @param s the string to evaluate for nullity
      * @return the passed string if non-zero length, else null
      */
@@ -1180,4 +1202,5 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
         return s;
     }
-}
+
+} // end class file ModelImpl.java
