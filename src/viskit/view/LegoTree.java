@@ -332,7 +332,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                     // NOTE: .class files come here if a directory is listed on
                     // the additional classpath element
                     LOG.warn("No classes of type {} found in {}", targetClassName, f.getName());
-                    LOG.info("{} will not be listed in the Assembly Editor's Event Graphs tree\n", f.getName());
+                    LOG.info("{} will not be listed in the Assembly Editor's SimEntity tree\n", f.getName());
                 }
 
                 // Note
@@ -429,7 +429,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         if (list.isEmpty()) {
             LOG.warn("No classes of type {} found in {}", targetClassName, name);
-            LOG.info("{} will not be listed in the Assembly Editor's Event Graphs SimEntity node tree\n", name);
+            LOG.info("{} will not be listed in the Assembly Editor's SimEntity tree\n", name);
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
