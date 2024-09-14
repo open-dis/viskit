@@ -46,6 +46,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -372,13 +373,17 @@ public class SettingsDialog extends JDialog {
     }
 
     /** Method to facilitate putting project/lib entries on the classpath
-     * @param lis a list of classpath (jar) entries to include in extraClassPaths.path[@value]
+     * @param extraPaths a list of (jar/.class) entries to include in extraClassPaths.path[@value]
      */
-    public static void saveExtraClassPathEntries(String[] lis) {
+    public static void saveExtraClassPathEntries(String[] extraPaths) {
+        String[] cpaths = getExtraClassPath();
+        if (Arrays.equals(extraPaths, cpaths))
+            return; // no need to rebuild the LEGO tree
+
         clearClassPathEntries();
 
         int ix = 0;
-        for (String s : lis) {
+        for (String s : extraPaths) {
             s = s.replaceAll("\\\\", "/");
             LOG.debug("lis[" + ix + "]: {}", s);
             projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
