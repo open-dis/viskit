@@ -1250,9 +1250,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
                 vp.setData(null);
                 pp.setData(null);
 
-                // Deliberate fallthrough here
+                // Deliberate fallthrough here. See default note
 
-            // Changes the jGraph needs to know about
+            // Changes that jGraph needs to know about
             default:
                 vgcw.viskitModelChanged((ModelEvent) event);
                 break;
