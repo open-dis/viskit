@@ -785,7 +785,9 @@ public class VGlobals {
 
     /**
      * Not the best Java Bean convention, but performs as a no argument setter
-     * for an open project's working directory (build/classes)
+     * for an open project's working directory (build/classes). Establishes the
+     * class loader, project space, extra classpaths and identifies the path for
+     * .class files of the projects EGs
      */
     public final void createWorkDirectory() {
         ViskitConfig vConfig = ViskitConfig.instance();
