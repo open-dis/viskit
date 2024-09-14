@@ -178,7 +178,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
                 vaw.openProject();
         }
     } else {
-        file = ViskitProject.openProjectDir(this, ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        file = ViskitProject.openProjectDir(this, ViskitProject.VISKIT_PROJECTS_DIR);
         VStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
 

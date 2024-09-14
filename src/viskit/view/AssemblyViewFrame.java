@@ -933,7 +933,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         if (VGlobals.instance().getCurrentViskitProject() != null)
             return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         else
-            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
     }
 
     @Override
@@ -977,7 +977,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         if (!aController.handleProjectClosing())
             return;
 
-        File file = ViskitProject.openProjectDir(this.getContent(), ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        File file = ViskitProject.openProjectDir(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIR);
         if (file != null)
             aController.openProject(file); // calls EGVF showProjectName
 

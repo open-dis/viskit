@@ -1072,7 +1072,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         if (VGlobals.instance().getCurrentViskitProject() != null) {
             return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
         } else {
-            return new JFileChooser(new File(ViskitProject.MY_VISKIT_PROJECTS_DIR));
+            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
         }
     }
 
