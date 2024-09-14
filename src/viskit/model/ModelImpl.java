@@ -119,11 +119,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             try {
                 currentFile = f;
 
-                // required for initial file loading
-                setDirty(false);
-
                 Unmarshaller u = jc.createUnmarshaller();
-                jaxbRoot = (SimEntity) u.unmarshal(f);
+                jaxbRoot = (SimEntity) u.unmarshal(currentFile);
 
                 GraphMetadata mymetaData = new GraphMetadata(this);
                 mymetaData.author = jaxbRoot.getAuthor();
@@ -151,7 +148,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     JAXBContext assyCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
                     Unmarshaller um = assyCtx.createUnmarshaller();
                     um.unmarshal(f);
-                    // If we get here, they've tried to load an assembly.
+                    // If we get here, we've tried to load an assembly.
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
                             "This file is an Assembly",
                             "Use the Assembly Editor to" +
@@ -166,10 +163,12 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                             "\nin Model.newModel(File)"
                             );
                 }
-                setDirty(true);
                 return false; // from either error case
             }
         }
+
+        // All of the above changes and builds set the model dirty
+        setDirty(false);
         return true;
     }
 
@@ -179,6 +178,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         if (f == null) {
             f = currentFile;
         }
+        currentFile = f;
 
         // Do the marshalling into a temporary file, so as to avoid possible
         // deletion of existing file on a marshal error.
@@ -218,10 +218,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             m.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tmpF.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             setDirty(false);
-            currentFile = f;
             retVal = true;
         } catch (JAXBException e) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
