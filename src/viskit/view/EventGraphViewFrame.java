@@ -21,6 +21,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import org.apache.logging.log4j.Logger;
+
 import viskit.control.EventGraphController;
 import viskit.Help;
 import viskit.model.ModelEvent;
@@ -72,6 +74,8 @@ import viskit.view.dialog.SettingsDialog;
   @version $Id$
  */
 public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
+
+    private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE = 0;
@@ -429,7 +433,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger(EventGraphViewFrame.class).error(tmle);
+            LOG.error(tmle);
         }
 
         // the view holds only one model, so it gets overwritten with each tab
@@ -859,21 +863,19 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         });
     }
 
-    /** Changes the background color of EG tabs depending on model.isDirty()
-     * status to give the user an indication of a good/bad save &amp; compile
-     * operation. Of note is that the default L&amp;F must be selected for
-     * WIN machines, else no color will be visible. On Macs, the platform
-     * L&amp;F works best.
+    /** Changes the background/foreground color of EG tabs depending on
+     * model.isDirty() status giving the user an indication of a good/bad save
+     * &amp; compile operation. Of note is that the default L&amp;F must be
+     * selected for WIN machines, else no colors will be visible. On Macs, the
+     * platform L&amp;F works best.
      */
     public void toggleEgStatusIndicators() {
         int selectedTab = tabbedPane.getSelectedIndex();
-
         for (Component c : tabbedPane.getComponents()) {
 
             // This will fire a call to stateChanged() which also sets the
             // current model
             tabbedPane.setSelectedComponent(c);
-
             if (((Model) getModel()).isDirty()) {
                 tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
