@@ -312,9 +312,10 @@ public class ViskitProject {
 
         // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
+            String file;
             for (File f : getLibDir().listFiles()) {
-                if ((f.getName().contains(".jar")) || (f.getName().contains(".zip"))) {
-                    String file = f.getCanonicalPath().replaceAll("\\\\", "/");
+                if ((f.getName().toLowerCase().contains(".jar")) || (f.getName().toLowerCase().contains(".zip"))) {
+                    file = f.getCanonicalPath().replaceAll("\\\\", "/");
                     LOG.debug(file);
                     cp.add(file);
                 }
