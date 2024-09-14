@@ -24,7 +24,7 @@ public interface Model {
     /**
      * Messaged by controller when a new Model should be created, or an existing
      * model is loading at startup.
-     * @param f File representing persistent model representation.  If null, model resets itself to 0 nodes, 0 edges, etc.
+     * @param f File representing persistent model representation. If null, model resets itself to 0 nodes, 0 edges, etc.
      * @return for good open
      */
     boolean newModel(File f);
@@ -58,7 +58,7 @@ public interface Model {
 
     /**
      * Messaged by controller to retrieve all defined StateVariables
-     * 
+     *
      * @return Vector of StateVariables
      */
     Vector<ViskitElement> getStateVariables();
