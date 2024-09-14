@@ -804,7 +804,7 @@ public class VGlobals {
             currentViskitProject.setProjectRoot(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (currentViskitProject.initProject()) {
-            SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents());
+            SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectContents()); // necessary to find and record extra classpaths
         } else {
             LOG.warn("Unable to create project directory, returning");
             return;
