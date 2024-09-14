@@ -515,7 +515,7 @@ public class VGlobals {
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitProjectButtonPanel.showDialog(); // hopefully, void this
         } else {
-            ViskitProject.MY_VISKIT_PROJECTS_DIR = projectHome;
+            ViskitProject.VISKIT_PROJECTS_DIR = projectHome;
         }
     }
 
@@ -798,7 +798,7 @@ public class VGlobals {
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
-        projectsBaseDir = new File(ViskitProject.MY_VISKIT_PROJECTS_DIR);
+        projectsBaseDir = new File(ViskitProject.VISKIT_PROJECTS_DIR);
 
         if (currentViskitProject == null)
             currentViskitProject = new ViskitProject(new File(projectsBaseDir, ViskitProject.DEFAULT_PROJECT_NAME));
