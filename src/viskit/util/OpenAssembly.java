@@ -48,7 +48,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * @since Dec 1, 2005
  * @since 11:18:53 AM
  *
- * This is a singleton class to coordinate opening of and modifications of
+ * This is a singleton class to coordinate opening of and modifications to
  * Assembly files
  */
 public class OpenAssembly {
