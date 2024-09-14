@@ -253,8 +253,8 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             adjustRecentEGFileSet(file);
             markEgFilesAsOpened();
 
-            // Check for good compilation
-            handleCompileAndSave(mod, file);
+            // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial EG parsing areadly took place in the project space during startup (tdn) 9/14/24
+//            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of EGs
         } else {
             viskitView.delTab(mod); // Not a good open, tell view
         }
