@@ -927,12 +927,14 @@ public class VGlobals {
         Thread[] threads = new Thread[Thread.activeCount()];
         Thread.enumerate(threads);
         for (Thread t : threads) {
-            LOG.debug("Thread is {}: ", t);
-            if (t.getName().contains("SwingWorker")) {
-                t.interrupt();
-            }
-            // Now attempt to release the URLClassLoader's file lock on open JARs
+            LOG.debug("Thread before exit {}: ", t);
+
+            // Attempt to release the URLClassLoader's file lock on open JARs
             t.setContextClassLoader(ClassLoader.getSystemClassLoader());
+//            if (t.getName().contains("SwingWorker"))
+//                t.interrupt(); // not working as expected
+//            if (t.getName().contains("Image Fetcher"))
+//                t.interrupt();
         }
     };
 
