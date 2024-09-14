@@ -38,7 +38,6 @@ import edu.nps.util.LogUtils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -369,9 +368,6 @@ public class SettingsDialog extends JDialog {
         projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
 
-    static JDialog progressDialog;
-    static JProgressBar progress = new JProgressBar(0, 100);
-
     /** Method to facilitate putting project/lib entries on the classpath
      * @param lis a list of classpath (jar) entries to include in extraClassPaths.path[@value]
      */
@@ -381,22 +377,9 @@ public class SettingsDialog extends JDialog {
         int ix = 0;
         for (String s : lis) {
             s = s.replaceAll("\\\\", "/");
-            LOG.debug("lis[" + ix + "]: " + s);
+            LOG.debug("lis[" + ix + "]: {}", s);
             projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
             ix++;
-        }
-
-        if (dialog != null) {
-            progressDialog = new JDialog(dialog);
-            progressDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            progress.setIndeterminate(true);
-            progress.setString("Loading Libraries");
-            progress.setStringPainted(true);
-            progressDialog.add(progress);
-            progressDialog.pack();
-            Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-            progressDialog.setLocation((d.width - progressDialog.getWidth()) / 2, (d.height - progressDialog.getHeight()) / 2);
-            progressDialog.setResizable(false);
         }
         Task t = new Task();
         t.execute();
@@ -406,12 +389,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public Void doInBackground() {
-            if (dialog != null) {
-                progressDialog.setVisible(true);
-                progress.setValue(0);
-                setProgress(0);
-                progressDialog.toFront();
-            }
+            setProgress(0);
 
             // Incase we have custom jars, need to add these to the ClassLoader
             VGlobals.instance().resetWorkClassLoader();
@@ -421,14 +399,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void done() {
-            // using a get here would block prevent the rest of the UI to build,
-            // hence, not using get()
-            if (dialog != null && progressDialog != null) {
-                progress.setIndeterminate(false);
-                progress.setValue(100);
-                setProgress(100);
-                progressDialog.dispose();
-            }
+            setProgress(100);
         }
     }
 
