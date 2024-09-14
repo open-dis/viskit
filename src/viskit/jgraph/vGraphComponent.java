@@ -1,7 +1,5 @@
 package viskit.jgraph;
 
-import edu.nps.util.LogUtils;
-
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -16,7 +14,6 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.UndoManager;
 
-import org.apache.logging.log4j.Logger;
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
 import org.jgraph.event.GraphModelListener;
@@ -42,7 +39,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
 
     vGraphModel vGModel; // local copy for convenience
     EventGraphViewFrame parent;
-    
+
     private UndoManager undoManager;
 
     /** Sets up JGraph to render nodes and edges for DES
