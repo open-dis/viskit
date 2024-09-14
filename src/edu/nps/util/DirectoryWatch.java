@@ -162,6 +162,7 @@ public class DirectoryWatch {
     class Runner implements Runnable, RecurseListener {
 
         Map<File, Long> workingHM = new HashMap<>(50);
+        Map<File, Long> temp;
 
         @Override
         public void run() {
@@ -177,7 +178,7 @@ public class DirectoryWatch {
                 for (File cPath : lastFiles.keySet()) {
                     fireAction(cPath, DirectoryChangeListener.FILE_REMOVED);
                 }
-                Map<File, Long> temp = lastFiles;
+                temp = lastFiles;
                 lastFiles = workingHM;
                 workingHM = temp; // gets zeroed above
                 for (File f : changed) {
@@ -191,7 +192,7 @@ public class DirectoryWatch {
                     Thread.sleep(sleepTimeMs);
                 } catch (InterruptedException e) {
                     System.err.println("DirWatcher killed");
-                    break;
+                    running = false;
                 }
             }
         }
