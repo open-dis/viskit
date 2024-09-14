@@ -178,7 +178,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         // deletion of existing file on a marshal error.
 
         File tmpF;
-        FileWriter fw = null;
         try {
             tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
         } catch (IOException e) {
@@ -190,6 +189,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             return false;
         }
 
+        FileWriter fw = null;
         try {
             fw = new FileWriter(tmpF);
             Marshaller m = jc.createMarshaller();
@@ -228,7 +228,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         } catch (IOException ex) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
-                    "Exception on writing " + f.getName() +
+                    "Exception on writing " +
+                    "\n" + f.getName() +
                     "\n" + ex.getMessage()
                     );
             retVal = false;
@@ -361,7 +362,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         node.setCodeBLock(ev.getCode());
         node.getTransitions().clear();
-        
+
         EventStateTransition est;
         LocalVariableAssignment l;
         StateVariable sv;
@@ -756,7 +757,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void redoEvent(EventNode node) {
         if (evNodeCache.containsValue(node))
             return;
-        
+
         Event jaxbEv = oFactory.createEvent();
         evNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
         jaxbEv.setName(node.getName());
@@ -1026,7 +1027,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void redoSchedulingEdge(Edge ed) {
         if (edgeCache.containsValue(ed))
             return;
-        
+
         EventNode src, target;
         src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
         target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
@@ -1076,7 +1077,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     public void redoCancelingEdge(Edge ed) {
         if (edgeCache.containsValue(ed))
             return;
-        
+
         EventNode src, target;
         src = (EventNode) ((DefaultMutableTreeNode) ed.from.opaqueViewObject).getUserObject();
         target = (EventNode) ((DefaultMutableTreeNode) ed.to.opaqueViewObject).getUserObject();
