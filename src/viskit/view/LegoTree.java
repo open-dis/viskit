@@ -226,24 +226,25 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 }
             }
         }
-        return null;
+        return null; // non SimEntity
     }
 
     // 4 May 06 JMB The filter down below checks for empty dirs.
     /**
      * Adds SimEntity icons to the Assembly Editor drag and drop tree. If there
-     * is a directory, or a jarfile with xml in it, it will show in the LEGO
-     * tree, but if its children have errors when marshaling they will not
-     * appear.
+     * is a directory, or a jar, containing .xml or .class SimEntitiy files,
+     * they will show in the LEGO tree, but if the directory's children have
+     * errors when marshaling XML they will not appear. Non SimEntity files will
+     * also not appear
      *
-     * @param f the directory to recurse to find SimEntitiy based EGs
+     * @param f the directory to recurse to find SimEntity based EGs
      * @param recurse if true, recurse the directory
      */
     public void addContentRoot(File f, boolean recurse) {
         if (f.getName().toLowerCase().endsWith(".jar")) {
             addJarFile(f.getPath());
-        } else if (!f.getName().endsWith(".java")) {
-            _addContentRoot(f, recurse);
+        } else if (!f.getName().toLowerCase().endsWith(".java")) {
+            _addContentRoot(f, recurse); // directories, .xml, .class
         }
     }
 
