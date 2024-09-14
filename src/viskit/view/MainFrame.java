@@ -123,7 +123,7 @@ public class MainFrame extends JFrame {
 
             @Override
             public void windowClosing(WindowEvent e) {
-                myQuitAction.actionPerformed(null);
+                myQuitAction.actionPerformed(null); // perform cleanups
             }
         });
         ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/ViskitSplash2.png"));
