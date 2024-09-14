@@ -705,6 +705,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
+        // Parse any extra/additional classpath for any required dependencies
         File file;
         try {
             URL[] extraCP = SettingsDialog.getExtraClassPathArraytoURLArray();
