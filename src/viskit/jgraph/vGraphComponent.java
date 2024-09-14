@@ -40,10 +40,9 @@ import viskit.model.Edge;
  */
 public class vGraphComponent extends JGraph implements GraphModelListener {
 
-    private static final Logger LOG = LogUtils.getLogger(vGraphComponent.class);
-
     vGraphModel vGModel; // local copy for convenience
     EventGraphViewFrame parent;
+    
     private UndoManager undoManager;
 
     /** Sets up JGraph to render nodes and edges for DES
