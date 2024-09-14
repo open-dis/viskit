@@ -422,17 +422,17 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void done() {
-            try {
-                get(); // waits
+//            try {
+//                get(); // waits, but out of sync with rebuildLEGOTreePanels b/c the avf still hasn't been built yet??
                 if (dialog != null && progressDialog != null) {
                     progress.setIndeterminate(false);
                     progress.setValue(100);
                     setProgress(100);
                     progressDialog.dispose();
                 }
-            } catch (InterruptedException | ExecutionException ex) {
-                LOG.error(ex);
-            }
+//            } catch (InterruptedException | ExecutionException ex) {
+//                LOG.error(ex);
+//            }
         }
     }
 
