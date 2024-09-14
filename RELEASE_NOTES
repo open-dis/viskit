@@ -64,6 +64,10 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    (Critical)
+    Removed source for unnecessary compilation and file checking during startup
+    which caused gross collision errors when opening a large set of EGs.
+
     Fix CMD Q for macOS. Will perform Exit cleanups
 
     (Critical)
