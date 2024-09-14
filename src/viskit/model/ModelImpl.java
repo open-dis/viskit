@@ -46,7 +46,6 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @version $Id$
  */
 public class ModelImpl extends mvcAbstractModel implements Model {
-
     JAXBContext jc;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
@@ -55,12 +54,14 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     Map<Object, Edge> edgeCache = new HashMap<>();
     Vector<ViskitElement> stateVariables = new Vector<>();
     Vector<ViskitElement> simParameters = new Vector<>();
+
     private final String schemaLoc = XMLValidationTool.EVENT_GRAPH_SCHEMA;
     private final String privateIdxVarPrefix = "_idxvar_";
     private final String privateLocVarPrefix = "locvar_";
     private final String stateVarPrefix = "state_";
-    private GraphMetadata metaData;
     private final EventGraphControllerImpl controller;
+
+    private GraphMetadata metaData;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
@@ -139,6 +140,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 changeMetaData(mymetaData);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
+
+                // The above change metadata and build set the model dirty
+                setDirty(false);
+                // The following builds just notify
+
                 buildParametersFromJaxb(jaxbRoot.getParameter());
                 buildStateVariablesFromJaxb(jaxbRoot.getStateVariable());
                 buildCodeBlockFromJaxb(jaxbRoot.getCode());
@@ -166,9 +172,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 return false; // from either error case
             }
         }
-
-        // All of the above changes and builds set the model dirty
-        setDirty(false);
         return true;
     }
 
@@ -275,8 +278,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         if (!nameCheck()) {
             mangleName(en);
         }
+        
         notifyChanged(new ModelEvent(en, ModelEvent.EVENTADDED, "Event added"));
-
         return en;
     }
 
@@ -342,12 +345,15 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         node.getComments().addAll(ev.getComment());
 
         node.getArguments().clear();
+
+        EventArgument ea;
+        List<String> com;
         for (Argument arg : ev.getArgument()) {
-            EventArgument ea = new EventArgument();
+            ea = new EventArgument();
             ea.setName(arg.getName());
             ea.setType(arg.getType());
 
-            List<String> com = new ArrayList<>();
+            com = new ArrayList<>();
             com.addAll(arg.getComment());
             ea.setComments(com);
             ea.opaqueModelObject = arg;
@@ -420,7 +426,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                     Double.parseDouble(coor.getX()),
                     Double.parseDouble(coor.getY())));
         }
-
     }
 
     private void buildEdgesFromJaxb(EventNode src, List<Object> lis) {
@@ -496,7 +501,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         edgeCache.put(ed, se);
 
         setDirty(true);
-
         this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
     }
 
@@ -525,15 +529,16 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         target.getConnections().add(ce);
 
         edgeCache.put(ed, ce);
-        setDirty(true);
 
+        setDirty(true);
         notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling edge added"));
     }
 
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
         List<ViskitElement> alis = new ArrayList<>(3);
+        vEdgeParameter vep;
         for (EdgeParameter ep : lis) {
-            vEdgeParameter vep = new vEdgeParameter(ep.getValue());
+            vep = new vEdgeParameter(ep.getValue());
             alis.add(vep);
         }
         return alis;
@@ -541,7 +546,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
     private void buildCodeBlockFromJaxb(String code) {
         code = (code == null) ? "" : code;
-
         notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCKCHANGED, "Code block changed"));
     }
 
@@ -564,7 +568,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             if (!stateVarParamNameCheck()) {
                 mangleName(v);
             }
-
             notifyChanged(new ModelEvent(v, ModelEvent.STATEVARIABLEADDED, "New state variable"));
         }
     }
@@ -611,8 +614,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     // --------------
     @Override
     public void newSimParameter(String nm, String typ, String xinitVal, String comment) {
-        setDirty(true);
-
         vParameter vp = new vParameter(nm, typ, comment);
         simParameters.add(vp);
 
@@ -623,7 +624,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         //p.setValue(initVal);
         Parameter p = this.oFactory.createParameter();
         p.setName(nIe(nm));
-        //p.setShortName(nm);
         p.setType(nIe(typ));
         p.getComment().add(comment);
 
@@ -631,6 +631,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         jaxbRoot.getParameter().add(p);
 
+        setDirty(true);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "new sim parameter"));
     }
 
@@ -644,8 +645,9 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                 break;
             }
         }
-        setDirty(true);
         simParameters.remove(vp);
+
+        setDirty(true);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
     }
 
@@ -679,7 +681,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     // -------------------
     @Override
     public void newStateVariable(String name, String type, String xinitVal, String comment) {
-        setDirty(true);
 
         // get the new one here and show it around
         vStateVariable vsv = new vStateVariable(name, type, comment);
@@ -695,6 +696,8 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
         vsv.opaqueModelObject = s;
         jaxbRoot.getStateVariable().add(s);
+
+        setDirty(true);
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
     }
 
@@ -709,6 +712,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             }
         }
         stateVariables.remove(vsv);
+
         setDirty(true);
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
     }
@@ -723,7 +727,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         // fill out jaxb variable
         StateVariable sv = (StateVariable) vsv.opaqueModelObject;
         sv.setName(nIe(vsv.getName()));
-        //sv.setShortName(nIe(vsv.getName()));
         sv.setType(nIe(vsv.getType()));
         sv.getComment().clear();
         sv.getComment().add(vsv.getComment());
@@ -787,7 +790,6 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         jaxbRoot.getEvent().remove(jaxbEv);
 
         setDirty(true);
-
         if (!controller.isUndo())
             notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
         else
@@ -1042,6 +1044,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         se.priority = "DEFAULT";  // set default
 
         edgeCache.put(sch, se);
+
         setDirty(true);
         notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Scheduling Edge added"));
     }
@@ -1061,6 +1064,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         Event srcEv = (Event) src.opaqueModelObject;
         srcEv.getScheduleOrCancel().add(sched);
         edgeCache.put(sched, ed);
+
         setDirty(true);
         notifyChanged(new ModelEvent(ed, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
     }
@@ -1093,6 +1097,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         }
 
         edgeCache.put(can, ce);
+
         setDirty(true);
         notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling Edge added"));
     }
@@ -1112,6 +1117,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
         Event srcEv = (Event) src.opaqueModelObject;
         srcEv.getScheduleOrCancel().add(can);
         edgeCache.put(can, ed);
+
         setDirty(true);
         notifyChanged(new ModelEvent(ed, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
     }
