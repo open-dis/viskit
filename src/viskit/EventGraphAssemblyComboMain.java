@@ -39,6 +39,8 @@ import java.awt.Desktop;
 import java.awt.Taskbar;
 import java.awt.desktop.QuitEvent;
 import java.awt.desktop.QuitResponse;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -123,7 +125,6 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void createGUI(String[] args) {
-
         boolean isMac = VStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
         String initialAssyFile = null;
 
@@ -167,11 +168,13 @@ public class EventGraphAssemblyComboMain {
             help.aboutViskit();
         });
 
-        // CMD Q for macOS, but some thread hangs preventing a full JVM shutdown
-//        Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {
-//            MainFrame mf = (MainFrame) VGlobals.instance().getMainAppWindow();
-//            mf.getMyQuitAction().actionPerformed(null);
-//        });
+        final MainFrame mf = (MainFrame) VGlobals.instance().getMainAppWindow();
+
+        // CMD Q for macOS
+        Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {
+            mf.getMyQuitAction().actionPerformed(null); // perform cleanups
+            response.performQuit();
+        });
 
         ImageIcon aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
         Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
