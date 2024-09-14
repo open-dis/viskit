@@ -1,7 +1,9 @@
 package viskit.model;
 
 import edu.nps.util.TempFileManager;
+
 import java.awt.geom.Point2D;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,12 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.regex.Pattern;
+
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import viskit.VGlobals;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.mvcAbstractModel;
