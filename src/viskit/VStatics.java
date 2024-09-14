@@ -62,7 +62,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
 
-import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
 
 import viskit.control.FileBasedClassManager;
@@ -100,7 +99,7 @@ public class VStatics {
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
     static final Logger LOG = LogUtils.getLogger(VStatics.class);
-    
+
     public static boolean debug = false;
 
     /** Utility method to configure a Viskit project
@@ -545,12 +544,12 @@ public class VStatics {
      */
     @SuppressWarnings("unchecked")
     public static List<Object>[] resolveParameters(Class<?> type) {
-        
+
         // nulls can occur when staring Viskit pointing to an assy in another
         // project space. In this case we can be silent
         if (type == null)
             return null;
-        
+
         // Ben Cheng NPE fix
         Object testResult = parameterMap.get(type.getName());
         List<Object>[] resolved = null;
@@ -569,7 +568,7 @@ public class VStatics {
             List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
             ObjectFactory of = new ObjectFactory();
             Field f = null;
-            
+
             try {
                 f = type.getField("parameterMap");
             } catch (SecurityException ex) {
@@ -609,7 +608,7 @@ public class VStatics {
                         types = param.types();
                         if (names.length != types.length)
                             throw new RuntimeException("ParameterMap names and types length mismatch"); // TODO: harsh
-                        
+
                         for (int k = 0; k < names.length; k++) {
                             pt = of.createParameter();
                             pt.setName(names[k]);
@@ -622,7 +621,7 @@ public class VStatics {
                 } else if (f != null) {
                     if (viskit.VStatics.debug)
                         LOG.debug("{} is a parameterMap", f);
-                    
+
                     try {
                         // parameters are in the following order
                         // {
@@ -649,7 +648,7 @@ public class VStatics {
                                         plist[n].add(p);
                                         if (viskit.VStatics.debug)
                                             LOG.debug("\tfrom compiled parameterMap {}", p.getName() + p.getType());
-                                        
+
                                     } catch (Exception ex) {
                                         LOG.error(ex);
 //                                        ex.printStackTrace();
@@ -678,7 +677,7 @@ public class VStatics {
                             plist[i].add(p);
                             if (viskit.VStatics.debug)
                                 LOG.info("\t {}{}", p.getName(), p.getType());
-                            
+
                         } catch (Exception ex) {
                             LOG.error(ex);
 //                            ex.printStackTrace();
@@ -797,7 +796,7 @@ public class VStatics {
             try {
                 if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
                     Desktop.getDesktop().mail(url.toURI());
-                    
+
                     if (showLog)
                         Desktop.getDesktop().browse(ViskitConfig.V_ERROR_LOG.toURI());
                 }
@@ -810,5 +809,5 @@ public class VStatics {
 
         JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
-    
+
 } // end class VStatics
