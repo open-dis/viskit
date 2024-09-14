@@ -321,7 +321,7 @@ public class ViskitProject {
             }
             LOG.debug(getEventGraphsDir().getCanonicalPath());
 
-            // Now list any paths outside of the project space, i.e. ${other path}/build/classes
+            // Now list any paths inside/outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = SettingsDialog.getExtraClassPath();
             cp.addAll(Arrays.asList(classPaths));
             LOG.debug("Project cp: {}", cp);
