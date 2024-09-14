@@ -92,7 +92,7 @@ public class ViskitProject {
 
     static final Logger LOG = LogUtils.getLogger(ViskitProject.class);
 
-    public static String MY_VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
+    public static String VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
 
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine. A default
