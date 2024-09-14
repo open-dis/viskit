@@ -64,6 +64,8 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    Fix CMD Q for macOS. Will perform Exit cleanups
+
     (Critical)
     Restored creation of the Analyst Report
 
