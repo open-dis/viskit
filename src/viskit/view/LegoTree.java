@@ -195,7 +195,6 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * @param f the file to remove from the LEGO tree
      */
     public void removeContentRoot(File f) {
-        //System.out.println("LegoTree.removeContentRoot: "+f.getAbsolutePath());
         _removeNode(rootNode, f);
     }
 
