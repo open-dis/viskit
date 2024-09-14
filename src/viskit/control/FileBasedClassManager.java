@@ -133,9 +133,9 @@ public class FileBasedClassManager {
                     fXml = null;
                     setFileBasedAssemblyNode(f);
 
-                    // TODO: work situtation where another build/classes gets added
+                    // TODO: work situation where another build/classes gets added
                     // to the classpath as it won't readily be seen before the
-                    // project's build/classes is.  This causes ClassNotFoundExceptions
+                    // project's build/classes is. This causes ClassNotFoundExceptions
                     addCache(f, fban.classFile);
                 }
 
@@ -202,7 +202,8 @@ public class FileBasedClassManager {
 
             LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
-        } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError e) {
+        } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError | NullPointerException e) {
+            LOG.warn("File causing error: {}", f);
             LOG.error(e);
         }
     }
@@ -210,7 +211,7 @@ public class FileBasedClassManager {
     /**
      * Cache the EG and its .class file with good MD5 hash
      * @param xmlEg the EG to cacheXML
-     * @param classFile the classfile of this EG
+     * @param classFile the compiled version of this EG
      */
     public void addCache(File xmlEg, File classFile) {
         // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cacheXML
