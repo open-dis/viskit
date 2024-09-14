@@ -112,10 +112,8 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         setTitle("Job " + title);
         this.isSubComponent = isSubComponent;
         mom = mainFrame;
-        content = buildContent();
         setContentPane(content);
         setFile(file, title);
-        doListeners();
 
         if (!isSubComponent) {
             try {
