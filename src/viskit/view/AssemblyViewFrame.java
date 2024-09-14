@@ -713,7 +713,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                     continue; // can happen if extraClassPaths.path[@value] is null or erroneous
                 file = new File(path.toURI());
                 if (file.exists())
-                    addEventGraphsToLegoTree(file, file.isDirectory());
+                    addEventGraphsToLegoTree(file, file.isDirectory()); // recurse directories
             }
         } catch (URISyntaxException ex) {
             LogUtils.getLogger(getClass()).error(ex);
