@@ -117,6 +117,11 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
         } else {
             try {
+                currentFile = f;
+
+                // required for initial file loading
+                setDirty(false);
+
                 Unmarshaller u = jc.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(f);
 
@@ -161,13 +166,10 @@ public class ModelImpl extends mvcAbstractModel implements Model {
                             "\nin Model.newModel(File)"
                             );
                 }
-                return false;    // from either error case
+                setDirty(true);
+                return false; // from either error case
             }
         }
-        currentFile = f;
-
-        // required for initial file loading
-        setDirty(false);
         return true;
     }
 
