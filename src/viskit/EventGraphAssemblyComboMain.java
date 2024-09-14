@@ -39,8 +39,6 @@ import java.awt.Desktop;
 import java.awt.Taskbar;
 import java.awt.desktop.QuitEvent;
 import java.awt.desktop.QuitResponse;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
