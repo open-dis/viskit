@@ -65,6 +65,7 @@ import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
+import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -133,6 +134,10 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 doProjectCleanup();
                 projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
                 openProject(projPath); // calls EGVF showProjectName
+
+                // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
+                SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
+                t.execute();
             }
             compileAssembly(initialAssyFile);
         } else {
