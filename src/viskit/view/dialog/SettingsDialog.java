@@ -43,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -367,7 +368,7 @@ public class SettingsDialog extends JDialog {
     }
 
     private static void clearClassPathEntries() {
-        // Always reinitialize the prop config.  We may have changed projects
+        // Always reinitialize the prop config. We may have changed projects
         initConfigs();
         projectConfig.clearTree(ViskitConfig.X_CLASS_PATHS_CLEAR_KEY);
     }
@@ -389,11 +390,11 @@ public class SettingsDialog extends JDialog {
             projectConfig.setProperty(ViskitConfig.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
             ix++;
         }
-        Task t = new Task();
+        RebuildLEGOTreePanelTask t = new RebuildLEGOTreePanelTask();
         t.execute();
     }
 
-    static class Task extends SwingWorker<Void, Void> {
+    public static class RebuildLEGOTreePanelTask extends SwingWorker<Void, Void> {
 
         @Override
         public Void doInBackground() {
@@ -401,7 +402,15 @@ public class SettingsDialog extends JDialog {
 
             // Incase we have custom jars, need to add these to the ClassLoader
             VGlobals.instance().resetWorkClassLoader();
-            VGlobals.instance().rebuildLEGOTreePanels();
+
+            Runnable r = () -> {
+                VGlobals.instance().rebuildLEGOTreePanels();
+            };
+            try {
+                SwingUtilities.invokeAndWait(r);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                LOG.error(ex);
+            }
             return null;
         }
 
