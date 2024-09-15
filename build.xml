@@ -578,6 +578,8 @@ their descpritions.
             description="Build and Run Viskit only, no module dependencies">
     </target>
 
+    <target name="run" depends="build.run.no.extensions" description="Default run target. Builds Viskit, then runs the app"/>
+
     <!-- TARGET: Quick Run, doesn't check dependencies, or compile -->
     <target name="quick.run"
             depends="init"
