@@ -123,7 +123,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JToolBar toolBar;
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
-    private LegoTree lTree,  pclTree;
+    private LegoTree lTree, pclTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjFileSetListener recentProjFileSetListener;
@@ -690,15 +690,16 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
     public void rebuildLEGOTreePanels() {
         lTree.clear();
+        pclTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         lTree.repaint();
+        pclTree.repaint();
     }
     private JSplitPane treePanels;
 
     private JSplitPane buildTreePanels() {
-
         lTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
@@ -765,7 +766,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         dragged = trans;
     }
 
-    /** Class to facilitate dragging new nodes onto the pallete */
+    /** Class to facilitate dragging new nodes onto the pallette */
     class vDropTargetAdapter extends DropTargetAdapter {
 
         @Override
