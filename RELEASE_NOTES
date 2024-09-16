@@ -66,9 +66,10 @@ Post release fixes / upgrades / issues:
   ****** FIXES / UPGRADES:
     (Critical)
     Removed source for unnecessary compilation and file checking when pointing
-    to an assembly file in another project space which caused UI hang when
-    opening a large set of EGs allowing for a big performance increase during
-    start up
+    to an assembly file in the same project space. Fixed bug where rebuilding of
+    the LEGO tree was not performed on the Event Dispatch Thread (EDT) which
+    caused UI hang when opening a large set of EGs. A big performance increase
+    is now observed during start up
 
     Fix CMD Q for macOS. Will perform Exit cleanups
 
