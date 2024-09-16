@@ -317,7 +317,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     private void fileWatchOpen(File f) {
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
-        LOG.debug("f is: " + f + " and ofile is: " + ofile);
+        LOG.debug("f is: {} and ofile is: {}", f, ofile);
         try {
             Files.copy(f.toPath(), ofile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
