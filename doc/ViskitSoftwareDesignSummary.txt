@@ -170,6 +170,12 @@ if any EGs are subclassed from other EGs, these will not open automatically.
 Also, if the last remaining Assy file is closed, all open EGs will close
 including any non-associated EG files that were also opened.
 
+If a path to an Assy file is given at Viskit start up, then Viskit will open all
+corresponding EG associated with that Assy, compile the Assy and ready the Run
+panel for immediate simulation run. Else, Viskit will open that last files
+recorded in the recent histories, both Assy and EG and default to the EG editor
+panel.
+
 7) At this point, the paths of any opened Assy and EG files are recorded in the
 ~.viskit/c_app.xml file and will be opened upon next Viskit launch.  The last
 open Viskit project, as well as its history of Assy and EG files will be listed
