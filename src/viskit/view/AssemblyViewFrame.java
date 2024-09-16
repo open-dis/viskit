@@ -90,14 +90,45 @@ import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
 
 /**
- * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu
  * @author Mike Bailey
- * @since May 10, 2004
- * @since 2:07:37 PM
- * @version $Id$
+ * @since May 10, 2004, 2:07:37 PM
+ *
+ * <pre>
+ * The following is a list of startup events that allow for population of the
+ * LEGO node tree (SimEntity and Properety Change Listener (PCL) drag and drop
+ * pallettes)
+ *
+ * - Parse any extra classpaths recorded in the app history and all jars in the
+ *   project's lib directory
+ * - Parse the project's EG directory
+ *
+ *   All SimEntities and PCLs found in either of the parsing events above, the
+ *   following takes place.
+ *
+ * - Translate any XML found to java source -> build/src/${pkg}/*.java
+ * - Validate XML
+ * - Compile java source to -> build/classes/${pkg}/*.class
+ * - Unmarshall XML
+ * - Load all SimEntity classes via working ClassLoader to check readiness for
+ *   running at sim time
+ * - Cache both .class and .xml w/ MD5 hash to denote ready for sim running. If
+ *   any files found not ready (won't validate, compile, etc.), place on the
+ *   cache missed list. If previously on the cached missed list, but now ready
+ *   for validation &and; compilation, remove from cached missed list and place
+ *   on cached ready list
+ * - If any files were previously cached, then make sure all .class files still
+ *   load correctly and XML still validates &and; compiles
+ * - All cached ready files are placed on file watch for any changes to ready
+ *  status
+ *
+ * - Load the above representations into thier respective LEGO trees denoted
+ *   with file type and a blue icon (SimEntity) or pink icon (PCL) showing ready
+ *   to be used to configure an assembly file for sim running
+ * </pre>
  */
 public class AssemblyViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
 
@@ -107,7 +138,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public static final int SIMEVLIS_MODE = 2;
     public static final int PCL_MODE = 3;
 
-    // The view needs access to this
+    // The controller needs access to this
     public JButton runButt;
 
     JMenu openRecentAssyMenu, openRecentProjMenu;
