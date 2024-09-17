@@ -64,6 +64,9 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
+    The validation tool now finds the assembly and simkit schemas inside the
+    viskit.jar
+
     (Critical)
     Removed source for unnecessary compilation and file checking when pointing
     to an assembly file in the same project space. Fixed bug where rebuilding of
