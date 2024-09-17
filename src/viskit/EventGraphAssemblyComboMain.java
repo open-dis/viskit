@@ -123,7 +123,7 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void createGUI(String[] args) {
-        boolean isMac = VStatics.OPERATING_SYSTEM.toLowerCase().startsWith("mac os x");
+        boolean isMac = VStatics.OPERATING_SYSTEM.contains("Mac");
         String initialAssyFile = null;
 
         if (args.length > 0)
