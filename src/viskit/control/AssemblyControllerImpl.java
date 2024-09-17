@@ -1389,8 +1389,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         String assySource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(f,
-                new File(XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA));
+        XMLValidationTool xvt = new XMLValidationTool(f.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
 
         if (!xvt.isValidXML()) {
 
@@ -1425,8 +1424,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile(),
-                new File(XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA));
+        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile().getPath(),
+                XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA);
 
         if (!xvt.isValidXML()) {
 
