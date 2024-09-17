@@ -92,13 +92,10 @@
             <fileset dir="stage" targetdir="$INSTALL_PATH">
                 <os family="windows"/>
                 <os family="unix"/>
-                <include name="Schemas/**"/>
-                <exclude name="Schemas/legacyDTDs/**"/>
                 <include name="configuration/**"/>
                 <exclude name="configuration/AnalystReportXMLtoHTML.xslt"/>
                 <exclude name="configuration/ClassFinder.properties"/>
                 <exclude name="configuration/ClassFinderReadme"/>
-                <exclude name="configuration/c_gui_mac.xml"/>
                 <exclude name="configuration/log4j2.xml"/>
                 <include name="images/**"/>
                 <exclude name="images/american-flag.gif"/>
@@ -124,13 +121,13 @@
                 <os family="windows"/>
             </executable>-->
 
-            <executable targetfile="$INSTALL_PATH/viskit-editor.jar" type="jar" 
+            <executable targetfile="$INSTALL_PATH/viskit-editor.jar" type="jar"
                         keep="true" stage="never" failure="warn" class="viskit.EventGraphAssemblyComboMain">
                 <os family="windows"/>
                 <os family="unix"/>
             </executable>
         </pack>
-        
+
         <!-- The documentation (1 directory) -->
         <pack name="Documentation" required="no">
             <description>Viskit documentation (HTML, ODT and TEXT).</description>
