@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import javax.xml.XMLConstants;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
@@ -35,7 +36,6 @@ import org.xml.sax.SAXParseException;
 
 // Local imports
 import edu.nps.util.LogUtils;
-import javax.xml.transform.stream.StreamSource;
 
 import viskit.ViskitConfig;
 
