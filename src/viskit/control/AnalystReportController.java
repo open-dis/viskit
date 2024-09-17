@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.control;
 
 import edu.nps.util.LogUtils;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.VGlobals;
 import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;
@@ -243,12 +246,12 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     private void buildAnalystReport(File targetFile) {
-        LOG.debug("TargetFile is: " + targetFile);
+        LOG.debug("TargetFile is: {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
             analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
         } catch (Exception e) {
-            LOG.error("Error parsing analyst report: " + e.getMessage());
+            LOG.error("Error parsing analyst report: {}", e);
 //            e.printStackTrace();
             return;
         }
