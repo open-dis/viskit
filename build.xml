@@ -300,6 +300,11 @@ their descpritions.
             </fileset>
         </copy>
 
+        <copy todir="${dir.build.classes}/xsd">
+            <fileset file="${assembly.xsd}"/>
+            <fileset file="${simkit.xsd}"/>
+        </copy>
+
         <!-- For some reason, viskit.doe.package-info.java makes its own directory in build/classes -->
         <delete dir="${dir.build.classes}/doe"/>
     </target>
