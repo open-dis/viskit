@@ -605,7 +605,6 @@ their descpritions.
         <java classname="viskit.ViskitApplication"
               classpathref="runtime.classpath"
               fork="true">
-
             <jvmarg line="${run.args}"/>
         </java>
     </target>
@@ -627,7 +626,6 @@ their descpritions.
               fork="true"
               failonerror="true">
             <classpath path="${extra.classpath}"/>
-
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${run.args}"/>
 
