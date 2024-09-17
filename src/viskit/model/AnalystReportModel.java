@@ -111,14 +111,17 @@ public final class AnalystReportModel extends mvcAbstractModel {
      * @param map the set of PCLs that have specific properties set for type statistic desired
      */
     public AnalystReportModel(String statisticsReportPath, Map<String, AssemblyNode> map) {
-
+        Document doc = null;
+        setStatsReportPath(statisticsReportPath);
         try {
-            Document doc = EventGraphCache.instance().loadXML(statisticsReportPath);
-            setStatsReportPath(statisticsReportPath);
-            setStatsReport(doc);
+            doc = EventGraphCache.instance().loadXML(statisticsReportPath);
         } catch (Exception e) {
-            LOG.error("Exception reading "+statisticsReportPath + " : "+e.getMessage());
+            LOG.error("Exception reading {}", statisticsReportPath + " : " + e.getMessage());
         }
+        if (doc == null)
+            return; // stats XML was not written to, not selected for recording
+
+        setStatsReport(doc);
         setPclNodeCache(map);
         initDocument();
     }
@@ -904,6 +907,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
     }
 
     private void replaceChild(Element parent, Element child) {
+        if (parent == null)
+            return;
+
         parent.removeChildren(child.getName());
         parent.addContent(child);
     }
@@ -965,16 +971,16 @@ public final class AnalystReportModel extends mvcAbstractModel {
         setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
     }
 
-    public boolean isDebug()                     { return debug; }
+    public boolean isDebug()                     {return debug;}
 
-    public Document   getReportJdomDocument()    { return reportJdomDocument; }
-    public Document   getStatsReport()           { return statsReport; }
-    public Element    getRootElement()           { return rootElement; }
-    public String     getFileName()              { return fileName; }
-    public String     getAuthor()                { return rootElement.getAttributeValue("author"); }
-    public String     getClassification()        { return rootElement.getAttributeValue("classification");}
-    public String     getDateOfReport()          { return rootElement.getAttributeValue("date");}
-    public String     getReportName()            { return rootElement.getAttributeValue("name"); }
+    public Document   getReportJdomDocument()    {return reportJdomDocument;}
+    public Document   getStatsReport()           {return statsReport;}
+    public Element    getRootElement()           {return rootElement;}
+    public String     getFileName()              {return fileName;}
+    public String     getAuthor()                {return rootElement.getAttributeValue("author");}
+    public String     getClassification()        {return rootElement.getAttributeValue("classification");}
+    public String     getDateOfReport()          {return rootElement.getAttributeValue("date");}
+    public String     getReportName()            {return rootElement.getAttributeValue("name");}
 
     /**
      * Called twice.  Once for preliminary AR, then for full integration AR.
@@ -986,6 +992,9 @@ public final class AnalystReportModel extends mvcAbstractModel {
         // Subsequent calls within the same runtime require a cleared cache
         // which this does
         EventGraphCache.instance().makeEntityTable(assemblyFile);
+        if (simConfig == null)
+            return; // stats report not set for recording
+
         simConfig.addContent(EventGraphCache.instance().getEntityTable());
         entityParameters.addContent(makeParameterTables());
         createBehaviorDescriptions();
