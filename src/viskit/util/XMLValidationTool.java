@@ -35,6 +35,7 @@ import org.xml.sax.SAXParseException;
 
 // Local imports
 import edu.nps.util.LogUtils;
+import javax.xml.transform.stream.StreamSource;
 
 import viskit.ViskitConfig;
 
@@ -58,18 +59,16 @@ public class XMLValidationTool {
     public static final String ASSEMBLY_SCHEMA = "http://diana.nps.edu/Simkit/assembly.xsd";
     public static final String EVENT_GRAPH_SCHEMA = "http://diana.nps.edu/Simkit/simkit.xsd";
 
-    /** The locally resolved location for assembly.xsd */
-    public static final String LOCAL_ASSEMBLY_SCHEMA =
-            System.getProperty("user.dir") + "/Schemas/assembly.xsd";
+    /** The locally resolved location for assembly schema */
+    public static final String LOCAL_ASSEMBLY_SCHEMA = "xsd/assembly.xsd";
 
-    /** The locally resolved location for simkit.xsd */
-    public static final String LOCAL_EVENT_GRAPH_SCHEMA =
-            System.getProperty("user.dir") + "/Schemas/simkit.xsd";
+    /** The locally resolved location for simkit schema */
+    public static final String LOCAL_EVENT_GRAPH_SCHEMA = "xsd/simkit.xsd";
 
     static final Logger LOG = LogUtils.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
-    private File xmlFile, schemaFile;
+    private String xmlFile, schemaFile;
     private boolean valid;
 
     /**
@@ -77,7 +76,7 @@ public class XMLValidationTool {
      * @param xmlFile the scene file to validate
      * @param schema the XML schema to validate the xmlFile against
      */
-    public XMLValidationTool(File xmlFile, File schema) {
+    public XMLValidationTool(String xmlFile, String schema) {
         setXmlFile(xmlFile);
         setSchemaFile(schema);
 
@@ -104,7 +103,7 @@ public class XMLValidationTool {
         // a java.net.URL or a javax.xml.transform.Source instead.
         Schema schemaDoc = null;
         try {
-            schemaDoc = factory.newSchema(getSchemaFile());
+            schemaDoc = factory.newSchema(new StreamSource(XMLValidationTool.class.getClassLoader().getResourceAsStream(getSchemaFile())));
         } catch (SAXException ex) {
             LOG.fatal("Unable to create Schema object: {}", ex);
         }
@@ -117,7 +116,7 @@ public class XMLValidationTool {
             validator.setErrorHandler(new MyHandler());
 
             // 5. Prepare to parse the document to be validated.
-            InputSource src = new InputSource(getXmlFile().getAbsolutePath());
+            InputSource src = new InputSource(getXmlFile());
             SAXSource source = new SAXSource(src);
 
             // 6. Parse, validate and report any errors.
@@ -159,22 +158,22 @@ public class XMLValidationTool {
         return valid;
     }
 
-    public File getXmlFile() {
+    public String getXmlFile() {
         return xmlFile;
     }
 
     /** Mutator method to change the X3D file to validate
      * @param file the file to set for this validator to validate
      */
-    public final void setXmlFile(File file) {
-        xmlFile = file;
+    public final void setXmlFile(String file) {
+        this.xmlFile = file;
     }
 
-    public File getSchemaFile() {
+    public String getSchemaFile() {
         return schemaFile;
     }
 
-    public final void setSchemaFile(File schema) {
+    public final void setSchemaFile(String schema) {
         this.schemaFile = schema;
     }
 
