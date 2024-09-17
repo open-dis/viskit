@@ -34,13 +34,13 @@
     </condition>
 
     <!-- ===== Build Viskit installer jars into ./installer directory ===== -->
-    
+
     <!-- Prerequisite for creating installer: you must have local izPack v5+ installed from http://izpack.org
          Place ${izpack.dist} key in nbproject/private/private.properties pointing to local izPack -->
     <path id="izpack.lib.path">
         <fileset dir="${izpack.dist}/lib" includes="*.jar"/>
     </path>
-  
+
     <taskdef name="izpack"
              classpathref="izpack.lib.path"
              classname="com.izforge.izpack.ant.IzPackTask"/>
@@ -113,7 +113,7 @@
                 <include name="Introduction.html"/>
             </fileset>
         </copy>
-        
+
         <antcall target="installers.common"/>
         <antcall target="make.win.unix.installer"/>
         <antcall target="make.mac.installer"/>
@@ -123,9 +123,6 @@
 
     <target name="installers.common">
         <mkdir dir="${installers.dir}/build"/>
-        <copy todir="${installers.dir}/stage/Schemas">
-            <fileset dir="${basedir}/Schemas"/>
-        </copy>
         <copy todir="${installers.dir}/stage/configuration">
             <fileset dir="${configuration.dir}"/>
         </copy>
@@ -171,7 +168,7 @@
                  classname="net.sf.launch4j.ant.Launch4jTask"
                  classpath="${launch4j}/launch4j.jar:${launch4j}/lib/xstream.jar"/>
 
-         Associate the viskit-exe.jar with a native win executable 
+         Associate the viskit-exe.jar with a native win executable
         <launch4j configFile="${installers.dir}/launch4jConfig.xml"/>-->
 
         <echo message="Running IzPack to build the installers..."/>
@@ -184,7 +181,7 @@
                 installerType="standard"
                 baseDir="${installers.dir}"
                 inheritAll="true"
-                compression="default" 
+                compression="default"
                 compressionlevel="9"
                 izPackDir="${izpack.dist}"
                 mkdirs="true"/>
