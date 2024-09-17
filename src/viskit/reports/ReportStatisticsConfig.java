@@ -9,7 +9,6 @@ import edu.nps.util.LogUtils;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -21,12 +20,12 @@ import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom.JDOMException;
 
 import simkit.stat.SampleStatistics;
 import viskit.VGlobals;
 import viskit.ViskitProject;
+import viskit.doe.FileHandler;
 
 /**
  * This class serves as the intermediate step between viskit.xsd.BasicAssembly and
@@ -118,12 +117,12 @@ public class ReportStatisticsConfig {
 
                 // TODO: verify this logic works with/without underscores present
                 entityIndex[idx] = key.substring(0, seperator);
-                
+
                 if (seperator > 0)
                     propertyIndex[idx] = key.substring(seperator + 1, key.length());
                 else
                     propertyIndex[idx] = key.substring(seperator, key.length());
-                
+
                 System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
                 idx++;
             }
@@ -220,43 +219,29 @@ public class ReportStatisticsConfig {
      * @return the String representation of this report
      */
     public String saveData(Document report) {
-
-        Date today;
-        String output;
         SimpleDateFormat formatter;
+        String dateFormat;
 
         formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-        today = new Date();
-        output = formatter.format(today);
+        Date today = new Date();
+        dateFormat = formatter.format(today);
 
-        FileWriter writer = null;
+        // Create a unique file name for each DTG/Location Pair
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        File anRptStatDir = vkp.getAnalystReportStatisticsDir();
+
+        String outputFile = (author + assemblyName + "_" + dateFormat + ".xml");
+        File f = new File(anRptStatDir, outputFile);
+
         try {
-            Format fmt = Format.getPrettyFormat();
-            fmt.setOmitDeclaration(false);
-            XMLOutputter outputter = new XMLOutputter(fmt);
-
-            // Create a unique file name for each DTG/Location Pair
-            ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
-            File anStatDir = vkp.getAnalystReportStatisticsDir();
-
-            String outputFile = (author + assemblyName + "_" + output + ".xml");
-            File f = new File(anStatDir, outputFile);
-            writer = new FileWriter(f);
-
-            outputter.output(report, writer);
-
-            return f.getAbsolutePath();
-
-        } catch (IOException ioe) {
-            LOG.error(ioe);
-//            ioe.printStackTrace();
+            FileHandler.marshallJdom(f, report, false);
+        } catch (JDOMException | IOException ex) {
+            LOG.error( ex);
+            ex.printStackTrace(System.err);
             return null;
-        } finally {
-            try {
-                if (writer != null)
-                    writer.close();
-            } catch (IOException ioe) {}
         }
+
+        return f.getAbsolutePath();
     }
-    
+
 } // end class ReportStatisticsConfig
