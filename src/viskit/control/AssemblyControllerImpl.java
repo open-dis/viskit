@@ -1554,8 +1554,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             /* We may have forgotten a parameter required for a super class */
             if (src == null) {
                 String msg = xmlFile + " did not translate to source code.\n" +
-                        "Please recheck that you have declared all parameters "
-                        + "in the @parameterMap";
+                        "Manually compile to determine cause";
                 LOG.error(msg);
                 messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", msg);
                 return null;
