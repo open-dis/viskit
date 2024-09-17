@@ -76,7 +76,7 @@ import viskit.doe.FileHandler;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
- * 
+ *
  * <p>
  *   <b>History:</b>
  *   <pre><b>
@@ -101,11 +101,8 @@ import viskit.doe.FileHandler;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
-
-    static Logger log = LogUtils.getLogger(EventGraphCache.class);
-
-    /** The jdom.Document object of the assembly file */
-    private Document assemblyDocument;
+    static final Logger LOG = LogUtils.getLogger(EventGraphCache.class);
+    private static EventGraphCache me;
 
     /**
      * The names and file locations of the the event graph files and image files
@@ -115,10 +112,9 @@ public class EventGraphCache {
     private final List<File> eventGraphFilesList;
     private final List<File> eventGraphImageFilesList;
 
-    private final String EVENT_GRAPH_IMAGE_DIR =
-            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
+    /** The jdom.Document object of the assembly file */
+    private Document assemblyDocument;
     private Element entityTable;
-    private static EventGraphCache me;
 
     public static synchronized EventGraphCache instance() {
         if (me == null) {
@@ -143,7 +139,7 @@ public class EventGraphCache {
     }
 
     /**
-     * Creates the entity table for an analyst report xml object.  Also aids in
+     * Creates the entity table for an analyst report xml object. Also aids in
      * opening EG files that are a SimEntity node of an Assy file
      *
      * @param assyFile the assembly file loaded
@@ -197,11 +193,12 @@ public class EventGraphCache {
     }
 
     public Document loadXML(File xmlFile) {
-        Document doc = null;
+        Document doc;
         try {
             doc = FileHandler.unmarshallJdom(xmlFile);
         } catch (JDOMException | IOException ex) {
-            log.error(ex);
+            LOG.error(ex);
+            return null;
         }
         return doc;
     }
@@ -214,7 +211,7 @@ public class EventGraphCache {
      * @param egFile the EG file type and name to save
      */
     private void saveEventGraphReferences(File egFile) {
-        log.debug("EG: " + egFile);
+        LOG.debug("EG: {}", egFile);
 
         // find the package seperator
         int lastSlash = egFile.getPath().lastIndexOf(File.separator);
@@ -224,10 +221,13 @@ public class EventGraphCache {
         String egName = egFile.getPath().substring(lastSlash + 1, pos);
         eventGraphNamesList.add(pkg + "." + egName);
 
-        log.debug("EventGraph Name: " + egName);
+        LOG.debug("EventGraph Name: {}", egName);
 
-        File imgFile = new File(EVENT_GRAPH_IMAGE_DIR + "/" + pkg + "/" + egName + ".xml.png");
-        log.debug("Event Graph Image location: " + imgFile);
+        String eg_img_dir =
+            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
+
+        File imgFile = new File(eg_img_dir + "/" + pkg + "/" + egName + ".xml.png");
+        LOG.debug("Event Graph Image location: {}", imgFile);
 
         eventGraphImageFilesList.add(imgFile);
     }
