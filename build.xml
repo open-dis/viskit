@@ -649,7 +649,8 @@ their descpritions.
         <echo message="viskit.args=${viskit.args}"/>
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
-              fork="true">
+              fork="true"
+              dir="${start.dir}">
             <classpath path="${extra.classpath}"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg line="${run.args}"/>
