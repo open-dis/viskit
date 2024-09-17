@@ -192,7 +192,6 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
      * Initialize the user interface
      */
     private void initUI() {
-
         buildMenus();
         buildToolbar();
 
@@ -216,9 +215,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     public VgraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
-        if (jsplt == null) {
-            return null;
-        }
+        if (jsplt == null) {return null;}
 
         JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
         return (VgraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
@@ -720,6 +717,9 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
     public void rebuildLEGOTreePanels() {
+        if (getCurrentVgacw() == null)
+            return; // no LEGO panel yet
+
         lTree.clear();
         pclTree.clear();
         JSplitPane treeSplit = buildTreePanels();
