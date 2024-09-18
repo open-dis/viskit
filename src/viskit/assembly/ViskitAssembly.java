@@ -75,7 +75,6 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void createDesignPointStats() {
-
         super.createDesignPointStats();
 
         // the super.
@@ -327,5 +326,5 @@ public class ViskitAssembly extends BasicAssembly {
             this.source = s;
         }
     }
-    
+
 } // end class ViskitAssembly
