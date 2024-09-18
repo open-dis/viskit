@@ -197,9 +197,9 @@ their descpritions.
     <target name="init"
             depends="initializeAll,check.JAVA_HOME,check.ANT_HOME"
             description="Preparatory actions required for all targets">
-
-        <tstamp/>
-
+        <tstamp>
+            <format property="TODAY_US" pattern="EEE, d MMM yyyy HHmm Z" locale="en,US"/>
+        </tstamp>
         <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
         <echo message="Build version ${product.Version}"/>
         <echo message="Base directory: ${basedir}"/>
