@@ -639,7 +639,6 @@ their descpritions.
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target name="quick.debug" depends="init" description="Debug Viskit, don't check dependencies, don't rebuild">
-
         <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
         <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
