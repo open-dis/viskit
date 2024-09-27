@@ -72,8 +72,11 @@ Post release fixes / upgrades / issues:
     reopening, it gets placed then
 
   ****** FIXES / UPGRADES:
-    The validation tool now finds the assembly and simkit schemas inside the
-    viskit.jar
+    Overrode simkit.util.ClassFinder so that it finds
+    config/ClassFinder.properties on the runtime classpath
+
+    The validation tool now finds the assembly and simkit schemas on the runtime
+    classpath
 
     (Critical)
     Removed source for unnecessary compilation and file checking when pointing
