@@ -1080,7 +1080,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     @Override
     public void showAndSaveSource(String className, String s, String fileName) {
         final JFrame f = new SourceWindow(this, className, s);
-        f.setTitle("Generated source from " + fileName);
+        f.setTitle("Generated Java source from: " + fileName);
 
         Runnable r = () -> {
             f.setVisible(true);
