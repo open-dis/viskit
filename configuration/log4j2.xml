@@ -8,15 +8,15 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${CONSOLE_PATTERN}"/>
         </Console>
-        <RollingFile name="RollingLogFile" fileName="logs/error.log.0" filePattern="logs/error.log.%i" >
+        <RollingFile name="RollingLogFile" fileName="logs/error.0.log" filePattern="logs/error.%i.log" >
             <LevelRangeFilter minLevel="FATAL" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="${LOG_PATTERN}"/> 
+            <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingFile>
-        <RollingFile name="InfoLog" fileName="logs/viskit.log.0" filePattern="logs/viskit.log.%i">
+        <RollingFile name="InfoLog" fileName="logs/viskit.0.log" filePattern="logs/viskit.%i.log">
             <LevelRangeFilter minLevel="WARN" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
@@ -24,7 +24,7 @@
             </Policies>
             <DefaultRolloverStrategy max="20" fileIndex="min"/>
         </RollingFile>
-        <RollingFile name="DebugLog" fileName="logs/debug.log.0" filePattern="logs/debug.log.%i">
+        <RollingFile name="DebugLog" fileName="logs/debug.0.log" filePattern="logs/debug.%i.log">
             <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
