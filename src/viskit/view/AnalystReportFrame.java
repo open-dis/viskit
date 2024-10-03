@@ -35,8 +35,10 @@ package viskit.view;
 
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
+
 import edu.nps.util.LogUtils;
 import edu.nps.util.SpringUtilities;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -59,7 +61,9 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+
 import org.apache.logging.log4j.Logger;
+
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
 import viskit.mvc.mvcAbstractJFrameView;
@@ -101,7 +105,8 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     }
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
-    JComboBox<String> classifiedTF = new JComboBox<>(new String[]{"UNCLASSIFIED", "FOUO", "CONFIDENTIAL", "SECRET", "TOP SECRET"});
+    // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
+    JComboBox<String> classifiedTF = new JComboBox<>(new String[] {"UNRESTRICTED", "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"});
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
@@ -364,7 +369,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         arb.setSimLocationProductionNotes(locProductionNotesTA.getText());
         arb.setSimLocationConclusions(locConclusionsTA.getText());
         arb.setPrintSimLocationImage(wantLocationImages.isSelected());
-        
+
         String s = simLocImgTF.getText().trim();
         if (s != null && !s.isEmpty())
             arb.setLocationImage(s);
@@ -860,7 +865,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
 
         fileMenu.add(buildMenuItem(controller,
                 "openAnalystReport",
-                "Open another analyst report",
+                "Open another analyst report XML",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
 
