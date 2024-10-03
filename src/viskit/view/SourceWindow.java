@@ -186,7 +186,7 @@ public class SourceWindow extends JFrame {
                 return;
             }
             File f = saveChooser.getSelectedFile();
-            
+
             if (f.exists()) {
                 int r = JOptionPane.showConfirmDialog(SourceWindow.this, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -194,15 +194,15 @@ public class SourceWindow extends JFrame {
                     return;
                 }
             }
-            
+
             try {
                 try (FileWriter fw = new FileWriter(f)) {
                     fw.write(src);
                 }
                 SourceWindow.this.dispose();
             } catch (IOException ex) {
-                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
-                        "File I/O Error", 
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+                        "File I/O Error",
                         "\n" + f.getName() + "\n" + ex.getMessage()
                 );
             }
@@ -431,6 +431,7 @@ class sysOutDialog extends JDialog implements ActionListener {
         //Lay out the label and scroll pane from top to bottom.
         JPanel listPane = new JPanel();
         listPane.setLayout(new BoxLayout(listPane, BoxLayout.PAGE_AXIS));
+        // TODO: Prepend Compiler test: {file name here} as the pant title
         JLabel label = new JLabel("Compiler results");
         label.setLabelFor(list);
         listPane.add(label);
