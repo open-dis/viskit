@@ -200,8 +200,8 @@ their descpritions.
         <tstamp>
             <format property="TODAY_US" pattern="EEE, d MMM yyyy HHmm Z" locale="en,US"/>
         </tstamp>
-        <echo message="Build started on ${DSTAMP} at ${TSTAMP}"/>
-        <echo message="Build version ${product.Version}"/>
+        <echo message="${product.shortname} v${product.Version}"/>
+        <echo message="Build started on ${TODAY_US}"/>
         <echo message="Base directory: ${basedir}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
 
@@ -343,7 +343,7 @@ their descpritions.
             <attribute name="Implementation-Title"
                        value="${impl.title}"/>
             <attribute name="Implementation-Version"
-                       value="${product.Version} built on ${TODAY} at ${TSTAMP} local"/>
+                       value="${product.Version} built on ${TODAY_US}"/>
             <attribute name="Implementation-Vendor"
                        value="${nps}, ${moves.institute}, ${savage.research.group}"/>
             <attribute name="Implementation-URL"
