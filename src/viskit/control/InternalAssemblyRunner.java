@@ -478,7 +478,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 }
             }
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
+            try (Writer bw = new BufferedWriter(new FileWriter(fil))) {
                 bw.write(runPanel.soutTA.getText());
             } catch (IOException e1) {
                 VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
