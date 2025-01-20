@@ -1,0 +1,39 @@
+package viskit.mvc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Abstract root class of the model hierarchy. Provides basic notification behavior.
+ *
+ * From an article at www.jaydeetechnology.co.uk
+ *
+ * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Mar 2, 2004 : 11:04:25 AM
+ * @version $Id$
+ */
+public abstract class Mvc2AbstractModel implements Mvc2Model {
+
+    private final List<Mvc2ModelListener> listeners = new ArrayList<>(4);
+
+    @Override
+    public void notifyChanged(Mvc2ModelEvent event) {
+        for (Mvc2ModelListener ml : listeners) {
+            ml.modelChanged(event);
+        }
+    }
+
+    public void addModelListener(Mvc2ModelListener l) {
+        if (!listeners.contains(l)) {
+            listeners.add(l);
+        }
+    }
+
+    public void removeModelListener(Mvc2ModelListener l) {
+        listeners.remove(l);
+    }
+}

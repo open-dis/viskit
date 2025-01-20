@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import viskit.model.*;
-import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.Mvc2RecentFileListener;
 
 /**
  * @author Mike Bailey
@@ -214,9 +214,9 @@ public interface EventGraphController {
 
     void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void addRecentEgFileListener(mvcRecentFileListener lis);
+    void addRecentEgFileListener(Mvc2RecentFileListener lis);
 
-    void removeRecentEgFileListener(mvcRecentFileListener lis);
+    void removeRecentEgFileListener(Mvc2RecentFileListener lis);
 
     Set<String> getRecentEGFileSet();
 

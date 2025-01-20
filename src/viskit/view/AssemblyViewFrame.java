@@ -75,11 +75,8 @@ import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.VgraphAssemblyComponentWrapper;
 import viskit.jgraph.vGraphAssemblyModel;
 import viskit.model.*;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
-import viskit.mvc.mvcModel;
-import viskit.mvc.mvcModelEvent;
-import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.Mvc2AbstractJFrameView;
+import viskit.mvc.Mvc2ModelEvent;
 import viskit.util.AssemblyFileFilter;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
@@ -88,6 +85,9 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.view.dialog.PclNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
+import viskit.mvc.Mvc2Controller;
+import viskit.mvc.Mvc2Model;
+import viskit.mvc.Mvc2RecentFileListener;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -130,7 +130,7 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
  *   to be used to configure an assembly file for sim running
  * </pre>
  */
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
+public class AssemblyViewFrame extends Mvc2AbstractJFrameView implements AssemblyView, DragStartListener {
 
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
@@ -162,7 +162,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(mvcController controller) {
+    public AssemblyViewFrame(Mvc2Controller controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI();   // build widgets
@@ -184,7 +184,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initMVC(Mvc2Controller ctrl) {
         setController(ctrl);
     }
 
@@ -257,7 +257,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             // Key to getting the LEGOs tree panel in each tab view
             myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
 
-            setModel((mvcModel) myVgacw.assyModel); // hold on locally
+            setModel((Mvc2Model) myVgacw.assyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
@@ -272,7 +272,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    class RecentAssyFileListener implements mvcRecentFileListener {
+    class RecentAssyFileListener implements Mvc2RecentFileListener {
 
         @Override
         public void listChanged() {
@@ -857,7 +857,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void modelChanged(mvcModelEvent event) {
+    public void modelChanged(Mvc2ModelEvent event) {
         switch (event.getID()) {
             default:
                 getCurrentVgacw().viskitModelChanged((ModelEvent) event);

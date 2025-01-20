@@ -35,12 +35,12 @@ package viskit.mvc;
 
 /** Handles recent assembly and event graphs files that were opened for a project
  *
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.mvc.mvcRecentFileListener">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.mvc.Mvc2RecentFileListener">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public interface mvcRecentFileListener {
+public interface Mvc2RecentFileListener {
 
     /** Each of the view frames will handle recent file openings */
     void listChanged();
 
-} // end class file mvcRecentFileListener.java
+} // end class file Mvc2RecentFileListener.java
