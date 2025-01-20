@@ -63,7 +63,7 @@ import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
 import viskit.model.ModelEvent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
@@ -753,7 +753,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
-        VGlobals vGlobals = VGlobals.instance();
+        ViskitGlobals vGlobals = ViskitGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
@@ -950,7 +950,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, title, type);
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainAppWindow(), msg, title, type);
     }
 
     @Override
@@ -963,8 +963,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
-        if (VGlobals.instance().getCurrentViskitProject() != null)
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         else
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
     }
@@ -1042,7 +1042,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             jfc = buildOpenSaveChooser();
 
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
         if (showUniqueName)
@@ -1071,7 +1071,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
                     deleteCanceledSave(file.getParentFile());
             }
         }

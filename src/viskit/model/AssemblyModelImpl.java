@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
@@ -201,7 +201,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
-            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
+            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);
@@ -891,7 +891,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (vi instanceof VInstantiator.Array) {
             VInstantiator.Array via = (VInstantiator.Array) vi;
 
-            if (VGlobals.instance().isArray(via.getType()))
+            if (ViskitGlobals.instance().isArray(via.getType()))
                 return buildParamFromArray(via);
             else if (via.getType().contains("..."))
                 return buildParamFromVarargs(via);

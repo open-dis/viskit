@@ -69,7 +69,7 @@ import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitConfig;
 
@@ -738,7 +738,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (ConcurrentModificationException cme) {
-                    VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+                    ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                             "Assembly Run Error",
                             cme + "\nSimulation will terminate"
                     );
@@ -820,7 +820,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
-            ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
+            ClassLoader localLoader = ViskitGlobals.instance().getWorkClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);

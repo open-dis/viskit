@@ -26,7 +26,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.Help;
 import viskit.model.ModelEvent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
@@ -497,7 +497,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public String addParameterDialog() {
 
-        if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
@@ -509,7 +509,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
@@ -683,9 +683,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(VGlobals.instance().getMainAppWindow());
-        help.mainFrameLocated(VGlobals.instance().getMainAppWindow().getBounds());
-        VGlobals.instance().setHelp(help); // single instance for all viskit frames
+        Help help = new Help(ViskitGlobals.instance().getMainAppWindow());
+        help.mainFrameLocated(ViskitGlobals.instance().getMainAppWindow().getBounds());
+        ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -1069,8 +1069,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for EventGraphs
-        if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
         } else {
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
         }
@@ -1096,7 +1096,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * the Actions library.
      */
     public void openProject() {
-        VGlobals.instance().getAssemblyEditor().openProject();
+        ViskitGlobals.instance().getAssemblyEditor().openProject();
     }
 
     /**
@@ -1134,7 +1134,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
         jfc.setDialogTitle("Save Event Graph");
 
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }
@@ -1164,24 +1164,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * @param file to candidate EG file
      */
     private void deleteCanceledSave(File file) {
-        VGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
+        ViskitGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        return VGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
+        return ViskitGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
     }
 
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), node); // blocks
+        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
     @Override
@@ -1191,27 +1191,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public boolean doEditParameter(vParameter param) {
-        return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), param);    // blocks
+        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), param);    // blocks
     }
 
     @Override
     public boolean doEditStateVariable(vStateVariable var) {
-        return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), var);
+        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), var);
     }
 
     @Override
     public int genericAsk(String title, String msg) {
-        return VGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
     }
 
     @Override
     public int genericAskYN(String title, String msg) {
-        return VGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
     }
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        VGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
+        ViskitGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
     }
 
     @Override

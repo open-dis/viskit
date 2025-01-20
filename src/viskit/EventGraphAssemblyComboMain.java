@@ -162,11 +162,11 @@ public class EventGraphAssemblyComboMain {
 
     private static void setupMacUI() {
         Desktop.getDesktop().setAboutHandler(e -> {
-            Help help = VGlobals.instance().getHelp();
+            Help help = ViskitGlobals.instance().getHelp();
             help.aboutViskit();
         });
 
-        final MainFrame mf = (MainFrame) VGlobals.instance().getMainAppWindow();
+        final MainFrame mf = (MainFrame) ViskitGlobals.instance().getMainAppWindow();
 
         // CMD Q for macOS
         Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {

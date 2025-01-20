@@ -49,7 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
@@ -83,7 +83,7 @@ public class AnalystReportController extends mvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -136,7 +136,7 @@ public class AnalystReportController extends mvcAbstractController {
             }
         }
 
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser openChooser = new JFileChooser(aRDir);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report files only", "xml");
         openChooser.setFileFilter(filter);
@@ -183,8 +183,8 @@ public class AnalystReportController extends mvcAbstractController {
     }
 
     public void generateHtmlReport() {
-        if (!VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()) {
-            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+        if (!ViskitGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()) {
+            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
@@ -203,7 +203,7 @@ public class AnalystReportController extends mvcAbstractController {
 
         outFile = outFile.substring(0, idx) + ".html";
 
-        File aRDir = VGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
+        File aRDir = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDir();
         JFileChooser genChooser = new JFileChooser(aRDir);
         genChooser.setSelectedFile(new File(outFile));
         genChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -286,7 +286,7 @@ public class AnalystReportController extends mvcAbstractController {
         try {
             Desktop.getDesktop().browse(f.toURI());
         } catch (IOException ex) {
-            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><center>Error displaying HTML:<br>" + ex.getMessage()
             );

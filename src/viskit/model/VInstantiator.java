@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
@@ -286,7 +286,7 @@ public abstract class VInstantiator {
                         instrs.add(buildMultiParameter(mp));
                     } else { // no constructors, should be a FactoryParameter or array of them
 
-                        if (VGlobals.instance().isArray(type)) {
+                        if (ViskitGlobals.instance().isArray(type)) {
                             mp = of.createMultiParameter();
                             mp.setType(type);
                             mp.setName(name);
@@ -320,7 +320,7 @@ public abstract class VInstantiator {
             VInstantiator vAorC;
 
             // Check for special case of varargs
-            if (VGlobals.instance().isArray(p.getType()) || p.getType().contains("..."))
+            if (ViskitGlobals.instance().isArray(p.getType()) || p.getType().contains("..."))
                 vAorC = buildMultiParameter(p, true);
             else {
                 if (VStatics.debug)
@@ -471,7 +471,7 @@ public abstract class VInstantiator {
                         pClazz = VStatics.classForName(pType);
 
                         if (pClazz == null) {
-                            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
+                            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
                                     "Basic Java Class Name Found",
                                     "<html><body><p align='center'>" +
                                     "Please check Event Graph <b>" + type + "</b> parameter(s) for compliance using" +
@@ -702,7 +702,7 @@ public abstract class VInstantiator {
                 args = VStatics.stripOutJavaDotLang(args);
 
                 // Show varargs symbol vice []
-                if (VGlobals.instance().isArray(args)) {
+                if (ViskitGlobals.instance().isArray(args)) {
                     args = VStatics.makeVarArgs(args);
                     b.append(args);
                 } else {

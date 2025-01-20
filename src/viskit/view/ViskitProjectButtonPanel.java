@@ -42,7 +42,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.mvc.mvcController;
@@ -169,7 +169,7 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
     File file;
     if (!firstTime) {
-        mvcController vac = VGlobals.instance().getAssemblyController();
+        mvcController vac = ViskitGlobals.instance().getAssemblyController();
         if (vac != null) {
 
             AssemblyView vaw = (AssemblyView) vac.getView();
@@ -226,7 +226,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     // Since this dialog is modal, need to dispose() before we can move along in the startup
     defaultButtActionPerformed(null);
 
-    // The work directory will have already been created by default as VGlobals.init
+    // The work directory will have already been created by default as ViskitGlobals.init
     // was already called which creates the directory ${user.home}/.viskit
     // during constructor init
 }//GEN-LAST:event_createButtActionPerformed
@@ -236,7 +236,7 @@ private void exitButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     // I don't like the idea of a SysExit call right here, but the way each
     // frame component needs to develop while starting Viskit; each has to
-    // finish before the VGlobals.instance().sysExit(0) call will work
+    // finish before the ViskitGlobals.instance().sysExit(0) call will work
     // properly, so, reluctantly...
     System.exit(0);
 }//GEN-LAST:event_exitButtActionPerformed

@@ -50,7 +50,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
@@ -122,7 +122,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void begin() {
-        File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+        File projPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -337,7 +337,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
-                    ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
+                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel vAMod = (AssemblyModel) getModel();
                     markAssyConfigClosed(vAMod.getLastFile());
@@ -481,7 +481,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (mod == null) {return;}
         GraphMetadata gmd = mod.getMetaData();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -550,13 +550,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newProject() {
         if (handleProjectClosing()) {
-            VGlobals.instance().initProjectHome();
-            VGlobals.instance().createWorkDirectory();
+            ViskitGlobals.instance().inititalizeProjectHome();
+            ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (egFiles.length == 0) {
-                ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
+                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
     }
@@ -573,7 +573,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projDir = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
                 projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
                 logFile = new File(projDir, "debug.log");
 
@@ -635,7 +635,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public boolean handleProjectClosing() {
         boolean retVal = true;
-        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";
 
@@ -652,21 +652,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void doProjectCleanup() {
         closeAll();
-        ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
         clearRecentAssyFileList();
-        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
-        VGlobals.instance().getCurrentViskitProject().closeProject();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
+        ViskitGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override
     public void openProject(File file) {
         VStatics.setViskitProjectFile(file);
-        VGlobals.instance().createWorkDirectory();
+        ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        VGlobals.instance().getEventGraphEditor().showProjectName();
+        adjustRecentProjSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
         runner.resetRunner();
     }
 
@@ -675,7 +675,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
         GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -697,7 +697,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         boolean modified =
-                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -743,7 +743,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void postQuit() {
-        VGlobals.instance().quitAssemblyEditor();
+        ViskitGlobals.instance().quitAssemblyEditor();
     }
 
     private boolean closeAll = false;
@@ -1486,7 +1486,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
             File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
@@ -1656,7 +1656,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 if (execStrings == null) {
 
-                    if (VGlobals.instance().getActiveAssemblyModel() == null) {
+                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
                         messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
@@ -1842,7 +1842,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened
-                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
             }
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);

@@ -17,7 +17,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EvGraphNode;
@@ -247,7 +247,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
+                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");

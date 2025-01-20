@@ -44,7 +44,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.mvc.mvcAbstractJFrameView;
 import viskit.mvc.mvcController;
@@ -70,7 +70,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
     @Override
     public void listChanged() {
-        AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
+        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Set<String> lis = acontroller.getRecentProjFileSet();
 
         for (JMenu m : openRecentProjMenus) {
@@ -117,7 +117,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
+            AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;
             Object obj = getValue(VStatics.FULL_PATH);

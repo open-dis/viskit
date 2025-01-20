@@ -3,7 +3,7 @@ package viskit.jgraph;
 import java.awt.event.MouseEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.control.EventGraphController;
 import viskit.model.Edge;
 import viskit.model.EventNode;
@@ -51,7 +51,7 @@ public class vGraphUI extends BasicGraphUI {
      */
     private void createEditDialog(Object cell) {
 
-        EventGraphController cntl = (EventGraphController) VGlobals.instance().getEventGraphController();
+        EventGraphController cntl = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
         if (cell instanceof vEdgeCell) {
             Edge e = (Edge) ((DefaultMutableTreeNode) cell).getUserObject();
             
