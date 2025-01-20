@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
     <Properties>
-        <Property name="CONSOLE_PATTERN">%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %style{%d{yyyy MMM dd HH:mm:ss 'GMT'Z}}{blue} [%t] %C:%L - %m%n</Property>
-        <Property name="LOG_PATTERN">[%-5level] %d{yyyy MMM dd HH:mm:ss 'GMT'Z} [%t] %C:%L - %m%n</Property>
+        <Property name="LOG_PATTERN" value="[%-5level] %d{yyyy MMM dd HH:mm:ss 'GMT'Z} [%t] %C:%L - %m%n"/>
+        <Property name="CONSOLE_PATTERN" value="%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %style{%d{yyyy MMM dd HH:mm:ss 'GMT'Z}}{blue} [%t] %C:%L - %m%n"/>
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
@@ -14,7 +18,7 @@
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
-            <DefaultRolloverStrategy max="20"/>
+            <!--<DefaultRolloverStrategy max="20" fileIndex="min"/>-->
         </RollingFile>
         <RollingFile name="InfoLog" fileName="logs/viskit.0.log" filePattern="logs/viskit.%i.log">
             <LevelRangeFilter minLevel="WARN" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -22,7 +26,7 @@
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
-            <DefaultRolloverStrategy max="20" fileIndex="min"/>
+            <!--<DefaultRolloverStrategy max="20" fileIndex="min"/>-->
         </RollingFile>
         <RollingFile name="DebugLog" fileName="logs/debug.0.log" filePattern="logs/debug.%i.log">
             <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
