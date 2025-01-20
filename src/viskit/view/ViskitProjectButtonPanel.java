@@ -45,8 +45,8 @@ import javax.swing.SwingUtilities;
 import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
-import viskit.mvc.mvcController;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
+import viskit.mvc.MvcController;
 
 /**
  * Utility to help guide the user on Viskit start up options, or when a new
@@ -169,7 +169,7 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
 private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtActionPerformed
     File file;
     if (!firstTime) {
-        mvcController vac = ViskitGlobals.instance().getAssemblyController();
+        MvcController vac = ViskitGlobals.instance().getAssemblyController();
         if (vac != null) {
 
             AssemblyView vaw = (AssemblyView) vac.getView();

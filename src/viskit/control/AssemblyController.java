@@ -8,7 +8,7 @@ import java.util.Vector;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
-import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.MvcRecentFileListener;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -236,17 +236,17 @@ public interface AssemblyController {
     /** Screen capture a snapshot of the Assembly View Frame */
     void captureWindow();
 
-    void addRecentAssyFileSetListener(mvcRecentFileListener lis);
+    void addRecentAssyFileSetListener(MvcRecentFileListener lis);
 
-    void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
+    void removeRecentAssyFileSetListener(MvcRecentFileListener lis);
 
     Set<String> getRecentAssyFileSet();
 
     void clearRecentAssyFileList();
 
-    void addRecentProjFileSetListener(mvcRecentFileListener lis);
+    void addRecentProjFileSetListener(MvcRecentFileListener lis);
 
-    void removeRecentProjFileSetListener(mvcRecentFileListener lis);
+    void removeRecentProjFileSetListener(MvcRecentFileListener lis);
 
     Set<String> getRecentProjFileSet();
 

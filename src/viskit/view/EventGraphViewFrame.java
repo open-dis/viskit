@@ -35,17 +35,17 @@ import viskit.images.SchedArcIcon;
 import viskit.jgraph.VgraphComponentWrapper;
 import viskit.jgraph.vGraphModel;
 import viskit.model.*;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
-import viskit.mvc.mvcModel;
-import viskit.mvc.mvcModelEvent;
-import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcModelEvent;
 import viskit.util.EventGraphFileFilter;
 import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
 import viskit.view.dialog.SettingsDialog;
+import viskit.mvc.MvcController;
+import viskit.mvc.MvcModel;
+import viskit.mvc.MvcRecentFileListener;
 
 /**
  Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -73,7 +73,7 @@ import viskit.view.dialog.SettingsDialog;
   @since 12:52:59 PM
   @version $Id$
  */
-public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
+public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView {
 
     private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
 
@@ -105,7 +105,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Constructor; lays out initial GUI objects
      * @param ctrl the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(mvcController ctrl) {
+    public EventGraphViewFrame(MvcController ctrl) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(ctrl);   // set up mvc linkages
         initUI();    // build widgets
@@ -147,7 +147,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initMVC(MvcController ctrl) {
         setController(ctrl);
     }
 
@@ -228,7 +228,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 //                ((EventGraphController)getController()).save();
 //            }
 
-            setModel((mvcModel) myVgcw.model);    // hold on locally
+            setModel((MvcModel) myVgcw.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
 //            adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
@@ -519,7 +519,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         return null;
     }
 
-    class RecentEgFileListener implements mvcRecentFileListener {
+    class RecentEgFileListener implements MvcRecentFileListener {
 
         @Override
         public void listChanged() {
@@ -1221,7 +1221,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void modelChanged(mvcModelEvent event) {
+    public void modelChanged(MvcModelEvent event) {
         VgraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
         ParametersPanel pp = vgcw.paramPan;
         StateVariablesPanel vp = vgcw.varPan;

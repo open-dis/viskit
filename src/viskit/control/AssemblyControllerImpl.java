@@ -57,9 +57,7 @@ import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
-import viskit.mvc.mvcAbstractController;
-import viskit.mvc.mvcModel;
-import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.MvcAbstractController;
 import viskit.util.Compiler;
 import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
@@ -69,6 +67,8 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.mvc.MvcModel;
+import viskit.mvc.MvcRecentFileListener;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -80,7 +80,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 9:26:02 AM
  * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
+public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
@@ -391,39 +391,39 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         OpenAssembly.inst().removeListener(lis);
     }
 
-    Set<mvcRecentFileListener> recentAssyListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssyFileSetListener(mvcRecentFileListener lis) {
+    public void addRecentAssyFileSetListener(MvcRecentFileListener lis) {
         recentAssyListeners.add(lis);
     }
 
     @Override
-    public void removeRecentAssyFileSetListener(mvcRecentFileListener lis) {
+    public void removeRecentAssyFileSetListener(MvcRecentFileListener lis) {
         recentAssyListeners.remove(lis);
     }
 
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssyFileListeners() {
-        for (mvcRecentFileListener lis : recentAssyListeners)
+        for (MvcRecentFileListener lis : recentAssyListeners)
             lis.listChanged();
     }
 
-    Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentProjListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjFileSetListener(mvcRecentFileListener lis) {
+    public void addRecentProjFileSetListener(MvcRecentFileListener lis) {
         recentProjListeners.add(lis);
     }
 
     @Override
-    public void removeRecentProjFileSetListener(mvcRecentFileListener lis) {
+    public void removeRecentProjFileSetListener(MvcRecentFileListener lis) {
         recentProjListeners.remove(lis);
     }
 
     private void notifyRecentProjFileListeners() {
-        for (mvcRecentFileListener lis : recentProjListeners) {
+        for (MvcRecentFileListener lis : recentProjListeners) {
             lis.listChanged();
         }
     }
@@ -731,7 +731,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         // Check for dirty models before exiting
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vmod : modAr) {
-            setModel((mvcModel) vmod);
+            setModel((MvcModel) vmod);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -752,7 +752,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     public void closeAll() {
         AssemblyModel[] modAr = ((AssemblyView) getView()).getOpenModels();
         for (AssemblyModel vmod : modAr) {
-            setModel((mvcModel) vmod);
+            setModel((MvcModel) vmod);
             setCloseAll(true);
             close();
         }

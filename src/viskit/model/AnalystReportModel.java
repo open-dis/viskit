@@ -57,7 +57,7 @@ import viskit.ViskitGlobals;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
-import viskit.mvc.mvcAbstractModel;
+import viskit.mvc.MvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
 
@@ -70,7 +70,7 @@ import viskit.reports.LinearRegressionChart;
  * @since July 18, 2006, 7:04 PM
  * @version $Id$
  */
-public final class AnalystReportModel extends mvcAbstractModel {
+public final class AnalystReportModel extends MvcAbstractModel {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportModel.class);
 

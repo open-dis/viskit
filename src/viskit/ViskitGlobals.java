@@ -71,14 +71,14 @@ import viskit.model.AnalystReportModel;
 import viskit.model.EventNode;
 import viskit.model.Model;
 import viskit.model.ViskitElement;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.view.AnalystReportFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.RunnerPanel2;
 import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.dialog.SettingsDialog;
+import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -134,8 +134,8 @@ public class ViskitGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    mvcAbstractJFrameView avf;
-    mvcController acont;
+    MvcAbstractJFrameView avf;
+    MvcController acont;
 
     /**
      * Get a reference to the assembly editor view.
@@ -149,7 +149,7 @@ public class ViskitGlobals {
      *
      * @return the component AssemblyViewFrame
      */
-    public mvcAbstractJFrameView buildAssemblyViewFrame() {
+    public MvcAbstractJFrameView buildAssemblyViewFrame() {
         acont = new AssemblyControllerImpl();
         avf = new AssemblyViewFrame(acont);
         acont.setView(avf);
@@ -165,7 +165,7 @@ public class ViskitGlobals {
         return (AssemblyModel) acont.getModel();
     }
 
-    public mvcController getAssemblyController() {
+    public MvcController getAssemblyController() {
         return acont;
     }
 
@@ -192,8 +192,8 @@ public class ViskitGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    mvcAbstractJFrameView egvf;
-    mvcController eContl;
+    MvcAbstractJFrameView egvf;
+    MvcController eContl;
 
     public EventGraphViewFrame getEventGraphEditor() {
         return (EventGraphViewFrame) egvf;
@@ -209,14 +209,14 @@ public class ViskitGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public mvcAbstractJFrameView buildEventGraphViewFrame() {
+    public MvcAbstractJFrameView buildEventGraphViewFrame() {
         eContl = new EventGraphControllerImpl();
         egvf = new EventGraphViewFrame(eContl);
         eContl.setView(egvf);
         return egvf;
     }
 
-    public mvcController getEventGraphController() {
+    public MvcController getEventGraphController() {
         return eContl;
     }
 
@@ -264,8 +264,8 @@ public class ViskitGlobals {
     /* AnalystReport model / view / controller */
 
     /* routines to manage the singleton-aspect of the view */
-    mvcAbstractJFrameView aRf;
-    mvcController aRcont;
+    MvcAbstractJFrameView aRf;
+    MvcController aRcont;
 
     /**
      * Get a reference to the analyst report view.
@@ -279,7 +279,7 @@ public class ViskitGlobals {
      *
      * @return the component AnalystReportFrame
      */
-    public mvcAbstractJFrameView buildAnalystReportFrame() {
+    public MvcAbstractJFrameView buildAnalystReportFrame() {
         aRcont = new AnalystReportController();
         aRf = new AnalystReportFrame(aRcont);
         aRcont.setView(aRf);
@@ -292,7 +292,7 @@ public class ViskitGlobals {
     }
 
     /** @return the analyst report controller */
-    public mvcController getAnalystReportController() {
+    public MvcController getAnalystReportController() {
         return aRcont;
     }
 
