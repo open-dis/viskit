@@ -21,9 +21,9 @@ import java.awt.event.ActionEvent;
  * Used to notify interested objects of changes in the state of a model
  */
 
-public class Mvc2ModelEvent extends ActionEvent
+public class MvcModelEvent extends ActionEvent
 {
-  public Mvc2ModelEvent(Object obj, int id, String message)
+  public MvcModelEvent(Object obj, int id, String message)
   {
     super(obj,id,message);
   }

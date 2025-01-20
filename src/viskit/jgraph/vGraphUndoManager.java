@@ -45,7 +45,7 @@ import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.control.EventGraphControllerImpl;
-import viskit.mvc.Mvc2Controller;
+import viskit.mvc.MvcController;
 
 /**
  * This class informs the controller that the selected set has changed. Since
@@ -59,9 +59,9 @@ import viskit.mvc.Mvc2Controller;
 public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
     private final Vector<Object> selected;
-    private final Mvc2Controller controller;
+    private final MvcController controller;
 
-    public vGraphUndoManager(Mvc2Controller controller) {
+    public vGraphUndoManager(MvcController controller) {
         this.controller = controller;
         selected = new Vector<>();
     }

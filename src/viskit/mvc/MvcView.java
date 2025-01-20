@@ -7,7 +7,7 @@ package viskit.mvc;
  * www.nps.navy.mil
  * By:   Mike Bailey
  * Date: Mar 2, 2004
- * Time: 10:53:21 AM
+ * Time: 10:56:30 AM
  */
 
 /**
@@ -15,9 +15,14 @@ package viskit.mvc;
  */
 
 /**
- *  Primary role of a model is to manage the underlying information
+ * The view displays information and captures data entered.
  */
-public interface Mvc2Model
+
+public interface MvcView
 {
-   void notifyChanged(Mvc2ModelEvent ev);
+  void setController(MvcController controller);
+  void setModel     (MvcModel      model);
+
+  MvcController getController();
+  MvcModel      getModel();
 }

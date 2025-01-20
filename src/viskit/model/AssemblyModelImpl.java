@@ -18,11 +18,11 @@ import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
-import viskit.mvc.Mvc2AbstractModel;
+import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.mvc.Mvc2Controller;
+import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -34,7 +34,7 @@ import viskit.mvc.Mvc2Controller;
  * @since 9:16:44 AM
  * @version $Id$
  */
-public class AssemblyModelImpl extends Mvc2AbstractModel implements AssemblyModel {
+public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel {
 
     private JAXBContext jc;
     private ObjectFactory oFactory;
@@ -49,7 +49,7 @@ public class AssemblyModelImpl extends Mvc2AbstractModel implements AssemblyMode
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl controller;
 
-    public AssemblyModelImpl(Mvc2Controller cont) {
+    public AssemblyModelImpl(MvcController cont) {
         pointLess = new Point2D.Double(30, 60);
         controller = (AssemblyControllerImpl) cont;
         metaData = new GraphMetadata(this);

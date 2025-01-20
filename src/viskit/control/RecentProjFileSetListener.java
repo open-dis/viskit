@@ -46,9 +46,9 @@ import javax.swing.JSeparator;
 
 import viskit.ViskitGlobals;
 import viskit.VStatics;
-import viskit.mvc.Mvc2AbstractJFrameView;
-import viskit.mvc.Mvc2Controller;
-import viskit.mvc.Mvc2RecentFileListener;
+import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcController;
+import viskit.mvc.MvcRecentFileListener;
 
 /** Utility class to help facilitate menu actions for recently opened Viskit
  * projects.
@@ -56,7 +56,7 @@ import viskit.mvc.Mvc2RecentFileListener;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.ParameterizedProjectAction">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class RecentProjFileSetListener implements Mvc2RecentFileListener {
+public class RecentProjFileSetListener implements MvcRecentFileListener {
 
     private final List<JMenu> openRecentProjMenus;
 
@@ -132,7 +132,7 @@ public class RecentProjFileSetListener implements Mvc2RecentFileListener {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
 
-                ((Mvc2AbstractJFrameView) ((Mvc2Controller) acontroller).getView()).showProjectName();
+                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).showProjectName();
             }
         }
     }

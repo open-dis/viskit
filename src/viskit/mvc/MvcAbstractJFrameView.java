@@ -17,19 +17,19 @@ import viskit.util.TitleListener;
 /**
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class Mvc2AbstractJFrameView extends JFrame implements Mvc2View, Mvc2ModelListener {
+public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, MvcModelListener {
 
     protected TitleListener titlList;
     protected int titlKey;
-    private Mvc2Model model;
-    private Mvc2Controller controller;
+    private MvcModel model;
+    private MvcController controller;
 
-    public Mvc2AbstractJFrameView(String title) {
+    public MvcAbstractJFrameView(String title) {
         super(title);
     }
 
     public void registerWithModel() {
-        ((Mvc2AbstractModel) model).addModelListener(this);
+        ((MvcAbstractModel) model).addModelListener(this);
     }
 
     /** Sets the frame title listener and key for this frame
@@ -55,27 +55,27 @@ public abstract class Mvc2AbstractJFrameView extends JFrame implements Mvc2View,
     }
 
     @Override
-    public Mvc2Controller getController() {
+    public MvcController getController() {
         return controller;
     }
 
     @Override
-    public Mvc2Model getModel() {
+    public MvcModel getModel() {
         return model;
     }
 
     @Override
-    public void setController(Mvc2Controller controller) {
+    public void setController(MvcController controller) {
         this.controller = controller;
     }
 
     @Override
-    public void setModel(Mvc2Model model) {
+    public void setModel(MvcModel model) {
         this.model = model;
         registerWithModel();
     }
 
     @Override
-    public abstract void modelChanged(Mvc2ModelEvent event);
+    public abstract void modelChanged(MvcModelEvent event);
 
 }

@@ -12,7 +12,7 @@ package viskit.mvc;
  *
  * From an article at www.jaydeetechnology.co.uk
  */
-public interface Mvc2ModelListener {
+public interface MvcModelListener {
 
     /**
      * This is where the "master" model (simkit.viskit.model.Model) updates the
@@ -20,5 +20,5 @@ public interface Mvc2ModelListener {
      *
      * @param event the instance when our model has changed
      */
-    void modelChanged(Mvc2ModelEvent event);
+    void modelChanged(MvcModelEvent event);
 }

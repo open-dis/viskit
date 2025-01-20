@@ -21,12 +21,12 @@ import javax.xml.bind.Unmarshaller;
 
 import viskit.ViskitGlobals;
 import viskit.control.EventGraphControllerImpl;
-import viskit.mvc.Mvc2AbstractModel;
+import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
-import viskit.mvc.Mvc2Controller;
+import viskit.mvc.MvcController;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ import viskit.mvc.Mvc2Controller;
  * @since 1:09:38 PM
  * @version $Id$
  */
-public class ModelImpl extends Mvc2AbstractModel implements Model {
+public class ModelImpl extends MvcAbstractModel implements Model {
     JAXBContext jc;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
@@ -65,7 +65,7 @@ public class ModelImpl extends Mvc2AbstractModel implements Model {
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public ModelImpl(Mvc2Controller controller) {
+    public ModelImpl(MvcController controller) {
         this.controller = (EventGraphControllerImpl) controller;
         metaData = new GraphMetadata(this);
     }

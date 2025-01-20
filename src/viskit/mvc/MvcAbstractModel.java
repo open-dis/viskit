@@ -16,24 +16,24 @@ import java.util.List;
  * @since Mar 2, 2004 : 11:04:25 AM
  * @version $Id$
  */
-public abstract class Mvc2AbstractModel implements Mvc2Model {
+public abstract class MvcAbstractModel implements MvcModel {
 
-    private final List<Mvc2ModelListener> listeners = new ArrayList<>(4);
+    private final List<MvcModelListener> listeners = new ArrayList<>(4);
 
     @Override
-    public void notifyChanged(Mvc2ModelEvent event) {
-        for (Mvc2ModelListener ml : listeners) {
+    public void notifyChanged(MvcModelEvent event) {
+        for (MvcModelListener ml : listeners) {
             ml.modelChanged(event);
         }
     }
 
-    public void addModelListener(Mvc2ModelListener l) {
+    public void addModelListener(MvcModelListener l) {
         if (!listeners.contains(l)) {
             listeners.add(l);
         }
     }
 
-    public void removeModelListener(Mvc2ModelListener l) {
+    public void removeModelListener(MvcModelListener l) {
         listeners.remove(l);
     }
 }
