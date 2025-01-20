@@ -27,11 +27,11 @@ public class LocalDriverImpl implements DoeRunDriver {
 
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        this(new URL[] {}, viskit.VGlobals.instance().getWorkDirectory());
+        this(new URL[] {}, viskit.ViskitGlobals.instance().getWorkDirectory());
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
-        loader = new LocalBootLoader(extClassPaths, viskit.VGlobals.instance().getWorkClassLoader(), workDir);
+        loader = new LocalBootLoader(extClassPaths, viskit.ViskitGlobals.instance().getWorkClassLoader(), workDir);
         initGridRunner(loader);
     }
 

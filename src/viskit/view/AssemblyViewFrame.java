@@ -61,9 +61,9 @@ import javax.swing.tree.TreePath;
 
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.model.ModelEvent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
@@ -75,8 +75,7 @@ import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.ViskitGraphAssemblyComponentWrapper;
 import viskit.jgraph.ViskitGraphAssemblyModel;
 import viskit.model.*;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
@@ -88,6 +87,7 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.view.dialog.PclNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
+import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -130,7 +130,7 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
  *   to be used to configure an assembly file for sim running
  * </pre>
  */
-public class AssemblyViewFrame extends mvcAbstractJFrameView implements AssemblyView, DragStartListener {
+public class AssemblyViewFrame extends MvcAbstractJFrameView implements AssemblyView, DragStartListener {
 
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
@@ -162,7 +162,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     private int untitledCount = 0;
 
-    public AssemblyViewFrame(mvcController controller) {
+    public AssemblyViewFrame(MvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);   // set up mvc linkages
         initUI();   // build widgets
@@ -184,7 +184,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initMVC(MvcController ctrl) {
         setController(ctrl);
     }
 
@@ -277,7 +277,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
-            Set<String> files = acontroller.getRecentAssyFileSet();
+            Set<String> files = acontroller.getRecentAssemblyFileSet();
             openRecentAssyMenu.removeAll();
             files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
                 String nameOnly = new File(fullPath).getName();
@@ -319,7 +319,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
             if (fullPath != null)
                 if (fullPath.getPath().equals(CLEARPATHFLAG))
-                    acontroller.clearRecentAssyFileList();
+                    acontroller.clearRecentAssemblyFileList();
                 else
                     acontroller.openRecentAssembly(fullPath);
         }
@@ -328,7 +328,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
         recentAssyFileListener = new RecentAssyFileListener();
-        controller.addRecentAssyFileSetListener(getRecentAssyFileListener());
+        controller.addRecentAssemblyFileSetListener(getRecentAssyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -354,7 +354,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
-        controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
+        controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
@@ -753,7 +753,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
-        VGlobals vGlobals = VGlobals.instance();
+        ViskitGlobals vGlobals = ViskitGlobals.instance();
         ViskitProject vkp = vGlobals.getCurrentViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
@@ -818,7 +818,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-                    FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
+                    FileBasedAssemblyNode xn = isFileBasedAssyNode(sa[1]);
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
@@ -848,10 +848,10 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
         }
     }
 
-    private FileBasedAssyNode isFileBasedAssyNode(String s) {
+    private FileBasedAssemblyNode isFileBasedAssyNode(String s) {
         try {
-            return FileBasedAssyNode.fromString(s);
-        } catch (FileBasedAssyNode.exception e) {
+            return FileBasedAssemblyNode.fromString(s);
+        } catch (FileBasedAssemblyNode.exception e) {
             return null;
         }
     }
@@ -950,7 +950,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        JOptionPane.showMessageDialog(VGlobals.instance().getMainAppWindow(), msg, title, type);
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainAppWindow(), msg, title, type);
     }
 
     @Override
@@ -963,8 +963,8 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
-        if (VGlobals.instance().getCurrentViskitProject() != null)
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getAssembliesDir());
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null)
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         else
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
     }
@@ -1042,7 +1042,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
             jfc = buildOpenSaveChooser();
 
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
         if (showUniqueName)
@@ -1071,7 +1071,7 @@ public class AssemblyViewFrame extends mvcAbstractJFrameView implements Assembly
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
                     deleteCanceledSave(file.getParentFile());
             }
         }

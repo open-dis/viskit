@@ -13,7 +13,7 @@ import java.awt.event.FocusEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
@@ -78,7 +78,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         commentField.addFocusListener(focList);
         setMaxHeight(commentField);
 
-        stateVarTypeCombo = VGlobals.instance().getTypeCB();
+        stateVarTypeCombo = ViskitGlobals.instance().getTypeCB();
         stateVarTypeCombo.getEditor().getEditorComponent().addFocusListener(focList);
         setMaxHeight(stateVarTypeCombo);
 
@@ -174,11 +174,11 @@ public class StateVariableDialog extends ViskitSmallDialog {
             stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
             arraySizeField.setText(getArraySize(ty));
             commentField.setText(stVar.getComment());
-            isArray = VGlobals.instance().isArray(stVar.getType());
+            isArray = ViskitGlobals.instance().isArray(stVar.getType());
         } else {
-            stateVarNameField.setText(((Model) VGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
+            stateVarNameField.setText(((Model) ViskitGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             ty = (String) stateVarTypeCombo.getSelectedItem();
-            isArray = VGlobals.instance().isArray(ty);
+            isArray = ViskitGlobals.instance().isArray(ty);
             commentField.setText("");
             arraySizeField.setText("");
         }
@@ -191,8 +191,8 @@ public class StateVariableDialog extends ViskitSmallDialog {
     void unloadWidgets() {
         // make sure there are no spaces
         String ty = (String) stateVarTypeCombo.getSelectedItem();
-        ty = VGlobals.instance().typeChosen(ty);
-        if (VGlobals.instance().isArray(ty)) {
+        ty = ViskitGlobals.instance().typeChosen(ty);
+        if (ViskitGlobals.instance().isArray(ty)) {
             ty = ty.substring(0, ty.indexOf('[') + 1) + arraySizeField.getText().trim() + "]";
         }
         String nm = stateVarNameField.getText();
@@ -241,7 +241,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
          */
         private void handleArrayFieldEnable() {
             String s = (String) stateVarTypeCombo.getEditor().getItem();
-            boolean isAr = VGlobals.instance().isArray(s);
+            boolean isAr = ViskitGlobals.instance().isArray(s);
             toggleArraySizeFields(isAr);
 
             // Do this this way to shake out all the pending focus events before twiddling focus.
@@ -280,22 +280,22 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
                 if (nam.length() <= 0 ||
                         typ.length() <= 0 ||
-                        (VGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
-                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+                        (ViskitGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
+                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Name, type and (if array) array size must be entered.");
                     toggleArraySizeFields(true);
                     arraySizeField.requestFocus();
                     return;
-                } else if (VGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
-                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+                } else if (ViskitGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
+                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.");
                     return;
                 } else if (isGeneric(typ)) {
-                    ((EventGraphController)VGlobals.instance().getEventGraphController()).messageUser(
+                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Actual Keys, Values or Element types must replace " +
@@ -306,13 +306,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
                 /* Do a beanshell test for array declaration
                  * isPrimitive returns false for arrays
                  */
-                if (!VGlobals.instance().isPrimitive(typ) && VGlobals.instance().isArray(typ)) {
+                if (!ViskitGlobals.instance().isPrimitive(typ) && ViskitGlobals.instance().isArray(typ)) {
 
                     String s = typ + " " + nam + " = new " + typ;
                     s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
                     if (ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
-                        String result = VGlobals.instance().parseCode(null, s);
+                        String result = ViskitGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);
                             if (!ret) // don't ignore

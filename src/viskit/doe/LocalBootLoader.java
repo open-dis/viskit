@@ -21,7 +21,7 @@ import java.util.jar.JarOutputStream;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 
 /** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
@@ -106,7 +106,7 @@ public class LocalBootLoader extends URLClassLoader {
         super(new URL[] {}, parent);
         extUrls = classes;
         this.workDir = workDir;
-        LOG.debug(VGlobals.instance().printCallerLog());
+        LOG.debug(ViskitGlobals.instance().printCallerLog());
     }
 
     /** Create a context with viskit's libs along with the generated

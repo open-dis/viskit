@@ -51,7 +51,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
         this.setGridSize(10);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new ViskitGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -63,7 +63,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         this.setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parent.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
@@ -123,7 +123,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphAssemblyUI());    // we use our own for node/edge inspector editting
+        setUI(new ViskitGraphAssemblyUI());    // we use our own for node/edge inspector editting
         invalidate();
     }
     

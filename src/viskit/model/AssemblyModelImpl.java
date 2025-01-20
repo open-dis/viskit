@@ -14,15 +14,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
-import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
+import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -49,7 +49,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl controller;
 
-    public AssemblyModelImpl(mvcController cont) {
+    public AssemblyModelImpl(MvcController cont) {
         pointLess = new Point2D.Double(30, 60);
         controller = (AssemblyControllerImpl) cont;
         metaData = new GraphMetadata(this);
@@ -201,7 +201,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
-            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
+            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);
@@ -296,7 +296,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+    public void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
         newEventGraph(widgetName, node.loadedClass, p);
     }
 
@@ -360,7 +360,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
         newPropChangeListener(widgetName, node.loadedClass, p);
     }
 
@@ -891,7 +891,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (vi instanceof VInstantiator.Array) {
             VInstantiator.Array via = (VInstantiator.Array) vi;
 
-            if (VGlobals.instance().isArray(via.getType()))
+            if (ViskitGlobals.instance().isArray(via.getType()))
                 return buildParamFromArray(via);
             else if (via.getType().contains("..."))
                 return buildParamFromVarargs(via);

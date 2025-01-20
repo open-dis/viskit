@@ -48,14 +48,14 @@ import org.apache.logging.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 
 import viskit.util.EventGraphCache;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import viskit.jgraph.vGraphUndoManager;
+import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -80,7 +80,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  * @since 9:26:02 AM
  * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
+public class AssemblyControllerImpl extends mvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
@@ -122,7 +122,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void begin() {
-        File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+        File projPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -173,7 +173,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
@@ -270,7 +270,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
 
         if (view.getCurrentVgacw() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -303,15 +303,15 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
-    public OpenAssembly.AssyChangeListener getAssemblyChangeListener() {
+    public OpenAssembly.AssemblyChangeListener getAssemblyChangeListener() {
         return assyChgListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
+    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
+    OpenAssembly.AssemblyChangeListener assyChgListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -337,7 +337,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
-                    ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
+                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel vAMod = (AssemblyModel) getModel();
                     markAssyConfigClosed(vAMod.getLastFile());
@@ -377,29 +377,29 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         assyChgListener.assemblyChanged(action, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
         OpenAssembly.inst().addListener(lis);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
         OpenAssembly.inst().removeListener(lis);
     }
 
     Set<mvcRecentFileListener> recentAssyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssyFileSetListener(mvcRecentFileListener lis) {
+    public void addRecentAssemblyFileSetListener(mvcRecentFileListener lis) {
         recentAssyListeners.add(lis);
     }
 
     @Override
-    public void removeRecentAssyFileSetListener(mvcRecentFileListener lis) {
+    public void removeRecentAssemblyFileSetListener(mvcRecentFileListener lis) {
         recentAssyListeners.remove(lis);
     }
 
@@ -413,12 +413,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     Set<mvcRecentFileListener> recentProjListeners = new HashSet<>();
 
     @Override
-    public void addRecentProjFileSetListener(mvcRecentFileListener lis) {
+    public void addRecentProjectFileSetListener(mvcRecentFileListener lis) {
         recentProjListeners.add(lis);
     }
 
     @Override
-    public void removeRecentProjFileSetListener(mvcRecentFileListener lis) {
+    public void removeRecentProjectFileSetListener(mvcRecentFileListener lis) {
         recentProjListeners.remove(lis);
     }
 
@@ -481,7 +481,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (mod == null) {return;}
         GraphMetadata gmd = mod.getMetaData();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -550,13 +550,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newProject() {
         if (handleProjectClosing()) {
-            VGlobals.instance().initProjectHome();
-            VGlobals.instance().createWorkDirectory();
+            ViskitGlobals.instance().initProjectHome();
+            ViskitGlobals.instance().createWorkDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (egFiles.length == 0) {
-                ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
+                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
     }
@@ -573,7 +573,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projDir = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
                 projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
                 logFile = new File(projDir, "debug.log");
 
@@ -635,7 +635,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public boolean handleProjectClosing() {
         boolean retVal = true;
-        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";
 
@@ -652,21 +652,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void doProjectCleanup() {
         closeAll();
-        ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
-        clearRecentAssyFileList();
-        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
-        VGlobals.instance().getCurrentViskitProject().closeProject();
+        clearRecentAssemblyFileList();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
+        ViskitGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override
     public void openProject(File file) {
         VStatics.setViskitProjectFile(file);
-        VGlobals.instance().createWorkDirectory();
+        ViskitGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        VGlobals.instance().getEventGraphEditor().showProjectName();
+        adjustRecentProjSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
         runner.resetRunner();
     }
 
@@ -675,7 +675,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
         GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -697,7 +697,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         boolean modified =
-                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -743,7 +743,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void postQuit() {
-        VGlobals.instance().quitAssemblyEditor();
+        ViskitGlobals.instance().quitAssemblyEditor();
     }
 
     private boolean closeAll = false;
@@ -827,8 +827,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedEventGraphNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -843,7 +843,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
@@ -857,8 +857,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedPropChangeListenerNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedPropChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -873,7 +873,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }
@@ -1261,7 +1261,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
                 break;
         }
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         // Prevent dups
         if (!selectionVector.contains(redoGraphCell.getUserObject()))
@@ -1311,7 +1311,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -1324,7 +1324,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
@@ -1486,7 +1486,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
             File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
@@ -1656,7 +1656,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 if (execStrings == null) {
 
-                    if (VGlobals.instance().getActiveAssemblyModel() == null) {
+                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
                         messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
@@ -1842,7 +1842,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened
-                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
             }
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
@@ -1961,14 +1961,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void clearRecentAssyFileList() {
+    public void clearRecentAssemblyFileList() {
         recentAssyFileSet.clear();
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();
     }
 
     @Override
-    public Set<String> getRecentAssyFileSet() {
+    public Set<String> getRecentAssemblyFileSet() {
         return getRecentAssyFileSet(false);
     }
 
@@ -1980,14 +1980,14 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void clearRecentProjFileSet() {
+    public void clearRecentProjectFileSet() {
         recentProjFileSet.clear();
         saveProjHistoryXML(recentProjFileSet);
         notifyRecentProjFileListeners();
     }
 
     @Override
-    public Set<String> getRecentProjFileSet() {
+    public Set<String> getRecentProjectFileSet() {
         return getRecentProjFileSet(false);
     }
 

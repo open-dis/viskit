@@ -22,10 +22,10 @@ import org.apache.commons.configuration2.XMLConfiguration;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.FindClassesForInterface;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 import viskit.ViskitConfig;
 
@@ -87,10 +87,10 @@ public class FileBasedClassManager {
         return classMap.get(s);
     }
 
-    public void unloadFile(FileBasedAssyNode fban) {
+    public void unloadFile(FileBasedAssemblyNode fban) {
         removeFileClass(fban.loadedClass);
     }
-    FileBasedAssyNode fban = null;
+    FileBasedAssemblyNode fban = null;
     Class<?> fclass = null;
     JAXBContext jaxbCtx = null;
     Unmarshaller um = null;
@@ -105,7 +105,7 @@ public class FileBasedClassManager {
      * @return a node tree for viewing in the Assembly Editor
      * @throws java.lang.Throwable for a problem finding a class
      */
-    public FileBasedAssyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
+    public FileBasedAssemblyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
@@ -119,7 +119,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
@@ -148,7 +148,7 @@ public class FileBasedClassManager {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-                fban = new FileBasedAssyNode(f, fclass.getName(), pkg);
+                fban = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
 
                 // If we have an annotated ParameterMap, then cacheXML it. If not,
                 // then treat the fclass as something that belongs on the
@@ -176,7 +176,7 @@ public class FileBasedClassManager {
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = VGlobals.instance().getWorkClassLoader();
+        ClassLoader loader = ViskitGlobals.instance().getWorkClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
@@ -189,8 +189,8 @@ public class FileBasedClassManager {
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
             fban =  (fXml == null) ?
-                new FileBasedAssyNode(paf.f, fclass.getName(), f, paf.pkg) :
-                new FileBasedAssyNode(f, fclass.getName(), fXml, simEntity.getPackage());
+                new FileBasedAssemblyNode(paf.f, fclass.getName(), f, paf.pkg) :
+                new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
@@ -226,7 +226,7 @@ public class FileBasedClassManager {
 
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
-//                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
 //                if (viskit.VStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }

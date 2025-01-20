@@ -26,17 +26,16 @@ import org.apache.logging.log4j.Logger;
 import viskit.control.EventGraphController;
 import viskit.Help;
 import viskit.model.ModelEvent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
-import viskit.jgraph.VgraphComponentWrapper;
-import viskit.jgraph.vGraphModel;
+import viskit.jgraph.ViskitGraphComponentWrapper;
+import viskit.jgraph.ViskitGraphModel;
 import viskit.model.*;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.mvc.mvcModelEvent;
 import viskit.mvc.mvcRecentFileListener;
@@ -46,6 +45,7 @@ import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
 import viskit.view.dialog.SettingsDialog;
+import viskit.mvc.MvcController;
 
 /**
  Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -73,7 +73,7 @@ import viskit.view.dialog.SettingsDialog;
   @since 12:52:59 PM
   @version $Id$
  */
-public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventGraphView {
+public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView {
 
     private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
 
@@ -105,7 +105,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Constructor; lays out initial GUI objects
      * @param ctrl the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(mvcController ctrl) {
+    public EventGraphViewFrame(MvcController ctrl) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(ctrl);   // set up mvc linkages
         initUI();    // build widgets
@@ -147,7 +147,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * Initialize the MVC connections
      * @param ctrl the controller for this view
      */
-    private void initMVC(mvcController ctrl) {
+    private void initMVC(MvcController ctrl) {
         setController(ctrl);
     }
 
@@ -176,18 +176,18 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphComponentWrapper getCurrentVgraphComponentWrapper() {
+    public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
         }
 
         JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-        return (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+        return (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
+        ViskitGraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getLeftComponent();
     }
@@ -213,7 +213,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            VgraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
+            ViskitGraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
 
             if (myVgcw == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
@@ -243,7 +243,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
     }
 
-    private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
+    private void buildStateParamSplit(ViskitGraphComponentWrapper vgcw) {
 
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
@@ -411,8 +411,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void addTab(Model mod) {
-        vGraphModel vmod = new vGraphModel();
-        VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
+        ViskitGraphModel vmod = new ViskitGraphModel();
+        ViskitGraphComponentWrapper graphPane = new ViskitGraphComponentWrapper(vmod, this);
         vmod.setjGraph(graphPane);
         graphPane.model = mod;
 
@@ -456,12 +456,12 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public void delTab(Model mod) {
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphComponentWrapper vgcw;
+        ViskitGraphComponentWrapper vgcw;
         Runnable r;
         for (Component c : tabbedPane.getComponents()) {
             jsplt = (JSplitPane) c;
             jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgcw.model == mod) {
                 tabbedPane.remove(c);
                 vgcw.isActive = false;
@@ -482,13 +482,13 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     public Model[] getOpenModels() {
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphComponentWrapper vgcw;
+        ViskitGraphComponentWrapper vgcw;
         Component[] ca = tabbedPane.getComponents();
         Model[] vm = new Model[ca.length];
         for (int i = 0; i < vm.length; i++) {
             jsplt = (JSplitPane) ca[i];
             jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgcw.model;
         }
         return vm;
@@ -497,7 +497,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     @Override
     public String addParameterDialog() {
 
-        if (ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
@@ -509,7 +509,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
@@ -683,9 +683,9 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(VGlobals.instance().getMainAppWindow());
-        help.mainFrameLocated(VGlobals.instance().getMainAppWindow().getBounds());
-        VGlobals.instance().setHelp(help); // single instance for all viskit frames
+        Help help = new Help(ViskitGlobals.instance().getMainAppWindow());
+        help.mainFrameLocated(ViskitGlobals.instance().getMainAppWindow().getBounds());
+        ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -1069,8 +1069,8 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for EventGraphs
-        if (VGlobals.instance().getCurrentViskitProject() != null) {
-            return new JFileChooser(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+        if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
+            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
         } else {
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
         }
@@ -1096,7 +1096,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * the Actions library.
      */
     public void openProject() {
-        VGlobals.instance().getAssemblyEditor().openProject();
+        ViskitGlobals.instance().getAssemblyEditor().openProject();
     }
 
     /**
@@ -1134,7 +1134,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
         }
         jfc.setDialogTitle("Save Event Graph");
 
-        File fil = new File(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }
@@ -1164,24 +1164,24 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
      * @param file to candidate EG file
      */
     private void deleteCanceledSave(File file) {
-        VGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
+        ViskitGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        return VGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
+        return ViskitGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
     }
 
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), node); // blocks
+        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(VGlobals.instance().getMainAppWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), edge); // blocks
     }
 
     @Override
@@ -1191,27 +1191,27 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public boolean doEditParameter(vParameter param) {
-        return ParameterDialog.showDialog(VGlobals.instance().getMainAppWindow(), param);    // blocks
+        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), param);    // blocks
     }
 
     @Override
     public boolean doEditStateVariable(vStateVariable var) {
-        return StateVariableDialog.showDialog(VGlobals.instance().getMainAppWindow(), var);
+        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), var);
     }
 
     @Override
     public int genericAsk(String title, String msg) {
-        return VGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
     }
 
     @Override
     public int genericAskYN(String title, String msg) {
-        return VGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
+        return ViskitGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
     }
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        VGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
+        ViskitGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
     }
 
     @Override
@@ -1222,7 +1222,7 @@ public class EventGraphViewFrame extends mvcAbstractJFrameView implements EventG
 
     @Override
     public void modelChanged(mvcModelEvent event) {
-        VgraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
+        ViskitGraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
         ParametersPanel pp = vgcw.paramPan;
         StateVariablesPanel vp = vgcw.varPan;
         switch (event.getID()) {

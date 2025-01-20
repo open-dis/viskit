@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import org.apache.logging.log4j.Logger;
 
 import viskit.util.Compiler;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 
 /**
@@ -47,7 +47,7 @@ public class SourceWindow extends JFrame {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
-            saveChooser.setCurrentDirectory(VGlobals.instance().getCurrentViskitProject().getSrcDir());
+            saveChooser.setCurrentDirectory(ViskitGlobals.instance().getCurrentViskitProject().getSrcDir());
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);
@@ -201,7 +201,7 @@ public class SourceWindow extends JFrame {
                 }
                 SourceWindow.this.dispose();
             } catch (IOException ex) {
-                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+                ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                         "File I/O Error",
                         "\n" + f.getName() + "\n" + ex.getMessage()
                 );

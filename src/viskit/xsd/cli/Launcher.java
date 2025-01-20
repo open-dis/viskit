@@ -14,7 +14,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import org.apache.logging.log4j.Logger;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -72,7 +72,7 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
 
-            cloader = VGlobals.instance().getWorkClassLoader();
+            cloader = ViskitGlobals.instance().getWorkClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

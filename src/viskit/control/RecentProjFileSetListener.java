@@ -44,11 +44,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.mvcRecentFileListener;
+import viskit.mvc.MvcController;
 
 /** Utility class to help facilitate menu actions for recently opened Viskit
  * projects.
@@ -70,8 +70,8 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
     @Override
     public void listChanged() {
-        AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
-        Set<String> lis = acontroller.getRecentProjFileSet();
+        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        Set<String> lis = acontroller.getRecentProjectFileSet();
 
         for (JMenu m : openRecentProjMenus) {
             m.removeAll();
@@ -117,7 +117,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
+            AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;
             Object obj = getValue(VStatics.FULL_PATH);
@@ -127,12 +127,12 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
                 fullPath = (File) obj;
 
             if (fullPath != null && fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
-                acontroller.clearRecentProjFileSet();
+                acontroller.clearRecentProjectFileSet();
             } else {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
 
-                ((mvcAbstractJFrameView) ((mvcController) acontroller).getView()).showProjectName();
+                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).showProjectName();
             }
         }
     }
