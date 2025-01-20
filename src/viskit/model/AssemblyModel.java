@@ -30,7 +30,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
       * Support redo for the event graph node
       * @param node the node to redo
       */
-     void redoEventGraph(EventGraphNode node);
+     void redoEventGraph(EvGraphNode node);
 
     /** Places an event graph node on the assembly pallete when the user drags
      * an icon from the LEGO tree
@@ -44,10 +44,10 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
     void newPropChangeListener(String widgetName, String className, Point2D p);
 
     /**
-     * Supports redo of a PropertyChangeListenerNode
+     * Supports redo of a PropChangeListenerNode
      * @param node the node to redo
      */
-    void redoPropChangeListener(PropertyChangeListenerNode node);
+    void redoPropChangeListener(PropChangeListenerNode node);
 
     void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 
@@ -92,25 +92,25 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     SimkitAssembly getJaxbRoot();
 
-    AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
+    AdapterEdge newAdapterEdge(String name, AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-    PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropertyChangeListenerNode target);
+    PropertyChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, PropChangeListenerNode target);
 
-    void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EventGraphNode target);
+    void newSimEvLisEdge(AssemblyNode src, AssemblyNode target); //EvGraphNode src, EvGraphNode target);
 
-    boolean changePclNode(PropertyChangeListenerNode pclNode);
+    boolean changePclNode(PropChangeListenerNode pclNode);
 
-    boolean changeEvGraphNode(EventGraphNode evNode);
+    boolean changeEvGraphNode(EvGraphNode evNode);
 
-    void changePclEdge(PropertyChangeListenerEdge pclEdge);
+    void changePclEdge(PropertyChangeEdge pclEdge);
 
     void changeAdapterEdge(AdapterEdge aEdge);
 
     void changeSimEvEdge(SimEvListenerEdge seEdge);
 
-    void deleteEvGraphNode(EventGraphNode evNode);
+    void deleteEvGraphNode(EvGraphNode evNode);
 
-    void deletePropChangeListener(PropertyChangeListenerNode pclNode);
+    void deletePropChangeListener(PropChangeListenerNode pclNode);
 
     void deleteAdapterEdge(AdapterEdge ae);
 
@@ -124,13 +124,13 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Assembly nodes don't hold onto edges.
      * @param pce the edge to delete
      */
-    void deletePropChangeEdge(PropertyChangeListenerEdge pce);
+    void deletePropChangeEdge(PropertyChangeEdge pce);
 
     /**
-     * Supports redo of a PropertyChangeListenerEdge
+     * Supports redo of a PropertyChangeEdge
      * @param pce the edge to redo
      */
-    void redoPropChangeEdge(PropertyChangeListenerEdge pce);
+    void redoPropChangeEdge(PropertyChangeEdge pce);
 
     void deleteSimEvLisEdge(SimEvListenerEdge sele);
 

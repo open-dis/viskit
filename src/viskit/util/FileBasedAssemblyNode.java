@@ -17,7 +17,7 @@ import java.io.File;
  * @since 3:26:42 PM
  * @version $Id$
  */
-public class FileBasedAssyNode {
+public class FileBasedAssemblyNode {
 
     public static final String FBAN_DELIM = "<fbasdelim>";
     public String loadedClass;
@@ -27,7 +27,7 @@ public class FileBasedAssyNode {
     public String pkg;
     public long lastModified;
 
-    public FileBasedAssyNode(File classFile, String loadedClass, File xml, String pkg) {
+    public FileBasedAssemblyNode(File classFile, String loadedClass, File xml, String pkg) {
         this.classFile = classFile;
         this.loadedClass = loadedClass;
         this.xmlSource = xml;
@@ -36,7 +36,7 @@ public class FileBasedAssyNode {
         lastModified = (isXML) ? xml.lastModified() : classFile.lastModified();
     }
 
-    public FileBasedAssyNode(File classFile, String loadedClass, String pkg) {
+    public FileBasedAssemblyNode(File classFile, String loadedClass, String pkg) {
         this(classFile, loadedClass, null, pkg);
     }
 
@@ -49,16 +49,16 @@ public class FileBasedAssyNode {
         }
     }
 
-    public static FileBasedAssyNode fromString(String s) throws FileBasedAssyNode.exception {
+    public static FileBasedAssemblyNode fromString(String s) throws FileBasedAssemblyNode.exception {
         try {
             String[] sa = s.split(FBAN_DELIM);
             if (sa.length == 3) {
-                return new FileBasedAssyNode(new File(sa[0]), sa[1], sa[2]);
+                return new FileBasedAssemblyNode(new File(sa[0]), sa[1], sa[2]);
             } else if (sa.length == 4) {
-                return new FileBasedAssyNode(new File(sa[0]), sa[1], new File(sa[2]), sa[3]);
+                return new FileBasedAssemblyNode(new File(sa[0]), sa[1], new File(sa[2]), sa[3]);
             }
         } catch (Exception e) {}
-        throw new FileBasedAssyNode.exception();
+        throw new FileBasedAssemblyNode.exception();
     }
 
     public static class exception extends Exception {}

@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,7 +53,7 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public final void setType(String pType) {
         super.setType(pType);
-        arraySize = VGlobals.instance().getArraySize(pType);
+        arraySize = ViskitGlobals.instance().getArraySize(pType);
     }
 
     public String[] getArraySize() {

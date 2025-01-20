@@ -45,7 +45,7 @@ import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.control.EventGraphControllerImpl;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcController;
 
 /**
  * This class informs the controller that the selected set has changed. Since
@@ -56,12 +56,12 @@ import viskit.mvc.mvcController;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vUndoableEditListener">Terry Norbraten, NPS MOVES</a>
  */
-public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
+public class ViskitGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
     private final Vector<Object> selected;
-    private final mvcController controller;
+    private final MvcController controller;
 
-    public vGraphUndoManager(mvcController controller) {
+    public ViskitGraphUndoManager(MvcController controller) {
         this.controller = controller;
         selected = new Vector<>();
     }
@@ -102,4 +102,4 @@ public class vGraphUndoManager extends GraphUndoManager implements GraphSelectio
             ((AssemblyController) controller).selectNodeOrEdge(selected);
     }
 
-} // end class vGraphUndoManager
+} // end class ViskitGraphUndoManager

@@ -3,7 +3,7 @@ package viskit.jgraph;
 import java.awt.event.MouseEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.control.AssemblyController;
 import viskit.model.*;
 
@@ -21,9 +21,9 @@ import viskit.model.*;
  * @since 3:17:59 PM
  * @version $Id$
  */
-public class vGraphAssemblyUI extends BasicGraphUI {
+public class ViskitGraphAssemblyUI extends BasicGraphUI {
 
-    public vGraphAssemblyUI() {
+    public ViskitGraphAssemblyUI() {
         super();
     }
 
@@ -45,20 +45,20 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
     private void createEditDialog(Object cell) {
 
-        AssemblyController cntl = (AssemblyController) VGlobals.instance().getAssemblyController();
+        AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
         if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
-                cntl.adapterEdgeEdit((AdapterEdge) obj);
-            } else if (obj instanceof PropertyChangeListenerEdge) {
-                cntl.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) obj);
+                assemblyController.adapterEdgeEdit((AdapterEdge) obj);
+            } else if (obj instanceof PropertyChangeEdge) {
+                assemblyController.pcListenerEdgeEdit((PropertyChangeEdge) obj);
             } else {
-                cntl.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
+                assemblyController.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
             }
         } else if (cell instanceof ViskitAssemblyCircleCell) {
-            cntl.eventGraphEdit((EventGraphNode) obj);
+            assemblyController.evGraphEdit((EvGraphNode) obj);
         } else if (cell instanceof ViskitAssemblyPropertyListCell) {
-            cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) obj);
+            assemblyController.pcListenerEdit((PropChangeListenerNode) obj);
         }
     }
 }

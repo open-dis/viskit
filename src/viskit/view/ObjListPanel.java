@@ -25,7 +25,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.model.VInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
@@ -244,7 +244,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             } catch (ClassNotFoundException e1) {
                 String msg = "An object type specified in this element (probably " + inst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
-                ((AssemblyController)VGlobals.instance().getAssemblyEditor().getController()).messageUser(
+                ((AssemblyController)ViskitGlobals.instance().getAssemblyEditor().getController()).messageUser(
                         JOptionPane.ERROR_MESSAGE,
                         e1.getMessage(),
                         msg);

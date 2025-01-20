@@ -13,7 +13,7 @@ import java.util.List;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class PropertyChangeListenerEdge extends AssemblyEdge {
+public class PropertyChangeEdge extends AssemblyEdge {
 
     protected String property;
     private List<String> descriptionArray = new ArrayList<>();
@@ -23,7 +23,7 @@ public class PropertyChangeListenerEdge extends AssemblyEdge {
     private String value;
     private String comment;
 
-    PropertyChangeListenerEdge() // package-limited
+    PropertyChangeEdge() // package-limited
     {
     }
 
