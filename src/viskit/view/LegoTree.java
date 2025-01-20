@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 
 /**
@@ -130,7 +130,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
 
-        projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+        projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
     }
 
     // beginning of hack to hide the tree rootNode
@@ -340,9 +340,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // dirty won't get set b/c the graph model is null until the
                 // model tab is created and the EG file is opened. First pass
                 // is only for inclusion in the LEGOs tree
-                if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
-                    ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
-                    ViskitGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
+                if (VGlobals.instance().getActiveEventGraphModel() != null) {
+                    VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
+                    VGlobals.instance().getEventGraphEditor().toggleEventGraphStatusIndicators();
                 }
 
             } catch (Throwable t) {

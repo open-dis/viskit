@@ -40,7 +40,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 
 /** Test of static variables isolated by unique class loaders. The static "debug"
  * variable of the VStatics class is initialized to false.
@@ -62,7 +62,7 @@ public class StaticsTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        loaderNoReset = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
+        loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
         statics = loaderNoReset.loadClass("viskit.VStatics");
         Constructor sconstr = statics.getConstructor();
         rstatics = sconstr.newInstance();
@@ -83,7 +83,7 @@ public class StaticsTest extends TestCase {
 
     public void testStatics() throws Exception {
         
-        LocalBootLoader loaderWithReset = (LocalBootLoader) VGlobals.instance().getFreshClassLoader();
+        LocalBootLoader loaderWithReset = (LocalBootLoader) ViskitGlobals.instance().getFreshClassLoader();
         Class<?> staticz = loaderWithReset.loadClass("viskit.VStatics");
         Constructor sconstr = staticz.getConstructor();
         Object rstaticz = sconstr.newInstance();

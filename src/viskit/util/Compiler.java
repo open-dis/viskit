@@ -17,7 +17,7 @@ import javax.tools.ToolProvider;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.doe.LocalBootLoader;
 
 /** Using the java compiler, now part of javax.tools, we no longer have to
@@ -70,12 +70,12 @@ public class Compiler {
 
             JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
             Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
-            File workDir = ViskitGlobals.instance().getWorkDirectory();
+            File workDir = VGlobals.instance().getWorkDirectory();
             String workDirPath = workDir.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
-            String[] workClassPath = ((LocalBootLoader) (ViskitGlobals.instance().getWorkClassLoader())).getClassPath();
+            String[] workClassPath = ((LocalBootLoader) (VGlobals.instance().getWorkClassLoader())).getClassPath();
             int wkpLength = workClassPath.length;
             classPaths = new StringBuilder(wkpLength);
             
@@ -122,7 +122,7 @@ public class Compiler {
                                 + "java.exe as first entry in the Path";
 
                 // Inform the user about the JRE vs. JDK java.exe Path issue
-                ViskitGlobals.instance().getAssemblyEditor().genericReport(
+                VGlobals.instance().getAssemblyEditor().genericReport(
                         JOptionPane.INFORMATION_MESSAGE,
                         "Incorrect Path", 
                         msg

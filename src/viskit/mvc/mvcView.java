@@ -20,9 +20,9 @@ package viskit.mvc;
 
 public interface mvcView
 {
-  void setController(MvcController controller);
+  void setController(mvcController controller);
   void setModel     (mvcModel      model);
 
-  MvcController getController();
+  mvcController getController();
   mvcModel      getModel();
 }

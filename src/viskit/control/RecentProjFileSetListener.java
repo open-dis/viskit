@@ -44,11 +44,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcController;
 import viskit.mvc.mvcRecentFileListener;
-import viskit.mvc.MvcController;
 
 /** Utility class to help facilitate menu actions for recently opened Viskit
  * projects.
@@ -70,7 +70,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
     @Override
     public void listChanged() {
-        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
         Set<String> lis = acontroller.getRecentProjectFileSet();
 
         for (JMenu m : openRecentProjMenus) {
@@ -117,7 +117,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+            AssemblyController acontroller = (AssemblyController) VGlobals.instance().getAssemblyController();
 
             File fullPath;
             Object obj = getValue(VStatics.FULL_PATH);
@@ -132,7 +132,7 @@ public class RecentProjFileSetListener implements mvcRecentFileListener {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
 
-                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).showProjectName();
+                ((mvcAbstractJFrameView) ((mvcController) acontroller).getView()).showProjectName();
             }
         }
     }

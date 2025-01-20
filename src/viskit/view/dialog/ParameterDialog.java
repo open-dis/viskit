@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -82,7 +82,7 @@ public class ParameterDialog extends JDialog {
         commentField = new JTextField(25);
         setMaxHeight(commentField);
 
-        parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
+        parameterTypeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
@@ -146,7 +146,7 @@ public class ParameterDialog extends JDialog {
 
     private void unloadWidgets() {
         String ty = (String) parameterTypeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
+        ty = VGlobals.instance().typeChosen(ty);
         String nm = parameterNameField.getText();
         nm = nm.replaceAll("\\s", "");
         if (param != null) {

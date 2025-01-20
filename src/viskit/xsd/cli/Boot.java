@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -41,7 +41,7 @@ public class Boot extends URLClassLoader implements Runnable {
     public URL baseJarURL;
 
     public Boot(URL[] urls) {
-        this(urls,ViskitGlobals.instance().getWorkClassLoader());
+        this(urls,VGlobals.instance().getWorkClassLoader());
     }
 
     public Boot(URL[] urls, ClassLoader cloader) {
@@ -213,7 +213,7 @@ public class Boot extends URLClassLoader implements Runnable {
     private String getJavaRev() {
         String rev = "java15";
         try {
-            ClassLoader cloader = ViskitGlobals.instance().getWorkClassLoader();
+            ClassLoader cloader = VGlobals.instance().getWorkClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

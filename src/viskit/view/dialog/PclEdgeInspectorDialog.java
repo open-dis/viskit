@@ -17,12 +17,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.AssemblyController;
-import viskit.model.EvGraphNode;
-import viskit.model.PropertyChangeEdge;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.EventGraphNode;
+import viskit.model.PropertyChangeListenerEdge;
+import viskit.model.PropertyChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -47,14 +47,14 @@ public class PclEdgeInspectorDialog extends JDialog {
     private JLabel emptyTF;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropertyChangeEdge pclEdge;
+    private PropertyChangeListenerEdge pclEdge;
     private final JButton okButt;
     private JButton canButt;
     private final JButton propButt;
     private final JPanel buttPan;
     private final enableApplyButtonListener lis;
 
-    public static boolean showDialog(JFrame f, PropertyChangeEdge parm) {
+    public static boolean showDialog(JFrame f, PropertyChangeListenerEdge parm) {
         if (dialog == null) {
             dialog = new PclEdgeInspectorDialog(f, parm);
         } else {
@@ -66,7 +66,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclEdgeInspectorDialog(JFrame parent, PropertyChangeEdge ed) {
+    private PclEdgeInspectorDialog(JFrame parent, PropertyChangeListenerEdge ed) {
         super(parent, "Property Change Connection", true);
         this.pclEdge = ed;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -133,7 +133,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         }
     }
 
-    public final void setParams(Component c, PropertyChangeEdge p) {
+    public final void setParams(Component c, PropertyChangeListenerEdge p) {
         pclEdge = p;
 
         fillWidgets();
@@ -231,9 +231,9 @@ public class PclEdgeInspectorDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             Object o = pclEdge.getFrom();
             String classname = null;
-            if (o instanceof EvGraphNode) {
+            if (o instanceof EventGraphNode) {
                 classname = ((ViskitElement) o).getType();
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 classname = ((ViskitElement) o).getType();
             }
 
@@ -247,7 +247,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
+                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");

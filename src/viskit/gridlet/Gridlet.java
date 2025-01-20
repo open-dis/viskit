@@ -55,7 +55,7 @@ import javax.tools.ToolProvider;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.doe.DoeException;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
@@ -175,7 +175,7 @@ public class Gridlet extends Thread {
                 // TODO: Fix generics
                 v = (Vector) xmlrpc.execute("gridkit.getJars",v);
                 Enumeration e = v.elements();
-                ClassLoader boot = ViskitGlobals.instance().getWorkClassLoader();
+                ClassLoader boot = VGlobals.instance().getWorkClassLoader();
                 if (boot instanceof Boot) {
                     while (e.hasMoreElements()) {
                         ((Boot) boot).addJar(new URI((String) e.nextElement()).toURL());
@@ -188,7 +188,7 @@ public class Gridlet extends Thread {
 
             } else {
                 // check if LocalBootLoader mode, otherwise throw exception
-                Object loaderO = ViskitGlobals.instance().getWorkClassLoader();
+                Object loaderO = VGlobals.instance().getWorkClassLoader();
                 Class<?> loaderz = loaderO.getClass();
                 if ( !( loaderz.getName().equals(VStatics.LOCAL_BOOT_LOADER) ) ) {
                     throw new RuntimeException("Not running as SGE job or local mode?");
@@ -209,7 +209,7 @@ public class Gridlet extends Thread {
         this.filename = expFile.getName();
         try {
             //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
-            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getWorkClassLoader());
+            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ VGlobals.instance().getWorkClassLoader());
             //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURI().toURL().openStream());
         } catch (IOException ex) {

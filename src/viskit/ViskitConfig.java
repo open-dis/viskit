@@ -276,8 +276,8 @@ public class ViskitConfig {
             FileHandler.marshallJdom(C_GUI_FILE, doc, false);
 
             // For the current viskitProject.xml file
-            doc = FileHandler.unmarshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile());
-            FileHandler.marshallJdom(ViskitGlobals.instance().getCurrentViskitProject().getProjectFile(), doc, false);
+            doc = FileHandler.unmarshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile());
+            FileHandler.marshallJdom(VGlobals.instance().getCurrentViskitProject().getProjectFile(), doc, false);
         } catch (IOException | JDOMException e) {
             LOG.error("Bad JDOM cleanup {}: ", e);
         }

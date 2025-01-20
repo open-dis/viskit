@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.util.FindClassesForInterface;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 import viskit.ViskitConfig;
 
@@ -119,7 +119,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found EGs
-                    paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {
@@ -176,7 +176,7 @@ public class FileBasedClassManager {
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = ViskitGlobals.instance().getWorkClassLoader();
+        ClassLoader loader = VGlobals.instance().getWorkClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
@@ -226,7 +226,7 @@ public class FileBasedClassManager {
 
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
-//                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                String s = VGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
 //                if (viskit.VStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }

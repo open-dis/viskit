@@ -50,12 +50,12 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import viskit.jgraph.ViskitGraphUndoManager;
+import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -117,12 +117,12 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         LOG.debug("Compiling assembly: {}", assyPath);
         File f = new File(assyPath);
         _doOpen(f);
-        prepSimRunner();
+        prepareSimulationRunner();
     }
 
     @Override
     public void begin() {
-        File projPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+        File projPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
         // The initialAssyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -270,7 +270,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
 
         if (view.getCurrentVgacw() != null) {
-            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -337,7 +337,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
-                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
+                    ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel vAMod = (AssemblyModel) getModel();
                     markAssyConfigClosed(vAMod.getLastFile());
@@ -481,7 +481,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         if (mod == null) {return;}
         GraphMetadata gmd = mod.getMetaData();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -550,13 +550,13 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void newProject() {
         if (handleProjectClosing()) {
-            ViskitGlobals.instance().initProjectHome();
-            ViskitGlobals.instance().createWorkDirectory();
+            VGlobals.instance().initProjectHome();
+            VGlobals.instance().createWorkDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (egFiles.length == 0) {
-                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
+                ((EventGraphController)VGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
     }
@@ -573,7 +573,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projDir = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projDir = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
                 projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
                 logFile = new File(projDir, "debug.log");
 
@@ -635,7 +635,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      */
     public boolean handleProjectClosing() {
         boolean retVal = true;
-        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+        if (VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";
 
@@ -652,21 +652,21 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     @Override
     public void doProjectCleanup() {
         closeAll();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfig.instance().clearViskitConfig();
-        clearRecentAssemblyFileList();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
-        ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+        clearRecentAssyFileList();
+        ((EventGraphController) VGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
+        VGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
     @Override
     public void openProject(File file) {
         VStatics.setViskitProjectFile(file);
-        ViskitGlobals.instance().createWorkDirectory();
+        VGlobals.instance().createWorkDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
+        adjustRecentProjSet(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        VGlobals.instance().getEventGraphEditor().showProjectName();
         runner.resetRunner();
     }
 
@@ -675,7 +675,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
         // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
         GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -697,7 +697,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         }
 
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(VGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -743,7 +743,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
     @Override
     public void postQuit() {
-        ViskitGlobals.instance().quitAssemblyEditor();
+        VGlobals.instance().quitAssemblyEditor();
     }
 
     private boolean closeAll = false;
@@ -930,7 +930,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newSimEvListArc(Object[] nodes) {
+    public void newSimEventListenerArc(Object[] nodes) {
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
@@ -944,7 +944,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void newPropChangeListArc(Object[] nodes) {
+    public void newPropertyChangeListenerArc(Object[] nodes) {
         // One and only one has to be a prop change listener
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
@@ -955,7 +955,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        pcListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
     AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
@@ -1029,7 +1029,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
      * @param pclNode Property Change Listener Node
      */
     @Override
-    public void pcListenerEdit(PropChangeListenerNode pclNode) {
+    public void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode) {
         boolean done, modified;
         do {
             done = true;
@@ -1041,7 +1041,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void evGraphEdit(EvGraphNode evNode) {
+    public void eventGraphEdit(EventGraphNode evNode) {
         boolean done, modified;
         do {
             done = true;
@@ -1053,7 +1053,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void pcListenerEdgeEdit(PropertyChangeEdge pclEdge) {
+    public void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge) {
         boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
@@ -1178,11 +1178,11 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
 
             p = new Point(x + (offset * copyCount), y + (offset * copyCount));
-            if (o instanceof EvGraphNode) {
+            if (o instanceof EventGraphNode) {
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
@@ -1199,18 +1199,18 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         for (Object elem : v) {
             if (elem instanceof AssemblyEdge) {
                 removeEdge((AssemblyEdge) elem);
-            } else if (elem instanceof EvGraphNode) {
-                en = (EvGraphNode) elem;
+            } else if (elem instanceof EventGraphNode) {
+                en = (EventGraphNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deleteEvGraphNode((EvGraphNode) en);
-            } else if (elem instanceof PropChangeListenerNode) {
-                en = (PropChangeListenerNode) elem;
+                ((AssemblyModel) getModel()).deleteEvGraphNode((EventGraphNode) en);
+            } else if (elem instanceof PropertyChangeListenerNode) {
+                en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePropChangeListener((PropChangeListenerNode) en);
+                ((AssemblyModel) getModel()).deletePropChangeListener((PropertyChangeListenerNode) en);
             }
         }
 
@@ -1222,8 +1222,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropertyChangeEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
+        } else if (e instanceof PropertyChangeListenerEdge) {
+            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeListenerEdge) e);
         } else if (e instanceof SimEvListenerEdge) {
             ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
         }
@@ -1261,7 +1261,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
                 break;
         }
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         // Prevent dups
         if (!selectionVector.contains(redoGraphCell.getUserObject()))
@@ -1292,8 +1292,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) {
-                PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
+            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerEdge) {
+                PropertyChangeListenerEdge ed = (PropertyChangeListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
                 SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
@@ -1301,17 +1301,17 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             }
         } else {
 
-            if (redoGraphCell.getUserObject() instanceof PropChangeListenerNode) {
-                PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
+            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
+                PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeListener(node);
             } else {
-                EvGraphNode node = (EvGraphNode) redoGraphCell.getUserObject();
+                EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoEventGraph(node);
             }
         }
 
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -1324,7 +1324,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
@@ -1486,7 +1486,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProj = VGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
             File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
@@ -1627,7 +1627,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void prepSimRunner() {
+    public void prepareSimulationRunner() {
 
         // Prevent multiple pushes of the initialize sim run button
         mutex++;
@@ -1656,7 +1656,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
 
                 if (execStrings == null) {
 
-                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
+                    if (VGlobals.instance().getActiveAssemblyModel() == null) {
                         messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
@@ -1842,7 +1842,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened
-                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
+                ((EventGraphControllerImpl) VGlobals.instance().getEventGraphController())._doOpen(file);
             }
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
@@ -1961,7 +1961,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void clearRecentAssemblyFileList() {
+    public void clearRecentAssyFileList() {
         recentAssyFileSet.clear();
         saveAssyHistoryXML(recentAssyFileSet);
         notifyRecentAssyFileListeners();

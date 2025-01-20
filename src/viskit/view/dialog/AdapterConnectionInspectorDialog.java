@@ -49,7 +49,7 @@ import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.model.AdapterEdge;
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.VStatics;
 
 /**
@@ -92,7 +92,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     private final JPanel buttPan;
     private final enableApplyButtonListener lis;
     
-    private EvGraphNode sourceEVG,  targetEVG;
+    private EventGraphNode sourceEVG,  targetEVG;
     private AdapterEdge adapterEdge;
 
     public static boolean showDialog(JFrame f, AdapterEdge parm) {
@@ -216,10 +216,10 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     private void fillWidgets() {
         if (adapterEdge != null) {
             nameTF.setText(adapterEdge.getName());
-            sourceEVG = (EvGraphNode) adapterEdge.getFrom();
+            sourceEVG = (EventGraphNode) adapterEdge.getFrom();
             sourceTF.setText(sourceEVG.getName() + " (" + sourceEVG.getType() + ")");
             sourceEventTF.setText(adapterEdge.getSourceEvent());
-            targetEVG = (EvGraphNode) adapterEdge.getTo();
+            targetEVG = (EventGraphNode) adapterEdge.getTo();
             targetTF.setText(targetEVG.getName() + " (" + targetEVG.getType() + ")");
             targetEventTF.setText(adapterEdge.getTargetEvent());
             descTF.setText(adapterEdge.getDescriptionString());
@@ -325,7 +325,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         }
     }
 
-    private void commonFindEvents(EvGraphNode node, JTextField selection) {
+    private void commonFindEvents(EventGraphNode node, JTextField selection) {
         Class<?> c;
         String classname = node.getType();
         try {

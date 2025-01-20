@@ -251,7 +251,7 @@ public class VStatics {
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkClassLoader());
+        Class<?> c = cForName(s, VGlobals.instance().getWorkClassLoader());
 
         if (c == null) {
             c = tryUnqualifiedName(s);
@@ -288,7 +288,7 @@ public class VStatics {
                 }
             }
         } catch (NoClassDefFoundError e) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(
+            VGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s
@@ -447,13 +447,13 @@ public class VStatics {
 
         String userDir = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
-        String workDir = ViskitGlobals.instance().getWorkDirectory().getPath();
+        String workDir = VGlobals.instance().getWorkDirectory().getPath();
 
         FindFile finder;
         Path startingDir;
         String pattern = name + "\\.class";
         Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
         String[] classpaths = loader.getClassPath();
         String clazz;
 
@@ -740,7 +740,7 @@ public class VStatics {
         if (debug) {
             System.out.print("number of constructors for " + type + ":");
         }
-        if (ViskitGlobals.instance().isArray(type)) {
+        if (VGlobals.instance().isArray(type)) {
             if (debug) {
                 System.out.print("1");
             }

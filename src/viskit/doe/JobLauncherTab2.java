@@ -756,7 +756,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     // remove, for testing some loader stuff while writing it
     public void runTesting() {
         writeStatus("JobLauncherTab2.run()");
-        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
         //loader.setTab(this);
 
         // loader gets own copy of Viskit's libs, init method here
@@ -779,7 +779,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (gridMode) {
                 doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()));
             } else {
-                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
+                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.VGlobals.instance().getWorkDirectory());
             }
             System.gc();
             qstatConsole.setDoe(doe);

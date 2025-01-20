@@ -214,12 +214,12 @@ public interface EventGraphController {
 
     void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void addRecentEgFileListener(mvcRecentFileListener lis);
+    void addRecentEventGraphFileListener(mvcRecentFileListener lis);
 
     void removeRecentEgFileListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentEGFileSet();
+    Set<String> getRecentEventGraphFileSet();
 
     /** Clears the recent EG file list thus far generated */
-    void clearRecentEGFileSet();
+    void clearRecentEventGraphFileSet();
 }

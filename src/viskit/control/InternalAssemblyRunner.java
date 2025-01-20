@@ -57,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 import simkit.Schedule;
 
 import viskit.util.TitleListener;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
@@ -127,10 +127,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.vcrStep.setEnabled(false);
 
         // Viskit's current working ClassLoader
-        lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
+        lastLoaderNoReset = VGlobals.instance().getWorkClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setSimRunnerPanel(runPanel);
+        VGlobals.instance().setSimRunnerPanel(runPanel);
     }
 
     public JMenuBar getMenus() {
@@ -164,7 +164,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         try {
             fillRepWidgetsFromPreRunAssy(defaultVerbose, saveRepDataToXml, defaultStopTime);
         } catch (Throwable throwable) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(
+            VGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
@@ -223,8 +223,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         try {
 
-            ViskitGlobals.instance().resetFreshClassLoader();
-            lastLoaderWithReset = ViskitGlobals.instance().getFreshClassLoader();
+            VGlobals.instance().resetFreshClassLoader();
+            lastLoaderWithReset = VGlobals.instance().getFreshClassLoader();
 
             // Test for Bug 1237
 //            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
@@ -292,7 +292,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setVerbose.invoke(assemblyInstance, getVerbose());
 
             setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl) VGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListener.invoke(assemblyInstance, this);
             assemblyRunnable = (Runnable) assemblyInstance;
 
@@ -459,9 +459,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+                saveChooser = new JFileChooser(VGlobals.instance().getCurrentViskitProject().getProjectRoot());
             }
-            File fil = ViskitGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
+            File fil = VGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
             int retv = saveChooser.showSaveDialog(null);
@@ -481,7 +481,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
                 bw.write(runPanel.assemblyOutputStreamTA.getText());
             } catch (IOException e1) {
-                ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
+                VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
         }
     }
@@ -492,7 +492,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             return;
         }
 
-        AnalystReportController analystReportController = (AnalystReportController) ViskitGlobals.instance().getAnalystReportController();
+        AnalystReportController analystReportController = (AnalystReportController) VGlobals.instance().getAnalystReportController();
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
 
@@ -504,7 +504,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 analystReportModel.setReportReady(false);
             }
         } else {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Analyst Report Panel not visible",
                     "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>To " +

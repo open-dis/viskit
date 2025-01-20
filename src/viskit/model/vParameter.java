@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * Class describes a "vParameter" to an event graph--something
@@ -60,7 +60,7 @@ public class vParameter extends ViskitElement {
     @Override
     public final void setType(String pType) {
         this.type = pType;
-        arraySize = ViskitGlobals.instance().getArraySize(pType);
+        arraySize = VGlobals.instance().getArraySize(pType);
     }
 
     public String[] getArraySize() {

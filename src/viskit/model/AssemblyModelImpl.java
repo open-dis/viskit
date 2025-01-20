@@ -14,15 +14,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.mvcAbstractModel;
+import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -49,7 +49,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl controller;
 
-    public AssemblyModelImpl(MvcController cont) {
+    public AssemblyModelImpl(mvcController cont) {
         pointLess = new Point2D.Double(30, 60);
         controller = (AssemblyControllerImpl) cont;
         metaData = new GraphMetadata(this);
@@ -201,7 +201,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
-            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
+            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(VGlobals.instance().getSimRunnerPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);
@@ -302,7 +302,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newEventGraph(String widgetName, String className, Point2D p) {
-        EvGraphNode node = new EvGraphNode(widgetName, className);
+        EventGraphNode node = new EventGraphNode(widgetName, className);
         if (p == null) {
             node.setPosition(pointLess);
         } else {
@@ -330,7 +330,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoEventGraph(EvGraphNode node) {
+    public void redoEventGraph(EventGraphNode node) {
         SimEntity jaxbEG = oFactory.createSimEntity();
 
         jaxbEG.setName(node.getName());
@@ -346,7 +346,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteEvGraphNode(EvGraphNode evNode) {
+    public void deleteEvGraphNode(EventGraphNode evNode) {
         SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
         getNodeCache().remove(jaxbEv.getName());
         jaxbRoot.getSimEntity().remove(jaxbEv);
@@ -366,7 +366,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
-        PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
+        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className);
         if (p == null)
             pcNode.setPosition(pointLess);
         else
@@ -395,7 +395,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeListener(PropChangeListenerNode node) {
+    public void redoPropChangeListener(PropertyChangeListenerNode node) {
 
         PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
@@ -411,7 +411,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeListener(PropChangeListenerNode pclNode) {
+    public void deletePropChangeListener(PropertyChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
         getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
@@ -471,8 +471,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public PropertyChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
-        PropertyChangeEdge pce = new PropertyChangeEdge();
+    public PropertyChangeListenerEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
+        PropertyChangeListenerEdge pce = new PropertyChangeListenerEdge();
         pce.setFrom(src);
         pce.setTo(target);
 
@@ -494,7 +494,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeEdge(PropertyChangeEdge pce) {
+    public void redoPropChangeEdge(PropertyChangeListenerEdge pce) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) pce.getFrom();
@@ -552,7 +552,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeEdge(PropertyChangeEdge pce) {
+    public void deletePropChangeEdge(PropertyChangeListenerEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
@@ -593,7 +593,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changePclEdge(PropertyChangeEdge pclEdge) {
+    public void changePclEdge(PropertyChangeListenerEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
         pclc.setDescription(pclEdge.getDescriptionString());
@@ -604,8 +604,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeAdapterEdge(AdapterEdge ae) {
-        EvGraphNode src = (EvGraphNode) ae.getFrom();
-        EvGraphNode targ = (EvGraphNode) ae.getTo();
+        EventGraphNode src = (EventGraphNode) ae.getFrom();
+        EventGraphNode targ = (EventGraphNode) ae.getTo();
 
         Adapter jaxbAE = (Adapter) ae.opaqueModelObject;
 
@@ -624,8 +624,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeSimEvEdge(SimEvListenerEdge seEdge) {
-        EvGraphNode src = (EvGraphNode) seEdge.getFrom();
-        EvGraphNode targ = (EvGraphNode) seEdge.getTo();
+        EventGraphNode src = (EventGraphNode) seEdge.getFrom();
+        EventGraphNode targ = (EventGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
 
         selc.setListener(targ.getName());
@@ -637,7 +637,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changePclNode(PropChangeListenerNode pclNode) {
+    public boolean changePclNode(PropertyChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(pclNode);
@@ -694,7 +694,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changeEvGraphNode(EvGraphNode evNode) {
+    public boolean changeEvGraphNode(EventGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(evNode);
@@ -891,7 +891,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         if (vi instanceof VInstantiator.Array) {
             VInstantiator.Array via = (VInstantiator.Array) vi;
 
-            if (ViskitGlobals.instance().isArray(via.getType()))
+            if (VGlobals.instance().isArray(via.getType()))
                 return buildParamFromArray(via);
             else if (via.getType().contains("..."))
                 return buildParamFromVarargs(via);
@@ -947,10 +947,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
-        PropertyChangeEdge pce;
+        PropertyChangeListenerEdge pce;
         AssemblyNode toNode, frNode;
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            pce = new PropertyChangeEdge();
+            pce = new PropertyChangeListenerEdge();
             pce.setProperty(pclc.getProperty());
             pce.setDescriptionString(pclc.getDescription());
             toNode = getNodeCache().get(pclc.getListener());
@@ -1049,12 +1049,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         }
     }
 
-    private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
-        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl.getName());
+    private PropertyChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
+        PropertyChangeListenerNode pNode = (PropertyChangeListenerNode) getNodeCache().get(pcl.getName());
         if (pNode != null) {
             return pNode;
         }
-        pNode = new PropChangeListenerNode(pcl.getName(), pcl.getType());
+        pNode = new PropertyChangeListenerNode(pcl.getName(), pcl.getType());
 
         // For backwards compatibility, bug 706
         pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
@@ -1087,12 +1087,12 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
         return pNode;
     }
 
-    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
-        EvGraphNode en = (EvGraphNode) getNodeCache().get(se.getName());
+    private EventGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
+        EventGraphNode en = (EventGraphNode) getNodeCache().get(se.getName());
         if (en != null) {
             return en;
         }
-        en = new EvGraphNode(se.getName(), se.getType());
+        en = new EventGraphNode(se.getName(), se.getType());
 
         Coordinate coor = se.getCoordinate();
         if (coor == null) {

@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +35,7 @@ public class EventStateTransition extends ViskitElement {
         }
 
         sb.append(name);
-        if (ViskitGlobals.instance().isArray(type)) {
+        if (VGlobals.instance().isArray(type)) {
             handleArrayIndexing(sb);
         }
 

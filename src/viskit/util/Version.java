@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Properties;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * Reads a file assumed to be in the following form (2 lines):
@@ -49,12 +49,12 @@ public class Version {
         
         versionProperties = new Properties();
         
-        // version.txt is in the same package as ViskitGlobals
-        URL versionURL = ViskitGlobals.class.getResource(fileName);
+        // version.txt is in the same package as VGlobals
+        URL versionURL = VGlobals.class.getResource(fileName);
         
         if (versionURL != null)
             if (versionURL.getProtocol().equals("jar"))
-                stream = ViskitGlobals.class.getResourceAsStream(fileName);
+                stream = VGlobals.class.getResourceAsStream(fileName);
             else {
                 try {
                     stream = versionURL.openStream();

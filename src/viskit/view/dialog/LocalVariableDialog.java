@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -84,7 +84,7 @@ public class LocalVariableDialog extends JDialog {
         setMaxHeight(valueField);
         commentField = new JTextField(25);
         setMaxHeight(commentField);
-        typeCombo = ViskitGlobals.instance().getTypeCB();
+        typeCombo = VGlobals.instance().getTypeCB();
         setMaxHeight(typeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
@@ -151,7 +151,7 @@ public class LocalVariableDialog extends JDialog {
 
     private void unloadWidgets() {
         String ty = (String) typeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
+        ty = VGlobals.instance().typeChosen(ty);
         String nm = nameField.getText();
         nm = nm.replaceAll("\\s", "");
         if (locVar != null) {

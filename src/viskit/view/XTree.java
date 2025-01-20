@@ -16,7 +16,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.*;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.doe.FileHandler;
 
@@ -275,7 +275,7 @@ public class XTree extends JTree {
             jfc.showOpenDialog(f);
             File fil = jfc.getSelectedFile();
             if (fil == null) {
-                ViskitGlobals.instance().sysExit(0);
+                VGlobals.instance().sysExit(0);
             }
             
             f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

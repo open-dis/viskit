@@ -19,7 +19,7 @@ import edu.nps.util.LogUtils;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import simkit.Priority;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.control.EventGraphController;
 import viskit.model.Edge;
@@ -363,7 +363,7 @@ public class EdgeInspectorDialog extends JDialog {
     private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
         JComboBox<ViskitElement> cb = new JComboBox<>();
 
-        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsCBModel();
+        ComboBoxModel<ViskitElement> m = VGlobals.instance().getSimParamsCBModel();
 
         // First item should be empty to allow for default zero delay
         ((MutableComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
@@ -387,22 +387,22 @@ public class EdgeInspectorDialog extends JDialog {
 
         java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
         types.addAll(edge.from.getArguments());
-        types.addAll(ViskitGlobals.instance().getSimParametersList());
+        types.addAll(VGlobals.instance().getSimParametersList());
 
         String className;
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (VGlobals.instance().isGeneric(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
-            if (ViskitGlobals.instance().isArray(typ)) {
+            if (VGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
             type = VStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ((EventGraphController) VGlobals.instance().getEventGraphController()).messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "

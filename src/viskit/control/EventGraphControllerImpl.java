@@ -33,10 +33,10 @@ import org.apache.logging.log4j.Logger;
 
 import org.jgraph.graph.DefaultGraphCell;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.VStatics;
-import viskit.jgraph.ViskitGraphUndoManager;
+import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.mvcAbstractController;
 import viskit.mvc.mvcModel;
@@ -90,7 +90,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         } else {
 
             // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] egFiles = VGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (egFiles.length == 0) {
                 newEventGraph();
             }
@@ -104,12 +104,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void newProject() {
-        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).newProject();
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).newProject();
     }
 
     @Override
     public void zipAndMailProject() {
-        ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).zipAndMailProject();
+        ((AssemblyController)VGlobals.instance().getAssemblyController()).zipAndMailProject();
     }
 
     @Override
@@ -117,7 +117,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
         // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!VGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
 
         GraphMetadata oldGmd = null;
         Model viskitModel = (Model) getModel();
@@ -267,7 +267,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
 
         if (view.getCurrentVgraphComponentWrapper() != null) {
-            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -330,7 +330,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         String nm = f.getName();
         File ofile = new File(watchDir, nm);
         ofile.delete();
-        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getAssemblyController().getView();
+        AssemblyView view = (AssemblyView) VGlobals.instance().getAssemblyController().getView();
         view.removeEventGraphFromLEGOTree(f);
     }
 
@@ -347,7 +347,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     Set<mvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentEgFileListener(mvcRecentFileListener lis)
+    public void addRecentEventGraphFileListener(mvcRecentFileListener lis)
     {
       recentListeners.add(lis);
     }
@@ -427,14 +427,14 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     }
 
     @Override
-    public void clearRecentEGFileSet() {
+    public void clearRecentEventGraphFileSet() {
         recentEGFileSet.clear();
         saveEgHistoryXML(recentEGFileSet);
         notifyRecentFileListeners();
     }
 
     @Override
-    public Set<String> getRecentEGFileSet() {
+    public Set<String> getRecentEventGraphFileSet() {
         return getRecentEGFileSet(false);
     }
 
@@ -483,7 +483,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
 
     @Override
     public void postQuit() {
-        ViskitGlobals.instance().quitEventGraphEditor();
+        VGlobals.instance().quitEventGraphEditor();
         dirWatch.stopWatcher();
     }
 
@@ -609,7 +609,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated. model.isDirty will be set from
             // this call.
-            ViskitGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
+            VGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
         }
 
         // Don't watch an XML file whose source couldn't be compiled correctly
@@ -854,7 +854,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
                 break;
         }
 
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
 
             // This will clear the selectionVector via callbacks
@@ -890,7 +890,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -903,7 +903,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
@@ -953,12 +953,12 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             LOG.error(fnfe);
         }
 
-        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
+        String source = ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
             String className = mod.getMetaData().packageName + "." +
                     mod.getMetaData().name;
-            ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
+            VGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
@@ -968,7 +968,7 @@ public class EventGraphControllerImpl extends mvcAbstractController implements E
             return;
         }
 
-        ViskitGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
+        VGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
     }
 
     @Override

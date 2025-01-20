@@ -5,7 +5,7 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.util.FindClassesForInterface;
 import viskit.ViskitProject;
 

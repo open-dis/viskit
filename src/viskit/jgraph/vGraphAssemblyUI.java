@@ -3,7 +3,7 @@ package viskit.jgraph;
 import java.awt.event.MouseEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.jgraph.plaf.basic.BasicGraphUI;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.control.AssemblyController;
 import viskit.model.*;
 
@@ -21,9 +21,9 @@ import viskit.model.*;
  * @since 3:17:59 PM
  * @version $Id$
  */
-public class ViskitGraphAssemblyUI extends BasicGraphUI {
+public class vGraphAssemblyUI extends BasicGraphUI {
 
-    public ViskitGraphAssemblyUI() {
+    public vGraphAssemblyUI() {
         super();
     }
 
@@ -45,20 +45,20 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
 
     private void createEditDialog(Object cell) {
 
-        AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        AssemblyController cntl = (AssemblyController) VGlobals.instance().getAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
         if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
-                assemblyController.adapterEdgeEdit((AdapterEdge) obj);
-            } else if (obj instanceof PropertyChangeEdge) {
-                assemblyController.pcListenerEdgeEdit((PropertyChangeEdge) obj);
+                cntl.adapterEdgeEdit((AdapterEdge) obj);
+            } else if (obj instanceof PropertyChangeListenerEdge) {
+                cntl.propertyChangeListenerEdgeEdit((PropertyChangeListenerEdge) obj);
             } else {
-                assemblyController.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
+                cntl.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
             }
         } else if (cell instanceof ViskitAssemblyCircleCell) {
-            assemblyController.evGraphEdit((EvGraphNode) obj);
+            cntl.eventGraphEdit((EventGraphNode) obj);
         } else if (cell instanceof ViskitAssemblyPropertyListCell) {
-            assemblyController.pcListenerEdit((PropChangeListenerNode) obj);
+            cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) obj);
         }
     }
 }

@@ -77,7 +77,7 @@ import org.jfree.data.statistics.Regression;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitProject;
 
 /**
@@ -111,7 +111,7 @@ public class LinearRegressionChart {
      * @return the path url of the created object
      */
     public String createChart(String title, String label, double[] data) {
-        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
+        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "LinearRegression.png");
         XYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);

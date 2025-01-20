@@ -17,15 +17,15 @@ import viskit.model.*;
 public interface AssemblyView {
 
     // permit user to edit existing entities
-    boolean doEditPclNode(PropChangeListenerNode pclNode);
+    boolean doEditPclNode(PropertyChangeListenerNode pclNode);
 
     /** Permits user to edit existing entities
      * @param evNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEvGraphNode(EvGraphNode evNode);
+    boolean doEditEvGraphNode(EventGraphNode evNode);
 
-    boolean doEditPclEdge(PropertyChangeEdge pclEdge);
+    boolean doEditPclEdge(PropertyChangeListenerEdge pclEdge);
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
