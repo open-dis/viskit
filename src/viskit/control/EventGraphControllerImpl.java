@@ -38,14 +38,14 @@ import viskit.ViskitConfig;
 import viskit.VStatics;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
-import viskit.mvc.MvcAbstractController;
+import viskit.mvc.mvcAbstractController;
+import viskit.mvc.mvcModel;
+import viskit.mvc.mvcRecentFileListener;
 import viskit.view.dialog.EventGraphMetadataDialog;
 import viskit.view.AssemblyView;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.EventGraphView;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
-import viskit.mvc.MvcModel;
-import viskit.mvc.MvcRecentFileListener;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -63,7 +63,7 @@ import viskit.mvc.MvcRecentFileListener;
  2 instantiate it in the constructor, mapping it to a handler (name)
  3 write the handler
  */
-public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController {
+public class EventGraphControllerImpl extends mvcAbstractController implements EventGraphController {
 
     static final Logger LOG = LogUtils.getLogger(EventGraphControllerImpl.class);
 
@@ -344,23 +344,23 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         dirWatch.removeListener(lis);
     }
 
-    Set<MvcRecentFileListener> recentListeners = new HashSet<>();
+    Set<mvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentEgFileListener(MvcRecentFileListener lis)
+    public void addRecentEgFileListener(mvcRecentFileListener lis)
     {
       recentListeners.add(lis);
     }
 
     @Override
-    public void removeRecentEgFileListener(MvcRecentFileListener lis)
+    public void removeRecentEgFileListener(mvcRecentFileListener lis)
     {
       recentListeners.remove(lis);
     }
 
     private void notifyRecentFileListeners()
     {
-      for(MvcRecentFileListener lis : recentListeners) {
+      for(mvcRecentFileListener lis : recentListeners) {
             lis.listChanged();
         }
     }
@@ -471,7 +471,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         // Check for dirty models before exiting
         Model[] mods = ((EventGraphView) getView()).getOpenModels();
         for (Model mod : mods) {
-            setModel((MvcModel) mod);
+            setModel((mvcModel) mod);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -492,7 +492,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         Model[] mods = ((EventGraphView) getView()).getOpenModels();
         for (Model mod : mods) {
-            setModel((MvcModel) mod);
+            setModel((mvcModel) mod);
             close();
         }
     }

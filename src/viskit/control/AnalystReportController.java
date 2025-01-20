@@ -50,7 +50,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
-import viskit.mvc.MvcAbstractController;
+import viskit.mvc.mvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
 import viskit.view.AnalystReportFrame;
@@ -61,7 +61,7 @@ import viskit.view.AnalystReportFrame;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.AnalystReportController">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class AnalystReportController extends MvcAbstractController {
+public class AnalystReportController extends mvcAbstractController {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
 
