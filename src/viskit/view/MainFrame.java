@@ -58,10 +58,10 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcModel;
 import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
-import viskit.mvc.MvcModel;
 
 /**
  * MOVES Institute
@@ -74,9 +74,9 @@ import viskit.mvc.MvcModel;
  */
 public class MainFrame extends JFrame {
 
-    MvcAbstractJFrameView egFrame;
-    MvcAbstractJFrameView assyFrame;
-    MvcAbstractJFrameView reportPanel;
+    mvcAbstractJFrameView egFrame;
+    mvcAbstractJFrameView assyFrame;
+    mvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
 
@@ -348,7 +348,7 @@ public class MainFrame extends JFrame {
             for (Model mod : mods) {
                 if (mod.isDirty()) {
                     dirtyMod = mod;
-                    ViskitGlobals.instance().getEventGraphController().setModel((MvcModel) mod);
+                    ViskitGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }

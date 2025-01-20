@@ -1,6 +1,6 @@
 package viskit.model;
 
-import viskit.mvc.MvcModelEvent;
+import viskit.mvc.mvcModelEvent;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -17,7 +17,7 @@ import viskit.mvc.MvcModelEvent;
  *
  * TODO: Implement enums for this (tdn) 9/14/24
  */
-public class ModelEvent extends MvcModelEvent
+public class ModelEvent extends mvcModelEvent
 {
   public static final int NEWMODEL = 0;
 
