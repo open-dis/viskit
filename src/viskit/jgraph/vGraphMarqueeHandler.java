@@ -202,7 +202,7 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
             if (graph instanceof vGraphComponent) {
                 ((vGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             } else {
-                ((vGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+                ((viskitGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             }
             e.consume();
             
@@ -211,8 +211,8 @@ public class vGraphMarqueeHandler extends BasicMarqueeHandler {
             GraphModel mod = graph.getModel();
             if (mod instanceof vGraphModel) {
                 ((vGraphModel)mod).reDrawNodes();
-            } else if (mod instanceof vGraphAssemblyModel) {
-                ((vGraphAssemblyModel)mod).reDrawNodes();
+            } else if (mod instanceof ViskitGraphAssemblyModel) {
+                ((ViskitGraphAssemblyModel)mod).reDrawNodes();
             }
         }
         

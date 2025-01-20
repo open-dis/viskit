@@ -14,10 +14,11 @@ import javax.swing.ImageIcon;
  */
 public class ViskitApplication extends javax.swing.JFrame {
 
-    private final static int INDEX_EVENTGRAPH_EDITOR_TAB = 0;
-    private final static int INDEX_ASSEMBLY_EDITOR_TAB   = 1;
-    private final static int INDEX_ASSEMBLY_RUN_TAB      = 2;
-    private final static int INDEX_ANALYST_REPORT_TAB    = 3;
+    private final static int INDEX_EVENTGRAPH_EDITOR_TAB     = 0;
+    private final static int INDEX_ASSEMBLY_EDITOR_TAB       = 1;
+    private final static int INDEX_DESIGN_OF_EXPERIMENTS_TAB = 2;
+    private final static int INDEX_ASSEMBLY_RUN_TAB          = 3;
+    private final static int INDEX_ANALYST_REPORT_TAB        = 4;
     
     /**
      * Creates new form NewViskitApplicationJFrame
@@ -33,6 +34,15 @@ public class ViskitApplication extends javax.swing.JFrame {
         // https://stackoverflow.com/questions/15657569/how-to-set-icon-to-jframe
         ImageIcon imageIcon = new ImageIcon("images/ViskitLogo.png");
         setIconImage(imageIcon.getImage());
+    }
+    protected void setTab(int newTab)
+    {
+        if ((newTab >= INDEX_EVENTGRAPH_EDITOR_TAB) &&
+            (newTab <= INDEX_ANALYST_REPORT_TAB))
+        {
+            viskitTabbedPane.setSelectedIndex(newTab);
+        }
+        else System.err.println ("*** illegal value ViskitApplication.setTab(" + newTab + "), ignored");            
     }
 
     /**
@@ -128,7 +138,6 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("Viskit"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(800, 600));
 
         javax.swing.GroupLayout eventGraphEditorPanelLayout = new javax.swing.GroupLayout(eventGraphEditorPanel);
         eventGraphEditorPanel.setLayout(eventGraphEditorPanelLayout);
@@ -138,7 +147,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         eventGraphEditorPanelLayout.setVerticalGroup(
             eventGraphEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 543, Short.MAX_VALUE)
+            .addGap(0, 542, Short.MAX_VALUE)
         );
 
         viskitTabbedPane.addTab("Event Graph Editor", eventGraphEditorPanel);
@@ -151,7 +160,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         assemblyEditorPanelLayout.setVerticalGroup(
             assemblyEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 543, Short.MAX_VALUE)
+            .addGap(0, 542, Short.MAX_VALUE)
         );
 
         viskitTabbedPane.addTab("Assembly Editor", assemblyEditorPanel);
@@ -164,7 +173,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         designOfExperimentsPanelLayout.setVerticalGroup(
             designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 543, Short.MAX_VALUE)
+            .addGap(0, 542, Short.MAX_VALUE)
         );
 
         viskitTabbedPane.addTab("Design of Experiments (DOE)", designOfExperimentsPanel);
@@ -177,7 +186,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         runLocalSimulationPanelLayout.setVerticalGroup(
             runLocalSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 508, Short.MAX_VALUE)
+            .addGap(0, 507, Short.MAX_VALUE)
         );
 
         runSimulationTabbedPane.addTab("Run Local Simulation", runLocalSimulationPanel);
@@ -192,7 +201,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         runClusterSimulationPanelLayout.setVerticalGroup(
             runClusterSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 508, Short.MAX_VALUE)
+            .addGap(0, 507, Short.MAX_VALUE)
         );
 
         runSimulationTabbedPane.addTab("Run Cluster Simulation", runClusterSimulationPanel);
@@ -207,7 +216,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _1_HeaderPanelLayout.setVerticalGroup(
             _1_HeaderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("1 Header", _1_HeaderPanel);
@@ -220,7 +229,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _2_ExecutiveSummaryPanelLayout.setVerticalGroup(
             _2_ExecutiveSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("2 ExecutiveSummary", _2_ExecutiveSummaryPanel);
@@ -233,7 +242,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _3_SimulationLocationPanelLayout.setVerticalGroup(
             _3_SimulationLocationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("3 Simulation Location", _3_SimulationLocationPanel);
@@ -246,7 +255,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _4_AssemblyConfirgurationPanelLayout.setVerticalGroup(
             _4_AssemblyConfirgurationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("4 Assembly Configuration", _4_AssemblyConfirgurationPanel);
@@ -259,7 +268,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _5_EntityParametersPanelLayout.setVerticalGroup(
             _5_EntityParametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("5 Entity Parameters", _5_EntityParametersPanel);
@@ -272,7 +281,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _6_BehaviorDescriptionsPanelLayout.setVerticalGroup(
             _6_BehaviorDescriptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("6 Behavior Descriptions", _6_BehaviorDescriptionsPanel);
@@ -285,7 +294,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _7_StatisticalResultsPanelLayout.setVerticalGroup(
             _7_StatisticalResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("7 Statistical Results", _7_StatisticalResultsPanel);
@@ -298,7 +307,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
         _8_ConclusionsRecommendationsPanelLayout.setVerticalGroup(
             _8_ConclusionsRecommendationsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 466, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
 
         analystReportTabbedPane.addTab("8 Conclusions, Recommendations", _8_ConclusionsRecommendationsPanel);
@@ -321,6 +330,8 @@ public class ViskitApplication extends javax.swing.JFrame {
         );
 
         viskitTabbedPane.addTab("Analyst Report", analystReportPanel);
+
+        viskitTabbedPane.setSelectedIndex(1);
 
         fileMenu.setText("File  ");
 
@@ -664,8 +675,11 @@ public class ViskitApplication extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new ViskitApplication().setVisible(true);
+                ViskitApplication viskitApplication = new ViskitApplication();
+                viskitApplication.setVisible(true);
+                viskitApplication.setTab(ViskitApplication.INDEX_ASSEMBLY_RUN_TAB);
             }
         });
     }

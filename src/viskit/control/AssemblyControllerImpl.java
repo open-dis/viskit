@@ -1053,7 +1053,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void pcListenerEdgeEdit(PropChangeEdge pclEdge) {
+    public void pcListenerEdgeEdit(PropertyChangeEdge pclEdge) {
         boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
@@ -1222,8 +1222,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropChangeEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropChangeEdge) e);
+        } else if (e instanceof PropertyChangeEdge) {
+            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
         } else if (e instanceof SimEvListenerEdge) {
             ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
         }
@@ -1292,8 +1292,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
             if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropChangeEdge) {
-                PropChangeEdge ed = (PropChangeEdge) redoGraphCell.getUserObject();
+            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) {
+                PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
                 SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();

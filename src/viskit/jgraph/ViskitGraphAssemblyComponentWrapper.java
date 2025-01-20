@@ -72,22 +72,22 @@ import viskit.view.AssemblyViewFrame;
  *   <pre><b>
  *     Date:     22 AUG 2008
  *     Time:     1758Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.VgraphAssemblyComponentWrapper">Terry Norbraten, NPS MOVES</a>
+ *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.ViskitGraphAssemblyComponentWrapper">Terry Norbraten, NPS MOVES</a>
  *     Comments: 1) Initial
  *
  *   </b></pre>
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
+public class ViskitGraphAssemblyComponentWrapper extends viskitGraphAssemblyComponent {
 
-    public AssemblyModel assyModel;
+    public AssemblyModel assemblyModel;
     public JSplitPane drawingSplitPane;
-    public JSplitPane trees;
+    public JSplitPane   treesSplitPane;
     public boolean isActive = true;
 
-    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public ViskitGraphAssemblyComponentWrapper(ViskitGraphAssemblyModel model, AssemblyViewFrame frame) {
         super(model, frame);
     }
 
-} // end class file VgraphAssemblyComponentWrapper.java
+} // end class file ViskitGraphAssemblyComponentWrapper.java

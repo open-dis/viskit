@@ -666,7 +666,7 @@ class vPortView extends PortView {
  */
 class vEdgeView extends EdgeView {
 
-    static vEdgeRenderer localRenderer = new vEdgeRenderer();
+    static viskitEdgeRenderer localRenderer = new viskitEdgeRenderer();
 
     public vEdgeView(Object cell) {
         super(cell);
@@ -710,7 +710,7 @@ class vCircleCell extends DefaultGraphCell {
  */
 class vCircleView extends VertexView {
 
-    static vVertexRenderer localRenderer = new vVertexRenderer();
+    static ViskitVertexRenderer localRenderer = new ViskitVertexRenderer();
 
     public vCircleView(Object cell) {
         super(cell);

@@ -471,8 +471,8 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
-        PropChangeEdge pce = new PropChangeEdge();
+    public PropertyChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
+        PropertyChangeEdge pce = new PropertyChangeEdge();
         pce.setFrom(src);
         pce.setTo(target);
 
@@ -494,7 +494,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeEdge(PropChangeEdge pce) {
+    public void redoPropChangeEdge(PropertyChangeEdge pce) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) pce.getFrom();
@@ -552,7 +552,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeEdge(PropChangeEdge pce) {
+    public void deletePropChangeEdge(PropertyChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
@@ -593,7 +593,7 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changePclEdge(PropChangeEdge pclEdge) {
+    public void changePclEdge(PropertyChangeEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
         pclc.setDescription(pclEdge.getDescriptionString());
@@ -947,10 +947,10 @@ public class AssemblyModelImpl extends mvcAbstractModel implements AssemblyModel
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
-        PropChangeEdge pce;
+        PropertyChangeEdge pce;
         AssemblyNode toNode, frNode;
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            pce = new PropChangeEdge();
+            pce = new PropertyChangeEdge();
             pce.setProperty(pclc.getProperty());
             pce.setDescriptionString(pclc.getDescription());
             toNode = getNodeCache().get(pclc.getListener());

@@ -101,7 +101,7 @@ public interface AssemblyController {
      *
      * @param pclEdge the PCL edite to edit
      */
-    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
+    void pcListenerEdgeEdit(PropertyChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *

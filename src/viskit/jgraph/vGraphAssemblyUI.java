@@ -47,17 +47,17 @@ public class vGraphAssemblyUI extends BasicGraphUI {
 
         AssemblyController cntl = (AssemblyController) VGlobals.instance().getAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
-        if (cell instanceof vAssyEdgeCell) {
+        if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
                 cntl.adapterEdgeEdit((AdapterEdge) obj);
-            } else if (obj instanceof PropChangeEdge) {
-                cntl.pcListenerEdgeEdit((PropChangeEdge) obj);
+            } else if (obj instanceof PropertyChangeEdge) {
+                cntl.pcListenerEdgeEdit((PropertyChangeEdge) obj);
             } else {
                 cntl.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
             }
-        } else if (cell instanceof vAssyCircleCell) {
+        } else if (cell instanceof ViskitAssemblyCircleCell) {
             cntl.evGraphEdit((EvGraphNode) obj);
-        } else if (cell instanceof vAssyPropListCell) {
+        } else if (cell instanceof ViskitAssemblyPropertyListCell) {
             cntl.pcListenerEdit((PropChangeListenerNode) obj);
         }
     }
