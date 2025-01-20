@@ -9,7 +9,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 import viskit.model.EvGraphNode;
 import viskit.model.VInstantiator;
@@ -57,7 +57,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         } catch (ClassNotFoundException e) {
             String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "Event Graph Definition Not Found", msg);
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "Event Graph Definition Not Found", msg);
             dialog = null;
             return false; // unmodified
         }

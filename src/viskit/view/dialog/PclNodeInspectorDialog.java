@@ -11,7 +11,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.model.PropChangeListenerNode;
 import viskit.view.InstantiationPanel;
@@ -57,7 +57,7 @@ public class PclNodeInspectorDialog extends JDialog {
         } catch (ClassNotFoundException e) {
             String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
+            VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
                     "Property Change Listener Definition Not Found", 
                     msg
             );

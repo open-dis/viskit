@@ -59,7 +59,7 @@ import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.logging.log4j.Logger;
 
 import viskit.control.EventGraphController;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitConfig;
 import viskit.ViskitProject;
 import viskit.VStatics;
@@ -353,7 +353,7 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            EventGraphController ctrlr = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
+            EventGraphController ctrlr = (EventGraphController) VGlobals.instance().getEventGraphController();
             ctrlr.clearRecentEGFileSet();
         }
     }
@@ -362,8 +362,8 @@ public class SettingsDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyController aCtrlr = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-            aCtrlr.clearRecentAssemblyFileList();
+            AssemblyController aCtrlr = (AssemblyController) VGlobals.instance().getAssemblyController();
+            aCtrlr.clearRecentAssyFileList();
         }
     }
 
@@ -401,10 +401,10 @@ public class SettingsDialog extends JDialog {
             setProgress(0);
 
             // Incase we have custom jars, need to add these to the ClassLoader
-            ViskitGlobals.instance().resetWorkClassLoader();
+            VGlobals.instance().resetWorkClassLoader();
 
             Runnable r = () -> {
-                ViskitGlobals.instance().rebuildLEGOTreePanels();
+                VGlobals.instance().rebuildLEGOTreePanels();
             };
             try {
                 SwingUtilities.invokeAndWait(r);
@@ -628,7 +628,7 @@ public class SettingsDialog extends JDialog {
             // Allow relative paths
             if (path.contains("..")) {
                 itr = Path.of(file.toURI()).iterator();
-                file = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                file = VGlobals.instance().getCurrentViskitProject().getProjectRoot();
                 while (itr.hasNext() && path.contains("..")) {
                     file = file.getParentFile();
                     path = path.replaceFirst("../", "");

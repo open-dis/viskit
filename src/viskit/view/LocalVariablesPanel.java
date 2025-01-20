@@ -1,6 +1,6 @@
 package viskit.view;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.model.EventLocalVariable;
 import viskit.model.ViskitElement;
 
@@ -51,7 +51,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
   {
     //return new EventLocalVariable("locvar_"+count++,"int","0");
     return new EventLocalVariable(
-            ViskitGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
+            VGlobals.instance().getActiveEventGraphModel().generateLocalVariableName(),
             "int",
             "0");
   }

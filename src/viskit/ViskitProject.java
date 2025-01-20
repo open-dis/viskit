@@ -135,20 +135,20 @@ public class ViskitProject {
 
         setAnalystReportsDir(new File(projectRoot, ANALYST_REPORTS_DIRECTORY_NAME));
         if (!analystReportsDir.exists()) {
-            getAnalystReportDir().mkdirs();
+            getAnalystReportsDir().mkdirs();
             try {
-                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportDir(), VISKIT_ICON_FILE_NAME).toPath());
+                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDir(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
                 LOG.error(ex);
             }
         }
 
-        setAnalystReportChartsDir(new File(getAnalystReportDir(), ANALYST_REPORT_CHARTS_DIRECTORY_NAME));
+        setAnalystReportChartsDir(new File(getAnalystReportsDir(), ANALYST_REPORT_CHARTS_DIRECTORY_NAME));
         if (!analystReportChartsDir.exists()) {
             getAnalystReportChartsDir().mkdirs();
         }
 
-        setAnalystReportImagesDir(new File(getAnalystReportDir(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
+        setAnalystReportImagesDir(new File(getAnalystReportsDir(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
 
         setAnalystReportAssemblyImagesDir(new File(getAnalystReportImagesDir(), ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME));
         if (!analystReportAssemblyImagesDir.exists()) {
@@ -160,7 +160,7 @@ public class ViskitProject {
             getAnalystReportEventGraphImagesDir().mkdirs();
         }
 
-        setAnalystReportStatisticsDir(new File(getAnalystReportDir(), ANALYST_REPORT_STATISTICS_DIRECTORY_NAME));
+        setAnalystReportStatisticsDir(new File(getAnalystReportsDir(), ANALYST_REPORT_STATISTICS_DIRECTORY_NAME));
         if (!analystReportStatisticsDir.exists()) {
             getAnalystReportStatisticsDir().mkdirs();
         }
@@ -432,7 +432,7 @@ public class ViskitProject {
     /**
      * @return the analystReportsDir
      */
-    public File getAnalystReportDir() {
+    public File getAnalystReportsDir() {
         return analystReportsDir;
     }
 

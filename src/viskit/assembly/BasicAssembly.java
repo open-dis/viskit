@@ -69,7 +69,7 @@ import simkit.stat.SampleStatistics;
 import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.ViskitConfig;
 
@@ -102,7 +102,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private double stopTime;
     private boolean singleStep;
     private int numberReplications;
-    static final public int DEFAULT_NUMBERREPLICATIONS = 30; // TODO create user preference
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
@@ -130,7 +129,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * printReplicationReports = true
      * printSummaryReport = true
      * saveReplicationData = false
-     * numberReplications = DEFAULT_NUMBERREPLICATIONS
+     * numberReplications = 1
      * </pre>
      */
     public BasicAssembly() {
@@ -143,7 +142,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         replicationStats = new PropertyChangeListener[0];
         designPointStats = new SampleStatistics[0];
         propertyChangeListener = new PropertyChangeListener[0];
-        setNumberReplications(DEFAULT_NUMBERREPLICATIONS);
+        setNumberReplications(1);
         hookupsCalled = false;
 
         // Creates a report stats config object and names it based on the name
@@ -597,7 +596,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         PrintStream out = new PrintStream(os);
         this.printWriter = new PrintWriter(os);
 
-        // This OutputStream gets ported to the JScrollPane of the Assembly Runner
+        // This OutputStream gets ported to the JScrollPane of the Assy Runner
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
@@ -739,7 +738,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (ConcurrentModificationException cme) {
-                    ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+                    VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
                             "Assembly Run Error",
                             cme + "\nSimulation will terminate"
                     );
@@ -821,7 +820,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
-            ClassLoader localLoader = ViskitGlobals.instance().getWorkClassLoader();
+            ClassLoader localLoader = VGlobals.instance().getWorkClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);

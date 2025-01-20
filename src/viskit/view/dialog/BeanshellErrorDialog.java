@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.ViskitConfig;
 
 /**
@@ -160,6 +160,6 @@ public class BeanshellErrorDialog extends JDialog {
 
     public static void main(String[] args) {
         BeanshellErrorDialog.showDialog("Mama Leone and \nblah blah", null);
-        ViskitGlobals.instance().sysExit(0);
+        VGlobals.instance().sysExit(0);
     }
 }

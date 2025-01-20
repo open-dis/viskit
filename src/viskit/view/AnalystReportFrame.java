@@ -66,10 +66,10 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.mvcController;
 import viskit.mvc.mvcModelEvent;
 import viskit.model.AnalystReportModel;
-import viskit.mvc.MvcController;
 
 /**
  * MOVES Institute
@@ -80,7 +80,7 @@ import viskit.mvc.MvcController;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAssembly.AssemblyChangeListener {
+public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
     private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
@@ -94,7 +94,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
 
-    public AnalystReportFrame(MvcController controller) {
+    public AnalystReportFrame(mvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);
         setLayout();
@@ -110,7 +110,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
-    private void initMVC(MvcController cntlr) {
+    private void initMVC(mvcController cntlr) {
         setController(cntlr);
     }
 
@@ -120,12 +120,12 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
      * @param param the object to act upon
      */
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;
-                AnalystReportController analystReportController = (AnalystReportController) getController();
-                analystReportController.setCurrentAssemblyFile(currentAssyFile);
+                AnalystReportController cntlr = (AnalystReportController) getController();
+                cntlr.setCurrentAssyFile(currentAssyFile);
                 break;
 
             case CLOSE_ASSY:
@@ -134,7 +134,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assemblyChanged");
+                LOG.error("Program error AnalystReportFrame.assyChanged");
         }
     }
 
@@ -862,12 +862,6 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         myMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
-
-        fileMenu.add(buildMenuItem(controller,
-                "clearAnalystReport",
-                "Clear analyst report",
-                KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
         fileMenu.add(buildMenuItem(controller,
                 "openAnalystReport",

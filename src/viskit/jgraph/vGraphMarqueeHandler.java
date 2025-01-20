@@ -56,9 +56,9 @@ import org.jgraph.graph.PortView;
 /**
  * Custom MarqueeHandler that connects vertices
  *
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitGraphMarqueeHandler">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vGraphMarqueeHandler">Terry Norbraten, NPS MOVES</a>
  */
-public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
+public class vGraphMarqueeHandler extends BasicMarqueeHandler {
 
     /** Holds the Start and the Current Point */
     protected Point2D start, current;
@@ -78,7 +78,7 @@ public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
      * 
      * @param graph JGraph component (our canvas)
      */
-    public ViskitGraphMarqueeHandler(JGraph graph) {
+    public vGraphMarqueeHandler(JGraph graph) {
 
         this.graph = graph;
 
@@ -199,20 +199,20 @@ public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
         if (e != null && port != null && firstPort != null
                 && firstPort != port) {
             // Then Establish Connection
-            if (graph instanceof ViskitGraphComponent) {
-                ((ViskitGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+            if (graph instanceof vGraphComponent) {
+                ((vGraphComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             } else {
-                ((viskitGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
+                ((vGraphAssemblyComponent)graph).connect((Port) firstPort.getCell(), (Port) port.getCell());
             }
             e.consume();
             
         // Else Repaint the Graph
         } else {
             GraphModel mod = graph.getModel();
-            if (mod instanceof ViskitGraphModel) {
-                ((ViskitGraphModel)mod).reDrawNodes();
-            } else if (mod instanceof ViskitGraphAssemblyModel) {
-                ((ViskitGraphAssemblyModel)mod).reDrawNodes();
+            if (mod instanceof vGraphModel) {
+                ((vGraphModel)mod).reDrawNodes();
+            } else if (mod instanceof vGraphAssemblyModel) {
+                ((vGraphAssemblyModel)mod).reDrawNodes();
             }
         }
         
@@ -347,4 +347,4 @@ public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
                 (int) (r.getHeight() + 2 * s));
     }
 
-} // end class ViskitGraphMarqueeHandler
+} // end class vGraphMarqueeHandler

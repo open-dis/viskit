@@ -14,7 +14,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.apache.logging.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -465,7 +465,7 @@ public class SimkitAssemblyXML2Java {
     // parameter may actually call for a subclass.
     String castIfSimEntity(String type) {
         String sret = "";
-        ClassLoader clsLoader = ViskitGlobals.instance().getWorkClassLoader();
+        ClassLoader clsLoader = VGlobals.instance().getWorkClassLoader();
         try {
             if ((Class.forName("simkit.SimEntityBase", true, clsLoader)).isAssignableFrom(Class.forName(type, true, clsLoader))
                     ||
@@ -520,7 +520,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     public boolean isPrimitive(String type) {
-        return ViskitGlobals.instance().isPrimitive(type);
+        return VGlobals.instance().isPrimitive(type);
     }
 
     public boolean isString(String type) {
@@ -528,7 +528,7 @@ public class SimkitAssemblyXML2Java {
     }
 
     public boolean isArray(String type) {
-        return ViskitGlobals.instance().isArray(type);
+        return VGlobals.instance().isArray(type);
     }
 
     void doMultiParameter(MultiParameter p, String indent, PrintWriter pw) {

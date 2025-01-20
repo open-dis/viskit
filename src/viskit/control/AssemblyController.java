@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
-import viskit.util.FileBasedAssemblyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
 import viskit.mvc.mvcRecentFileListener;
@@ -36,9 +36,9 @@ public interface AssemblyController {
      */
     void newEventGraphNode(String name, Point p);
 
-    void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
+    void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
 
-    void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
+    void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
 
     void newPropChangeListenerNode(String name, Point p);
 
@@ -101,7 +101,7 @@ public interface AssemblyController {
      *
      * @param pclEdge the PCL edite to edit
      */
-    void pcListenerEdgeEdit(PropertyChangeEdge pclEdge);
+    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *
@@ -162,7 +162,7 @@ public interface AssemblyController {
     void quit();
 
     /**
-     * Save the current Assembly file as is
+     * Save the current Assy file as is
      */
     void save();
 
@@ -177,7 +177,7 @@ public interface AssemblyController {
      */
     void close();
 
-    /** Closes all open Assembly files and their corresponding EG files */
+    /** Closes all open Assy files and their corresponding EG files */
     void closeAll();
 
     /**
@@ -202,16 +202,16 @@ public interface AssemblyController {
     void postQuit();
 
     /**
-     * @param lis the AssemblyChangeListener to add as a listener
+     * @param lis the AssyChangeListener to add as a listener
      */
-    void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
+    void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
     /**
-     * @param lis the AssemblyChangeListener to remove as a listener
+     * @param lis the AssyChangeListener to remove as a listener
      */
-    void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
+    void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
 
-    OpenAssembly.AssemblyChangeListener getAssemblyChangeListener();
+    OpenAssembly.AssyChangeListener getAssemblyChangeListener();
 
     /** @return a DirectoryChangeListener */
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
@@ -236,19 +236,19 @@ public interface AssemblyController {
     /** Screen capture a snapshot of the Assembly View Frame */
     void captureWindow();
 
-    void addRecentAssemblyFileSetListener(mvcRecentFileListener lis);
+    void addRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    void removeRecentAssemblyFileSetListener(mvcRecentFileListener lis);
+    void removeRecentAssyFileSetListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentAssemblyFileSet();
+    Set<String> getRecentAssyFileSet();
 
-    void clearRecentAssemblyFileList();
+    void clearRecentAssyFileList();
 
-    void addRecentProjectFileSetListener(mvcRecentFileListener lis);
+    void addRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    void removeRecentProjectFileSetListener(mvcRecentFileListener lis);
+    void removeRecentProjFileSetListener(mvcRecentFileListener lis);
 
-    Set<String> getRecentProjectFileSet();
+    Set<String> getRecentProjFileSet();
 
-    void clearRecentProjectFileSet();
+    void clearRecentProjFileSet();
 }

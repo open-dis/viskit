@@ -91,13 +91,13 @@ public class OpenAssembly {
             doSendNewAssy(file);
         }
     }
-    private final Set<AssemblyChangeListener> listeners = new HashSet<>();
+    private final Set<AssyChangeListener> listeners = new HashSet<>();
 
     /**
      * @param listener assembly change listener
      * @return true if was not already registered
      */
-    public boolean addListener(AssemblyChangeListener listener) {
+    public boolean addListener(AssyChangeListener listener) {
         return listeners.add(listener);
     }
 
@@ -105,35 +105,35 @@ public class OpenAssembly {
      * @param listener assembly change listener
      * @return true if it had been registered
      */
-    public boolean removeListener(AssemblyChangeListener listener) {
+    public boolean removeListener(AssyChangeListener listener) {
         return listeners.remove(listener);
     }
 
-    public void doParamLocallyEditted(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
+    public void doParamLocallyEditted(AssyChangeListener source) {
+        fireAction(AssyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
     }
 
-    public void doSendAssyJaxbChanged(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.JAXB_CHANGED, source, null);
+    public void doSendAssyJaxbChanged(AssyChangeListener source) {
+        fireAction(AssyChangeListener.JAXB_CHANGED, source, null);
     }
 
     public void doSendNewAssy(File f) {
-        fireAction(AssemblyChangeListener.NEW_ASSY, null, f);
+        fireAction(AssyChangeListener.NEW_ASSY, null, f);
     }
 
     public void doSendCloseAssy() {
-        fireAction(AssemblyChangeListener.CLOSE_ASSY, null, null);
+        fireAction(AssyChangeListener.CLOSE_ASSY, null, null);
     }
 
-    private void fireAction(int action, AssemblyChangeListener source, Object param) {
-        for (AssemblyChangeListener lis : listeners) {
+    private void fireAction(int action, AssyChangeListener source, Object param) {
+        for (AssyChangeListener lis : listeners) {
             if (lis != source) {
-                lis.assemblyChanged(action, source, param);
+                lis.assyChanged(action, source, param);
             }
         }
     }
 
-    static public interface AssemblyChangeListener {
+    static public interface AssyChangeListener {
 
         // public final static int JDOM_CHANGED = 0;
         int JAXB_CHANGED = 1;
@@ -144,10 +144,10 @@ public class OpenAssembly {
         /**
          * Notify the assembly listeners of a change
          * @param action the change taking place
-         * @param source the AssemblyChangeListener
+         * @param source the AssyChangeListener
          * @param param the object that changes
          */
-        void assemblyChanged(int action, AssemblyChangeListener source, Object param);
+        void assyChanged(int action, AssyChangeListener source, Object param);
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();

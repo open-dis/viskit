@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.doe.LocalBootLoader;
 
@@ -129,7 +129,7 @@ public class FindClassesForInterface {
      */
     public static List<Class<?>> findClasses(JarFile jarFile, Class<?> implementing) {
         List<Class<?>> found = new ArrayList<>();
-        URLClassLoader loader = ((LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader());
+        URLClassLoader loader = ((LocalBootLoader) VGlobals.instance().getWorkClassLoader());
         JarEntry nextEntry;
         Class<?> c;
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {

@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * Represents the information about one state variable. This
@@ -49,7 +49,7 @@ public class vStateVariable extends ViskitElement {
     @Override
     public final void setType(String pVariableType) {
         type = pVariableType;
-        arraySize = ViskitGlobals.instance().getArraySize(pVariableType);
+        arraySize = VGlobals.instance().getArraySize(pVariableType);
     }
 
     public String[] getArraySize() {

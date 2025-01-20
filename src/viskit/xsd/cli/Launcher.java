@@ -14,7 +14,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import org.apache.logging.log4j.Logger;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -72,7 +72,7 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
 
-            cloader = ViskitGlobals.instance().getWorkClassLoader();
+            cloader = VGlobals.instance().getWorkClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);
@@ -94,7 +94,7 @@ public class Launcher extends Thread implements Runnable {
                     while ((je = jis.getNextJarEntry()) != null) {
                         name = je.getName();
 
-                        // Assemblies are forced to be identified with "Assembly" in the file name
+                        // Assemblies are foreced to be identified with "Assembly" in the file name
                         if (name.contains(eventGraphDir) && name.endsWith("xml") && !name.contains("Assembly") ) {
                             log.info("Loading EventGraph from: " + name);
                             addEventGraph(jis);

@@ -12,7 +12,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
 import viskit.view.CodeBlockPanel;
@@ -383,7 +383,7 @@ public class EventInspectorDialog extends JDialog {
             setModified(false);
 
             // To start numbering over next time
-            ViskitGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
+            VGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
             dispose();
         }
     }
@@ -420,7 +420,7 @@ public class EventInspectorDialog extends JDialog {
 //
 //                String ps = parseThis.toString().trim();
 //                if (!ps.isEmpty() && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
-//                    String parseResults = ViskitGlobals.instance().parseCode(evn, ps);
+//                    String parseResults = VGlobals.instance().parseCode(evn, ps);
 //                    if (parseResults != null) {
 //                        boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);
 //                        if (!ret) // don't ignore

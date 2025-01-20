@@ -53,7 +53,7 @@ import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 
 import viskit.util.EventGraphCache;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
@@ -1038,7 +1038,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private void captureEventGraphImages() {
         EventGraphCache evc = EventGraphCache.instance();
-        ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).captureEventGraphImages(
+        ((EventGraphController)VGlobals.instance().getEventGraphController()).captureEventGraphImages(
                 evc.getEventGraphFilesList(),
                 evc.getEventGraphImageFilesList());
     }
@@ -1051,19 +1051,19 @@ public final class AnalystReportModel extends mvcAbstractModel {
         String assyFile = assemblyFile.getPath();
         assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
         File assyImage = new File(
-                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
                 assyFile + ".png");
 
         if (!assyImage.getParentFile().exists())
             assyImage.mkdirs();
 
         setAssemblyImageLocation(assyImage.getPath());
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
+        ((AssemblyControllerImpl)VGlobals.instance().getAssemblyController()).captureAssemblyImage(
                 assyImage);
     }
 
     private void announceAnalystReportReadyToView() {
-        ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+        VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Analyst Report Ready", "<html><body><p align='center'>" +
                 "Analyst Report is loaded and is now ready for further editing.</p></body></html>"
         );
@@ -1075,7 +1075,7 @@ public final class AnalystReportModel extends mvcAbstractModel {
      */
     private void captureLocationImage() {
         File locationImage = new File(
-                ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
+                VGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
                 assemblyFile.getName() + ".png");
 
         LOG.debug(locationImage);

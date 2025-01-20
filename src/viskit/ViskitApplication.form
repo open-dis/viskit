@@ -487,6 +487,9 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="name" type="java.lang.String" value="Viskit" noResource="true"/>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[800, 600]"/>
+    </Property>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="viskitMenuBar"/>
@@ -519,9 +522,6 @@
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JTabbedPane" name="viskitTabbedPane">
-      <Properties>
-        <Property name="selectedIndex" type="int" value="1"/>
-      </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
@@ -542,7 +542,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -564,7 +564,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -586,7 +586,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="542" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="543" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -619,7 +619,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="507" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="508" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -644,7 +644,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="507" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="508" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -702,7 +702,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -724,7 +724,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -746,7 +746,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -768,7 +768,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -790,7 +790,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -812,7 +812,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -834,7 +834,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>
@@ -856,7 +856,7 @@
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="465" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="466" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                   </Layout>

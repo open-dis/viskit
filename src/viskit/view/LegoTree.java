@@ -19,10 +19,10 @@ import javax.swing.tree.*;
 
 import org.apache.logging.log4j.Logger;
 
-import viskit.util.FileBasedAssemblyNode;
+import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 import viskit.VStatics;
 
 /**
@@ -130,7 +130,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
 
-        projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
+        projectPath = VGlobals.instance().getCurrentViskitProject().getProjectRoot().getPath();
     }
 
     // beginning of hack to hide the tree rootNode
@@ -201,17 +201,17 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     private DefaultMutableTreeNode _removeNode(DefaultMutableTreeNode dmtn, File f) {
         DefaultMutableTreeNode n;
         Object uo;
-        FileBasedAssemblyNode fban;
+        FileBasedAssyNode fban;
         for (int i = 0; i < dmtn.getChildCount(); i++) {
             n = (DefaultMutableTreeNode) dmtn.getChildAt(i);
             if (n != null) {
                 uo = n.getUserObject();
-                if (!(uo instanceof FileBasedAssemblyNode)) {
+                if (!(uo instanceof FileBasedAssyNode)) {
 
                     // Keep looking for a FBAN in the root branches
                     _removeNode(n, f);
                 } else {
-                    fban = (FileBasedAssemblyNode) uo;
+                    fban = (FileBasedAssyNode) uo;
 
                     try {
                         if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
@@ -308,7 +308,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         } // is directory
         // We're NOT a directory...
         else {
-            FileBasedAssemblyNode fban;
+            FileBasedAssyNode fban;
             try {
 
                 // This call generates the source, compiles and validates EG XML files
@@ -340,9 +340,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // dirty won't get set b/c the graph model is null until the
                 // model tab is created and the EG file is opened. First pass
                 // is only for inclusion in the LEGOs tree
-                if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
-                    ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
-                    ViskitGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
+                if (VGlobals.instance().getActiveEventGraphModel() != null) {
+                    VGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
+                    VGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
                 }
 
             } catch (Throwable t) {
@@ -463,8 +463,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 //      if(sel)
                 //        nm = "<html><b>"+nm+"</b></html>";   // sizes inst screwed up
                 value = nm;
-            } else if (uo instanceof FileBasedAssemblyNode) {
-                FileBasedAssemblyNode xn = (FileBasedAssemblyNode) uo;
+            } else if (uo instanceof FileBasedAssyNode) {
+                FileBasedAssyNode xn = (FileBasedAssyNode) uo;
                 String nm = xn.loadedClass;
                 nm = nm.substring(nm.lastIndexOf('.') + 1);
                 if (xn.isXML) {
@@ -533,8 +533,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         Transferable xfer;
         StringSelection ss;
 
-        if (o instanceof FileBasedAssemblyNode) {
-            FileBasedAssemblyNode xn = (FileBasedAssemblyNode) o;
+        if (o instanceof FileBasedAssyNode) {
+            FileBasedAssyNode xn = (FileBasedAssyNode) o;
             ss = new StringSelection(targetClassName + "\t" + xn.toString());
         } else if (o instanceof Class<?>) {
             String s = getClassName(o);
@@ -594,8 +594,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         if (o instanceof Class<?>) {
             return ((Class<?>) o).getName();
         }
-        if (o instanceof FileBasedAssemblyNode) {
-            return ((FileBasedAssemblyNode) o).loadedClass;
+        if (o instanceof FileBasedAssyNode) {
+            return ((FileBasedAssyNode) o).loadedClass;
         }
         return null;
     }
