@@ -485,7 +485,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
     }
 
     @Override

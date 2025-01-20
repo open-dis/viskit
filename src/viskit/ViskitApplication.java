@@ -14,11 +14,19 @@ import javax.swing.ImageIcon;
  */
 public class ViskitApplication extends javax.swing.JFrame {
 
+    private final static int INDEX_EVENTGRAPH_EDITOR_TAB = 0;
+    private final static int INDEX_ASSEMBLY_EDITOR_TAB   = 1;
+    private final static int INDEX_ASSEMBLY_RUN_TAB      = 2;
+    private final static int INDEX_ANALYST_REPORT_TAB    = 3;
+    
     /**
      * Creates new form NewViskitApplicationJFrame
      */
-    public ViskitApplication() {
+    public ViskitApplication()
+    {
         initComponents();
+        
+        viskitTabbedPane.setSelectedIndex(INDEX_ASSEMBLY_EDITOR_TAB);
         
         setTitle(" Viskit for Discrete Event Simulation (DES) using Simkit");
         // TODO fix

@@ -102,6 +102,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private double stopTime;
     private boolean singleStep;
     private int numberReplications;
+    static final public int DEFAULT_NUMBERREPLICATIONS = 30; // TODO create user preference
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
@@ -129,7 +130,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * printReplicationReports = true
      * printSummaryReport = true
      * saveReplicationData = false
-     * numberReplications = 1
+     * numberReplications = DEFAULT_NUMBERREPLICATIONS
      * </pre>
      */
     public BasicAssembly() {
@@ -142,7 +143,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         replicationStats = new PropertyChangeListener[0];
         designPointStats = new SampleStatistics[0];
         propertyChangeListener = new PropertyChangeListener[0];
-        setNumberReplications(1);
+        setNumberReplications(DEFAULT_NUMBERREPLICATIONS);
         hookupsCalled = false;
 
         // Creates a report stats config object and names it based on the name

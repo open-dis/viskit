@@ -311,7 +311,7 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -377,8 +377,8 @@ public class AssemblyControllerImpl extends mvcAbstractController implements Ass
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
-        assyChgListener.assyChanged(action, source, param);
+    public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        assyChgListener.assemblyChanged(action, source, param);
     }
 
     @Override

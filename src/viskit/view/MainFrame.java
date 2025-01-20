@@ -570,14 +570,14 @@ public class MainFrame extends JFrame {
         @Override
         public void resetRunner() {
             RunnerPanel2 rp2 = VGlobals.instance().getSimRunnerPanel();
-            rp2.soutTA.setText(null);
-            rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
+            rp2.assemblyOutputStreamTA.setText(null);
+            rp2.assemblyOutputStreamTA.setText("Assembly output stream:" + rp2.lineEnd
                     + "----------------------" + rp2.lineEnd);
             rp2.vcrSimTime.setText("");
             rp2.vcrStopTime.setText("");
-            rp2.numRepsTF.setText("");
+            rp2.numberReplicationsTF.setText("");
             rp2.vcrVerbose.setSelected(false);
-            rp2.printRepReportsCB.setSelected(false);
+            rp2.printReplicationReportsCB.setSelected(false);
             rp2.printSummReportsCB.setSelected(false);
 
             assyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);

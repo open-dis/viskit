@@ -120,12 +120,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
      * @param param the object to act upon
      */
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSY:
                 currentAssyFile = (File) param;
-                AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssyFile(currentAssyFile);
+                AnalystReportController analystReportController = (AnalystReportController) getController();
+                analystReportController.setCurrentAssemblyFile(currentAssyFile);
                 break;
 
             case CLOSE_ASSY:
@@ -134,7 +134,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assyChanged");
+                LOG.error("Program error AnalystReportFrame.assemblyChanged");
         }
     }
 
@@ -862,6 +862,12 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
         myMenuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
+
+        fileMenu.add(buildMenuItem(controller,
+                "clearAnalystReport",
+                "Clear analyst report",
+                KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
 
         fileMenu.add(buildMenuItem(controller,
                 "openAnalystReport",

@@ -79,7 +79,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
 
-    /** The name of the assy to run */
+    /** The name of the assembly to run */
     String assemblyClassName;
     RunnerPanel2 runPanel;
     ActionListener saver;
@@ -114,7 +114,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
-        runPanel = new RunnerPanel2("Assembly Runner", true, analystReportPanelVisible);
+        runPanel = new RunnerPanel2("Assembly Run Console Output", true, analystReportPanelVisible);
         doMenus();
         runPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
         runPanel.vcrPlay.addActionListener(new StartResumeListener());
@@ -184,7 +184,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
         assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
 
-        /* in order to resolve the assy as a BasicAssembly, it must be
+        /* in order to resolve the assembly as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
          * it. Used in the verboseListener within the working Viskit
          * ClassLoader
@@ -200,12 +200,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
         Method getStopTime = assemblyClass.getMethod("getStopTime");
 
-        runPanel.numRepsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
-        runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
+        runPanel.numberReplicationsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
+        runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
-        runPanel.saveRepDataCB.setSelected(saveRepDataToXml);
+        runPanel.saveReplicationDataToXmlCB.setSelected(saveRepDataToXml);
 
-        // Set the run panel according to what the assy XML value is
+        // Set the run panel according to what the assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
@@ -232,7 +232,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            }
 //            LOG.info("\n");
 
-            // Now we are in the pure classloader realm where each assy run can
+            // Now we are in the pure classloader realm where each assembly run can
             // be independent of any other
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
             assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
@@ -275,15 +275,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
             // *** End RNG seed state reset ***
 
-            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
+            textAreaOutputStream = new JTextAreaOutputStream(runPanel.assemblyOutputStreamTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numRepsTF.getText().trim()));
-            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
+            setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numberReplicationsTF.getText().trim()));
+            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printReplicationReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
-            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
+            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveReplicationDataToXmlCB.isSelected());
             setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
@@ -479,7 +479,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(fil))) {
-                bw.write(runPanel.soutTA.getText());
+                bw.write(runPanel.assemblyOutputStreamTA.getText());
             } catch (IOException e1) {
                 VGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
@@ -609,7 +609,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String s = runPanel.soutTA.getSelectedText();
+            String s = runPanel.assemblyOutputStreamTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbd.setContents(ss, ss);
@@ -620,8 +620,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.requestFocus();
-            runPanel.soutTA.selectAll();
+            runPanel.assemblyOutputStreamTA.requestFocus();
+            runPanel.assemblyOutputStreamTA.selectAll();
         }
     }
 
@@ -629,7 +629,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.setText(null);
+            runPanel.assemblyOutputStreamTA.setText(null);
         }
     }
 
@@ -650,7 +650,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 tool = "gedit"; // assuming Linux here
             }
 
-            String s = runPanel.soutTA.getText().trim();
+            String s = runPanel.assemblyOutputStreamTA.getText().trim();
             try {
                 f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
@@ -707,7 +707,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             int beginLength = npsString.length();
             npsString.append(evt.getNewValue());
             npsString.append(" of ");
-            npsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
+            npsString.append(Integer.parseInt(runPanel.numberReplicationsTF.getText()));
             npsString.append("</b>\n");
             npsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(npsString.toString());

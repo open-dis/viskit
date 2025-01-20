@@ -94,7 +94,7 @@ public class Launcher extends Thread implements Runnable {
                     while ((je = jis.getNextJarEntry()) != null) {
                         name = je.getName();
 
-                        // Assemblies are foreced to be identified with "Assembly" in the file name
+                        // Assemblies are forced to be identified with "Assembly" in the file name
                         if (name.contains(eventGraphDir) && name.endsWith("xml") && !name.contains("Assembly") ) {
                             log.info("Loading EventGraph from: " + name);
                             addEventGraph(jis);
