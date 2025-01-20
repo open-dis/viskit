@@ -156,7 +156,7 @@ public class VGlobals {
         return avf;
     }
 
-    /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assy Editor */
+    /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assembly Editor */
     public void rebuildLEGOTreePanels() {
         ((AssemblyViewFrame) avf).rebuildLEGOTreePanels();
     }
@@ -169,7 +169,7 @@ public class VGlobals {
         return acont;
     }
 
-    ActionListener defaultAssyQuitHandler = new ActionListener() {
+    ActionListener defaultAssemblyQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -178,16 +178,16 @@ public class VGlobals {
             }
         }
     };
-    ActionListener assyQuitHandler = defaultAssyQuitHandler;
+    ActionListener assemblyQuitHandler = defaultAssemblyQuitHandler;
 
     public void quitAssemblyEditor() {
-        if (assyQuitHandler != null) {
-            assyQuitHandler.actionPerformed(new ActionEvent(this, 0, "quit assy editor"));
+        if (assemblyQuitHandler != null) {
+            assemblyQuitHandler.actionPerformed(new ActionEvent(this, 0, "quit Assembly editor"));
         }
     }
 
     public void setAssemblyQuitHandler(ActionListener lis) {
-        assyQuitHandler = lis;
+        assemblyQuitHandler = lis;
     }
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
