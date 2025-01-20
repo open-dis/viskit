@@ -48,9 +48,9 @@ import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.PortView;
 
-import viskit.model.EventGraphNode;
+import viskit.model.EvGraphNode;
 import viskit.model.EventNode;
-import viskit.model.PropertyChangeListenerNode;
+import viskit.model.PropChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -188,12 +188,12 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         } else if (o instanceof ViskitAssemblyCircleView) {
             ViskitAssemblyCircleView cv = (ViskitAssemblyCircleView) o;
             ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) cv.getCell();
-            EventGraphNode egn = (EventGraphNode) cc.getUserObject();
+            EvGraphNode egn = (EvGraphNode) cc.getUserObject();
             return egn.getModelKey();
         } else if (o instanceof ViskitAssemblyPropertyListView) {
             ViskitAssemblyPropertyListView apv = (ViskitAssemblyPropertyListView) o;
             ViskitAssemblyPropertyListCell apc = (ViskitAssemblyPropertyListCell) apv.getCell();
-            PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
+            PropChangeListenerNode pn = (PropChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
             LogUtils.getLogger(getClass()).warn("ParentView of " + pv + " is " + o);

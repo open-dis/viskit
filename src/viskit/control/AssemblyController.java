@@ -80,33 +80,34 @@ public interface AssemblyController {
 
     /**
      * Creates an adapter arc between two assembly nodes
+     *
      * @param nodes and array of Nodes to connect with an adapter
      */
     void newAdapterArc(Object[] nodes);
 
-    void newSimEventListenerArc(Object[] nodes);
+    void newSimEvListArc(Object[] nodes);
 
-    void newPropertyChangeListenerArc(Object[] nodes);
+    void newPropChangeListArc(Object[] nodes);
 
-    void propertyChangeListenerEdit(PropertyChangeListenerNode propertyChangeListenerNode);
+    void pcListenerEdit(PropChangeListenerNode pclNode);
 
     /** Handles editing of Event Graph nodes
      *
-     * @param eventGraphNode the node to edit
+     * @param evNode the node to edit
      */
-    void eventGraphEdit(EventGraphNode eventGraphNode);
+    void evGraphEdit(EvGraphNode evNode);
 
     /** Edits the PropertyChangeListner edge
      *
-     * @param pclEdge the PropertyChangeListenerEdge to edit
+     * @param pclEdge the PCL edite to edit
      */
-    void propertyChangeListenerEdgeEdit(PropertyChangeListenerEdge pclEdge);
+    void pcListenerEdgeEdit(PropertyChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *
-     * @param adapterEdge the Adapter edge to edit
+     * @param aEdge the Adapter edge to edit
      */
-    void adapterEdgeEdit(AdapterEdge adapterEdge);
+    void adapterEdgeEdit(AdapterEdge aEdge);
 
     /** Edits the selected SimEvent listener edge
      *
@@ -225,7 +226,7 @@ public interface AssemblyController {
      * the AssemblyView via reflection when the Initialize assembly run button 
      * is selected from the Assembly Editor panel.
      */
-    void prepareSimulationRunner();
+    void prepSimRunner();
 
     /** Generating java source and compilation are taken care of here */
     void initAssemblyRun();
@@ -241,7 +242,7 @@ public interface AssemblyController {
 
     Set<String> getRecentAssemblyFileSet();
 
-    void clearRecentAssyFileList();
+    void clearRecentAssemblyFileList();
 
     void addRecentProjectFileSetListener(mvcRecentFileListener lis);
 

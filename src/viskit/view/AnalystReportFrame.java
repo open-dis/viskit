@@ -66,10 +66,10 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
-import viskit.mvc.mvcAbstractJFrameView;
-import viskit.mvc.mvcController;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.mvcModelEvent;
 import viskit.model.AnalystReportModel;
+import viskit.mvc.MvcController;
 
 /**
  * MOVES Institute
@@ -80,7 +80,7 @@ import viskit.model.AnalystReportModel;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAssembly.AssemblyChangeListener {
+public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAssembly.AssemblyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
     private final static String FRAME_DEFAULT_TITLE = " Viskit Analyst Report Editor";
@@ -94,7 +94,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
 
-    public AnalystReportFrame(mvcController controller) {
+    public AnalystReportFrame(MvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);
         setLayout();
@@ -110,7 +110,7 @@ public class AnalystReportFrame extends mvcAbstractJFrameView implements OpenAss
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssyFile;
 
-    private void initMVC(mvcController cntlr) {
+    private void initMVC(MvcController cntlr) {
         setController(cntlr);
     }
 

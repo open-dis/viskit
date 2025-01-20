@@ -29,7 +29,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
-import viskit.ViskitGlobals;
+import viskit.VGlobals;
 
 /**
  * @author Rick Goldberg
@@ -58,7 +58,7 @@ public class TestGridkitServerAssembly3 extends Thread {
         // this of course only works in a development workspace
 
         // get the jarurl path to viskit.EventGraphAssemblyComboMain
-        URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
+        URL u = VGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
         log.info(u);
 

@@ -51,7 +51,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
         this.setGridSize(10);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new ViskitGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -63,7 +63,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         this.setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parent.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
@@ -92,7 +92,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                 EdgeView view = null;
                 if (e instanceof ViskitAssemblyEdgeCell) {
                     Object o = ((DefaultMutableTreeNode) e).getUserObject();
-                    if (o instanceof PropertyChangeListenerEdge) {
+                    if (o instanceof PropertyChangeEdge) {
                         view = new ViskitAssemblyPclEdgeView(e);
                     }
                     if (o instanceof AdapterEdge) {
@@ -123,7 +123,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphAssemblyUI());    // we use our own for node/edge inspector editting
+        setUI(new ViskitGraphAssemblyUI());    // we use our own for node/edge inspector editting
         invalidate();
     }
     
@@ -235,15 +235,15 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             ViskitAssemblyCircleCell cc;
             AttributeMap m;
             Rectangle2D.Double r;
-            EventGraphNode en;
-            PropertyChangeListenerNode pcln;
+            EvGraphNode en;
+            PropChangeListenerNode pcln;
             for (Object cell : ch) {
                 if (cell instanceof ViskitAssemblyCircleCell) {
                     cc = (ViskitAssemblyCircleCell) cell;
                     m = cc.getAttributes();
                     r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        en = (EventGraphNode) cc.getUserObject();
+                        en = (EvGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
@@ -254,7 +254,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                     m = plc.getAttributes();
                     r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        pcln = (PropertyChangeListenerNode) plc.getUserObject();
+                        pcln = (PropChangeListenerNode) plc.getUserObject();
                         pcln.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent. getModel()).changePclNode(pcln);
                         m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
@@ -299,7 +299,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                     } else {
-                        String prop = ((PropertyChangeListenerEdge) se).getProperty();
+                        String prop = ((PropertyChangeEdge) se).getProperty();
                         prop = (prop != null && prop.length() > 0) ? prop : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
                         sb.append(to);
@@ -326,13 +326,13 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                     String desc;
                     if (c instanceof ViskitAssemblyCircleCell) {
                         ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) c;
-                        EventGraphNode en = (EventGraphNode) cc.getUserObject();
+                        EvGraphNode en = (EvGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
                         desc = en.getDescriptionString();
                     } else /*if (c instanceof ViskitAssemblyPropertyListCell)*/ {
                         ViskitAssemblyPropertyListCell cc = (ViskitAssemblyPropertyListCell) c;
-                        PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
+                        PropChangeListenerNode pcln = (PropChangeListenerNode) cc.getUserObject();
                         typ = pcln.getType();
                         name = pcln.getName();
                         desc = pcln.getDescriptionString();
@@ -390,7 +390,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         if (view instanceof ViskitAssemblyCircleView) {
             ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) view.getCell();
             Object en = cc.getUserObject();
-            if (en instanceof EventGraphNode) {
+            if (en instanceof EvGraphNode) {
                 return ((ViskitElement) en).getName();
             }    // label name is actually gotten in paintComponent
         }
@@ -419,10 +419,10 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                 controller.newAdapterArc(oa);
                 break;
             case AssemblyViewFrame.SIMEVLIS_MODE:
-                controller.newSimEventListenerArc(oa);
+                controller.newSimEvListArc(oa);
                 break;
             case AssemblyViewFrame.PCL_MODE:
-                controller.newPropertyChangeListenerArc(oa);
+                controller.newPropChangeListArc(oa);
                 break;
             default:
                 break;
@@ -485,7 +485,7 @@ public class viskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
         DefaultGraphCell cell = null;
         if (node != null) {
-            if (node instanceof EventGraphNode) {
+            if (node instanceof EvGraphNode) {
                 cell = new ViskitAssemblyCircleCell(node);
             } else {
                 cell = new ViskitAssemblyPropertyListCell(node);

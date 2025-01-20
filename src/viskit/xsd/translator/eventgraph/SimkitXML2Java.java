@@ -13,7 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.logging.log4j.Logger;
 
 import viskit.control.AssemblyControllerImpl;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.xsd.bindings.eventgraph.*;
 
@@ -298,7 +298,7 @@ public class SimkitXML2Java {
                 c = VStatics.classForName(s.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
-                if (c == null || VGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
+                if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
 
                     if (!s.getComment().isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
@@ -1132,7 +1132,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isGeneric(String type) {
-        return VGlobals.instance().isGeneric(type);
+        return ViskitGlobals.instance().isGeneric(type);
     }
 
     private String stripLength(String s) {
@@ -1255,7 +1255,7 @@ public class SimkitXML2Java {
         Class<?> aClass = null;
 
         try {
-            aClass = VGlobals.instance().getWorkClassLoader().loadClass(c);
+            aClass = ViskitGlobals.instance().getWorkClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
 //            LOG.error(cnfe);
         }
@@ -1267,7 +1267,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isArray(String a) {
-        return VGlobals.instance().isArray(a);
+        return ViskitGlobals.instance().isArray(a);
     }
 
     /** Report and exit the JVM

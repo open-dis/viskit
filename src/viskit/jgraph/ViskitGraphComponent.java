@@ -35,32 +35,32 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphComponent extends JGraph implements GraphModelListener {
+public class ViskitGraphComponent extends JGraph implements GraphModelListener {
 
-    vGraphModel vGModel; // local copy for convenience
+    ViskitGraphModel viskitGraphModel; // local copy for convenience
     EventGraphViewFrame parent;
 
     private UndoManager undoManager;
 
     /** Sets up JGraph to render nodes and edges for DES
      *
-     * @param model a model of the node with its specific edges
-     * @param frame the main view frame canvas to render to
+     * @param viskitGraphModel a model of the node with its specific edges
+     * @param eventGraphViewFrame the main view frame canvas to render to
      */
-    public vGraphComponent(vGraphModel model, EventGraphViewFrame frame) {
-        super(model);
-        parent = frame;
+    public ViskitGraphComponent(ViskitGraphModel viskitGraphModel, EventGraphViewFrame eventGraphViewFrame) {
+        super(viskitGraphModel);
+        parent = eventGraphViewFrame;
 
-        vGraphComponent instance = this;
+        ViskitGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
-        this.vGModel = model;
+        this.viskitGraphModel = viskitGraphModel;
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
         this.setGridSize(10);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new ViskitGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -72,10 +72,10 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setJumpToDefaultPort(true);
 
         // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parent.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
-        model.addUndoableEditListener(undoManager);
-        model.addGraphModelListener(instance);
+        viskitGraphModel.addUndoableEditListener(undoManager);
+        viskitGraphModel.addGraphModelListener(instance);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
@@ -124,7 +124,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphUI());    // we use our own for node/edge inspector editing
+        setUI(new ViskitGraphUI());    // we use our own for node/edge inspector editing
         invalidate();
     }
 
@@ -154,36 +154,36 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.NEWMODEL:
 
                 // Ensure we start fresh
-                vGModel.deleteAll();
+                viskitGraphModel.deleteAll();
                 break;
             case ModelEvent.EVENTADDED:
 
-                // Reclaimed from the vGModel to here
+                // Reclaimed from the viskitGraphModel to here
                 insert((EventNode) ev.getSource());
                 break;
             case ModelEvent.EVENTCHANGED:
-                vGModel.changeEvent((EventNode) ev.getSource());
+                viskitGraphModel.changeEvent((EventNode) ev.getSource());
                 break;
             case ModelEvent.EVENTDELETED:
-                vGModel.deleteEventNode((EventNode) ev.getSource());
+                viskitGraphModel.deleteEventNode((EventNode) ev.getSource());
                 break;
             case ModelEvent.EDGEADDED:
-                vGModel.addEdge((Edge) ev.getSource());
+                viskitGraphModel.addEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.EDGECHANGED:
-                vGModel.changeEdge((Edge) ev.getSource());
+                viskitGraphModel.changeEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.EDGEDELETED:
-                vGModel.deleteEdge((Edge) ev.getSource());
+                viskitGraphModel.deleteEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.CANCELINGEDGEADDED:
-                vGModel.addCancelEdge((Edge) ev.getSource());
+                viskitGraphModel.addCancelEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.CANCELINGEDGECHANGED:
-                vGModel.changeCancelingEdge((Edge) ev.getSource());
+                viskitGraphModel.changeCancelingEdge((Edge) ev.getSource());
                 break;
             case ModelEvent.CANCELINGEDGEDELETED:
-                vGModel.deleteCancelingEdge((Edge) ev.getSource());
+                viskitGraphModel.deleteCancelingEdge((Edge) ev.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
@@ -194,7 +194,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
             case ModelEvent.UNDO_CANCELING_EDGE:
             case ModelEvent.UNDO_SCHEDULING_EDGE:
             case ModelEvent.UNDO_EVENT_NODE:
-                vGModel.reDrawNodes();
+                viskitGraphModel.reDrawNodes();
                 break;
             default:
                 //System.out.println("duh");
@@ -610,7 +610,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);
 
-        vGModel.reDrawNodes();
+        viskitGraphModel.reDrawNodes();
     }
 }
 

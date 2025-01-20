@@ -23,7 +23,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 
 import simkit.stat.SampleStatistics;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitProject;
 import viskit.doe.FileHandler;
 
@@ -227,7 +227,7 @@ public class ReportStatisticsConfig {
         dateFormat = formatter.format(today);
 
         // Create a unique file name for each DTG/Location Pair
-        ViskitProject vkp = VGlobals.instance().getCurrentViskitProject();
+        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
         File anRptStatDir = vkp.getAnalystReportStatisticsDir();
 
         String outputFile = (author + assemblyName + "_" + dateFormat + ".xml");
