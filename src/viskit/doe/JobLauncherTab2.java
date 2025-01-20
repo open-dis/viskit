@@ -79,7 +79,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 2:50:08 PM
  * @version $Id$
  */
-public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
+public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssemblyChangeListener {
 
     DoeRunDriver doe;
 //    Map statsGraphs;
@@ -485,7 +485,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
     }
 
     @Override
@@ -756,7 +756,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     // remove, for testing some loader stuff while writing it
     public void runTesting() {
         writeStatus("JobLauncherTab2.run()");
-        LocalBootLoader loader = (LocalBootLoader) VGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
         //loader.setTab(this);
 
         // loader gets own copy of Viskit's libs, init method here
@@ -779,7 +779,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (gridMode) {
                 doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()));
             } else {
-                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.VGlobals.instance().getWorkDirectory());
+                doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
             }
             System.gc();
             qstatConsole.setDoe(doe);

@@ -17,11 +17,11 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.VStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EvGraphNode;
-import viskit.model.PropChangeEdge;
+import viskit.model.PropertyChangeEdge;
 import viskit.model.PropChangeListenerNode;
 import viskit.model.ViskitElement;
 
@@ -47,14 +47,14 @@ public class PclEdgeInspectorDialog extends JDialog {
     private JLabel emptyTF;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
-    private PropChangeEdge pclEdge;
+    private PropertyChangeEdge pclEdge;
     private final JButton okButt;
     private JButton canButt;
     private final JButton propButt;
     private final JPanel buttPan;
     private final enableApplyButtonListener lis;
 
-    public static boolean showDialog(JFrame f, PropChangeEdge parm) {
+    public static boolean showDialog(JFrame f, PropertyChangeEdge parm) {
         if (dialog == null) {
             dialog = new PclEdgeInspectorDialog(f, parm);
         } else {
@@ -66,7 +66,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private PclEdgeInspectorDialog(JFrame parent, PropChangeEdge ed) {
+    private PclEdgeInspectorDialog(JFrame parent, PropertyChangeEdge ed) {
         super(parent, "Property Change Connection", true);
         this.pclEdge = ed;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -133,7 +133,7 @@ public class PclEdgeInspectorDialog extends JDialog {
         }
     }
 
-    public final void setParams(Component c, PropChangeEdge p) {
+    public final void setParams(Component c, PropertyChangeEdge p) {
         pclEdge = p;
 
         fillWidgets();
@@ -247,7 +247,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                 BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
                 PropertyDescriptor[] pds = binf.getPropertyDescriptors();
                 if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)VGlobals.instance().getAssemblyController()).messageUser(
+                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");

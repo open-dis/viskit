@@ -19,14 +19,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.mvcAbstractModel;
-import viskit.mvc.mvcController;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.mvc.MvcController;
 
 /**
  * <p>
@@ -65,7 +65,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public ModelImpl(mvcController controller) {
+    public ModelImpl(MvcController controller) {
         this.controller = (EventGraphControllerImpl) controller;
         metaData = new GraphMetadata(this);
     }
@@ -395,7 +395,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
             est.setType(sv.getType());
 
             // bug fix 1183
-            if (VGlobals.instance().isArray(sv.getType())) {
+            if (ViskitGlobals.instance().isArray(sv.getType())) {
                 idx = st.getIndex();
                 est.setIndexingExpression(idx);
             }
@@ -909,7 +909,7 @@ public class ModelImpl extends mvcAbstractModel implements Model {
 
             st.setState(sv);
 
-            if (sv.getType() != null && VGlobals.instance().isArray(sv.getType())) {
+            if (sv.getType() != null && ViskitGlobals.instance().isArray(sv.getType())) {
 
                 // Match the state transition's index to the given index
                 st.setIndex(transition.getIndexingExpression());

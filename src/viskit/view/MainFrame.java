@@ -45,7 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import viskit.util.TitleListener;
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.ViskitConfig;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
@@ -58,7 +58,7 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
-import viskit.mvc.mvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.mvcModel;
 import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
@@ -74,9 +74,9 @@ import viskit.view.dialog.SettingsDialog;
  */
 public class MainFrame extends JFrame {
 
-    mvcAbstractJFrameView egFrame;
-    mvcAbstractJFrameView assyFrame;
-    mvcAbstractJFrameView reportPanel;
+    MvcAbstractJFrameView egFrame;
+    MvcAbstractJFrameView assyFrame;
+    MvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assyRunComponent;
     JobLauncherTab2 runGridComponent;
 
@@ -107,7 +107,7 @@ public class MainFrame extends JFrame {
     public MainFrame(String initialAssyFile) {
         super(ViskitConfig.VISKIT_FULL_APPLICATION_NAME);
         this.initialAssyFile = initialAssyFile;
-        VGlobals.instance().setMainAppWindow(MainFrame.this);
+        ViskitGlobals.instance().setMainAppWindow(MainFrame.this);
 
         initUI();
 
@@ -138,8 +138,8 @@ public class MainFrame extends JFrame {
     java.util.List<JMenuBar> menus = new ArrayList<>();
 
     private void initUI() {
-//        VGlobals.instance().setAssemblyQuitHandler(null);
-//        VGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
+//        ViskitGlobals.instance().setAssemblyQuitHandler(null);
+//        ViskitGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
         JMenuBar menuBar;
         int idx;
 
@@ -153,7 +153,7 @@ public class MainFrame extends JFrame {
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
 
         // Tabbed event graph editor
-        egFrame = VGlobals.instance().buildEventGraphViewFrame();
+        egFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
             tabbedPane.add(((EventGraphViewFrame) egFrame).getContent());
             idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) egFrame).getContent());
@@ -175,7 +175,7 @@ public class MainFrame extends JFrame {
         tabbedPane.addChangeListener(tabChangeListener);
 
         // Assembly editor
-        assyFrame = VGlobals.instance().buildAssemblyViewFrame();
+        assyFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
             tabbedPane.add(((AssemblyViewFrame) assyFrame).getContent());
             idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assyFrame).getContent());
@@ -228,7 +228,7 @@ public class MainFrame extends JFrame {
         // Analyst report
         boolean analystReportPanelVisible = SettingsDialog.isAnalystReportVisible();
         if (analystReportPanelVisible) {
-            reportPanel = VGlobals.instance().buildAnalystReportFrame();
+            reportPanel = ViskitGlobals.instance().buildAnalystReportFrame();
             tabbedPane.add(reportPanel.getContentPane());
             idx = tabbedPane.indexOfComponent(reportPanel.getContentPane());
             tabbedPane.setTitleAt(idx, "Analyst Report");
@@ -245,14 +245,14 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
             AnalystReportController cntlr = (AnalystReportController) reportPanel.getController();
             cntlr.setMainTabbedPane(tabbedPane, idx);
-            assyCntlr.addAssemblyFileListener((OpenAssembly.AssyChangeListener) reportPanel);
+            assyCntlr.addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) reportPanel);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
 
         // Assembly runner
         assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
-        runTabbedPane.add(VGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
+        runTabbedPane.add(ViskitGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
         menuBar = assyRunComponent.getMenus();
@@ -341,15 +341,15 @@ public class MainFrame extends JFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            Model[] mods = VGlobals.instance().getEventGraphEditor().getOpenModels();
+            Model[] mods = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
             Model dirtyMod = null;
 
             // Make sure we save modified EGs if we wander off to the Assy tab
             for (Model mod : mods) {
                 if (mod.isDirty()) {
                     dirtyMod = mod;
-                    VGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
-                    ((EventGraphController) VGlobals.instance().getEventGraphController()).save();
+                    ViskitGlobals.instance().getEventGraphController().setModel((mvcModel) mod);
+                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }
 
@@ -454,12 +454,12 @@ public class MainFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            SysExitHandler defaultHandler = VGlobals.instance().getSysExitHandler();
-            VGlobals.instance().setSysExitHandler(nullSysExitHandler);
+            SysExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
+            ViskitGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
             // Tell Visit to not recompile open EGs from any remaining open
             // Assemblies when we perform a Viskit exit
-            ((AssemblyControllerImpl) VGlobals.instance().getAssemblyController()).setCloseAll(true);
+            ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
 
             outer:
             {
@@ -488,11 +488,11 @@ public class MainFrame extends JFrame {
                 /* End DIFF between OA3302 branch and trunk */
 
                 // TODO: other preQuits here if needed
-                VGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
+                ViskitGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     egCntlr.removeEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
-                    egCntlr.removeRecentEgFileListener(VGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
+                    egCntlr.removeRecentEgFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
@@ -500,9 +500,9 @@ public class MainFrame extends JFrame {
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssyChangeListener) reportPanel);
-                    assyCntlr.removeRecentAssyFileSetListener(VGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
-                    assyCntlr.removeRecentProjFileSetListener(VGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
+                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) reportPanel);
+                    assyCntlr.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
+                    assyCntlr.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
@@ -535,11 +535,11 @@ public class MainFrame extends JFrame {
                 setVisible(false);
 
                 // This will dispose all "Frames" and interrupt any non-daemon threads
-                VGlobals.instance().sysExit(0);  // quit application
+                ViskitGlobals.instance().sysExit(0);  // quit application
             } //outer
 
             // Here if somebody cancelled.
-            VGlobals.instance().setSysExitHandler(defaultHandler);
+            ViskitGlobals.instance().setSysExitHandler(defaultHandler);
         }
     }
 
@@ -569,7 +569,7 @@ public class MainFrame extends JFrame {
 
         @Override
         public void resetRunner() {
-            RunnerPanel2 rp2 = VGlobals.instance().getSimRunnerPanel();
+            RunnerPanel2 rp2 = ViskitGlobals.instance().getSimRunnerPanel();
             rp2.assemblyOutputStreamTA.setText(null);
             rp2.assemblyOutputStreamTA.setText("Assembly output stream:" + rp2.lineEnd
                     + "----------------------" + rp2.lineEnd);

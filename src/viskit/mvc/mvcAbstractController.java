@@ -12,7 +12,7 @@ package viskit.mvc;
  *
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class mvcAbstractController implements mvcController {
+public abstract class mvcAbstractController implements MvcController {
 
     private mvcView view;
     private mvcModel model;

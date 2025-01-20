@@ -55,7 +55,7 @@ import viskit.model.ViskitElement;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vSelfEdgeRenderer">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-class vSelfEdgeRenderer extends vEdgeRenderer {
+class vSelfEdgeRenderer extends viskitEdgeRenderer {
 
     private final double circleDiam = 30.0d;
     private Arc2D arc;

@@ -1,29 +1,4 @@
 /*
- * Program:      Visual Discrete Event Simulation (DES) Toolkit (Viskit)
- *
- * Author(s):    Terry Norbraten
- *               http://www.nps.edu and http://www.movesinstitute.org
- *
- * Created:      22 AUG 2008
- *
- * Filename:     vGraphAssemblyComponentWrapper.java
- *
- * Compiler:     JDK1.6
- * O/S:          Windows XP Home Ed. (SP2)
- *
- * Description:  A class to serve as the jgraph object, while carrying other
- *               objects needed for the gui
- *
- * References:   see viskit.VgraphComponentWrapper
- *
- * URL:
- *
- * Requirements: 1)
- *
- * Assumptions:  1)
- *
- * TODO:
- *
 Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,35 +34,35 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.jgraph;
 
 import javax.swing.JSplitPane;
-import viskit.model.AssemblyModel;
-import viskit.view.AssemblyViewFrame;
+import viskit.model.Model;
+import viskit.view.CodeBlockPanel;
+import viskit.view.EventGraphViewFrame;
+import viskit.view.ParametersPanel;
+import viskit.view.StateVariablesPanel;
 
 /**
  * A class to serve as the jgraph object, while carrying other objects needed
  * for the gui
  *
- * @version $Id:$
- * <p>
- *   <b>History:</b>
- *   <pre><b>
- *     Date:     22 AUG 2008
- *     Time:     1758Z
- *     Author:   <a href="mailto:tdnorbra@nps.edu?subject=viskit.VgraphAssemblyComponentWrapper">Terry Norbraten, NPS MOVES</a>
- *     Comments: 1) Initial
- *
- *   </b></pre>
- *
- * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
+ * MOVES Institute
+ * Naval Postgraduate School, Monterey, CA
+ * www.nps.edu
+ * @author Mike Bailey
+ * @since Sep 15, 2005
+ * @since 11:13:40 AM
+ * @version $Id$
  */
-public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
+public class ViskitGraphComponentWrapper extends ViskitGraphComponent {
 
-    public AssemblyModel assyModel;
+    public Model model;
     public JSplitPane drawingSplitPane;
-    public JSplitPane trees;
+    public JSplitPane stateParamSplitPane;
+    public ParametersPanel paramPan;
+    public StateVariablesPanel varPan;
+    public CodeBlockPanel codeBlockPan;
     public boolean isActive = true;
 
-    public VgraphAssemblyComponentWrapper(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public ViskitGraphComponentWrapper(ViskitGraphModel model, EventGraphViewFrame frame) {
         super(model, frame);
     }
-
-} // end class file VgraphAssemblyComponentWrapper.java
+}

@@ -71,7 +71,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
-import viskit.VGlobals;
+import viskit.ViskitGlobals;
 import viskit.doe.FileHandler;
 
 /**
@@ -160,7 +160,7 @@ public class EventGraphCache {
         if (!getEventGraphImageFilesList().isEmpty())
             getEventGraphImageFilesList().clear();
 
-        setEventGraphFiles(VGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
+        setEventGraphFiles(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
 
         Element localRootElement = assemblyDocument.getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
@@ -224,7 +224,7 @@ public class EventGraphCache {
         LOG.debug("EventGraph Name: {}", egName);
 
         String eg_img_dir =
-            VGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
+            ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
 
         File imgFile = new File(eg_img_dir + "/" + pkg + "/" + egName + ".xml.png");
         LOG.debug("Event Graph Image location: {}", imgFile);

@@ -25,7 +25,7 @@ public interface AssemblyView {
      */
     boolean doEditEvGraphNode(EvGraphNode evNode);
 
-    boolean doEditPclEdge(PropChangeEdge pclEdge);
+    boolean doEditPclEdge(PropertyChangeEdge pclEdge);
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
