@@ -10,7 +10,7 @@ import java.util.List;
  * @since 3:19:43 PM
  * @version $Id$
  */
-public class viskitEdgeParameter extends ViskitElement {
+public class Viskit2EdgeParameter extends ViskitElement {
 
     public String bogus; //todo fix
 
@@ -21,7 +21,7 @@ public class viskitEdgeParameter extends ViskitElement {
     private String indexingExpression;
     private String comment;
 
-    public viskitEdgeParameter(String value) {
+    public Viskit2EdgeParameter(String value) {
         this.value = value;
     }
 

@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.viskitEdgeParameter;
+import viskit.model.Viskit2EdgeParameter;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -27,13 +27,13 @@ public class EdgeParameterDialog extends JDialog {
     private final JLabel typeLabel;            // static type value passed in
     private static EdgeParameterDialog dialog;
     private static boolean modified = false;
-    private viskitEdgeParameter param;
+    private Viskit2EdgeParameter param;
     private String type;
     private final JButton okButt;
     private JButton canButt;
     public static String newValue;
 
-    public static boolean showDialog(JDialog d, viskitEdgeParameter parm) {
+    public static boolean showDialog(JDialog d, Viskit2EdgeParameter parm) {
         if (dialog == null) {
             dialog = new EdgeParameterDialog(d, parm);
         } else {
@@ -44,7 +44,7 @@ public class EdgeParameterDialog extends JDialog {
         return modified;
     }
 
-    private EdgeParameterDialog(JDialog parent, viskitEdgeParameter param) {
+    private EdgeParameterDialog(JDialog parent, Viskit2EdgeParameter param) {
         super(parent, "Edge Parameter", true);
         this.param = param;
         this.type = param.bogus != null ? param.bogus : "";
@@ -103,7 +103,7 @@ public class EdgeParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, viskitEdgeParameter p) {
+    public final void setParams(Component c, Viskit2EdgeParameter p) {
         param = p;
         type = p.bogus != null ? p.bogus : "";
 

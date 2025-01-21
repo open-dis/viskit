@@ -17,7 +17,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
-import viskit.model.viskitStateVariable;
+import viskit.model.Viskit2StateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -34,14 +34,14 @@ public class StateVariableDialog extends ViskitSmallDialog {
     private final JTextField arraySizeField;
     private final JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
     private final JLabel arrSizeLab;
-    private viskitStateVariable stVar;
+    private Viskit2StateVariable stVar;
     private final JButton okButt;
     private final JButton canButt;
     public static String newName,  newType,  newComment;
     private final myFocusListener focList;
     private final Component myTyperComponent;       // i.e., the editor of the type JComboBox
 
-    public static boolean showDialog(JFrame f, viskitStateVariable var) {
+    public static boolean showDialog(JFrame f, Viskit2StateVariable var) {
         return ViskitSmallDialog.showDialog(StateVariableDialog.class.getName(), f, var);
     }
 
@@ -132,7 +132,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
     @Override
     final void setParams(Component c, Object p) {
-        stVar = (viskitStateVariable) p;
+        stVar = (Viskit2StateVariable) p;
 
         fillWidgets();
 

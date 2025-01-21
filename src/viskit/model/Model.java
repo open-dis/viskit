@@ -66,7 +66,7 @@ public interface Model {
     /**
      * Messaged by controller to inst all defined simulation parameters
      *
-     * @return Vector of viskitParameter objects.
+     * @return Vector of Viskit2Parameter objects.
      */
     Vector<ViskitElement> getSimParameters();
 
@@ -140,15 +140,15 @@ public interface Model {
 
     void newSimParameter(String name, String type, String initVal, String comment);
 
-    boolean changeStateVariable(viskitStateVariable st);
+    boolean changeStateVariable(Viskit2StateVariable st);
 
-    boolean changeSimParameter(viskitParameter p);
+    boolean changeSimParameter(Viskit2Parameter p);
 
     void changeCodeBlock(String s);
 
-    void deleteStateVariable(viskitStateVariable sv);
+    void deleteStateVariable(Viskit2StateVariable sv);
 
-    void deleteSimParameter(viskitParameter p);
+    void deleteSimParameter(Viskit2Parameter p);
 
     GraphMetadata getMetaData();
 

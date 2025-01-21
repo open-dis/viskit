@@ -536,9 +536,9 @@ public class ModelImpl extends MvcAbstractModel implements Model {
 
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
         List<ViskitElement> alis = new ArrayList<>(3);
-        viskitEdgeParameter vep;
+        Viskit2EdgeParameter vep;
         for (EdgeParameter ep : lis) {
-            vep = new viskitEdgeParameter(ep.getValue());
+            vep = new Viskit2EdgeParameter(ep.getValue());
             alis.add(vep);
         }
         return alis;
@@ -552,7 +552,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     private void buildStateVariablesFromJaxb(List<StateVariable> lis) {
         String c;
         List<String> varCom;
-        viskitStateVariable v;
+        Viskit2StateVariable v;
         for (StateVariable var : lis) {
             varCom = var.getComment();
             c = " ";
@@ -560,7 +560,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
                 c += comment;
                 c += " ";
             }
-            v = new viskitStateVariable(var.getName(), var.getType(), c.trim());
+            v = new Viskit2StateVariable(var.getName(), var.getType(), c.trim());
             v.opaqueModelObject = var;
 
             stateVariables.add(v);
@@ -575,7 +575,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     private void buildParametersFromJaxb(List<Parameter> lis) {
         List<String> pCom;
         String c;
-        viskitParameter vp;
+        Viskit2Parameter vp;
         for (Parameter p : lis) {
             pCom = p.getComment();
             c = " ";
@@ -583,7 +583,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
                 c += comment;
                 c += " ";
             }
-            vp = new viskitParameter(p.getName(), p.getType(), c.trim());
+            vp = new Viskit2Parameter(p.getName(), p.getType(), c.trim());
             vp.opaqueModelObject = p;
 
             simParameters.add(vp);
@@ -614,7 +614,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     // --------------
     @Override
     public void newSimParameter(String nm, String typ, String xinitVal, String comment) {
-        viskitParameter vp = new viskitParameter(nm, typ, comment);
+        Viskit2Parameter vp = new Viskit2Parameter(nm, typ, comment);
         simParameters.add(vp);
 
         if (!stateVarParamNameCheck()) {
@@ -636,7 +636,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     }
 
     @Override
-    public void deleteSimParameter(viskitParameter vp) {
+    public void deleteSimParameter(Viskit2Parameter vp) {
         // remove jaxb variable
         Iterator<Parameter> spItr = jaxbRoot.getParameter().iterator();
         while (spItr.hasNext()) {
@@ -658,7 +658,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     }
 
     @Override
-    public boolean changeSimParameter(viskitParameter vp) {
+    public boolean changeSimParameter(Viskit2Parameter vp) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
             mangleName(vp);
@@ -683,7 +683,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     public void newStateVariable(String name, String type, String xinitVal, String comment) {
 
         // get the new one here and show it around
-        viskitStateVariable vsv = new viskitStateVariable(name, type, comment);
+        Viskit2StateVariable vsv = new Viskit2StateVariable(name, type, comment);
         stateVariables.add(vsv);
         if (!stateVarParamNameCheck()) {
             mangleName(vsv);
@@ -702,7 +702,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     }
 
     @Override
-    public void deleteStateVariable(viskitStateVariable vsv) {
+    public void deleteStateVariable(Viskit2StateVariable vsv) {
         // remove jaxb variable
         Iterator<StateVariable> svItr = jaxbRoot.getStateVariable().iterator();
         while (svItr.hasNext()) {
@@ -718,7 +718,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     }
 
     @Override
-    public boolean changeStateVariable(viskitStateVariable vsv) {
+    public boolean changeStateVariable(Viskit2StateVariable vsv) {
         boolean retcode = true;
         if (!stateVarParamNameCheck()) {
             mangleName(vsv);
@@ -1036,7 +1036,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
         if (!args.isEmpty()) {
             edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new viskitEdgeParameter(arg.getValue()));
+                edgeParameters.add(new Viskit2EdgeParameter(arg.getValue()));
             }
             se.parameters = edgeParameters;
         }
@@ -1091,7 +1091,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
         if (!args.isEmpty()) {
             edgeParameters = new ArrayList<>(args.size());
             for (ViskitElement arg : args) {
-                edgeParameters.add(new viskitEdgeParameter(arg.getValue()));
+                edgeParameters.add(new Viskit2EdgeParameter(arg.getValue()));
             }
             ce.parameters = edgeParameters;
         }

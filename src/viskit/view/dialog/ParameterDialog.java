@@ -1,6 +1,6 @@
 package viskit.view.dialog;
 
-import viskit.model.viskitParameter;
+import viskit.model.Viskit2Parameter;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -35,11 +35,11 @@ public class ParameterDialog extends JDialog {
     private final JTextField expressionField;       // Text field that holds the expression
     private final JTextField commentField;          // Text field that holds the comment
     private final JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
-    private viskitParameter param;
+    private Viskit2Parameter param;
     private final JButton okButt;
     private JButton canButt;
 
-    public static boolean showDialog(JFrame f, viskitParameter parm) {
+    public static boolean showDialog(JFrame f, Viskit2Parameter parm) {
         if (dialog == null) {
             dialog = new ParameterDialog(f, parm);
         } else {
@@ -52,7 +52,7 @@ public class ParameterDialog extends JDialog {
         return modified;
     }
 
-    private ParameterDialog(JFrame parent, viskitParameter param) {
+    private ParameterDialog(JFrame parent, Viskit2Parameter param) {
         super(parent, "Parameter Inspector", true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
@@ -121,7 +121,7 @@ public class ParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, viskitParameter p) {
+    public final void setParams(Component c, Viskit2Parameter p) {
         param = p;
 
         fillWidgets();
