@@ -122,7 +122,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void begin() {
-        File projPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+        File projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
         // The initialAssemblyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -130,10 +130,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.debug("Loading initial file: {}", initialAssemblyFile);                             // pointing to a assembly path isn't commented
                                                                                                          // out
             // Switch to the project that this Assembly file is located in if paths do not coincide
-            if (!initialAssemblyFile.contains(projPath.getPath())) {
+            if (!initialAssemblyFile.contains(projectPath.getPath())) {
                 doProjectCleanup();
-                projPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projPath); // calls EGVF showProjectName
+                projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
+                openProject(projectPath); // calls EGVF showProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
                 SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
@@ -141,7 +141,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
             compileAssembly(initialAssemblyFile);
         } else {
-            openProject(projPath); // calls EGVF showProjectName
+            openProject(projectPath); // calls EGVF showProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -410,20 +410,20 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             lis.listChanged();
     }
 
-    Set<MvcRecentFileListener> recentProjListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentProjectListeners = new HashSet<>();
 
     @Override
     public void addRecentProjectFileSetListener(MvcRecentFileListener lis) {
-        recentProjListeners.add(lis);
+        recentProjectListeners.add(lis);
     }
 
     @Override
     public void removeRecentProjectFileSetListener(MvcRecentFileListener lis) {
-        recentProjListeners.remove(lis);
+        recentProjectListeners.remove(lis);
     }
 
     private void notifyRecentProjectFileListeners() {
-        for (MvcRecentFileListener lis : recentProjListeners) {
+        for (MvcRecentFileListener lis : recentProjectListeners) {
             lis.listChanged();
         }
     }
@@ -566,19 +566,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
-            File projDir;
-            File projZip;
+            File projectDirectory;
+            File projectZipFile;
             File logFile;
 
             @Override
             public Void doInBackground() {
 
-                projDir = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
-                projZip = new File(projDir.getParentFile(), projDir.getName() + ".zip");
-                logFile = new File(projDir, "debug.log");
+                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projectZipFile = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
+                logFile = new File(projectDirectory, "debug.log");
 
-                if (projZip.exists())
-                    projZip.delete();
+                if (projectZipFile.exists())
+                    projectZipFile.delete();
 
                 if (logFile.exists())
                     logFile.delete();
@@ -587,7 +587,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
                     // First, copy the error.log to the project dir
                     Files.copy(ViskitConfiguration.VISKIT_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    ZipUtils.zipFolder(projDir, projZip);
+                    ZipUtils.zipFolder(projectDirectory, projectZipFile);
                 } catch (IOException e) {
                     LOG.error(e);
                 }
@@ -605,21 +605,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     try {
                         URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Submission%20for%20"
-                                + projDir.getName() + "&body=see%20attachment").toURL();
+                                + projectDirectory.getName() + "&body=see%20attachment").toURL();
                         String msg = "Please navigate to<br/>"
-                                + projZip.getParent()
-                                + "<br/>and email the " + projZip.getName()
+                                + projectZipFile.getParent()
+                                + "<br/>and email the " + projectZipFile.getName()
                                 + " file to "
                                 + "<b><a href=\"" + url.toString() + "\">"
                                 + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                                 + "<br/><br/>Click the link to open up an email "
                                 + "form, then attach the zip file";
-                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
+                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, msg, false);
                     } catch (MalformedURLException | URISyntaxException e) {
                         LOG.error(e);
                     }
 
-                    Desktop.getDesktop().open(projZip.getParentFile());
+                    Desktop.getDesktop().open(projectZipFile.getParentFile());
 
                 } catch (InterruptedException | ExecutionException | IOException e) {
                     LOG.error(e);
@@ -665,7 +665,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
         ViskitGlobals.instance().getEventGraphEditor().showProjectName();
         runner.resetRunner();
     }
@@ -1492,10 +1492,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProj = ViskitGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProj.getSrcDir(), packagePath);
+            File srcPkg = new File(viskitProject.getSrcDir(), packagePath);
             if (!srcPkg.isDirectory())
                 srcPkg.mkdirs();
             File javaFile = new File(srcPkg, baseName + ".java");
@@ -1508,7 +1508,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             OutputStream baosOut = new ByteArrayOutputStream();
             Compiler.setOutPutStream(baosOut);
 
-            File classesDir = viskitProj.getClassesDir();
+            File classesDir = viskitProject.getClassesDir();
 
             LOG.info("Test compiling " + javaFile.getCanonicalPath());
 
@@ -1892,7 +1892,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
-    private void adjustRecentProjSet(File file) {
+    private void adjustRecentProjectSet(File file) {
         String f;
         for (Iterator<String> itr = recentProjectFileSet.iterator(); itr.hasNext();) {
             f = itr.next();
@@ -1903,9 +1903,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
 
         if (!recentProjectFileSet.contains(file.getPath()))
-            recentProjectFileSet.add(file.getPath()); // to the top
+             recentProjectFileSet.add(file.getPath()); // to the top
 
-        saveProjHistoryXML(recentProjectFileSet);
+        saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjectFileListeners();
     }
 
@@ -1914,12 +1914,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordAssemblyFiles() {
         openAssemblies = new ArrayList<>(4);
-        List<Object> valueAr = historyConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
-        LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueAr.size());
+        List<Object> valueList = historyConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
+        LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueList.size());
         int idx = 0;
         String op;
         String assemblyFile;
-        for (Object s : valueAr) {
+        for (Object s : valueList) {
             assemblyFile = (String) s;
             if (recentAssemblyFileSet.add(assemblyFile)) {
                 op = historyConfiguration.getString(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
@@ -1936,9 +1936,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordProjectFiles() {
         List<Object> valueAr = historyConfiguration.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
-        LOG.debug("recordProjFiles valueAr size is: {}", valueAr.size());
+        LOG.debug("recordProjectFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)
-            adjustRecentProjSet(new File((String) value));
+            adjustRecentProjectSet(new File((String) value));
     }
 
     private void saveAssemblyHistoryXML(Set<String> recentFiles) {
@@ -1953,11 +1953,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         historyConfiguration.getDocument().normalize();
     }
 
-    /** Always keep our project Hx until a user clears it manually
+    /** Always keep our project history until a user clears it manually
      *
      * @param recentFiles a Set of recently opened projects
      */
-    private void saveProjHistoryXML(Set<String> recentFiles) {
+    private void saveProjectHistoryXML(Set<String> recentFiles) {
         int idx = 0;
         for (String value : recentFiles) {
             historyConfiguration.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
@@ -1988,7 +1988,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void clearRecentProjectFileSet() {
         recentProjectFileSet.clear();
-        saveProjHistoryXML(recentProjectFileSet);
+        saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjectFileListeners();
     }
 
