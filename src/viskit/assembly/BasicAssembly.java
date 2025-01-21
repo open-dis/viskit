@@ -596,7 +596,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         PrintStream out = new PrintStream(os);
         this.printWriter = new PrintWriter(os);
 
-        // This OutputStream gets ported to the JScrollPane of the Assy Runner
+        // This OutputStream gets ported to the JScrollPane of the Assembly Runner
         Schedule.setOutputStream(out);
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
@@ -634,7 +634,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
                 String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfiguration.V_ERROR_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfiguration.VISKIT_ERROR_LOG.getPath() + " and "
                     + "email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then attach the log. Would "
