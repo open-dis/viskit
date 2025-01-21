@@ -35,9 +35,9 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class vGraphComponent extends JGraph implements GraphModelListener {
+public class ViskitGraphComponent extends JGraph implements GraphModelListener {
 
-    vGraphModel vGModel; // local copy for convenience
+    ViskitGraphModel vGModel; // local copy for convenience
     EventGraphViewFrame parent;
 
     private UndoManager undoManager;
@@ -47,11 +47,11 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
      * @param model a model of the node with its specific edges
      * @param frame the main view frame canvas to render to
      */
-    public vGraphComponent(vGraphModel model, EventGraphViewFrame frame) {
+    public ViskitGraphComponent(ViskitGraphModel model, EventGraphViewFrame frame) {
         super(model);
         parent = frame;
 
-        vGraphComponent instance = this;
+        ViskitGraphComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         this.vGModel = model;
         this.setSizeable(false);
@@ -60,7 +60,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
         this.setGridSize(10);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new ViskitGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -72,7 +72,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
         this.setJumpToDefaultPort(true);
 
         // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parent.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
@@ -124,7 +124,7 @@ public class vGraphComponent extends JGraph implements GraphModelListener {
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphUI());    // we use our own for node/edge inspector editing
+        setUI(new ViskitGraphUI());    // we use our own for node/edge inspector editing
         invalidate();
     }
 
@@ -666,7 +666,7 @@ class vPortView extends PortView {
  */
 class vEdgeView extends EdgeView {
 
-    static vEdgeRenderer localRenderer = new vEdgeRenderer();
+    static ViskitGraphEdgeRenderer localRenderer = new ViskitGraphEdgeRenderer();
 
     public vEdgeView(Object cell) {
         super(cell);
@@ -683,7 +683,7 @@ class vEdgeView extends EdgeView {
  */
 class vSelfEdgeView extends vEdgeView {
 
-    static vSelfEdgeRenderer localRenderer2 = new vSelfEdgeRenderer();
+    static ViskitGraphSelfEdgeRenderer localRenderer2 = new ViskitGraphSelfEdgeRenderer();
 
     public vSelfEdgeView(Object cell) {
         super(cell);
@@ -710,7 +710,7 @@ class vCircleCell extends DefaultGraphCell {
  */
 class vCircleView extends VertexView {
 
-    static vVertexRenderer localRenderer = new vVertexRenderer();
+    static ViskitGraphVertexRenderer localRenderer = new ViskitGraphVertexRenderer();
 
     public vCircleView(Object cell) {
         super(cell);

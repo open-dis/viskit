@@ -22,10 +22,10 @@ import viskit.model.SchedulingEdge;
  * @since Mar 8, 2004
  * @since 3:17:59 PM
  */
-public class vGraphUI extends BasicGraphUI {
+public class ViskitGraphUI extends BasicGraphUI {
 
     /** Default constructor */
-    public vGraphUI() {
+    public ViskitGraphUI() {
         super();
     }
 

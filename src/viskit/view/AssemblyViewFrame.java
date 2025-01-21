@@ -72,8 +72,8 @@ import viskit.images.AdapterIcon;
 import viskit.images.PropChangListenerImageIcon;
 import viskit.images.PropChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
-import viskit.jgraph.VgraphAssemblyComponentWrapper;
-import viskit.jgraph.vGraphAssemblyModel;
+import viskit.jgraph.ViskitGraphAssemblyComponentWrapper;
+import viskit.jgraph.ViskitGraphAssemblyModel;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.MvcModelEvent;
@@ -213,16 +213,16 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphAssemblyComponentWrapper getCurrentVgacw() {
+    public ViskitGraphAssemblyComponentWrapper getCurrentVgacw() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {return null;}
 
         JScrollPane jSP = (JScrollPane) jsplt.getRightComponent();
-        return (VgraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
+        return (ViskitGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        ViskitGraphAssemblyComponentWrapper vcw = getCurrentVgacw();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
@@ -247,7 +247,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
         @Override
         public void stateChanged(ChangeEvent e) {
-            VgraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
+            ViskitGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
 
             if (myVgacw == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
@@ -632,8 +632,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
     @Override
     public void addTab(AssemblyModel mod) {
-        vGraphAssemblyModel vGAmod = new vGraphAssemblyModel();
-        VgraphAssemblyComponentWrapper graphPane = new VgraphAssemblyComponentWrapper(vGAmod, this);
+        ViskitGraphAssemblyModel vGAmod = new ViskitGraphAssemblyModel();
+        ViskitGraphAssemblyComponentWrapper graphPane = new ViskitGraphAssemblyComponentWrapper(vGAmod, this);
         vGAmod.setjGraph(graphPane);                               // todo fix this
 
         graphPane.assemblyModel = mod;
@@ -678,11 +678,11 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphAssemblyComponentWrapper vgacw;
+        ViskitGraphAssemblyComponentWrapper vgacw;
         for (int i = 0; i < ca.length; i++) {
             jsplt = (JSplitPane) ca[i];
             jsp = (JScrollPane) jsplt.getRightComponent();
-            vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            vgacw = (ViskitGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgacw.assemblyModel == mod) {
                 tabbedPane.remove(i);
                 vgacw.isActive = false;
@@ -705,11 +705,11 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         AssemblyModel[] vm = new AssemblyModel[ca.length];
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphAssemblyComponentWrapper vgacw;
+        ViskitGraphAssemblyComponentWrapper vgacw;
         for (int i = 0; i < vm.length; i++) {
             jsplt = (JSplitPane) ca[i];
             jsp = (JScrollPane) jsplt.getRightComponent();
-            vgacw = (VgraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
+            vgacw = (ViskitGraphAssemblyComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgacw.assemblyModel;
         }
         return vm;

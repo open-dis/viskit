@@ -55,7 +55,7 @@ import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
-import viskit.jgraph.vGraphUndoManager;
+import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
 import viskit.util.Compiler;
@@ -270,7 +270,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
 
         if (view.getCurrentVgacw() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -1267,7 +1267,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
                 break;
         }
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         // Prevent dups
         if (!selectionVector.contains(redoGraphCell.getUserObject()))
@@ -1317,7 +1317,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
 
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -1330,7 +1330,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyViewFrame view = (AssemblyViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));

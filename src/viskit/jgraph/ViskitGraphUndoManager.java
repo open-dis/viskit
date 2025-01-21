@@ -56,12 +56,12 @@ import viskit.mvc.MvcController;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vUndoableEditListener">Terry Norbraten, NPS MOVES</a>
  */
-public class vGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
+public class ViskitGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
     private final Vector<Object> selected;
     private final MvcController controller;
 
-    public vGraphUndoManager(MvcController controller) {
+    public ViskitGraphUndoManager(MvcController controller) {
         this.controller = controller;
         selected = new Vector<>();
     }
@@ -102,4 +102,4 @@ public class vGraphUndoManager extends GraphUndoManager implements GraphSelectio
             ((AssemblyController) controller).selectNodeOrEdge(selected);
     }
 
-} // end class vGraphUndoManager
+} // end class ViskitGraphUndoManager

@@ -52,10 +52,10 @@ import viskit.model.ViskitElement;
 /**
  * Class to draw the self-referential edges as an arc attached to the node.
  *
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vSelfEdgeRenderer">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitGraphSelfEdgeRenderer">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-class vSelfEdgeRenderer extends vEdgeRenderer {
+class ViskitGraphSelfEdgeRenderer extends ViskitGraphEdgeRenderer {
 
     private final double circleDiam = 30.0d;
     private Arc2D arc;
@@ -207,4 +207,4 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
         return 0.0d;      // should always find one
     }
 
-} // end class vSelfEdgeRenderer
+} // end class ViskitGraphSelfEdgeRenderer

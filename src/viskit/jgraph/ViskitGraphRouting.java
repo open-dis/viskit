@@ -56,15 +56,15 @@ import viskit.model.ViskitElement;
 /**
  * A replacement class to tweak the routing slightly so that the edges come into
  * the node from directions other than NSE and W if there are more than one edge
- * to/from a node.  This class will also provide a unique control point to give
- * a distinctive parabolic shape to the edge when there are more than one edge
- * to/from a node.
+ * to/from a node.This class will also provide a unique control point to give
+ a distinctive parabolic shape to the edge when there are more than one edge
+ to/from a node.
  *
  * @author Mike Bailey
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.vRouting">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitGraphRouting">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
+public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
 
     Map<String, Vector<Object>> nodePairs = new HashMap<>();
 
@@ -250,4 +250,4 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         return GraphConstants.STYLE_BEZIER;
     }
 
-} // end class file vRouting.java
+} // end class file ViskitGraphRouting.java

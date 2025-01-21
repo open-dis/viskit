@@ -32,8 +32,8 @@ import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
-import viskit.jgraph.VgraphComponentWrapper;
-import viskit.jgraph.vGraphModel;
+import viskit.jgraph.ViskitGraphComponentWrapper;
+import viskit.jgraph.ViskitGraphModel;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.MvcModelEvent;
@@ -176,18 +176,18 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public VgraphComponentWrapper getCurrentVgraphComponentWrapper() {
+    public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {
             return null;
         }
 
         JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-        return (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+        return (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
     }
 
     public Component getCurrentJgraphComponent() {
-        VgraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
+        ViskitGraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getLeftComponent();
     }
@@ -213,7 +213,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            VgraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
+            ViskitGraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
 
             if (myVgcw == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
@@ -243,7 +243,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         }
     }
 
-    private void buildStateParamSplit(VgraphComponentWrapper vgcw) {
+    private void buildStateParamSplit(ViskitGraphComponentWrapper vgcw) {
 
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
@@ -411,8 +411,8 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
     @Override
     public void addTab(Model mod) {
-        vGraphModel vmod = new vGraphModel();
-        VgraphComponentWrapper graphPane = new VgraphComponentWrapper(vmod, this);
+        ViskitGraphModel vmod = new ViskitGraphModel();
+        ViskitGraphComponentWrapper graphPane = new ViskitGraphComponentWrapper(vmod, this);
         vmod.setjGraph(graphPane);
         graphPane.model = mod;
 
@@ -456,12 +456,12 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     public void delTab(Model mod) {
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphComponentWrapper vgcw;
+        ViskitGraphComponentWrapper vgcw;
         Runnable r;
         for (Component c : tabbedPane.getComponents()) {
             jsplt = (JSplitPane) c;
             jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
             if (vgcw.model == mod) {
                 tabbedPane.remove(c);
                 vgcw.isActive = false;
@@ -482,13 +482,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     public Model[] getOpenModels() {
         JSplitPane jsplt;
         JScrollPane jsp;
-        VgraphComponentWrapper vgcw;
+        ViskitGraphComponentWrapper vgcw;
         Component[] ca = tabbedPane.getComponents();
         Model[] vm = new Model[ca.length];
         for (int i = 0; i < vm.length; i++) {
             jsplt = (JSplitPane) ca[i];
             jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (VgraphComponentWrapper) jsp.getViewport().getComponent(0);
+            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
             vm[i] = vgcw.model;
         }
         return vm;
@@ -1222,7 +1222,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
     @Override
     public void modelChanged(MvcModelEvent event) {
-        VgraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
+        ViskitGraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
         ParametersPanel pp = vgcw.paramPan;
         StateVariablesPanel vp = vgcw.varPan;
         switch (event.getID()) {

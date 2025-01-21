@@ -36,7 +36,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitStatics;
-import viskit.jgraph.vGraphUndoManager;
+import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
 import viskit.view.dialog.EventGraphMetadataDialog;
@@ -267,7 +267,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
 
         if (view.getCurrentVgraphComponentWrapper() != null) {
-            vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -854,7 +854,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 break;
         }
 
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
 
             // This will clear the selectionVector via callbacks
@@ -890,7 +890,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
 
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
             undoMgr.redo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
@@ -903,7 +903,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        vGraphUndoManager undoMgr = (vGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
 
         ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
         ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));

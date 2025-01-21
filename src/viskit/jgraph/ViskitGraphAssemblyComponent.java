@@ -24,25 +24,25 @@ import viskit.control.AssemblyController;
 import viskit.model.*;
 
 /**
- * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects MOVES Institute. Naval
- * Postgraduate School, Monterey, CA
+ * OPNAV N81-NPS World-Class-Modeling (WCM) 2004 Projects MOVES Institute.Naval
+ Postgraduate School, Monterey, CA
  *
  * @author Mike Bailey
  * @since Feb 19, 2004
  * @since 2:54:31 PM
- * @version $Id: vGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra$
+ * @version $Id: ViskitGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra$
  */
-public class vGraphAssemblyComponent extends JGraph implements GraphModelListener {
+public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
-    vGraphAssemblyModel vGAModel;
+    ViskitGraphAssemblyModel vGAModel;
     AssemblyViewFrame parent;
     private UndoManager undoManager;
 
-    public vGraphAssemblyComponent(vGraphAssemblyModel model, AssemblyViewFrame frame) {
+    public ViskitGraphAssemblyComponent(ViskitGraphAssemblyModel model, AssemblyViewFrame frame) {
         super(model);
         parent = frame;
 
-        vGraphAssemblyComponent instance = this;
+        ViskitGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
         this.vGAModel = model;
         this.setSizeable(false);
@@ -51,7 +51,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setGridColor(new Color(0xcc, 0xcc, 0xff)); // default on Mac, makes Windows look better
         this.setGridEnabled(true); // means snap
         this.setGridSize(10);
-        this.setMarqueeHandler(new vGraphMarqueeHandler(instance));
+        this.setMarqueeHandler(new ViskitGraphMarqueeHandler(instance));
         this.setAntiAliased(true);
         this.setLockedHandleColor(Color.red);
         this.setHighlightColor(Color.red);
@@ -63,7 +63,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         this.setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new vGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parent.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
         model.addUndoableEditListener(undoManager);
         model.addGraphModelListener(instance);
@@ -123,7 +123,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
     @Override
     public void updateUI() {
         // Install a new UI
-        setUI(new vGraphAssemblyUI());    // we use our own for node/edge inspector editting
+        setUI(new ViskitGraphAssemblyUI());    // we use our own for node/edge inspector editting
         invalidate();
     }
     
@@ -515,7 +515,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         vGAModel.reDrawNodes();
     }
     
-} // end class vGraphAssemblyComponent
+} // end class ViskitGraphAssemblyComponent
 
 /**        Extended JGraph Classes
  * ********************************************
@@ -574,7 +574,7 @@ class vAssyPropListCell extends DefaultGraphCell {
 class vAssyPropListView extends VertexView {
 
     // shared with vAssyCircleView
-    static vVertexRenderer vvr = new vVertexRenderer();
+    static ViskitGraphVertexRenderer vvr = new ViskitGraphVertexRenderer();
 
     public vAssyPropListView(Object cell) {
         super(cell);
@@ -650,7 +650,7 @@ class vAssyPclEdgeView extends vEdgeView {
     }
 }
 
-class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
+class vAssyAdapterEdgeRenderer extends ViskitGraphEdgeRenderer {
 
     /**
      * Paint the vaaer. Overridden to do a double line and paint over the end
@@ -739,7 +739,7 @@ class vAssyAdapterEdgeRenderer extends vEdgeRenderer {
     }
 }
 
-class vAssyEdgeRenderer extends vEdgeRenderer {
+class vAssyEdgeRenderer extends ViskitGraphEdgeRenderer {
 
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
@@ -747,4 +747,4 @@ class vAssyEdgeRenderer extends vEdgeRenderer {
     }
 }
 // End support for custom line ends and double adapter line on assembly edges
-// end class file vGraphAssemblyComponent.java
+// end class file ViskitGraphAssemblyComponent.java

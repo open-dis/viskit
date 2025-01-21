@@ -21,9 +21,9 @@ import viskit.model.*;
  * @since 3:17:59 PM
  * @version $Id$
  */
-public class vGraphAssemblyUI extends BasicGraphUI {
+public class ViskitGraphAssemblyUI extends BasicGraphUI {
 
-    public vGraphAssemblyUI() {
+    public ViskitGraphAssemblyUI() {
         super();
     }
 
