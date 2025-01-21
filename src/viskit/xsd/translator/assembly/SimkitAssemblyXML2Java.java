@@ -15,7 +15,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.logging.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
@@ -74,7 +74,7 @@ public class SimkitAssemblyXML2Java {
      * @throws FileNotFoundException
      */
     public SimkitAssemblyXML2Java(String xmlFile) throws FileNotFoundException {
-        this(VStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
+        this(ViskitStatics.classForName(SimkitAssemblyXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
     }
 
@@ -229,7 +229,7 @@ public class SimkitAssemblyXML2Java {
 //        printImports(pw);
 //        pw.println();
 
-        if (extendz.equals(VStatics.JAVA_LANG_OBJECT)) {
+        if (extendz.equals(ViskitStatics.JAVA_LANG_OBJECT)) {
             extendz = "";
         } else {
             extendz = "extends" + sp + extendz + sp;

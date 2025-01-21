@@ -14,7 +14,7 @@ import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphController;
 
 import viskit.model.EventStateTransition;
@@ -311,14 +311,14 @@ public class EventStateTransitionDialog extends JDialog {
             }
 
             // Beware of qualified types here
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
             methods = Arrays.asList(type.getMethods());
 
             // Filter out methods of Object, and any
             // methods requiring more then one parameter
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
 
                 if (method.getParameterCount() == 0) {
                     methodNames.add(method.getName() + "()");
@@ -362,7 +362,7 @@ public class EventStateTransitionDialog extends JDialog {
             if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
 
             if (type == null) {
                 ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).messageUser(
@@ -378,7 +378,7 @@ public class EventStateTransitionDialog extends JDialog {
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (!method.getReturnType().getName().contains("void")) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 

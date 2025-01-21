@@ -70,8 +70,8 @@ import simkit.stat.SavedStats;
 import simkit.stat.SimpleStatsTally;
 
 import viskit.ViskitGlobals;
-import viskit.VStatics;
-import viskit.ViskitConfig;
+import viskit.ViskitStatics;
+import viskit.ViskitConfiguration;
 
 import viskit.model.AssemblyNode;
 
@@ -259,7 +259,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                     // This is not a designPoint, so skip
-                    if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
+                    if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                         LOG.debug("SimplePropertyDumper encountered");
                         continue;
                     }
@@ -630,17 +630,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //            t.printStackTrace();
 
             try {
-                URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST
+                URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
                 String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfiguration.V_ERROR_LOG.getPath() + " and "
                     + "email the log to "
-                    + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                    + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then attach the log. Would "
                     + "be good to have your project attached as well to replicate: File -> Zip/Mail Viskit Project";
 
-                VStatics.showHyperlinkedDialog(null, t.getMessage(), url, msg, true);
+                ViskitStatics.showHyperlinkedDialog(null, t.getMessage(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
                 LOG.error(ex);
             }
@@ -781,7 +781,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                             nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
 
                             // This is not a designPoint, so skip
-                            if (nodeType.equals(VStatics.SIMPLE_PROPERTY_DUMPER)) {
+                            if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                                 LOG.debug("SimplePropertyDumper encountered");
                                 continue;
                             }

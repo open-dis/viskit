@@ -87,16 +87,16 @@ public class EventGraphAssemblyComboMain {
             }
 
             try {
-                URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST +
+                URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
 
                 String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                        + "navigate to " + ViskitConfig.V_ERROR_LOG.getPath() + " and "
+                        + "navigate to " + ViskitConfiguration.V_ERROR_LOG.getPath() + " and "
                         + "email the log to "
-                        + "<b><a href=\"" + url.toString() + "\">" + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                        + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
-                VStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
+                ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
                 LogUtils.getLogger(EventGraphAssemblyComboMain.class).fatal(ex);
             }
@@ -107,7 +107,7 @@ public class EventGraphAssemblyComboMain {
      * .viskit config directory in the user's profile space
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfig.VISKIT_CONFIG_DIR;
+        File dotViskit = ViskitConfiguration.VISKIT_CONFIG_DIR;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
@@ -123,13 +123,13 @@ public class EventGraphAssemblyComboMain {
     }
 
     private static void createGUI(String[] args) {
-        boolean isMac = VStatics.OPERATING_SYSTEM.contains("Mac");
+        boolean isMac = ViskitStatics.OPERATING_SYSTEM.contains("Mac");
         String initialAssemblyFile = null;
 
         if (args.length > 0)
             initialAssemblyFile = args[0];
 
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LogUtils.getLogger(EventGraphAssemblyComboMain.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
         }
         setLandFandFonts();

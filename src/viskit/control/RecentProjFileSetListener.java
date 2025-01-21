@@ -45,7 +45,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.mvc.MvcAbstractJFrameView;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcRecentFileListener;
@@ -90,7 +90,7 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
             for (JMenu m : openRecentProjMenus) {
                 nameOnly = f.getName();
                 act = new ParameterizedProjAction(nameOnly);
-                act.putValue(VStatics.FULL_PATH, fullPath);
+                act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
                 m.add(mi);
@@ -101,7 +101,7 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
             for (JMenu m : openRecentProjMenus) {
                 m.add(new JSeparator());
                 act = new ParameterizedProjAction("clear");
-                act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
+                act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
                 m.add(mi);
@@ -120,13 +120,13 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
             AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;
-            Object obj = getValue(VStatics.FULL_PATH);
+            Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
                 fullPath = new File((String) obj);
             else
                 fullPath = (File) obj;
 
-            if (fullPath != null && fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
+            if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
                 acontroller.clearRecentProjFileSet();
             } else {
                 acontroller.doProjectCleanup();

@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.util.Compiler;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -309,7 +309,7 @@ public class SourceWindow extends JFrame {
         aMap.put(searchAgainHandle, againAct);
 
         // Mac uses cmd-G
-        String vers = VStatics.OPERATING_SYSTEM.toLowerCase();
+        String vers = ViskitStatics.OPERATING_SYSTEM.toLowerCase();
         if (vers.contains("mac")) {
             key = KeyStroke.getKeyStroke(KeyEvent.VK_G, cntlKeyMask);
             iMap.put(key, searchAgainHandle);

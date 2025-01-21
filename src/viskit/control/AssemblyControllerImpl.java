@@ -51,9 +51,9 @@ import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssyNode;
 import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.jgraph.vGraphUndoManager;
 import viskit.model.*;
@@ -103,7 +103,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param f the assy file to initially open upon startup
      */
     public void setInitialAssyFile(String f) {
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LOG.info("Initial file set: {}", f);
         }
         initialAssyFile = f;
@@ -456,8 +456,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         GraphMetadata gmd = model.getMetaData();
 
         // Allow the user to type specific package names
-        String packageName = gmd.packageName.replace(".", VStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + VStatics.getFileSeparator() + gmd.name + ".xml", false);
+        String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false);
 
         if (saveFile != null) {
 
@@ -586,7 +586,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 try {
 
                     // First, copy the error.log to the project dir
-                    Files.copy(ViskitConfig.V_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(ViskitConfiguration.V_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -603,7 +603,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     get();
 
                     try {
-                        URL url = new URI("mailto:" + VStatics.VISKIT_MAILING_LIST
+                        URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                                 + "?subject=Viskit%20Project%20Submission%20for%20"
                                 + projDir.getName() + "&body=see%20attachment").toURL();
                         String msg = "Please navigate to<br/>"
@@ -611,10 +611,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                                 + "<br/>and email the " + projZip.getName()
                                 + " file to "
                                 + "<b><a href=\"" + url.toString() + "\">"
-                                + VStatics.VISKIT_MAILING_LIST + "</a></b>"
+                                + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                                 + "<br/><br/>Click the link to open up an email "
                                 + "form, then attach the zip file";
-                        VStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
+                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projDir.getName(), url, msg, false);
                     } catch (MalformedURLException | URISyntaxException e) {
                         LOG.error(e);
                     }
@@ -653,7 +653,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void doProjectCleanup() {
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
-        ViskitConfig.instance().clearViskitConfig();
+        ViskitConfiguration.instance().clearViskitConfig();
         clearRecentAssyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
@@ -661,7 +661,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void openProject(File file) {
-        VStatics.setViskitProjectFile(file);
+        ViskitStatics.setViskitProjectFile(file);
         ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
@@ -793,7 +793,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -805,7 +805,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }
@@ -971,7 +971,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     Class<?> findClass(AssemblyNode o) {
-        return VStatics.classForName(o.getType());
+        return ViskitStatics.classForName(o.getType());
     }
 
     AssemblyNode[] orderPCLSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
@@ -980,10 +980,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // we don't know if the workClassLoader is the same instance
         // as it used to be when these were originally loaded
         // the tbd here is to see if there can be a shared root loader
-        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
         if (propChgSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (propChgSrcClass.isAssignableFrom(cb)) {
@@ -1003,10 +1003,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
         AssemblyNode[] obArr = new AssemblyNode[2];
-        simEvSrcClass = VStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = VStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = VStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = VStatics.classForName("java.beans.PropertyChangeListener");
+        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
+        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
+        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
+        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
         if (simEvSrcClass.isAssignableFrom(ca)) {
             obArr[0] = a;
         } else if (simEvSrcClass.isAssignableFrom(cb)) {
@@ -1908,7 +1908,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordAssyFiles() {
         openAssemblies = new ArrayList<>(4);
-        List<Object> valueAr = historyConfig.getList(ViskitConfig.ASSY_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.ASSY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
         int idx = 0;
         String op;
@@ -1916,7 +1916,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         for (Object s : valueAr) {
             assemblyFile = (String) s;
             if (recentAssyFileSet.add(assemblyFile)) {
-                op = historyConfig.getString(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfig.getString(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openAssemblies.add(assemblyFile);
@@ -1929,19 +1929,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @SuppressWarnings("unchecked")
     private void recordProjFiles() {
-        List<Object> valueAr = historyConfig.getList(ViskitConfig.PROJ_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.PROJ_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)
             adjustRecentProjSet(new File((String) value));
     }
 
     private void saveAssyHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfiguration.RECENT_ASSY_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1954,7 +1954,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void saveProjHistoryXML(Set<String> recentFiles) {
         int idx = 0;
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfig.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfiguration.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -2002,7 +2002,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private void initConfig() {
         try {
-            historyConfig = ViskitConfig.instance().getViskitAppConfig();
+            historyConfig = ViskitConfiguration.instance().getViskitAppConfig();
         } catch (Exception e) {
             LOG.error("Error loading history file: {}", e.getMessage());
             LOG.warn("Recent file saving disabled");

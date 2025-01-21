@@ -27,9 +27,9 @@ import viskit.util.FindClassesForInterface;
 
 import viskit.ViskitGlobals;
 
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -63,7 +63,7 @@ public class FileBasedClassManager {
         }
 
         // This requires reinitializing everytime this FBM is called
-        projectConfig = ViskitConfig.instance().getProjectXMLConfig();
+        projectConfig = ViskitConfiguration.instance().getProjectXMLConfig();
         return me;
     }
 
@@ -153,9 +153,9 @@ public class FileBasedClassManager {
                 // If we have an annotated ParameterMap, then cacheXML it. If not,
                 // then treat the fclass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = VStatics.resolveParameters(fclass);
+                List<Object>[] pMap = ViskitStatics.resolveParameters(fclass);
                 if (pMap != null && pMap.length > 0)
-                    VStatics.putParameterList(fclass.getName(), pMap);
+                    ViskitStatics.putParameterList(fclass.getName(), pMap);
             }
 
         // TODO: Check if this is really necessary and should be dealt with
@@ -194,7 +194,7 @@ public class FileBasedClassManager {
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
             pa[0].addAll(simEntity.getParameter());
-            VStatics.putParameterList(fclass.getName(), pa);
+            ViskitStatics.putParameterList(fclass.getName(), pa);
 
             LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
 
@@ -215,8 +215,8 @@ public class FileBasedClassManager {
             return;
         }
         try {
-            List<String> cache = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-            if (viskit.VStatics.debug) {
+            List<String> cache = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+            if (viskit.ViskitStatics.debug) {
                 if (cache == null) {
                     LOG.debug("cache " + cache);
                 } else {
@@ -227,12 +227,12 @@ public class FileBasedClassManager {
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
 //                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
-//                if (viskit.VStatics.debug) {
+//                if (viskit.ViskitStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }
-//                projectConfig.setProperty(ViskitConfig.CACHED_WORKING_DIR_KEY, s);
+//                projectConfig.setProperty(ViskitConfiguration.CACHED_WORKING_DIR_KEY, s);
 //            }
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("Adding cache " + xmlEg + " " + classFile);
             }
 
@@ -278,7 +278,7 @@ public class FileBasedClassManager {
                 }
             }
             byte[] hash = md.digest();
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("hash " + new BigInteger(hash).toString(16) + " " + hash.length);
             }
             retVal = new BigInteger(hash).toString(16);
@@ -290,7 +290,7 @@ public class FileBasedClassManager {
     }
 
     public boolean isCached(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
         try {
             String filePath = file.getCanonicalPath().replaceAll("\\\\", "/");
             LOG.debug("isCached() " + file + " of cacheSize " + cacheXML.size());
@@ -317,12 +317,12 @@ public class FileBasedClassManager {
      * @return a cached class file given its cached XML file
      */
     public File getCachedClass(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheXML.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("getCached index at {}", index);
                 LOG.debug("will return {}", cacheClass.get(index));
             }
@@ -331,7 +331,7 @@ public class FileBasedClassManager {
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheClass.get(index));
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LOG.debug("cachedFile index at {}", index);
             LOG.debug("will return {}", cachedFile);
         }
@@ -343,12 +343,12 @@ public class FileBasedClassManager {
      * @return an XML file given its cached class file
      */
     public File getCachedXML(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
         int index = 0;
         try {
             index = cacheClass.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
-            if (viskit.VStatics.debug) {
+            if (viskit.ViskitStatics.debug) {
                 LOG.debug("getCachedXml index at " + index);
                 LOG.debug("will return " + cacheXML.get(index));
             }
@@ -357,7 +357,7 @@ public class FileBasedClassManager {
 //            ex.printStackTrace();
         }
         File cachedFile = new File(cacheXML.get(index));
-        if (viskit.VStatics.debug) {
+        if (viskit.ViskitStatics.debug) {
             LOG.debug("cachedFile index at " + index);
             LOG.debug("will return " + cachedFile);
         }
@@ -368,8 +368,8 @@ public class FileBasedClassManager {
      * @param file the XML, or class file to delete from the cacheXML
      */
     public void deleteCache(File file) {
-        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
-        List<String> cacheClass = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_CLASS_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheClass = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_CLASS_KEY));
         String filePath;
         File deletedCache = null;
         try {
@@ -391,7 +391,7 @@ public class FileBasedClassManager {
                 boolean didDelete = false;
                 if (deletedCache != null)
                     didDelete = deletedCache.delete();
-                if (viskit.VStatics.debug) {
+                if (viskit.ViskitStatics.debug) {
                     LOG.debug(didDelete + ": cachedFile deleted index at " + index);
                 }
             }
@@ -407,8 +407,8 @@ public class FileBasedClassManager {
      * @return an indication of miss caching
      */
     public boolean isCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
-        List<String> digests = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_DIGEST_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_MISS_FILE_KEY));
+        List<String> digests = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_MISS_DIGEST_KEY));
         int index;
         try {
             index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"));
@@ -427,7 +427,7 @@ public class FileBasedClassManager {
     public void addCacheMiss(File file) {
         deleteCache(file);
         removeCacheMiss(file); // remove any old ones
-        int index = ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY).length;
+        int index = ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_MISS_FILE_KEY).length;
         try {
             projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
             projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
@@ -438,7 +438,7 @@ public class FileBasedClassManager {
     }
 
     public void removeCacheMiss(File file) {
-        List<String> cacheMisses = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_MISS_FILE_KEY));
+        List<String> cacheMisses = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_MISS_FILE_KEY));
         int index;
         try {
             if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"))) > -1) {
@@ -457,8 +457,8 @@ public class FileBasedClassManager {
      */
     public boolean isStale(File egFile) {
         File classFile = getCachedClass(egFile);
-        List<String> cacheDigest = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_DIGEST_KEY));
-        List<String> cacheXML = Arrays.asList(ViskitConfig.instance().getConfigValues(ViskitConfig.CACHED_EVENTGRAPHS_KEY));
+        List<String> cacheDigest = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_DIGEST_KEY));
+        List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
         String filePath;
         try {
             filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");

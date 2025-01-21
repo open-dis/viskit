@@ -23,7 +23,7 @@ import viskit.util.FileBasedAssyNode;
 import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
@@ -105,7 +105,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         targetClassName = className;
         genericTableToolTip = tooltip;
 
-        targetClass = VStatics.classForName(targetClassName);
+        targetClass = ViskitStatics.classForName(targetClassName);
 
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -413,7 +413,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         List<Class<?>> list = FindClassesForInterface.findClasses(jarFile, targetClass);
         list.forEach(c -> {
-            VStatics.resolveParameters(c);
+            ViskitStatics.resolveParameters(c);
         });
 
         // Shorten long path names

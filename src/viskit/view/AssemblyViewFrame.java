@@ -64,7 +64,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssyNode;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.control.RecentProjFileSetListener;
 import viskit.doe.LocalBootLoader;
@@ -145,8 +145,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
 
-    private final String FULLPATH = VStatics.FULL_PATH;
-    private final String CLEARPATHFLAG = VStatics.CLEAR_PATH_FLAG;
+    private final String FULLPATH = ViskitStatics.FULL_PATH;
+    private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
     private final Color background = new Color(0xFB, 0xFB, 0xE5);
 
     /** Toolbar for dropping icons, connecting, etc. */
@@ -267,7 +267,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             GraphMetadata gmd = mod.getMetaData();
             if (gmd != null)
                 setSelectedAssemblyName(gmd.name);
-            else if (viskit.VStatics.debug)
+            else if (viskit.ViskitStatics.debug)
                 System.err.println("error: AssemblyViewFrame gmd null..");
         }
     }
@@ -311,7 +311,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             AssemblyController acontroller = (AssemblyController) getController();
 
             File fullPath;
-            Object obj = getValue(VStatics.FULL_PATH);
+            Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
                 fullPath = new File((String) obj);
             else

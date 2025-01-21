@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import simkit.Priority;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphController;
 import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
@@ -336,7 +336,7 @@ public class EdgeInspectorDialog extends JDialog {
         JComboBox<String> jcb = new JComboBox<>(priorityNames);
         priorityList = new ArrayList<>(10);
         try {
-            Class<?> c = VStatics.classForName("simkit.Priority");
+            Class<?> c = ViskitStatics.classForName("simkit.Priority");
             Field[] fa = c.getDeclaredFields();
             for (Field f : fa) {
                 if (Modifier.isStatic(f.getModifiers()) && f.getType().equals(c)) {
@@ -399,7 +399,7 @@ public class EdgeInspectorDialog extends JDialog {
             if (ViskitGlobals.instance().isArray(typ)) {
                 typ = typ.substring(0, typ.indexOf("["));
             }
-            type = VStatics.classForName(typ);
+            type = ViskitStatics.classForName(typ);
 
             if (type == null) {
                 ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).messageUser(
@@ -415,7 +415,7 @@ public class EdgeInspectorDialog extends JDialog {
             // methods requiring parameters
             for (Method method : methods) {
                 className = method.getDeclaringClass().getName();
-                if (className.contains(VStatics.JAVA_LANG_OBJECT)) {continue;}
+                if (className.contains(ViskitStatics.JAVA_LANG_OBJECT)) {continue;}
                 if (method.getParameterCount() > 0) {continue;}
 
                 if (!methodNames.contains(method.getName() + "()"))

@@ -11,7 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /** This is a class to help in code reuse.  There are several small Dialogs
  * which are all used the same way.  This class puts the common code in a single
@@ -39,10 +39,10 @@ public abstract class ViskitSmallDialog extends JDialog {
         if (dialog == null) {
             try {
                 Class[] args = new Class[] {
-                    VStatics.classForName("javax.swing.JFrame"),
-                    VStatics.classForName(VStatics.JAVA_LANG_OBJECT)
+                    ViskitStatics.classForName("javax.swing.JFrame"),
+                    ViskitStatics.classForName(ViskitStatics.JAVA_LANG_OBJECT)
                 };
-                Class<?> c = VStatics.classForName(className);
+                Class<?> c = ViskitStatics.classForName(className);
                 Constructor constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {

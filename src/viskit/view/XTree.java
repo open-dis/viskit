@@ -17,7 +17,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.*;
 
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.doe.FileHandler;
 
 /**
@@ -232,7 +232,7 @@ public class XTree extends JTree {
     }
 //    static int wrapSiz = 50;//100;
 //    static String nl = System.getProperty("line.separator");
-    static boolean isWindows = VStatics.OPERATING_SYSTEM.toLowerCase().contains("windows");
+    static boolean isWindows = ViskitStatics.OPERATING_SYSTEM.toLowerCase().contains("windows");
 
     static private String wrap(String s) {
         if (isWindows) {

@@ -50,7 +50,7 @@ import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.model.AdapterEdge;
 import viskit.model.EvGraphNode;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -127,20 +127,20 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         sourceEventTF = new JTextField();
         sourceEventTF.setEditable(false); // events are chosen from list
         sourceEventTF.setBackground(tfBack);
-        VStatics.clampHeight(sourceEventTF);
+        ViskitStatics.clampHeight(sourceEventTF);
         targetEventTF = new JTextField();
         targetEventTF.setEditable(false); // events are chosen from list
         targetEventTF.setBackground(tfBack);
-        VStatics.clampHeight(targetEventTF);
+        ViskitStatics.clampHeight(targetEventTF);
 
         evSourceNavButt = new JButton("...");
         evSourceNavButt.addActionListener(new findSourceEventsAction());
         evSourceNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        VStatics.clampHeight(evSourceNavButt, sourceEventTF);
+        ViskitStatics.clampHeight(evSourceNavButt, sourceEventTF);
         evTargetNavButt = new JButton("...");
         evTargetNavButt.addActionListener(new findTargetEventsAction());
         evTargetNavButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        VStatics.clampHeight(evTargetNavButt, targetEventTF);
+        ViskitStatics.clampHeight(evTargetNavButt, targetEventTF);
 
         sourceEventLab = new JLabel("source event", JLabel.TRAILING);
         sourceEventPan = new JPanel();
@@ -190,7 +190,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
     }
 
     private void pairWidgets(JLabel lab, JComponent tf, boolean edit) {
-        VStatics.clampHeight(tf);
+        ViskitStatics.clampHeight(tf);
         lab.setLabelFor(tf);
         if (tf instanceof JTextField) {
             ((JTextComponent) tf).setEditable(edit);
@@ -329,7 +329,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
         Class<?> c;
         String classname = node.getType();
         try {
-            c = VStatics.classForName(classname);
+            c = ViskitStatics.classForName(classname);
             if (c == null) {
                 throw new ClassNotFoundException("classname not found");
             }

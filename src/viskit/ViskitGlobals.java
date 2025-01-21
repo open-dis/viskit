@@ -509,8 +509,8 @@ public class ViskitGlobals {
      * create a new project space, or open another existing one, or exit Viskit
      */
     public final void inititalizeProjectHome() {
-        ViskitConfig vConfig = ViskitConfig.instance();
-        String projectHome = vConfig.getVal(ViskitConfig.PROJECT_PATH_KEY);
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
+        String projectHome = vConfig.getVal(ViskitConfiguration.PROJECT_PATH_KEY);
         LOG.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitProjectButtonPanel.showDialog(); // hopefully, void this
@@ -528,7 +528,7 @@ public class ViskitGlobals {
             isArr = true;
         }
         try {
-            Class<?> c = VStatics.classForName(type);
+            Class<?> c = ViskitStatics.classForName(type);
             if (c != null) {
 
                 Constructor<?>[] constructors = c.getConstructors();
@@ -790,11 +790,11 @@ public class ViskitGlobals {
      * .class files of the projects EGs
      */
     public final void createWorkingDirectory() {
-        ViskitConfig vConfig = ViskitConfig.instance();
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
         if (vConfig.getViskitAppConfig() == null)
             return;
 
-        String projectName = vConfig.getVal(ViskitConfig.PROJECT_NAME_KEY);
+        String projectName = vConfig.getVal(ViskitConfiguration.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }

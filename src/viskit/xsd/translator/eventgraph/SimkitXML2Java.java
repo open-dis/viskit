@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.eventgraph.*;
 
 /** A generator of source code from Event Graph XML
@@ -96,7 +96,7 @@ public class SimkitXML2Java {
      * @param xmlFile the file to generate code from
      */
     public SimkitXML2Java(String xmlFile) {
-        this(VStatics.classForName(
+        this(ViskitStatics.classForName(
                 SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
         setFileBaseName(new File(baseNameOf(xmlFile)).getName());
         setEventGraphFile(new File(xmlFile));
@@ -295,7 +295,7 @@ public class SimkitXML2Java {
                     pw.println(SP_4 + PROTECTED + SP + stripLength(s.getType()) + SP + s.getName() + SC);
             } else {
 
-                c = VStatics.classForName(s.getType());
+                c = ViskitStatics.classForName(s.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
                 if (c == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(s.getType())) {
@@ -1155,9 +1155,9 @@ public class SimkitXML2Java {
         Class<?> c;
         if (!extendz.contains(".")) {
             unqualifiedExtends = packageName + "." + extendz;
-            c = VStatics.classForName(unqualifiedExtends.split("\\s")[0]);
+            c = ViskitStatics.classForName(unqualifiedExtends.split("\\s")[0]);
         } else {
-            c = VStatics.classForName(extendz.split("\\s")[0]);
+            c = ViskitStatics.classForName(extendz.split("\\s")[0]);
         }
         return c;
     }
@@ -1220,7 +1220,7 @@ public class SimkitXML2Java {
      * @return indication of a match
      */
     private boolean unqualifiedMatch(String fromXml, String fromClazz) {
-        fromClazz = VStatics.convertClassName(fromClazz);
+        fromClazz = ViskitStatics.convertClassName(fromClazz);
         if (fromXml.equals(fromClazz)) {
             return true;
         }

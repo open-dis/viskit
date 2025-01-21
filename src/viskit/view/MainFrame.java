@@ -46,7 +46,7 @@ import javax.swing.event.ChangeListener;
 
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
@@ -105,15 +105,15 @@ public class MainFrame extends JFrame {
     private EventGraphController egCntlr;
 
     public MainFrame(String initialAssyFile) {
-        super(ViskitConfig.VISKIT_FULL_APPLICATION_NAME);
+        super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME);
         this.initialAssyFile = initialAssyFile;
         ViskitGlobals.instance().setMainAppWindow(MainFrame.this);
 
         initUI();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
         MainFrame.this.setLocation((d.width - w) / 2, (d.height - h) / 2);
         MainFrame.this.setSize(w, h);
 
@@ -519,17 +519,17 @@ public class MainFrame extends JFrame {
 
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
-                if (viskit.VStatics.debug) {
+                if (viskit.ViskitStatics.debug) {
                     LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user
                 Rectangle bounds = getBounds();
-                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
-                ViskitConfig.instance().setVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+                ViskitConfiguration.instance().setVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitConfiguration.instance().setVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
-                ViskitConfig.instance().cleanup();
+                ViskitConfiguration.instance().cleanup();
 
                 // All other "Frames" were setVisible(false) above
                 setVisible(false);

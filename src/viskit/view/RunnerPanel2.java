@@ -40,8 +40,8 @@ import java.awt.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import viskit.ViskitConfig;
-import viskit.VStatics;
+import viskit.ViskitConfiguration;
+import viskit.ViskitStatics;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -122,8 +122,8 @@ public class RunnerPanel2 extends JPanel {
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
         npsLabel.setIconTextGap(50);
 
-        int w = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfig.instance().getVal(ViskitConfig.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         leftSplit.setDividerLocation((h/2) - 50); // TODO check with Ben, else -1
@@ -144,7 +144,7 @@ public class RunnerPanel2 extends JPanel {
         // TODO:  can a user use this to advance to a certain time in the sim?
         vcrSimTime = new JTextField(10);
         vcrSimTime.setEditable(false);
-        VStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
+        ViskitStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
         JPanel labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrSimTimeLab);
@@ -155,7 +155,7 @@ public class RunnerPanel2 extends JPanel {
         JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
-        VStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
+        ViskitStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
         labTF.add(vcrStopTimeLabel);
@@ -170,7 +170,7 @@ public class RunnerPanel2 extends JPanel {
                 numRepsTF.setText("1");
             }
         });
-        VStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
+        ViskitStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
         JLabel numRepsLab = new JLabel("# replications: ");
         labTF = new JPanel();
         labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
@@ -189,7 +189,7 @@ public class RunnerPanel2 extends JPanel {
         verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
         verboseRepNumberTF.addActionListener(lis);
         verboseRepNumberTF.addCaretListener(lis);
-        VStatics.clampSize(verboseRepNumberTF);
+        ViskitStatics.clampSize(verboseRepNumberTF);
         verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
         flowPan.add(verboseRepNumberTF);
 

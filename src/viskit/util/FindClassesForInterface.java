@@ -19,7 +19,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.doe.LocalBootLoader;
 
 /** A custom class finder to support finding EGs and PCLs in *.class form vice
@@ -39,7 +39,7 @@ public class FindClassesForInterface {
         Class<?> c = null;
         try {
 //            c = classFromFile(f);
-            c = VStatics.classForName(f.getPath());
+            c = ViskitStatics.classForName(f.getPath());
 
             if (c.isInterface() || !isConcrete(c)) {
                 c = null;

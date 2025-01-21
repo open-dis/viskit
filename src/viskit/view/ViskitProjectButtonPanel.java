@@ -43,7 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.mvc.MvcController;
@@ -179,7 +179,7 @@ private void existingButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         }
     } else {
         file = ViskitProject.openProjectDir(this, ViskitProject.VISKIT_PROJECTS_DIR);
-        VStatics.setViskitProjectFile(file);
+        ViskitStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
 
         // NOTE: We have no way of setting the first opened project here as the
@@ -217,7 +217,7 @@ private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         
     } while (true);
 
-    VStatics.setViskitProjectFile(projF);
+    ViskitStatics.setViskitProjectFile(projF);
 
     // NOTE: We have no way of setting the first opened project here as the
     // controller hasn't been created yet to store that info when Viskit first

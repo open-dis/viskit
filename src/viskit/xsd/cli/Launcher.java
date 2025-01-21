@@ -15,7 +15,7 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
@@ -513,7 +513,7 @@ public class Launcher extends Thread implements Runnable {
             m = bshcmz.getDeclaredMethod("classExists", new Class<?>[]{String.class});
             out = m.invoke(bshcm, new Object[]{assemblyName});
             log.debug("Checking if " + assemblyName + " exists... " + out.toString());
-            out = m.invoke(bshcm, new Object[]{VStatics.RANDOM_VARIATE_FACTORY_CLASS});
+            out = m.invoke(bshcm, new Object[]{ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS});
             log.debug("Checking if simkit.random.RandomVariateFactory exists... " + out.toString());
 
             // get the assembly class, create instance and thread it

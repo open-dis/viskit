@@ -1,7 +1,7 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
-import viskit.ViskitConfig;
+import viskit.ViskitConfiguration;
 import viskit.util.TitleListener;
 
 /**
@@ -48,7 +48,7 @@ public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, M
      * Shows the project name in the frame title bar
      */
     public void showProjectName() {
-        String ttl = " Project: " + ViskitConfig.instance().getVal(ViskitConfig.PROJECT_TITLE_NAME);
+        String ttl = " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
         if (this.titlList != null) {
             titlList.setTitle(ttl, titlKey);
         }

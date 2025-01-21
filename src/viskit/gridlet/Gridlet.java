@@ -56,7 +56,7 @@ import javax.tools.ToolProvider;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.doe.DoeException;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.assembly.ViskitAssembly;
@@ -190,7 +190,7 @@ public class Gridlet extends Thread {
                 // check if LocalBootLoader mode, otherwise throw exception
                 Object loaderO = ViskitGlobals.instance().getWorkClassLoader();
                 Class<?> loaderz = loaderO.getClass();
-                if ( !( loaderz.getName().equals(VStatics.LOCAL_BOOT_LOADER) ) ) {
+                if ( !( loaderz.getName().equals(ViskitStatics.LOCAL_BOOT_LOADER) ) ) {
                     throw new RuntimeException("Not running as SGE job or local mode?");
                 }
                 usid = "LOCAL-RUN";
@@ -400,7 +400,7 @@ public class Gridlet extends Thread {
 
             if(cloader instanceof Boot) {
                 ((Boot) cloader).addURL(new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());
-            } else if (cloader.getClass().getName().equals(VStatics.LOCAL_BOOT_LOADER)) {
+            } else if (cloader.getClass().getName().equals(ViskitStatics.LOCAL_BOOT_LOADER)) {
                 System.out.println("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
                 Method doAddURL = cloader.getClass().getMethod("doAddURL",java.net.URL.class);
                 doAddURL.invoke(cloader, new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());

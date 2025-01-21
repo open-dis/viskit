@@ -27,7 +27,7 @@ import viskit.control.EventGraphController;
 import viskit.Help;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
@@ -237,7 +237,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
-            } else if (viskit.VStatics.debug) {
+            } else if (viskit.ViskitStatics.debug) {
                 System.err.println("error: EventGraphViewFrame gmd null..");
             }
         }
@@ -537,7 +537,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
                 }
                 nameOnly = file.getName();
                 act = new ParameterizedAction(nameOnly);
-                act.putValue(VStatics.FULL_PATH, fullPath);
+                act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
                 mi.setToolTipText(file.getPath());
                 openRecentEGMenu.add(mi);
@@ -545,7 +545,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             if (!files.isEmpty()) {
                 openRecentEGMenu.add(new JSeparator());
                 act = new ParameterizedAction("clear");
-                act.putValue(VStatics.FULL_PATH, VStatics.CLEAR_PATH_FLAG);  // flag
+                act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
                 openRecentEGMenu.add(mi);
@@ -564,13 +564,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             EventGraphController vcontroller = (EventGraphController) getController();
 
             File fullPath;
-            Object obj = getValue(VStatics.FULL_PATH);
+            Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
                 fullPath = new File((String) obj);
             else
                 fullPath = (File) obj;
 
-            if (fullPath != null && fullPath.getPath().equals(VStatics.CLEAR_PATH_FLAG)) {
+            if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
                 vcontroller.clearRecentEGFileSet();
             } else {
                 vcontroller.openRecentEventGraph(fullPath);
@@ -908,7 +908,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
-            if (d.width != 0 && d.height != 0 && VStatics.OPERATING_SYSTEM.contains("Windows")) {
+            if (d.width != 0 && d.height != 0 && ViskitStatics.OPERATING_SYSTEM.contains("Windows")) {
 
                 // Only works on windoze
                 buildCancelCursor(img);

@@ -33,7 +33,7 @@ import viskit.doe.FileHandler;
  * @since 11:09:07 AM
  * @version $Id$
  */
-public class ViskitConfig {
+public class ViskitConfiguration {
 
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
@@ -88,9 +88,9 @@ public class ViskitConfig {
     
     public static final String VISKIT_PROJ_NAME = "Project[@name]";
 
-    private static ViskitConfig me;
+    private static ViskitConfiguration me;
 
-    static final Logger LOG = LogUtils.getLogger(ViskitConfig.class);
+    static final Logger LOG = LogUtils.getLogger(ViskitConfiguration.class);
 
     private final Map<String, XMLConfiguration> xmlConfigurations;
     private final Map<String, String> sessionHM;
@@ -102,14 +102,14 @@ public class ViskitConfig {
         LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " " + VISKIT_CONFIG_DIR.exists() + "\n");
     }
 
-    public static synchronized ViskitConfig instance() {
+    public static synchronized ViskitConfiguration instance() {
         if (me == null) {
-            me = new ViskitConfig();
+            me = new ViskitConfiguration();
         }
         return me;
     }
 
-    private ViskitConfig() {
+    private ViskitConfiguration() {
         try {
             if (!VISKIT_CONFIG_DIR.exists()) {
                 VISKIT_CONFIG_DIR.mkdirs();
@@ -174,10 +174,10 @@ public class ViskitConfig {
     }
 
     /**
-     * Rather screwy.  A decent design would allow the CombinedConfiguration obj
-     * to do the saving, but it won't.
+     * Rather screwy.A decent design would allow the CombinedConfiguration obj
+ to do the saving, but it won't.
      *
-     * @param key the ViskitConfig named key to set
+     * @param key the ViskitConfiguration named key to set
      * @param val the value of this key
      */
     public void setVal(String key, String val) {
@@ -250,10 +250,10 @@ public class ViskitConfig {
      * Viskit Project
      */
     public void clearViskitConfig() {
-        setVal(ViskitConfig.PROJECT_PATH_KEY, "");
-        setVal(ViskitConfig.PROJECT_NAME_KEY, "");
-        getViskitAppConfig().clearTree(ViskitConfig.RECENT_EG_CLEAR_KEY);
-        getViskitAppConfig().clearTree(ViskitConfig.RECENT_ASSY_CLEAR_KEY);
+        setVal(ViskitConfiguration.PROJECT_PATH_KEY, "");
+        setVal(ViskitConfiguration.PROJECT_NAME_KEY, "");
+        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_EG_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_ASSY_CLEAR_KEY);
 
         // Retain the recent projects list
     }

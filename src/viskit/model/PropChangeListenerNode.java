@@ -2,7 +2,7 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -37,9 +37,9 @@ public class PropChangeListenerNode extends AssemblyNode {
     public final void setType(String typ) {
         super.setType(typ);
 
-        Class<?> myClass = VStatics.classForName(typ);
+        Class<?> myClass = ViskitStatics.classForName(typ);
         if (myClass != null) {
-            Class<?> sampstatcls = VStatics.classForName("simkit.stat.SampleStatistics");
+            Class<?> sampstatcls = ViskitStatics.classForName("simkit.stat.SampleStatistics");
             if (sampstatcls != null) {
                 if (sampstatcls.isAssignableFrom(myClass)) {
                     isSampleStatistics = true;

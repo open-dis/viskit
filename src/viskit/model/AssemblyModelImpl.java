@@ -15,7 +15,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import viskit.ViskitGlobals;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.util.FileBasedAssyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.MvcAbstractModel;
@@ -861,7 +861,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
         return new VInstantiator.Factory(o.getType(),
                 o.getFactory(),
-                VStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
+                ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 

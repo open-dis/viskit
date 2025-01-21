@@ -43,7 +43,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import org.jgraph.graph.GraphConstants;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 
 import viskit.model.Edge;
 import viskit.model.EventNode;
@@ -161,7 +161,7 @@ class vSelfEdgeRenderer extends vEdgeRenderer {
                 pi.next();
                 ix++;
             }
-            if (VStatics.debug)
+            if (ViskitStatics.debug)
                 System.out.println();
         }
 

@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.text.JTextComponent;
-import viskit.VStatics;
+import viskit.ViskitStatics;
 import viskit.model.EvGraphNode;
 import viskit.model.SimEvListenerEdge;
 
@@ -101,7 +101,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
   private void pairWidgets(JLabel lab, JComponent tf, boolean edit)
   {
-    VStatics.clampHeight(tf);
+    ViskitStatics.clampHeight(tf);
     lab.setLabelFor(tf);
     if(tf instanceof JTextField){
       ((JTextComponent)tf).setEditable(edit);

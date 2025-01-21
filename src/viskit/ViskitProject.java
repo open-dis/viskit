@@ -215,10 +215,10 @@ public class ViskitProject {
         } else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitConfig.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        ViskitConfiguration.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
 
-        XMLConfiguration config = ViskitConfig.instance().getProjectXMLConfig();
-        config.setProperty(ViskitConfig.VISKIT_PROJ_NAME, getProjectRoot().getName());
+        XMLConfiguration config = ViskitConfiguration.instance().getProjectXMLConfig();
+        config.setProperty(ViskitConfiguration.VISKIT_PROJ_NAME, getProjectRoot().getName());
 
         setProjectOpen(projectFileExists);
         return projectFileExists;
@@ -378,8 +378,8 @@ public class ViskitProject {
     }
 
     public void closeProject() {
-        ViskitConfig vConfig = ViskitConfig.instance();
-        vConfig.getViskitGuiConfig().setProperty(ViskitConfig.PROJECT_TITLE_NAME, "");
+        ViskitConfiguration vConfig = ViskitConfiguration.instance();
+        vConfig.getViskitGuiConfig().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
         vConfig.cleanup();
         vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
         setProjectOpen(false);
@@ -392,8 +392,8 @@ public class ViskitProject {
 
     public final void setProjectRoot(File projectRoot) {
         this.projectRoot = projectRoot;
-        XMLConfiguration guiConfig = ViskitConfig.instance().getViskitGuiConfig();
-        guiConfig.setProperty(ViskitConfig.PROJECT_TITLE_NAME, getProjectRoot().getName());
+        XMLConfiguration guiConfig = ViskitConfiguration.instance().getViskitGuiConfig();
+        guiConfig.setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, getProjectRoot().getName());
     }
 
     public boolean isDirty() {
