@@ -1,0 +1,58 @@
+ant -f C:\\x3d-nps-gitlab\\viskit all
+reset.viskit:
+Deleting directory C:\Users\brutzman\.viskit
+Created dir: C:\Users\brutzman\.viskit
+Copying 1 file to C:\Users\brutzman\.viskit
+Copying 1 file to C:\Users\brutzman\.viskit
+Copying 1 file to C:\x3d-nps-gitlab\viskit\MyViskitProjects\DefaultProject
+clean:
+Deleting directory C:\x3d-nps-gitlab\viskit\src\viskit\xsd\bindings
+Deleting directory C:\x3d-nps-gitlab\viskit\build
+Deleting directory C:\x3d-nps-gitlab\viskit\logs
+platformType:
+platformInitialize:
+initWin:
+initUnix:
+initMac:
+initializeAll:
+check.JAVA_HOME:
+check.ANT_HOME:
+init:
+viskit v1.0.16
+Build started on Mon, 20 Jan 2025 2247 -0800
+Base directory: C:\x3d-nps-gitlab\viskit
+JAVA_HOME: C:\Program Files\Java\openjdk\jdk-23.0.1
+Created dir: C:\x3d-nps-gitlab\viskit\build
+Created dir: C:\x3d-nps-gitlab\viskit\build\lib
+Created dir: C:\x3d-nps-gitlab\viskit\build\classes
+Created dir: C:\x3d-nps-gitlab\viskit\src\viskit\xsd\bindings\eventgraph
+Created dir: C:\x3d-nps-gitlab\viskit\src\viskit\xsd\bindings\assembly
+Created dir: C:\x3d-nps-gitlab\viskit\src\viskit\xsd\bindings\assembly\stats
+Created dir: C:\x3d-nps-gitlab\viskit\src\viskit\xsd\bindings\cli
+bindings.simkit:
+Compiling file:/C:/x3d-nps-gitlab/viskit/Schemas/simkit.xsd
+Writing output to C:\x3d-nps-gitlab\viskit\src
+Compiling file:/C:/x3d-nps-gitlab/viskit/Schemas/assembly.xsd
+Writing output to C:\x3d-nps-gitlab\viskit\src
+Compiling file:/C:/x3d-nps-gitlab/viskit/Schemas/statistics.xsd
+Writing output to C:\x3d-nps-gitlab\viskit\src
+Compiling file:/C:/x3d-nps-gitlab/viskit/Schemas/cli.xsd
+Writing output to C:\x3d-nps-gitlab\viskit\src
+javahelp:
+Copying 133 files to C:\x3d-nps-gitlab\viskit\build\classes\viskit\javahelp
+compile:
+Compiling 256 source files to C:\x3d-nps-gitlab\viskit\build\classes
+Creating empty C:\x3d-nps-gitlab\viskit\build\classes\viskit\doe\package-info.class
+Copying 40 files to C:\x3d-nps-gitlab\viskit\build\classes
+Copying 2 files to C:\x3d-nps-gitlab\viskit\build\classes\config
+Copying 2 files to C:\x3d-nps-gitlab\viskit\build\classes\xsd
+jar:
+Building jar: C:\x3d-nps-gitlab\viskit\build\lib\viskit.jar
+build.no.extensions:
+build:
+javadoc:
+Created dir: C:\x3d-nps-gitlab\viskit\doc\api
+Generating Javadoc
+C:\x3d-nps-gitlab\viskit\build.xml:467: jaxb.runtime.path doesn't denote a fileset
+BUILD FAILED (total time: 19 seconds)
+

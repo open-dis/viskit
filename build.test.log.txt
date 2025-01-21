@@ -1,0 +1,352 @@
+ant -f C:\\x3d-nps-gitlab\\viskit test
+platformType:
+platformInitialize:
+initWin:
+initUnix:
+initMac:
+initializeAll:
+check.JAVA_HOME:
+check.ANT_HOME:
+init:
+viskit v1.0.16
+Build started on Mon, 20 Jan 2025 2248 -0800
+Base directory: C:\x3d-nps-gitlab\viskit
+JAVA_HOME: C:\Program Files\Java\openjdk\jdk-23.0.1
+compile.test:
+Compiling 6 source files to C:\x3d-nps-gitlab\viskit\build\classes
+C:\x3d-nps-gitlab\viskit\test\viskit\test\TestVarArgs.java:73: warning: non-varargs call of varargs method with inexact argument type for last parameter;
+        waitDelay("Bar", 2.0, new String[] { "This", "is", "a", "warning!"});
+  cast to Object for a varargs call
+  cast to Object[] for a non-varargs call and to suppress this warning
+1 warning
+test.code.format:
+viskit.test.TestCodeFormat test/ArrayTester.xml
+wd=>>>>>>>>>>> C:\x3d-nps-gitlab\viskit
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity name="ArrayTester" package="test" version="$Id:$" extend="SimEntityBase">
+    <StateVariable name="sinus" type="double[180]">
+        <Comment></Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment></Comment>
+        <LocalVariable name="_idxvar_0" type="int" value="0">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition state="sinus" index="_idxvar_0">
+            <Assignment value="Math.sin(2.0*Math.PI*((double)_idxvar_0)/((double)180))"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="DumpArrayElement" condition="true" priority="0">
+            <Comment></Comment>
+            <EdgeParameter value="0"/>
+        </Schedule>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="DumpArrayElement">
+        <Comment></Comment>
+        <Argument name="i" type="int"/>
+        <LocalVariable name="code" type="boolean" value="true; System.out.println(getSinus(i))">
+            <Comment></Comment>
+        </LocalVariable>
+        <Schedule delay="0.0" event="DumpArrayElement" condition="i&lt;180" priority="0">
+            <Comment></Comment>
+            <EdgeParameter value="i++"/>
+        </Schedule>
+        <Code>
+
+System.out.println("Element "+i + " dumped. ");
+if ( true ) {
+	System.out.println("");
+}
+
+	</Code>
+        <Coordinate x="200" y="110"/>
+    </Event>
+</SimEntity>
+INFO  2025 Jan 20 22:48:38 GMT-0800 [Thread-0] viskit.ViskitConfiguration:101 - Welcome to the Visual Discrete Event Simulation (DES) toolkit (Viskit)
+package test;
+
+// Standard library imports
+import java.util.*;
+
+// Application specific imports
+import simkit.*;
+import simkit.random.*;
+
+public class ArrayTester extends SimEntityBase {
+
+    /* Simulation Parameters */
+
+    /* None */
+
+    /* Simulation State Variables */
+
+    /**  */
+    protected double[] sinus;
+
+    @viskit.ParameterMap (
+        names = {},
+        types = {}
+    )
+
+    /** Creates a new default instance of ArrayTester */
+    public ArrayTester() {
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+
+        /* local variable decarlations */
+        int _idxvar_0;
+
+        for (_idxvar_0 = 0; _idxvar_0 < sinus.length; _idxvar_0++) {
+            sinus[_idxvar_0] = Math.sin(2.0*Math.PI*((double)_idxvar_0)/((double)180));
+        }
+    }
+
+    /** Bootstraps the first simulation event */
+    public void doRun() {
+
+        /* local variable decarlations */
+        int _idxvar_0;
+
+        for (_idxvar_0 = 0; _idxvar_0 < sinus.length; _idxvar_0++) {
+            fireIndexedPropertyChange(_idxvar_0, "sinus", getSinus(_idxvar_0));
+        }
+
+        waitDelay("DumpArrayElement", 0.0, Priority.0, (Object) 0);
+    }
+
+    public void doDumpArrayElement(int i) {
+
+        /* local variable decarlations */
+        boolean code = true;
+        System.out.println(getSinus(i));
+
+        /* Code insertion for Event DumpArrayElement */
+        
+        
+        System.out.println("Element "+i + " dumped. ");
+        if ( true ) {
+        	System.out.println("");
+        }
+        
+        	
+        /* End Code insertion */
+
+        if (i<180) {
+            waitDelay("DumpArrayElement", 0.0, Priority.0, (Object) (i++));
+        }
+    }
+
+    public double getSinus(int i0) {
+        return sinus[i0];
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+}
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SimEntity name="ArrayTester" package="test" version="$Id:$" extend="SimEntityBase">
+    <StateVariable name="sinus" type="double[180]">
+        <Comment></Comment>
+    </StateVariable>
+    <Event name="Run">
+        <Comment></Comment>
+        <LocalVariable name="_idxvar_0" type="int" value="0">
+            <Comment>used internally</Comment>
+        </LocalVariable>
+        <StateTransition state="sinus" index="_idxvar_0">
+            <Assignment value="Math.sin(2.0*Math.PI*((double)_idxvar_0)/((double)180))"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="DumpArrayElement" condition="true" priority="0">
+            <Comment></Comment>
+            <EdgeParameter value="0"/>
+        </Schedule>
+        <Coordinate x="30" y="30"/>
+    </Event>
+    <Event name="DumpArrayElement">
+        <Comment></Comment>
+        <Argument name="i" type="int"/>
+        <LocalVariable name="code" type="boolean" value="true; System.out.println(getSinus(i))">
+            <Comment></Comment>
+        </LocalVariable>
+        <Schedule delay="0.0" event="DumpArrayElement" condition="i&lt;180" priority="0">
+            <Comment></Comment>
+            <EdgeParameter value="i++"/>
+        </Schedule>
+        <Code>
+
+System.out.println("Element "+i + " dumped. ");
+if ( true ) {
+	System.out.println("");
+}
+
+	</Code>
+        <Coordinate x="200" y="110"/>
+    </Event>
+    <Code>System.out.println("this is a test");
+if ( true ) {
+	System.out.println();
+}</Code>
+</SimEntity>
+Code inserted was:
+System.out.println("this is a test");
+if ( true ) {
+	System.out.println();
+}
+package test;
+
+// Standard library imports
+import java.util.*;
+
+// Application specific imports
+import simkit.*;
+import simkit.random.*;
+
+public class ArrayTester extends SimEntityBase {
+
+    /* Simulation Parameters */
+
+    /* None */
+
+    /* Simulation State Variables */
+
+    /**  */
+    protected double[] sinus;
+
+    @viskit.ParameterMap (
+        names = {},
+        types = {}
+    )
+
+    /** Creates a new default instance of ArrayTester */
+    public ArrayTester() {
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+
+        /* local variable decarlations */
+        int _idxvar_0;
+
+        for (_idxvar_0 = 0; _idxvar_0 < sinus.length; _idxvar_0++) {
+            sinus[_idxvar_0] = Math.sin(2.0*Math.PI*((double)_idxvar_0)/((double)180));
+        }
+    }
+
+    /** Bootstraps the first simulation event */
+    public void doRun() {
+
+        /* local variable decarlations */
+        int _idxvar_0;
+
+        for (_idxvar_0 = 0; _idxvar_0 < sinus.length; _idxvar_0++) {
+            fireIndexedPropertyChange(_idxvar_0, "sinus", getSinus(_idxvar_0));
+        }
+
+        waitDelay("DumpArrayElement", 0.0, Priority.0, (Object) 0);
+    }
+
+    public void doDumpArrayElement(int i) {
+
+        /* local variable decarlations */
+        boolean code = true;
+        System.out.println(getSinus(i));
+
+        /* Code insertion for Event DumpArrayElement */
+        
+        
+        System.out.println("Element "+i + " dumped. ");
+        if ( true ) {
+        	System.out.println("");
+        }
+        
+        	
+        /* End Code insertion */
+
+        if (i<180) {
+            waitDelay("DumpArrayElement", 0.0, Priority.0, (Object) (i++));
+        }
+    }
+
+    public double getSinus(int i0) {
+        return sinus[i0];
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+    /* Inserted code for ArrayTester */
+    System.out.println("this is a test");
+    if ( true ) {
+    	System.out.println();
+    }
+    /* End inserted code */
+}
+
+test.var.args:
+viskit.test.TestVarArgs
+** Event List 0 -- Starting Simulation **
+0.0000	Run	 <TestVarArgs.1>
+ ** End of Event List -- Starting Simulation **
+
+Time: 0.0000	CurrentEvent: Run [1]
+** Event List 0 --  **
+1.0000	Foo 	{[Ljava.lang.String;@73a8dfcc}	 <TestVarArgs.1>
+2.0000	Bar 	{This, is, a, warning!}	 <TestVarArgs.1>
+3.0000	Baz 	{3, [I@ea30797, [Ljava.lang.String;@7e774085}	 <TestVarArgs.1>
+5.0000	FooBar 	{[I@3f8f9dd6}	 <TestVarArgs.1>
+ ** End of Event List --  **
+
+[Hi, Mom!]
+Time: 1.0000	CurrentEvent: Foo 	{[Ljava.lang.String;@73a8dfcc} [1]
+** Event List 0 --  **
+2.0000	Bar 	{This, is, a, warning!}	 <TestVarArgs.1>
+3.0000	Baz 	{3, [I@ea30797, [Ljava.lang.String;@7e774085}	 <TestVarArgs.1>
+5.0000	FooBar 	{[I@3f8f9dd6}	 <TestVarArgs.1>
+ ** End of Event List --  **
+
+Time: 2.0000	CurrentEvent: Bar 	{This, is, a, warning!} [1]
+** Event List 0 --  **
+3.0000	Baz 	{3, [I@ea30797, [Ljava.lang.String;@7e774085}	 <TestVarArgs.1>
+5.0000	FooBar 	{[I@3f8f9dd6}	 <TestVarArgs.1>
+ ** End of Event List --  **
+
+x = 3
+y = [3, 4]
+y = [Hi, Again!]
+Time: 3.0000	CurrentEvent: Baz 	{3, [I@ea30797, [Ljava.lang.String;@7e774085} [1]
+** Event List 0 --  **
+5.0000	FooBar 	{[I@3f8f9dd6}	 <TestVarArgs.1>
+ ** End of Event List --  **
+
+[3, 4, -17, 2147483647]
+Time: 5.0000	CurrentEvent: FooBar 	{[I@3f8f9dd6} [1]
+** Event List 0 --  **
+            << empty >>
+ ** End of Event List --  **
+
+test.statics:
+viskit.doe.StaticsTest
+.INFO  2025 Jan 20 22:48:40 GMT-0800 [main] viskit.ViskitConfiguration:101 - Welcome to the Visual Discrete Event Simulation (DES) toolkit (Viskit)
+E
+Time: 1.486
+There was 1 error:
+1) testStatics(viskit.doe.StaticsTest)java.lang.ClassNotFoundException: viskit.VStatics
+	at java.base/java.net.URLClassLoader.findClass(URLClassLoader.java:445)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:595)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:528)
+	at viskit.doe.StaticsTest.setUp(StaticsTest.java:66)
+	at viskit.doe.StaticsTest.main(StaticsTest.java:116)
+
+FAILURES!!!
+Tests run: 1,  Failures: 0,  Errors: 1
+
+test:
+BUILD SUCCESSFUL (total time: 6 seconds)
