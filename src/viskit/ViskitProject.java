@@ -183,9 +183,9 @@ public class ViskitProject {
 //        }
 
         // NOTE: If the project's build directory got nuked and we have
-        // cached our EGs and classes with MD5 hash, we'll throw a
-        // ClassNotFoundException. Caching of EGs is a convenience for large
-        // directories of EGs that take time to compile the first time
+        // cached our Event Graphs and classes with MD5 hash, we'll throw a
+        // ClassNotFoundException. Caching of Event Graphs is a convenience for large
+        // directories of Event Graphs that take time to compile the first time
 
         setSrcDir(new File(getBuildDir(), SOURCE_DIRECTORY_NAME));
         if (!srcDir.exists()) {

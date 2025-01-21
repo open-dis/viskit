@@ -176,7 +176,7 @@ public interface AssemblyController {
      */
     void close();
 
-    /** Closes all open Assembly files and their corresponding EG files */
+    /** Closes all open Assembly files and their corresponding Event Graph files */
     void closeAll();
 
     /**

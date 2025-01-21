@@ -192,11 +192,11 @@ public class ViskitGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    MvcAbstractJFrameView egvf;
+    MvcAbstractJFrameView eventGraphViewFrame;
     MvcController eContl;
 
     public EventGraphViewFrame getEventGraphEditor() {
-        return (EventGraphViewFrame) egvf;
+        return (EventGraphViewFrame) eventGraphViewFrame;
     }
 
     /** This method starts the chain of various Viskit startup steps.  By
@@ -211,9 +211,9 @@ public class ViskitGlobals {
      */
     public MvcAbstractJFrameView buildEventGraphViewFrame() {
         eContl = new EventGraphControllerImpl();
-        egvf = new EventGraphViewFrame(eContl);
-        eContl.setView(egvf);
-        return egvf;
+        eventGraphViewFrame = new EventGraphViewFrame(eContl);
+        eContl.setView(eventGraphViewFrame);
+        return eventGraphViewFrame;
     }
 
     public MvcController getEventGraphController() {
@@ -228,8 +228,8 @@ public class ViskitGlobals {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (egvf != null) {
-                egvf.setVisible(false);
+            if (eventGraphViewFrame != null) {
+                eventGraphViewFrame.setVisible(false);
             }
         }
     };
@@ -787,7 +787,7 @@ public class ViskitGlobals {
      * Not the best Java Bean convention, but performs as a no argument setter
      * for an open project's working directory (build/classes). Establishes the
      * class loader, project space, extra classpaths and identifies the path for
-     * .class files of the projects EGs
+     * .class files of the projects Event Graphs
      */
     public final void createWorkingDirectory() {
         ViskitConfiguration vConfig = ViskitConfiguration.instance();

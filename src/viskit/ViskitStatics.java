@@ -508,8 +508,8 @@ public class ViskitStatics {
     static Map<String, List<Object>[]> parameterMap = new HashMap<>();
 
     /**
-     * For the given class type EG, record its specific ParameterMap
-     * @param type the EG class name
+     * For the given class type Event Graph, record its specific ParameterMap
+     * @param type the Event Graph class name
      * @param p a List of parameter map object arrays
      */
     public static void putParameterList(String type, List<Object>[] p) {
@@ -536,10 +536,10 @@ public class ViskitStatics {
     }
 
     /**
-     * For the given EG class type, return its specific ParameterMap contents.
+     * For the given Event Graph class type, return its specific ParameterMap contents.
      * A LOG error will report if something is missing on the classpath
      *
-     * @param type the EG class type to resolve
+     * @param type the Event Graph class type to resolve
      * @return a List of parameter map object arrays
      */
     @SuppressWarnings("unchecked")

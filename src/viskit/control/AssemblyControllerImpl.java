@@ -133,7 +133,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (!initialAssemblyFile.contains(projectPath.getPath())) {
                 doProjectCleanup();
                 projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projectPath); // calls EGVF showProjectName
+                openProject(projectPath); // calls EventGraphViewFrame showProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
                 SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
@@ -141,7 +141,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
             compileAssembly(initialAssemblyFile);
         } else {
-            openProject(projectPath); // calls EGVF showProjectName
+            openProject(projectPath); // calls EventGraphViewFrame showProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -429,14 +429,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     /** Here we are informed of open Event Graphs */
-    DirectoryWatch.DirectoryChangeListener egListener = (File file, int action, DirectoryWatch source) -> {
-        // Do nothing.  The DirectoryWatch still tracks temp EGs, but we
+    DirectoryWatch.DirectoryChangeListener eventGraphListener = (File file, int action, DirectoryWatch source) -> {
+        // Do nothing.  The DirectoryWatch still tracks temp Event Graphs, but we
         // don't need anything special from this method, yet....
     };
 
     @Override
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
-        return egListener; // A live listener, but currently doing nothing (tdn) 9/13/24
+        return eventGraphListener; // A live listener, but currently doing nothing (tdn) 9/13/24
     }
 
     @Override
@@ -491,34 +491,34 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     // These can not be final, else reflection with fail
-    private int egNodeCount = 0;
-    private int adptrNodeCount = 0;
-    private int pclNodeCount = 0;    // A little experiment in class introspection
+    private int eventGraphNodeCount = 0;
+    private int adapterNodeCount = 0;
+    private int propertyChangeListenerNodeCount = 0;    // A little experiment in class introspection
 
-    private static Field egCountField;
-    private static Field adptrCountField;
-    private static Field pclCountField;
+    private static Field eventGraphCountField;
+    private static Field adapterNodeCountField;
+    private static Field propertyChangeListenerNodeCountField;
 
     static { // do at class init time
         try {
-            egCountField = AssemblyControllerImpl.class.getDeclaredField("egNodeCount");
-            adptrCountField = AssemblyControllerImpl.class.getDeclaredField("adptrNodeCount");
-            pclCountField = AssemblyControllerImpl.class.getDeclaredField("pclNodeCount");
+            eventGraphCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
+           adapterNodeCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
+            propertyChangeListenerNodeCountField = AssemblyControllerImpl.class.getDeclaredField("propertyChangeListenerNodeCount");
         } catch (NoSuchFieldException | SecurityException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private String shortEgName(String typeName) {
-        return shortName(typeName, "evgr_", egCountField);
+    private String shortEventGraphName(String typeName) {
+        return shortName(typeName, "eventGraph_", eventGraphCountField); // use same counter
     }
 
-    private String shortPCLName(String typeName) {
-        return shortName(typeName, "lstnr_", pclCountField); // use same counter
+    private String shortPropertyChangeListenerName(String typeName) {
+        return shortName(typeName, "listener_", propertyChangeListenerNodeCountField); // use same counter
     }
 
     private String shortAdapterName(String typeName) {
-        return shortName(typeName, "adptr_", adptrCountField); // use same counter
+        return shortName(typeName, "adapter_", adapterNodeCountField); // use same counter
     }
 
     private String shortName(String typeName, String prefix, Field intField) {
@@ -844,13 +844,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void newEventGraphNode(String typeName, Point p) {
-        String shName = shortEgName(typeName);
+        String shName = shortEventGraphName(typeName);
         ((AssemblyModel) getModel()).newEventGraph(shName, typeName, p);
     }
 
     @Override
     public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortEgName(xnode.loadedClass);
+        String shName = shortEventGraphName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
 
@@ -874,13 +874,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void newPropertyChangeListenerNode(String name, Point p) {
-        String shName = shortPCLName(name);
+        String shName = shortPropertyChangeListenerName(name);
         ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
     }
 
     @Override
     public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
-        String shName = shortPCLName(xnode.loadedClass);
+        String shName = shortPropertyChangeListenerName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }
 

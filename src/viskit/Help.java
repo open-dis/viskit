@@ -60,7 +60,7 @@ public class Help {
     public static final Version VERSION = new Version("version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
-    public static final String ABOUT_EG_STRING =
+    public static final String ABOUT_EVENTGRAPH_STRING =
             "Viskit Event Graph and Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String ABOUT_ASSEMBLY_STRING =
@@ -140,7 +140,7 @@ public class Help {
         aboutViskitEditorPane.addHyperlinkListener(bl);
         aboutViskitEditorPane.setContentType("text/html");
         aboutViskitEditorPane.setEditable(false);
-        aboutViskitEditorPane.setText(ABOUT_EG_STRING
+        aboutViskitEditorPane.setText(ABOUT_EVENTGRAPH_STRING
                 + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
                 + SIMKIT_PAGE + VERSIONS);
     }
