@@ -76,10 +76,10 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             @Override
             protected VertexView createVertexView(Object v) {
                 VertexView view;
-                if (v instanceof vAssyCircleCell) {
-                    view = new vAssyCircleView(v);
-                } else if (v instanceof vAssyPropListCell) {
-                    view = new vAssyPropListView(v);
+                if (v instanceof ViskitAssemblyCircleCell) {
+                    view = new ViskitAssemblyCircleView(v);
+                } else if (v instanceof vAssemblyPropListCell) {
+                    view = new ViskitAssemblyPropListView(v);
                 } else {
                     view = super.createVertexView(v);
                 }
@@ -90,16 +90,16 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             @Override
             protected EdgeView createEdgeView(Object e) {
                 EdgeView view = null;
-                if (e instanceof vAssyEdgeCell) {
+                if (e instanceof ViskitAssemblyEdgeCell) {
                     Object o = ((DefaultMutableTreeNode) e).getUserObject();
                     if (o instanceof PropertyChangeEdge) {
-                        view = new vAssyPclEdgeView(e);
+                        view = new ViskitAssemblyPropertyChangeListenerEdgeView(e);
                     }
                     if (o instanceof AdapterEdge) {
-                        view = new vAssyAdapterEdgeView(e);
+                        view = new ViskitAssemblyAdapterEdgeView(e);
                     }
                     if (o instanceof SimEventListenerEdge) {
-                        view = new vAssySelEdgeView(e);
+                        view = new ViskitAssemblySelEdgeView(e);
                     }
                 } else {
                     view = super.createEdgeView(e);
@@ -110,8 +110,8 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             @Override
             protected PortView createPortView(Object p) {
                 PortView view;
-                if (p instanceof vAssyPortCell) {
-                    view = new vAssyPortView(p);
+                if (p instanceof ViskitAssemblyPortCell) {
+                    view = new ViskitAssemblyPortView(p);
                 } else {
                     view = super.createPortView(p);
                 }
@@ -232,14 +232,14 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
         // bounds (position) might have changed:
         if (ch != null) {
-            vAssyCircleCell cc;
+            ViskitAssemblyCircleCell cc;
             AttributeMap m;
             Rectangle2D.Double r;
             EventGraphNode en;
             PropertyChangeListenerNode pcln;
             for (Object cell : ch) {
-                if (cell instanceof vAssyCircleCell) {
-                    cc = (vAssyCircleCell) cell;
+                if (cell instanceof ViskitAssemblyCircleCell) {
+                    cc = (ViskitAssemblyCircleCell) cell;
                     m = cc.getAttributes();
                     r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
@@ -248,8 +248,8 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
-                } else if (cell instanceof vAssyPropListCell) {
-                    vAssyPropListCell plc = (vAssyPropListCell) cell;
+                } else if (cell instanceof vAssemblyPropListCell) {
+                    vAssemblyPropListCell plc = (vAssemblyPropListCell) cell;
 
                     m = plc.getAttributes();
                     r = (Rectangle2D.Double) m.get("bounds");
@@ -276,8 +276,8 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             Object c = this.getFirstCellForLocation(event.getX(), event.getY());
             if (c != null) {
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vAssyEdgeCell) {
-                    vAssyEdgeCell vc = (vAssyEdgeCell) c;
+                if (c instanceof ViskitAssemblyEdgeCell) {
+                    ViskitAssemblyEdgeCell vc = (ViskitAssemblyEdgeCell) c;
                     AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
                     Object to = se.getTo();
                     Object from = se.getFrom();
@@ -320,18 +320,18 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                     sb.append("</center>");
                     sb.append("</html>");
                     return sb.toString();
-                } else if (c instanceof vAssyCircleCell || c instanceof vAssyPropListCell) {
+                } else if (c instanceof ViskitAssemblyCircleCell || c instanceof vAssemblyPropListCell) {
                     String typ;
                     String name;
                     String desc;
-                    if (c instanceof vAssyCircleCell) {
-                        vAssyCircleCell cc = (vAssyCircleCell) c;
+                    if (c instanceof ViskitAssemblyCircleCell) {
+                        ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) c;
                         EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
                         desc = en.getDescriptionString();
-                    } else /*if (c instanceof vAssyPropListCell)*/ {
-                        vAssyPropListCell cc = (vAssyPropListCell) c;
+                    } else /*if (c instanceof vAssemblyPropListCell)*/ {
+                        vAssemblyPropListCell cc = (vAssemblyPropListCell) c;
                         PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
                         typ = pcln.getType();
                         name = pcln.getName();
@@ -387,8 +387,8 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        if (view instanceof vAssyCircleView) {
-            vAssyCircleCell cc = (vAssyCircleCell) view.getCell();
+        if (view instanceof ViskitAssemblyCircleView) {
+            ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) view.getCell();
             Object en = cc.getUserObject();
             if (en instanceof EventGraphNode) {
                 return ((ViskitElement) en).getName();
@@ -486,15 +486,15 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         DefaultGraphCell cell = null;
         if (node != null) {
             if (node instanceof EventGraphNode) {
-                cell = new vAssyCircleCell(node);
+                cell = new ViskitAssemblyCircleCell(node);
             } else {
-                cell = new vAssyPropListCell(node);
+                cell = new vAssemblyPropListCell(node);
             }
 
             node.opaqueViewObject = cell;
 
             // Add one Floating Port
-            cell.add(new vAssyPortCell(node.getName() + "/Center"));
+            cell.add(new ViskitAssemblyPortCell(node.getName() + "/Center"));
         }
         return cell;
     }
@@ -524,33 +524,33 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 /**
  * To mark our edges.
  */
-class vAssyEdgeCell extends DefaultEdge {
+class ViskitAssemblyEdgeCell extends DefaultEdge {
 
-    public vAssyEdgeCell() {
+    public ViskitAssemblyEdgeCell() {
         this(null);
     }
 
-    public vAssyEdgeCell(Object userObject) {
+    public ViskitAssemblyEdgeCell(Object userObject) {
         super(userObject);
     }
 }
 
-class vAssyPortCell extends DefaultPort {
+class ViskitAssemblyPortCell extends DefaultPort {
 
-    public vAssyPortCell(Object o) {
+    public ViskitAssemblyPortCell(Object o) {
         this(o, null);
     }
 
-    public vAssyPortCell(Object o, Port port) {
+    public ViskitAssemblyPortCell(Object o, Port port) {
         super(o, port);
     }
 }
 
-class vAssyPortView extends PortView {
+class ViskitAssemblyPortView extends PortView {
 
     static int mysize = 10;   // smaller than the circle
 
-    public vAssyPortView(Object o) {
+    public ViskitAssemblyPortView(Object o) {
         super(o);
         setPortSize(mysize);
     }
@@ -561,9 +561,9 @@ class vAssyPortView extends PortView {
 /**
  * To mark our nodes.
  */
-class vAssyPropListCell extends DefaultGraphCell {
+class vAssemblyPropListCell extends DefaultGraphCell {
 
-    public vAssyPropListCell(Object userObject) {
+    public vAssemblyPropListCell(Object userObject) {
         super(userObject);
     }
 }
@@ -571,12 +571,12 @@ class vAssyPropListCell extends DefaultGraphCell {
 /**
  * Sub class VertexView to install our own vvr.
  */
-class vAssyPropListView extends VertexView {
+class ViskitAssemblyPropListView extends VertexView {
 
-    // shared with vAssyCircleView
+    // shared with ViskitAssemblyCircleView
     static ViskitGraphVertexRenderer vvr = new ViskitGraphVertexRenderer();
 
-    public vAssyPropListView(Object cell) {
+    public ViskitAssemblyPropListView(Object cell) {
         super(cell);
     }
 
@@ -586,31 +586,31 @@ class vAssyPropListView extends VertexView {
     }
 }
 
-class vAssyCircleCell extends DefaultGraphCell {
+class ViskitAssemblyCircleCell extends DefaultGraphCell {
 
-    public vAssyCircleCell(Object userObject) {
+    public ViskitAssemblyCircleCell(Object userObject) {
         super(userObject);
     }
 }
 
-class vAssyCircleView extends VertexView {
+class ViskitAssemblyCircleView extends VertexView {
 
-    public vAssyCircleView(Object cell) {
+    public ViskitAssemblyCircleView(Object cell) {
         super(cell);
     }
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vAssyPropListView.vvr;
+        return ViskitAssemblyPropListView.vvr;
     }
 }
 
 // Begin support for custom line ends and double line (adapter) on assembly edges
-class vAssyAdapterEdgeView extends vEdgeView {
+class ViskitAssemblyAdapterEdgeView extends vEdgeView {
 
-    static vAssyAdapterEdgeRenderer vaaer = new vAssyAdapterEdgeRenderer();
+    static ViskitAssemblyAdapterEdgeRenderer vaaer = new ViskitAssemblyAdapterEdgeRenderer();
 
-    public vAssyAdapterEdgeView(Object cell) {
+    public ViskitAssemblyAdapterEdgeView(Object cell) {
         super(cell);
     }
 
@@ -623,12 +623,12 @@ class vAssyAdapterEdgeView extends vEdgeView {
 /**
  * Sub class vEdgeView to install our own vaer.
  */
-class vAssySelEdgeView extends vEdgeView {
+class ViskitAssemblySelEdgeView extends vEdgeView {
 
-    // shared with vAssyPclEdgeView
-    static vAssyEdgeRenderer vaer = new vAssyEdgeRenderer();
+    // shared with ViskitAssemblyPropertyChangeListenerEdgeView
+    static ViskitAssemblyEdgeRenderer vaer = new ViskitAssemblyEdgeRenderer();
 
-    public vAssySelEdgeView(Object cell) {
+    public ViskitAssemblySelEdgeView(Object cell) {
         super(cell);
     }
 
@@ -638,19 +638,19 @@ class vAssySelEdgeView extends vEdgeView {
     }
 }
 
-class vAssyPclEdgeView extends vEdgeView {
+class ViskitAssemblyPropertyChangeListenerEdgeView extends vEdgeView {
 
-    public vAssyPclEdgeView(Object cell) {
+    public ViskitAssemblyPropertyChangeListenerEdgeView(Object cell) {
         super(cell);
     }
 
     @Override
     public CellViewRenderer getRenderer() {
-        return vAssySelEdgeView.vaer;
+        return ViskitAssemblySelEdgeView.vaer;
     }
 }
 
-class vAssyAdapterEdgeRenderer extends ViskitGraphEdgeRenderer {
+class ViskitAssemblyAdapterEdgeRenderer extends ViskitGraphEdgeRenderer {
 
     /**
      * Paint the vaaer. Overridden to do a double line and paint over the end
@@ -724,7 +724,7 @@ class vAssyAdapterEdgeRenderer extends ViskitGraphEdgeRenderer {
         }
     }
 
-    // Shared with vAssyEdgeRenderer.createLineEnd
+    // Shared with ViskitAssemblyEdgeRenderer.createLineEnd
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
         double d = Math.max(1, dst.distance(src));
@@ -739,11 +739,11 @@ class vAssyAdapterEdgeRenderer extends ViskitGraphEdgeRenderer {
     }
 }
 
-class vAssyEdgeRenderer extends ViskitGraphEdgeRenderer {
+class ViskitAssemblyEdgeRenderer extends ViskitGraphEdgeRenderer {
 
     @Override
     protected Shape createLineEnd(int size, int style, Point2D src, Point2D dst) {
-        return vAssyAdapterEdgeView.vaaer.createLineEnd(size, style, src, dst);
+        return ViskitAssemblyAdapterEdgeView.vaaer.createLineEnd(size, style, src, dst);
     }
 }
 // End support for custom line ends and double adapter line on assembly edges

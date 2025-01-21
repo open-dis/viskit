@@ -185,14 +185,14 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
             vCircleCell cc = (vCircleCell) cv.getCell();
             EventNode en = (EventNode) cc.getUserObject();
             return en.getModelKey();
-        } else if (o instanceof vAssyCircleView) {
-            vAssyCircleView cv = (vAssyCircleView) o;
-            vAssyCircleCell cc = (vAssyCircleCell) cv.getCell();
+        } else if (o instanceof ViskitAssemblyCircleView) {
+            ViskitAssemblyCircleView cv = (ViskitAssemblyCircleView) o;
+            ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) cv.getCell();
             EventGraphNode egn = (EventGraphNode) cc.getUserObject();
             return egn.getModelKey();
-        } else if (o instanceof vAssyPropListView) {
-            vAssyPropListView apv = (vAssyPropListView) o;
-            vAssyPropListCell apc = (vAssyPropListCell) apv.getCell();
+        } else if (o instanceof ViskitAssemblyPropListView) {
+            ViskitAssemblyPropListView apv = (ViskitAssemblyPropListView) o;
+            vAssemblyPropListCell apc = (vAssemblyPropListCell) apv.getCell();
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
@@ -237,7 +237,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
         if (ev.getCell() instanceof vEdgeCell) {
             vec = (DefaultEdge) ev.getCell();
             edg = (ViskitElement) vec.getUserObject();
-        } else if (ev.getCell() instanceof vAssyEdgeCell) {
+        } else if (ev.getCell() instanceof ViskitAssemblyEdgeCell) {
             vec = (DefaultEdge) ev.getCell();
             edg = (ViskitElement) vec.getUserObject();
         }

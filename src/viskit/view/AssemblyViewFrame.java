@@ -139,7 +139,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     public static final int PCL_MODE = 3;
 
     // The controller needs access to this
-    public JButton runButt;
+    public JButton runButton;
 
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
@@ -520,7 +520,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         );
 
         Action runAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
-        runButt = makeButton(runAction, "viskit/images/Play24.gif",
+        runButton = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -550,7 +550,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         JLabel initializeLabel = new JLabel ("  Initialize Assembly Run: ");
         initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
         getToolBar().add(initializeLabel);
-        getToolBar().add(runButt);
+        getToolBar().add(runButton);
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);

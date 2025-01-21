@@ -253,9 +253,9 @@ public class ViskitGraphVertexRenderer
         Rectangle2D r = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         
-        if (view instanceof vAssyCircleView) // EGN
+        if (view instanceof ViskitAssemblyCircleView) // EGN
             circColor = egColor;
-        if (view instanceof vAssyPropListView) // PCL
+        if (view instanceof ViskitAssemblyPropListView) // PCL
             circColor = pclColor;
         if (view instanceof vCircleView) // EN
             circColor = enColor;
@@ -263,18 +263,18 @@ public class ViskitGraphVertexRenderer
         g2.setColor(circColor);
         int myoff = 2;
         
-        if (view instanceof vAssyCircleView) // EGN
+        if (view instanceof ViskitAssemblyCircleView) // EGN
             g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
-        if (view instanceof vAssyPropListView) // PCL
+        if (view instanceof ViskitAssemblyPropListView) // PCL
             g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         if (view instanceof vCircleView) // EN
             g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
             
         g2.setColor(Color.darkGray);
         
-        if (view instanceof vAssyCircleView) // EGN
+        if (view instanceof ViskitAssemblyCircleView) // EGN
             g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
-        if (view instanceof vAssyPropListView) { // PCL
+        if (view instanceof ViskitAssemblyPropListView) { // PCL
             g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
             g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         }
@@ -288,7 +288,7 @@ public class ViskitGraphVertexRenderer
         FontMetrics metrics = g2.getFontMetrics();
         nm = breakName(nm, 50, metrics);
 
-        if (view instanceof vAssyCircleView) { // EGN
+        if (view instanceof ViskitAssemblyCircleView) { // EGN
         
             // Show event node names w/ corresponding parameters if any
             String[] arr = nm.split("_");

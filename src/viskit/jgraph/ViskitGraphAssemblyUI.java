@@ -47,7 +47,7 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
 
         AssemblyController cntl = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
-        if (cell instanceof vAssyEdgeCell) {
+        if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
                 cntl.adapterEdgeEdit((AdapterEdge) obj);
             } else if (obj instanceof PropertyChangeEdge) {
@@ -55,9 +55,9 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
             } else {
                 cntl.simEventListenerEdgeEdit((SimEventListenerEdge) obj);
             }
-        } else if (cell instanceof vAssyCircleCell) {
+        } else if (cell instanceof ViskitAssemblyCircleCell) {
             cntl.eventGraphEdit((EventGraphNode) obj);
-        } else if (cell instanceof vAssyPropListCell) {
+        } else if (cell instanceof vAssemblyPropListCell) {
             cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) obj);
         }
     }
