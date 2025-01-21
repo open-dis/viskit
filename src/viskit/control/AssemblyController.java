@@ -64,13 +64,13 @@ public interface AssemblyController {
 
     void showXML();
 
-    /** A component, e.g., vAMod, wants to say something.
-     *
-     * @param typ the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
-     * @param title the title of the message in the dialog frame
-     * @param msg the message to transmit
+    /** 
+     * A component, e.g., vAMod, wants to say something.
+     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
+     * @param messageTitle the title of the message in the dialog frame
+     * @param messageBody the message to transmit
      */
-    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
+    void messageUser(int messageType, String messageTitle, String messageBody);    // typ is one of JOptionPane types
 
     /** Handles UI selection of nodes and edges
      *
@@ -85,22 +85,22 @@ public interface AssemblyController {
      */
     void newAdapterArc(Object[] nodes);
 
-    void newSimEventListArc(Object[] nodes);
+    void newSimEventListenerArc(Object[] nodes);
 
     void newPropertyChangeListenerArc(Object[] nodes);
 
     void propertyChangeListenerEdit(PropChangeListenerNode pclNode);
 
     /** Handles editing of EventGraph nodes
-     * @param evNode the node to edit
+     * @param eventGraphNode the node to edit
      */
-    void eventGraphEdit(EvGraphNode evNode);
+    void eventGraphEdit(EventGraphNode eventGraphNode);
 
-    /** Edits the PropertyChangeListner edge
+    /** Edits the PropertyChangeListener edge
      *
      * @param pclEdge the PCL edge to edit
      */
-    void propertyChangListenerEdgeEdit(PropChangeEdge pclEdge);
+    void propertyChangeListenerEdgeEdit(PropertyChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *

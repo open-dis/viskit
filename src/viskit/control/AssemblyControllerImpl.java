@@ -711,11 +711,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
+    /** 
+     * A component, e.g., vAMod, wants to say something.
+     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
+     * @param messageTitle the title of the message in the dialog frame
+     * @param messageBody the message to transmit
+     */
     @Override
-    public void messageUser(int typ, String title, String msg) // typ is one of JOptionPane types
+    public void messageUser(int messageType, String messageTitle, String messageBody) // messageType is one of JOptionPane types
     {
         if (((AssemblyView) getView()) != null)
-            ((AssemblyView) getView()).genericReport(typ, title, msg);
+            ((AssemblyView) getView()).genericReport(messageType, messageTitle, messageBody);
     }
 
     @Override
@@ -930,7 +936,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newSimEventListArc(Object[] nodes) {
+    public void newSimEventListenerArc(Object[] nodes) {
         AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
         AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
@@ -955,7 +961,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        propertyChangListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
     }
 
     AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
@@ -1041,7 +1047,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void eventGraphEdit(EvGraphNode evNode) {
+    public void eventGraphEdit(EventGraphNode evNode) {
         boolean done, modified;
         do {
             done = true;
@@ -1053,7 +1059,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void propertyChangListenerEdgeEdit(PropChangeEdge pclEdge) {
+    public void propertyChangeListenerEdgeEdit(PropertyChangeEdge pclEdge) {
         boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
@@ -1178,7 +1184,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
 
             p = new Point(x + (offset * copyCount), y + (offset * copyCount));
-            if (o instanceof EvGraphNode) {
+            if (o instanceof EventGraphNode) {
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
@@ -1199,12 +1205,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         for (Object elem : v) {
             if (elem instanceof AssemblyEdge) {
                 removeEdge((AssemblyEdge) elem);
-            } else if (elem instanceof EvGraphNode) {
-                en = (EvGraphNode) elem;
+            } else if (elem instanceof EventGraphNode) {
+                en = (EventGraphNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deleteEvGraphNode((EvGraphNode) en);
+                ((AssemblyModel) getModel()).deleteEvGraphNode((EventGraphNode) en);
             } else if (elem instanceof PropChangeListenerNode) {
                 en = (PropChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
@@ -1222,8 +1228,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void removeEdge(AssemblyEdge e) {
         if (e instanceof AdapterEdge) {
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropChangeEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropChangeEdge) e);
+        } else if (e instanceof PropertyChangeEdge) {
+            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
         } else if (e instanceof SimEvListenerEdge) {
             ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
         }
@@ -1292,8 +1298,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
                 AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropChangeEdge) {
-                PropChangeEdge ed = (PropChangeEdge) redoGraphCell.getUserObject();
+            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) {
+                PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
                 SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
@@ -1305,7 +1311,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeListener(node);
             } else {
-                EvGraphNode node = (EvGraphNode) redoGraphCell.getUserObject();
+                EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoEventGraph(node);
             }
         }

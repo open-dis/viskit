@@ -11,7 +11,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
 
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.model.VInstantiator;
 import viskit.ViskitStatics;
 import viskit.view.InstantiationPanel;
@@ -39,7 +39,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     // verboseCheck not used, does nothing for Viskit
     private final JCheckBox outputCheck /*, verboseCheck*/;
     private InstantiationPanel ip;
-    private EvGraphNode egNode;
+    private EventGraphNode egNode;
     private final JButton okButt;
     private final JButton canButt;
     private final enableApplyButtonListener lis;
@@ -47,7 +47,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
     private final JTextField descField;
     private final JLabel descLab;
 
-    public static boolean showDialog(JFrame f, EvGraphNode parm) {
+    public static boolean showDialog(JFrame f, EventGraphNode parm) {
         try {
             if (dialog == null) {
                 dialog = new EventGraphNodeInspectorDialog(f, parm);
@@ -73,7 +73,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         return modified;
     }
 
-    private EventGraphNodeInspectorDialog(JFrame parent, EvGraphNode node) throws ClassNotFoundException {
+    private EventGraphNodeInspectorDialog(JFrame parent, EventGraphNode node) throws ClassNotFoundException {
         super(parent, "Event Graph Inspector", true);
         this.egNode = node;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -122,7 +122,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         setParams(parent, node);
     }
 
-    public final void setParams(Component c, EvGraphNode p) throws ClassNotFoundException {
+    public final void setParams(Component c, EventGraphNode p) throws ClassNotFoundException {
         egNode = p;
 
         fillWidgets();

@@ -866,7 +866,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditEvGraphNode(EvGraphNode evNode) {
+    public boolean doEditEvGraphNode(EventGraphNode evNode) {
         return EventGraphNodeInspectorDialog.showDialog(this, evNode);
     }
 
@@ -876,7 +876,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditPclEdge(PropChangeEdge pclEdge) {
+    public boolean doEditPclEdge(PropertyChangeEdge pclEdge) {
         return PclEdgeInspectorDialog.showDialog(this, pclEdge);
     }
 

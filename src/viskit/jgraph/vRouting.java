@@ -48,7 +48,7 @@ import org.jgraph.graph.GraphConstants;
 import org.jgraph.graph.GraphLayoutCache;
 import org.jgraph.graph.PortView;
 
-import viskit.model.EvGraphNode;
+import viskit.model.EventGraphNode;
 import viskit.model.EventNode;
 import viskit.model.PropChangeListenerNode;
 import viskit.model.ViskitElement;
@@ -188,7 +188,7 @@ public class vRouting implements org.jgraph.graph.DefaultEdge.Routing {
         } else if (o instanceof vAssyCircleView) {
             vAssyCircleView cv = (vAssyCircleView) o;
             vAssyCircleCell cc = (vAssyCircleCell) cv.getCell();
-            EvGraphNode egn = (EvGraphNode) cc.getUserObject();
+            EventGraphNode egn = (EventGraphNode) cc.getUserObject();
             return egn.getModelKey();
         } else if (o instanceof vAssyPropListView) {
             vAssyPropListView apv = (vAssyPropListView) o;

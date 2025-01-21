@@ -302,7 +302,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void newEventGraph(String widgetName, String className, Point2D p) {
-        EvGraphNode node = new EvGraphNode(widgetName, className);
+        EventGraphNode node = new EventGraphNode(widgetName, className);
         if (p == null) {
             node.setPosition(pointLess);
         } else {
@@ -330,7 +330,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoEventGraph(EvGraphNode node) {
+    public void redoEventGraph(EventGraphNode node) {
         SimEntity jaxbEG = oFactory.createSimEntity();
 
         jaxbEG.setName(node.getName());
@@ -346,7 +346,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteEvGraphNode(EvGraphNode evNode) {
+    public void deleteEvGraphNode(EventGraphNode evNode) {
         SimEntity jaxbEv = (SimEntity) evNode.opaqueModelObject;
         getNodeCache().remove(jaxbEv.getName());
         jaxbRoot.getSimEntity().remove(jaxbEv);
@@ -471,8 +471,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public PropChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
-        PropChangeEdge pce = new PropChangeEdge();
+    public PropertyChangeEdge newPropChangeEdge(AssemblyNode src, AssemblyNode target) {
+        PropertyChangeEdge pce = new PropertyChangeEdge();
         pce.setFrom(src);
         pce.setTo(target);
 
@@ -494,7 +494,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeEdge(PropChangeEdge pce) {
+    public void redoPropChangeEdge(PropertyChangeEdge pce) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) pce.getFrom();
@@ -552,7 +552,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeEdge(PropChangeEdge pce) {
+    public void deletePropChangeEdge(PropertyChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
@@ -593,7 +593,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changePclEdge(PropChangeEdge pclEdge) {
+    public void changePclEdge(PropertyChangeEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
         pclc.setDescription(pclEdge.getDescriptionString());
@@ -604,8 +604,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeAdapterEdge(AdapterEdge ae) {
-        EvGraphNode src = (EvGraphNode) ae.getFrom();
-        EvGraphNode targ = (EvGraphNode) ae.getTo();
+        EventGraphNode src = (EventGraphNode) ae.getFrom();
+        EventGraphNode targ = (EventGraphNode) ae.getTo();
 
         Adapter jaxbAE = (Adapter) ae.opaqueModelObject;
 
@@ -624,8 +624,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void changeSimEvEdge(SimEvListenerEdge seEdge) {
-        EvGraphNode src = (EvGraphNode) seEdge.getFrom();
-        EvGraphNode targ = (EvGraphNode) seEdge.getTo();
+        EventGraphNode src = (EventGraphNode) seEdge.getFrom();
+        EventGraphNode targ = (EventGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
 
         selc.setListener(targ.getName());
@@ -694,7 +694,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changeEvGraphNode(EvGraphNode evNode) {
+    public boolean changeEvGraphNode(EventGraphNode evNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(evNode);
@@ -947,10 +947,10 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
-        PropChangeEdge pce;
+        PropertyChangeEdge pce;
         AssemblyNode toNode, frNode;
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            pce = new PropChangeEdge();
+            pce = new PropertyChangeEdge();
             pce.setProperty(pclc.getProperty());
             pce.setDescriptionString(pclc.getDescription());
             toNode = getNodeCache().get(pclc.getListener());
@@ -1087,12 +1087,12 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return pNode;
     }
 
-    private EvGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
-        EvGraphNode en = (EvGraphNode) getNodeCache().get(se.getName());
+    private EventGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
+        EventGraphNode en = (EventGraphNode) getNodeCache().get(se.getName());
         if (en != null) {
             return en;
         }
-        en = new EvGraphNode(se.getName(), se.getType());
+        en = new EventGraphNode(se.getName(), se.getType());
 
         Coordinate coor = se.getCoordinate();
         if (coor == null) {

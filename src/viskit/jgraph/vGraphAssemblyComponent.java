@@ -92,7 +92,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 EdgeView view = null;
                 if (e instanceof vAssyEdgeCell) {
                     Object o = ((DefaultMutableTreeNode) e).getUserObject();
-                    if (o instanceof PropChangeEdge) {
+                    if (o instanceof PropertyChangeEdge) {
                         view = new vAssyPclEdgeView(e);
                     }
                     if (o instanceof AdapterEdge) {
@@ -235,7 +235,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
             vAssyCircleCell cc;
             AttributeMap m;
             Rectangle2D.Double r;
-            EvGraphNode en;
+            EventGraphNode en;
             PropChangeListenerNode pcln;
             for (Object cell : ch) {
                 if (cell instanceof vAssyCircleCell) {
@@ -243,7 +243,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     m = cc.getAttributes();
                     r = (Rectangle2D.Double) m.get("bounds");
                     if (r != null) {
-                        en = (EvGraphNode) cc.getUserObject();
+                        en = (EventGraphNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
                         ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
@@ -299,7 +299,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                     } else {
-                        String prop = ((PropChangeEdge) se).getProperty();
+                        String prop = ((PropertyChangeEdge) se).getProperty();
                         prop = (prop != null && prop.length() > 0) ? prop : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
                         sb.append(to);
@@ -326,7 +326,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                     String desc;
                     if (c instanceof vAssyCircleCell) {
                         vAssyCircleCell cc = (vAssyCircleCell) c;
-                        EvGraphNode en = (EvGraphNode) cc.getUserObject();
+                        EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
                         desc = en.getDescriptionString();
@@ -390,7 +390,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
         if (view instanceof vAssyCircleView) {
             vAssyCircleCell cc = (vAssyCircleCell) view.getCell();
             Object en = cc.getUserObject();
-            if (en instanceof EvGraphNode) {
+            if (en instanceof EventGraphNode) {
                 return ((ViskitElement) en).getName();
             }    // label name is actually gotten in paintComponent
         }
@@ -419,7 +419,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 controller.newAdapterArc(oa);
                 break;
             case AssemblyViewFrame.SIMEVLIS_MODE:
-                controller.newSimEventListArc(oa);
+                controller.newSimEventListenerArc(oa);
                 break;
             case AssemblyViewFrame.PCL_MODE:
                 controller.newPropertyChangeListenerArc(oa);
@@ -485,7 +485,7 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
 
         DefaultGraphCell cell = null;
         if (node != null) {
-            if (node instanceof EvGraphNode) {
+            if (node instanceof EventGraphNode) {
                 cell = new vAssyCircleCell(node);
             } else {
                 cell = new vAssyPropListCell(node);

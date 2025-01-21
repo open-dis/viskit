@@ -23,9 +23,9 @@ public interface AssemblyView {
      * @param evNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEvGraphNode(EvGraphNode evNode);
+    boolean doEditEvGraphNode(EventGraphNode evNode);
 
-    boolean doEditPclEdge(PropChangeEdge pclEdge);
+    boolean doEditPclEdge(PropertyChangeEdge pclEdge);
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
