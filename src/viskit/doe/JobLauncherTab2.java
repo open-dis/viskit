@@ -79,7 +79,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 2:50:08 PM
  * @version $Id$
  */
-public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssyChangeListener {
+public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssembyChangeListener {
 
     DoeRunDriver doe;
 //    Map statsGraphs;
@@ -485,7 +485,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
     }
 
     @Override

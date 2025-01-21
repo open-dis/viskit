@@ -48,7 +48,7 @@ import org.apache.logging.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 
 import viskit.util.EventGraphCache;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
@@ -80,7 +80,7 @@ import viskit.mvc.MvcRecentFileListener;
  * @since 9:26:02 AM
  * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssyChangeListener {
+public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
@@ -173,7 +173,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (localDirty) {
             StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+            for (Iterator<OpenAssembly.AssembyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
@@ -303,15 +303,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
-    public OpenAssembly.AssyChangeListener getAssemblyChangeListener() {
+    public OpenAssembly.AssembyChangeListener getAssemblyChangeListener() {
         return assyChgListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssyChangeListener assyChgListener = new OpenAssembly.AssyChangeListener() {
+    private Set<OpenAssembly.AssembyChangeListener> isLocalDirty = new HashSet<>();
+    OpenAssembly.AssembyChangeListener assyChgListener = new OpenAssembly.AssembyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+        public void assyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -377,17 +377,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssyChangeListener source, Object param) {
+    public void assyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
         assyChgListener.assyChanged(action, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+    public void addAssemblyFileListener(OpenAssembly.AssembyChangeListener lis) {
         OpenAssembly.inst().addListener(lis);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis) {
+    public void removeAssemblyFileListener(OpenAssembly.AssembyChangeListener lis) {
         OpenAssembly.inst().removeListener(lis);
     }
 
@@ -827,8 +827,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newEventGraphNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedEventGraphNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedEventGraphNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -843,7 +843,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortEgName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newEventGraphFromXML(shName, xnode, p);
     }
@@ -857,8 +857,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (o instanceof Class<?>) {
                 newPropChangeListenerNode(((Class<?>) o).getName(), getNextPoint());
                 return;
-            } else if (o instanceof FileBasedAssyNode) {
-                newFileBasedPropChangeListenerNode((FileBasedAssyNode) o, getNextPoint());
+            } else if (o instanceof FileBasedAssemblyNode) {
+                newFileBasedPropChangeListenerNode((FileBasedAssemblyNode) o, getNextPoint());
                 return;
             }
         }
@@ -873,7 +873,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p) {
+    public void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortPCLName(xnode.loadedClass);
         ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
     }

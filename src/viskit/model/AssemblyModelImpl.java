@@ -16,7 +16,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -296,7 +296,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newEventGraphFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+    public void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
         newEventGraph(widgetName, node.loadedClass, p);
     }
 
@@ -360,7 +360,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssyNode node, Point2D p) {
+    public void newPropChangeListenerFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p) {
         newPropChangeListener(widgetName, node.loadedClass, p);
     }
 

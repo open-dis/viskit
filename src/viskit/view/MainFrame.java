@@ -245,7 +245,7 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
             AnalystReportController cntlr = (AnalystReportController) reportPanel.getController();
             cntlr.setMainTabbedPane(tabbedPane, idx);
-            assyCntlr.addAssemblyFileListener((OpenAssembly.AssyChangeListener) reportPanel);
+            assyCntlr.addAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
@@ -500,7 +500,7 @@ public class MainFrame extends JFrame {
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssyChangeListener) reportPanel);
+                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
                     assyCntlr.removeRecentAssyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
                     assyCntlr.removeRecentProjFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
 

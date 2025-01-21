@@ -61,7 +61,7 @@ import javax.swing.tree.TreePath;
 
 import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -818,7 +818,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-                    FileBasedAssyNode xn = isFileBasedAssyNode(sa[1]);
+                    FileBasedAssemblyNode xn = isFileBasedAssyNode(sa[1]);
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
@@ -848,10 +848,10 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         }
     }
 
-    private FileBasedAssyNode isFileBasedAssyNode(String s) {
+    private FileBasedAssemblyNode isFileBasedAssyNode(String s) {
         try {
-            return FileBasedAssyNode.fromString(s);
-        } catch (FileBasedAssyNode.exception e) {
+            return FileBasedAssemblyNode.fromString(s);
+        } catch (FileBasedAssemblyNode.exception e) {
             return null;
         }
     }
