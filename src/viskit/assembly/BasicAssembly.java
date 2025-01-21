@@ -249,7 +249,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
             LOG.debug("entry is: {}", entry);
             obj = pclNodeCache.get(entry.getKey());
-            if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+            if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
                 LOG.debug("AssemblyNode is: {}", obj);
 
                 try {
@@ -772,7 +772,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     LOG.debug("entry is: {}", entry);
 
                     obj = pclNodeCache.get(entry.getKey());
-                    if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+                    if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
 
                         try {
                             // Since the pclNodeCache was created under a previous ClassLoader
