@@ -109,9 +109,9 @@ public class ViskitStatics {
     @SuppressWarnings("unchecked")
     public static void setViskitProjectFile(File projFile) {
         ViskitProject.VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIR);
+        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIR);
         ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
-        ViskitConfig.instance().setVal(ViskitConfig.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }
 
     /**
@@ -798,7 +798,7 @@ public class ViskitStatics {
                     Desktop.getDesktop().mail(url.toURI());
 
                     if (showLog)
-                        Desktop.getDesktop().browse(ViskitConfig.V_ERROR_LOG.toURI());
+                        Desktop.getDesktop().browse(ViskitConfiguration.V_ERROR_LOG.toURI());
                 }
             } catch (IOException | URISyntaxException ex) {
                 LOG.error(ex);
