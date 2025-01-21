@@ -26,7 +26,7 @@ import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
 import viskit.model.SchedulingEdge;
 import viskit.model.ViskitElement;
-import viskit.model.Viskit2EdgeParameter;
+import viskit.model.ViskitEdgeParameter;
 import viskit.view.ConditionalExpressionPanel;
 import viskit.view.EdgeParametersPanel;
 
@@ -294,7 +294,7 @@ public class EdgeInspectorDialog extends JDialog {
         addDescriptionButton.addActionListener(hideList);
 
         parameters.addDoubleClickedListener((ActionEvent event) -> {
-            Viskit2EdgeParameter ep = (Viskit2EdgeParameter) event.getSource();
+            ViskitEdgeParameter ep = (ViskitEdgeParameter) event.getSource();
             
             boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this, ep);
             if (wasModified) {

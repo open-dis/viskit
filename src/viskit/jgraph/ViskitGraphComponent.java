@@ -296,9 +296,9 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                         if (!se.parameters.isEmpty()) {
 
                             sb.append("<u>edge parameters</u><br>");
-                            Viskit2EdgeParameter ep;
+                            ViskitEdgeParameter ep;
                             for (ViskitElement e : se.parameters) {
-                                ep = (Viskit2EdgeParameter) e;
+                                ep = (ViskitEdgeParameter) e;
                                 sb.append("&nbsp;");
                                 sb.append(idx++);
                                 sb.append(" ");

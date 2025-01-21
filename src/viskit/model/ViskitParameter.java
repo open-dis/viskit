@@ -12,7 +12,7 @@ import viskit.ViskitGlobals;
  * @author DMcG
  * @version $Id$
  */
-public class Viskit2Parameter extends ViskitElement {
+public class ViskitParameter extends ViskitElement {
 
     private String value = EMPTY;
     private String comment = EMPTY;
@@ -22,13 +22,13 @@ public class Viskit2Parameter extends ViskitElement {
     private String operationOrAssignment;
     private String indexingExpression;
 
-    Viskit2Parameter(String pName, String pType) //package-accessible
+    ViskitParameter(String pName, String pType) //package-accessible
     {
         name = pName;
         setType(pType);
     }
 
-    public Viskit2Parameter(String pName, String pType, String comment) //todo make package-accessible
+    public ViskitParameter(String pName, String pType, String comment) //todo make package-accessible
     {
         this(pName, pType);
         this.comment = comment;

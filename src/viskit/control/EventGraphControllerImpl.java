@@ -630,7 +630,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void simParameterEdit(Viskit2Parameter param) {
+    public void simParameterEdit(ViskitParameter param) {
         boolean modified = ((EventGraphView) getView()).doEditParameter(param);
         if (modified) {
             ((viskit.model.Model) getModel()).changeSimParameter(param);
@@ -643,7 +643,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void stateVariableEdit(Viskit2StateVariable var) {
+    public void stateVariableEdit(ViskitStateVariable var) {
         boolean modified = ((EventGraphView) getView()).doEditStateVariable(var);
         if (modified) {
             ((viskit.model.Model) getModel()).changeStateVariable(var);
@@ -912,12 +912,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void deleteSimParameter(Viskit2Parameter p) {
+    public void deleteSimParameter(ViskitParameter p) {
         ((Model) getModel()).deleteSimParameter(p);
     }
 
     @Override
-    public void deleteStateVariable(Viskit2StateVariable var) {
+    public void deleteStateVariable(ViskitStateVariable var) {
         ((Model) getModel()).deleteStateVariable(var);
     }
 

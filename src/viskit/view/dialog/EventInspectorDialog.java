@@ -352,7 +352,7 @@ public class EventInspectorDialog extends JDialog {
                             // The user will be able to change any values from
                             // the EdgeInspectorDialog.  Right now, values are
                             // defaulted to zeros.
-                            ((Edge) ve).parameters.add(new Viskit2EdgeParameter(v.getValue()));
+                            ((Edge) ve).parameters.add(new ViskitEdgeParameter(v.getValue()));
                         }
                     }
                 }

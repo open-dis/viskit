@@ -272,11 +272,11 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
         // Introspector can't handle a param to the method....?
         vp.addMinusListener((ActionEvent event) -> {
-            ((EventGraphController) getController()).deleteStateVariable((Viskit2StateVariable) event.getSource());
+            ((EventGraphController) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
         });
 
         vp.addDoubleClickedListener((ActionEvent event) -> {
-            ((EventGraphController) getController()).stateVariableEdit((Viskit2StateVariable) event.getSource());
+            ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
         });
 
         // Event jGraph parameters area
@@ -327,10 +327,10 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
         // Introspector can't handle a param to the method....?
         pp.addMinusListener((ActionEvent event) -> {
-            ((EventGraphController) getController()).deleteSimParameter((Viskit2Parameter) event.getSource());
+            ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
         });
         pp.addDoubleClickedListener((ActionEvent event) -> {
-            ((EventGraphController) getController()).simParameterEdit((Viskit2Parameter) event.getSource());
+            ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
         });
 
         parametersPanel.add(pp);
@@ -1190,12 +1190,12 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public boolean doEditParameter(Viskit2Parameter param) {
+    public boolean doEditParameter(ViskitParameter param) {
         return ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), param);    // blocks
     }
 
     @Override
-    public boolean doEditStateVariable(Viskit2StateVariable var) {
+    public boolean doEditStateVariable(ViskitStateVariable var) {
         return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), var);
     }
 

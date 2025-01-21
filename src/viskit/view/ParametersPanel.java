@@ -1,7 +1,7 @@
 package viskit.view;
 
 import viskit.model.ViskitElement;
-import viskit.model.Viskit2Parameter;
+import viskit.model.ViskitParameter;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -44,7 +44,7 @@ public class ParametersPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        Viskit2Parameter ea = new Viskit2Parameter("name", "int", "description");
+        ViskitParameter ea = new ViskitParameter("name", "int", "description");
         return ea;
     }
 
