@@ -125,7 +125,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
             case NEW_ASSY:
                 currentAssyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssyFile(currentAssyFile);
+                cntlr.setCurrentAssembyFile(currentAssyFile);
                 break;
 
             case CLOSE_ASSY:

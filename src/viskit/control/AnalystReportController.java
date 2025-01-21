@@ -67,7 +67,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     private AnalystReportFrame frame;
     private File analystReportFile;
-    private File currentAssyFile;
+    private File currentAssembyFile;
     private AnalystReportModel analystReportModel;
 
     /** Creates a new instance of AnalystReportController */
@@ -150,11 +150,11 @@ public class AnalystReportController extends MvcAbstractController {
         openAnalystReport(openChooser.getSelectedFile());
     }
 
-    public void setCurrentAssyFile(File f) {
-        currentAssyFile = f;
+    public void setCurrentAssembyFile(File f) {
+        currentAssembyFile = f;
 
         if (analystReportModel != null) {
-            analystReportModel.setAssemblyFile(currentAssyFile);
+            analystReportModel.setAssemblyFile(currentAssembyFile);
         }
     }
 
@@ -249,7 +249,7 @@ public class AnalystReportController extends MvcAbstractController {
         LOG.debug("TargetFile is: {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
-            analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssyFile);
+            analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssembyFile);
         } catch (Exception e) {
             LOG.error("Error parsing analyst report: {}", e);
 //            e.printStackTrace();
