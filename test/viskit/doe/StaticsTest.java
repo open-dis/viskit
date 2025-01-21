@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2023 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,7 +43,7 @@ import junit.textui.TestRunner;
 import viskit.ViskitGlobals;
 
 /** Test of static variables isolated by unique class loaders. The static "debug"
- * variable of the VStatics class is initialized to false.
+ * variable of the ViskitStatics class is initialized to false.
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.doe.StaticsTest">Terry D. Norbraten</a>
  */
@@ -63,7 +63,7 @@ public class StaticsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
-        statics = loaderNoReset.loadClass("viskit.VStatics");
+        statics = loaderNoReset.loadClass("viskit.ViskitStatics");
         Constructor sconstr = statics.getConstructor();
         rstatics = sconstr.newInstance();
         debug = statics.getDeclaredField("debug");
@@ -84,7 +84,7 @@ public class StaticsTest extends TestCase {
     public void testStatics() throws Exception {
         
         LocalBootLoader loaderWithReset = (LocalBootLoader) ViskitGlobals.instance().getFreshClassLoader();
-        Class<?> staticz = loaderWithReset.loadClass("viskit.VStatics");
+        Class<?> staticz = loaderWithReset.loadClass("viskit.ViskitStatics");
         Constructor sconstr = staticz.getConstructor();
         Object rstaticz = sconstr.newInstance();
         Field debugz = staticz.getDeclaredField("debug");
