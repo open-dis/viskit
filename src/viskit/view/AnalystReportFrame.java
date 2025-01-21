@@ -108,7 +108,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
     JComboBox<String> classifiedTF = new JComboBox<>(new String[] {"UNRESTRICTED", "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"});
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
-    File currentAssyFile;
+    File currentAssemblyFile;
 
     private void initMVC(MvcController cntlr) {
         setController(cntlr);
@@ -123,9 +123,9 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSEMBLY:
-                currentAssyFile = (File) param;
+                currentAssemblyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssembyFile(currentAssyFile);
+                cntlr.setCurrentAssembyFile(currentAssemblyFile);
                 break;
 
             case CLOSE_ASSEMBLY:
@@ -134,7 +134,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assyChanged");
+                LOG.error("Program error AnalystReportFrame.assemblyChanged");
         }
     }
 

@@ -222,7 +222,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
             // NOTE: Although a somewhat good idea, perhaps the user does not
             // wish to have work saved when merely switching between tabs on
-            // the EG pallete. However, when switching to the Assy pallete, we
+            // the EG palette. However, when switching to the Assembly pallete, we
             // will save all EGs that have been modified
 //            if (((Model)getModel()).isDirty()) {
 //                ((EventGraphController)getController()).save();

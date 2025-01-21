@@ -27,8 +27,8 @@ import viskit.ViskitStatics;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
- * Assy Editor. Used for dragging and dropping EG and PCL nodes to the pallette
- * for creating Assy files.
+ * Assembly Editor. Used for dragging and dropping EG and PCL nodes to the pallette
+ * for creating Assembly files.
  *
  * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -189,7 +189,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     /**
      * Used to help prevent duplicate EG or PCL nodes from appearing in the LEGO
-     * tree on the Assy Editor in addition to simply supporting the user by
+     * tree on the Assembly Editor in addition to simply supporting the user by
      * removing a node
      *
      * @param f the file to remove from the LEGO tree

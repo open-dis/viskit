@@ -151,8 +151,8 @@ public class ModelImpl extends MvcAbstractModel implements Model {
             } catch (JAXBException ee) {
                 // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
                 try {
-                    JAXBContext assyCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-                    Unmarshaller um = assyCtx.createUnmarshaller();
+                    JAXBContext assemblyContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+                    Unmarshaller um = assemblyContext.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, we've tried to load an assembly.
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,

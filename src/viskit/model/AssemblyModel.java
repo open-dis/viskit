@@ -72,7 +72,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     /** Saves the current Assembly file out to XML
      *
-     * @param f the Assy file to save
+     * @param f the Assembly file to save
      */
     void saveModel(File f);
 

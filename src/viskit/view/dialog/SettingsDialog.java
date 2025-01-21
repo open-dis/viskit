@@ -85,7 +85,7 @@ public class SettingsDialog extends JDialog {
     private final JTabbedPane tabbedPane;
     private JList<String> classPathJlist;
     private JCheckBox evGrCB;
-    private JCheckBox assyCB;
+    private JCheckBox assemblyCB;
     private JCheckBox runCB;
     private JCheckBox doeCB;
     private JCheckBox clusterRunCB;
@@ -141,7 +141,7 @@ public class SettingsDialog extends JDialog {
         okButt.addActionListener(new applyButtonListener());
         VisibilityHandler vis = new VisibilityHandler();
         evGrCB.addActionListener(vis);
-        assyCB.addActionListener(vis);
+        assemblyCB.addActionListener(vis);
         runCB.addActionListener(vis);
         doeCB.addActionListener(vis);
         clusterRunCB.addActionListener(vis);
@@ -217,8 +217,8 @@ public class SettingsDialog extends JDialog {
         innerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         evGrCB = new JCheckBox("Event Graph Editor");
         innerP.add(evGrCB);
-        assyCB = new JCheckBox("Assembly Editor");
-        innerP.add(assyCB);
+        assemblyCB = new JCheckBox("Assembly Editor");
+        innerP.add(assemblyCB);
         runCB = new JCheckBox("Assembly Run");
         innerP.add(runCB);
         doeCB = new JCheckBox("Design Of Experiments");
@@ -326,13 +326,13 @@ public class SettingsDialog extends JDialog {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
                 appConfig.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, evGrCB.isSelected());
-            } else if (src == assyCB) {
-                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assyCB.isSelected());
+            } else if (src == assemblyCB) {
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assemblyCB.isSelected());
             } else if (src == runCB) {
                 if (runCB.isSelected()) {
-                    // if we turn on the assembly runner, we also need the assy editor
-                    if (!assyCB.isSelected()) {
-                        assyCB.doClick();
+                    // if we turn on the assembly runner, we also need the assembly editor
+                    if (!assemblyCB.isSelected()) {
+                        assemblyCB.doClick();
                     } // reenter here
                 }
                 appConfig.setProperty(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY, runCB.isSelected());
@@ -433,7 +433,7 @@ public class SettingsDialog extends JDialog {
         }
 
         evGrCB.setSelected(isEventGraphEditorVisible());
-        assyCB.setSelected(isAssemblyEditorVisible());
+        assemblyCB.setSelected(isAssemblyEditorVisible());
         runCB.setSelected(isAssemblyRunVisible());
         doeCB.setSelected(isDOEVisible());
         clusterRunCB.setSelected(isClusterRunVisible());
@@ -675,16 +675,16 @@ public class SettingsDialog extends JDialog {
     }
 
     /**
-     * Return if the Assy Editor is to be visible
-     * @return if the Assy Editor is to be visible
+     * Return if the Assembly Editor is to be visible
+     * @return if the Assembly Editor is to be visible
      */
     public static boolean isAssemblyEditorVisible() {
         return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY);
     }
 
     /**
-     * Return if the Assy Runner is to be visible
-     * @return if the Assy Runner is to be visible
+     * Return if the Assembly Runner is to be visible
+     * @return if the Assembly Runner is to be visible
      */
     public static boolean isAssemblyRunVisible() {
         return getVisibilitySense(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY);

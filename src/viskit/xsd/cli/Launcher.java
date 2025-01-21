@@ -320,7 +320,7 @@ public class Launcher extends Thread implements Runnable {
         Class<?> xml2jz;
         Class<?> axml2jz;
         Class<?> tempDirz;
-        Class<?> assyContlr;
+        Class<?> assemblyController;
 
         Object out;
         Method m;
@@ -331,7 +331,7 @@ public class Launcher extends Thread implements Runnable {
 
         xml2jz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
         axml2jz = cloader.loadClass("viskit.xsd.translator.assembly.SimkitAssemblyXML2Java");
-        assyContlr = cloader.loadClass("viskit.control.AssemblyController");
+        assemblyController = cloader.loadClass("viskit.control.AssemblyController");
         tempDirz = cloader.loadClass("viskit.VGlobals");
 
         try {
@@ -370,7 +370,7 @@ public class Launcher extends Thread implements Runnable {
                     // editor that aren't already in the BehaviorLibraries, so here we need
                     // to boot up the BehaviorLibraries.
 
-                    m = assyContlr.getDeclaredMethod("compileJavaClassFromString", new Class<?>[]{String.class});
+                    m = assemblyController.getDeclaredMethod("compileJavaClassFromString", new Class<?>[]{String.class});
 
                     log.info("Generating Java Bytecode...");
 

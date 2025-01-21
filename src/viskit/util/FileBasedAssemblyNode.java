@@ -3,7 +3,7 @@ package viskit.util;
 import java.io.File;
 
 /** Utility class to help identify whether an EG or PCL is from XML or *.class
- * form.  Used to help populate the LEGO tree on the Assy Editor.
+ * form.  Used to help populate the LEGO tree on the Assembly Editor.
  *
  * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

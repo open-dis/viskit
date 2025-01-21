@@ -141,7 +141,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     // The controller needs access to this
     public JButton runButt;
 
-    JMenu openRecentAssyMenu, openRecentProjMenu;
+    JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
     private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
 
@@ -157,8 +157,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     private LegoTree lTree, pclTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
-    private RecentProjFileSetListener recentProjFileSetListener;
-    private RecentAssyFileListener recentAssyFileListener;
+    private RecentProjFileSetListener recentProjectFileSetListener;
+    private RecentAssemblyFileListener recentAssemblyFileListener;
 
     private int untitledCount = 0;
 
@@ -236,10 +236,10 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     /**
-     * @return the recentProjFileSetListener
+     * @return the recentProjectFileSetListener
      */
     public RecentProjFileSetListener getRecentProjFileSetListener() {
-        return recentProjFileSetListener;
+        return recentProjectFileSetListener;
     }
 
     /** Tab switch: this will come in with the newly selected tab in place */
@@ -272,37 +272,37 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         }
     }
 
-    class RecentAssyFileListener implements MvcRecentFileListener {
+    class RecentAssemblyFileListener implements MvcRecentFileListener {
 
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
             Set<String> files = acontroller.getRecentAssemblyFileSet();
-            openRecentAssyMenu.removeAll();
+            openRecentAssemblyMenu.removeAll();
             files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
                 String nameOnly = new File(fullPath).getName();
-                Action act = new ParameterizedAssyAction(nameOnly);
+                Action act = new ParameterizedAssemblyAction(nameOnly);
                 act.putValue(FULLPATH, fullPath);
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
                 return mi;
             }).forEachOrdered(mi -> {
-                openRecentAssyMenu.add(mi);
+                openRecentAssemblyMenu.add(mi);
             });
             if (!files.isEmpty()) {
-                openRecentAssyMenu.add(new JSeparator());
-                Action act = new ParameterizedAssyAction("clear");
+                openRecentAssemblyMenu.add(new JSeparator());
+                Action act = new ParameterizedAssemblyAction("clear");
                 act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
                 JMenuItem mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                openRecentAssyMenu.add(mi);
+                openRecentAssemblyMenu.add(mi);
             }
         }
     }
 
-    class ParameterizedAssyAction extends javax.swing.AbstractAction {
+    class ParameterizedAssemblyAction extends javax.swing.AbstractAction {
 
-        ParameterizedAssyAction(String s) {
+        ParameterizedAssemblyAction(String s) {
             super(s);
         }
 
@@ -327,8 +327,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
-        recentAssyFileListener = new RecentAssyFileListener();
-        controller.addRecentAssemblyFileSetListener(getRecentAssyFileListener());
+        recentAssemblyFileListener = new RecentAssemblyFileListener();
+        controller.addRecentAssemblyFileSetListener(getRecentAssemblyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -346,14 +346,14 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
         fileMenu.add(buildMenuItem(controller, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentAssyMenu = buildMenu("Open Recent Assembly"));
+        fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
+        fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 
         // The EGViewFrame will get this listener for it's menu item of the same
-        recentProjFileSetListener = new RecentProjFileSetListener();
-        getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
+        recentProjectFileSetListener = new RecentProjFileSetListener();
+        getRecentProjFileSetListener().addMenuItem(openRecentProjectMenu);
         controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
         // Bug fix: 1195
@@ -818,7 +818,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-                    FileBasedAssemblyNode xn = isFileBasedAssyNode(sa[1]);
+                    FileBasedAssemblyNode xn = isFileBasedAssemblyNode(sa[1]);
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
@@ -848,7 +848,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         }
     }
 
-    private FileBasedAssemblyNode isFileBasedAssyNode(String s) {
+    private FileBasedAssemblyNode isFileBasedAssemblyNode(String s) {
         try {
             return FileBasedAssemblyNode.fromString(s);
         } catch (FileBasedAssemblyNode.exception e) {
@@ -1148,8 +1148,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     /**
      * @return the recentAsyFileListener
      */
-    public RecentAssyFileListener getRecentAssyFileListener() {
-        return recentAssyFileListener;
+    public RecentAssemblyFileListener getRecentAssemblyFileListener() {
+        return recentAssemblyFileListener;
     }
 
 } // end class file AssemblyViewFrame.java

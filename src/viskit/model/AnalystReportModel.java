@@ -133,10 +133,10 @@ public final class AnalystReportModel extends MvcAbstractModel {
      * to finalize the report.</p>
      * @param aRPanel a reference to the Analyst Report Frame
      * @param xmlFile an existing temp Analyst Report
-     * @param assyFile the current assembly file to process a report from
+     * @param newAssemblyFile the current assembly file to process a report from
      * @throws java.lang.Exception general catchall
      */
-    public AnalystReportModel(JFrame aRPanel, File xmlFile, File assyFile) throws Exception {
+    public AnalystReportModel(JFrame aRPanel, File xmlFile, File newAssemblyFile) throws Exception {
         this(xmlFile);
 
         // TODO: This doesn't seem to be doing anything correctly
@@ -145,8 +145,8 @@ public final class AnalystReportModel extends MvcAbstractModel {
         aRPanel.validate();
 
         LOG.debug("Successful parseXML");
-        if (assyFile != null) {
-            setAssemblyFile(assyFile);
+        if (newAssemblyFile != null) {
+            setAssemblyFile(newAssemblyFile);
             LOG.debug("Successful setting of assembly file");
             postProcessing();
             LOG.debug("Successful post processing of Analyst Report");
@@ -984,10 +984,10 @@ public final class AnalystReportModel extends MvcAbstractModel {
 
     /**
      * Called twice.  Once for preliminary AR, then for full integration AR.
-     * @param assyFile the Assembly File to parse for information
+     * @param newAssemblyFile the Assembly File to parse for information
      */
-    public void setAssemblyFile(File assyFile) {
-        assemblyFile = assyFile;
+    public void setAssemblyFile(File newAssemblyFile) {
+        assemblyFile = newAssemblyFile;
 
         // Subsequent calls within the same runtime require a cleared cache
         // which this does
@@ -1048,18 +1048,18 @@ public final class AnalystReportModel extends MvcAbstractModel {
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
     private void captureAssemblyImage() {
-        String assyFile = assemblyFile.getPath();
-        assyFile = assyFile.substring(assyFile.indexOf("Assemblies"), assyFile.length());
-        File assyImage = new File(
+        String assemblyFilePath = assemblyFile.getPath();
+        assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf("Assemblies"), assemblyFilePath.length());
+        File assemblyImage = new File(
                 ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportImagesDir(),
-                assyFile + ".png");
+                assemblyFilePath + ".png");
 
-        if (!assyImage.getParentFile().exists())
-            assyImage.mkdirs();
+        if (!assemblyImage.getParentFile().exists())
+             assemblyImage.mkdirs();
 
-        setAssemblyImageLocation(assyImage.getPath());
+        setAssemblyImageLocation(assemblyImage.getPath());
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
-                assyImage);
+                assemblyImage);
     }
 
     private void announceAnalystReportReadyToView() {

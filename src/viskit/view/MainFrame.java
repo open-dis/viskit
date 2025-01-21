@@ -75,9 +75,9 @@ import viskit.mvc.MvcModel;
 public class MainFrame extends JFrame {
 
     MvcAbstractJFrameView egFrame;
-    MvcAbstractJFrameView assyFrame;
+    MvcAbstractJFrameView assemblyFrame;
     MvcAbstractJFrameView reportPanel;
-    InternalAssemblyRunner assyRunComponent;
+    InternalAssemblyRunner assemblyRunComponent;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -86,7 +86,7 @@ public class MainFrame extends JFrame {
     private DoeMain doeMain;
 
     /** The initial assembly to load. */
-    private final String initialAssyFile;
+    private final String initialAssemblyFile;
     private final int TAB0_EVENTGRAPH_EDITOR_IDX = 0;
     private final int TAB0_ASSEMBLY_EDITOR_IDX = 1;
     private final int TAB0_ASSEMBLYRUN_SUBTABS_IDX = 2;
@@ -101,12 +101,12 @@ public class MainFrame extends JFrame {
     private final int TAB1_DOE_IDX = 1;
     private final int TAB1_CLUSTERUN_IDX = 2;
 
-    private AssemblyController assyCntlr;
-    private EventGraphController egCntlr;
+    private AssemblyController     assemblyController;
+    private EventGraphController eventGraphController;
 
-    public MainFrame(String initialAssyFile) {
+    public MainFrame(String initialAssemblyFile) {
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME);
-        this.initialAssyFile = initialAssyFile;
+        this.initialAssemblyFile = initialAssemblyFile;
         ViskitGlobals.instance().setMainAppWindow(MainFrame.this);
 
         initUI();
@@ -175,35 +175,35 @@ public class MainFrame extends JFrame {
         tabbedPane.addChangeListener(tabChangeListener);
 
         // Assembly editor
-        assyFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
+        assemblyFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
         if (SettingsDialog.isAssemblyEditorVisible()) {
-            tabbedPane.add(((AssemblyViewFrame) assyFrame).getContent());
-            idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assyFrame).getContent());
+            tabbedPane.add(((AssemblyViewFrame) assemblyFrame).getContent());
+            idx = tabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyFrame).getContent());
             tabbedPane.setTitleAt(idx, "Assembly Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation defined by assembly");
-            menuBar = ((AssemblyViewFrame) assyFrame).getMenus();
+            menuBar = ((AssemblyViewFrame) assemblyFrame).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
-            assyFrame.setTitleListener(myTitleListener, idx);
+            assemblyFrame.setTitleListener(myTitleListener, idx);
             setJMenuBar(menuBar);
-            jamQuitHandler(((AssemblyViewFrame) assyFrame).getQuitMenuItem(), myQuitAction, menuBar);
+            jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] = -1;
         }
 
-        assyCntlr = (AssemblyController) assyFrame.getController();
-        egCntlr = (EventGraphController) egFrame.getController();
+        assemblyController = (AssemblyController) assemblyFrame.getController();
+        eventGraphController = (EventGraphController) egFrame.getController();
 
         // Now set the recent open project's file listener for the egFrame now
-        // that we have an assyFrame reference
-        RecentProjFileSetListener listener = ((AssemblyViewFrame) assyFrame).getRecentProjFileSetListener();
+        // that we have an assemblyFrame reference
+        RecentProjFileSetListener listener = ((AssemblyViewFrame) assemblyFrame).getRecentProjFileSetListener();
         listener.addMenuItem(((EventGraphViewFrame) egFrame).getOpenRecentProjMenu());
 
         // Now setup the assembly and event graph file change listener(s)
-        assyCntlr.addAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-        egCntlr.addEventGraphFileListener(assyCntlr.getOpenEventGraphListener()); // A live listener, but currently doing nothing (tdn) 9/13/24
+        assemblyController.addAssemblyFileListener(assemblyController.getAssemblyChangeListener());
+        eventGraphController.addEventGraphFileListener(assemblyController.getOpenEventGraphListener()); // A live listener, but currently doing nothing (tdn) 9/13/24
 
         // Assembly Run
         runTabbedPane = new JTabbedPane();
@@ -245,24 +245,24 @@ public class MainFrame extends JFrame {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = idx;
             AnalystReportController cntlr = (AnalystReportController) reportPanel.getController();
             cntlr.setMainTabbedPane(tabbedPane, idx);
-            assyCntlr.addAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
+            assemblyController.addAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
         } else {
             tabIndices[TAB0_ANALYST_REPORT_IDX] = -1;
         }
 
         // Assembly runner
-        assyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
+        assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
         runTabbedPane.add(ViskitGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_IDX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_IDX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_IDX, "Run replications on local host");
-        menuBar = assyRunComponent.getMenus();
+        menuBar = assemblyRunComponent.getMenus();
         menus.add(menuBar);
         doCommonHelp(menuBar);
         jamSettingsHandler(menuBar);
-        assyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
-        jamQuitHandler(assyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
-        AssemblyControllerImpl controller = ((AssemblyControllerImpl) assyFrame.getController());
-        controller.setInitialAssemblyFile(initialAssyFile);
+        assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
+        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
+        AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyFrame.getController());
+        controller.setInitialAssemblyFile(initialAssemblyFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
 
         /* DIFF between OA3302 branch and trunk */
@@ -285,8 +285,8 @@ public class MainFrame extends JFrame {
             doCommonHelp(menuBar);
             doeFrame.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_DOE_IDX);
             jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
-            assyCntlr.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
-            egCntlr.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
+            assemblyController.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
+            eventGraphController.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
         }
 
         // Grid run panel
@@ -303,20 +303,20 @@ public class MainFrame extends JFrame {
             menus.add(menuBar);
             doCommonHelp(menuBar);
             runGridComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_CLUSTERUN_IDX);
-            assyCntlr.addAssemblyFileListener(runGridComponent);
+            assemblyController.addAssemblyFileListener(runGridComponent);
         }
         /* End DIFF between OA3302 branch and trunk */
 
         // let the event graph controller establish Viskit's classpath and open
-        // EventGraphs first if an assy file has not been submitted at startup
-        if (initialAssyFile == null || initialAssyFile.isBlank() || initialAssyFile.contains("$")) {
+        // EventGraphs first if an assembly file has not been submitted at startup
+        if (initialAssemblyFile == null || initialAssemblyFile.isBlank() || initialAssemblyFile.contains("$")) {
             runLater(0L, () -> {
-                egCntlr.begin();
+                eventGraphController.begin();
             });
         }
 
         runLater(500L, () -> {
-            assyCntlr.begin();
+            assemblyController.begin();
         });
     }
 
@@ -344,7 +344,7 @@ public class MainFrame extends JFrame {
             Model[] mods = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
             Model dirtyMod = null;
 
-            // Make sure we save modified EGs if we wander off to the Assy tab
+            // Make sure we save modified EGs if we wander off to the Assembly tab
             for (Model mod : mods) {
                 if (mod.isDirty()) {
                     dirtyMod = mod;
@@ -471,7 +471,7 @@ public class MainFrame extends JFrame {
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_IDX]);
-                    if (!((AssemblyController) assyFrame.getController()).preQuit()) {
+                    if (!((AssemblyController) assemblyFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -491,22 +491,22 @@ public class MainFrame extends JFrame {
                 ViskitGlobals.instance().setSysExitHandler(defaultHandler);    // reset default handler
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
-                    egCntlr.removeEventGraphFileListener(assyCntlr.getOpenEventGraphListener());
-                    egCntlr.removeRecentEgFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
+                    eventGraphController.removeEventGraphFileListener(assemblyController.getOpenEventGraphListener());
+                    eventGraphController.removeRecentEgFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
                     ((EventGraphController) egFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
-                    assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
-                    assyCntlr.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
-                    assyCntlr.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
-                    assyCntlr.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
+                    assemblyController.removeAssemblyFileListener(assemblyController.getAssemblyChangeListener());
+                    assemblyController.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
+                    assemblyController.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssemblyFileListener());
+                    assemblyController.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
-                    ((AssemblyController) assyFrame.getController()).postQuit();
+                    ((AssemblyController) assemblyFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */
@@ -547,7 +547,7 @@ public class MainFrame extends JFrame {
         // do nothing
     };
 
-    /** Prepares the Assy with a fresh class loader free of static artifacts for
+    /** Prepares the Assembly with a fresh class loader free of static artifacts for
      * a completely independent run
      */
     class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
@@ -563,7 +563,7 @@ public class MainFrame extends JFrame {
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_IDX);
 
                 // initializes a fresh class loader
-                assyRunComponent.preInitRun(execStrings);
+                assemblyRunComponent.preInitRun(execStrings);
             }
         }
 
@@ -580,8 +580,8 @@ public class MainFrame extends JFrame {
             rp2.printRepReportsCB.setSelected(false);
             rp2.printSummReportsCB.setSelected(false);
 
-            assyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
-            assyRunComponent.doTitle(null);
+            assemblyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
+            assemblyRunComponent.doTitle(null);
         }
     }
 

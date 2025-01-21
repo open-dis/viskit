@@ -130,25 +130,25 @@ public class EventGraphCache {
     }
 
     /**
-     * Converts a loaded assy file into a Document
+     * Converts a loaded assembly file into a Document
      *
-     * @param assyFile the assembly file loaded
+     * @param assemblyFile the assembly file loaded
      */
-    public void setAssemblyFileDocument(File assyFile) {
-        assemblyDocument = loadXML(assyFile);
+    public void setAssemblyFileDocument(File assemblyFile) {
+        assemblyDocument = loadXML(assemblyFile);
     }
 
     /**
      * Creates the entity table for an analyst report xml object. Also aids in
-     * opening EG files that are a SimEntity node of an Assy file
+     * opening EG files that are a SimEntity node of an Assembly file
      *
-     * @param assyFile the assembly file loaded
+     * @param assemblyFile the assembly file loaded
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public void makeEntityTable(File assyFile) {
+    public void makeEntityTable(File assemblyFile) {
 
-        setAssemblyFileDocument(assyFile);
+        setAssemblyFileDocument(assemblyFile);
 
         entityTable = new Element("EntityTable");
 
