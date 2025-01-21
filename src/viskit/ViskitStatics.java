@@ -798,7 +798,7 @@ public class ViskitStatics {
                     Desktop.getDesktop().mail(url.toURI());
 
                     if (showLog)
-                        Desktop.getDesktop().browse(ViskitConfiguration.V_ERROR_LOG.toURI());
+                        Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_ERROR_LOG.toURI());
                 }
             } catch (IOException | URISyntaxException ex) {
                 LOG.error(ex);

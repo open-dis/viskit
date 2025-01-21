@@ -38,11 +38,11 @@ public class ViskitConfiguration {
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
     public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 
-    public static final File VISKIT_CONFIG_DIR = new File(System.getProperty("user.home"), ".viskit");
-    public static final File C_APP_FILE = new File(VISKIT_CONFIG_DIR, "c_app.xml");
-    public static final File C_GUI_FILE = new File(VISKIT_CONFIG_DIR, "c_gui.xml");
+    public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
+    public static final File C_APP_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
+    public static final File C_GUI_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
     public static final File VISKIT_LOGS_DIR = new File("logs");
-    public static final File V_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
+    public static final File VISKIT_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";
@@ -55,22 +55,22 @@ public class ViskitConfiguration {
     public static final String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
     public static final String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
     public static final String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
-    public static final String X_CLASS_PATHS_CLEAR_KEY = "extraClassPaths";
-    public static final String X_CLASS_PATHS_PATH_KEY = X_CLASS_PATHS_CLEAR_KEY + ".path";
-    public static final String X_CLASS_PATHS_KEY = X_CLASS_PATHS_PATH_KEY + "[@value]";
-    public static final String RECENT_EG_CLEAR_KEY = "history.EventGraphEditor.Recent";
-    public static final String RECENT_ASSY_CLEAR_KEY = "history.AssemblyEditor.Recent";
-    public static final String RECENT_PROJ_CLEAR_KEY = "history.ProjectEditor.Recent";
-    public static final String EG_HISTORY_KEY = RECENT_EG_CLEAR_KEY + ".EventGraphFile";
-    public static final String ASSY_HISTORY_KEY = RECENT_ASSY_CLEAR_KEY + ".AssemblyFile";
-    public static final String PROJ_HISTORY_KEY = RECENT_PROJ_CLEAR_KEY + ".Project";
-    public static final String EG_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
-    public static final String ASSY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
-    public static final String ASSY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String X_CLASSPATHS_CLEAR_KEY = "extraClassPaths";
+    public static final String X_CLASSPATHS_PATH_KEY = X_CLASSPATHS_CLEAR_KEY + ".path";
+    public static final String X_CLASSPATHS_KEY = X_CLASSPATHS_PATH_KEY + "[@value]";
+    public static final String RECENT_EVENTGRAPH_CLEAR_KEY = "history.EventGraphEditor.Recent";
+    public static final String RECENT_ASSEMBLY_CLEAR_KEY = "history.AssemblyEditor.Recent";
+    public static final String RECENT_PROJECT_CLEAR_KEY = "history.ProjectEditor.Recent";
+    public static final String EVENTGRAPH_HISTORY_KEY = RECENT_EVENTGRAPH_CLEAR_KEY + ".EventGraphFile";
+    public static final String ASSEMBLY_HISTORY_KEY = RECENT_ASSEMBLY_CLEAR_KEY + ".AssemblyFile";
+    public static final String PROJECT_HISTORY_KEY = RECENT_PROJECT_CLEAR_KEY + ".Project";
+    public static final String EVENTGRAPH_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
+    public static final String ASSEMBLY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
+    public static final String ASSEMBLY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String DOE_EDIT_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
     public static final String CLUSTER_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
     public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
-    public static final String DEBUG_MSGS_KEY = "app.debug";
+    public static final String DEBUG_MESSAGES_KEY = "app.debug";
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
     public static final String CACHED_CLEAR_KEY = "Cached";
@@ -83,10 +83,10 @@ public class ViskitConfiguration {
     public static final String APP_MAIN_BOUNDS_KEY = "app.mainframe.size";
     public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
     public static final String PROJECT_TITLE_NAME = "gui.projecttitle.name[@value]";
-    public static final String LAF_DEFAULT = "default";
-    public static final String LAF_PLATFORM = "platform";
+    public static final String LOOK_AND_FEEL_DEFAULT = "default";
+    public static final String LOOK_AND_FEEL_PLATFORM = "platform";
     
-    public static final String VISKIT_PROJ_NAME = "Project[@name]";
+    public static final String VISKIT_PROJECT_NAME = "Project[@name]";
 
     private static ViskitConfiguration me;
 
@@ -94,12 +94,12 @@ public class ViskitConfiguration {
 
     private final Map<String, XMLConfiguration> xmlConfigurations;
     private final Map<String, String> sessionHM;
-    private CombinedConfiguration cc;
-    private XMLConfiguration projectXMLConfig = null;
+    private CombinedConfiguration combinedConfiguration;
+    private XMLConfiguration projectXMLConfiguration = null;
 
     static {
         LOG.info("Welcome to the Visual Discrete Event Simulation (DES) toolkit (Viskit)");
-        LOG.debug("VISKIT_CONFIG_DIR: " + VISKIT_CONFIG_DIR + " " + VISKIT_CONFIG_DIR.exists() + "\n");
+        LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
     }
 
     public static synchronized ViskitConfiguration instance() {
@@ -111,9 +111,9 @@ public class ViskitConfiguration {
 
     private ViskitConfiguration() {
         try {
-            if (!VISKIT_CONFIG_DIR.exists()) {
-                VISKIT_CONFIG_DIR.mkdirs();
-                LOG.info("Created dir: {}", VISKIT_CONFIG_DIR);
+            if (!VISKIT_CONFIGURATION_DIR.exists()) {
+                VISKIT_CONFIGURATION_DIR.mkdirs();
+                LOG.info("Created dir: {}", VISKIT_CONFIGURATION_DIR);
             }
 
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
@@ -150,9 +150,9 @@ public class ViskitConfiguration {
             bldr2.setAutoSave(true);
 
             NodeCombiner combiner = new UnionCombiner();
-            cc = new CombinedConfiguration(combiner);
-            cc.addConfiguration(bldr1.getConfiguration(), "gui");
-            cc.addConfiguration(bldr2.getConfiguration(), "app");
+            combinedConfiguration = new CombinedConfiguration(combiner);
+            combinedConfiguration.addConfiguration(bldr1.getConfiguration(), "gui");
+            combinedConfiguration.addConfiguration(bldr2.getConfiguration(), "app");
         } catch (ConfigurationException e) {
             LOG.error(e);
         }
@@ -161,8 +161,8 @@ public class ViskitConfiguration {
         Object obj;
         XMLConfiguration xc;
         NodeModel m;
-        for (String name : cc.getConfigurationNames()) {
-            obj = cc.getConfiguration(name);
+        for (String name : combinedConfiguration.getConfigurationNames()) {
+            obj = combinedConfiguration.getConfiguration(name);
             if (obj instanceof XMLConfiguration) {
                 xc = (XMLConfiguration) obj;
                 m = xc.getNodeModel();
@@ -196,11 +196,11 @@ public class ViskitConfiguration {
             return retS;
         }
 
-        return cc.getString(key);
+        return combinedConfiguration.getString(key);
     }
 
     public String[] getConfigValues(String key) {
-        return cc.getStringArray(key);
+        return combinedConfiguration.getStringArray(key);
     }
 
     /**
@@ -214,36 +214,36 @@ public class ViskitConfiguration {
                         .configure(params.xml()
                         .setFileName(f));
             bldr.setAutoSave(true);
-            projectXMLConfig = bldr.getConfiguration();
+            projectXMLConfiguration = bldr.getConfiguration();
         } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
-        if (cc.getConfiguration("proj") == null || cc.getConfiguration("proj").isEmpty())
-            cc.addConfiguration(projectXMLConfig, "proj");
-        xmlConfigurations.put("proj", projectXMLConfig);
+        if (combinedConfiguration.getConfiguration("proj") == null || combinedConfiguration.getConfiguration("proj").isEmpty())
+            combinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
+        xmlConfigurations.put("proj", projectXMLConfiguration);
     }
 
     /** @return the XMLConfiguration for Viskit project */
     public XMLConfiguration getProjectXMLConfig() {
-        return projectXMLConfig;
+        return projectXMLConfiguration;
     }
 
     /** Remove a project's XML configuration upon closing a Viskit project
      * @param projConfig the project configuration to remove
      */
     public void removeProjectXMLConfig(XMLConfiguration projConfig) {
-        cc.removeConfiguration(projConfig);
+        combinedConfiguration.removeConfiguration(projConfig);
         xmlConfigurations.remove("proj");
     }
 
     /** @return the XMLConfiguration for Viskit app */
     public XMLConfiguration getViskitAppConfig() {
-        return (XMLConfiguration) cc.getConfiguration("app");
+        return (XMLConfiguration) combinedConfiguration.getConfiguration("app");
     }
 
     /** @return the XMLConfiguration for Viskit gui */
     public XMLConfiguration getViskitGuiConfig() {
-        return (XMLConfiguration) cc.getConfiguration("gui");
+        return (XMLConfiguration) combinedConfiguration.getConfiguration("gui");
     }
 
     /** Used to clear all Viskit Configuration information to create a new
@@ -252,8 +252,8 @@ public class ViskitConfiguration {
     public void clearViskitConfig() {
         setVal(ViskitConfiguration.PROJECT_PATH_KEY, "");
         setVal(ViskitConfiguration.PROJECT_NAME_KEY, "");
-        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_EG_CLEAR_KEY);
-        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_ASSY_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
+        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
 
         // Retain the recent projects list
     }

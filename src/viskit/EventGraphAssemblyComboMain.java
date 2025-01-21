@@ -91,7 +91,7 @@ public class EventGraphAssemblyComboMain {
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
 
                 String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                        + "navigate to " + ViskitConfiguration.V_ERROR_LOG.getPath() + " and "
+                        + "navigate to " + ViskitConfiguration.VISKIT_ERROR_LOG.getPath() + " and "
                         + "email the log to "
                         + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
@@ -107,7 +107,7 @@ public class EventGraphAssemblyComboMain {
      * .viskit config directory in the user's profile space
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfiguration.VISKIT_CONFIG_DIR;
+        File dotViskit = ViskitConfiguration.VISKIT_CONFIGURATION_DIR;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty

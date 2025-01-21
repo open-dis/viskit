@@ -396,14 +396,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private void recordEgFiles() {
         if (historyConfig == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
-        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.EG_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
         int idx = 0;
         String op;
         String egFile;
         for (Object s : valueAr) {
             egFile = (String) s;
             if (recentEGFileSet.add(egFile)) {
-                op = historyConfig.getString(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfig.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openEventGraphs.add(egFile);
@@ -415,12 +415,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private void saveEgHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfiguration.RECENT_EG_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -538,7 +538,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEGFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -550,7 +550,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEGFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.EG_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }

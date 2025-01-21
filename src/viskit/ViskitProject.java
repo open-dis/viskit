@@ -218,7 +218,7 @@ public class ViskitProject {
         ViskitConfiguration.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
 
         XMLConfiguration config = ViskitConfiguration.instance().getProjectXMLConfig();
-        config.setProperty(ViskitConfiguration.VISKIT_PROJ_NAME, getProjectRoot().getName());
+        config.setProperty(ViskitConfiguration.VISKIT_PROJECT_NAME, getProjectRoot().getName());
 
         setProjectOpen(projectFileExists);
         return projectFileExists;

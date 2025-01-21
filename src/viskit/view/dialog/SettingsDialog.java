@@ -297,10 +297,10 @@ public class SettingsDialog extends JDialog {
                 guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
             } else {
                 if (defaultLafRB.isSelected()) {
-                    guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LAF_DEFAULT);
+                    guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LOOK_AND_FEEL_DEFAULT);
                     otherTF.setEnabled(false);
                 } else if (platformLafRB.isSelected()) {
-                    guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LAF_PLATFORM);
+                    guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, ViskitConfiguration.LOOK_AND_FEEL_PLATFORM);
                     otherTF.setEnabled(false);
                 } else if (otherLafRB.isSelected()) {
                     guiConfig.setProperty(ViskitConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
@@ -325,9 +325,9 @@ public class SettingsDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == evGrCB) {
-                appConfig.setProperty(ViskitConfiguration.EG_EDIT_VISIBLE_KEY, evGrCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, evGrCB.isSelected());
             } else if (src == assyCB) {
-                appConfig.setProperty(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY, assyCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assyCB.isSelected());
             } else if (src == runCB) {
                 if (runCB.isSelected()) {
                     // if we turn on the assembly runner, we also need the assy editor
@@ -335,9 +335,9 @@ public class SettingsDialog extends JDialog {
                         assyCB.doClick();
                     } // reenter here
                 }
-                appConfig.setProperty(ViskitConfiguration.ASSY_RUN_VISIBLE_KEY, runCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY, runCB.isSelected());
             } else if (src == debugMsgsCB) {
-                appConfig.setProperty(ViskitConfiguration.DEBUG_MSGS_KEY, debugMsgsCB.isSelected());
+                appConfig.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, debugMsgsCB.isSelected());
                 ViskitStatics.debug = debugMsgsCB.isSelected();
             } else if (src == analystReportCB) {
                 appConfig.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
@@ -370,7 +370,7 @@ public class SettingsDialog extends JDialog {
     private static void clearClassPathEntries() {
         // Always reinitialize the prop config. We may have changed projects
         initConfigs();
-        projectConfig.clearTree(ViskitConfiguration.X_CLASS_PATHS_CLEAR_KEY);
+        projectConfig.clearTree(ViskitConfiguration.X_CLASSPATHS_CLEAR_KEY);
     }
 
     /** Method to facilitate putting project/lib entries on the classpath
@@ -387,7 +387,7 @@ public class SettingsDialog extends JDialog {
         for (String s : extraPaths) {
             s = s.replaceAll("\\\\", "/");
             LOG.debug("lis[" + ix + "]: {}", s);
-            projectConfig.setProperty(ViskitConfiguration.X_CLASS_PATHS_PATH_KEY + "(" + ix + ")[@value]", s);
+            projectConfig.setProperty(ViskitConfiguration.X_CLASSPATHS_PATH_KEY + "(" + ix + ")[@value]", s);
             ix++;
         }
         RebuildLEGOTreePanelTask t = new RebuildLEGOTreePanelTask();
@@ -444,10 +444,10 @@ public class SettingsDialog extends JDialog {
         if(null == laf) {
             platformLafRB.setSelected(true);
         } else switch (laf) {
-            case ViskitConfiguration.LAF_PLATFORM:
+            case ViskitConfiguration.LOOK_AND_FEEL_PLATFORM:
                 platformLafRB.setSelected(true);
                 break;
-            case ViskitConfiguration.LAF_DEFAULT:
+            case ViskitConfiguration.LOOK_AND_FEEL_DEFAULT:
                 defaultLafRB.setSelected(true);
                 break;
             default:
@@ -611,7 +611,7 @@ public class SettingsDialog extends JDialog {
     public static String[] getExtraClassPath() {
         // Always reinitialize the prop config.  We may have changed projects
         initConfigs();
-        return projectConfig.getStringArray(ViskitConfiguration.X_CLASS_PATHS_KEY);
+        return projectConfig.getStringArray(ViskitConfiguration.X_CLASSPATHS_KEY);
     }
 
     /** @return a URL[] of the extra classpaths, to include a path to event graphs */
@@ -671,7 +671,7 @@ public class SettingsDialog extends JDialog {
      * @return if the EG Editor is to be visible
      */
     public static boolean isEventGraphEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.EG_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY);
     }
 
     /**
@@ -679,7 +679,7 @@ public class SettingsDialog extends JDialog {
      * @return if the Assy Editor is to be visible
      */
     public static boolean isAssemblyEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSY_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY);
     }
 
     /**
@@ -687,7 +687,7 @@ public class SettingsDialog extends JDialog {
      * @return if the Assy Runner is to be visible
      */
     public static boolean isAssemblyRunVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSY_RUN_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY);
     }
 
     /**
@@ -703,7 +703,7 @@ public class SettingsDialog extends JDialog {
      * @return if verbose debug message are to be printed
      */
     public static boolean isVerboseDebug() {
-        return getVisibilitySense(ViskitConfiguration.DEBUG_MSGS_KEY);
+        return getVisibilitySense(ViskitConfiguration.DEBUG_MESSAGES_KEY);
     }
 
     /**

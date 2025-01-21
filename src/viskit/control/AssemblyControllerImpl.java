@@ -586,7 +586,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 try {
 
                     // First, copy the error.log to the project dir
-                    Files.copy(ViskitConfiguration.V_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(ViskitConfiguration.VISKIT_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projDir, projZip);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -793,7 +793,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -805,7 +805,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssyFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }
@@ -1908,7 +1908,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordAssyFiles() {
         openAssemblies = new ArrayList<>(4);
-        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.ASSY_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
         int idx = 0;
         String op;
@@ -1916,7 +1916,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         for (Object s : valueAr) {
             assemblyFile = (String) s;
             if (recentAssyFileSet.add(assemblyFile)) {
-                op = historyConfig.getString(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfig.getString(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openAssemblies.add(assemblyFile);
@@ -1929,19 +1929,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @SuppressWarnings("unchecked")
     private void recordProjFiles() {
-        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.PROJ_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.PROJECT_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)
             adjustRecentProjSet(new File((String) value));
     }
 
     private void saveAssyHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfiguration.RECENT_ASSY_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfiguration.ASSY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -1954,7 +1954,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void saveProjHistoryXML(Set<String> recentFiles) {
         int idx = 0;
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfiguration.PROJ_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfiguration.PROJECT_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
