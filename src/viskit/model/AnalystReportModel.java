@@ -712,7 +712,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
                 dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
                     obj = getPclNodeCache().get(entry.getKey());
-                    if (obj.getClass().toString().contains("PropChangeListenerNode")) {
+                    if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
                         try {
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStat = isCount ? "count" : "mean";

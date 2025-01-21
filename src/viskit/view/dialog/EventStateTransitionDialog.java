@@ -19,7 +19,7 @@ import viskit.control.EventGraphController;
 
 import viskit.model.EventStateTransition;
 import viskit.model.ViskitElement;
-import viskit.model.vStateVariable;
+import viskit.model.viskitStateVariable;
 import viskit.view.ArgumentsPanel;
 import viskit.view.LocalVariablesPanel;
 
@@ -222,7 +222,7 @@ public class EventStateTransitionDialog extends JDialog {
 
         stateVarsCB.addActionListener((ActionEvent e) -> {
             JComboBox cb = (JComboBox) e.getSource();
-            vStateVariable sv = (vStateVariable) cb.getSelectedItem();
+            viskitStateVariable sv = (viskitStateVariable) cb.getSelectedItem();
             descriptionField.setText(sv.getComment());
             okButt.setEnabled(true);
             indexPanel.setVisible(ViskitGlobals.instance().isArray(sv.getType()));
@@ -234,7 +234,7 @@ public class EventStateTransitionDialog extends JDialog {
             if (nm != null) {
                 stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
                 for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-                    vStateVariable vsv = (vStateVariable) stateVarsCB.getItemAt(i);
+                    viskitStateVariable vsv = (viskitStateVariable) stateVarsCB.getItemAt(i);
                     if (vsv.getName().contains(nm)) {
                         stateVarsCB.setSelectedIndex(i);
                         break;
@@ -481,7 +481,7 @@ public class EventStateTransitionDialog extends JDialog {
         stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
         stateVarsCB.setSelectedIndex(0);
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
-            vStateVariable sv = (vStateVariable) stateVarsCB.getItemAt(i);
+            viskitStateVariable sv = (viskitStateVariable) stateVarsCB.getItemAt(i);
             if (est.getName().equalsIgnoreCase(sv.getName())) {
                 stateVarsCB.setSelectedIndex(i);
                 return;

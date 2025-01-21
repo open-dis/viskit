@@ -1,7 +1,7 @@
 package viskit.view;
 
 import viskit.model.EventArgument;
-import viskit.model.vEdgeParameter;
+import viskit.model.viskitEdgeParameter;
 import viskit.model.ViskitElement;
 
 import javax.swing.table.DefaultTableCellRenderer;
@@ -58,7 +58,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        return new vEdgeParameter("value");
+        return new viskitEdgeParameter("value");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
             // more arguments than we've got.
             for (int i = 0; i < diff; i++) {
-                myList.add(new vEdgeParameter("0"));
+                myList.add(new viskitEdgeParameter("0"));
             }
             super.setData(myList);
         } else {
@@ -124,7 +124,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
                 Object o = e.getSource();
                 int row = findObjectRow(o);
                 EventArgument ea = (EventArgument) argList.get(row);
-                ((vEdgeParameter) o).bogus = ea.getType();
+                ((viskitEdgeParameter) o).bogus = ea.getType();
                 ActionEvent ae = new ActionEvent(o, 0, "");
                 alis.actionPerformed(ae);
             }

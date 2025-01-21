@@ -262,7 +262,7 @@ public class MainFrame extends JFrame {
         assyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_IDX);
         jamQuitHandler(assyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assyFrame.getController());
-        controller.setInitialAssyFile(initialAssyFile);
+        controller.setInitialAssemblyFile(initialAssyFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
 
         /* DIFF between OA3302 branch and trunk */
@@ -501,7 +501,7 @@ public class MainFrame extends JFrame {
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
                     assyCntlr.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
-                    assyCntlr.removeRecentAssembyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
+                    assyCntlr.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
                     assyCntlr.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24

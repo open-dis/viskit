@@ -28,7 +28,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitStatics;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitModelInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
 /**
@@ -145,8 +145,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         JOptionPane.showMessageDialog(InstantiationPanel.this, "Unknown type: " + e1 );
                         return;
                     }
-                    ffPan.setData(new VInstantiator.FreeF(newType, ""));
-                    factPan.setData(new VInstantiator.Factory(newType,
+                    ffPan.setData(new ViskitModelInstantiator.FreeF(newType, ""));
+                    factPan.setData(new ViskitModelInstantiator.Factory(newType,
                             ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS,
                             ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                             new Vector<>()
@@ -178,7 +178,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         });
     }
 
-    public VInstantiator getData() {
+    public ViskitModelInstantiator getData() {
         switch (methodCB.getSelectedIndex()) {
             case FF:
                 return ffPan.getData();
@@ -192,9 +192,9 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
     }
 
-    VInstantiator myVi;
+    ViskitModelInstantiator myVi;
 
-    public void setData(VInstantiator vi) throws ClassNotFoundException {
+    public void setData(ViskitModelInstantiator vi) throws ClassNotFoundException {
         myVi = vi.vcopy();
         String typ = myVi.getType();
         typeTF.setText(typ);
@@ -204,14 +204,14 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         factPan.setType(typ);
         ffPan.setType(typ);
 
-        if (vi instanceof VInstantiator.Constr) {
-            conPan.setData((VInstantiator.Constr) myVi);
+        if (vi instanceof ViskitModelInstantiator.Constr) {
+            conPan.setData((ViskitModelInstantiator.Constr) myVi);
             methodCB.setSelectedIndex(CONSTR);
-        } else if (vi instanceof VInstantiator.Factory) {
-            factPan.setData((VInstantiator.Factory) myVi);
+        } else if (vi instanceof ViskitModelInstantiator.Factory) {
+            factPan.setData((ViskitModelInstantiator.Factory) myVi);
             methodCB.setSelectedIndex(FACT);
-        } else if (vi instanceof VInstantiator.FreeF) {
-            ffPan.setData((VInstantiator.FreeF) myVi);
+        } else if (vi instanceof ViskitModelInstantiator.FreeF) {
+            ffPan.setData((ViskitModelInstantiator.FreeF) myVi);
             methodCB.setSelectedIndex(FF);
         } else {
             System.err.println("Internal error InstantiationPanel.setData()");
@@ -254,7 +254,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             add(Box.createVerticalGlue());
         }
 
-        public void setData(VInstantiator.FreeF viff) {
+        public void setData(ViskitModelInstantiator.FreeF viff) {
             if (viff == null) {
                 return;
             }
@@ -271,8 +271,8 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        public VInstantiator getData() {
-            return new VInstantiator.FreeF(typ, value.getText().trim());
+        public ViskitModelInstantiator getData() {
+            return new ViskitModelInstantiator.FreeF(typ, value.getText().trim());
         }
 
         @Override
@@ -318,17 +318,17 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             if (parameters == null) {
                 tp.addTab("Constructor 0", null, new JLabel("No constructor, Factory, Abstract or Interface"));
             } else {
-                VInstantiator.Constr constr;
+                ViskitModelInstantiator.Constr constr;
                 String sign;
                 constructorPanels = new ConstructorPanel[parameters.length];
                 for (int i = 0; i < parameters.length; ++i) {
-                    constr = new VInstantiator.Constr(parameters[i], clName);
+                    constr = new ViskitModelInstantiator.Constr(parameters[i], clName);
                     sign = noParamString;
                     for (int j = 0; j < constr.getArgs().size(); j++) {
                         sign += ((Parameter) parameters[i].get(j)).getType() + ", ";
 
-                        if (!((VInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter) parameters[i].get(j)).getName()))
-                            ((VInstantiator) (constr.getArgs().get(j))).setName(((Parameter) parameters[i].get(j)).getName());
+                        if (!((ViskitModelInstantiator) (constr.getArgs().get(j))).getName().equals(((Parameter) parameters[i].get(j)).getName()))
+                            ((ViskitModelInstantiator) (constr.getArgs().get(j))).setName(((Parameter) parameters[i].get(j)).getName());
                     }
                     sign = sign.substring(0, sign.length() - 2);
 
@@ -370,7 +370,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        public void setData(VInstantiator.Constr vi) {
+        public void setData(ViskitModelInstantiator.Constr vi) {
             if (vi == null) {
                 return;
             }
@@ -389,12 +389,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             actionPerformed(null);
         }
 
-        public VInstantiator getData() {
+        public ViskitModelInstantiator getData() {
             ConstructorPanel cp = (ConstructorPanel) tp.getSelectedComponent();
             if (cp == null)
                 return null;
             else
-                return new VInstantiator.Constr(typ, cp.getData());
+                return new ViskitModelInstantiator.Constr(typ, cp.getData());
         }
     }
 
@@ -456,7 +456,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             }
         }
 
-        public void setData(VInstantiator.Factory vi) {
+        public void setData(ViskitModelInstantiator.Factory vi) {
             if (vi == null) {
                 return;
             }
@@ -499,12 +499,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             revalidate();
         }
 
-        public VInstantiator getData() {
+        public ViskitModelInstantiator getData() {
             String fc = (String) factClassCB.getSelectedItem();
             fc = (fc == null) ? ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS : fc.trim();
             String m = ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD;
             List<Object> lis = (olp != null) ? olp.getData() : new Vector<>();
-            return new VInstantiator.Factory(typ, fc, m, lis);
+            return new ViskitModelInstantiator.Factory(typ, fc, m, lis);
         }
 
 //        class MyChangedListener implements ActionListener {
@@ -603,7 +603,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 }
 
                 Method m = hm.get(ret);
-                Vector<Object> vc = VInstantiator.buildDummyInstantiators(m);
+                Vector<Object> vc = ViskitModelInstantiator.buildDummyInstantiators(m);
                 addObjListPanel(vc, true);
 
                 if (ip.modifiedListener != null) {

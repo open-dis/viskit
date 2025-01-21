@@ -22,7 +22,7 @@ import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
 import viskit.model.EventGraphNode;
 import viskit.model.PropertyChangeEdge;
-import viskit.model.PropChangeListenerNode;
+import viskit.model.PropertyChangeListenerNode;
 import viskit.model.ViskitElement;
 
 /**
@@ -233,7 +233,7 @@ public class PclEdgeInspectorDialog extends JDialog {
             String classname = null;
             if (o instanceof EventGraphNode) {
                 classname = ((ViskitElement) o).getType();
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 classname = ((ViskitElement) o).getType();
             }
 

@@ -1,7 +1,7 @@
 package viskit.view;
 
 import viskit.model.ViskitElement;
-import viskit.model.vStateVariable;
+import viskit.model.viskitStateVariable;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -40,7 +40,7 @@ public class StateVariablesPanel extends ViskitTablePanel {
 
     @Override
     public ViskitElement newRowObject() {
-        vStateVariable ea = new vStateVariable("name", "int", "description");
+        viskitStateVariable ea = new viskitStateVariable("name", "int", "description");
         return ea;
     }
 

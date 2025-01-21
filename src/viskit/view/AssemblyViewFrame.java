@@ -262,7 +262,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
 
             if (mod.getLastFile() != null)
-                ((AssemblyControllerImpl) getController()).initOpenAssyWatch(mod.getLastFile(), mod.getJaxbRoot());
+                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
 
             GraphMetadata gmd = mod.getMetaData();
             if (gmd != null)
@@ -328,7 +328,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
         recentAssyFileListener = new RecentAssyFileListener();
-        controller.addRecentAssembyFileSetListener(getRecentAssyFileListener());
+        controller.addRecentAssemblyFileSetListener(getRecentAssyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -871,7 +871,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditPclNode(PropChangeListenerNode pclNode) {
+    public boolean doEditPclNode(PropertyChangeListenerNode pclNode) {
         return PclNodeInspectorDialog.showDialog(this, pclNode); // blocks
     }
 
@@ -886,7 +886,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditSimEvListEdge(SimEvListenerEdge seEdge) {
+    public boolean doEditSimEvListEdge(SimEventListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
     }
 

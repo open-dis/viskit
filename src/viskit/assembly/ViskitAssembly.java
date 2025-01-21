@@ -66,7 +66,7 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     @Override
-    protected void createReplicationStats() {
+    protected void createReplicationStatistics() {
         replicationStats = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
         for (PropertyChangeListener sampleStats : replicationStats) {
             LOG.debug(((Named) sampleStats).getName() + " replicationStat created");

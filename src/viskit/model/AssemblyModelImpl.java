@@ -315,7 +315,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         jaxbEG.setType(className);
         node.opaqueModelObject = jaxbEG;
 
-        VInstantiator vc = new VInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
         node.setInstantiator(vc);
 
         if (!nameCheck())
@@ -366,7 +366,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void newPropChangeListener(String widgetName, String className, Point2D p) {
-        PropChangeListenerNode pcNode = new PropChangeListenerNode(widgetName, className);
+        PropertyChangeListenerNode pcNode = new PropertyChangeListenerNode(widgetName, className);
         if (p == null)
             pcNode.setPosition(pointLess);
         else
@@ -380,7 +380,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         List<Object> lis = pcl.getParameters();
 
-        VInstantiator vc = new VInstantiator.Constr(pcl.getType(), lis);
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(pcl.getType(), lis);
         pcNode.setInstantiator(vc);
 
         if (!nameCheck())
@@ -395,7 +395,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoPropChangeListener(PropChangeListenerNode node) {
+    public void redoPropChangeListener(PropertyChangeListenerNode node) {
 
         PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
 
@@ -411,7 +411,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeListener(PropChangeListenerNode pclNode) {
+    public void deletePropChangeListener(PropertyChangeListenerNode pclNode) {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
         getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
@@ -513,7 +513,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void newSimEvLisEdge(AssemblyNode src, AssemblyNode target) {
-        SimEvListenerEdge sele = new SimEvListenerEdge();
+        SimEventListenerEdge sele = new SimEventListenerEdge();
         sele.setFrom(src);
         sele.setTo(target);
 
@@ -534,7 +534,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void redoSimEvLisEdge(SimEvListenerEdge sele) {
+    public void redoSimEvLisEdge(SimEventListenerEdge sele) {
         AssemblyNode src, target;
 
         src = (AssemblyNode) sele.getFrom();
@@ -566,7 +566,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteSimEvLisEdge(SimEvListenerEdge sele) {
+    public void deleteSimEvLisEdge(SimEventListenerEdge sele) {
         SimEventListenerConnection sel_c = (SimEventListenerConnection) sele.opaqueModelObject;
 
         jaxbRoot.getSimEventListenerConnection().remove(sel_c);
@@ -623,7 +623,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changeSimEvEdge(SimEvListenerEdge seEdge) {
+    public void changeSimEvEdge(SimEventListenerEdge seEdge) {
         EventGraphNode src = (EventGraphNode) seEdge.getFrom();
         EventGraphNode targ = (EventGraphNode) seEdge.getTo();
         SimEventListenerConnection selc = (SimEventListenerConnection) seEdge.opaqueModelObject;
@@ -637,7 +637,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean changePclNode(PropChangeListenerNode pclNode) {
+    public boolean changePclNode(PropertyChangeListenerNode pclNode) {
         boolean retcode = true;
         if (!nameCheck()) {
             mangleName(pclNode);
@@ -673,7 +673,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         List<Object> lis = jaxBPcl.getParameters();
         lis.clear();
 
-        VInstantiator inst = pclNode.getInstantiator();
+        ViskitModelInstantiator inst = pclNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the
@@ -717,7 +717,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         List<Object> lis = jaxbSE.getParameters();
         lis.clear();
 
-        VInstantiator inst = evNode.getInstantiator();
+        ViskitModelInstantiator inst = evNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the SimEntity object
@@ -833,7 +833,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return vi;
     }
 
-    private VInstantiator buildInstantiatorFromJaxbParameter(Object o) {
+    private ViskitModelInstantiator buildInstantiatorFromJaxbParameter(Object o) {
         if (o instanceof TerminalParameter) {
             return buildFreeFormFromTermParameter((TerminalParameter) o);
         }
@@ -844,22 +844,22 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
-    private VInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
-        return new VInstantiator.FreeF(tp.getType(), tp.getValue());
+    private ViskitModelInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
+        return new ViskitModelInstantiator.FreeF(tp.getType(), tp.getValue());
     }
 
-    private VInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
-        return new VInstantiator.Array(o.getType(),
+    private ViskitModelInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
+        return new ViskitModelInstantiator.Array(o.getType(),
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
-    private VInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
-        return new VInstantiator.Constr(o.getType(),
+    private ViskitModelInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
+        return new ViskitModelInstantiator.Constr(o.getType(),
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
     }
 
-    private VInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
-        return new VInstantiator.Factory(o.getType(),
+    private ViskitModelInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
+        return new ViskitModelInstantiator.Factory(o.getType(),
                 o.getFactory(),
                 ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
                 getInstantiatorListFromJaxbParmList(o.getParameters()));
@@ -867,7 +867,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     // We know we will get a List<Object> one way or the other
     @SuppressWarnings("unchecked")
-    private List<Object> getJaxbParamList(VInstantiator vi) {
+    private List<Object> getJaxbParamList(ViskitModelInstantiator vi) {
         Object o = buildParam(vi);
         if (o instanceof List<?>) {
             return (List<Object>) o;
@@ -879,17 +879,17 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private Object buildParam(Object vi) {
-        if (vi instanceof VInstantiator.FreeF) {
-            return buildParamFromFreeF((VInstantiator.FreeF) vi);
+        if (vi instanceof ViskitModelInstantiator.FreeF) {
+            return buildParamFromFreeF((ViskitModelInstantiator.FreeF) vi);
         } //TerminalParm
-        if (vi instanceof VInstantiator.Constr) {
-            return buildParamFromConstr((VInstantiator.Constr) vi);
+        if (vi instanceof ViskitModelInstantiator.Constr) {
+            return buildParamFromConstr((ViskitModelInstantiator.Constr) vi);
         } // List of Parms
-        if (vi instanceof VInstantiator.Factory) {
-            return buildParamFromFactory((VInstantiator.Factory) vi);
+        if (vi instanceof ViskitModelInstantiator.Factory) {
+            return buildParamFromFactory((ViskitModelInstantiator.Factory) vi);
         } // FactoryParam
-        if (vi instanceof VInstantiator.Array) {
-            VInstantiator.Array via = (VInstantiator.Array) vi;
+        if (vi instanceof ViskitModelInstantiator.Array) {
+            ViskitModelInstantiator.Array via = (ViskitModelInstantiator.Array) vi;
 
             if (ViskitGlobals.instance().isArray(via.getType()))
                 return buildParamFromArray(via);
@@ -901,7 +901,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return null;
     }
 
-    private TerminalParameter buildParamFromFreeF(VInstantiator.FreeF viff) {
+    private TerminalParameter buildParamFromFreeF(ViskitModelInstantiator.FreeF viff) {
         TerminalParameter tp = oFactory.createTerminalParameter();
 
         tp.setType(viff.getType());
@@ -910,7 +910,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return tp;
     }
 
-    private MultiParameter buildParamFromConstr(VInstantiator.Constr vicon) {
+    private MultiParameter buildParamFromConstr(ViskitModelInstantiator.Constr vicon) {
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
@@ -920,7 +920,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return mp;
     }
 
-    private FactoryParameter buildParamFromFactory(VInstantiator.Factory vifact) {
+    private FactoryParameter buildParamFromFactory(ViskitModelInstantiator.Factory vifact) {
         FactoryParameter fp = oFactory.createFactoryParameter();
 
         fp.setType(vifact.getType());
@@ -932,7 +932,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return fp;
     }
 
-    private MultiParameter buildParamFromArray(VInstantiator.Array viarr) {
+    private MultiParameter buildParamFromArray(ViskitModelInstantiator.Array viarr) {
         MultiParameter mp = oFactory.createMultiParameter();
 
         mp.setType(viarr.getType());
@@ -942,8 +942,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return mp;
     }
 
-    private TerminalParameter buildParamFromVarargs(VInstantiator.Array viarr) {
-        return buildParamFromFreeF((VInstantiator.FreeF) viarr.getInstantiators().get(0));
+    private TerminalParameter buildParamFromVarargs(ViskitModelInstantiator.Array viarr) {
+        return buildParamFromFreeF((ViskitModelInstantiator.FreeF) viarr.getInstantiators().get(0));
     }
 
     private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
@@ -967,10 +967,10 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private void buildSimEvConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
-        SimEvListenerEdge sele;
+        SimEventListenerEdge sele;
         AssemblyNode toNode, frNode;
         for (SimEventListenerConnection selc : simevconnsList) {
-            sele = new SimEvListenerEdge();
+            sele = new SimEventListenerEdge();
             toNode = getNodeCache().get(selc.getListener());
             frNode = getNodeCache().get(selc.getSource());
             sele.setTo(toNode);
@@ -1049,12 +1049,12 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private PropChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
-        PropChangeListenerNode pNode = (PropChangeListenerNode) getNodeCache().get(pcl.getName());
+    private PropertyChangeListenerNode buildPclNodeFromJaxbPCL(PropertyChangeListener pcl) {
+        PropertyChangeListenerNode pNode = (PropertyChangeListenerNode) getNodeCache().get(pcl.getName());
         if (pNode != null) {
             return pNode;
         }
-        pNode = new PropChangeListenerNode(pcl.getName(), pcl.getType());
+        pNode = new PropertyChangeListenerNode(pcl.getName(), pcl.getType());
 
         // For backwards compatibility, bug 706
         pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
@@ -1071,7 +1071,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
 
         List<Object> lis = pcl.getParameters();
-        VInstantiator vc = new VInstantiator.Constr(pcl.getType(),
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(pcl.getType(),
                 getInstantiatorListFromJaxbParmList(lis));
         pNode.setInstantiator(vc);
 
@@ -1109,7 +1109,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         List<Object> lis = se.getParameters();
 
-        VInstantiator vc = new VInstantiator.Constr(lis, se.getType());
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(lis, se.getType());
         en.setInstantiator(vc);
 
         en.opaqueModelObject = se;

@@ -169,15 +169,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /**
-     * Create all the objects used.  The <code>createSimEntities()</code> method
-     * is abstract and will be implemented in the concrete subclass.  The others
-     * are empty by default.  The <code>createReplicationStats()</code> method
+     * Create all the objects used.The <code>createSimEntities()</code> method
+ is abstract and will be implemented in the concrete subclass.  The others
+ are empty by default.  The <code>createReplicationStatistics()</code> method
      * must be overridden if any replications stats are needed.
      */
     protected void createObjects() {
 //        LOG.info("I was called?");
         createSimEntities();
-        createReplicationStats();
+        createReplicationStatistics();
 
         // This is implemented in this class
         createDesignPointStats();
@@ -227,7 +227,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     protected abstract void createSimEntities();
 
-    protected abstract void createReplicationStats();
+    protected abstract void createReplicationStatistics();
 
     /**
      * The default behavior is to create a <code>SimplStatsTally</code>

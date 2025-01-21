@@ -87,7 +87,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
 
     /** The path to an assembly file if given from the command line */
-    private String initialAssyFile;
+    private String initialAssemblyFile;
 
     /** The handler to run an assembly */
     private AssemblyRunnerPlug runner;
@@ -98,24 +98,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     /**
-     * Sets an initial assy file to open upon Viskit startup supplied by the
+     * Sets an initial assembly file to open upon Viskit startup supplied by the
      * command line
-     * @param f the assy file to initially open upon startup
+     * @param f the assembly file to initially open upon startup
      */
-    public void setInitialAssyFile(String f) {
+    public void setInitialAssemblyFile(String f) {
         if (viskit.ViskitStatics.debug) {
             LOG.info("Initial file set: {}", f);
         }
-        initialAssyFile = f;
+        initialAssemblyFile = f;
     }
 
-    /** This method is for Assembly compilation
-     *
-     * @param assyPath an assembly file to compile
+    /** 
+     *This method is for Assembly compilation
+     * @param assemblyPath an assembly file to compile
      */
-    private void compileAssembly(String assyPath) {
-        LOG.debug("Compiling assembly: {}", assyPath);
-        File f = new File(assyPath);
+    private void compileAssembly(String assemblyPath) {
+        LOG.debug("Compiling assembly: {}", assemblyPath);
+        File f = new File(assemblyPath);
         _doOpen(f);
         prepareSimulationRunner();
     }
@@ -124,25 +124,25 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void begin() {
         File projPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
 
-        // The initialAssyFile is set if we have stated a file "arg" upon startup
+        // The initialAssemblyFile is set if we have stated a file "arg" upon startup
         // from the command line
-        if (initialAssyFile != null && !initialAssyFile.isBlank() && !initialAssyFile.contains("$")) { // Check for $ makes sure that a property
-            LOG.debug("Loading initial file: {}", initialAssyFile);                             // pointing to a assembly path isn't commented
+        if (initialAssemblyFile != null && !initialAssemblyFile.isBlank() && !initialAssemblyFile.contains("$")) { // Check for $ makes sure that a property
+            LOG.debug("Loading initial file: {}", initialAssemblyFile);                             // pointing to a assembly path isn't commented
                                                                                                          // out
-            // Switch to the project that this Assy file is located in if paths do not coincide
-            if (!initialAssyFile.contains(projPath.getPath())) {
+            // Switch to the project that this Assembly file is located in if paths do not coincide
+            if (!initialAssemblyFile.contains(projPath.getPath())) {
                 doProjectCleanup();
-                projPath = new File(initialAssyFile).getParentFile().getParentFile().getParentFile();
+                projPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
                 openProject(projPath); // calls EGVF showProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
                 SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
                 t.execute();
             }
-            compileAssembly(initialAssyFile);
+            compileAssembly(initialAssemblyFile);
         } else {
             openProject(projPath); // calls EGVF showProjectName
-            List<String> files = getOpenAssyFileList(false);
+            List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
             for (String f : files) {
@@ -162,9 +162,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param refresh flag to refresh the list from viskitConfig.xml
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
-    public final List<String> getOpenAssyFileList(boolean refresh) {
+    public final List<String> getOpenAssemblyFileList(boolean refresh) {
         if (refresh || openAssemblies == null)
-            recordAssyFiles();
+            recordAssemblyFiles();
 
         return openAssemblies;
     }
@@ -252,11 +252,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             vaw.setSelectedAssemblyName(mod.getMetaData().name);
             // TODO: Implement an Assembly description block set here
 
-            adjustRecentAssySet(file);
-            markAssyFilesOpened();
+            adjustRecentAssemblySet(file);
+            markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssyWatch(file, mod.getJaxbRoot());
+            initOpenAssemblyWatch(file, mod.getJaxbRoot());
             openEventGraphs(file);
         } else {
             vaw.delTab(mod);
@@ -276,14 +276,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
-    /** Mark every Assy file opened as "open" in the app config file */
-    private void markAssyFilesOpened() {
+    /** Mark every Assembly file opened as "open" in the app config file */
+    private void markAssemblyFilesOpened() {
 
         // Mark every vAMod opened as "open"
         AssemblyModel[] openAlready = ((AssemblyView) getView()).getOpenModels();
-        for (AssemblyModel vAMod : openAlready) {
-            if (vAMod.getLastFile() != null)
-                markAssyConfigOpen(vAMod.getLastFile());
+        for (AssemblyModel assemblyModel : openAlready) {
+            if (assemblyModel.getLastFile() != null)
+                markAssemblyConfigurationOpen(assemblyModel.getLastFile());
         }
     }
 
@@ -297,21 +297,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param f the XML Assembly file
      * @param jaxbroot the JAXB root of this XML file
      */
-    public void initOpenAssyWatch(File f, SimkitAssembly jaxbroot) {
+    public void initOpenAssemblyWatch(File f, SimkitAssembly jaxbroot) {
         OpenAssembly.inst().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
     public OpenAssembly.AssembyChangeListener getAssemblyChangeListener() {
-        return assyChgListener;
+        return assemblyChangeListener;
     }
     private boolean localDirty = false;
     private Set<OpenAssembly.AssembyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssembyChangeListener assyChgListener = new OpenAssembly.AssembyChangeListener() {
+    OpenAssembly.AssembyChangeListener assemblyChangeListener = new OpenAssembly.AssembyChangeListener() {
 
         @Override
-        public void assyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -321,39 +321,39 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     ((AssemblyModel) getModel()).setDirty(true);
                     break;
 
-                case NEW_ASSY:
+                case NEW_ASSEMBLY:
                     isLocalDirty.clear();
                     localDirty = false;
                     break;
 
-                case PARAM_LOCALLY_EDITTED:
+                case PARAM_LOCALLY_EDITED:
                     // This gets hit when you type something in the last three tabs
                     isLocalDirty.add(source);
                     localDirty = true;
                     break;
 
-                case CLOSE_ASSY:
+                case CLOSE_ASSEMBLY:
 
                     // Close any currently open EGs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
-                    AssemblyModel vAMod = (AssemblyModel) getModel();
-                    markAssyConfigClosed(vAMod.getLastFile());
+                    AssemblyModel assemblyModel = (AssemblyModel) getModel();
+                    markAssemblyConfigurationClosed(assemblyModel.getLastFile());
 
                     AssemblyView view = (AssemblyView) getView();
-                    view.delTab(vAMod);
+                    view.delTab(assemblyModel);
 
-                    // NOTE: This doesn't work quite right. If no Assy is open,
+                    // NOTE: This doesn't work quite right. If no Assembly is open,
                     // then any non-associated EGs that were also open will
                     // annoyingly close from the closeAll call above. We are
                     // using an open EG cache system that relies on parsing an
-                    // Assy file to find its associated EGs to open
+                    // Assembly file to find its associated EGs to open
                     if (!isCloseAll()) {
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(vAMod))
+                            if (!mod.equals(assemblyModel))
                                 openEventGraphs(mod.getLastFile());
                         }
                     }
@@ -361,7 +361,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     break;
 
                 default:
-                    LOG.warn("Program error AssemblyController.assyChanged");
+                    LOG.warn("Program error AssemblyController.assemblyChanged");
             }
         }
 
@@ -373,12 +373,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public String getHandle() {
-        return assyChgListener.getHandle();
+        return assemblyChangeListener.getHandle();
     }
 
     @Override
-    public void assyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
-        assyChgListener.assyChanged(action, source, param);
+    public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+        assemblyChangeListener.assemblyChanged(action, source, param);
     }
 
     @Override
@@ -391,22 +391,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         OpenAssembly.inst().removeListener(lis);
     }
 
-    Set<MvcRecentFileListener> recentAssyListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentAssemblyListeners = new HashSet<>();
 
     @Override
-    public void addRecentAssembyFileSetListener(MvcRecentFileListener lis) {
-        recentAssyListeners.add(lis);
+    public void addRecentAssemblyFileSetListener(MvcRecentFileListener lis) {
+        recentAssemblyListeners.add(lis);
     }
 
     @Override
-    public void removeRecentAssembyFileSetListener(MvcRecentFileListener lis) {
-        recentAssyListeners.remove(lis);
+    public void removeRecentAssemblyFileSetListener(MvcRecentFileListener lis) {
+        recentAssemblyListeners.remove(lis);
     }
 
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssemblyFileListeners() {
-        for (MvcRecentFileListener lis : recentAssyListeners)
+        for (MvcRecentFileListener lis : recentAssemblyListeners)
             lis.listChanged();
     }
 
@@ -470,8 +470,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
             model.saveModel(saveFile);
             view.setSelectedAssemblyName(gmd.name);
-            adjustRecentAssySet(saveFile);
-            markAssyFilesOpened();
+            adjustRecentAssemblySet(saveFile);
+            markAssemblyFilesOpened();
         }
     }
 
@@ -629,7 +629,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssyView and this AssyController
+    /** Common method between the AssemblyView and this AssemblyController
      *
      * @return indication of continue or cancel
      */
@@ -691,7 +691,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // when TabbedPane changelistener detects a tab change.
         ((AssemblyView) getView()).addTab(mod);
 
-        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assy
+        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assembly
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
         }
@@ -788,10 +788,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void postClose() {
-        OpenAssembly.inst().doSendCloseAssy();
+        OpenAssembly.inst().doSendCloseAssembly();
     }
 
-    private void markAssyConfigClosed(File f) {
+    private void markAssemblyConfigurationClosed(File f) {
 
         // Someone may try to close a file that hasn't been saved
         if (f == null) {return;}
@@ -806,7 +806,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     // The open attribute is zeroed out for all recent files the first time a file is opened
-    private void markAssyConfigOpen(File f) {
+    private void markAssemblyConfigurationOpen(File f) {
 
         int idx = 0;
         for (String key : recentAssemblyFileSet) {
@@ -1035,7 +1035,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param pclNode Property Change Listener Node
      */
     @Override
-    public void propertyChangeListenerEdit(PropChangeListenerNode pclNode) {
+    public void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode) {
         boolean done, modified;
         do {
             done = true;
@@ -1075,7 +1075,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void simEventListenerEdgeEdit(SimEvListenerEdge seEdge) {
+    public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
         boolean modified = ((AssemblyView) getView()).doEditSimEvListEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
@@ -1188,7 +1188,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newEventGraph(nm + "-copy" + copyCount, typ, p);
-            } else if (o instanceof PropChangeListenerNode) {
+            } else if (o instanceof PropertyChangeListenerNode) {
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
                 ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
@@ -1211,12 +1211,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     removeEdge(ed);
                 }
                 ((AssemblyModel) getModel()).deleteEvGraphNode((EventGraphNode) en);
-            } else if (elem instanceof PropChangeListenerNode) {
-                en = (PropChangeListenerNode) elem;
+            } else if (elem instanceof PropertyChangeListenerNode) {
+                en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePropChangeListener((PropChangeListenerNode) en);
+                ((AssemblyModel) getModel()).deletePropChangeListener((PropertyChangeListenerNode) en);
             }
         }
 
@@ -1230,8 +1230,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
         } else if (e instanceof PropertyChangeEdge) {
             ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
-        } else if (e instanceof SimEvListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEvListenerEdge) e);
+        } else if (e instanceof SimEventListenerEdge) {
+            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEventListenerEdge) e);
         }
     }
 
@@ -1302,13 +1302,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
             } else {
-                SimEvListenerEdge ed = (SimEvListenerEdge) redoGraphCell.getUserObject();
+                SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
             }
         } else {
 
-            if (redoGraphCell.getUserObject() instanceof PropChangeListenerNode) {
-                PropChangeListenerNode node = (PropChangeListenerNode) redoGraphCell.getUserObject();
+            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
+                PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoPropChangeListener(node);
             } else {
                 EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
@@ -1392,7 +1392,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @return a string of Assembly source code
      */
     public String buildJavaAssemblySource(File f) {
-        String assySource = null;
+        String assemblySource = null;
 
         // Must validate XML first and handle any errors before compiling
         XMLValidationTool xvt = new XMLValidationTool(f.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
@@ -1400,7 +1400,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!xvt.isValidXML()) {
 
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            return assySource;
+            return assemblySource;
         } else {
             LOG.info("{} is valid XML\n", f);
         }
@@ -1409,12 +1409,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
-            assySource = x2j.translate();
+            assemblySource = x2j.translate();
         } catch (FileNotFoundException e) {
             LOG.error(e);
-            assySource = "";
+            assemblySource = "";
         }
-        return assySource;
+        return assemblySource;
     }
 
     // NOTE: above are routines to operate on current assembly
@@ -1574,7 +1574,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return paf;
     }
 
-    /** Path for EG and Assy compilation
+    /** Path for EG and Assembly compilation
      *
      * @param source the raw source to write to file
      * @return a package and file pair
@@ -1605,7 +1605,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyModel model = (AssemblyModel) getModel();
         File tFile;
         try {
-            tFile = TempFileManager.createTempFile("ViskitAssy", ".xml");
+            tFile = TempFileManager.createTempFile("ViskitAssembly", ".xml");
         } catch (IOException e) {
             messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
@@ -1615,7 +1615,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
     private String[] execStrings;
 
-    // Known modelPath for Assy compilation
+    // Known modelPath for Assembly compilation
     @Override
     public void initAssemblyRun() {
         String src = produceJavaAssemblyClass(); // asks to save
@@ -1692,7 +1692,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             protected void done() {
                 try {
 
-                    // Wait for the compile, save and Assy preps to finish
+                    // Wait for the compile, save and Assembly preps to finish
                     get();
 
                 } catch (InterruptedException | ExecutionException e) {
@@ -1753,12 +1753,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
      *
-     * @param assyImage an image file to write the .png
+     * assemblyImage assemblyImage an image file to write the .png
      */
-    public void captureAssemblyImage(File assyImage) {
+    public void captureAssemblyImage(File assemblyImage) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer tim = new Timer(100, new timerCallback(assyImage, false));
+        final Timer tim = new Timer(100, new timerCallback(assemblyImage, false));
         tim.setRepeats(false);
         tim.start();
     }
@@ -1870,7 +1870,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Trim to RECENTLISTSIZE
      * @param file an assembly file to add to the list
      */
-    private void adjustRecentAssySet(File file) {
+    private void adjustRecentAssemblySet(File file) {
         String f;
         for (Iterator<String> itr = recentAssemblyFileSet.iterator(); itr.hasNext();) {
             f = itr.next();
@@ -1883,7 +1883,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!recentAssemblyFileSet.contains(file.getPath()))
             recentAssemblyFileSet.add(file.getPath()); // to the top
 
-        saveAssyHistoryXML(recentAssemblyFileSet);
+        saveAssemblyHistoryXML(recentAssemblyFileSet);
         notifyRecentAssemblyFileListeners();
     }
 
@@ -1912,10 +1912,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private List<String> openAssemblies;
 
     @SuppressWarnings("unchecked")
-    private void recordAssyFiles() {
+    private void recordAssemblyFiles() {
         openAssemblies = new ArrayList<>(4);
         List<Object> valueAr = historyConfiguration.getList(ViskitConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
-        LOG.debug("recordAssyFiles() valueAr size is: {}", valueAr.size());
+        LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueAr.size());
         int idx = 0;
         String op;
         String assemblyFile;
@@ -1941,7 +1941,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             adjustRecentProjSet(new File((String) value));
     }
 
-    private void saveAssyHistoryXML(Set<String> recentFiles) {
+    private void saveAssemblyHistoryXML(Set<String> recentFiles) {
         historyConfiguration.clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
         int idx = 0;
 
@@ -1969,7 +1969,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void clearRecentAssemblyFileList() {
         recentAssemblyFileSet.clear();
-        saveAssyHistoryXML(recentAssemblyFileSet);
+        saveAssemblyHistoryXML(recentAssemblyFileSet);
         notifyRecentAssemblyFileListeners();
     }
 
@@ -1980,7 +1980,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private Set<String> getRecentAssemblyFileSet(boolean refresh) {
         if (refresh || recentAssemblyFileSet == null)
-            recordAssyFiles();
+            recordAssemblyFiles();
 
         return recentAssemblyFileSet;
     }

@@ -16,7 +16,7 @@ import viskit.ViskitStatics;
  *
  * An event as seen by the model (not the view)
  */
-public class PropChangeListenerNode extends AssemblyNode {
+public class PropertyChangeListenerNode extends AssemblyNode {
 
     private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
@@ -27,7 +27,7 @@ public class PropChangeListenerNode extends AssemblyNode {
     private boolean getMean = false;
     private boolean getCount = false;
 
-    PropChangeListenerNode(String name, String type) // package access on constructor
+    PropertyChangeListenerNode(String name, String type) // package access on constructor
     {
         super(name, type);
         setType(type);

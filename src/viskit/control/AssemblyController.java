@@ -89,7 +89,7 @@ public interface AssemblyController {
 
     void newPropertyChangeListenerArc(Object[] nodes);
 
-    void propertyChangeListenerEdit(PropChangeListenerNode pclNode);
+    void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode);
 
     /** Handles editing of EventGraph nodes
      * @param eventGraphNode the node to edit
@@ -104,15 +104,15 @@ public interface AssemblyController {
 
     /** Edits the Adapter edge
      *
-     * @param aEdge the Adapter edge to edit
+     * @param adapterEdge the Adapter edge to edit
      */
-    void adapterEdgeEdit(AdapterEdge aEdge);
+    void adapterEdgeEdit(AdapterEdge adapterEdge);
 
     /** Edits the selected SimEvent listener edge
      *
      * @param seEdge the SimEvent edge to edit
      */
-    void simEventListenerEdgeEdit(SimEvListenerEdge seEdge);
+    void simEventListenerEdgeEdit(SimEventListenerEdge seEdge);
 
     /** CMD-Z or CNTL-Z */
     void undo();
@@ -235,9 +235,9 @@ public interface AssemblyController {
     /** Screen capture a snapshot of the Assembly View Frame */
     void captureWindow();
 
-    void addRecentAssembyFileSetListener(MvcRecentFileListener lis);
+    void addRecentAssemblyFileSetListener(MvcRecentFileListener lis);
 
-    void removeRecentAssembyFileSetListener(MvcRecentFileListener lis);
+    void removeRecentAssemblyFileSetListener(MvcRecentFileListener lis);
 
     Set<String> getRecentAssemblyFileSet();
 

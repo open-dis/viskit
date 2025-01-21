@@ -110,7 +110,7 @@ public class OpenAssembly {
     }
 
     public void doParamLocallyEditted(AssembyChangeListener source) {
-        fireAction(AssembyChangeListener.PARAM_LOCALLY_EDITTED, source, null);
+        fireAction(AssembyChangeListener.PARAM_LOCALLY_EDITED, source, null);
     }
 
     public void doSendAssyJaxbChanged(AssembyChangeListener source) {
@@ -118,17 +118,17 @@ public class OpenAssembly {
     }
 
     public void doSendNewAssy(File f) {
-        fireAction(AssembyChangeListener.NEW_ASSY, null, f);
+        fireAction(AssembyChangeListener.NEW_ASSEMBLY, null, f);
     }
 
-    public void doSendCloseAssy() {
-        fireAction(AssembyChangeListener.CLOSE_ASSY, null, null);
+    public void doSendCloseAssembly() {
+        fireAction(AssembyChangeListener.CLOSE_ASSEMBLY, null, null);
     }
 
     private void fireAction(int action, AssembyChangeListener source, Object param) {
         for (AssembyChangeListener lis : listeners) {
             if (lis != source) {
-                lis.assyChanged(action, source, param);
+                lis.assemblyChanged(action, source, param);
             }
         }
     }
@@ -137,9 +137,9 @@ public class OpenAssembly {
 
         // public final static int JDOM_CHANGED = 0;
         int JAXB_CHANGED = 1;
-        int NEW_ASSY = 2;
-        int CLOSE_ASSY = 3;
-        int PARAM_LOCALLY_EDITTED = 4;
+        int NEW_ASSEMBLY = 2;
+        int CLOSE_ASSEMBLY = 3;
+        int PARAM_LOCALLY_EDITED = 4;
 
         /**
          * Notify the assembly listeners of a change
@@ -147,7 +147,7 @@ public class OpenAssembly {
          * @param source the AssembyChangeListener
          * @param param the object that changes
          */
-        void assyChanged(int action, AssembyChangeListener source, Object param);
+        void assemblyChanged(int action, AssembyChangeListener source, Object param);
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();

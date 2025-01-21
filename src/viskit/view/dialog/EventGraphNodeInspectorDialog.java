@@ -12,7 +12,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
 
 import viskit.model.EventGraphNode;
-import viskit.model.VInstantiator;
+import viskit.model.ViskitModelInstantiator;
 import viskit.ViskitStatics;
 import viskit.view.InstantiationPanel;
 
@@ -29,7 +29,7 @@ import viskit.view.InstantiationPanel;
 public class EventGraphNodeInspectorDialog extends JDialog {
 
     public static String newName;
-    public static VInstantiator newInstantiator;
+    public static ViskitModelInstantiator newInstantiator;
     private static EventGraphNodeInspectorDialog dialog;
     private static boolean modified = false;
 
@@ -240,7 +240,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
      * @return true = cancel close
      */
     boolean checkBlankFields() {
-        VInstantiator vi;
+        ViskitModelInstantiator vi;
 
         if (egNode != null) {
             vi = egNode.getInstantiator();

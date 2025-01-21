@@ -11,7 +11,7 @@ import viskit.ViskitGlobals;
  * @author DMcG
  * @version $Id$
  */
-public class vStateVariable extends ViskitElement {
+public class viskitStateVariable extends ViskitElement {
 
     /** array size, for (multi-dim) array */
     private String[] arraySize;
@@ -30,13 +30,13 @@ public class vStateVariable extends ViskitElement {
      * @param pVariableName
      * @param pVariableType
      */
-    vStateVariable(String pVariableName, String pVariableType) {
+    viskitStateVariable(String pVariableName, String pVariableType) {
         name = pVariableName;
         setType(pVariableType);
         currentValue = null;
     }
 
-    public vStateVariable(String nm, String typ, String comment) {
+    public viskitStateVariable(String nm, String typ, String comment) {
         this(nm, typ);
         this.comment = comment;
     }

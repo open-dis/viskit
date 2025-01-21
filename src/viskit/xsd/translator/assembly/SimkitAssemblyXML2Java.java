@@ -635,7 +635,7 @@ public class SimkitAssemblyXML2Java {
         pw.println();
 
         pw.println(sp4 + "@Override");
-        pw.println(sp4 + "public void createReplicationStats" + lp + rp + sp + ob);
+        pw.println(sp4 + "public void createReplicationStatistics" + lp + rp + sp + ob);
 
         PropertyChangeListener pcl;
         List<PropertyChangeListenerConnection> myConnections;
@@ -666,7 +666,7 @@ public class SimkitAssemblyXML2Java {
                 }
             }
         }
-        pw.println(sp8 + "super" + pd + "createReplicationStats" + lp + rp + sc);
+        pw.println(sp8 + "super" + pd + "createReplicationStatistics" + lp + rp + sc);
         pw.println(sp4 + cb);
         pw.println();
 
