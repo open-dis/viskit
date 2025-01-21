@@ -501,8 +501,8 @@ public class MainFrame extends JFrame {
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     assyCntlr.removeAssemblyFileListener(assyCntlr.getAssemblyChangeListener());
                     assyCntlr.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
-                    assyCntlr.removeRecentAssyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
-                    assyCntlr.removeRecentProjFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
+                    assyCntlr.removeRecentAssembyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssyFileListener());
+                    assyCntlr.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 

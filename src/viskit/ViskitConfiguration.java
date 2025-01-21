@@ -237,7 +237,7 @@ public class ViskitConfiguration {
     }
 
     /** @return the XMLConfiguration for Viskit app */
-    public XMLConfiguration getViskitAppConfig() {
+    public XMLConfiguration getViskitAppConfiguration() {
         return (XMLConfiguration) combinedConfiguration.getConfiguration("app");
     }
 
@@ -252,8 +252,8 @@ public class ViskitConfiguration {
     public void clearViskitConfig() {
         setVal(ViskitConfiguration.PROJECT_PATH_KEY, "");
         setVal(ViskitConfiguration.PROJECT_NAME_KEY, "");
-        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
-        getViskitAppConfig().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
+        getViskitAppConfiguration().clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
+        getViskitAppConfiguration().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
 
         // Retain the recent projects list
     }

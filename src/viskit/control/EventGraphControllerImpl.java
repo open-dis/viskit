@@ -1217,10 +1217,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
     XMLConfiguration historyConfig;
 
-    /** This is the very first caller for getViskitAppConfig() upon Viskit startup */
+    /** This is the very first caller for getViskitAppConfiguration() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = ViskitConfiguration.instance().getViskitAppConfig();
+            historyConfig = ViskitConfiguration.instance().getViskitAppConfiguration();
         } catch (Exception e) {
             LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");

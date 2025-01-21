@@ -419,10 +419,10 @@ public class vGraphAssemblyComponent extends JGraph implements GraphModelListene
                 controller.newAdapterArc(oa);
                 break;
             case AssemblyViewFrame.SIMEVLIS_MODE:
-                controller.newSimEvListArc(oa);
+                controller.newSimEventListArc(oa);
                 break;
             case AssemblyViewFrame.PCL_MODE:
-                controller.newPropChangeListArc(oa);
+                controller.newPropertyChangeListenerArc(oa);
                 break;
             default:
                 break;

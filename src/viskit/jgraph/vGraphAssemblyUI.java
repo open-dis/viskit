@@ -51,14 +51,14 @@ public class vGraphAssemblyUI extends BasicGraphUI {
             if (obj instanceof AdapterEdge) {
                 cntl.adapterEdgeEdit((AdapterEdge) obj);
             } else if (obj instanceof PropChangeEdge) {
-                cntl.pcListenerEdgeEdit((PropChangeEdge) obj);
+                cntl.propertyChangListenerEdgeEdit((PropChangeEdge) obj);
             } else {
-                cntl.simEvListenerEdgeEdit((SimEvListenerEdge) obj);
+                cntl.simEventListenerEdgeEdit((SimEvListenerEdge) obj);
             }
         } else if (cell instanceof vAssyCircleCell) {
-            cntl.evGraphEdit((EvGraphNode) obj);
+            cntl.eventGraphEdit((EvGraphNode) obj);
         } else if (cell instanceof vAssyPropListCell) {
-            cntl.pcListenerEdit((PropChangeListenerNode) obj);
+            cntl.propertyChangeListenerEdit((PropChangeListenerNode) obj);
         }
     }
 }

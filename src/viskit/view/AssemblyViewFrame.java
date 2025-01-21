@@ -277,7 +277,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         @Override
         public void listChanged() {
             AssemblyController acontroller = (AssemblyController) getController();
-            Set<String> files = acontroller.getRecentAssyFileSet();
+            Set<String> files = acontroller.getRecentAssemblyFileSet();
             openRecentAssyMenu.removeAll();
             files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
                 String nameOnly = new File(fullPath).getName();
@@ -319,7 +319,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
             if (fullPath != null)
                 if (fullPath.getPath().equals(CLEARPATHFLAG))
-                    acontroller.clearRecentAssyFileList();
+                    acontroller.clearRecentAssemblyFileList();
                 else
                     acontroller.openRecentAssembly(fullPath);
         }
@@ -328,7 +328,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     private void buildMenus() {
         AssemblyController controller = (AssemblyController) getController();
         recentAssyFileListener = new RecentAssyFileListener();
-        controller.addRecentAssyFileSetListener(getRecentAssyFileListener());
+        controller.addRecentAssembyFileSetListener(getRecentAssyFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -338,7 +338,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
-        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/E-Mail Viskit Project", KeyEvent.VK_Z,
+        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
         fileMenu.add(buildMenuItem(controller, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
@@ -354,7 +354,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         // The EGViewFrame will get this listener for it's menu item of the same
         recentProjFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjMenu);
-        controller.addRecentProjFileSetListener(getRecentProjFileSetListener());
+        controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
 
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
@@ -370,7 +370,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "prepSimRunner", "Initialize Assembly Run", KeyEvent.VK_C,
+        fileMenu.add(buildMenuItem(controller, "prepareSimulationRunner", "Initialize Assembly Runner", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
 
         // TODO: Unknown as to what this does exactly
@@ -415,7 +415,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(controller, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
-        editMenu.add(buildMenuItem(controller, "newPropChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
+        editMenu.add(buildMenuItem(controller, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(controller, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
@@ -519,7 +519,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 "Zoom out on the graph"
         );
 
-        Action runAction = ActionIntrospector.getAction(getController(), "prepSimRunner");
+        Action runAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
         runButt = makeButton(runAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
@@ -825,7 +825,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                                 ((AssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropChangeListenerNode(xn, p);
+                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
                                 break;
                         }
                     } else {
@@ -835,7 +835,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                                 ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newPropChangeListenerNode(sa[1], p);
+                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p);
                                 break;
                         }
                     }

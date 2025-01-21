@@ -28,7 +28,7 @@ public interface AssemblyController {
     /** User has clicked a menu item */
     void newEventGraphNode();
 
-    void newPropChangeListenerNode();
+    void newPropertyChangeListenerNode();
 
     /** User has established some parameter, model can create object
      * @param name the name of the node
@@ -38,9 +38,9 @@ public interface AssemblyController {
 
     void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
 
-    void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
+    void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
 
-    void newPropChangeListenerNode(String name, Point p);
+    void newPropertyChangeListenerNode(String name, Point p);
 
     /**
      * Edit the properties (metadata) of the Assembly
@@ -85,23 +85,22 @@ public interface AssemblyController {
      */
     void newAdapterArc(Object[] nodes);
 
-    void newSimEvListArc(Object[] nodes);
+    void newSimEventListArc(Object[] nodes);
 
-    void newPropChangeListArc(Object[] nodes);
+    void newPropertyChangeListenerArc(Object[] nodes);
 
-    void pcListenerEdit(PropChangeListenerNode pclNode);
+    void propertyChangeListenerEdit(PropChangeListenerNode pclNode);
 
-    /** Handles editing of Event Graph nodes
-     *
+    /** Handles editing of EventGraph nodes
      * @param evNode the node to edit
      */
-    void evGraphEdit(EvGraphNode evNode);
+    void eventGraphEdit(EvGraphNode evNode);
 
     /** Edits the PropertyChangeListner edge
      *
-     * @param pclEdge the PCL edite to edit
+     * @param pclEdge the PCL edge to edit
      */
-    void pcListenerEdgeEdit(PropChangeEdge pclEdge);
+    void propertyChangListenerEdgeEdit(PropChangeEdge pclEdge);
 
     /** Edits the Adapter edge
      *
@@ -113,7 +112,7 @@ public interface AssemblyController {
      *
      * @param seEdge the SimEvent edge to edit
      */
-    void simEvListenerEdgeEdit(SimEvListenerEdge seEdge);
+    void simEventListenerEdgeEdit(SimEvListenerEdge seEdge);
 
     /** CMD-Z or CNTL-Z */
     void undo();
@@ -226,7 +225,7 @@ public interface AssemblyController {
      * the AssemblyView via reflection when the Initialize assembly run button 
      * is selected from the Assembly Editor panel.
      */
-    void prepSimRunner();
+    void prepareSimulationRunner();
 
     /** Generating java source and compilation are taken care of here */
     void initAssemblyRun();
@@ -236,19 +235,19 @@ public interface AssemblyController {
     /** Screen capture a snapshot of the Assembly View Frame */
     void captureWindow();
 
-    void addRecentAssyFileSetListener(MvcRecentFileListener lis);
+    void addRecentAssembyFileSetListener(MvcRecentFileListener lis);
 
-    void removeRecentAssyFileSetListener(MvcRecentFileListener lis);
+    void removeRecentAssembyFileSetListener(MvcRecentFileListener lis);
 
-    Set<String> getRecentAssyFileSet();
+    Set<String> getRecentAssemblyFileSet();
 
-    void clearRecentAssyFileList();
+    void clearRecentAssemblyFileList();
 
-    void addRecentProjFileSetListener(MvcRecentFileListener lis);
+    void addRecentProjectFileSetListener(MvcRecentFileListener lis);
 
-    void removeRecentProjFileSetListener(MvcRecentFileListener lis);
+    void removeRecentProjectFileSetListener(MvcRecentFileListener lis);
 
-    Set<String> getRecentProjFileSet();
+    Set<String> getRecentProjectFileSet();
 
-    void clearRecentProjFileSet();
+    void clearRecentProjectFileSet();
 }

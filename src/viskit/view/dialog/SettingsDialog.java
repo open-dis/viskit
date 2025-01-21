@@ -314,7 +314,7 @@ public class SettingsDialog extends JDialog {
     private static XMLConfiguration guiConfig;
 
     private static void initConfigs() {
-        appConfig = ViskitConfiguration.instance().getViskitAppConfig();
+        appConfig = ViskitConfiguration.instance().getViskitAppConfiguration();
         projectConfig = ViskitConfiguration.instance().getProjectXMLConfig();
         guiConfig = ViskitConfiguration.instance().getViskitGuiConfig();
     }
@@ -363,7 +363,7 @@ public class SettingsDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             AssemblyController aCtrlr = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-            aCtrlr.clearRecentAssyFileList();
+            aCtrlr.clearRecentAssemblyFileList();
         }
     }
 

@@ -71,7 +71,7 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
     @Override
     public void listChanged() {
         AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-        Set<String> lis = acontroller.getRecentProjFileSet();
+        Set<String> lis = acontroller.getRecentProjectFileSet();
 
         for (JMenu m : openRecentProjMenus) {
             m.removeAll();
@@ -127,7 +127,7 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
                 fullPath = (File) obj;
 
             if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
-                acontroller.clearRecentProjFileSet();
+                acontroller.clearRecentProjectFileSet();
             } else {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);

@@ -323,7 +323,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
         pp.doAddsAndDeletes(false);
-        pp.addPlusListener(ActionIntrospector.getAction(getController(), "newSimParameter"));
+        pp.addPlusListener(ActionIntrospector.getAction(getController(), "newSimulationParameter"));
 
         // Introspector can't handle a param to the method....?
         pp.addMinusListener((ActionEvent event) -> {
