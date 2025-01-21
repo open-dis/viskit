@@ -1635,7 +1635,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void prepareSimulationRunner() {
 
-        // Prevent multiple pushes of the initialize sim run button
+        // Prevent multiple pushes of the initialize simulation run button
         mutex++;
         if (mutex > 1) {
             return;
@@ -1643,7 +1643,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Prevent double clicking which will cause potential ClassLoader issues
         Runnable r = () -> {
-            ((AssemblyViewFrame) getView()).runButt.setEnabled(false);
+            ((AssemblyViewFrame) getView()).runButton.setEnabled(false);
         };
 
         try {
@@ -1699,7 +1699,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     LOG.error(e);
 //                    e.printStackTrace();
                 } finally {
-                    ((AssemblyViewFrame) getView()).runButt.setEnabled(true);
+                    ((AssemblyViewFrame) getView()).runButton.setEnabled(true);
                     mutex--;
                 }
             }
@@ -1753,12 +1753,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
      *
-     * assemblyImage assemblyImage an image file to write the .png
+     *@param assemblyImageFile assemblyImage an image file to write the .png
      */
-    public void captureAssemblyImage(File assemblyImage) {
+    public void captureAssemblyImage(File assemblyImageFile) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer tim = new Timer(100, new timerCallback(assemblyImage, false));
+        final Timer tim = new Timer(100, new timerCallback(assemblyImageFile, false));
         tim.setRepeats(false);
         tim.start();
     }
