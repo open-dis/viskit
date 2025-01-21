@@ -5,7 +5,7 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
-import viskit.util.FileBasedAssyNode;
+import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
 import viskit.mvc.MvcRecentFileListener;
@@ -36,9 +36,9 @@ public interface AssemblyController {
      */
     void newEventGraphNode(String name, Point p);
 
-    void newFileBasedEventGraphNode(FileBasedAssyNode xnode, Point p);
+    void newFileBasedEventGraphNode(FileBasedAssemblyNode xnode, Point p);
 
-    void newFileBasedPropChangeListenerNode(FileBasedAssyNode xnode, Point p);
+    void newFileBasedPropChangeListenerNode(FileBasedAssemblyNode xnode, Point p);
 
     void newPropChangeListenerNode(String name, Point p);
 
@@ -162,7 +162,7 @@ public interface AssemblyController {
     void quit();
 
     /**
-     * Save the current Assy file as is
+     * Save the current Assembly file as is
      */
     void save();
 
@@ -177,7 +177,7 @@ public interface AssemblyController {
      */
     void close();
 
-    /** Closes all open Assy files and their corresponding EG files */
+    /** Closes all open Assembly files and their corresponding EG files */
     void closeAll();
 
     /**
@@ -202,16 +202,16 @@ public interface AssemblyController {
     void postQuit();
 
     /**
-     * @param lis the AssyChangeListener to add as a listener
+     * @param lis the AssembyChangeListener to add as a listener
      */
-    void addAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
+    void addAssemblyFileListener(OpenAssembly.AssembyChangeListener lis);
 
     /**
-     * @param lis the AssyChangeListener to remove as a listener
+     * @param lis the AssembyChangeListener to remove as a listener
      */
-    void removeAssemblyFileListener(OpenAssembly.AssyChangeListener lis);
+    void removeAssemblyFileListener(OpenAssembly.AssembyChangeListener lis);
 
-    OpenAssembly.AssyChangeListener getAssemblyChangeListener();
+    OpenAssembly.AssembyChangeListener getAssemblyChangeListener();
 
     /** @return a DirectoryChangeListener */
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();
