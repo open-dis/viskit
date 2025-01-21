@@ -591,7 +591,7 @@ their descpritions.
             description="Run Viskit, don't check dependencies, don't rebuild">
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
-                showduration="5000"/>
+                showduration="1000"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
