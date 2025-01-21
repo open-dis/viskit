@@ -79,8 +79,8 @@ public class DoeFileModel {
     }
 
     public void saveEventGraphsToJaxb(Collection<File> evGraphs) {
-        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
-        List<EventGraph> lis = assy.getEventGraph();
+        SimkitAssembly simkitAssembly = OpenAssembly.inst().jaxbRoot;
+        List<EventGraph> lis = simkitAssembly.getEventGraph();
         lis.clear();
 
         for (File f : evGraphs) {
@@ -113,10 +113,10 @@ public class DoeFileModel {
     }
 
     public void saveTableEditsToJaxb() {
-        SimkitAssembly assy = OpenAssembly.inst().jaxbRoot;
+        SimkitAssembly simkitAssembly = OpenAssembly.inst().jaxbRoot;
         ObjectFactory factory = OpenAssembly.inst().jaxbFactory;
 
-        List<TerminalParameter> designParameters = assy.getDesignParameters();
+        List<TerminalParameter> designParameters = simkitAssembly.getDesignParameters();
 
         // Throw away existing design points
         designParameters.clear();

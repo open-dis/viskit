@@ -332,7 +332,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
      */
     public void saveDoeParams() {
         saveDoeParmsNoNotify();
-        OpenAssembly.inst().doSendAssyJaxbChanged(this);
+        OpenAssembly.inst().doSendAssemblyJaxbChanged(this);
     }
 
     private void saveDoeParmsNoNotify() {
@@ -368,7 +368,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             case CLOSE_ASSEMBLY:
                 break;
             default:
-                System.err.println("Program error DoeController.assyChanged");
+                System.err.println("Program error DoeController.assemblyChanged");
         }
 
     }

@@ -480,7 +480,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
             saveParamsToJaxbNoNotify();
-            OpenAssembly.inst().doSendAssyJaxbChanged(JobLauncherTab2.this);
+            OpenAssembly.inst().doSendAssemblyJaxbChanged(JobLauncherTab2.this);
         }
     }
 

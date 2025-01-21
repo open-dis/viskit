@@ -79,7 +79,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
 
-    /** The name of the assy to run */
+    /** The name of the assembly to run */
     String assemblyClassName;
     RunnerPanel2 runPanel;
     ActionListener saver;
@@ -162,7 +162,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
-            fillRepWidgetsFromPreRunAssy(defaultVerbose, saveRepDataToXml, defaultStopTime);
+            fillRepWidgetsFromPreRunAssembly(defaultVerbose, saveRepDataToXml, defaultStopTime);
         } catch (Throwable throwable) {
             ViskitGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
@@ -176,7 +176,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(Event.REWIND);
     }
 
-    private void fillRepWidgetsFromPreRunAssy(boolean verbose, boolean saveRepDataToXml, double stopTime) throws Throwable {
+    private void fillRepWidgetsFromPreRunAssembly(boolean verbose, boolean saveRepDataToXml, double stopTime) throws Throwable {
 
         assemblyClass = ViskitStatics.classForName(assemblyClassName);
         if (assemblyClass == null) {
@@ -184,7 +184,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
         assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
 
-        /* in order to resolve the assy as a BasicAssembly, it must be
+        /* in order to resolve the assembly as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
          * it. Used in the verboseListener within the working Viskit
          * ClassLoader
@@ -205,7 +205,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
         runPanel.saveRepDataCB.setSelected(saveRepDataToXml);
 
-        // Set the run panel according to what the assy XML value is
+        // Set the run panel according to what the assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
@@ -232,7 +232,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            }
 //            LOG.info("\n");
 
-            // Now we are in the pure classloader realm where each assy run can
+            // Now we are in the pure classloader realm where each assembly run can
             // be independent of any other
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
             assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
@@ -422,9 +422,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
-                // the initialize Assy run button and tabs back and forth
-                // between the Assy editor and the Assy runner panel, but it
-                // won't impede a correct Assy run.  Catch the
+                // the initialize Assembly run button and tabs back and forth
+                // between the Assembly editor and the Assembly runner panel, but it
+                // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
 //                LOG.error(ex);
 //                ex.printStackTrace();

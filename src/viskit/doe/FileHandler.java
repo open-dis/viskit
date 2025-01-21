@@ -99,12 +99,12 @@ public class FileHandler {
     }
 
     // todo replace above
-    public static DoeFileModel _openFileJaxb(SimkitAssembly assy, File f) {
+    public static DoeFileModel _openFileJaxb(SimkitAssembly simkitAssembly, File f) {
         DoeFileModel dfm = new DoeFileModel();
         dfm.userFile = f;
-        // todo dfm.jaxbRoot = assy;
-        dfm.designParms = assy.getDesignParameters();
-        dfm.setSimEntities(assy.getSimEntity());
+        // todo dfm.jaxbRoot = assembly;
+        dfm.designParms = simkitAssembly.getDesignParameters();
+        dfm.setSimEntities(simkitAssembly.getSimEntity());
         dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
 
         return dfm;
@@ -141,7 +141,7 @@ public class FileHandler {
 
     /** Called from the DoeController. Not currently used
      * 
-     * @param fil the assy file to run
+     * @param fil the assembly file to run
      * @param title the title of the run
      * @param mainFrame the parent frame
      */

@@ -81,7 +81,7 @@ import viskit.view.AssemblyViewFrame;
  */
 public class VgraphAssemblyComponentWrapper extends vGraphAssemblyComponent {
 
-    public AssemblyModel assyModel;
+    public AssemblyModel assemblyModel;
     public JSplitPane drawingSplitPane;
     public JSplitPane trees;
     public boolean isActive = true;

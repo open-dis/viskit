@@ -113,7 +113,7 @@ public class OpenAssembly {
         fireAction(AssembyChangeListener.PARAM_LOCALLY_EDITED, source, null);
     }
 
-    public void doSendAssyJaxbChanged(AssembyChangeListener source) {
+    public void doSendAssemblyJaxbChanged(AssembyChangeListener source) {
         fireAction(AssembyChangeListener.JAXB_CHANGED, source, null);
     }
 
