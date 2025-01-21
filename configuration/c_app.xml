@@ -22,9 +22,9 @@
             <EventGraphEditor visible="true"/>
             <AssemblyEditor visible="true"/>
             <AssemblyRun visible="true"/>
+            <AnalystReport visible="true"/>
             <DesignOfExperiments visible="false"/>
             <ClusterRun visible="false"/>
-            <AnalystReport visible="false"/>
         </tabs>
         <debug>false</debug>
     </app>
