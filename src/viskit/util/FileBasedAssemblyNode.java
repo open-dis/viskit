@@ -2,7 +2,7 @@ package viskit.util;
 
 import java.io.File;
 
-/** Utility class to help identify whether an EG or PCL is from XML or *.class
+/** Utility class to help identify whether an Event Graph or PCL is from XML or *.class
  * form.  Used to help populate the LEGO tree on the Assembly Editor.
  *
  * <pre>

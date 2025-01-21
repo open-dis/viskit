@@ -1019,7 +1019,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
         LOG.debug("JProgressBar set");
 
         captureEventGraphImages();
-        LOG.debug("EGs captured");
+        LOG.debug("Event Graphs captured");
         captureAssemblyImage();
         LOG.debug("Assembly captured");
         captureLocationImage();

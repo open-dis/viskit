@@ -85,7 +85,7 @@ public class OpenAssembly {
             jaxbRoot = jaxb;
             jaxbFactory = new ObjectFactory();
 
-            // This is crucial for Viskit being able to open associated EGs for
+            // This is crucial for Viskit being able to open associated Event Graphs for
             // this Assembly
             EventGraphCache.instance().makeEntityTable(file);
             doSendNewAssembly(file);

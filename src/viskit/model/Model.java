@@ -123,7 +123,7 @@ public interface Model {
      */
     void changeCancelingEdge(Edge e);
 
-    /** Modifies the properties of this EG model
+    /** Modifies the properties of this Event Graph model
      *
      * @param gmd the meta data that contains changes to record
      */

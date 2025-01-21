@@ -86,7 +86,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
             protected VertexView createVertexView(Object v) {
                 VertexView view;
                 if (v instanceof vCircleCell) {
-                    view = new vCircleView(v);
+                    view = new VertexCircleView(v);
                 } else {
                     view = super.createVertexView(v);
                 }
@@ -485,7 +485,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                 : getGraphLayoutCache().getMapping(value, false);
 
         String retVal = null;
-        if (view instanceof vCircleView) {
+        if (view instanceof VertexCircleView) {
             vCircleCell cc = (vCircleCell) view.getCell();
             Object en = cc.getUserObject();
 
@@ -708,11 +708,11 @@ class vCircleCell extends DefaultGraphCell {
 /**
  * Sub class VertexView to install our own localRenderer.
  */
-class vCircleView extends VertexView {
+class VertexCircleView extends VertexView {
 
     static ViskitGraphVertexRenderer localRenderer = new ViskitGraphVertexRenderer();
 
-    public vCircleView(Object cell) {
+    public VertexCircleView(Object cell) {
         super(cell);
     }
 

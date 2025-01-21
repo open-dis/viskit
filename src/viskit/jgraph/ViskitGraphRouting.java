@@ -180,8 +180,8 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
     private Object getKey(PortView pv) {
         Object o = pv.getParentView();
 
-        if (o instanceof vCircleView) {
-            vCircleView cv = (vCircleView) pv.getParentView();
+        if (o instanceof VertexCircleView) {
+            VertexCircleView cv = (VertexCircleView) pv.getParentView();
             vCircleCell cc = (vCircleCell) cv.getCell();
             EventNode en = (EventNode) cc.getUserObject();
             return en.getModelKey();

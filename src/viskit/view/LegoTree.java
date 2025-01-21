@@ -27,7 +27,7 @@ import viskit.ViskitStatics;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
- * Assembly Editor. Used for dragging and dropping EG and PCL nodes to the pallette
+ * Assembly Editor. Used for dragging and dropping Event Graph and PCL nodes to the pallette
  * for creating Assembly files.
  *
  * <pre>
@@ -188,7 +188,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     }
 
     /**
-     * Used to help prevent duplicate EG or PCL nodes from appearing in the LEGO
+     * Used to help prevent duplicate Event Graph or PCL nodes from appearing in the LEGO
      * tree on the Assembly Editor in addition to simply supporting the user by
      * removing a node
      *
@@ -236,7 +236,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      * errors when marshaling XML they will not appear. Non SimEntity files will
      * also not appear
      *
-     * @param f the directory to recurse to find SimEntity based EGs
+     * @param f the directory to recurse to find SimEntity based Event Graphs
      * @param recurse if true, recurse the directory
      */
     public void addContentRoot(File f, boolean recurse) {
@@ -251,7 +251,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     private void _addContentRoot(File f, boolean recurse) {
         DefaultMutableTreeNode myNode;
 
-        // Prevent duplicates of the EG icons
+        // Prevent duplicates of the Event Graph icons
         removeContentRoot(f);
 
         if (f.isDirectory()) {
@@ -311,7 +311,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             FileBasedAssemblyNode fban;
             try {
 
-                // This call generates the source, compiles and validates EG XML files
+                // This call generates the source, compiles and validates Event Graph XML files
                 // Also checks for extensions of SimEntityBase in .class files
                 fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
@@ -338,11 +338,11 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // Note
                 // On initial startup with valid XML, but bad compilation,
                 // dirty won't get set b/c the graph model is null until the
-                // model tab is created and the EG file is opened. First pass
+                // model tab is created and the Event Graph file is opened. First pass
                 // is only for inclusion in the LEGOs tree
                 if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
                     ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
-                    ViskitGlobals.instance().getEventGraphEditor().toggleEgStatusIndicators();
+                    ViskitGlobals.instance().getEventGraphEditor().toggleEventGraphStatusIndicators();
                 }
 
             } catch (Throwable t) {
@@ -381,7 +381,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     /**
      * Adds SimEntity icons to the Assembly Editor drag and drop tree
      *
-     * @param f the jar to evaluate for SimEntitiy based EGs
+     * @param f the jar to evaluate for SimEntitiy based Event Graphs
      */
     private void addJarFile(String jarFilePath) {
         JarFile jf;

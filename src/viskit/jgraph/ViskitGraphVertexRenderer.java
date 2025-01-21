@@ -241,10 +241,10 @@ public class ViskitGraphVertexRenderer
             // JDK Bug: Zero length string passed to TextLayout constructor
         }
     }
-    Color egColor = new Color(0xCE, 0xCE, 0xFF); // pale blue
-    Color pclColor = new Color(0xFF, 0xC8, 0xC8); // pale pink
+    Color eventGraphColor = new Color(0xCE, 0xCE, 0xFF); // pale blue
+    Color propertyChangeListenerColor = new Color(0xFF, 0xC8, 0xC8); // pale pink
     Color enColor = new Color(255, 255, 204); // pale yellow
-    Color circColor;
+    Color circleColor;
     Font myfont = new Font("Verdana", Font.PLAIN, 10);
 
     // jmb
@@ -254,20 +254,20 @@ public class ViskitGraphVertexRenderer
         Graphics2D g2 = (Graphics2D) g;
         
         if (view instanceof ViskitAssemblyCircleView) // EGN
-            circColor = egColor;
+            circleColor = eventGraphColor;
         if (view instanceof ViskitAssemblyPropListView) // PCL
-            circColor = pclColor;
-        if (view instanceof vCircleView) // EN
-            circColor = enColor;
+            circleColor = propertyChangeListenerColor;
+        if (view instanceof VertexCircleView) // EN
+            circleColor = enColor;
         
-        g2.setColor(circColor);
+        g2.setColor(circleColor);
         int myoff = 2;
         
         if (view instanceof ViskitAssemblyCircleView) // EGN
             g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
         if (view instanceof ViskitAssemblyPropListView) // PCL
             g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
-        if (view instanceof vCircleView) // EN
+        if (view instanceof VertexCircleView) // EN
             g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
             
         g2.setColor(Color.darkGray);
@@ -278,7 +278,7 @@ public class ViskitGraphVertexRenderer
             g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
             g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
         }
-        if (view instanceof vCircleView) // EN
+        if (view instanceof VertexCircleView) // EN
             g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
 
         // Draw the text in the circle

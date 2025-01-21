@@ -168,7 +168,7 @@ public class SimkitXML2Java {
         return source.toString();
     }
 
-    /** @return the base name of this EG file */
+    /** @return the base name of this Event Graph file */
     public String getFileBaseName() {
         return fileBaseName;
     }
@@ -1288,7 +1288,7 @@ public class SimkitXML2Java {
     public static void main(String[] args) {
 
         String xmlFile = args[0].replaceAll("\\\\", "/");
-        LOG.info("EventGraph (EG) file is: {}", xmlFile);
+        LOG.info("EventGraph file is: {}", xmlFile);
         LOG.info("Generating Java Source...");
 
         try (InputStream is = new FileInputStream(xmlFile)) {

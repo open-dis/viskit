@@ -87,7 +87,7 @@ public class EdgeInspectorDialog extends JDialog {
      */
     public static boolean showDialog(JFrame f, Edge edge) {
 
-        // New ones every time so that each EG has it's own time delay vars
+        // New ones every time so that each Event Graph has it's own time delay vars
         dialog = new EdgeInspectorDialog(f, edge);
 
         if (allGood)
@@ -596,7 +596,7 @@ public class EdgeInspectorDialog extends JDialog {
                 s = (String) priorityCB.getSelectedItem();
                 if (s.isEmpty()) {
 
-                    // Force default in this case (no information provided in EG)
+                    // Force default in this case (no information provided in Event Graph)
                     s = "DEFAULT";
                 } else {
                     if (s.contains("-3")) {
@@ -647,7 +647,7 @@ public class EdgeInspectorDialog extends JDialog {
         if (!edge.to.getArguments().isEmpty()) {
 
             // Bug 1373: This is how applying changes to a scheduling edge
-            // causes the correct EG XML representation when removing event
+            // causes the correct Event Graph XML representation when removing event
             // parameters from a proceeding node.  This loop adds vEdgeParameters
             for (ViskitElement o : parameters.getData()) {
                 edge.parameters.add(o);

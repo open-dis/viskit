@@ -202,7 +202,7 @@ public abstract class ViskitModelInstantiator {
                     
                 }
                 if (eparams[indx] != null) {
-                    // now that the values, types, etc. set, grab names from eg parameters
+                    // now that the values, types, etc. set, grab names from Event Graph parameters
                     if (viskit.ViskitStatics.debug) {
                         LOG.info("args came back from buildInstantiators as: ");
                         for (Object arg : args)
@@ -424,10 +424,10 @@ public abstract class ViskitModelInstantiator {
             return (indexOfArgNames(type, args) < 0);
         }
 
-        /** Find a constructor match in the ClassLoader of the given EG's parameters
+        /** Find a constructor match in the ClassLoader of the given Event Graph's parameters
          *
          * @param type the EventGraph to parameter check
-         * @param args a list of EG parameters
+         * @param args a list of Event Graph parameters
          * @return the index into the found matching constructor
          */
         public int indexOfArgNames(String type, List<Object> args) {

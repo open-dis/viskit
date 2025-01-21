@@ -84,9 +84,9 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         jGraph.refresh();
     }
 
-    public void changeEventGraphNode(AssemblyNode egn) {
-        DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
-        c.setUserObject(egn);
+    public void changeEventGraphNode(AssemblyNode assemblyNode) {
+        DefaultGraphCell c = (DefaultGraphCell) assemblyNode.opaqueViewObject;
+        c.setUserObject(assemblyNode);
 
         reDrawNodes();
     }
@@ -206,15 +206,15 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
 
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
-    public void addPclEdge(AssemblyEdge pce) {
-        AssemblyNode egn = (AssemblyNode) pce.getFrom();
+    public void addPclEdge(AssemblyEdge assemblyEdge) {
+        AssemblyNode assemblyNode = (AssemblyNode) assemblyEdge.getFrom();
         //PropertyChangeListenerNode pcln = (PropertyChangeListenerNode)pce.getTo();         //todo uncomment after xml fixed
-        AssemblyNode pcln = (AssemblyNode) pce.getTo();
-        DefaultGraphCell from = (DefaultGraphCell) egn.opaqueViewObject;
+        AssemblyNode pcln = (AssemblyNode) assemblyEdge.getTo();
+        DefaultGraphCell from = (DefaultGraphCell) assemblyNode.opaqueViewObject;
         DefaultGraphCell to = (DefaultGraphCell) pcln.opaqueViewObject;
         ViskitAssemblyEdgeCell edge = new ViskitAssemblyEdgeCell();
-        pce.opaqueViewObject = edge;
-        edge.setUserObject(pce);
+        assemblyEdge.opaqueViewObject = edge;
+        edge.setUserObject(assemblyEdge);
 
         ConnectionSet cs = new ConnectionSet();
         cs.connect(edge, from.getChildAt(0), to.getChildAt(0));

@@ -553,7 +553,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitGlobals.instance().inititalizeProjectHome();
             ViskitGlobals.instance().createWorkingDirectory();
 
-            // For a brand new empty project open a default EG
+            // For a brand new empty project open a default Event Graph
             File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
             if (eventGraphFiles.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();

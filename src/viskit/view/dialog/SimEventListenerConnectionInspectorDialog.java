@@ -31,8 +31,8 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
 
     private final JLabel sourceLab;
   private JLabel targetLab, descLab;
-    private final JTextField sourceTF;
-  private JTextField targetTF, descTF;
+    private final JTextField sourceTextField;
+  private JTextField targetTextField, descriptionTF;
 
   private static SimEventListenerConnectionInspectorDialog dialog;
   private static boolean modified = false;
@@ -70,13 +70,13 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     targetLab = new JLabel("listening event graph",JLabel.TRAILING);
     descLab   = new JLabel("description",JLabel.TRAILING);
 
-    sourceTF = new JTextField();
-    targetTF = new JTextField();
-    descTF   = new JTextField();
+    sourceTextField = new JTextField();
+    targetTextField = new JTextField();
+    descriptionTF   = new JTextField();
 
-    pairWidgets(sourceLab,sourceTF,false);
-    pairWidgets(targetLab,targetTF,false);
-    pairWidgets(descLab,  descTF,true);
+    pairWidgets(sourceLab,sourceTextField,false);
+    pairWidgets(targetLab,targetTextField,false);
+    pairWidgets(descLab,  descriptionTF,true);
 
     buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
@@ -127,15 +127,15 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void fillWidgets()
   {
     if(simEvEdge != null) {
-      EventGraphNode egnS = (EventGraphNode)simEvEdge.getFrom();
-      EventGraphNode egnT = (EventGraphNode)simEvEdge.getTo();
-      sourceTF.setText(egnS.getName() + " (" + egnS.getType()+")");
-      targetTF.setText(egnT.getName() + " (" + egnT.getType()+")");
-      descTF  .setText(simEvEdge.getDescriptionString());
+      EventGraphNode eventGraphNodeSource = (EventGraphNode)simEvEdge.getFrom();
+      EventGraphNode eventGraphNodeTarget = (EventGraphNode)simEvEdge.getTo();
+      sourceTextField.setText(eventGraphNodeSource.getName() + " (" + eventGraphNodeSource.getType()+")");
+      targetTextField.setText(eventGraphNodeTarget.getName() + " (" + eventGraphNodeTarget.getType()+")");
+ descriptionTF.setText(simEvEdge.getDescriptionString());
     }
     else {
-      sourceTF.setText("");
-      targetTF.setText("");
+      sourceTextField.setText("");
+      targetTextField.setText("");
     }
 
     JPanel content = new JPanel();
@@ -143,9 +143,9 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
     content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
     JPanel cont = new JPanel(new SpringLayout());
-    cont.add(sourceLab);      cont.add(sourceTF);
-    cont.add(targetLab);      cont.add(targetTF);
-    cont.add(descLab);        cont.add(descTF);
+    cont.add(sourceLab);      cont.add(sourceTextField);
+    cont.add(targetLab);      cont.add(targetTextField);
+    cont.add(descLab);        cont.add(descriptionTF);
     SpringUtilities.makeCompactGrid(cont,3,2,10,10,5,5);
     content.add(cont);
     content.add(buttPan);
@@ -156,7 +156,7 @@ public class SimEventListenerConnectionInspectorDialog extends JDialog
   private void unloadWidgets()
   {
     if(simEvEdge != null)
-      simEvEdge.setDescriptionString(descTF.getText().trim());
+      simEvEdge.setDescriptionString(descriptionTF.getText().trim());
   }
 
   class cancelButtonListener implements ActionListener

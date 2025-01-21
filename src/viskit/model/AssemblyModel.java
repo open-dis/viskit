@@ -17,12 +17,12 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  */
  public interface AssemblyModel {
 
-    /** Places an event graph node on the assembly pallete when the user drags
+    /** Places an event graph node on the assembly palette when the user drags
      * an icon from the LEGO tree
      *
-     * @param widgetName the name of the EG
-     * @param className the EG class from parsing third party libs of the current project
-     * @param p the point on the pallete to place the node icon
+     * @param widgetName the name of the Event Graph
+     * @param className the Event Graph class from parsing third party libs of the current project
+     * @param p the point on the palette to place the node icon
      */
      void newEventGraph(String widgetName, String className, Point2D p);
 
@@ -32,12 +32,12 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
       */
      void redoEventGraph(EventGraphNode node);
 
-    /** Places an event graph node on the assembly pallete when the user drags
+    /** Places an event graph node on the assembly palette when the user drags
      * an icon from the LEGO tree
      *
-     * @param widgetName the name of the EG
-     * @param node the cached node from parsing the EG directory of the current project
-     * @param p the point on the pallete to place the node icon
+     * @param widgetName the name of the Event Graph
+     * @param node the cached node from parsing the Event Graph directory of the current project
+     * @param p the point on the palette to place the node icon
      */
     void newEventGraphFromXML(String widgetName, FileBasedAssemblyNode node, Point2D p);
 

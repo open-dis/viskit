@@ -63,7 +63,7 @@ class ViskitGraphSelfEdgeRenderer extends ViskitGraphEdgeRenderer {
     @Override
     @SuppressWarnings("unchecked") // JGraph not genericized
     protected Shape createShape() {
-        vCircleView myCircle = (vCircleView) view.getSource().getParentView();
+        VertexCircleView myCircle = (VertexCircleView) view.getSource().getParentView();
         Rectangle2D circBnds = myCircle.getBounds();
         double circCenterX = circBnds.getCenterX();
         double circCenterY = circBnds.getCenterY();

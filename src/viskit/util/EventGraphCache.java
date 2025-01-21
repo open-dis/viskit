@@ -140,7 +140,7 @@ public class EventGraphCache {
 
     /**
      * Creates the entity table for an analyst report xml object. Also aids in
-     * opening EG files that are a SimEntity node of an Assembly file
+     * opening Event Graph files that are a SimEntity node of an Assembly file
      *
      * @param assemblyFile the assembly file loaded
      */
@@ -205,28 +205,28 @@ public class EventGraphCache {
 
     /**
      * Processes the 'type' value from a Viskit assembly, if it is an xml file
-     * in the project's EGs directory, and adds it to the list of event graphs
+     * in the project's Event Graphs directory, and adds it to the list of event graphs
      * with the proper formatting of the file's path
      *
-     * @param egFile the EG file type and name to save
+     * @param eventGraphFile the Event Graph file type and name to save
      */
-    private void saveEventGraphReferences(File egFile) {
-        LOG.debug("EG: {}", egFile);
+    private void saveEventGraphReferences(File eventGraphFile) {
+        LOG.debug("Event Graph: {}", eventGraphFile);
 
         // find the package seperator
-        int lastSlash = egFile.getPath().lastIndexOf(File.separator);
-        int pos = egFile.getPath().lastIndexOf(".");
+        int lastSlash = eventGraphFile.getPath().lastIndexOf(File.separator);
+        int pos = eventGraphFile.getPath().lastIndexOf(".");
 
-        String pkg = egFile.getParentFile().getName();
-        String egName = egFile.getPath().substring(lastSlash + 1, pos);
-        eventGraphNamesList.add(pkg + "." + egName);
+        String packageName = eventGraphFile.getParentFile().getName();
+        String eventGraphName = eventGraphFile.getPath().substring(lastSlash + 1, pos);
+        eventGraphNamesList.add(packageName + "." + eventGraphName);
 
-        LOG.debug("EventGraph Name: {}", egName);
+        LOG.debug("EventGraph Name: {}", eventGraphName);
 
-        String eg_img_dir =
+        String eventGraph_image_directory =
             ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportEventGraphImagesDir().getPath();
 
-        File imgFile = new File(eg_img_dir + "/" + pkg + "/" + egName + ".xml.png");
+        File imgFile = new File(eventGraph_image_directory + "/" + packageName + "/" + eventGraphName + ".xml.png");
         LOG.debug("Event Graph Image location: {}", imgFile);
 
         eventGraphImageFilesList.add(imgFile);
@@ -234,15 +234,15 @@ public class EventGraphCache {
 
     /** Use recursion to find EventGraph XML files
      *
-     * @param dir the path the EGs directory to begin evaluation
+     * @param dir the path the Event Graphs directory to begin evaluation
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
     private void setEventGraphFiles(File dir) {
         Element localRootElement;
         List<Element> simEntityList;
-        String egName;
-        int pos;
+        String eventGraphName;
+        int position;
 
         File[] files = dir.listFiles();
         for (File file : files) {
@@ -255,12 +255,12 @@ public class EventGraphCache {
 
                 // Check all names against the simEntityList obtained from the Assembly
                 for (Element entity : simEntityList) {
-                    egName = entity.getAttributeValue("type");
+                    eventGraphName = entity.getAttributeValue("type");
 
-                    pos = egName.lastIndexOf(".");
-                    egName = egName.substring(pos + 1, egName.length());
+                    position = eventGraphName.lastIndexOf(".");
+                    eventGraphName = eventGraphName.substring(position + 1, eventGraphName.length());
 
-                    if (file.getName().equals(egName + ".xml")) {
+                    if (file.getName().equals(eventGraphName + ".xml")) {
                         eventGraphFilesList.add(file);
                         saveEventGraphReferences(file);
                     }

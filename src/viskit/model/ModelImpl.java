@@ -188,7 +188,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
 
         File tmpF;
         try {
-            tmpF = TempFileManager.createTempFile("tmpEGmarshal", ".xml");
+            tmpF = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
         } catch (IOException e) {
             controller.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",

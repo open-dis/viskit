@@ -74,7 +74,7 @@ import viskit.mvc.MvcModel;
  */
 public class MainFrame extends JFrame {
 
-    MvcAbstractJFrameView egFrame;
+    MvcAbstractJFrameView eventGraphFrame;
     MvcAbstractJFrameView assemblyFrame;
     MvcAbstractJFrameView reportPanel;
     InternalAssemblyRunner assemblyRunComponent;
@@ -153,25 +153,25 @@ public class MainFrame extends JFrame {
         tabbedPane.setFont(tabbedPane.getFont().deriveFont(Font.BOLD));
 
         // Tabbed event graph editor
-        egFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
+        eventGraphFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
         if (SettingsDialog.isEventGraphEditorVisible()) {
-            tabbedPane.add(((EventGraphViewFrame) egFrame).getContent());
-            idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) egFrame).getContent());
+            tabbedPane.add(((EventGraphViewFrame) eventGraphFrame).getContent());
+            idx = tabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
             tabbedPane.setTitleAt(idx, "Event Graph Editor");
             tabbedPane.setToolTipTextAt(idx, "Visual editor for simulation entity definitions");
-            menuBar = ((EventGraphViewFrame) egFrame).getMenus();
+            menuBar = ((EventGraphViewFrame) eventGraphFrame).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);
-            egFrame.setTitleListener(myTitleListener, idx);
+            eventGraphFrame.setTitleListener(myTitleListener, idx);
             setJMenuBar(menuBar);
-            jamQuitHandler(((EventGraphViewFrame) egFrame).getQuitMenuItem(), myQuitAction, menuBar);
+            jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = idx;
         } else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] = -1;
         }
 
-        // Ensures EG editor is the selected tab for menu function
+        // Ensures Event Graph editor is the selected tab for menu function
         tabbedPane.addChangeListener(tabChangeListener);
 
         // Assembly editor
@@ -194,12 +194,12 @@ public class MainFrame extends JFrame {
         }
 
         assemblyController = (AssemblyController) assemblyFrame.getController();
-        eventGraphController = (EventGraphController) egFrame.getController();
+        eventGraphController = (EventGraphController) eventGraphFrame.getController();
 
-        // Now set the recent open project's file listener for the egFrame now
+        // Now set the recent open project's file listener for the eventGraphFrame now
         // that we have an assemblyFrame reference
         RecentProjFileSetListener listener = ((AssemblyViewFrame) assemblyFrame).getRecentProjFileSetListener();
-        listener.addMenuItem(((EventGraphViewFrame) egFrame).getOpenRecentProjMenu());
+        listener.addMenuItem(((EventGraphViewFrame) eventGraphFrame).getOpenRecentProjMenu());
 
         // Now setup the assembly and event graph file change listener(s)
         assemblyController.addAssemblyFileListener(assemblyController.getAssemblyChangeListener());
@@ -344,7 +344,7 @@ public class MainFrame extends JFrame {
             Model[] mods = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
             Model dirtyMod = null;
 
-            // Make sure we save modified EGs if we wander off to the Assembly tab
+            // Make sure we save modified Event Graphs if we wander off to the Assembly tab
             for (Model mod : mods) {
                 if (mod.isDirty()) {
                     dirtyMod = mod;
@@ -457,7 +457,7 @@ public class MainFrame extends JFrame {
             SysExitHandler defaultHandler = ViskitGlobals.instance().getSysExitHandler();
             ViskitGlobals.instance().setSysExitHandler(nullSysExitHandler);
 
-            // Tell Visit to not recompile open EGs from any remaining open
+            // Tell Visit to not recompile open Event Graphs from any remaining open
             // Assemblies when we perform a Viskit exit
             ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
 
@@ -465,7 +465,7 @@ public class MainFrame extends JFrame {
             {
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     tabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX]);
-                    if (!((EventGraphController) egFrame.getController()).preQuit()) {
+                    if (!((EventGraphController) eventGraphFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -492,11 +492,11 @@ public class MainFrame extends JFrame {
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     eventGraphController.removeEventGraphFileListener(assemblyController.getOpenEventGraphListener());
-                    eventGraphController.removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
+                    eventGraphController.removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEventGraphFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
-                    ((EventGraphController) egFrame.getController()).postQuit();
+                    ((EventGraphController) eventGraphFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_IDX] != -1) {
                     assemblyController.removeAssemblyFileListener(assemblyController.getAssemblyChangeListener());

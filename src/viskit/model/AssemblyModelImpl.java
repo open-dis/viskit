@@ -108,7 +108,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             try {
                 Unmarshaller u = jc.createUnmarshaller();
 
-                // Check for inadvertant opening of an EG, tough to do, yet possible (bugfix 1248)
+                // Check for inadvertant opening of an Event Graph, tough to do, yet possible (bugfix 1248)
                 try {
                     jaxbRoot = (SimkitAssembly) u.unmarshal(f);
                 } catch (ClassCastException cce) {
@@ -136,7 +136,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 }
 
                 changeMetaData(mymetaData);
-                buildEGsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
+                buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
@@ -309,13 +309,13 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             node.setPosition(p);
         }
 
-        SimEntity jaxbEG = oFactory.createSimEntity();
+        SimEntity jaxbEventGraph = oFactory.createSimEntity();
 
-        jaxbEG.setName(nIe(widgetName));
-        jaxbEG.setType(className);
-        node.opaqueModelObject = jaxbEG;
+        jaxbEventGraph.setName(nIe(widgetName));
+        jaxbEventGraph.setType(className);
+        node.opaqueModelObject = jaxbEventGraph;
 
-        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(jaxbEG.getType(), null);  // null means undefined
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(jaxbEventGraph.getType(), null);  // null means undefined
         node.setInstantiator(vc);
 
         if (!nameCheck())
@@ -323,7 +323,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         getNodeCache().put(node.getName(), node);   // key = ev
 
-        jaxbRoot.getSimEntity().add(jaxbEG);
+        jaxbRoot.getSimEntity().add(jaxbEventGraph);
 
         modelDirty = true;
         notifyChanged(new ModelEvent(node, ModelEvent.EVENTGRAPHADDED, "Event graph added to assembly"));
@@ -331,15 +331,15 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void redoEventGraph(EventGraphNode node) {
-        SimEntity jaxbEG = oFactory.createSimEntity();
+        SimEntity jaxbEventGraph = oFactory.createSimEntity();
 
-        jaxbEG.setName(node.getName());
-        node.opaqueModelObject = jaxbEG;
-        jaxbEG.setType(node.getType());
+        jaxbEventGraph.setName(node.getName());
+        node.opaqueModelObject = jaxbEventGraph;
+        jaxbEventGraph.setType(node.getType());
 
         getNodeCache().put(node.getName(), node);   // key = ev
 
-        jaxbRoot.getSimEntity().add(jaxbEG);
+        jaxbRoot.getSimEntity().add(jaxbEventGraph);
 
         modelDirty = true;
         notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
@@ -1022,7 +1022,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildEGsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose> verboseList) {
+    private void buildEventGraphsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose> verboseList) {
         for (SimEntity se : simEntities) {
             boolean isOutput = false;
             boolean isVerbose = false;

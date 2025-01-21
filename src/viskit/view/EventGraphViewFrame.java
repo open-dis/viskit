@@ -99,7 +99,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
-    private RecentEgFileListener recentEgFileListener;
+    private RecentEventGraphFileListener recentEventGraphFileListener;
 
     /**
      * Constructor; lays out initial GUI objects
@@ -222,8 +222,8 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
             // NOTE: Although a somewhat good idea, perhaps the user does not
             // wish to have work saved when merely switching between tabs on
-            // the EG palette. However, when switching to the Assembly pallete, we
-            // will save all EGs that have been modified
+            // the Event Graph palette. However, when switching to the Assembly palette, we
+            // will save all Event Graphs that have been modified
 //            if (((Model)getModel()).isDirty()) {
 //                ((EventGraphController)getController()).save();
 //            }
@@ -231,7 +231,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             setModel((MvcModel) myVgcw.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
-//            adjustMenus((Model) getModel()); // enable/disable menu items based on new EG
+//            adjustMenus((Model) getModel()); // enable/disable menu items based on new Event Graph
 
             GraphMetadata gmd = ((Model) getModel()).getMetaData();
             if (gmd != null) {
@@ -519,7 +519,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         return null;
     }
 
-    class RecentEgFileListener implements MvcRecentFileListener {
+    class RecentEventGraphFileListener implements MvcRecentFileListener {
 
         @Override
         public void listChanged() {
@@ -528,7 +528,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             JMenuItem mi;
             EventGraphController vcontroller = (EventGraphController) getController();
             Set<String> files = vcontroller.getRecentEventGraphFileSet();
-            openRecentEGMenu.removeAll();
+            openRecentEventGraphMenu.removeAll();
             File file;
             for (String fullPath : files) {
                 file = new File(fullPath);
@@ -540,15 +540,15 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
                 act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
                 mi.setToolTipText(file.getPath());
-                openRecentEGMenu.add(mi);
+                openRecentEventGraphMenu.add(mi);
             }
             if (!files.isEmpty()) {
-                openRecentEGMenu.add(new JSeparator());
+                openRecentEventGraphMenu.add(new JSeparator());
                 act = new ParameterizedAction("clear");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                openRecentEGMenu.add(mi);
+                openRecentEventGraphMenu.add(mi);
             }
         }
     }
@@ -578,12 +578,12 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         }
     }
 
-    private JMenu openRecentEGMenu, openRecentProjMenu;
+    private JMenu openRecentEventGraphMenu, openRecentProjMenu;
 
     private void buildMenus() {
         EventGraphController controller = (EventGraphController) getController();
-        recentEgFileListener = new RecentEgFileListener();
-        controller.addRecentEventGraphFileListener(getRecentEgFileListener());
+        recentEventGraphFileListener = new RecentEventGraphFileListener();
+        controller.addRecentEventGraphFileListener(getRecentEventGraphFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -601,7 +601,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
         fileMenu.add(buildMenuItem(controller, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        fileMenu.add(openRecentEGMenu = buildMenu("Open Recent Event Graph"));
+        fileMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
@@ -829,7 +829,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(zoomOut);
 
-        // Let the opening of EGs make this visible
+        // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);
 
         zoomIn.addActionListener((ActionEvent e) -> {
@@ -863,13 +863,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         });
     }
 
-    /** Changes the background/foreground color of EG tabs depending on
+    /** Changes the background/foreground color of Event Graph tabs depending on
      * model.isDirty() status giving the user an indication of a good/bad save
      * &amp; compile operation. Of note is that the default L&amp;F must be
      * selected for WIN machines, else no colors will be visible. On Macs, the
      * platform L&amp;F works best.
      */
-    public void toggleEgStatusIndicators() {
+    public void toggleEventGraphStatusIndicators() {
         int selectedTab = tabbedPane.getSelectedIndex();
         for (Component c : tabbedPane.getComponents()) {
 
@@ -1159,9 +1159,9 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         return null;
     }
 
-    /** Handles a canceled new EG file creation
+    /** Handles a canceled new Event Graph file creation
      *
-     * @param file to candidate EG file
+     * @param file to candidate Event Graph file
      */
     private void deleteCanceledSave(File file) {
         ViskitGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
@@ -1261,14 +1261,14 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         }
 
         // Let model.isDirty() determine status color
-        toggleEgStatusIndicators();
+        toggleEventGraphStatusIndicators();
     }
 
     /**
-     * @return the recentEgFileListener
+     * @return the recentEventGraphFileListener
      */
-    public RecentEgFileListener getRecentEgFileListener() {
-        return recentEgFileListener;
+    public RecentEventGraphFileListener getRecentEventGraphFileListener() {
+        return recentEventGraphFileListener;
     }
 
 } // end class file EventGraphViewFrame.java

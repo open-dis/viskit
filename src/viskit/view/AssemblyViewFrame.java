@@ -104,7 +104,7 @@ import viskit.mvc.MvcRecentFileListener;
  *
  * - Parse any extra classpaths recorded in the app history and all jars in the
  *   project's lib directory
- * - Parse the project's EG directory
+ * - Parse the project's Event Graph directory
  *
  *   All SimEntities and PCLs found in either of the parsing events above, the
  *   following takes place.
@@ -195,7 +195,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         buildMenus();
         buildToolbar();
 
-        // Build here to prevent NPE from EGContrlr
+        // Build here to prevent NPE from EventGraphController
         buildTreePanels();
 
         // Set up a assemblyEditorContent level pane that will be the content pane. This
@@ -351,7 +351,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 
-        // The EGViewFrame will get this listener for it's menu item of the same
+        // The EventGraphViewFrame will get this listener for its menu item of the same name
         recentProjectFileSetListener = new RecentProjFileSetListener();
         getRecentProjFileSetListener().addMenuItem(openRecentProjectMenu);
         controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
@@ -1064,9 +1064,9 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         return null;
     }
 
-    /** Handles a canceled new EG file creation
+    /** Handles a canceled new Event Graph file creation
      *
-     * @param file to candidate EG file
+     * @param file to candidate Event Graph file
      */
     public void deleteCanceledSave(File file) {
         if (file.exists()) {

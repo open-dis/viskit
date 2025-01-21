@@ -196,14 +196,14 @@ public class SettingsDialog extends JDialog {
         JPanel recentP = new JPanel();
         recentP.setLayout(new BoxLayout(recentP, BoxLayout.Y_AXIS));
 
-        JButton clearEGRecent = new JButton("Clear recent event graphs list");
-        clearEGRecent.addActionListener(new clearEGHandler());
-        clearEGRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
+        JButton clearEventGraphRecent = new JButton("Clear recent event graphs list");
+        clearEventGraphRecent.addActionListener(new ClearEventGraphHandler());
+        clearEventGraphRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
         JButton clearAssRecent = new JButton("Clear recent assemblies list");
         clearAssRecent.addActionListener(new clearAssHandler());
         clearAssRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
         recentP.add(Box.createVerticalGlue());
-        recentP.add(clearEGRecent);
+        recentP.add(clearEventGraphRecent);
         recentP.add(clearAssRecent);
         recentP.add(Box.createVerticalGlue());
 
@@ -247,11 +247,11 @@ public class SettingsDialog extends JDialog {
         lAndFeelInnerP.setLayout(new BoxLayout(lAndFeelInnerP, BoxLayout.Y_AXIS));
         lAndFeelInnerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         defaultLafRB = new JRadioButton("Default");
-        defaultLafRB.setToolTipText("Best for WIN to render EG editor status color");
+        defaultLafRB.setToolTipText("Best for WIN to render Event Graph editor status color");
         defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(defaultLafRB);
         platformLafRB = new JRadioButton("Platform");
-        platformLafRB.setToolTipText("Best for macOS to render EG editor status color");
+        platformLafRB.setToolTipText("Best for macOS to render Event Graph editor status color");
         platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lAndFeelInnerP.add(platformLafRB);
         otherLafRB = new JRadioButton("Other");
@@ -349,7 +349,7 @@ public class SettingsDialog extends JDialog {
         }
     }
 
-    class clearEGHandler implements ActionListener {
+    class ClearEventGraphHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -667,8 +667,8 @@ public class SettingsDialog extends JDialog {
     }
 
     /**
-     * Return if the EG Editor is to be visible
-     * @return if the EG Editor is to be visible
+     * Return if the Event Graph Editor is to be visible
+     * @return if the Event Graph Editor is to be visible
      */
     public static boolean isEventGraphEditorVisible() {
         return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY);

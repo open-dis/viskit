@@ -171,7 +171,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         }
     }
 
-    /** The base of embedded parameters to finalize EG constructor instantiation.
+    /** The base of embedded parameters to finalize Event Graph constructor instantiation.
      * Provides support for Object... (varargs)
      *
      * @return a list of free form instantiators

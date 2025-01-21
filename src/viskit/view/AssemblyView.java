@@ -37,7 +37,7 @@ public interface AssemblyView {
 
     /**
      * Add a path to SimEntities in the LEGO tree.  This call will check
-     * compilation of EGs
+     * compilation of Event Graphs
      *
      * @param f the path to evaluate for SimEntites
      * @param b flag to indicate recursion checking of the given path if a known
