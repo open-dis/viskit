@@ -24,52 +24,52 @@ import viskit.model.*;
  */
 public class ViskitGraphAssemblyModel extends DefaultGraphModel {
 
-    Map viskitAssyAdapterEdgeStyle;
-    Map viskitAssyPclEdgeStyle;
-    Map viskitAssySimEvLisEdgeStyle;
+    Map viskitAssemblyAdapterEdgeStyle;
+    Map viskitAssemblyPropertyChangeListenerEdgeStyle;
+    Map viskitAssemblySimEventListenerEdgeStyle;
     private JGraph jGraph;
 
     public ViskitGraphAssemblyModel() {
-        initViskitStyle();
+        initializeViskitStyle();
     }
 
     @SuppressWarnings("unchecked") // JGraph not genericized
-    private void initViskitStyle() {
+    private void initializeViskitStyle() {
 
-        viskitAssyAdapterEdgeStyle = new AttributeMap();
+        viskitAssemblyAdapterEdgeStyle = new AttributeMap();
 
         // common to 3 types
-        GraphConstants.setDisconnectable(viskitAssyAdapterEdgeStyle, false);
-        GraphConstants.setLineBegin(viskitAssyAdapterEdgeStyle, GraphConstants.ARROW_TECHNICAL);  // arrow not drawn
-        GraphConstants.setBeginFill(viskitAssyAdapterEdgeStyle, false);
-        GraphConstants.setBeginSize(viskitAssyAdapterEdgeStyle, 16);
+        GraphConstants.setDisconnectable(viskitAssemblyAdapterEdgeStyle, false);
+        GraphConstants.setLineBegin(viskitAssemblyAdapterEdgeStyle, GraphConstants.ARROW_TECHNICAL);  // arrow not drawn
+        GraphConstants.setBeginFill(viskitAssemblyAdapterEdgeStyle, false);
+        GraphConstants.setBeginSize(viskitAssemblyAdapterEdgeStyle, 16);
 
         // This setting critical to getting the start and end points offset from
         // the center of the node
-        GraphConstants.setLineStyle(viskitAssyAdapterEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
-        GraphConstants.setOpaque(viskitAssyAdapterEdgeStyle, true);
-        GraphConstants.setForeground(viskitAssyAdapterEdgeStyle, Color.black);
-        GraphConstants.setRouting(viskitAssyAdapterEdgeStyle, new ViskitGraphRouting());
+        GraphConstants.setLineStyle(viskitAssemblyAdapterEdgeStyle, GraphConstants.STYLE_ORTHOGONAL);
+        GraphConstants.setOpaque(viskitAssemblyAdapterEdgeStyle, true);
+        GraphConstants.setForeground(viskitAssemblyAdapterEdgeStyle, Color.black);
+        GraphConstants.setRouting(viskitAssemblyAdapterEdgeStyle, new ViskitGraphRouting());
 
         // duplicate for pcl
-        viskitAssyPclEdgeStyle = new AttributeMap();
-        viskitAssyPclEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
+        viskitAssemblyPropertyChangeListenerEdgeStyle = new AttributeMap();
+        viskitAssemblyPropertyChangeListenerEdgeStyle.putAll(viskitAssemblyAdapterEdgeStyle);
 
         // duplicate for sel
-        viskitAssySimEvLisEdgeStyle = new AttributeMap();
-        viskitAssySimEvLisEdgeStyle.putAll(viskitAssyAdapterEdgeStyle);
+        viskitAssemblySimEventListenerEdgeStyle = new AttributeMap();
+        viskitAssemblySimEventListenerEdgeStyle.putAll(viskitAssemblyAdapterEdgeStyle);
 
         // Customize adapter
-        GraphConstants.setLineWidth(viskitAssyAdapterEdgeStyle, 3.0f); // wide line because we're doubling
-        GraphConstants.setLineColor(viskitAssyAdapterEdgeStyle, Color.black);
+        GraphConstants.setLineWidth(viskitAssemblyAdapterEdgeStyle, 3.0f); // wide line because we're doubling
+        GraphConstants.setLineColor(viskitAssemblyAdapterEdgeStyle, Color.black);
 
         // Customize pcl
-        GraphConstants.setLineWidth(viskitAssyPclEdgeStyle, 1.5f);
-        GraphConstants.setLineColor(viskitAssyPclEdgeStyle, new Color(134, 87, 87)); // sort of blood color
+        GraphConstants.setLineWidth(viskitAssemblyPropertyChangeListenerEdgeStyle, 1.5f);
+        GraphConstants.setLineColor(viskitAssemblyPropertyChangeListenerEdgeStyle, new Color(134, 87, 87)); // sort of blood color
 
         // Customize sel
-        GraphConstants.setLineWidth(viskitAssySimEvLisEdgeStyle, 1.0f);
-        GraphConstants.setLineColor(viskitAssySimEvLisEdgeStyle, Color.black);
+        GraphConstants.setLineWidth(viskitAssemblySimEventListenerEdgeStyle, 1.0f);
+        GraphConstants.setLineColor(viskitAssemblySimEventListenerEdgeStyle, Color.black);
     }
 
     public void changeEvent(AssemblyNode en) {
@@ -139,7 +139,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         cs.connect(edge, from.getFirstChild(), to.getFirstChild());
 
         Map atts = new Hashtable();
-        atts.put(edge, this.viskitAssyAdapterEdgeStyle);
+        atts.put(edge, this.viskitAssemblyAdapterEdgeStyle);
 
         jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
 
@@ -189,7 +189,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         cs.connect(edge, from.getFirstChild(), to.getFirstChild());
 
         Map atts = new Hashtable();
-        atts.put(edge, this.viskitAssySimEvLisEdgeStyle);
+        atts.put(edge, this.viskitAssemblySimEventListenerEdgeStyle);
 
         jGraph.getGraphLayoutCache().insert(new Object[]{edge}, atts, cs, null, null);
 
@@ -220,7 +220,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         cs.connect(edge, from.getChildAt(0), to.getChildAt(0));
 
         Map atts = new Hashtable();
-        atts.put(edge, this.viskitAssyPclEdgeStyle);
+        atts.put(edge, this.viskitAssemblyPropertyChangeListenerEdgeStyle);
 
         jGraph.getGraphLayoutCache().insert(new Object[] {edge}, atts, cs, null, null);
 
