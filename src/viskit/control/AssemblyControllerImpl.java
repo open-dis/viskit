@@ -334,7 +334,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
                 case CLOSE_ASSEMBLY:
 
-                    // Close any currently open EGs because we don't yet know which ones
+                    // Close any currently open Event Graphs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
@@ -346,10 +346,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     view.delTab(assemblyModel);
 
                     // NOTE: This doesn't work quite right. If no Assembly is open,
-                    // then any non-associated EGs that were also open will
+                    // then any non-associated Event Graphs that were also open will
                     // annoyingly close from the closeAll call above. We are
-                    // using an open EG cache system that relies on parsing an
-                    // Assembly file to find its associated EGs to open
+                    // using an open Event Graph cache system that relies on parsing an
+                    // Assembly file to find its associated Event Graphs to open
                     if (!isCloseAll()) {
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
@@ -452,12 +452,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void saveAs() {
         AssemblyModel model = (AssemblyModel) getModel();
-        AssemblyView view = (AssemblyView) getView();
-        GraphMetadata gmd = model.getMetaData();
+        AssemblyView assemblyView = (AssemblyView) getView();
+        GraphMetadata graphMetadata = model.getMetaData();
 
         // Allow the user to type specific package names
-        String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false);
+        String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
+        File saveFile = assemblyView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false);
 
         if (saveFile != null) {
 
@@ -465,11 +465,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
-            gmd.name = n;
-            model.changeMetaData(gmd); // might have renamed
+            graphMetadata.name = n;
+            model.changeMetaData(graphMetadata); // might have renamed
 
             model.saveModel(saveFile);
-            view.setSelectedAssemblyName(gmd.name);
+            assemblyView.setSelectedAssemblyName(graphMetadata.name);
             adjustRecentAssemblySet(saveFile);
             markAssemblyFilesOpened();
         }
@@ -477,9 +477,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void editGraphMetaData() {
-        AssemblyModel mod = (AssemblyModel) getModel();
-        if (mod == null) {return;}
-        GraphMetadata gmd = mod.getMetaData();
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null) {return;}
+        GraphMetadata gmd = assemblyModel.getMetaData();
         boolean modified =
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
         if (modified) {
@@ -554,8 +554,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
-            if (egFiles.length == 0) {
+            File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            if (eventGraphFiles.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
         }
@@ -655,7 +655,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfiguration.instance().clearViskitConfig();
         clearRecentAssemblyFileList();
-        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEGFileSet();
+        ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
     }
 
@@ -1574,7 +1574,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return paf;
     }
 
-    /** Path for EG and Assembly compilation
+    /** Path for Event Graph and Assembly compilation
      *
      * @param source the raw source to write to file
      * @return a package and file pair
@@ -1836,15 +1836,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         runner = plug;
     }
 
-    /** Opens each EG associated with this Assembly
+    /** Opens each Event Graph associated with this Assembly
      *
      * @param f the Assembly File to open EventGraphs for (not used)
      */
     private void openEventGraphs(File f) {
         File tempFile = f;
         try {
-            List<File> eGFiles = EventGraphCache.instance().getEventGraphFilesList();
-            for (File file : eGFiles) {
+            List<File> eventGraphFiles = EventGraphCache.instance().getEventGraphFilesList();
+            for (File file : eventGraphFiles) {
                 tempFile = file;
 
                 // _doOpen checks if a tab is already opened

@@ -10,7 +10,7 @@
     // start with a base LHS, where
     // A(i,j) = [ i + (N-j) % N ] % N
     //
-    // which is also a table of addition, eg,
+    // which is also a table of addition, for example,
     // ( i + j ) = A(i,j) % N
 
     // can be shown that any permution of 1..N-1 used as

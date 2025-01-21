@@ -492,7 +492,7 @@ public class MainFrame extends JFrame {
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_IDX] != -1) {
                     eventGraphController.removeEventGraphFileListener(assemblyController.getOpenEventGraphListener());
-                    eventGraphController.removeRecentEgFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
+                    eventGraphController.removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEgFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 

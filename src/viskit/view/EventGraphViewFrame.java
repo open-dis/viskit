@@ -527,7 +527,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             Action act;
             JMenuItem mi;
             EventGraphController vcontroller = (EventGraphController) getController();
-            Set<String> files = vcontroller.getRecentEGFileSet();
+            Set<String> files = vcontroller.getRecentEventGraphFileSet();
             openRecentEGMenu.removeAll();
             File file;
             for (String fullPath : files) {
@@ -571,7 +571,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
                 fullPath = (File) obj;
 
             if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
-                vcontroller.clearRecentEGFileSet();
+                vcontroller.clearRecentEventGraphFileSet();
             } else {
                 vcontroller.openRecentEventGraph(fullPath);
             }
@@ -583,7 +583,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     private void buildMenus() {
         EventGraphController controller = (EventGraphController) getController();
         recentEgFileListener = new RecentEgFileListener();
-        controller.addRecentEgFileListener(getRecentEgFileListener());
+        controller.addRecentEventGraphFileListener(getRecentEgFileListener());
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 

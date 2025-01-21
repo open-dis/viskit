@@ -84,7 +84,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         jGraph.refresh();
     }
 
-    public void changeEGNode(AssemblyNode egn) {
+    public void changeEventGraphNode(AssemblyNode egn) {
         DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
         c.setUserObject(egn);
 
@@ -92,7 +92,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
     }
 
     public void changePCLNode(AssemblyNode pcln) {
-        changeEGNode(pcln);
+        changeEventGraphNode(pcln);
     }
 
     /** Ensures a clean JGraph tab for a new model */
@@ -110,7 +110,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
         reDrawNodes();
     }
 
-    public void deleteEGNode(AssemblyNode egn) {
+    public void deleteEventGraphNode(AssemblyNode egn) {
         DefaultGraphCell c = (DefaultGraphCell) egn.opaqueViewObject;
         c.removeAllChildren();
         jGraph.getGraphLayoutCache().remove(new Object[]{c});
@@ -119,7 +119,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
     }
 
     public void deletePCLNode(AssemblyNode pcln) {
-        deleteEGNode(pcln);
+        deleteEventGraphNode(pcln);
     }
 
     // TODO: This version JGraph does not support generics

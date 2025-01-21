@@ -69,7 +69,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     public EventGraphControllerImpl() {
         initConfig();
-        initOpenEgWatch();
+        initOpenEventGraphWatch();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!files.isEmpty()) {
             File file;
 
-            // Open whatever EGs were marked open on last closing
+            // Open whatever Event Graphs were marked open on last closing
             for (String f : files) {
                 file = new File(f);
                 // Prevent project mismatch
@@ -89,9 +89,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         } else {
 
-            // For a brand new empty project open a default EG
-            File[] egFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
-            if (egFiles.length == 0) {
+            // For a brand new empty project open a default Event Graph
+            File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            if (eventGraphFiles.length == 0) {
                 newEventGraph();
             }
         }
@@ -134,7 +134,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         ((EventGraphView) getView()).addTab(mod);
 
         // If we have models already opened, then use their package names for
-        // this new EG
+        // this new Event Graph
         GraphMetadata gmd = mod.getMetaData();
         if (oldGmd != null) {
             gmd.packageName = oldGmd.packageName;
@@ -242,7 +242,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (mod.newModel(file) && !isOpenAlready) {
 
             // We may find one or more simkit.Priority(s) with numeric values vice
-            // eneumerations in the EG XML. Modify and save the EG XML silently
+            // eneumerations in the Event Graph XML. Modify and save the Event Graph XML silently
             if (mod.isNumericPriority()) {
                 save();
                 mod.setNumericPriority(false);
@@ -250,11 +250,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             viskitView.setSelectedEventGraphName(mod.getMetaData().name);
             viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
-            adjustRecentEGFileSet(file);
-            markEgFilesAsOpened();
+            adjustRecentEventGraphFileSet(file);
+            markEventGraphFilesAsOpened();
 
-            // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial EG parsing areadly took place in the project space during startup (tdn) 9/14/24
-//            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of EGs
+            // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial Event Graph parsing areadly took place in the project space during startup (tdn) 9/14/24
+//            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of Event Graphs
         } else {
             viskitView.delTab(mod); // Not a good open, tell view
         }
@@ -273,8 +273,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
 
-    /** Mark every EG file opened as "open" in the app config file */
-    private void markEgFilesAsOpened() {
+    /** Mark every Event Graph file opened as "open" in the app config file */
+    private void markEventGraphFilesAsOpened() {
         Model[] openAlready = ((EventGraphView) getView()).getOpenModels();
         for (Model vMod : openAlready) {
             if (vMod.getLastFile() != null)
@@ -288,9 +288,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private DirectoryWatch dirWatch;
     private File watchDir;
 
-    private void initOpenEgWatch() {
+    private void initOpenEventGraphWatch() {
         try { // TBD this may be obsolete
-            watchDir = TempFileManager.createTempFile("egs", "current");   // actually creates
+            watchDir = TempFileManager.createTempFile("eventGraphs", "current");   // actually creates
             watchDir = TempFileManager.createTempDir(watchDir);
 
             dirWatch = new DirectoryWatch(watchDir);
@@ -302,8 +302,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     /**
-     * Creates a new temporary EG as a scratch pad
-     * @param f the EG to watch
+     * Creates a new temporary Event Graph as a scratch pad
+     * @param f the Event Graph to watch
      */
     private void fileWatchSave(File f) {
         fileWatchOpen(f);
@@ -311,7 +311,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     /** A temporary location to store copies of EventGraphs in XML form.
      * This is to compare against any changes to and whether to re-cache the
-     * MD5 hash generated for this EG.
+     * MD5 hash generated for this Event Graph.
      * @param f the EventGraph file to generate MD5 hash for
      */
     private void fileWatchOpen(File f) {
@@ -347,13 +347,13 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     Set<MvcRecentFileListener> recentListeners = new HashSet<>();
 
     @Override
-    public void addRecentEgFileListener(MvcRecentFileListener lis)
+    public void addRecentEventGraphFileListener(MvcRecentFileListener lis)
     {
       recentListeners.add(lis);
     }
 
     @Override
-    public void removeRecentEgFileListener(MvcRecentFileListener lis)
+    public void removeRecentEventGraphFileListener(MvcRecentFileListener lis)
     {
       recentListeners.remove(lis);
     }
@@ -366,16 +366,16 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private static final int RECENTLISTSIZE = 15;
-    private final Set<String> recentEGFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
+    private final Set<String> recentEventGraphFileSet = new LinkedHashSet<>(RECENTLISTSIZE + 1);;
 
     /**
      * If passed file is in the list, move it to the top.  Else insert it;
      * Trim to RECENTLISTSIZE
      * @param file an event graph file to add to the list
      */
-    private void adjustRecentEGFileSet(File file) {
+    private void adjustRecentEventGraphFileSet(File file) {
         String f;
-        for (Iterator<String> itr = recentEGFileSet.iterator(); itr.hasNext();) {
+        for (Iterator<String> itr = recentEventGraphFileSet.iterator(); itr.hasNext();) {
             f = itr.next();
             if (file.getPath().equals(f)) {
                 itr.remove();
@@ -383,30 +383,30 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
         }
 
-        if (!recentEGFileSet.contains(file.getPath()))
-            recentEGFileSet.add(file.getPath()); // to the top
+        if (!recentEventGraphFileSet.contains(file.getPath()))
+            recentEventGraphFileSet.add(file.getPath()); // to the top
 
-        saveEgHistoryXML(recentEGFileSet);
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
     }
 
     private List<String> openEventGraphs;
 
     @SuppressWarnings("unchecked")
-    private void recordEgFiles() {
+    private void recordEventGraphFiles() {
         if (historyConfig == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
         List<Object> valueAr = historyConfig.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
         int idx = 0;
         String op;
-        String egFile;
+        String eventGraphFile;
         for (Object s : valueAr) {
-            egFile = (String) s;
-            if (recentEGFileSet.add(egFile)) {
+            eventGraphFile = (String) s;
+            if (recentEventGraphFileSet.add(eventGraphFile)) {
                 op = historyConfig.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
-                    openEventGraphs.add(egFile);
+                    openEventGraphs.add(eventGraphFile);
 
                 notifyRecentFileListeners();
             }
@@ -414,7 +414,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
 
-    private void saveEgHistoryXML(Set<String> recentFiles) {
+    private void saveEventGraphHistoryXML(Set<String> recentFiles) {
         historyConfig.clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
         int idx = 0;
 
@@ -427,27 +427,27 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void clearRecentEGFileSet() {
-        recentEGFileSet.clear();
-        saveEgHistoryXML(recentEGFileSet);
+    public void clearRecentEventGraphFileSet() {
+        recentEventGraphFileSet.clear();
+        saveEventGraphHistoryXML(recentEventGraphFileSet);
         notifyRecentFileListeners();
     }
 
     @Override
-    public Set<String> getRecentEGFileSet() {
-        return getRecentEGFileSet(false);
+    public Set<String> getRecentEventGraphFileSet() {
+        return getRecentEventGraphFileSet(false);
     }
 
-    private Set<String> getRecentEGFileSet(boolean refresh) {
-        if (refresh || recentEGFileSet == null)
-            recordEgFiles();
+    private Set<String> getRecentEventGraphFileSet(boolean refresh) {
+        if (refresh || recentEventGraphFileSet == null)
+            recordEventGraphFiles();
 
-        return recentEGFileSet;
+        return recentEventGraphFileSet;
     }
 
     private List<String> getOpenFileSet(boolean refresh) {
         if (refresh || openEventGraphs == null)
-            recordEgFiles();
+            recordEventGraphFiles();
 
         return openEventGraphs;
     }
@@ -536,7 +536,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (f == null) {return;}
 
         int idx = 0;
-        for (String key : recentEGFileSet) {
+        for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
@@ -548,7 +548,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     // time a file is opened
     private void markConfigOpen(File f) {
         int idx = 0;
-        for (String key : recentEGFileSet) {
+        for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
                 historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
@@ -592,15 +592,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             mod.changeMetaData(gmd); // might have renamed
 
             handleCompileAndSave(mod, saveFile);
-            adjustRecentEGFileSet(saveFile);
-            markEgFilesAsOpened();
+            adjustRecentEventGraphFileSet(saveFile);
+            markEventGraphFilesAsOpened();
         }
     }
 
     /**
-     * Handles whether an XML EG file gets its java source compiled and watched
+     * Handles whether an XML Event Graph file gets its java source compiled and watched
      *
-     * @param m the model of the XML EG
+     * @param m the model of the XML Event Graph
      * @param f the XML file name to save to
      */
     private void handleCompileAndSave(Model m, File f) {
@@ -1093,10 +1093,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         String fileName = "ViskitScreenCapture";
 
         // create and save the image
-        EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
         // Get only the jgraph part
-        Component component = egvf.getCurrentJgraphComponent();
+        Component component = eventGraphViewFrame.getCurrentJgraphComponent();
         if (component == null) {return;}
         File localLastFile = ((Model) getModel()).getLastFile();
         if (localLastFile != null) {
@@ -1124,7 +1124,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         TimerCallback tcb;
 
         // create and save the image
-        EventGraphViewFrame egvf = (EventGraphViewFrame) getView();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
 
         /* If another run is to be performed with the intention of generating
          * an Analyst Report, prevent the last Event Graph open (from prior group
@@ -1146,7 +1146,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 LOG.debug("eventGraphImage is: " + imageFile);
 
                 // Don't display an extra frame while taking snapshots
-                tcb = new TimerCallback(imageFile, false, egvf.getCurrentJgraphComponent());
+                tcb = new TimerCallback(imageFile, false, eventGraphViewFrame.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
                 if (!imageFile.getParentFile().isDirectory()) {

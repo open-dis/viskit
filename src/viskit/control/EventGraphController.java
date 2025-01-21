@@ -130,8 +130,8 @@ public interface EventGraphController {
     void open();
 
     /**
-     * Opens one of the recently opened EGs
-     * @param path to the recent EG
+     * Opens one of the recently opened Event Graphs
+     * @param path to the recent Event Graph
      */
     void openRecentEventGraph(File path);
 
@@ -139,7 +139,7 @@ public interface EventGraphController {
     void close();
 
     /**
-     * Closes all open EGs open from a project
+     * Closes all open Event Graphs open from a project
      */
     void closeAll();
 
@@ -214,12 +214,12 @@ public interface EventGraphController {
 
     void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
 
-    void addRecentEgFileListener(MvcRecentFileListener lis);
+    void addRecentEventGraphFileListener(MvcRecentFileListener lis);
 
-    void removeRecentEgFileListener(MvcRecentFileListener lis);
+    void removeRecentEventGraphFileListener(MvcRecentFileListener lis);
 
-    Set<String> getRecentEGFileSet();
+    Set<String> getRecentEventGraphFileSet();
 
-    /** Clears the recent EG file list thus far generated */
-    void clearRecentEGFileSet();
+    /** Clears the recent Event Graph file list thus far generated */
+    void clearRecentEventGraphFileSet();
 }

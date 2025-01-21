@@ -156,7 +156,7 @@ public class LocalBootLoader extends URLClassLoader {
         // dirty assembly in the classpath issue that we were attempting to
         // mitigate with the buildCleanWorkJar call below, but something doesn't
         // go quite right if we are building a project from scratch where
-        // we have no build/classes compiled, and/or have no cached EGs in the
+        // we have no build/classes compiled, and/or have no cached Event Graphs in the
         // viskitProject.xml. So, leaving commeted out for now. Will need
         // to reopen this issue when we need strict design points for DOE.
 
@@ -184,11 +184,11 @@ public class LocalBootLoader extends URLClassLoader {
 //        initStage1();
         LOG.debug("Adding cleaned jar "+jar);
 
-        // Now add our tmp jars containing compiled EGs and Assemblies
+        // Now add our tmp jars containing compiled Event Graphs and Assemblies
 //        try {
 //            if (jar != null)  {
 //
-//                // If this is the first time through, and no cached EGs, we are
+//                // If this is the first time through, and no cached Event Graphs, we are
 //                // now adding our project's build/classes path here
 //                stage1.addURL(jar.toURI().toURL());
 //                String[] tmp = new String[getClassPath().length + 1];

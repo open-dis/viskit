@@ -97,9 +97,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     // TODO: single variable for all viskit
     String clusterDNS = "wipeout.hpr.nps.edu";
     String clusterName = clusterDNS;
-    String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
-    String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
-    String clusterWebStatus = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
+    String clusterWebStatus1 = "https://" + clusterDNS + "/ganglia/";
+    String clusterWebStatus2 = "https://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
+    String clusterWebStatus  = "https://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
 
     // Configuration file data
     private String serverCfg;
@@ -114,7 +114,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JTextArea statusTextArea;
     private JTextField numCubesTF;
     private JTextField clusterTF;
-    private JTextField clusNameReadOnlyTF;
+    private JTextField clusterNameReadOnlyTF;
     private JTextField portTF;
     private JTextField numRepsTF;
     private JTextField numDPsTF;
@@ -128,12 +128,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private Thread thread;
     private boolean outputDirty = false;
     private final String title;
-    private final DoeController cntlr;
+    private final DoeController doeController;
     private SimkitAssembly jaxbRoot;
     private Unmarshaller unmarshaller;
-    private JPanel clusterConfigPanel;
-    private Boolean clusterConfigReturn = null;
-    private JDialog configDialog;
+    private JPanel clusterConfigurationPanel;
+    private Boolean clusterConfigurationReturn = null;
+    private JDialog configurationDialog;
     private JAXBContext jaxbCtx;
 
     public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame) {
@@ -144,7 +144,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             LogUtils.getLogger(JobLauncherTab2.class).error(je);
         }
         this.title = title;
-        cntlr = controller;
+        doeController = controller;
         mom = mainFrame;
         buildContent();
         doListeners();
@@ -226,14 +226,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         allPan.add(buttPan);
 
         cancelButt.addActionListener((ActionEvent e) -> {
-            clusterConfigReturn = false;
-            configDialog.dispose();
-            configDialog = null;
+            clusterConfigurationReturn = false;
+            configurationDialog.dispose();
+            configurationDialog = null;
         });
         okButt.addActionListener((ActionEvent e) -> {
-            clusterConfigReturn = true;
-            configDialog.dispose();
-            configDialog = null;
+            clusterConfigurationReturn = true;
+            configurationDialog.dispose();
+            configurationDialog = null;
         });
 
         doLocalRun.addActionListener((ActionEvent e) -> {
@@ -264,10 +264,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         clusNameP.setLayout(new BoxLayout(clusNameP, BoxLayout.X_AXIS));
         clusNameP.add(Box.createHorizontalStrut(5));
         clusNameP.add(new JLabel("Grid machine    "));
-        clusNameReadOnlyTF = new JTextField(10);
-        clusNameReadOnlyTF.setText(serverCfg);
-        clusNameReadOnlyTF.setEditable(false);
-        clusNameP.add(clusNameReadOnlyTF);
+        clusterNameReadOnlyTF = new JTextField(10);
+        clusterNameReadOnlyTF.setText(serverCfg);
+        clusterNameReadOnlyTF.setEditable(false);
+        clusNameP.add(clusterNameReadOnlyTF);
         dotDotButt = new JButton("...");
         clusNameP.add(dotDotButt);
         clusNameP.add(Box.createHorizontalStrut(5));
@@ -319,7 +319,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private Container buildContent() {
         initConfig();
-        clusterConfigPanel = buildClusterConfigPanel();
+        clusterConfigurationPanel = buildClusterConfigPanel();
 
         setLayout(new BorderLayout());
 
@@ -599,9 +599,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         runButt.setEnabled(false);
         canButt.setEnabled(true);
 
-        // call back to the controller to put design parms and egs in place in a temp file
+        // call back to the controller to put design parms and Event Graphs in place in a temp file
         // prepRun() access the DOE tab and puts the dps into the
-        if (!cntlr.prepRun()) {
+        if (!doeController.prepRun()) {
             runButt.setEnabled(true);
             canButt.setEnabled(false);
             return;
@@ -610,8 +610,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         saveExp(jaxbRoot.getExperiment());
         saveParamsToJaxbNoNotify();
 
-        filteredFile = cntlr.doTempFileMarshall();
-        cntlr.restorePrepRun();
+        filteredFile = doeController.doTempFileMarshall();
+        doeController.restorePrepRun();
 
         thread = new Thread(JobLauncherTab2.this);
         thread.setPriority(Thread.NORM_PRIORITY); // don't inherit swing event thread prior
@@ -639,17 +639,17 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         System.err.println("Bad number parse: " + e1.getMessage() + "; using " + defaultClusterPort);
                         port = defaultClusterPort;
                     }
-                    ClusterAdminDialog.showDialog(clusterTF.getText(), port, configDialog, mom);
+                    ClusterAdminDialog.showDialog(clusterTF.getText(), port, configurationDialog, mom);
                     break;
                 case 'd': // dot dot
-                    configDialog = new JDialog(mom, "Cluster Configuration", true);
-                    configDialog.setContentPane(clusterConfigPanel);
-                    configDialog.pack();
-                    configDialog.setLocationRelativeTo(mom);
-                    clusterConfigReturn = null;
-                    configDialog.setVisible(true);
+                    configurationDialog = new JDialog(mom, "Cluster Configuration", true);
+                    configurationDialog.setContentPane(clusterConfigurationPanel);
+                    configurationDialog.pack();
+                    configurationDialog.setLocationRelativeTo(mom);
+                    clusterConfigurationReturn = null;
+                    configurationDialog.setVisible(true);
 
-                    if (clusterConfigReturn) {// true means apply
+                    if (clusterConfigurationReturn) {// true means apply
                         unloadServerWidgets();
                         writeConfig();
                     }
@@ -747,9 +747,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
         baos.flush();
         baos.close();
-        String egText = new String(baos.toByteArray());
+        String eventGraphText = new String(baos.toByteArray());
 
-        doe.addEventGraph(egText);
+        doe.addEventGraph(eventGraphText);
     }
     StringWriter data;
 
@@ -800,9 +800,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     createOutputDir();
 
                     // Send EventGraphs
-                    Collection egs = cntlr.getLoadedEventGraphs();
+                    Collection eventGraphCollection = doeController.getLoadedEventGraphs();
 
-                    for (Iterator itr = egs.iterator(); itr.hasNext();) {
+                    for (Iterator itr = eventGraphCollection.iterator(); itr.hasNext();) {
                         addEventGraphFile((File) itr.next());
                     }
 
@@ -1319,7 +1319,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         pwordDecrCfg = new String(upwPF.getPassword());
         portCfg = portTF.getText().trim();
         serverCfg = clusterTF.getText().trim();
-        clusNameReadOnlyTF.setText(serverCfg);
+        clusterNameReadOnlyTF.setText(serverCfg);
     }
 
     private void addDesignPointStatsToGraphs(Map ret, int d, int s) {

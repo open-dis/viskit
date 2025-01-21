@@ -762,12 +762,12 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             List<EventGraph> eventGraphList = root.getEventGraph();
             Enumeration<String> e = eventGraphs.elements();
             while ( e.hasMoreElements() ) {
-                String eg = e.nextElement();
+                String eventGraphText = e.nextElement();
 
                 // TODO: update with generic JWSDP
-                EventGraph egt = assemblyFactory.createEventGraph();
-                egt.setContent(eg);
-                eventGraphList.add(egt);
+                EventGraph eventGraph = assemblyFactory.createEventGraph();
+                eventGraph.setContent(eventGraphText);
+                eventGraphList.add(eventGraph);
             }
 
             if (!usid.equals("LOCAL-RUN")) {
@@ -1005,7 +1005,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     /**
      * Here we can use a Script to optionally set values before each set of Runs.
-     * eg.
+     * for example,
      * &lt;Script&gt; server.getServiceTime().getRandomNumber().resetSeed(); &lt;/Script&gt;
      * so, the script should get copied into each DesignPoint instance (?).
      *

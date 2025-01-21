@@ -94,18 +94,18 @@ public class DoeFileModel {
                     sb.append(cbuf, 0, retc);
                 }
 
-                EventGraph eg = OpenAssembly.inst().jaxbFactory.createEventGraph();
-                eg.setFileName(f.getName());
+                EventGraph eventGraph = OpenAssembly.inst().jaxbFactory.createEventGraph();
+                eventGraph.setFileName(f.getName());
                 String s = sb.toString();
                 String[] sa = s.split("<\\?xml.*\\?>"); // remove the hdr if present
                 if (sa.length == 2) {
                     s = sa[1];
                 }
-                //eg.getContent().add(0,"<![CDATA["+s.trim() + "]]>");
-                eg.setContent(s.trim());
+                //eventGraph.getContent().add(0,"<![CDATA["+s.trim() + "]]>");
+                eventGraph.setContent(s.trim());
 
-                //eg.getContent().add(0,src.trim());
-                lis.add(eg);
+                //eventGraph.getContent().add(0,src.trim());
+                lis.add(eventGraph);
             } catch (IOException e) {
                 System.err.println("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
             }

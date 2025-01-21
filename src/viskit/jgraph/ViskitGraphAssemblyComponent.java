@@ -34,7 +34,7 @@ import viskit.model.*;
  */
 public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelListener {
 
-    ViskitGraphAssemblyModel vGAModel;
+    ViskitGraphAssemblyModel viskitGraphAssemblyModel;
     AssemblyViewFrame parent;
     private UndoManager undoManager;
 
@@ -44,7 +44,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
         ViskitGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
-        this.vGAModel = model;
+        this.viskitGraphAssemblyModel = model;
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
@@ -141,60 +141,60 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             case ModelEvent.NEWASSEMBLYMODEL:
 
                 // Ensure we start fresh
-                vGAModel.deleteAll();
+                viskitGraphAssemblyModel.deleteAll();
                 break;
             case ModelEvent.EVENTGRAPHADDED:
 
-                // Reclaimed from the vGAModel to here
+                // Reclaimed from the viskitGraphAssemblyModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
             case ModelEvent.EVENTGRAPHCHANGED:
-                vGAModel.changeEGNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.changeEventGraphNode((AssemblyNode) ev.getSource());
                 break;
             case ModelEvent.EVENTGRAPHDELETED:
-                vGAModel.deleteEGNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.deleteEventGraphNode((AssemblyNode) ev.getSource());
                 break;
 
             case ModelEvent.PCLADDED:
 
-                // Reclaimed from the vGAModel to here
+                // Reclaimed from the viskitGraphAssemblyModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
             case ModelEvent.PCLCHANGED:
-                vGAModel.changePCLNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.changePCLNode((AssemblyNode) ev.getSource());
                 break;
             case ModelEvent.PCLDELETED:
-                vGAModel.deletePCLNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.deletePCLNode((AssemblyNode) ev.getSource());
                 break;
 
             case ModelEvent.ADAPTEREDGEADDED:
-                vGAModel.addAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.ADAPTEREDGECHANGED:
-                vGAModel.changeAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changeAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.ADAPTEREDGEDELETED:
-                vGAModel.deleteAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deleteAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
 
             case ModelEvent.SIMEVLISTEDGEADDED:
-                vGAModel.addSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.SIMEVLISTEDGECHANGED:
-                vGAModel.changeSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changeSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.SIMEVLISTEDGEDELETED:
-                vGAModel.deleteSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deleteSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
 
             case ModelEvent.PCLEDGEADDED:
-                vGAModel.addPclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addPclEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.PCLEDGEDELETED:
-                vGAModel.deletePclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deletePclEdge((AssemblyEdge) ev.getSource());
                 break;
             case ModelEvent.PCLEDGECHANGED:
-                vGAModel.changePclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changePclEdge((AssemblyEdge) ev.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
@@ -209,7 +209,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             case ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE:
             case ModelEvent.UNDO_PCL_EDGE:
             case ModelEvent.REDO_PCL_EDGE:
-                vGAModel.reDrawNodes();
+                viskitGraphAssemblyModel.reDrawNodes();
                 break;
             default:
             //System.out.println("duh");
@@ -512,7 +512,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);
 
-        vGAModel.reDrawNodes();
+        viskitGraphAssemblyModel.reDrawNodes();
     }
     
 } // end class ViskitGraphAssemblyComponent

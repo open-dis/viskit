@@ -34,7 +34,7 @@ import viskit.ViskitStatics;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
-/** A custom class manager to support finding EGs and PCLs in *.class form vice
+/** A custom class manager to support finding Event Graphs and PCLs in *.class form vice
  * XML.  Used to populate the LEGOs tree on the Assembly Editor.
  *
  * <pre>
@@ -118,7 +118,7 @@ public class FileBasedClassManager {
                 // Make sure it's not a Cached Miss
                 if (!isCacheMiss(f)) {
 
-                    // This will compile first time found EGs
+                    // This will compile first time found Event Graphs
                     paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
@@ -183,9 +183,9 @@ public class FileBasedClassManager {
             simEntity = (fXml == null) ? (SimEntity) um.unmarshal(f) : (SimEntity) um.unmarshal(fXml);
 
             // NOTE: If the project's build directory got nuked and we have
-            // cached our EGs and classes with MD5 hash, we'll throw a
+            // cached our Event Graphs and classes with MD5 hash, we'll throw a
             // ClassNotFoundException.
-            // TODO: Check for this and recompile the EGs before loading their classes
+            // TODO: Check for this and recompile the Event Graphs before loading their classes
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
             fban =  (fXml == null) ?
@@ -205,13 +205,13 @@ public class FileBasedClassManager {
     }
 
     /**
-     * Cache the EG and its .class file with good MD5 hash
-     * @param xmlEg the EG to cacheXML
-     * @param classFile the compiled version of this EG
+     * Cache the Event Graph and its .class file with good MD5 hash
+     * @param xmlEventGraphFile the Event Graph to cacheXML
+     * @param classFile the compiled version of this Event Graph
      */
-    public void addCache(File xmlEg, File classFile) {
+    public void addCache(File xmlEventGraphFile, File classFile) {
         // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cacheXML
-        if (isCached(xmlEg)) {
+        if (isCached(xmlEventGraphFile)) {
             return;
         }
         try {
@@ -233,16 +233,16 @@ public class FileBasedClassManager {
 //                projectConfig.setProperty(ViskitConfiguration.CACHED_WORKING_DIR_KEY, s);
 //            }
             if (viskit.ViskitStatics.debug) {
-                LOG.debug("Adding cache " + xmlEg + " " + classFile);
+                LOG.debug("Adding cache " + xmlEventGraphFile + " " + classFile);
             }
 
             if (cache != null) {
-                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEg.getCanonicalPath().replaceAll("\\\\", "/"));
+                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEventGraphFile.getCanonicalPath().replaceAll("\\\\", "/"));
                 projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
-                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEg, classFile));
+                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEventGraphFile, classFile));
             }
             // if used to miss, unmiss it
-            removeCacheMiss(xmlEg);
+            removeCacheMiss(xmlEventGraphFile);
         } catch (IOException ex) {
             LOG.error(ex);
             ex.printStackTrace(System.err);
@@ -451,28 +451,28 @@ public class FileBasedClassManager {
         }
     }
 
-    /** If either the egFile changed, or the classFile, the cacheXML is stale
-     * @param egFile the EventGraph file to compare digests with
-     * @return an indication EG state change
+    /** If either the eventGraphFile changed, or the classFile, the cacheXML is stale
+     * @param eventGraphFile the EventGraph file to compare digests with
+     * @return an indication Event Graph state change
      */
-    public boolean isStale(File egFile) {
-        File classFile = getCachedClass(egFile);
+    public boolean isStale(File eventGraphFile) {
+        File classFile = getCachedClass(eventGraphFile);
         List<String> cacheDigest = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_DIGEST_KEY));
         List<String> cacheXML = Arrays.asList(ViskitConfiguration.instance().getConfigValues(ViskitConfiguration.CACHED_EVENTGRAPHS_KEY));
         String filePath;
         try {
-            filePath = egFile.getCanonicalPath().replaceAll("\\\\", "/");
+            filePath = eventGraphFile.getCanonicalPath().replaceAll("\\\\", "/");
             int index = cacheXML.lastIndexOf(filePath);
             if (index >= 0) {
                 String cachedDigest = cacheDigest.get(index);
-                String compareDigest = createMessageDigest(egFile, classFile);
+                String compareDigest = createMessageDigest(eventGraphFile, classFile);
                 return !cachedDigest.equals(compareDigest);
             }
         } catch (IOException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
-        // if egFile not in cacheXML, it can't be stale
+        // if eventGraphFile not in cacheXML, it can't be stale
         return false;
     }
 

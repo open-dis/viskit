@@ -354,7 +354,7 @@ public class SettingsDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             EventGraphController ctrlr = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
-            ctrlr.clearRecentEGFileSet();
+            ctrlr.clearRecentEventGraphFileSet();
         }
     }
 
