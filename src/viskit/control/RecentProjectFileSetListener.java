@@ -56,24 +56,25 @@ import viskit.mvc.MvcRecentFileListener;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.ParameterizedProjectAction">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class RecentProjFileSetListener implements MvcRecentFileListener {
+public class RecentProjectFileSetListener implements MvcRecentFileListener {
 
-    private final List<JMenu> openRecentProjMenus;
+    private final List<JMenu> openRecentProjectMenus;
 
-    public RecentProjFileSetListener() {
-        openRecentProjMenus = new ArrayList<>();
+    public RecentProjectFileSetListener() {
+        openRecentProjectMenus = new ArrayList<>();
     }
 
     public void addMenuItem(JMenu menuItem) {
-        openRecentProjMenus.add(menuItem);
+        openRecentProjectMenus.add(menuItem);
     }
 
     @Override
-    public void listChanged() {
+    public void listChanged()
+    {
         AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
         Set<String> lis = acontroller.getRecentProjectFileSet();
 
-        for (JMenu m : openRecentProjMenus) {
+        for (JMenu m : openRecentProjectMenus) {
             m.removeAll();
         }
 
@@ -87,7 +88,7 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
                 continue;
             }
 
-            for (JMenu m : openRecentProjMenus) {
+            for (JMenu m : openRecentProjectMenus) {
                 nameOnly = f.getName();
                 act = new ParameterizedProjAction(nameOnly);
                 act.putValue(ViskitStatics.FULL_PATH, fullPath);
@@ -98,7 +99,8 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
         }
         if (!lis.isEmpty()) {
 
-            for (JMenu m : openRecentProjMenus) {
+            for (JMenu m : openRecentProjectMenus) 
+            {
                 m.add(new JSeparator());
                 act = new ParameterizedProjAction("clear");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
@@ -137,4 +139,4 @@ public class RecentProjFileSetListener implements MvcRecentFileListener {
         }
     }
 
-} // end class RecentProjFileSetListener
+} // end class RecentProjectFileSetListener
