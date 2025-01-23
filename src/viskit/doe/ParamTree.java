@@ -52,7 +52,7 @@ import java.awt.*;
  * @author Mike Bailey
  * @since Jul 20, 2005
  * @since 1:25:58 PM
- * @verion $Id$
+ * @version $Id$
  */
 public class ParamTree extends JTree {
 
