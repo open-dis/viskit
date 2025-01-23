@@ -758,7 +758,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public Boolean run() {
 
         File userDir;
-        try { // install the eventgraphs in the assembly
+        try { // install the event graphs in the assembly
             List<EventGraph> eventGraphList = root.getEventGraph();
             Enumeration<String> e = eventGraphs.elements();
             while ( e.hasMoreElements() ) {
