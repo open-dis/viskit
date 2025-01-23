@@ -1,3 +1,36 @@
+/*
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer
+      in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the names of the Naval Postgraduate School (NPS)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
+      nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+*/
 package viskit.view;
 
 import actions.ActionIntrospector;
@@ -59,11 +92,11 @@ import viskit.mvc.MvcRecentFileListener;
  is a model listener, so it gets the report, then updates the GUI. A round
  trip.
 
- 20 SEP 2005: Updated to show multiple open eventgraphs. The controller is
+ 20 SEP 2005: Updated to show multiple open event graphs. The controller is
  largely unchanged. To understand the flow, understand that 1) The tab
  "ChangeListener" plays a key role; 2) When the ChangeListener is hit, the
  controller.setModel() method installs the appropriate model for the
- newly-selectedTab eventgraph.
+ newly-selectedTab event graph.
 
  OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects MOVES Institute
  Naval Postgraduate School, Monterey CA www.nps.edu
@@ -203,8 +236,9 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     /**
      * @return the openRecentProjMenu
      */
-    public JMenu getOpenRecentProjMenu() {
-        return openRecentProjMenu;
+    public JMenu getOpenRecentProjectMenu() 
+    {
+        return openRecentProjectMenu;
     }
 
     /** Tab switch: this will come in with the newly selected tab in place */
@@ -519,37 +553,46 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         return null;
     }
 
-    class RecentEventGraphFileListener implements MvcRecentFileListener {
-
+    class RecentEventGraphFileListener implements MvcRecentFileListener 
+    {
         @Override
-        public void listChanged() {
+        public void listChanged() 
+        {
             String nameOnly;
-            Action act;
+            Action currentAction;
             JMenuItem mi;
-            EventGraphController vcontroller = (EventGraphController) getController();
-            Set<String> files = vcontroller.getRecentEventGraphFileSet();
-            openRecentEventGraphMenu.removeAll();
+            EventGraphController eventGraphController = (EventGraphController) getController();
+            Set<String> files = eventGraphController.getRecentEventGraphFileSet();
+            openRecentEventGraphMenu.removeAll(); // clear prior to rebuilding menu
+            openRecentEventGraphMenu.setEnabled(false); // disable unless file is found
             File file;
-            for (String fullPath : files) {
+            for (String fullPath : files) 
+            {
                 file = new File(fullPath);
-                if (!file.exists()) {
-                    continue;
+                if (!file.exists())
+                {
+                    // file not found as expected, something happened externally and so report it
+                    System.err.println("*** [EventGraphViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    continue; // actual file not found, skip to next file in files loop
                 }
                 nameOnly = file.getName();
-                act = new ParameterizedAction(nameOnly);
-                act.putValue(ViskitStatics.FULL_PATH, fullPath);
-                mi = new JMenuItem(act);
+                currentAction = new ParameterizedAction(nameOnly);
+                currentAction.putValue(ViskitStatics.FULL_PATH, fullPath);
+                mi = new JMenuItem(currentAction);
                 mi.setToolTipText(file.getPath());
                 openRecentEventGraphMenu.add(mi);
+                openRecentEventGraphMenu.setEnabled(true); // at least one is found
             }
-            if (!files.isEmpty()) {
+            if (!files.isEmpty()) 
+            {
                 openRecentEventGraphMenu.add(new JSeparator());
-                act = new ParameterizedAction("clear");
-                act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
-                mi = new JMenuItem(act);
+                currentAction = new ParameterizedAction("clear history");
+                currentAction.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
+                mi = new JMenuItem(currentAction);
                 mi.setToolTipText("Clear this list");
                 openRecentEventGraphMenu.add(mi);
             }
+            // TODO note that some items might remain loaded after "clear menu" and so wondering if that is ambiguous
         }
     }
 
@@ -578,9 +621,10 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         }
     }
 
-    private JMenu openRecentEventGraphMenu, openRecentProjMenu;
+    private JMenu openRecentEventGraphMenu, openRecentProjectMenu;
 
-    private void buildMenus() {
+    private void buildMenus() 
+    {
         EventGraphController controller = (EventGraphController) getController();
         recentEventGraphFileListener = new RecentEventGraphFileListener();
         controller.addRecentEventGraphFileListener(getRecentEventGraphFileListener());
@@ -602,13 +646,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         fileMenu.add(buildMenuItem(controller, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
+        openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-        fileMenu.add(openRecentProjMenu = buildMenu("Open Recent Project"));
+        fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 
         // The recently opened project file listener will be set with the
-        // openRecentProjMenu in the MainFrame after the AssemblyView is
-        // instantiated
+        // openRecentProjMenu in the MainFrame after the AssemblyView is instantiated
 
         fileMenu.add(buildMenuItem(controller, "close", "Close Event Graph", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));

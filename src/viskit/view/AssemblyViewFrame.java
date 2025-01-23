@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -66,7 +66,7 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
-import viskit.control.RecentProjFileSetListener;
+import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
 import viskit.images.PropChangListenerImageIcon;
@@ -88,6 +88,7 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import viskit.view.EventGraphViewFrame.ParameterizedAction;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -157,7 +158,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     private LegoTree lTree, pclTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
-    private RecentProjFileSetListener recentProjectFileSetListener;
+    private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener recentAssemblyFileListener;
 
     private int untitledCount = 0;
@@ -238,7 +239,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     /**
      * @return the recentProjectFileSetListener
      */
-    public RecentProjFileSetListener getRecentProjFileSetListener() {
+    public RecentProjectFileSetListener getRecentProjectFileSetListener() {
         return recentProjectFileSetListener;
     }
 
@@ -275,28 +276,66 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     class RecentAssemblyFileListener implements MvcRecentFileListener {
 
         @Override
-        public void listChanged() {
-            AssemblyController acontroller = (AssemblyController) getController();
-            Set<String> files = acontroller.getRecentAssemblyFileSet();
-            openRecentAssemblyMenu.removeAll();
-            files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
-                String nameOnly = new File(fullPath).getName();
-                Action act = new ParameterizedAssemblyAction(nameOnly);
-                act.putValue(FULLPATH, fullPath);
-                JMenuItem mi = new JMenuItem(act);
-                mi.setToolTipText(fullPath);
-                return mi;
-            }).forEachOrdered(mi -> {
+        public void listChanged()
+        {
+            String nameOnly;
+            Action currentAction;
+            JMenuItem mi;
+            AssemblyController assemblyController = (AssemblyController) getController();
+            Set<String> files = assemblyController.getRecentAssemblyFileSet();
+            openRecentAssemblyMenu.removeAll(); // clear prior to rebuilding menu
+            openRecentAssemblyMenu.setEnabled(false); // disable unless file is found
+            File file;
+            for (String fullPath : files) 
+            {
+                file = new File(fullPath);
+                if (!file.exists())
+                {
+                    // file not found as expected, something happened externally and so report it
+                    System.err.println("*** [AssemblyViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    continue; // actual file not found, skip to next file in files loop
+                }
+                nameOnly = file.getName();
+                currentAction = new ParameterizedAssemblyAction(nameOnly);
+                currentAction.putValue(ViskitStatics.FULL_PATH, fullPath);
+                mi = new JMenuItem(currentAction);
+                mi.setToolTipText(file.getPath());
                 openRecentAssemblyMenu.add(mi);
-            });
-            if (!files.isEmpty()) {
+                openRecentAssemblyMenu.setEnabled(true); // at least one is found
+            }
+            if (!files.isEmpty()) 
+            {
                 openRecentAssemblyMenu.add(new JSeparator());
-                Action act = new ParameterizedAssemblyAction("clear");
-                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
-                JMenuItem mi = new JMenuItem(act);
+                currentAction = new ParameterizedAssemblyAction("clear history");
+                currentAction.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
+                mi = new JMenuItem(currentAction);
                 mi.setToolTipText("Clear this list");
                 openRecentAssemblyMenu.add(mi);
             }
+            // TODO note that some items might remain loaded after "clear menu" and so wondering if that is ambiguous
+            
+            // prior implementation is different pattern and so not continued
+//            AssemblyController assemblyCcontroller = (AssemblyController) getController();
+//            Set<String> files = assemblyCcontroller.getRecentAssemblyFileSet();
+//            openRecentAssemblyMenu.removeAll();
+//            files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
+//                String nameOnly = new File(fullPath).getName();
+//                Action act = new ParameterizedAssemblyAction(nameOnly);
+//                act.putValue(FULLPATH, fullPath);
+//                JMenuItem mi = new JMenuItem(act);
+//                mi.setToolTipText(fullPath);
+//                return mi;
+//            }).forEachOrdered(mi -> {
+//                openRecentAssemblyMenu.add(mi);
+//            });
+//            if (!files.isEmpty()) {
+//                openRecentAssemblyMenu.add(new JSeparator());
+//                Action act = new ParameterizedAssemblyAction("clear history");
+//                act.putValue(FULLPATH, CLEARPATHFLAG);  // flag
+//                JMenuItem mi = new JMenuItem(act);
+//                mi.setToolTipText("Clear this list");
+//                openRecentAssemblyMenu.add(mi);
+//            }
         }
     }
 
@@ -325,7 +364,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         }
     }
 
-    private void buildMenus() {
+    private void buildMenus()
+    {
         AssemblyController controller = (AssemblyController) getController();
         recentAssemblyFileListener = new RecentAssemblyFileListener();
         controller.addRecentAssemblyFileSetListener(getRecentAssemblyFileListener());
@@ -347,14 +387,15 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(controller, "open", "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
+        openRecentAssemblyMenu.setEnabled(false); // inactive until needed, reset by listener
         fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
         fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 
-        // The EventGraphViewFrame will get this listener for its menu item of the same name
-        recentProjectFileSetListener = new RecentProjFileSetListener();
-        getRecentProjFileSetListener().addMenuItem(openRecentProjectMenu);
-        controller.addRecentProjectFileSetListener(getRecentProjFileSetListener());
+        // The AssemblyViewFrame will get this listener for its menu item of the same name
+        recentProjectFileSetListener = new RecentProjectFileSetListener();
+        getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
+        controller.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
 
         // Bug fix: 1195
         fileMenu.add(buildMenuItem(controller, "close", "Close Assembly", null,
@@ -429,7 +470,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         // Help editor created by the EGVF for all of Viskit's UIs
     }
 
-    private JMenu buildMenu(String name) {
+    private JMenu buildMenu(String name) 
+    {
         return new JMenu(name);
     }
 

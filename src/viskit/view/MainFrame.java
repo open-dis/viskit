@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -53,7 +53,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
 import viskit.control.InternalAssemblyRunner;
-import viskit.control.RecentProjFileSetListener;
+import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
@@ -198,8 +198,8 @@ public class MainFrame extends JFrame {
 
         // Now set the recent open project's file listener for the eventGraphFrame now
         // that we have an assemblyFrame reference
-        RecentProjFileSetListener listener = ((AssemblyViewFrame) assemblyFrame).getRecentProjFileSetListener();
-        listener.addMenuItem(((EventGraphViewFrame) eventGraphFrame).getOpenRecentProjMenu());
+        RecentProjectFileSetListener recentProjectFileSetListener = ((AssemblyViewFrame) assemblyFrame).getRecentProjectFileSetListener();
+        recentProjectFileSetListener.addMenuItem(((EventGraphViewFrame) eventGraphFrame).getOpenRecentProjectMenu());
 
         // Now setup the assembly and event graph file change listener(s)
         assemblyController.addAssemblyFileListener(assemblyController.getAssemblyChangeListener());
@@ -502,7 +502,7 @@ public class MainFrame extends JFrame {
                     assemblyController.removeAssemblyFileListener(assemblyController.getAssemblyChangeListener());
                     assemblyController.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
                     assemblyController.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssemblyFileListener());
-                    assemblyController.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjFileSetListener());
+                    assemblyController.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjectFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
