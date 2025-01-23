@@ -84,7 +84,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 file = new File(f);
                 // Prevent project mismatch
                 if (file.exists())
-                    _doOpen(file);
+                    _doOpenEventGraph(file);
             }
 
         } else {
@@ -208,22 +208,22 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         for (File file : files) {
             if (file != null) {
-                _doOpen(file);
+                _doOpenEventGraph(file);
             }
         }
     }
 
     @Override
     public void openRecentEventGraph(File path) {
-        _doOpen(path);
+        _doOpenEventGraph(path);
     }
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
-    void _doOpen(File file) {
+    void _doOpenEventGraph(File file) {
         EventGraphView viskitView = (EventGraphView) getView();
-        ModelImpl mod = new ModelImpl(this);
-        mod.init();
-        viskitView.addTab(mod);
+        ModelImpl modelImplementation = new ModelImpl(this);
+        modelImplementation.init();
+        viskitView.addTab(modelImplementation);
 
         Model[] openAlready = viskitView.getOpenModels();
         boolean isOpenAlready = false;
@@ -239,24 +239,26 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 }
             }
         }
-        if (mod.newModel(file) && !isOpenAlready) {
+        if (modelImplementation.newModel(file) && !isOpenAlready) {
 
             // We may find one or more simkit.Priority(s) with numeric values vice
             // eneumerations in the Event Graph XML. Modify and save the Event Graph XML silently
-            if (mod.isNumericPriority()) {
+            if (modelImplementation.isNumericPriority()) {
                 save();
-                mod.setNumericPriority(false);
+                modelImplementation.setNumericPriority(false);
             }
 
-            viskitView.setSelectedEventGraphName(mod.getMetaData().name);
-            viskitView.setSelectedEventGraphDescription(mod.getMetaData().description);
+            viskitView.setSelectedEventGraphName(modelImplementation.getMetaData().name);
+            if  (modelImplementation.getMetaData().description.isBlank())
+                 viskitView.setSelectedEventGraphDescription(EventGraphViewFrame.TODO_DESCRIPTION_WARNING);
+            else viskitView.setSelectedEventGraphDescription(modelImplementation.getMetaData().description);
             adjustRecentEventGraphFileSet(file);
             markEventGraphFilesAsOpened();
 
             // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial Event Graph parsing areadly took place in the project space during startup (tdn) 9/14/24
 //            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of Event Graphs
         } else {
-            viskitView.delTab(mod); // Not a good open, tell view
+            viskitView.delTab(modelImplementation); // Not a good open, tell view
         }
 
         resetRedoUndoStatus();
@@ -571,11 +573,13 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void saveAs() {
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
-        GraphMetadata gmd = mod.getMetaData();
+        GraphMetadata graphMetadata = mod.getMetaData();
+        if (graphMetadata.description.equals(EventGraphViewFrame.TODO_DESCRIPTION_WARNING))
+            graphMetadata.description = "";
 
         // Allow the user to type specific package names
-        String packageName = gmd.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + gmd.name + ".xml", false);
+        String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false);
 
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();
@@ -587,9 +591,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             if (n.toLowerCase().endsWith(".xml")) {
                 n = n.substring(0, n.length() - 4);
             }
-            gmd.name = n;
-            view.setSelectedEventGraphName(gmd.name);
-            mod.changeMetaData(gmd); // might have renamed
+            graphMetadata.name = n;
+            view.setSelectedEventGraphName(graphMetadata.name);
+            mod.changeMetaData(graphMetadata); // might have renamed
 
             handleCompileAndSave(mod, saveFile);
             adjustRecentEventGraphFileSet(saveFile);
@@ -1137,7 +1141,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) {
-            _doOpen(eventGraph);
+            _doOpenEventGraph(eventGraph);
             LOG.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
