@@ -85,7 +85,7 @@ public class Splash2 extends JFrame {
         });
     }
 
-    private final void createScreenImage() {
+    private void createScreenImage() {
         try {
             if (robot == null) {
                 robot = new Robot();
