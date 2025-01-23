@@ -43,7 +43,7 @@ public class GraphMetadata {
             implementsPackageName = tmp.getImplement();
 
         } else {
-            name = "EventGraphName";
+            name = "NewEventGraphName";
             viskit.xsd.bindings.eventgraph.ObjectFactory of =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tmp = of.createSimEntity();

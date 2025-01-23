@@ -517,7 +517,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
         // Buttons for what mode we are in
 
-        selectMode = makeJTButton(
+        selectMode = makeJToggleButton(
                 null,
                 "viskit/images/selectNode.png",
                 "Select items on the graph"
@@ -525,7 +525,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         Border defBor = selectMode.getBorder();
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        adapterMode = makeJTButton(
+        adapterMode = makeJToggleButton(
                 null,
                 new AdapterIcon(24, 24),
                 "Connect SimEntities with adapter pattern"
@@ -533,7 +533,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         defBor = adapterMode.getBorder();
         adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        simEventListenerMode = makeJTButton(
+        simEventListenerMode = makeJToggleButton(
                 null,
                 new SimEventListenerIcon(24, 24),
                 "Connect SimEntities through a SimEvent listener pattern"
@@ -541,7 +541,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeJTButton(
+        propChangeListenerMode = makeJToggleButton(
                 null,
                 new PropChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity"
@@ -589,9 +589,9 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        JLabel initializeLabel = new JLabel ("  Initialize Assembly Run: ");
-        initializeLabel.setToolTipText("First initialize assembly runner from Assembly tab");
-        getToolBar().add(initializeLabel);
+        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly Run: ");
+        initializeAssemblyRunLabel.setToolTipText("First initialize assembly runner from Assembly tab");
+        getToolBar().add(initializeAssemblyRunLabel);
         getToolBar().add(runButton);
 
         // Let the opening of Assembliess make this visible
@@ -622,33 +622,33 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             }
         }
 
-        PortsVisibleListener portsOn = new PortsVisibleListener(true);
+        PortsVisibleListener portsOn  = new PortsVisibleListener(true);
         PortsVisibleListener portsOff = new PortsVisibleListener(false);
-        selectMode.addActionListener(portsOff);
-        adapterMode.addActionListener(portsOn);
-        simEventListenerMode.addActionListener(portsOn);
+                    selectMode.addActionListener(portsOff);
+                   adapterMode.addActionListener(portsOn);
+          simEventListenerMode.addActionListener(portsOn);
         propChangeListenerMode.addActionListener(portsOn);
     }
 
-    private JToggleButton makeJTButton(Action a, String icPath, String tt) {
-        JToggleButton jtb;
+    private JToggleButton makeJToggleButton(Action newAction, String iconPath, String tooltipText) {
+        JToggleButton jToggleButton;
 
-        if (a != null)
-            jtb = new JToggleButton(a);
+        if (newAction != null)
+            jToggleButton = new JToggleButton(newAction);
         else
-            jtb = new JToggleButton();
+            jToggleButton = new JToggleButton();
 
-        return (JToggleButton) buttonCommon(jtb, icPath, tt);
+        return (JToggleButton) buttonCommon(jToggleButton, iconPath, tooltipText);
     }
 
-    private JToggleButton makeJTButton(Action a, Icon ic, String tt) {
-        JToggleButton jtb;
-        if (a != null)
-            jtb = new JToggleButton(a);
+    private JToggleButton makeJToggleButton(Action newAction, Icon iconInstance, String tooltipText) {
+        JToggleButton jToggleButton;
+        if (newAction != null)
+            jToggleButton = new JToggleButton(newAction);
         else
-            jtb = new JToggleButton();
-        jtb.setIcon(ic);
-        return (JToggleButton) buttonCommon2(jtb, tt);
+            jToggleButton = new JToggleButton();
+        jToggleButton.setIcon(iconInstance);
+        return (JToggleButton) buttonCommon2(jToggleButton, tooltipText);
     }
 
     private JButton makeButton(Action a, String icPath, String tt) {

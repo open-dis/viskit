@@ -106,7 +106,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
-    JComboBox<String> classifiedTF = new JComboBox<>(new String[] {"","Informational", "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"});
+    JComboBox<String> documentLabelTF = new JComboBox<>(new String[] {"","Informational", "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"});
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
 
@@ -200,14 +200,14 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         } else {
             dateTF.setText(DateFormat.getDateInstance().format(new Date()));
         } //now
-        classifiedTF.setSelectedItem(analystReportModel.getAccess());
+        documentLabelTF.setSelectedItem(analystReportModel.getAccess());
     }
 
     private void unFillHeader() {
         analystReportModel.setReportName(titleTF.getText());
         analystReportModel.setAuthor(analystNameTF.getText());
         analystReportModel.setDateOfReport(dateTF.getText());
-        analystReportModel.setAccessLabel((String) classifiedTF.getSelectedItem());
+        analystReportModel.setAccessLabel((String) documentLabelTF.getSelectedItem());
     }
 
     private void setLayout() {
@@ -223,13 +223,13 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         headerPanel.add(analystNameTF);
         headerPanel.add(new JLabel("Analysis Date"));
         headerPanel.add(dateTF);
-        headerPanel.add(new JLabel("Report Classification"));
-        headerPanel.add(classifiedTF);
+        headerPanel.add(new JLabel("Document Label"));
+        headerPanel.add(documentLabelTF);
         Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
         titleTF.setMaximumSize(new Dimension(d));
         analystNameTF.setMaximumSize(new Dimension(d));
         dateTF.setMaximumSize(new Dimension(d));
-        classifiedTF.setMaximumSize(new Dimension(d));
+        documentLabelTF.setMaximumSize(new Dimension(d));
         SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
 
         headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
