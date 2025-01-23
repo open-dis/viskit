@@ -486,8 +486,8 @@ their descpritions.
             depends="jar"
             description="Build viskit jar only, no DES extensions"/>
 
-    <!--  === TARGET: javadoc. Create javadocs and put the result in the docs directory. === -->
-    <target name="javadoc"
+    <!--  === TARGET: javadoc.prior is now obsolete. Create javadocs and put the result in the docs directory. === -->
+    <target name="javadoc.prior"
             depends="init,compile"
             description="Create the javadoc for Viskit.">
 
@@ -503,8 +503,7 @@ their descpritions.
             <!-- Include all the jar files in the lib directory; this prevents some
             javadoc warnings about classes not being found. -->
             <classpath>
-                <fileset refid="jaxb.runtime.path"/>
-                <fileset dir="${dir.lib}" includes="*.jar"/>
+                <fileset dir="${dir.lib}" includes="**/*.jar"/>
             </classpath>
             <package name="edu.nps.util"/>
             <package name="viskit"/>
@@ -538,7 +537,7 @@ their descpritions.
     </target>
 
     <!-- === TARGET: dist === -->
-    <target name="dist" depends="versions,clean,build,javadoc">
+    <target name="dist" depends="versions,clean,build,javadoc.custom">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/examples"/>
@@ -546,7 +545,7 @@ their descpritions.
             <fileset dir="${dir.build.lib}"/>
         </copy>
         <copy todir="${dir.dist}/doc">
-            <fileset dir="${dir.api.doc}"/>
+            <fileset dir="${javadoc.dir}"/>
         </copy>
         <copy todir="${dir.dist}/examples">
             <fileset dir="${examples.lib}">
@@ -872,7 +871,7 @@ their descpritions.
                      Splitindex="${javadoc.splitindex}"
                      Use="${javadoc.use}" 
                      useexternalfile="yes"
-                     verbose="true"
+                     verbose="false"
                      version="${javadoc.version}"
                      windowtitle="${javadoc.windowtitle}">
             <classpath>
