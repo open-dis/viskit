@@ -102,7 +102,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
             for (JMenu m : openRecentProjectMenus) 
             {
                 m.add(new JSeparator());
-                act = new ParameterizedProjAction("clear");
+                act = new ParameterizedProjAction("clear history");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
