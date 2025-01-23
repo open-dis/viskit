@@ -256,7 +256,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // put Event graphs in place (CDATA stuff)
 
         savedEvGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
-        // eventgraphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
+        // event graphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
         return true;
     }
 
