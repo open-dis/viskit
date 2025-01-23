@@ -435,7 +435,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     @Override
     public Set<String> getRecentEventGraphFileSet() {
-        return getRecentEventGraphFileSet(false);
+        return getRecentEventGraphFileSet(true);
     }
 
     private Set<String> getRecentEventGraphFileSet(boolean refresh) {
