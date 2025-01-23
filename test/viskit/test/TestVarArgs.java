@@ -8,7 +8,7 @@ import simkit.SimEntityBase;
  * This test shows that arguments for varargs only need to be cast to
  * (Object) if the variable is an non-primitive array.
  *
- * <p>Output:
+ * <p>Output:</p>
  * <pre>
 Compiling 1 source file to C:\tmp\SimkitExamples\build\classes
 C:\tmp\SimkitExamples\src\test\VarArgsTest.java:60: warning: non-varargs call of varargs method with inexact argument type for last parameter;
@@ -55,9 +55,9 @@ Time: 3.0000	CurrentEvent: Baz 	{3, [I@156ee8e, [Ljava.lang.String;@47b480} [1]
 [3, 4, -17, 2147483647]
 Time: 5.0000	CurrentEvent: FooBar 	{[I@19b49e6} [1]
 ** Event List 0 --  **
-            << empty >>
+            &lt;&lt; empty &gt;&gt;
  ** End of Event List --  **
- * </pre></p>
+ * </pre>
  *
  * @version $Id$
  * @author abuss
