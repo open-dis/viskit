@@ -248,13 +248,13 @@ public class Launcher extends Thread implements Runnable {
 
             jclz = cloader.loadClass("javax.xml.bind.Unmarshaller");
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
-            Object eventgraph = m.invoke(umo, new Object[]{bais});
+            Object eventGraphObject = m.invoke(umo, new Object[]{bais}); // TODO why isn't this a typed class?
 
             jclz = cloader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
-            String eventGraphName = (String) m.invoke(eventgraph, new Object[]{});
+            String eventGraphName = (String) m.invoke(eventGraphObject, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
-            eventGraphName += "." + m.invoke(eventgraph, new Object[]{});
+            eventGraphName += "." + m.invoke(eventGraphObject, new Object[]{});
 
             eventGraphs.put(eventGraphName, xml.toString());
             log.debug(eventGraphName + "EventGraph XML");
