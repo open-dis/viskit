@@ -80,7 +80,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
     private File assemblyFile;
 
     /** The viskit.reports.ReportStatisticsDOM object for this report */
-    private Document statsReport;
+    private Document statisiticsReport;
     private String   statsReportPath;
 
     /** The jdom.Document object that is used to build the report */
@@ -237,7 +237,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
      */
     public void createHeader() {
         rootElement.setAttribute("name", "");
-        rootElement.setAttribute("classification", "");
+        rootElement.setAttribute("access", "");
         rootElement.setAttribute("author", "");
         rootElement.setAttribute("date", "");
     }
@@ -324,7 +324,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
             statisticalResults.setAttribute("file", statsReportPath);
 
             Element sumReport = new Element("SummaryReport");
-            List<Element> itr = statsReport.getRootElement().getChildren("SimEntity");
+            List<Element> itr = statisiticsReport.getRootElement().getChildren("SimEntity");
             List<Element> summItr;
             Element temp, summaryRecord, summStats;
             for (Element entity : itr) {
@@ -694,7 +694,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
     @SuppressWarnings("unchecked")
     private Element makeReplicationReport() {
         Element repReports = new Element("ReplicationReports");
-        List<Element> simEntities = statsReport.getRootElement().getChildren("SimEntity");
+        List<Element> simEntities = statisiticsReport.getRootElement().getChildren("SimEntity");
 
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
@@ -920,8 +920,8 @@ public final class AnalystReportModel extends MvcAbstractModel {
     private void setDefaultValues() {
         //Header values
         setReportName("***ENTER REPORT TITLE HERE***");
-        setClassification("***ENTER CLASSIFICATION HERE***");
-        setAuthor("***ENTER THE NAME OF THE AUTHOR HERE***");
+        setAccessLabel("***ENTER ACCESS LABEL HERE***");
+        setAuthor("***ENTER NAME OF AUTHOR HERE***");
         setDateOfReport(DateFormat.getInstance().format(new Date()));
 
         //Executive Summary values
@@ -974,11 +974,11 @@ public final class AnalystReportModel extends MvcAbstractModel {
     public boolean isDebug()                     {return debug;}
 
     public Document   getReportJdomDocument()    {return reportJdomDocument;}
-    public Document   getStatsReport()           {return statsReport;}
+    public Document   getStatisiticsReport()     {return statisiticsReport;}
     public Element    getRootElement()           {return rootElement;}
     public String     getFileName()              {return fileName;}
     public String     getAuthor()                {return rootElement.getAttributeValue("author");}
-    public String     getClassification()        {return rootElement.getAttributeValue("classification");}
+    public String     getAccess()        {return rootElement.getAttributeValue("access");}
     public String     getDateOfReport()          {return rootElement.getAttributeValue("date");}
     public String     getReportName()            {return rootElement.getAttributeValue("name");}
 
@@ -1088,10 +1088,10 @@ public final class AnalystReportModel extends MvcAbstractModel {
     }
 
     public void setFileName          (String fileName)           { this.fileName = fileName; }
-    public void setStatsReport       (Document statsReport)      { this.statsReport = statsReport; }
+    public void setStatsReport       (Document statsReport)      { this.statisiticsReport = statsReport; }
     public void setStatsReportPath   (String filename)           { this.statsReportPath = filename; }
     public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
-    public void setClassification           (String s) { rootElement.setAttribute("classification", s);}
+    public void setAccessLabel           (String s) { rootElement.setAttribute("access", s);}
     public void setDateOfReport             (String s) { rootElement.setAttribute("date", s);}
     public void setDebug                    (boolean bool) { this.debug = bool; }
     public void setReportName              (String s) { rootElement.setAttribute("name", s); }
