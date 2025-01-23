@@ -106,7 +106,9 @@ import viskit.mvc.MvcRecentFileListener;
   @since 12:52:59 PM
   @version $Id$
  */
-public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView {
+public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView
+{
+    public static String TODO_DESCRIPTION_WARNING = "(Use \"Edit > Edit Properties\" or (Ctrl-E) to modify event graph description)";
 
     private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
 
@@ -318,15 +320,16 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 
-        JLabel descriptionLabel = new JLabel("Description");
+        JLabel descriptionLabel = new JLabel("Event Graph Description");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        descriptionLabel.setToolTipText("Use \"Edit > Edit Properties\" or (Ctrl-E) to modify description");
+        descriptionLabel.setToolTipText(TODO_DESCRIPTION_WARNING);
 
         parametersPanel.add(descriptionLabel);
         parametersPanel.add(Box.createVerticalStrut(5));
 
         JTextArea descriptionTA = new JTextArea();
         descriptionTA.setEditable(false);
+        descriptionTA.setText(TODO_DESCRIPTION_WARNING);
         descriptionTA.setWrapStyleWord(true);
         descriptionTA.setLineWrap(true);
         descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -768,37 +771,37 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         return new JMenu(name);
     }
 
-    private JToggleButton makeJTButton(Action a, String icPath, String tt) {
-        JToggleButton jtb;
-        if (a != null) {
-            jtb = new JToggleButton(a);
+    private JToggleButton makeJToggleButton(Action currentAction, String iconPath, String tooltipText) {
+        JToggleButton jToggleButton;
+        if (currentAction != null) {
+            jToggleButton = new JToggleButton(currentAction);
         } else {
-            jtb = new JToggleButton();
+            jToggleButton = new JToggleButton();
         }
-        return (JToggleButton) buttonCommon(jtb, icPath, tt);
+        return (JToggleButton) buttonCommon(jToggleButton, iconPath, tooltipText);
     }
 
-    private JButton makeButton(Action a, String icPath, String tt) {
+    private JButton makeButton(Action a, String iconPath, String tooltipText) {
         JButton b;
         if (a != null) {
             b = new JButton(a);
         } else {
             b = new JButton();
         }
-        return (JButton) buttonCommon(b, icPath, tt);
+        return (JButton) buttonCommon(b, iconPath, tooltipText);
     }
 
-    private AbstractButton buttonCommon(AbstractButton b, String icPath, String tt) {
-        b.setIcon(new ImageIcon(getClass().getClassLoader().getResource(icPath)));
-        b.setToolTipText(tt);
-        b.setBorder(BorderFactory.createEtchedBorder());
-        b.setText(null);
-        return b;
+    private AbstractButton buttonCommon(AbstractButton button, String iconPath, String tooltipText) {
+        button.setIcon(new ImageIcon(getClass().getClassLoader().getResource(iconPath)));
+        button.setToolTipText(tooltipText);
+        button.setBorder(BorderFactory.createEtchedBorder());
+        button.setText(null);
+        return button;
     }
 
-    private JLabel makeJLabel(String icPath, String tt) {
-        JLabel jlab = new JLabel(new ImageIcon(getClass().getClassLoader().getResource(icPath)));
-        jlab.setToolTipText(tt);
+    private JLabel makeJLabel(String iconPath, String tooltipText) {
+        JLabel jlab = new JLabel(new ImageIcon(getClass().getClassLoader().getResource(iconPath)));
+        jlab.setToolTipText(tooltipText);
         return jlab;
     }
 
@@ -827,14 +830,14 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        selectMode = makeJTButton(null, "viskit/images/selectNode.png",
+        selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
                 "Select items on the graph");
 
-        arcMode = makeJTButton(null, "viskit/images/schedArc.png",
+        arcMode = makeJToggleButton(null, "viskit/images/schedArc.png",
                 "Connect nodes with a scheduling edge");
         arcMode.setIcon(new SchedArcIcon());
 
-        cancelArcMode = makeJTButton(null, "viskit/images/canArc.png",
+        cancelArcMode = makeJToggleButton(null, "viskit/images/canArc.png",
                 "Connect nodes with a cancelling edge");
         cancelArcMode.setIcon(new CanArcIcon());
 
