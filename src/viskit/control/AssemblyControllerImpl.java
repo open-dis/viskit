@@ -1847,8 +1847,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             for (File file : eventGraphFiles) {
                 tempFile = file;
 
-                // _doOpen checks if a tab is already opened
-                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpen(file);
+                // _doOpenEventGraph checks if a tab is already opened
+                ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpenEventGraph(file);
             }
         } catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
