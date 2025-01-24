@@ -269,7 +269,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
 //            adjustMenus((Model) getModel()); // enable/disable menu items based on new Event Graph
 
-            GraphMetadata gmd = ((Model) getModel()).getMetaData();
+            GraphMetadata gmd = ((Model) getModel()).getMetadata();
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
@@ -490,18 +490,18 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     }
 
     @Override
-    public void delTab(Model mod) {
+    public void deleteTab(Model mod) {
         JSplitPane jsplt;
         JScrollPane jsp;
-        ViskitGraphComponentWrapper vgcw;
+        ViskitGraphComponentWrapper viskitGraphComponentWrapper;
         Runnable r;
         for (Component c : tabbedPane.getComponents()) {
             jsplt = (JSplitPane) c;
             jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
-            if (vgcw.model == mod) {
+            viskitGraphComponentWrapper = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
+            if (viskitGraphComponentWrapper.model == mod) {
                 tabbedPane.remove(c);
-                vgcw.isActive = false;
+                viskitGraphComponentWrapper.isActive = false;
 
                 // Don't allow operation of tools with no Event Graph tab in view (NPEs)
                 if (tabbedPane.getTabCount() == 0) {
@@ -911,31 +911,38 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     }
 
     /** Changes the background/foreground color of Event Graph tabs depending on
-     * model.isDirty() status giving the user an indication of a good/bad save
-     * &amp; compile operation. Of note is that the default L&amp;F must be
+     * model.isDirty() status giving the user an indication of a good/bad
+     * save and compile operation. Of note is that the default Look+Feel must be
      * selected for WIN machines, else no colors will be visible. On Macs, the
-     * platform L&amp;F works best.
+     * platform Look+Feel works best.
      */
-    public void toggleEventGraphStatusIndicators() {
+    public void toggleEventGraphStatusIndicators()
+    {
         int selectedTab = tabbedPane.getSelectedIndex();
-        for (Component c : tabbedPane.getComponents()) {
-
-            // This will fire a call to stateChanged() which also sets the
-            // current model
-            tabbedPane.setSelectedComponent(c);
-            if (((Model) getModel()).isDirty()) {
-                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+        for (Component currentSwingComponent : tabbedPane.getComponents()) 
+        {
+            // This will fire a call to stateChanged() which also sets the current model
+            tabbedPane.setSelectedComponent(currentSwingComponent);
+            // TODO tooltip text hints not appearing
+            if (((Model) getModel()).isDirty())
+            {
+                // background changes seem excessive
+//                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
-            } else {
-                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+                tabbedPane.setToolTipText("Problem with event graph model validation and compilation");
+            } 
+            else 
+            {
+                // background changes seem excessive
+//                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
                     tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
+                tabbedPane.setToolTipText("Successful event graph model validation and compilation");
             }
         }
-
         // Restore active tab and model by virtue of firing a call to stateChanged()
         tabbedPane.setSelectedIndex(selectedTab);
     }
