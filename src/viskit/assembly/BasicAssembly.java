@@ -757,10 +757,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
                 Schedule.startSimulation();
 
-                String typeStat, nodeType;
+                String typeStatistics, nodeType;
                 int ix = 0;
                 boolean isCount;
-                SampleStatistics ss;
+                SampleStatistics sampleStatistics;
                 Object obj;
                 
                 // Outer stats output
@@ -786,14 +786,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 continue;
                             }
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                            typeStat = isCount ? ".count" : ".mean";
-                            ss = (SampleStatistics) getReplicationStats()[ix];
-                            fireIndexedPropertyChange(ix, ss.getName(), ss);
+                            typeStatistics = isCount ? ".count" : ".mean";
+                            sampleStatistics = (SampleStatistics) getReplicationStats()[ix];
+                            fireIndexedPropertyChange(ix, sampleStatistics.getName(), sampleStatistics);
 
                             if (isCount)
-                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getCount());
+                                fireIndexedPropertyChange(ix, sampleStatistics.getName() + typeStatistics, sampleStatistics.getCount());
                             else
-                                fireIndexedPropertyChange(ix, ss.getName() + typeStat, ss.getMean());
+                                fireIndexedPropertyChange(ix, sampleStatistics.getName() + typeStatistics, sampleStatistics.getMean());
 
                             ix++;
                         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {

@@ -95,7 +95,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     }
 
     @Override
-    public GraphMetadata getMetaData() {
+    public GraphMetadata getMetadata() {
         return metaData;
     }
 

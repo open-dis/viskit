@@ -97,7 +97,7 @@ public interface EventGraphView {
 
     void addTab(Model mod); // When a tab is added
 
-    void delTab(Model mod); // When a tab is removed
+    void deleteTab(Model mod); // When a tab is removed
 
     Model[] getOpenModels();
 

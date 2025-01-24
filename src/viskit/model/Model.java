@@ -150,7 +150,7 @@ public interface Model {
 
     void deleteSimParameter(ViskitParameter p);
 
-    GraphMetadata getMetaData();
+    GraphMetadata getMetadata();
 
     /**
      * This is to allow the controller to stick in a Run event, but treat the graph as fresh.

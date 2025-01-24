@@ -154,7 +154,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
     private JToggleButton selectMode;
-    private JToggleButton adapterMode,  simEventListenerMode,  propChangeListenerMode;
+    private JToggleButton adapterMode,  simEventListenerMode,  propertyChangeListenerMode;
     private LegoTree lTree, pclTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -505,7 +505,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             return ADAPTER_MODE;
         if (simEventListenerMode.isSelected())
             return SIMEVLIS_MODE;
-        if (propChangeListenerMode.isSelected())
+        if (propertyChangeListenerMode.isSelected())
             return PCL_MODE;
         LogUtils.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
@@ -541,13 +541,13 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         defBor = simEventListenerMode.getBorder();
         simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propChangeListenerMode = makeJToggleButton(
+        propertyChangeListenerMode = makeJToggleButton(
                 null,
                 new PropChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity"
         );
-        defBor = propChangeListenerMode.getBorder();
-        propChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        defBor = propertyChangeListenerMode.getBorder();
+        propertyChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         JButton zoomIn = makeButton(
                 null,
@@ -567,7 +567,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
         modeButtonGroup.add(simEventListenerMode);
-        modeButtonGroup.add(propChangeListenerMode);
+        modeButtonGroup.add(propertyChangeListenerMode);
 
         // Make selection mode the default mode
         selectMode.setSelected(true);
@@ -580,7 +580,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(simEventListenerMode);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(propChangeListenerMode);
+        getToolBar().add(propertyChangeListenerMode);
 
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("Zoom: "));
@@ -627,7 +627,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                     selectMode.addActionListener(portsOff);
                    adapterMode.addActionListener(portsOn);
           simEventListenerMode.addActionListener(portsOn);
-        propChangeListenerMode.addActionListener(portsOn);
+        propertyChangeListenerMode.addActionListener(portsOn);
     }
 
     private JToggleButton makeJToggleButton(Action newAction, String iconPath, String tooltipText) {
