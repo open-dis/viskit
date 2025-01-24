@@ -239,8 +239,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         /* Check for zero length.  SimplePropertyDumper may have been selected
          * as the only PCL
          */
-        if (getReplicationStats().length == 0) {return;}
-        designPointStats = new SampleStatistics[getReplicationStats().length];
+        if (getReplicationStatistics().length == 0) {return;}
+        designPointStats = new SampleStatistics[getReplicationStatistics().length];
         String typeStat, nodeType;
         int ix = 0;
         boolean isCount;
@@ -270,7 +270,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     typeStat = isCount ? ".count" : ".mean";
                     LOG.debug("typeStat is: " + typeStat);
 
-                    stat = (SampleStatistics) getReplicationStats()[ix];
+                    stat = (SampleStatistics) getReplicationStatistics()[ix];
                     
                     if (stat.getName().equals("%unnamed%"))
                         stat.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
@@ -425,7 +425,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     }
 
     /** @return an array of ProperChangeListeners for this Assembly  */
-    public PropertyChangeListener[] getReplicationStats() {
+    public PropertyChangeListener[] getReplicationStatistics() {
         return replicationStats.clone();
     }
 
@@ -453,9 +453,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getIDforReplicationStateName(String state) {
         int id = -1;
-        int repStatsLength = getReplicationStats().length;
+        int repStatsLength = getReplicationStatistics().length;
         for (int i = 0; i < repStatsLength; i++) {
-            if (((Named) getReplicationStats()[i]).getName().equals(state)) {
+            if (((Named) getReplicationStatistics()[i]).getName().equals(state)) {
                 id = i;
                 break;
             }
@@ -508,7 +508,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     protected String getReplicationReport(int rep) {
 
-        PropertyChangeListener[] clonedReplicationStats = getReplicationStats();
+        PropertyChangeListener[] clonedReplicationStats = getReplicationStatistics();
         int i = 0;
 
         // Outputs raw replication statistics to XML report
@@ -666,7 +666,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
        
         // Used by the Gridlet(s)
         replicationData.clear();
-        int repStatsLength = getReplicationStats().length;
+        int repStatsLength = getReplicationStatistics().length;
         for (int i = 0; i < repStatsLength; i++)
             replicationData.put(i, new ArrayList<>());
 
@@ -787,7 +787,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                             }
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
                             typeStatistics = isCount ? ".count" : ".mean";
-                            sampleStatistics = (SampleStatistics) getReplicationStats()[ix];
+                            sampleStatistics = (SampleStatistics) getReplicationStatistics()[ix];
                             fireIndexedPropertyChange(ix, sampleStatistics.getName(), sampleStatistics);
 
                             if (isCount)

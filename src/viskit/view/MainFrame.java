@@ -568,7 +568,8 @@ public class MainFrame extends JFrame {
         }
 
         @Override
-        public void resetRunner() {
+        public void resetRunner()
+        {
             RunnerPanel2 rp2 = ViskitGlobals.instance().getSimRunnerPanel();
             rp2.soutTA.setText(null);
             rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
@@ -577,11 +578,13 @@ public class MainFrame extends JFrame {
             rp2.vcrStopTime.setText("");
             rp2.numRepsTF.setText("");
             rp2.vcrVerbose.setSelected(false);
-            rp2.printRepReportsCB.setSelected(false);
-            rp2.printSummReportsCB.setSelected(false);
+            rp2.printReplicationReportsCB.setSelected(false);
+            rp2.printSummaryReportsCB.setSelected(false);
 
             assemblyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
             assemblyRunComponent.doTitle(null);
+            
+            rp2.npsLabel.setText("");
         }
     }
 

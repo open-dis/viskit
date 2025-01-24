@@ -1011,7 +1011,8 @@ public final class AnalystReportModel extends MvcAbstractModel {
     }
 
     /** Post Analyst Report processing steps to take */
-    private void postProcessing() {
+    private void postProcessing() 
+    {
         jpb.setIndeterminate(true);
         jpb.setString("Analyst Report now generating...");
         jpb.setStringPainted(true);
@@ -1062,12 +1063,16 @@ public final class AnalystReportModel extends MvcAbstractModel {
                 assemblyImage);
     }
 
-    private void announceAnalystReportReadyToView() {
+    private void announceAnalystReportReadyToView()
+    {
+        // TODO consider inserting loaded assembly filename into message above as a user confirmation
+        
+        String assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
         ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Analyst Report Ready", "<html><body><p align='center'>" +
-                "Analyst Report is loaded and is now ready for further editing.</p></body></html>"
+                assemblyName + " " +
+                "Analyst Report</p><br /><p align='center'> is loaded and ready for further editing</p></body></html>"
         );
-        // TODO consider inserting loaded filename into message above as a user confirmation
     }
 
     /** If a 2D top town image was generated from SavageStudio, then point to

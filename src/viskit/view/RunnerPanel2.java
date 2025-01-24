@@ -62,19 +62,19 @@ public class RunnerPanel2 extends JPanel {
     public JScrollPane jsp;
     public JTextArea soutTA;
     public JSplitPane xsplPn;
-    public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButt;
+    public JButton vcrStop, vcrPlay, vcrRewind, vcrStep, closeButton;
     public JCheckBox vcrVerbose;
     public JTextField vcrSimTime, vcrStopTime;
     public JCheckBox saveRepDataCB;
-    public JCheckBox printRepReportsCB;
+    public JCheckBox printReplicationReportsCB;
     public JCheckBox searchCB;
     public JDialog searchPopup;
-    public JCheckBox printSummReportsCB;
+    public JCheckBox printSummaryReportsCB;
     public JCheckBox resetSeedStateCB;
     public JCheckBox analystReportCB;
     public JTextField numRepsTF;
     public JScrollBar bar;
-    public JTextField verboseRepNumberTF;
+    public JTextField verboseReplicationNumberTF;
     public JLabel npsLabel;
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
@@ -135,33 +135,35 @@ public class RunnerPanel2 extends JPanel {
         add(leftRightSplit, BorderLayout.CENTER);
     }
 
-    private JPanel makeVCRPanel(boolean skipCloseButt) {
-        JPanel flowPan = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private final String VERBOSE_REPLICATION_DEFAULT_LABEL = "[replication #]";
+    
+    private JPanel makeVCRPanel(boolean skipIncompleteButtons) {
+        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrSimTimeLab = new JLabel("Sim start time: ");
+        JLabel vcrSimTimeLabel = new JLabel("Sim start time: ");
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
         vcrSimTime = new JTextField(10);
         vcrSimTime.setEditable(false);
         ViskitStatics.clampSize(vcrSimTime, vcrSimTime, vcrSimTime);
-        JPanel labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(vcrSimTimeLab);
-        labTF.add(vcrSimTime);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        JPanel vcrSimTimePanel = new JPanel();
+        vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
+        vcrSimTimePanel.add(vcrSimTimeLabel);
+        vcrSimTimePanel.add(vcrSimTime);
+        vcrSimTimePanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrSimTimePanel);
 
         JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         vcrStopTime = new JTextField(10);
         ViskitStatics.clampSize(vcrStopTime, vcrStopTime, vcrStopTime);
-        labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(vcrStopTimeLabel);
-        labTF.add(vcrStopTime);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        vcrSimTimePanel = new JPanel();
+        vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
+        vcrSimTimePanel.add(vcrStopTimeLabel);
+        vcrSimTimePanel.add(vcrStopTime);
+        vcrSimTimePanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrSimTimePanel);
 
         numRepsTF = new JTextField(10);
         numRepsTF.addActionListener((ActionEvent e) -> {
@@ -171,122 +173,130 @@ public class RunnerPanel2 extends JPanel {
             }
         });
         ViskitStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
-        JLabel numRepsLab = new JLabel("# replications: ");
-        labTF = new JPanel();
-        labTF.setLayout(new BoxLayout(labTF, BoxLayout.X_AXIS));
-        labTF.add(numRepsLab);
-        labTF.add(numRepsTF);
-        labTF.add(Box.createHorizontalStrut(10));
-        flowPan.add(labTF);
+        JLabel numReplicationsLabel = new JLabel("# replications: ");
+        vcrSimTimePanel = new JPanel();
+        vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
+        vcrSimTimePanel.add(numReplicationsLabel);
+        vcrSimTimePanel.add(numRepsTF);
+        vcrSimTimePanel.add(Box.createHorizontalStrut(10));
+        flowPanel.add(vcrSimTimePanel);
 
 
         vcrVerbose = new JCheckBox("Verbose output", false);
         vcrVerbose.addActionListener(new vcrVerboseCBListener());
         vcrVerbose.setToolTipText("Enables verbose output for all runs");
-        flowPan.add(vcrVerbose);
+        flowPanel.add(vcrVerbose);
 
-        verboseRepNumberTF = new JTextField(7);
-        verboseRepNumberTFListener lis = new verboseRepNumberTFListener();
-        verboseRepNumberTF.addActionListener(lis);
-        verboseRepNumberTF.addCaretListener(lis);
-        ViskitStatics.clampSize(verboseRepNumberTF);
-        verboseRepNumberTF.setToolTipText("Input a single replication run (1...n) to be verbose");
-        flowPan.add(verboseRepNumberTF);
+        verboseReplicationNumberTF = new JTextField(7);
+        VerboseReplicationNumberTFListener listener = new VerboseReplicationNumberTFListener();
+        verboseReplicationNumberTF.addActionListener(listener);
+        verboseReplicationNumberTF.addCaretListener(listener);
+        ViskitStatics.clampSize(verboseReplicationNumberTF);
+        verboseReplicationNumberTF.setToolTipText("Input a single replication run (1..n) to be verbose");
+        verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_LABEL);
+        flowPanel.add(verboseReplicationNumberTF);
 
-        closeButt = new JButton("Close");
-        closeButt.setToolTipText("Close this window");
-        if (!skipCloseButt) {
-            flowPan.add(closeButt);
+        closeButton = new JButton("Close");
+        closeButton.setToolTipText("Close this window");
+        if (!skipIncompleteButtons) {
+            flowPanel.add(closeButton);
         }
 
-        printRepReportsCB = new JCheckBox("Print replication report(s)");
-        printRepReportsCB.setToolTipText("Print Output Report for Replication(s) to console");
-        flowPan.add(printRepReportsCB);
-        printSummReportsCB = new JCheckBox("Print summary report");
-        printSummReportsCB.setToolTipText("Print out the Summary Output Report to console");
-        flowPan.add(printSummReportsCB);
+        printReplicationReportsCB = new JCheckBox("Print replication report(s)");
+        printReplicationReportsCB.setToolTipText("Print Output Report for Replication(s) to console");
+        flowPanel.add(printReplicationReportsCB);
+        printSummaryReportsCB = new JCheckBox("Print summary report");
+        printSummaryReportsCB.setToolTipText("Print out the Summary Output Report to console");
+        flowPanel.add(printSummaryReportsCB);
 
         /* DIFF between OA3302 branch and trunk */
         saveRepDataCB = new JCheckBox("Save replication data to XML");
         saveRepDataCB.setToolTipText("Use in conjuction with Enable Analyst Reports to save replication data to XML");
         saveRepDataCB.setSelected(aRPanelVisible);
         saveRepDataCB.setEnabled(aRPanelVisible);
-        flowPan.add(saveRepDataCB);
+        flowPanel.add(saveRepDataCB);
         analystReportCB = new JCheckBox("Enable Analyst Reports");
         analystReportCB.setToolTipText("When enabled, replication data saved to XML will be used to generate HTML reports");
         analystReportCB.setSelected(aRPanelVisible);
         analystReportCB.setEnabled(aRPanelVisible);
-        flowPan.add(analystReportCB);
+        flowPanel.add(analystReportCB);
 
         // Initially, unselected
         resetSeedStateCB = new JCheckBox("Reset seed state each rerun");
 
-        // TODO: Expose at a later time when we have usefullness for this
+        // TODO: Expose at a later time when we have use for this
         resetSeedStateCB.setEnabled(false);
-//        flowPan.add(resetSeedStateCB);
-        /* End DIFF between OA3302 branch and trunk */
+//      flowPanel.add(resetSeedStateCB);
+        
+        JPanel runLabelPanel = new JPanel();
+        JLabel runLabel = new JLabel("Run assembly: ");
+        runLabelPanel.setToolTipText("Start the simulation replications");
+        runLabelPanel.add(runLabel);
+        flowPanel.add(runLabelPanel);
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-
-        vcrStop = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
-        vcrStop.setToolTipText("Stop the simulation run");
-        vcrStop.setEnabled(false);
-        vcrStop.setBorder(BorderFactory.createEtchedBorder());
-        vcrStop.setText(null);
-        buttPan.add(vcrStop);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         vcrRewind = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
         vcrRewind.setToolTipText("Reset the simulation run");
         vcrRewind.setEnabled(false);
         vcrRewind.setBorder(BorderFactory.createEtchedBorder());
         vcrRewind.setText(null);
-        if (!skipCloseButt) {
-            buttPan.add(vcrRewind);
+        if (!skipIncompleteButtons) {
+            buttonPanel.add(vcrRewind);
         }
 
         vcrPlay = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
-        vcrPlay.setToolTipText("Begin or resume the simulation run");
-        if (skipCloseButt) {
-            vcrPlay.setToolTipText("Begin the simulation run");
-        }
+        vcrPlay.setToolTipText("Start or resume the simulation run");
         vcrPlay.setBorder(BorderFactory.createEtchedBorder());
         vcrPlay.setText(null);
-        buttPan.add(vcrPlay);
+        buttonPanel.add(vcrPlay);
 
         vcrStep = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStep.setToolTipText("Step the simulation");
         vcrStep.setBorder(BorderFactory.createEtchedBorder());
         vcrStep.setText(null);
-        if (!skipCloseButt) {
-            buttPan.add(vcrStep);
-        }
+        vcrStep.setToolTipText("Single step");
+        vcrStep.setEnabled(false); // TODO
+        buttonPanel.add(vcrStep);
 
-        buttPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        flowPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        vcrStop = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
+        vcrStop.setToolTipText("Stop the simulation run");
+        vcrStop.setEnabled(false);
+        vcrStop.setBorder(BorderFactory.createEtchedBorder());
+        vcrStop.setText(null);
+        buttonPanel.add(vcrStop);
 
-        flowPan.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
+        buttonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        flowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        flowPan.add(buttPan);
-        return flowPan;
+        flowPanel.setPreferredSize(new Dimension(vcrPlay.getPreferredSize()));
+
+        flowPanel.add(buttonPanel);
+        return flowPanel;
     }
 
     class vcrVerboseCBListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent event) {
-            if (vcrVerbose.isSelected()) {
-                verboseRepNumberTF.setText("");
+        public void actionPerformed(ActionEvent event) 
+        {
+            if (verboseReplicationNumberTF.getText().isBlank())
+            {
+                verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_LABEL);
             }
         }
     }
 
-    class verboseRepNumberTFListener implements CaretListener, ActionListener {
+    class VerboseReplicationNumberTFListener implements CaretListener, ActionListener {
 
         @Override
         public void caretUpdate(CaretEvent event) {
-            if (!verboseRepNumberTF.getText().isEmpty()) {
-                vcrVerbose.setSelected(false);
+            if (!verboseReplicationNumberTF.getText().isEmpty() || 
+                 verboseReplicationNumberTF.getText().equals(VERBOSE_REPLICATION_DEFAULT_LABEL)) 
+            {
+                // probably no response needed, keep user in control of panel settings
+                // vcrVerbose.setSelected(false);
             }
         }
 

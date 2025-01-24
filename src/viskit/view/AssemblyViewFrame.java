@@ -411,7 +411,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "prepareSimulationRunner", "Initialize Assembly Runner", KeyEvent.VK_C,
+        fileMenu.add(buildMenuItem(controller, "prepareSimulationRunner", "Initialize Assembly Run", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
 
         // TODO: Unknown as to what this does exactly
@@ -476,14 +476,14 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonicKeyEvent, KeyStroke accelleratorKeyStroke) {
         Action a = ActionIntrospector.getAction(source, method);
 
         Map<String, Object> map = new HashMap<>();
-        if (mn != null)
-            map.put(Action.MNEMONIC_KEY, mn);
-        if (accel != null)
-            map.put(Action.ACCELERATOR_KEY, accel);
+        if (mnemonicKeyEvent != null)
+            map.put(Action.MNEMONIC_KEY, mnemonicKeyEvent);
+        if (accelleratorKeyStroke != null)
+            map.put(Action.ACCELERATOR_KEY, accelleratorKeyStroke);
         if (name != null)
             map.put(Action.NAME, name);
         if (!map.isEmpty())

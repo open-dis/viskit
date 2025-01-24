@@ -1635,8 +1635,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void prepareSimulationRunner() {
-
+    public void prepareSimulationRunner()
+    {
         // Prevent multiple pushes of the initialize simulation run button
         mutex++;
         if (mutex > 1) {
@@ -1672,8 +1672,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                         String msg = "Please locate and correct the source of the error in the assembly XML for proper compilation";
                         messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error", msg);
                     }
-                } else {
-
+                }
+                else
+                {
                     // Ensure a cleared Assembly Run panel upon every Assembly compile
                     runner.resetRunner();
 

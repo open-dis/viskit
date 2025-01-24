@@ -176,7 +176,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         twiddleButtons(Event.REWIND);
     }
 
-    private void fillRepWidgetsFromPreRunAssembly(boolean verbose, boolean saveRepDataToXml, double stopTime) throws Throwable {
+    private void fillRepWidgetsFromPreRunAssembly(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable {
 
         assemblyClass = ViskitStatics.classForName(assemblyClassName);
         if (assemblyClass == null) {
@@ -201,11 +201,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method getStopTime = assemblyClass.getMethod("getStopTime");
 
         runPanel.numRepsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
-        runPanel.printRepReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
-        runPanel.printSummReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
-        runPanel.saveRepDataCB.setSelected(saveRepDataToXml);
+        runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
+        runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
+        runPanel.saveRepDataCB.setSelected(saveReplicationDataToXml);
 
-        // Set the run panel according to what the assembly XML value is
+        // Set the run panel verboseness according to what the assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
         runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
@@ -279,8 +279,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numRepsTF.getText().trim()));
-            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printRepReportsCB.isSelected());
-            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummReportsCB.isSelected());
+            setPrintReplicationReports.invoke(assemblyInstance, runPanel.printReplicationReportsCB.isSelected());
+            setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummaryReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
             setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
@@ -366,7 +366,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public int getVerboseReplicationNumber() {
         int ret = -1;
         try {
-            ret = Integer.parseInt(runPanel.verboseRepNumberTF.getText().trim());
+            ret = Integer.parseInt(runPanel.verboseReplicationNumberTF.getText().trim());
         } catch (NumberFormatException ex) {
           //  ;
         }
@@ -546,7 +546,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 //System.out.println("twbutt stop");
                 runPanel.vcrPlay.setEnabled(true);
                 runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(true);
+                runPanel.vcrStep.setEnabled(false); // TODO restore when working
                 runPanel.vcrRewind.setEnabled(true);
                 break;
             case STEP:
@@ -560,7 +560,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 //System.out.println("twbutt rewind");
                 runPanel.vcrPlay.setEnabled(true);
                 runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(true);
+                runPanel.vcrStep.setEnabled(false); // TODO restore when working
                 runPanel.vcrRewind.setEnabled(false);
                 break;
             case OFF:
@@ -697,23 +697,23 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         doTitle(null);
     }
 
-    StringBuilder npsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
+    StringBuilder nowRunningsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         LOG.debug(evt.getPropertyName());
 
         if (evt.getPropertyName().equals("replicationNumber")) {
-            int beginLength = npsString.length();
-            npsString.append(evt.getNewValue());
-            npsString.append(" of ");
-            npsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
-            npsString.append("</b>\n");
-            npsString.append("</font></p></body></html>\n");
-            runPanel.npsLabel.setText(npsString.toString());
+            int beginLength = nowRunningsString.length();
+            nowRunningsString.append(evt.getNewValue());
+            nowRunningsString.append(" of ");
+            nowRunningsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
+            nowRunningsString.append("</b>\n");
+            nowRunningsString.append("</font></p></body></html>\n");
+            runPanel.npsLabel.setText(nowRunningsString.toString());
 
             // reset for the next replication output
-            npsString.delete(beginLength, npsString.length());
+            nowRunningsString.delete(beginLength, nowRunningsString.length());
         }
     }
 
