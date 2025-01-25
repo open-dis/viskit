@@ -1695,7 +1695,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             protected void done() {
                 try {
 
-                    // Wait for the compile, save and Assembly preps to finish
+                    // Wait for the compile, save and Assembly preparations to finish
                     get();
 
                 } catch (InterruptedException | ExecutionException e) {

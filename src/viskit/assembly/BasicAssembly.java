@@ -210,10 +210,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * </p>
      * TODO: Remove the naming convention requirement and have the SimEntity name be
      * an automated key value
-     * @param repStatistics a map containing collected stats on a SimEntity's state variables
+     * @param replicationStatistics a map containing collected stats on a SimEntity's state variables
      */
-    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> repStatistics) {
-        Set<Map.Entry<String, PropertyChangeListener>> entrySet = repStatistics.entrySet();
+    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatistics) {
+        Set<Map.Entry<String, PropertyChangeListener>> entrySet = replicationStatistics.entrySet();
         entitiesWithStats = new LinkedList<>();
         entrySet.forEach(entry -> {
             String ent = entry.getKey();
@@ -435,9 +435,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     public SampleStatistics[] getReplicationStats(int id) {
         SampleStatistics[] stats = null;
 
-        List<SavedStats> reps = replicationData.get(id);
-        if (reps != null)
-            stats = GenericConversion.toArray(reps, new SavedStats[0]);
+        List<SavedStats> replicationsList = replicationData.get(id);
+        if (replicationsList != null)
+            stats = GenericConversion.toArray(replicationsList, new SavedStats[0]);
         
         return stats;
     }
@@ -453,8 +453,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public int getIDforReplicationStateName(String state) {
         int id = -1;
-        int repStatsLength = getReplicationStatistics().length;
-        for (int i = 0; i < repStatsLength; i++) {
+        int replicationStatisticsLength = getReplicationStatistics().length;
+        for (int i = 0; i < replicationStatisticsLength; i++) {
             if (((Named) getReplicationStatistics()[i]).getName().equals(state)) {
                 id = i;
                 break;
@@ -463,18 +463,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         return id;
     }
 
-//    private void saveState(int lastRepNum) {
+//    private void saveState(int lastReplicationNum) {
 //        boolean midRun = !Schedule.getDefaultEventList().isFinished();
-//        boolean midReps = lastRepNum < getNumberReplications();
+//        boolean midReplications = lastReplicationNum < getNumberReplicationlications();
 //
-//        if (midReps) {
+//        if (midReplications) {
 //            // middle of some rep, fell out because of GUI stop
-//            startRepNumber = lastRepNum;
-//        } else if (!midReps && !midRun) {
-//            // done with all reps
-//            startRepNumber = 0;
-//        } else if (!midReps && midRun) {
-//            // n/a can't be out of reps but in a run
+//            startReplicationNumber = lastReplicationNum;
+//        } else if (!midReplications && !midRun) {
+//            // done with all replications
+//            startReplicationlicationlicationNumber = 0;
+//        } else if (!midReplications && midRun) {
+//            // n/a can't be out of replications but in a run
 //            throw new RuntimeException("Bad state in ViskitAssembly");
 //        }
 //    }
@@ -503,17 +503,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * For each inner stats, print to console name, count, min, max, mean,
      * standard deviation and variance. This can be done generically.
      *
-     * @param rep The replication number (one off) for this report
+     * @param replicationNumber The replication number (one off) for this report
      * @return a replication report section for the analyst report
      */
-    protected String getReplicationReport(int rep) {
+    protected String getReplicationReport(int replicationNumber) {
 
-        PropertyChangeListener[] clonedReplicationStats = getReplicationStatistics();
+        PropertyChangeListener[] clonedReplicationStatistics = getReplicationStatistics();
         int i = 0;
 
         // Outputs raw replication statistics to XML report
         if (isSaveReplicationData())
-            statsConfig.processReplicationStats((rep + 1), clonedReplicationStats);
+            statsConfig.processReplicationStatistics((replicationNumber + 1), clonedReplicationStatistics);
         
         // Borrowed from https://howtodoinjava.com/java/string/align-text-in-columns/#:~:text=One%20of%20the%20most%20straightforward,column%20within%20the%20format%20string.
         // Define column widths (CW). These may have to be slightly adjusted for
@@ -528,7 +528,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         // Report header
         StringBuilder buf = new StringBuilder("\nOutput Report for Replication #");
-        buf.append(rep + 1);
+        buf.append(replicationNumber + 1);
         buf.append(System.getProperty("line.separator"));
         buf.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
                 + minCW + "s%" + maxCW + "s%" + meanCW + "s%" + stdDevCW 
@@ -541,7 +541,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         SampleStatistics stat;
 
         // Report data (stats) in aligned columns
-        for (PropertyChangeListener pcl : clonedReplicationStats) {
+        for (PropertyChangeListener pcl : clonedReplicationStatistics) {
             stat = (SampleStatistics) pcl;
             buf.append(System.getProperty("line.separator"));
             buf.append(String.format("%-" + nameCW   + "s",stat.getName()));
@@ -666,8 +666,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
        
         // Used by the Gridlet(s)
         replicationData.clear();
-        int repStatsLength = getReplicationStatistics().length;
-        for (int i = 0; i < repStatsLength; i++)
+        int replicationStatisticsLength = getReplicationStatistics().length;
+        for (int i = 0; i < replicationStatisticsLength; i++)
             replicationData.put(i, new ArrayList<>());
 
         // TBD: there should be a pluggable way to have Viskit

@@ -57,7 +57,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
 /**
  * Shows a JFreeChart Statistics Graph for each named property.
  * Vertical axis bounded by maxObjs and minObs.
- * Horozontal each DesignPoint Statistic as a vertical bar, as these come in
+ * Horizontal each DesignPoint Statistic as a vertical bar, as these come in
  * the maxObjs and minObs scales are adjusted dynamically.
  * Each vertical bar shows standard deviation.
  * To consider, maybe clicking on a bar brings up replication stats for

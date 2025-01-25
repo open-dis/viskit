@@ -106,18 +106,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private String portCfg;
     private String unameDecrCfg = "";
     private String pwordDecrCfg = "";
-    private JButton canButt;
-    private JButton runButt;
-    private JButton adminButt;
-    private JButton dotDotButt;
+    private JButton cancelButton;
+    private JButton runButton;
+    private JButton adminButton;
+    private JButton dotDotButton;
     private JPasswordField upwPF;
     private JTextArea statusTextArea;
-    private JTextField numCubesTF;
+    private JTextField numberCubesTF;
     private JTextField clusterTF;
     private JTextField clusterNameReadOnlyTF;
     private JTextField portTF;
-    private JTextField numRepsTF;
-    private JTextField numDPsTF;
+    private JTextField numberReplicationsTF;
+    private JTextField numberDPsTF;
     private JTextField tmo;
     private JTextField unameTF;
     private JCheckBox doAnalystReports;
@@ -185,10 +185,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         upwPF.setText(pwordDecrCfg);
         ViskitStatics.clampHeight(upwPF);
         JPanel adminPan = new JPanel();
-        adminButt = new JButton("admin");
+        adminButton = new JButton("admin");
         adminPan.setLayout(new BoxLayout(adminPan, BoxLayout.X_AXIS));
         adminPan.add(clusterTF);
-        adminPan.add(adminButt);
+        adminPan.add(adminButton);
         JLabel localRunLab = new JLabel("Run Locally");
         doLocalRun = new JCheckBox();
 
@@ -242,7 +242,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 unameTF.setEnabled(false);
                 portTF.setEnabled(false);
                 upwPF.setEnabled(false);
-                adminButt.setEnabled(false);
+                adminButton.setEnabled(false);
                 clusterTF.setEnabled(false);
                 gridMode = false;
             } else {
@@ -250,7 +250,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 unameTF.setEnabled(true);
                 portTF.setEnabled(true);
                 upwPF.setEnabled(true);
-                adminButt.setEnabled(true);
+                adminButton.setEnabled(true);
                 clusterTF.setEnabled(true);
                 gridMode = true;
             }
@@ -268,8 +268,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         clusterNameReadOnlyTF.setText(serverCfg);
         clusterNameReadOnlyTF.setEditable(false);
         clusNameP.add(clusterNameReadOnlyTF);
-        dotDotButt = new JButton("...");
-        clusNameP.add(dotDotButt);
+        dotDotButton = new JButton("...");
+        clusNameP.add(dotDotButton);
         clusNameP.add(Box.createHorizontalStrut(5));
         Dimension d = clusNameP.getPreferredSize();
         clusNameP.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
@@ -280,12 +280,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         JPanel topPan = new JPanel(new SpringLayout());
 
         JLabel dpLab = new JLabel("Design point variables");
-        numDPsTF = new JTextField(6);
+        numberDPsTF = new JTextField(6);
 
         JLabel sampLab = new JLabel("Hypercubes");
-        numCubesTF = new ttJTextField(20);
+        numberCubesTF = new ttJTextField(20);
 
-        numRepsTF = new JTextField(6);
+        numberReplicationsTF = new JTextField(6);
         JLabel repLab = new JLabel("Replications");
         tmo = new JTextField(6);
         JLabel tmoLab = new JLabel("Replication time out (ms)");
@@ -293,14 +293,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         JLabel analystReportLab = new JLabel("Analyst report each run");
         doAnalystReports = new JCheckBox((String) null, false);
 
-        numDPsTF.setEditable(false);
+        numberDPsTF.setEditable(false);
 
         topPan.add(dpLab);
-        topPan.add(numDPsTF);
+        topPan.add(numberDPsTF);
         topPan.add(sampLab);
-        topPan.add(numCubesTF);
+        topPan.add(numberCubesTF);
         topPan.add(repLab);
-        topPan.add(numRepsTF);
+        topPan.add(numberReplicationsTF);
         topPan.add(tmoLab);
         topPan.add(tmo);
         topPan.add(analystReportLab); // tooltip this with warning
@@ -336,18 +336,18 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         JPanel vPan = new JPanel();
         vPan.setLayout(new BoxLayout(vPan, BoxLayout.X_AXIS));
-        canButt = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
-        canButt.setToolTipText("Stop the Grid run");
-        canButt.setEnabled(false);
-        canButt.setBorder(BorderFactory.createEtchedBorder());
-        canButt.setText(null);
-        vPan.add(canButt);
+        cancelButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
+        cancelButton.setToolTipText("Stop the Grid run");
+        cancelButton.setEnabled(false);
+        cancelButton.setBorder(BorderFactory.createEtchedBorder());
+        cancelButton.setText(null);
+        vPan.add(cancelButton);
 
-        runButt = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
-        runButt.setToolTipText("Begin the Grid run");
-        runButt.setBorder(BorderFactory.createEtchedBorder());
-        runButt.setText(null);
-        vPan.add(runButt);
+        runButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
+        runButton.setToolTipText("Begin the Grid run");
+        runButton.setBorder(BorderFactory.createEtchedBorder());
+        runButton.setText(null);
+        vPan.add(runButton);
         vPan.add(Box.createHorizontalGlue());
         controlP.add(vPan);
 
@@ -419,7 +419,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
      */
     public void setAssemblyFile(SimkitAssembly jaxbRoot, File file) {
         this.jaxbRoot = jaxbRoot;
-        numDPsTF.setText("" + jaxbRoot.getDesignParameters().size());
+        numberDPsTF.setText("" + jaxbRoot.getDesignParameters().size());
         setFile(file.getAbsolutePath(), file.getName());
     }
 
@@ -444,14 +444,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         if (exp != null) {
             //designPts = exp.getDesignPoint().size();
             int numDesignPts = jaxbRoot.getDesignParameters().size();
-            numDPsTF.setText("" + numDesignPts);
+            numberDPsTF.setText("" + numDesignPts);
             String s = exp.getTotalSamples();
             if (s != null) {
-                numCubesTF.setText(s);
+                numberCubesTF.setText(s);
             }
             s = exp.getReplicationsPerDesignPoint();
             if (s != null) {
-                numRepsTF.setText(s);
+                numberReplicationsTF.setText(s);
             }
 
             s = exp.getTimeout();
@@ -464,13 +464,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             jaxbRoot.setExperiment(exp);
 
             exp.setTotalSamples("1");
-            numCubesTF.setText("1");
+            numberCubesTF.setText("1");
             exp.setReplicationsPerDesignPoint("1");
-            numRepsTF.setText("1");
+            numberReplicationsTF.setText("1");
             exp.setTimeout("5000");
             tmo.setText("5000");
             int numDesignPts = jaxbRoot.getDesignParameters().size();
-            numDPsTF.setText("" + numDesignPts);
+            numberDPsTF.setText("" + numDesignPts);
         }
     }
 
@@ -496,7 +496,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private void saveParamsToJaxbNoNotify() {
         // Put the params from the GUI into the jaxbRoot
         int numDesignPts = jaxbRoot.getDesignParameters().size();
-        numDPsTF.setText("" + numDesignPts);
+        numberDPsTF.setText("" + numDesignPts);
 
         Experiment exp = jaxbRoot.getExperiment();
         Schedule sch = jaxbRoot.getSchedule();
@@ -507,7 +507,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             sch = OpenAssembly.inst().jaxbFactory.createSchedule();
         }
 
-        String reps = numRepsTF.getText().trim();
+        String reps = numberReplicationsTF.getText().trim();
         try {
             Integer.valueOf(reps);
         } catch (NumberFormatException e) {
@@ -517,7 +517,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         sch.setNumberReplications(reps);                            // rg: 2
         exp.setReplicationsPerDesignPoint(reps);
 
-        String samps = numCubesTF.getText().trim();
+        String samps = numberCubesTF.getText().trim();
         try {
             Integer.valueOf(samps);
         } catch (NumberFormatException e) {
@@ -545,19 +545,19 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void doListeners() {
-        canButt.setActionCommand("cancel");
-        runButt.setActionCommand("run");
-        adminButt.setActionCommand("admin");
-        dotDotButt.setActionCommand("dotdot");
+        cancelButton.setActionCommand("cancel");
+        runButton.setActionCommand("run");
+        adminButton.setActionCommand("admin");
+        dotDotButton.setActionCommand("dotdot");
 
         ActionListener al = new ButtListener();
-        canButt.addActionListener(al);
-        runButt.addActionListener(al);
-        dotDotButt.addActionListener(al);
-        adminButt.addActionListener(al);
+        cancelButton.addActionListener(al);
+        runButton.addActionListener(al);
+        dotDotButton.addActionListener(al);
+        adminButton.addActionListener(al);
 
-        numCubesTF.addKeyListener(myEditListener);
-        numRepsTF.addKeyListener(myEditListener);
+        numberCubesTF.addKeyListener(myEditListener);
+        numberReplicationsTF.addKeyListener(myEditListener);
         tmo.addKeyListener(myEditListener);
     }
 
@@ -596,14 +596,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void doStartRun() {
-        runButt.setEnabled(false);
-        canButt.setEnabled(true);
+        runButton.setEnabled(false);
+        cancelButton.setEnabled(true);
 
         // call back to the controller to put design parms and Event Graphs in place in a temp file
         // prepRun() access the DOE tab and puts the dps into the
         if (!doeController.prepRun()) {
-            runButt.setEnabled(true);
-            canButt.setEnabled(false);
+            runButton.setEnabled(true);
+            cancelButton.setEnabled(false);
             return;
         }
         // put the local stuff in place
@@ -656,8 +656,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
                     break;
                 case 'x':
-                    runButt.setEnabled(true);  // for next time (probably not used)
-                    canButt.setEnabled(false);
+                    runButton.setEnabled(true);  // for next time (probably not used)
+                    cancelButton.setEnabled(false);
                     if (outputDirty) {
                         if (JOptionPane.showConfirmDialog(JobLauncherTab2.this, "Save output?") == JOptionPane.YES_OPTION) {
                             JFileChooser jfc = new JFileChooser();
@@ -696,8 +696,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private void stopRun() {
         outputList.clear();
 
-        canButt.setEnabled(false);
-        runButt.setEnabled(true);
+        cancelButton.setEnabled(false);
+        runButton.setEnabled(true);
 
         if (thread == null) {
             return;
@@ -1398,7 +1398,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             unameTF.setEnabled(false);
             portTF.setEnabled(false);
             upwPF.setEnabled(false);
-            adminButt.setEnabled(false);
+            adminButton.setEnabled(false);
             clusterTF.setEnabled(false);
         }
     }

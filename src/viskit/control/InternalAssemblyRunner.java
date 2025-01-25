@@ -200,7 +200,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
         Method getStopTime = assemblyClass.getMethod("getStopTime");
 
-        runPanel.numRepsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
+        runPanel.numberReplicationsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
         runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
         runPanel.saveRepDataCB.setSelected(saveReplicationDataToXml);
@@ -278,7 +278,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numRepsTF.getText().trim()));
+            setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numberReplicationsTF.getText().trim()));
             setPrintReplicationReports.invoke(assemblyInstance, runPanel.printReplicationReportsCB.isSelected());
             setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummaryReportsCB.isSelected());
 
@@ -707,7 +707,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             int beginLength = nowRunningsString.length();
             nowRunningsString.append(evt.getNewValue());
             nowRunningsString.append(" of ");
-            nowRunningsString.append(Integer.parseInt(runPanel.numRepsTF.getText()));
+            nowRunningsString.append(Integer.parseInt(runPanel.numberReplicationsTF.getText()));
             nowRunningsString.append("</b>\n");
             nowRunningsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(nowRunningsString.toString());

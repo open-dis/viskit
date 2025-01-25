@@ -115,11 +115,11 @@ public class ViskitAssembly extends BasicAssembly {
     @Override
     public void hookupReplicationListeners() {
         String[] listeners = GenericConversion.toArray(replicationStatsListenerConnections.keySet(), new String[0]);
-        List<PropertyConnector> repStatsConnects;
+        List<PropertyConnector> replicationStatisiticsConnectorList;
         for (String listener : listeners) {
-            repStatsConnects = replicationStatsListenerConnections.get(listener);
-            if (repStatsConnects != null) {
-                for (PropertyConnector pc : repStatsConnects) {
+            replicationStatisiticsConnectorList = replicationStatsListenerConnections.get(listener);
+            if (replicationStatisiticsConnectorList != null) {
+                for (PropertyConnector pc : replicationStatisiticsConnectorList) {
                     connectReplicationStats(listener, pc);
                 }
             } else if (DEBUG) {
@@ -271,12 +271,12 @@ public class ViskitAssembly extends BasicAssembly {
     }
 
     public void addReplicationStatsListenerConnection(String listener, String property, String source) {
-        List<PropertyConnector> repStatsConnects = replicationStatsListenerConnections.get(listener);
-        if ( repStatsConnects == null ) {
-            repStatsConnects = new LinkedList<>();
-            replicationStatsListenerConnections.put(listener, repStatsConnects);
+        List<PropertyConnector> replicationStatisticsConnects = replicationStatsListenerConnections.get(listener);
+        if ( replicationStatisticsConnects == null ) {
+            replicationStatisticsConnects = new LinkedList<>();
+            replicationStatsListenerConnections.put(listener, replicationStatisticsConnects);
         }
-        repStatsConnects.add(new PropertyConnector(property,source));
+        replicationStatisticsConnects.add(new PropertyConnector(property,source));
     }
 
     public void addSimEventListenerConnection(String listener, String source) {

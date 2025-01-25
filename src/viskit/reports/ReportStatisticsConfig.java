@@ -155,7 +155,7 @@ public class ReportStatisticsConfig {
      * @param repNumber replication number
      * @param repStats  replication statistics
      */
-    public void processReplicationStats(int repNumber, PropertyChangeListener[] repStats) {
+    public void processReplicationStatistics(int repNumber, PropertyChangeListener[] repStats) {
         LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[repStats.length];

@@ -576,7 +576,7 @@ public class MainFrame extends JFrame {
                     + "----------------------" + rp2.lineEnd);
             rp2.vcrSimTime.setText("");
             rp2.vcrStopTime.setText("");
-            rp2.numRepsTF.setText("");
+            rp2.numberReplicationsTF.setText("");
             rp2.vcrVerbose.setSelected(false);
             rp2.printReplicationReportsCB.setSelected(false);
             rp2.printSummaryReportsCB.setSelected(false);
