@@ -12,6 +12,6 @@
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="SimplePropertyDumper_4" source="ArrayTester_3"/>
     <Output entity="ArrayTester_3"/>
-    <Schedule stopTime="100." verbose="false" saveReplicationData="false"/>
+    <Schedule stopTime="100." verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="1" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>

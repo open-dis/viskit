@@ -20,6 +20,6 @@
     </SimEntity>
     <SimEventListenerConnection listener="EntityCreator_2" source="ArrivalProcess_1"/>
     <Adapter name="adptr_3" eventHeard="EntityArrival" eventSent="Arrival" from="EntityCreator_2" to="ServerGeneric_0" description=""/>
-    <Schedule stopTime="100." verbose="false" saveReplicationData="false"/>
+    <Schedule stopTime="100." verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="1" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
