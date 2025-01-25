@@ -135,7 +135,7 @@ public class ViskitGlobals {
 
     /* routines to manage the singleton-aspect of the views. */
     MvcAbstractJFrameView avf;
-    MvcController acont;
+    MvcController aController;
 
     /**
      * Get a reference to the assembly editor view.
@@ -150,9 +150,9 @@ public class ViskitGlobals {
      * @return the component AssemblyViewFrame
      */
     public MvcAbstractJFrameView buildAssemblyViewFrame() {
-        acont = new AssemblyControllerImpl();
-        avf = new AssemblyViewFrame(acont);
-        acont.setView(avf);
+        aController = new AssemblyControllerImpl();
+        avf = new AssemblyViewFrame(aController);
+        aController.setView(avf);
         return avf;
     }
 
@@ -162,11 +162,11 @@ public class ViskitGlobals {
     }
 
     public AssemblyModel getActiveAssemblyModel() {
-        return (AssemblyModel) acont.getModel();
+        return (AssemblyModel) aController.getModel();
     }
 
     public MvcController getAssemblyController() {
-        return acont;
+        return aController;
     }
 
     ActionListener defaultAssemblyQuitHandler = new ActionListener() {
@@ -287,7 +287,7 @@ public class ViskitGlobals {
     }
 
     /** @return the analyst report builder (model) */
-    public AnalystReportModel getAnalystReoprtModel() {
+    public AnalystReportModel getAnalystReportModel() {
         return (AnalystReportModel) aRcont.getModel();
     }
 
@@ -763,11 +763,11 @@ public class ViskitGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public RunnerPanel2 getSimRunnerPanel() {
+    public RunnerPanel2 getSimulationRunnerPanel() {
         return runPanel;
     }
 
-    public void setSimRunnerPanel(RunnerPanel2 runPanel) {
+    public void setSimulationRunnerPanel(RunnerPanel2 runPanel) {
         this.runPanel = runPanel;
     }
 
