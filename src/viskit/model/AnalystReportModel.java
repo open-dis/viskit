@@ -99,7 +99,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Element statisticalResultsElement;
     private Element conclusionsRecommendationsElement;
 
-    private JProgressBar jpb;
+    private JProgressBar progressBar;
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -140,8 +140,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         this(xmlFile);
 
         // TODO: This doesn't seem to be doing anything correctly
-        jpb = new JProgressBar();
-        aRPanel.add(jpb);
+        progressBar = new JProgressBar();
+        aRPanel.add(progressBar);
         aRPanel.validate();
 
         LOG.debug("Successful parseXML");
@@ -1015,9 +1015,9 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Post Analyst Report processing steps to take */
     private void postProcessing() 
     {
-        jpb.setIndeterminate(true);
-        jpb.setString("Analyst Report now generating...");
-        jpb.setStringPainted(true);
+        progressBar.setIndeterminate(true);
+        progressBar.setString("Analyst Report now generating...");
+        progressBar.setStringPainted(true);
 
         LOG.debug("JProgressBar set");
 
@@ -1028,8 +1028,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         captureLocationImage();
         LOG.debug("Location Image captured");
 
-        jpb.setIndeterminate(false);
-        jpb.setStringPainted(false);
+        progressBar.setIndeterminate(false);
+        progressBar.setStringPainted(false);
 
         announceAnalystReportReadyToView();
         reportReady = true;
@@ -1078,7 +1078,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             announcement = announcement + "s";
         announcement = announcement +  " performed</p><br />" +
                   // Elapsed clock time: TODO
-                "<p align='center'>Analyst Report<br />" + assemblyName + "</p>" +
+                "<p align='center'>Analyst Report " + assemblyName + "</p>" +
                 "<p align='center'> is loaded and ready for further editing</p></body></html>";
                 
         ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,

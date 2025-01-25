@@ -14,6 +14,6 @@ public interface AssemblyRunnerPlug {
     void exec(String[] execStrings);
     
     /** Resets the runner upon project change */
-    void resetRunner();
+    void resetRunnerPanel();
 
 } // end class file AssemblyRunnerPlug.java

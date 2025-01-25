@@ -145,9 +145,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     public void postQuit() {
-        // TODO: provide something other than the sysExit() call.  This is done
+        // TODO: provide something other than the systemExit() call.  This is done
         // elsewhere
-//        VGlobals.instance().sysExit(0);
+//        VGlobals.instance().systemExit(0);
     }
 
     private int checkDirty() {

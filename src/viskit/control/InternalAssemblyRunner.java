@@ -114,7 +114,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
-        runPanel = new RunnerPanel2("Assembly Runner", true, analystReportPanelVisible);
+        runPanel = new RunnerPanel2("Assembly Runner", false, analystReportPanelVisible);
         doMenus();
         runPanel.vcrStopButton.addActionListener(assemblyRunStopListener = new StopListener());
         runPanel.vcrPlayButton.addActionListener(new StartResumeListener());
@@ -275,7 +275,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
             // *** End RNG seed state reset ***
 
-            textAreaOutputStream = new JTextAreaOutputStream(runPanel.soutTA, 16*1024);
+            textAreaOutputStream = new JTextAreaOutputStream(runPanel.outputStreamTA, 16*1024);
 
             setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplications.invoke(assemblyInstance, Integer.valueOf(runPanel.numberReplicationsTF.getText().trim()));
@@ -348,7 +348,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             System.out.println("Simulation ended");
             System.out.println("----------------");
 
-            runPanel.npsLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
+            runPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblyRunStopListener.actionPerformed(null);
         }
     }
@@ -479,7 +479,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             }
 
             try (Writer bw = new BufferedWriter(new FileWriter(fil))) {
-                bw.write(runPanel.soutTA.getText());
+                bw.write(runPanel.outputStreamTA.getText());
             } catch (IOException e1) {
                 ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
@@ -609,7 +609,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String s = runPanel.soutTA.getSelectedText();
+            String s = runPanel.outputStreamTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
             clpbd.setContents(ss, ss);
@@ -620,8 +620,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.requestFocus();
-            runPanel.soutTA.selectAll();
+            runPanel.outputStreamTA.requestFocus();
+            runPanel.outputStreamTA.selectAll();
         }
     }
 
@@ -629,7 +629,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.soutTA.setText(null);
+            runPanel.outputStreamTA.setText(null);
         }
     }
 
@@ -650,7 +650,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 tool = "gedit"; // assuming Linux here
             }
 
-            String s = runPanel.soutTA.getText().trim();
+            String s = runPanel.outputStreamTA.getText().trim();
             try {
                 f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
@@ -711,7 +711,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             nowRunningsString.append(Integer.parseInt(runPanel.numberReplicationsTF.getText()));
             nowRunningsString.append("</b>\n");
             nowRunningsString.append("</font></p></body></html>\n");
-            runPanel.npsLabel.setText(nowRunningsString.toString());
+            runPanel.nowRunningLabel.setText(nowRunningsString.toString());
 
             // reset display string in preparation for the next replication output
             nowRunningsString.delete(beginLength, nowRunningsString.length());

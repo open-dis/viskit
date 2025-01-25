@@ -667,7 +667,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
         ViskitGlobals.instance().getEventGraphEditor().showProjectName();
-        runner.resetRunner();
+        runner.resetRunnerPanel();
     }
 
     @Override
@@ -1676,7 +1676,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 else
                 {
                     // Ensure a cleared Assembly Run panel upon every Assembly compile
-                    runner.resetRunner();
+                    runner.resetRunnerPanel();
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();

@@ -39,7 +39,6 @@ import bsh.NameSpace;
 
 import edu.nps.util.GenericConversion;
 import edu.nps.util.LogUtils;
-import edu.nps.util.SysExitHandler;
 
 import java.awt.Component;
 import java.awt.Frame;
@@ -79,6 +78,7 @@ import viskit.view.RunnerPanel2;
 import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
+import edu.nps.util.SystemExitHandler;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -106,7 +106,7 @@ public class ViskitGlobals {
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private RunnerPanel2 runnerPanel;
 
-    /** Flag to denote called sysExit only once */
+    /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
 
     /** The current project working directory */
@@ -134,15 +134,15 @@ public class ViskitGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    MvcAbstractJFrameView avf;
-    MvcController aController;
+    MvcAbstractJFrameView assemblyViewFrame;
+    MvcController assemblyController;
 
     /**
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
     public AssemblyViewFrame getAssemblyEditor() {
-        return (AssemblyViewFrame) avf;
+        return (AssemblyViewFrame) assemblyViewFrame;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
@@ -150,31 +150,31 @@ public class ViskitGlobals {
      * @return the component AssemblyViewFrame
      */
     public MvcAbstractJFrameView buildAssemblyViewFrame() {
-        aController = new AssemblyControllerImpl();
-        avf = new AssemblyViewFrame(aController);
-        aController.setView(avf);
-        return avf;
+        assemblyController = new AssemblyControllerImpl();
+        assemblyViewFrame = new AssemblyViewFrame(assemblyController);
+        assemblyController.setView(assemblyViewFrame);
+        return assemblyViewFrame;
     }
 
     /** Rebuilds the Listener Event Graph Object (LEGO) panels on the Assembly Editor */
     public void rebuildLEGOTreePanels() {
-        ((AssemblyViewFrame) avf).rebuildLEGOTreePanels();
+        ((AssemblyViewFrame) assemblyViewFrame).rebuildLEGOTreePanels();
     }
 
     public AssemblyModel getActiveAssemblyModel() {
-        return (AssemblyModel) aController.getModel();
+        return (AssemblyModel) assemblyController.getModel();
     }
 
     public MvcController getAssemblyController() {
-        return aController;
+        return assemblyController;
     }
 
     ActionListener defaultAssemblyQuitHandler = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (avf != null) {
-                avf.setVisible(false);
+            if (assemblyViewFrame != null) {
+                assemblyViewFrame.setVisible(false);
             }
         }
     };
@@ -889,8 +889,8 @@ public class ViskitGlobals {
         return sb.toString();
     }
 
-    /** All of this to avoid a SysExit call explicitly */
-    private SysExitHandler sysexithandler = (int status) -> {
+    /** All of this to avoid a SystemExit call explicitly */
+    private SystemExitHandler systemExitHandler = (int status) -> {
         LOG.debug("Viskit is exiting with status {}: ", status);
 
         /* If an application launched a JVM, and is still running, this will
@@ -942,22 +942,22 @@ public class ViskitGlobals {
         }
     };
 
-    public void setSysExitHandler(SysExitHandler handler) {
-        sysexithandler = handler;
+    public void setSystemExitHandler(SystemExitHandler handler) {
+        systemExitHandler = handler;
     }
 
-    public SysExitHandler getSysExitHandler() {
-        return sysexithandler;
+    public SystemExitHandler getSystemExitHandler() {
+        return systemExitHandler;
     }
 
     /** Called to perform proper thread shutdown without calling System.exit(0)
      *
      * @param status the status of JVM shutdown
      */
-    public void sysExit(int status) {
-        if (!isSysExitCalled()) {
-            sysexithandler.doSysExit(status);
-            setSysExitCalled(true);
+    public void systemExit(int status) {
+        if (!isSystemExitCalled()) {
+            systemExitHandler.doSystemExit(status);
+            setSystemExitCalled(true);
         }
     }
 
@@ -981,12 +981,12 @@ public class ViskitGlobals {
         this.help = help;
     }
 
-    public boolean isSysExitCalled() {
+    public boolean isSystemExitCalled() {
         return systemExitCalled;
     }
 
-    public void setSysExitCalled(boolean sysExitCalled) {
-        this.systemExitCalled = sysExitCalled;
+    public void setSystemExitCalled(boolean systemExitCalled) {
+        this.systemExitCalled = systemExitCalled;
     }
 
     /**
