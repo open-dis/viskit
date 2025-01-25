@@ -39,7 +39,6 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         viskitTabbedPane = new javax.swing.JTabbedPane();
         eventGraphEditorPanel = new javax.swing.JPanel();
         assemblyEditorPanel = new javax.swing.JPanel();
-        designOfExperimentsPanel = new javax.swing.JPanel();
         runSimulationTabbedPane = new javax.swing.JTabbedPane();
         runLocalSimulationPanel = new javax.swing.JPanel();
         runClusterSimulationPanel = new javax.swing.JPanel();
@@ -53,6 +52,7 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         _6_BehaviorDescriptionsPanel = new javax.swing.JPanel();
         _7_StatisticalResultsPanel = new javax.swing.JPanel();
         _8_ConclusionsRecommendationsPanel = new javax.swing.JPanel();
+        designOfExperimentsPanel = new javax.swing.JPanel();
         viskitMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         newViskitProjectMI = new javax.swing.JMenuItem();
@@ -100,7 +100,6 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         undoAssemblyEditMenuItem = new javax.swing.JMenuItem();
         redoAssemblyEditMenuItem = new javax.swing.JMenuItem();
-        designOfExperimentsMenu = new javax.swing.JMenu();
         runAssemblyMenu = new javax.swing.JMenu();
         saveSimulationConsoleMI = new javax.swing.JMenuItem();
         viewConsoleTextEditorMI = new javax.swing.JMenuItem();
@@ -109,6 +108,7 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         openAnotherAnalystReportMI = new javax.swing.JMenuItem();
         saveAnalystReportXml = new javax.swing.JMenuItem();
         viewAnalystReportXmlMI = new javax.swing.JMenuItem();
+        designOfExperimentsMenu = new javax.swing.JMenu();
         viewMenu = new javax.swing.JMenu();
         viewSavedXmlMI = new javax.swing.JMenuItem();
         generateJavaSourceMI = new javax.swing.JMenuItem();
@@ -147,19 +147,6 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         );
 
         viskitTabbedPane.addTab("Assembly Editor", assemblyEditorPanel);
-
-        javax.swing.GroupLayout designOfExperimentsPanelLayout = new javax.swing.GroupLayout(designOfExperimentsPanel);
-        designOfExperimentsPanel.setLayout(designOfExperimentsPanelLayout);
-        designOfExperimentsPanelLayout.setHorizontalGroup(
-            designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
-        );
-        designOfExperimentsPanelLayout.setVerticalGroup(
-            designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 543, Short.MAX_VALUE)
-        );
-
-        viskitTabbedPane.addTab("Design of Experiments (DOE)", designOfExperimentsPanel);
 
         javax.swing.GroupLayout runLocalSimulationPanelLayout = new javax.swing.GroupLayout(runLocalSimulationPanel);
         runLocalSimulationPanel.setLayout(runLocalSimulationPanelLayout);
@@ -313,6 +300,19 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         );
 
         viskitTabbedPane.addTab("Analyst Report", analystReportPanel);
+
+        javax.swing.GroupLayout designOfExperimentsPanelLayout = new javax.swing.GroupLayout(designOfExperimentsPanel);
+        designOfExperimentsPanel.setLayout(designOfExperimentsPanelLayout);
+        designOfExperimentsPanelLayout.setHorizontalGroup(
+            designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 800, Short.MAX_VALUE)
+        );
+        designOfExperimentsPanelLayout.setVerticalGroup(
+            designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 543, Short.MAX_VALUE)
+        );
+
+        viskitTabbedPane.addTab("Design of Experiments (DOE)", designOfExperimentsPanel);
 
         fileMenu.setText("File  ");
 
@@ -522,9 +522,6 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
 
         viskitMenuBar.add(assemblyMenu);
 
-        designOfExperimentsMenu.setText("Design of Experiments (DOE)   ");
-        viskitMenuBar.add(designOfExperimentsMenu);
-
         runAssemblyMenu.setText("Run Simulation  ");
 
         saveSimulationConsoleMI.setMnemonic(KeyEvent.VK_S);
@@ -557,6 +554,9 @@ public class ViskitApplicationLayoutRedesignLayout extends javax.swing.JFrame {
         analystReportMenu.add(viewAnalystReportXmlMI);
 
         viskitMenuBar.add(analystReportMenu);
+
+        designOfExperimentsMenu.setText("Design of Experiments (DOE)   ");
+        viskitMenuBar.add(designOfExperimentsMenu);
 
         viewMenu.setText("View");
 
