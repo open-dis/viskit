@@ -72,7 +72,7 @@ public class RunnerPanel2 extends JPanel {
     public JCheckBox printSummaryReportsCB;
     public JCheckBox resetSeedStateCB;
     public JCheckBox analystReportCB;
-    public JTextField numRepsTF;
+    public JTextField numberReplicationsTF;
     public JScrollBar bar;
     public JTextField verboseReplicationNumberTF;
     public JLabel npsLabel;
@@ -165,19 +165,19 @@ public class RunnerPanel2 extends JPanel {
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         flowPanel.add(vcrSimTimePanel);
 
-        numRepsTF = new JTextField(10);
-        numRepsTF.addActionListener((ActionEvent e) -> {
-            int numReps = Integer.parseInt(numRepsTF.getText().trim());
+        numberReplicationsTF = new JTextField(10);
+        numberReplicationsTF.addActionListener((ActionEvent e) -> {
+            int numReps = Integer.parseInt(numberReplicationsTF.getText().trim());
             if (numReps < 1) {
-                numRepsTF.setText("1");
+                numberReplicationsTF.setText("1");
             }
         });
-        ViskitStatics.clampSize(numRepsTF, numRepsTF, numRepsTF);
+        ViskitStatics.clampSize(numberReplicationsTF, numberReplicationsTF, numberReplicationsTF);
         JLabel numReplicationsLabel = new JLabel("# replications: ");
         vcrSimTimePanel = new JPanel();
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
         vcrSimTimePanel.add(numReplicationsLabel);
-        vcrSimTimePanel.add(numRepsTF);
+        vcrSimTimePanel.add(numberReplicationsTF);
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         flowPanel.add(vcrSimTimePanel);
 
