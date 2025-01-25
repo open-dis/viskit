@@ -67,9 +67,9 @@ public class ViskitConfiguration {
     public static final String EVENTGRAPH_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSEMBLY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
     public static final String ASSEMBLY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DOE_EDIT_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
     public static final String CLUSTER_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
-    public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DEBUG_MESSAGES_KEY = "app.debug";
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
