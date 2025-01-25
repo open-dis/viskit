@@ -60,7 +60,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * Horizontal each DesignPoint Statistic as a vertical bar, as these come in
  * the maxObjs and minObs scales are adjusted dynamically.
  * Each vertical bar shows standard deviation.
- * To consider, maybe clicking on a bar brings up replication stats for
+ * To consider, maybe clicking on a bar brings up replication statistics for
  * that design point with horizontal line across the mean.
  * @author Patrick Sullivan
  * @version $Id$
@@ -99,7 +99,7 @@ public class StatisticsGraph extends JPanel {
         tabbedPane.removeAll();
         for (String prop : properties) {
             if (viskit.ViskitStatics.debug) {
-                System.out.println("StatsGraph: createDataSets for " + prop);
+                System.out.println("StatisticsGraph: createDataSets for " + prop);
             }
             createDataSets(prop);
             tabbedPane.add(prop, chartPanels.get(prop));
@@ -117,12 +117,12 @@ public class StatisticsGraph extends JPanel {
      */
     public void addSampleStatistic(viskit.xsd.bindings.assembly.SampleStatistics sample, int d, int s) {
         String name = sample.getName();
-        DefaultStatisticalCategoryDataset statsData = meanAndStandardDeviations.get(name);
+        DefaultStatisticalCategoryDataset statisticalCategoryDataset = meanAndStandardDeviations.get(name);
         DefaultIntervalCategoryDataset minMax = minMaxs.get(name);
         if (viskit.ViskitStatics.debug) {
             System.out.println("SampleStatisticType name: " + sample.getName());
         }
-        statsData.add(Double.parseDouble(sample.getMean()),Double.parseDouble(sample.getStandardDeviation()), "Design Point " + d, "Sample " + s);
+        statisticalCategoryDataset.add(Double.parseDouble(sample.getMean()),Double.parseDouble(sample.getStandardDeviation()), "Design Point " + d, "Sample " + s);
         minMax.setStartValue(d, "Sample " + s, Double.valueOf(sample.getMinObs()));
         minMax.setEndValue(d, "Sample " + s, Double.valueOf(sample.getMaxObs()));
         chartPanels.get(name).repaint();

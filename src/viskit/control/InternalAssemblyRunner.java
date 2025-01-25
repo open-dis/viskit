@@ -130,7 +130,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setSimRunnerPanel(runPanel);
+        ViskitGlobals.instance().setSimulationRunnerPanel(runPanel);
     }
 
     public JMenuBar getMenus() {
@@ -706,13 +706,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         if (evt.getPropertyName().equals("replicationNumber")) {
             int beginLength = nowRunningsString.length();
             nowRunningsString.append(evt.getNewValue());
+            runPanel.setNumberOfReplications(Integer.parseInt(evt.getNewValue().toString()));
             nowRunningsString.append(" of ");
             nowRunningsString.append(Integer.parseInt(runPanel.numberReplicationsTF.getText()));
             nowRunningsString.append("</b>\n");
             nowRunningsString.append("</font></p></body></html>\n");
             runPanel.npsLabel.setText(nowRunningsString.toString());
 
-            // reset for the next replication output
+            // reset display string in preparation for the next replication output
             nowRunningsString.delete(beginLength, nowRunningsString.length());
         }
     }

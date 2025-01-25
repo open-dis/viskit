@@ -41,6 +41,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
 import viskit.ViskitConfiguration;
+import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
 /**
@@ -181,7 +182,6 @@ public class RunnerPanel2 extends JPanel {
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         flowPanel.add(vcrSimTimePanel);
 
-
         vcrVerboseCB = new JCheckBox("Verbose output", false);
         vcrVerboseCB.addActionListener(new vcrVerboseCBListener());
         vcrVerboseCB.setToolTipText("Enables verbose output for all runs");
@@ -304,5 +304,27 @@ public class RunnerPanel2 extends JPanel {
         public void actionPerformed(ActionEvent event) {
             caretUpdate(null);
         }
+    }
+    // utility methods
+    
+    public int getTotalReplications()
+    {
+        if (!numberReplicationsTF.getText().isBlank() && ViskitGlobals.isNumeric(numberReplicationsTF.getText().trim()))
+        {
+            return Integer.parseInt(numberReplicationsTF.getText().trim());
+        }
+        else return 0;
+    }
+    
+    private int numberOfReplications;
+    
+    public int getNumberOfReplications()
+    {
+        return numberOfReplications;
+    }
+    
+    public void setNumberOfReplications(int value)
+    {
+        numberOfReplications = value;
     }
 }

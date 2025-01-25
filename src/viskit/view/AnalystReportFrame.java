@@ -176,7 +176,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         fillSimulationConfiguration();
         fillEntityParams();
         fillBehaviors();
-        fillStatsPan();
+        fillStatisticsPanel();
         fillConclusionsRecommendationsPanel();
     }
 
@@ -347,14 +347,14 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     }
 
     private void fillSimulationLocation() {
-        wantLocationDescriptions.setSelected(analystReportModel.isPrintSimLocationComments());
-        locationCommentsTA.setText(analystReportModel.getSimLocationComments());
+        wantLocationDescriptions.setSelected(analystReportModel.isPrintSimulationLocationComments());
+        locationCommentsTA.setText(analystReportModel.getSimulationLocationComments());
         locationCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
-        locationProductionNotesTA.setText(analystReportModel.getSimLocationProductionNotes());
+        locationProductionNotesTA.setText(analystReportModel.getSimulationLocationProductionNotes());
         locationProductionNotesTA.setEnabled(wantLocationDescriptions.isSelected());
-        locationConclusionsTA.setText(analystReportModel.getSimLocationConclusions());
+        locationConclusionsTA.setText(analystReportModel.getSimulationLocationConclusions());
         locationConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
-        wantLocationImages.setSelected(analystReportModel.isPrintSimLocationImage());
+        wantLocationImages.setSelected(analystReportModel.isPrintSimulationLocationImage());
         simLocationImageTF.setEnabled(wantLocationImages.isSelected());
         simLocationImageButton.setEnabled(wantLocationImages.isSelected());
         simChartImageTF.setEnabled(wantLocationImages.isSelected());
@@ -364,11 +364,11 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     }
 
     private void unFillSimulationLocation() {
-        analystReportModel.setPrintSimLocationComments(wantLocationDescriptions.isSelected());
-        analystReportModel.setSimLocationDescription(locationCommentsTA.getText());
-        analystReportModel.setSimLocationProductionNotes(locationProductionNotesTA.getText());
-        analystReportModel.setSimLocationConclusions(locationConclusionsTA.getText());
-        analystReportModel.setPrintSimLocationImage(wantLocationImages.isSelected());
+        analystReportModel.setPrintSimulationLocationComments(wantLocationDescriptions.isSelected());
+        analystReportModel.setSimulationLocationDescription(locationCommentsTA.getText());
+        analystReportModel.setSimulationLocationProductionNotes(locationProductionNotesTA.getText());
+        analystReportModel.setSimulationLocationConclusions(locationConclusionsTA.getText());
+        analystReportModel.setPrintSimulationLocationImage(wantLocationImages.isSelected());
 
         String s = simLocationImageTF.getText().trim();
         if (s != null && !s.isEmpty())
@@ -448,22 +448,22 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     }
 
     private void fillSimulationConfiguration() {
-        wantAssemblyDesignAndAnalysis.setSelected(analystReportModel.isPrintSimConfigComments());
-        assemblyDesignConsiderations.setText(analystReportModel.getSimConfigComments());
+        wantAssemblyDesignAndAnalysis.setSelected(analystReportModel.isPrintSimulationConfigurationComments());
+        assemblyDesignConsiderations.setText(analystReportModel.getSimulationConfigurationComments());
         assemblyDesignConsiderations.setEnabled(wantAssemblyDesignAndAnalysis.isSelected());
 
         wantEntityTable.setSelected(analystReportModel.isPrintEntityTable());
 
-        String[][] sa = analystReportModel.getSimConfigEntityTable();
+        String[][] sa = analystReportModel.getSimulationConfigurationEntityTable();
         entityTable.setModel(new DefaultTableModel(sa, new String[] {"Entity Name", "Behavior Type"}));
         entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
-        simProductionNotes.setText(analystReportModel.getSimConfigProductionNotes());
-        simProductionNotes.setEnabled(analystReportModel.isPrintSimConfigComments());
+        simProductionNotes.setText(analystReportModel.getSimulationConfigurationProductionNotes());
+        simProductionNotes.setEnabled(analystReportModel.isPrintSimulationConfigurationComments());
 
-        simConfigConclusions.setText(analystReportModel.getSimConfigConclusions());
-        simConfigConclusions.setEnabled(analystReportModel.isPrintSimConfigComments());
+        simConfigConclusions.setText(analystReportModel.getSimulationConfigurationConclusions());
+        simConfigConclusions.setEnabled(analystReportModel.isPrintSimulationConfigurationComments());
 
         wantSimConfigImages.setSelected(analystReportModel.isPrintAssemblyImage());
         configImgButt.setEnabled(wantSimConfigImages.isSelected());
@@ -472,10 +472,10 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     }
 
     private void unFillSimulationConfiguration() {
-        analystReportModel.setPrintSimConfigComments(wantAssemblyDesignAndAnalysis.isSelected());
-        analystReportModel.setSimConfigurationDescription(assemblyDesignConsiderations.getText());
-        analystReportModel.setSimConfigationProductionNotes(simProductionNotes.getText());
-        analystReportModel.setSimConfigurationConclusions(simConfigConclusions.getText());
+        analystReportModel.setPrintSimulationConfigurationComments(wantAssemblyDesignAndAnalysis.isSelected());
+        analystReportModel.setSimulationConfigurationDescription(assemblyDesignConsiderations.getText());
+        analystReportModel.setSimulationConfigationProductionNotes(simProductionNotes.getText());
+        analystReportModel.setSimulationConfigurationConclusions(simConfigConclusions.getText());
         analystReportModel.setPrintEntityTable(wantEntityTable.isSelected());
         analystReportModel.setPrintAssemblyImage(wantSimConfigImages.isSelected());
         String s = configImgPathTF.getText();
@@ -686,8 +686,8 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     JCheckBox wantStatisticsDescriptionAnalysis;
     JCheckBox wantStatsReplications;
     JCheckBox wantStatisticsSummary;
-    JTextArea statsComments;
-    JTextArea statsConclusions;
+    JTextArea statisticsComments;
+    JTextArea statisticsConclusions;
     JPanel statsSummaryPanel;
     JPanel statisticsRepPanel;
     JScrollPane repsJsp;
@@ -701,13 +701,13 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsDescriptionAnalysis);
 
-        JScrollPane jsp = new JScrollPane(statsComments = new WrappingTextArea());
+        JScrollPane jsp = new JScrollPane(statisticsComments = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Description of Expected Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        jsp = new JScrollPane(statsConclusions = new WrappingTextArea());
+        jsp = new JScrollPane(statisticsConclusions = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
@@ -736,17 +736,17 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         return p;
     }
 
-    private void fillStatsPan() {
-        boolean bool = analystReportModel.isPrintStatsComments();
+    private void fillStatisticsPanel() {
+        boolean bool = analystReportModel.isPrintStatisticsComments();
         wantStatisticsDescriptionAnalysis.setSelected(bool);
-        statsComments.setText(analystReportModel.getStatsComments());
-        statsConclusions.setText(analystReportModel.getStatsConclusions());
-        statsComments.setEnabled(bool);
-        statsConclusions.setEnabled(bool);
+        statisticsComments.setText(analystReportModel.getStatsComments());
+        statisticsConclusions.setText(analystReportModel.getStatsConclusions());
+        statisticsComments.setEnabled(bool);
+        statisticsConclusions.setEnabled(bool);
 
-        bool = analystReportModel.isPrintReplicationStats();
+        bool = analystReportModel.isPrintReplicationStatistics();
         wantStatsReplications.setSelected(bool);
-        bool = analystReportModel.isPrintSummaryStats();
+        bool = analystReportModel.isPrintSummaryStatistics();
         wantStatisticsSummary.setSelected(bool);
 
         List replicationsList = analystReportModel.getStatisticsReplicationsList();
@@ -806,11 +806,11 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     }
 
     private void unFillStatsPan() {
-        analystReportModel.setPrintStatsComments(wantStatisticsDescriptionAnalysis.isSelected());
-        analystReportModel.setStatsDescription(statsComments.getText());
-        analystReportModel.setStatsConclusions(statsConclusions.getText());
-        analystReportModel.setPrintReplicationStats(wantStatsReplications.isSelected());
-        analystReportModel.setPrintSummaryStats(wantStatisticsSummary.isSelected());
+        analystReportModel.setPrintStatisticsComments(wantStatisticsDescriptionAnalysis.isSelected());
+        analystReportModel.setStatisticsDescription(statisticsComments.getText());
+        analystReportModel.setStatisticsConclusions(statisticsConclusions.getText());
+        analystReportModel.setPrintReplicationStatistics(wantStatsReplications.isSelected());
+        analystReportModel.setPrintSummaryStatistics(wantStatisticsSummary.isSelected());
     }
     JCheckBox wantConclusionsRecommendations;
     JTextArea conRecConclusionsTA;

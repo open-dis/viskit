@@ -165,10 +165,10 @@ public class AssemblyHandler implements XmlRpcHandler {
                 case "gridkit.addDesignPointStat":
                     {
                         Integer sample = (Integer) arguments.elementAt(1);
-                        Integer designPt = (Integer) arguments.elementAt(2);
-                        Integer numberOfStats = (Integer) arguments.elementAt(3);
+                        Integer designPoint = (Integer) arguments.elementAt(2);
+                        Integer numberOfStatistics = (Integer) arguments.elementAt(3);
                         String stat = (String) arguments.elementAt(4);
-                        ret = gridRunner.addDesignPointStat(sample, designPt, numberOfStats, stat);
+                        ret = gridRunner.addDesignPointStat(sample, designPoint, numberOfStatistics, stat);
                         break;
                     }
                 case "gridkit.addReplicationStat":

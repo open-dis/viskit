@@ -103,8 +103,8 @@ public class ViskitGlobals {
 
     private ViskitProject currentViskitProject;
 
-    /** Need hold of the Enable Analyst Reports checkbox */
-    private RunnerPanel2 runPanel;
+    /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
+    private RunnerPanel2 runnerPanel;
 
     /** Flag to denote called sysExit only once */
     private boolean systemExitCalled = false;
@@ -763,12 +763,14 @@ public class ViskitGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public RunnerPanel2 getSimulationRunnerPanel() {
-        return runPanel;
+    public RunnerPanel2 getSimulationRunnerPanel()
+    {
+        return runnerPanel;
     }
 
-    public void setSimulationRunnerPanel(RunnerPanel2 runPanel) {
-        this.runPanel = runPanel;
+    public void setSimulationRunnerPanel(RunnerPanel2 runnerPanel) 
+    {
+        this.runnerPanel = runnerPanel;
     }
 
     public ViskitProject getCurrentViskitProject() {
@@ -1059,6 +1061,21 @@ public class ViskitGlobals {
             }
 
             return lab;
+        }
+    }
+    
+    /** test if string is numeric.  sheesh, why isn't this in Java already?
+     * https://stackoverflow.com/questions/1102891/how-to-check-if-a-string-is-numeric-in-java
+     * @param string
+     * @return whether numeric
+     */
+    public static boolean isNumeric(String string) {
+        try {
+            Double.valueOf(string);
+            return true;
+        } 
+        catch (NumberFormatException e) {
+            return false;
         }
     }
 

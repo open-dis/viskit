@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
     MvcAbstractJFrameView eventGraphFrame;
     MvcAbstractJFrameView assemblyFrame;
     MvcAbstractJFrameView reportPanel;
-    InternalAssemblyRunner assemblyRunComponent;
+    InternalAssemblyRunner assemblyRunner;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -251,16 +251,18 @@ public class MainFrame extends JFrame {
         }
 
         // Assembly runner
-        assemblyRunComponent = new InternalAssemblyRunner(analystReportPanelVisible);
-        runTabbedPane.add(ViskitGlobals.instance().getSimRunnerPanel(), TAB1_LOCALRUN_INDEX);
+        assemblyRunner = new InternalAssemblyRunner(analystReportPanelVisible); // TODO expose
+//        ViskitGlobals.instance().setSimulationRunnerPanel(assemblyRunner); // TODO align classes
+        
+        runTabbedPane.add(ViskitGlobals.instance().getSimulationRunnerPanel(), TAB1_LOCALRUN_INDEX);
         runTabbedPane.setTitleAt(TAB1_LOCALRUN_INDEX, "Local Run");
         runTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
-        menuBar = assemblyRunComponent.getMenus();
+        menuBar = assemblyRunner.getMenus();
         menus.add(menuBar);
         doCommonHelp(menuBar);
         jamSettingsHandler(menuBar);
-        assemblyRunComponent.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_INDEX);
-        jamQuitHandler(assemblyRunComponent.getQuitMenuItem(), myQuitAction, menuBar);
+        assemblyRunner.setTitleListener(myTitleListener, tabbedPane.getTabCount() + TAB1_LOCALRUN_INDEX);
+        jamQuitHandler(assemblyRunner.getQuitMenuItem(), myQuitAction, menuBar);
         AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyFrame.getController());
         controller.setInitialAssemblyFile(initialAssemblyFile);
         controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
@@ -563,14 +565,14 @@ public class MainFrame extends JFrame {
                 runTabbedPane.setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a fresh class loader
-                assemblyRunComponent.preInitRun(execStrings);
+                assemblyRunner.preInitRun(execStrings);
             }
         }
 
         @Override
         public void resetRunner()
         {
-            RunnerPanel2 rp2 = ViskitGlobals.instance().getSimRunnerPanel();
+            RunnerPanel2 rp2 = ViskitGlobals.instance().getSimulationRunnerPanel();
             rp2.soutTA.setText(null);
             rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
                     + "----------------------" + rp2.lineEnd);
@@ -581,8 +583,8 @@ public class MainFrame extends JFrame {
             rp2.printReplicationReportsCB.setSelected(false);
             rp2.printSummaryReportsCB.setSelected(false);
 
-            assemblyRunComponent.twiddleButtons(InternalAssemblyRunner.Event.OFF);
-            assemblyRunComponent.doTitle(null);
+            assemblyRunner.twiddleButtons(InternalAssemblyRunner.Event.OFF);
+            assemblyRunner.doTitle(null);
             
             rp2.npsLabel.setText("");
         }

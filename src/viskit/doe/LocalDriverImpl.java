@@ -98,7 +98,7 @@ public class LocalDriverImpl implements DoeRunDriver {
     @Override
     public synchronized Hashtable getDesignPointStatistics(int sampleIndex, int designPtIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getDesignPointStats").invoke(runner,sampleIndex,designPtIndex);
+            return (Hashtable) methods.get("getDesignPointStatistics").invoke(runner,sampleIndex,designPtIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());
@@ -121,7 +121,7 @@ public class LocalDriverImpl implements DoeRunDriver {
     @Override
     public synchronized Hashtable getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
         try {
-            return (Hashtable) methods.get("getReplicationStats").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
+            return (Hashtable) methods.get("getReplicationStatistics").invoke(runner,sampleIndex,designPtIndex,replicationIndex);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             ex.printStackTrace();
             throw new DoeException(ex.getMessage());

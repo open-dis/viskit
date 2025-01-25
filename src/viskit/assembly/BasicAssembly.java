@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -294,8 +294,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /** Set up all outer statistics propertyChangeListeners */
     protected void hookupDesignPointListeners() {
-        for (SampleStatistics designPointStat : designPointSimpleStatisticsTally) {
-            this.addPropertyChangeListener(designPointStat);
+        for (SampleStatistics designPointStatistics : designPointSimpleStatisticsTally) {
+            this.addPropertyChangeListener(designPointStatistics);
         }
     }
 
@@ -363,7 +363,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         numberReplications = num;
     }
 
-    public int getNumberReplications() {
+    /** How many replications have occurred so far during this simulation
+     * @return number of replications completed, so far */
+    public int getNumberReplications()
+    {
         return numberReplications;
     }
 
@@ -574,9 +577,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         buf.append(super.toString());
         buf.append(System.getProperty("line.separator"));
 
-        for (SampleStatistics designPointStat : getDesignPointSampleStatistics()) {
+        for (SampleStatistics designPointStatistics : getDesignPointSampleStatistics()) {
             buf.append(System.getProperty("line.separator"));
-            buf.append(designPointStat);
+            buf.append(designPointStatistics);
         }
         buf.append(System.getProperty("line.separator"));
         return buf.toString();
