@@ -66,7 +66,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * @version $Id$
  * @since April 20, 2006, 11:19 AM
  */
-public class StatsGraph extends JPanel {
+public class StatisticsGraph extends JPanel {
 
     int designPoints;
     int samples;
@@ -76,7 +76,7 @@ public class StatsGraph extends JPanel {
     JTabbedPane tabbedPane;
     ChartPanel chartPanel;
 
-    public StatsGraph() {
+    public StatisticsGraph() {
         tabbedPane = new JTabbedPane();
         meanAndStandardDeviations = new Hashtable<>();
         minMaxs = new Hashtable<>();

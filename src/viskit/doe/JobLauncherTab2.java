@@ -83,7 +83,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     DoeRunDriver doe;
 //    Map statsGraphs;
-    BlockingQueue<DesignPointStatsWrapper> bQ;
+    BlockingQueue<DesignPointStatisticsWrapper> bQ;
     String inputFileString;
     File inputFile;
     File filteredFile;
@@ -123,8 +123,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JCheckBox doAnalystReports;
     private JCheckBox doLocalRun;
     private GraphUpdater graphUpdater;
-    private QstatConsole qstatConsole;
-    private StatsGraph statsGraph;
+    private QStatisticsConsole qStatisticsConsole;
+    private StatisticsGraph statsGraph;
     private Thread thread;
     private boolean outputDirty = false;
     private final String title;
@@ -353,9 +353,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         controlP.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        qstatConsole = new QstatConsole();
+        qStatisticsConsole = new QStatisticsConsole();
 
-        leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlP, qstatConsole.getContent());
+        leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, controlP, qStatisticsConsole.getContent());
         leftSplit.setDividerLocation(180);
 
         statusTextArea = new JTextArea("Grid system console:" + lineEnd +
@@ -374,7 +374,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         serrTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         serrTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
 
-        statsGraph = new StatsGraph();
+        statsGraph = new StatisticsGraph();
         JScrollPane stgSp = new JScrollPane(statsGraph);
         rightSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusJsp, stgSp);
         leftRightSplit.setLeftComponent(leftSplit);
@@ -782,9 +782,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 doe = new LocalDriverImpl(SettingsDialog.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
             }
             System.gc();
-            qstatConsole.setDoe(doe);
+            qStatisticsConsole.setDoe(doe);
 
-            statsGraph = new StatsGraph();
+            statsGraph = new StatisticsGraph();
             rightSplit.setBottomComponent(new JScrollPane(statsGraph));
             rightSplit.setDividerLocation(180);
 
@@ -860,9 +860,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         SimkitAssembly jaxbRoot;
         DoeRunDriver doe;
-        StatsGraph statsGraph;
+        StatisticsGraph statsGraph;
 
-        public ProcessResults(DoeRunDriver doe, SimkitAssembly jaxbRoot, StatsGraph statsGraph) {
+        public ProcessResults(DoeRunDriver doe, SimkitAssembly jaxbRoot, StatisticsGraph statsGraph) {
             this.doe = doe;
             this.jaxbRoot = jaxbRoot;
             this.statsGraph = statsGraph;
@@ -1325,23 +1325,23 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private void addDesignPointStatsToGraphs(Map ret, int d, int s) {
 
         // for the SwingWorker to publish a single object
-        bQ.add(new DesignPointStatsWrapper(ret, d, s));
+        bQ.add(new DesignPointStatisticsWrapper(ret, d, s));
 
     }
 
-    class GraphUpdater extends SwingWorker<Void, DesignPointStatsWrapper> {
+    class GraphUpdater extends SwingWorker<Void, DesignPointStatisticsWrapper> {
 
-        BlockingQueue<DesignPointStatsWrapper> bQ;
-        StatsGraph statsGraph;
+        BlockingQueue<DesignPointStatisticsWrapper> bQ;
+        StatisticsGraph statsGraph;
 
-        GraphUpdater(BlockingQueue<DesignPointStatsWrapper> bQ, StatsGraph statsGraph) {
+        GraphUpdater(BlockingQueue<DesignPointStatisticsWrapper> bQ, StatisticsGraph statsGraph) {
             this.bQ = bQ; // bbq
             this.statsGraph = statsGraph;
         }
 
         @Override
         public Void doInBackground() {
-            DesignPointStatsWrapper dp;
+            DesignPointStatisticsWrapper dp;
 
             try {
                 while ((dp = bQ.take()) != null) {
@@ -1355,9 +1355,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
 
         @Override
-        protected void process(List<DesignPointStatsWrapper> chunks) {
-            for (DesignPointStatsWrapper dp : chunks) {
-                java.util.Enumeration stats = ((Dictionary) dp.statsReturned).elements();
+        protected void process(List<DesignPointStatisticsWrapper> chunks) {
+            for (DesignPointStatisticsWrapper dp : chunks) {
+                java.util.Enumeration stats = ((Dictionary) dp.statisticsReturnedMap).elements();
                 while (stats.hasMoreElements()) {
                     String data = (String) stats.nextElement();
                     try {
@@ -1378,15 +1378,15 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         }
     }
 
-    class DesignPointStatsWrapper {
+    class DesignPointStatisticsWrapper {
 
-        public Map statsReturned;
+        public Map statisticsReturnedMap;
         public int designPtIndex;
         public int sampleIndex;
 
-        DesignPointStatsWrapper(Map statsReturned, int designPtIndex, int sampleIndex) {
-            this.statsReturned = statsReturned;
-            this.designPtIndex = designPtIndex;
+        DesignPointStatisticsWrapper(Map statisticsReturned, int designPointIndex, int sampleIndex) {
+            this.statisticsReturnedMap = statisticsReturned;
+            this.designPtIndex = designPointIndex;
             this.sampleIndex = sampleIndex;
         }
     }
