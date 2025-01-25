@@ -1078,7 +1078,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             announcement = announcement + "s";
         announcement = announcement +  " performed</p><br />" +
                   // Elapsed clock time: TODO
-                "<p align='center'>Analyst Report " + assemblyName + "</p>" +
+                "<p align='center'>Analyst Report<br />" + assemblyName + "</p>" +
                 "<p align='center'> is loaded and ready for further editing</p></body></html>";
                 
         ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
