@@ -782,14 +782,14 @@ their descpritions.
     <target name="clean.DefaultProject">
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
-                <include name="*.png"/>
-                <include name="*.xml"/>
+                <include name="**/*.png"/>
+                <include name="**/*.xml"/>
             </fileset>
         </delete>
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/build">
-                <include name="*.class"/>
-                <include name="*.java"/>
+                <include name="**/*.class"/>
+                <include name="**/*.java"/>
             </fileset>
 
         </delete>
