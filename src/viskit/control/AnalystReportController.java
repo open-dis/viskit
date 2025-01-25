@@ -188,7 +188,7 @@ public class AnalystReportController extends MvcAbstractController {
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
-                    + " currently selected.  Please select on the <code>Assembly Run </code>panel,"
+                    + " currently selected.  Please select on the <code>Assembly Simulation Run </code>panel,"
                     + " re-run the experiment and the report will then be available to "
                     + "view.</p></body></html>"
             );
@@ -250,7 +250,8 @@ public class AnalystReportController extends MvcAbstractController {
         AnalystReportModel analystReportModelLocal;
         try {
             analystReportModelLocal = new AnalystReportModel(frame, targetFile, currentAssembyFile);
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             LOG.error("Error parsing analyst report: {}", e);
 //            e.printStackTrace();
             return;

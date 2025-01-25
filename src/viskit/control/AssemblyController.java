@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.io.File;
 import java.util.Set;
 import java.util.Vector;
+import javax.swing.JComponent;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.model.*;
@@ -250,4 +251,6 @@ public interface AssemblyController {
     Set<String> getRecentProjectFileSet();
 
     void clearRecentProjectFileSet();
+    
+    public void setMainTabbedPane(JComponent tabbedPane, int idx);
 }

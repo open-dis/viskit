@@ -17,21 +17,21 @@ import viskit.model.*;
 public interface AssemblyView {
 
     // permit user to edit existing entities
-    boolean doEditPclNode(PropertyChangeListenerNode pclNode);
+    boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode pclNode);
 
     /** Permits user to edit existing entities
      * @param evNode the event graph node to edit
      * @return an indication of success
      */
-    boolean doEditEvGraphNode(EventGraphNode evNode);
+    boolean doEditEventGraphNode(EventGraphNode evNode);
 
-    boolean doEditPclEdge(PropertyChangeEdge pclEdge);
+    boolean doEditPropertyChangeListenerEdge(PropertyChangeEdge pclEdge);
 
     boolean doEditAdapterEdge(AdapterEdge aEdge);
 
-    boolean doEditSimEvListEdge(SimEventListenerEdge seEdge);
+    boolean doEditSimEventListenerEdge(SimEventListenerEdge seEdge);
 
-    Object getSelectedPropChangeListener();
+    Object getSelectedPropertyChangeListener();
 
     Object getSelectedEventGraph();
 
@@ -52,19 +52,19 @@ public interface AssemblyView {
      * @param f the path to evaluate for PropertyChangeListeners
      * @param b flag to indicate recursion checking of the given path
      */
-    void addPCLsToLegoTree(File f, boolean b);
+    void addPropertyChangeListenersToLegoTree(File f, boolean b);
 
     /** Not currently used
      *
      * @param f the PCL to remove from the node tree
      */
-    void removePropChangeFromLEGOTree(File f);
+    void removePropertyChangeListenerFromLEGOTree(File f);
 
     int genericAsk(String title, String prompt);      // returns JOptionPane constants
 
     int genericAskYN(String title, String prompt);
 
-    int genericAsk2Butts(String title, String prompt, String button1, String button2);
+    int genericAsk2Buttons(String title, String prompt, String button1, String button2);
 
     /** A component, e.g., vAMod, wants to say something.
      *
@@ -129,7 +129,7 @@ public interface AssemblyView {
      *
      * @param mod the Assembly model to remove from view
      */
-    void delTab(AssemblyModel mod);
+    void deleteTab(AssemblyModel mod);
 
     /** @return an array of open ViskitAssemblyModels */
     AssemblyModel[] getOpenModels();

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -56,8 +56,8 @@ import viskit.ViskitStatics;
  * @since Jul 17, 2006
  * @since 3:17:07 PM
  */
-public class RunnerPanel2 extends JPanel {
-
+public class AssemblySimulationRunPanel extends JPanel
+{
     public boolean dump = true;
     public boolean search;
     public String lineEnd = System.getProperty("line.separator");
@@ -94,7 +94,7 @@ public class RunnerPanel2 extends JPanel {
      * Currently, only start and stop work
      * @param analystReportPanelVisible if true, will enable the analyst report check box
      */
-    public RunnerPanel2(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible) {
+    public AssemblySimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible) {
         this.aRPanelVisible = analystReportPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -182,7 +182,7 @@ public class RunnerPanel2 extends JPanel {
 
         numberReplicationsTF = new JTextField(10);
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
-        numberReplicationsTF.setBorder(new EmptyBorder(10,0,10,0));
+        numberReplicationsTF.setBorder(new EmptyBorder(0,0,0,0));
         numberReplicationsTF.addActionListener((ActionEvent e) -> {
             int numReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
             if (numReplications < 1) 
@@ -248,7 +248,7 @@ public class RunnerPanel2 extends JPanel {
         JPanel runLabelPanel = new JPanel();
         JLabel runLabel = new JLabel("Run assembly: ");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
-//        runLabel.setBorder(new EmptyBorder(0,0,0,10));
+        runLabel.setBorder(new EmptyBorder(0,0,0,0));
         runLabelPanel.setToolTipText("Simulation replications control");
         runLabelPanel.add(runLabel);
         upperLeftFlowPanel.add(runLabelPanel);
@@ -290,13 +290,12 @@ public class RunnerPanel2 extends JPanel {
         upperLeftFlowPanel.add(runButtonPanel);
         
         nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
-        runLabel.setBorder(new EmptyBorder(0,20,0,10));
+        nowRunningLabel.setBorder(new EmptyBorder(0,5,0,10));
         nowRunningLabel.setText(lineEnd);
-        nowRunningLabel.setIconTextGap(50);
         // text value is set by propertyChange listener
         upperLeftFlowPanel.add(Box.createVerticalBox());
         upperLeftFlowPanel.add(nowRunningLabel);
-        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
+//        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
 
         runButtonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);

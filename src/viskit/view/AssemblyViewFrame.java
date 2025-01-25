@@ -412,7 +412,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(assemblyController, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly Run", KeyEvent.VK_C,
+        fileMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly Simulation Run", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
 
         // TODO: Unknown as to what this does exactly
@@ -590,8 +590,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly Run: ");
-        initializeAssemblyRunLabel.setToolTipText("First initialize assembly runner from Assembly tab");
+        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly Simulation Run: ");
+        initializeAssemblyRunLabel.setToolTipText("First initialize Assembly Simulation Run from Assembly tab");
         getToolBar().add(initializeAssemblyRunLabel);
         getToolBar().add(runButton);
 
@@ -678,7 +678,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     {
         ViskitGraphAssemblyModel vGAmod = new ViskitGraphAssemblyModel();
         ViskitGraphAssemblyComponentWrapper graphPane = new ViskitGraphAssemblyComponentWrapper(vGAmod, this);
-        vGAmod.setjGraph(graphPane);                               // todo fix this
+        vGAmod.setjGraph(graphPane); // TODO fix this
 
         graphPane.assemblyModel = assemblyModel;
         graphPane.trees = treePanels;
@@ -712,13 +712,15 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         // Now expose the Assembly toolbar
         Runnable r = () -> {
             getToolBar().setVisible(true);
-            // TODO If an assembly is loaded, make assembly frame active ViskitGlobals.instance().getA
+            // If an assembly is loaded, make assembly frame active 
+            AssemblyControllerImpl assemblyController = (AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController();
+            assemblyController.makeTopPaneAssemblyTabActive();
         };
         SwingUtilities.invokeLater(r);
     }
 
     @Override
-    public void delTab(AssemblyModel mod) {
+    public void deleteTab(AssemblyModel mod) {
         Component[] ca = tabbedPane.getComponents();
 
         JSplitPane jsplt;
@@ -812,7 +814,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);
-                addPCLsToLegoTree(new File(path), false);
+                addPropertyChangeListenersToLegoTree(new File(path), false);
             }
         }
 
@@ -911,17 +913,17 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditEvGraphNode(EventGraphNode evNode) {
+    public boolean doEditEventGraphNode(EventGraphNode evNode) {
         return EventGraphNodeInspectorDialog.showDialog(this, evNode);
     }
 
     @Override
-    public boolean doEditPclNode(PropertyChangeListenerNode pclNode) {
+    public boolean doEditPropertyChangeListenerNode(PropertyChangeListenerNode pclNode) {
         return PclNodeInspectorDialog.showDialog(this, pclNode); // blocks
     }
 
     @Override
-    public boolean doEditPclEdge(PropertyChangeEdge pclEdge) {
+    public boolean doEditPropertyChangeListenerEdge(PropertyChangeEdge pclEdge) {
         return PclEdgeInspectorDialog.showDialog(this, pclEdge);
     }
 
@@ -931,7 +933,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public boolean doEditSimEvListEdge(SimEventListenerEdge seEdge) {
+    public boolean doEditSimEventListenerEdge(SimEventListenerEdge seEdge) {
         return SimEventListenerConnectionInspectorDialog.showDialog(this, seEdge);
     }
 
@@ -950,7 +952,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public Object getSelectedPropChangeListener() {
+    public Object getSelectedPropertyChangeListener() {
         return getLeafUO(pclTree);
     }
 
@@ -961,7 +963,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void addPCLsToLegoTree(File f, boolean b) {
+    public void addPropertyChangeListenersToLegoTree(File f, boolean b) {
         pclTree.addContentRoot(f, b);
     }
 
@@ -972,7 +974,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
     // Not used
     @Override
-    public void removePropChangeFromLEGOTree(File f) {
+    public void removePropertyChangeListenerFromLEGOTree(File f) {
         pclTree.removeContentRoot(f);
     }
 
@@ -987,7 +989,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public int genericAsk2Butts(String title, String msg, String butt1, String butt2) {
+    public int genericAsk2Buttons(String title, String msg, String butt1, String butt2) {
         return JOptionPane.showOptionDialog(this, msg, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
                 new String[]{butt1, butt2}, butt1);
@@ -1153,13 +1155,13 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         content.setLayout(new BorderLayout());
         content.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         content.add(xt, BorderLayout.CENTER);
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        buttPan.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
-        JButton closeButt = new JButton("Close");
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(closeButt);
-        content.add(buttPan, BorderLayout.SOUTH);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
+        JButton closeButton = new JButton("Close");
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(closeButton);
+        content.add(buttonPanel, BorderLayout.SOUTH);
 
         //jf.pack();
         jf.setSize(475, 500);
@@ -1170,7 +1172,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         };
         SwingUtilities.invokeLater(r);
 
-        closeButt.addActionListener((ActionEvent e) -> {
+        closeButton.addActionListener((ActionEvent e) -> {
             Runnable r1 = () -> {
                 jf.dispose();
             };

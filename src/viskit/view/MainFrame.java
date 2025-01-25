@@ -46,7 +46,6 @@ import javax.swing.event.ChangeListener;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
-import viskit.assembly.AssemblyRunnerPlug;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
@@ -62,6 +61,7 @@ import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
+import viskit.assembly.AssemblySimulationRunPlug;
 
 /**
  * MOVES Institute
@@ -190,11 +190,14 @@ public class MainFrame extends JFrame {
             setJMenuBar(menuBar);
             jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = idx;
-        } else {
+        } 
+        else 
+        {
             tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = -1;
         }
 
         assemblyController = (AssemblyController) assemblyFrame.getController();
+        assemblyController.setMainTabbedPane(topTabbedPane, TAB0_ASSEMBLY_EDITOR_INDEX);
         eventGraphController = (EventGraphController) eventGraphFrame.getController();
 
         // Now set the recent open project's file listener for the eventGraphFrame now
@@ -206,7 +209,7 @@ public class MainFrame extends JFrame {
         assemblyController.addAssemblyFileListener(assemblyController.getAssemblyChangeListener());
         eventGraphController.addEventGraphFileListener(assemblyController.getOpenEventGraphListener()); // A live listener, but currently doing nothing (tdn) 9/13/24
 
-        // Assembly Run
+        // Assembly Simulation Run
         runTabbedPane = new JTabbedPane();
         runTabbedPane.addChangeListener(tabChangeListener);
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
@@ -217,8 +220,8 @@ public class MainFrame extends JFrame {
         if (SettingsDialog.isAssemblyRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             idx = topTabbedPane.indexOfComponent(runTabbedPanePanel);
-            topTabbedPane.setTitleAt(idx, "Assembly Run");
-            topTabbedPane.setToolTipTextAt(idx, "First initialize assembly runner from Assembly tab");
+            topTabbedPane.setTitleAt(idx, "Assembly Simulation Run");
+            topTabbedPane.setToolTipTextAt(idx, "First initialize Assembly Simulation Run from Assembly tab");
             menus.add(null); // placeholder
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
@@ -249,11 +252,13 @@ public class MainFrame extends JFrame {
             AnalystReportController analystReportController = (AnalystReportController) reportPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, idx);
             assemblyController.addAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
-        } else {
+        } 
+        else
+        {
             tabIndices[TAB0_ANALYST_REPORT_INDEX] = -1;
         }
 
-        // Assembly runner
+        // Assembly Simulation Run
         assemblyRunner = new InternalAssemblyRunner(analystReportPanelVisible); // TODO expose
 //        ViskitGlobals.instance().setSimulationRunnerPanel(assemblyRunner); // TODO align classes
         
@@ -266,9 +271,9 @@ public class MainFrame extends JFrame {
         jamSettingsHandler(menuBar);
         assemblyRunner.setTitleListener(myTitleListener, topTabbedPane.getTabCount() + TAB1_LOCALRUN_INDEX);
         jamQuitHandler(assemblyRunner.getQuitMenuItem(), myQuitAction, menuBar);
-        AssemblyControllerImpl controller = ((AssemblyControllerImpl) assemblyFrame.getController());
-        controller.setInitialAssemblyFile(initialAssemblyFile);
-        controller.setAssemblyRunner(new ThisAssemblyRunnerPlug());
+        AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) assemblyFrame.getController());
+        assemblyController.setInitialAssemblyFile(initialAssemblyFile);
+        assemblyController.setAssemblyRunner(new ThisAssemblyRunnerPlug());
 
         /* DIFF between OA3302 branch and trunk */
 
@@ -373,7 +378,7 @@ public class MainFrame extends JFrame {
                 i = topTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX], "Run simulation defined by assembly");
             } else {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX], "First initialize assembly runner from Assembly tab");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX], "First initialize Assembly Simulation Run from Assembly tab");
             }
 
             getJMenuBar().remove(helpMenu);
@@ -555,7 +560,7 @@ public class MainFrame extends JFrame {
     /** Prepares the Assembly with a fresh class loader free of static artifacts for
      * a completely independent run
      */
-    class ThisAssemblyRunnerPlug implements AssemblyRunnerPlug {
+    class ThisAssemblyRunnerPlug implements AssemblySimulationRunPlug {
 
         @Override
         public void exec(String[] execStrings) {
@@ -573,9 +578,9 @@ public class MainFrame extends JFrame {
         }
 
         @Override
-        public void resetRunnerPanel()
+        public void resetAssemblySimulationRunPanel()
         {
-            RunnerPanel2 runnerPanel = ViskitGlobals.instance().getSimulationRunnerPanel();
+            AssemblySimulationRunPanel runnerPanel = ViskitGlobals.instance().getSimulationRunnerPanel();
             runnerPanel.outputStreamTA.setText(null);
             runnerPanel.outputStreamTA.setText("Assembly output stream:" + runnerPanel.lineEnd
                     + "----------------------" + runnerPanel.lineEnd);

@@ -54,7 +54,6 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
-import viskit.assembly.AssemblyRunnerPlug;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
@@ -69,6 +68,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import viskit.assembly.AssemblySimulationRunPlug;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -90,7 +90,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private String initialAssemblyFile;
 
     /** The handler to run an assembly */
-    private AssemblyRunnerPlug runner;
+    private AssemblySimulationRunPlug runner;
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
@@ -181,7 +181,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int yn = (((AssemblyView) getView()).genericAsk2Butts("Question", sb.toString(), "Stop and let me save",
+            int yn = (((AssemblyView) getView()).genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
                     "Ignore my execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -223,23 +223,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!file.exists())
             return;
 
-        AssemblyView vaw = (AssemblyView) getView();
-        AssemblyModelImpl mod = new AssemblyModelImpl(this);
-        mod.init();
-        vaw.addTab(mod);
+        AssemblyView assemblyView = (AssemblyView) getView();
+        AssemblyModelImpl assemblyModelImpl = new AssemblyModelImpl(this);
+        assemblyModelImpl.init();
+        assemblyView.addTab(assemblyModelImpl);
 
         // these may init to null on startup, check
         // before doing any openAlready lookups
-        AssemblyModel[] openAlready = null;
-        if (vaw != null)
-            openAlready = vaw.getOpenModels();
+        AssemblyModel[] assemblyModelOpenAlreadyArray = null;
+        if (assemblyView != null)
+            assemblyModelOpenAlreadyArray = assemblyView.getOpenModels();
 
         boolean isOpenAlready = false;
         String path;
-        if (openAlready != null) {
-            for (AssemblyModel model : openAlready) {
-                if (model.getLastFile() != null) {
-                    path = model.getLastFile().getAbsolutePath();
+        if (assemblyModelOpenAlreadyArray != null) 
+        {
+            for (AssemblyModel assemblyModleOpenAlready : assemblyModelOpenAlreadyArray) {
+                if (assemblyModleOpenAlready.getLastFile() != null) {
+                    path = assemblyModleOpenAlready.getLastFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath())){
                         isOpenAlready = true;
                         break;
@@ -247,19 +248,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
             }
         }
-        if (mod.newModel(file) && !isOpenAlready) {
-
-            vaw.setSelectedAssemblyName(mod.getMetaData().name);
+        if (assemblyModelImpl.newModel(file) && !isOpenAlready) 
+        {
+            assemblyView.setSelectedAssemblyName(assemblyModelImpl.getMetaData().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblySet(file);
             markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssemblyWatch(file, mod.getJaxbRoot());
+            initOpenAssemblyWatch(file, assemblyModelImpl.getJaxbRoot());
             openEventGraphs(file);
-        } else {
-            vaw.delTab(mod);
+        } 
+        else 
+        {
+            assemblyView.deleteTab(assemblyModelImpl);
         }
 
         resetRedoUndoStatus();
@@ -343,7 +346,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     markAssemblyConfigurationClosed(assemblyModel.getLastFile());
 
                     AssemblyView view = (AssemblyView) getView();
-                    view.delTab(assemblyModel);
+                    view.deleteTab(assemblyModel);
 
                     // NOTE: This doesn't work quite right. If no Assembly is open,
                     // then any non-associated Event Graphs that were also open will
@@ -667,7 +670,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
         ViskitGlobals.instance().getEventGraphEditor().showProjectName();
-        runner.resetRunnerPanel();
+        runner.resetAssemblySimulationRunPanel();
     }
 
     @Override
@@ -707,7 +710,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             // TODO: Implement this
 //            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
         } else {
-            ((AssemblyView) getView()).delTab(mod);
+            ((AssemblyView) getView()).deleteTab(mod);
         }
     }
 
@@ -857,7 +860,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newPropertyChangeListenerNode() // menu click
     {
-        Object o = ((AssemblyView) getView()).getSelectedPropChangeListener();
+        Object o = ((AssemblyView) getView()).getSelectedPropertyChangeListener();
 
         if (o != null) {
             if (o instanceof Class<?>) {
@@ -1039,7 +1042,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         boolean done, modified;
         do {
             done = true;
-            modified = ((AssemblyView) getView()).doEditPclNode(pclNode);
+            modified = ((AssemblyView) getView()).doEditPropertyChangeListenerNode(pclNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changePclNode(pclNode);
             }
@@ -1051,7 +1054,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         boolean done, modified;
         do {
             done = true;
-            modified = ((AssemblyView) getView()).doEditEvGraphNode(evNode);
+            modified = ((AssemblyView) getView()).doEditEventGraphNode(evNode);
             if (modified) {
                 done = ((AssemblyModel) getModel()).changeEvGraphNode(evNode);
             }
@@ -1060,7 +1063,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void propertyChangeListenerEdgeEdit(PropertyChangeEdge pclEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditPclEdge(pclEdge);
+        boolean modified = ((AssemblyView) getView()).doEditPropertyChangeListenerEdge(pclEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changePclEdge(pclEdge);
         }
@@ -1076,7 +1079,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void simEventListenerEdgeEdit(SimEventListenerEdge seEdge) {
-        boolean modified = ((AssemblyView) getView()).doEditSimEvListEdge(seEdge);
+        boolean modified = ((AssemblyView) getView()).doEditSimEventListenerEdge(seEdge);
         if (modified) {
             ((AssemblyModel) getModel()).changeSimEvEdge(seEdge);
         }
@@ -1675,8 +1678,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
                 else
                 {
-                    // Ensure a cleared Assembly Run panel upon every Assembly compile
-                    runner.resetRunnerPanel();
+                    // Ensure a cleared Simulation panel upon every Assembly compile
+                    runner.resetAssemblySimulationRunPanel();
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
@@ -1831,11 +1834,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
-    /** Override the default AssemblyRunnerPlug
+    /** Override the default AssemblySimulationRunPlug
      *
-     * @param plug the AssemblyRunnerPlug to set
+     * @param plug the AssemblySimulationRunPlug to set
      */
-    public void setAssemblyRunner(AssemblyRunnerPlug plug) {
+    public void setAssemblyRunner(AssemblySimulationRunPlug plug) {
         runner = plug;
     }
 
@@ -2017,5 +2020,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.warn("Recent file saving disabled");
             historyConfiguration = null;
         }
+    }
+    JTabbedPane mainTabbedPane;
+    int mainTabbedPaneIdx;
+
+    /**
+     * Sets the Analyst report panel
+     * @param tabbedPane our Analyst report panel parent
+     * @param idx the index to retrieve the Analyst report panel
+     */
+    @Override
+    public void setMainTabbedPane(JComponent tabbedPane, int idx) {
+        this.mainTabbedPane = (JTabbedPane) tabbedPane;
+        mainTabbedPaneIdx = idx;
+    }
+    public void makeTopPaneAssemblyTabActive()
+    {
+        mainTabbedPane.setSelectedIndex(mainTabbedPaneIdx);
     }
 }

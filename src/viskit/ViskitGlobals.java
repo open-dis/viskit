@@ -74,7 +74,7 @@ import viskit.mvc.MvcAbstractJFrameView;
 import viskit.view.AnalystReportFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
-import viskit.view.RunnerPanel2;
+import viskit.view.AssemblySimulationRunPanel;
 import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
@@ -104,7 +104,7 @@ public class ViskitGlobals {
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
-    private RunnerPanel2 runnerPanel;
+    private AssemblySimulationRunPanel simulationRunnerPanel;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -763,14 +763,14 @@ public class ViskitGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public RunnerPanel2 getSimulationRunnerPanel()
+    public AssemblySimulationRunPanel getSimulationRunnerPanel()
     {
-        return runnerPanel;
+        return simulationRunnerPanel;
     }
 
-    public void setSimulationRunnerPanel(RunnerPanel2 runnerPanel) 
+    public void setSimulationRunnerPanel(AssemblySimulationRunPanel runnerPanel) 
     {
-        this.runnerPanel = runnerPanel;
+        this.simulationRunnerPanel = runnerPanel;
     }
 
     public ViskitProject getCurrentViskitProject() {
