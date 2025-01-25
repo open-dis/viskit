@@ -167,7 +167,7 @@ public class RemoteDriverImpl implements DoeDriver {
     }
 
     @Override
-    public synchronized Map getDesignPointStats(int sampleIndex, int designPtIndex) throws DoeException {
+    public synchronized Map getDesignPointStatistics(int sampleIndex, int designPtIndex) throws DoeException {
         Map ret = new Hashtable();
 
         try {
@@ -194,7 +194,7 @@ public class RemoteDriverImpl implements DoeDriver {
     }
 
     @Override
-    public synchronized Map getReplicationStats(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
+    public synchronized Map getReplicationStatistics(int sampleIndex, int designPtIndex, int replicationIndex) throws DoeException {
          Map ret = new Hashtable();
 
         try {

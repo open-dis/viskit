@@ -247,7 +247,7 @@ public class BshGridlet extends Thread {
             // finished running, collect some statistics
             // from the beanshell context to java
 
-            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointStats();
+            simkit.stat.SampleStatistics[] designPointStats = sim.getDesignPointSampleStatistics();
             simkit.stat.SampleStatistics replicationStat;
 
             // go through and copy in the statistics
@@ -292,7 +292,7 @@ public class BshGridlet extends Thread {
                         String repName = designPointStat.getName();
                         repName = repName.substring(0, repName.length() - 6); // strip off ".count"
                         for (int j = 0; j < replicationsPerDesignPoint; j++) {
-                            replicationStat = sim.getReplicationStat(repName, j);
+                            replicationStat = sim.getReplicationSampleStatistics(repName, j);
                             if (replicationStat != null) {
                                 try {
                                     if (replicationStat instanceof simkit.stat.IndexedSampleStatistics) {

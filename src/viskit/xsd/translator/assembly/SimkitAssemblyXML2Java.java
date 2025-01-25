@@ -671,7 +671,7 @@ public class SimkitAssemblyXML2Java {
         pw.println();
 
         pw.println(sp4 + "@Override");
-        pw.println(sp4 + "public void createDesignPointStats" + lp + rp + sp + ob);
+        pw.println(sp4 + "public void createDesignPointStatistics" + lp + rp + sp + ob);
 
         for (String propChangeListener : designPointStats.keySet()) {
             pcl = designPointStats.get(propChangeListener);
@@ -690,7 +690,7 @@ public class SimkitAssemblyXML2Java {
             }
          }
 
-        pw.println(sp8 + "super" + pd + "createDesignPointStats" + lp + rp + sc);
+        pw.println(sp8 + "super" + pd + "createDesignPointStatistics" + lp + rp + sc);
 
         pw.println(sp4 + cb);
         pw.println();

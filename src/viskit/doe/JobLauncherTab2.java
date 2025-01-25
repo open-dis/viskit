@@ -924,7 +924,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                     //writeStatus(ret.toString());
                                     }
 
-                                    ret = doe.getDesignPointStats(sampleIndex, designPtIndex);
+                                    ret = doe.getDesignPointStatistics(sampleIndex, designPtIndex);
 
                                     if (statsGraphSet == false) {
                                         String[] properties = GenericConversion.toArray(ret.keySet(), new String[0]);
@@ -937,7 +937,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                                     writeStatus("Replications per designPt " + exp.getReplicationsPerDesignPoint());
                                     for (int j = 0; j < Integer.parseInt(exp.getReplicationsPerDesignPoint()); j++) {
                                         writeStatus("ReplicationStats from task " + (i + 1) + " replication " + j);
-//                                        ret = doe.getReplicationStats(sampleIndex, designPtIndex, j);
+//                                        ret = doe.getReplicationStatistics(sampleIndex, designPtIndex, j);
                                     }
                                     --tasksRemaining;
                                     lastQueue.set(i, state);
