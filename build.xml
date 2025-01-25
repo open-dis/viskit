@@ -778,6 +778,22 @@ their descpritions.
             <include name="*.zip"/>
         </delete>
     </target>
+    
+    <target name="clean.DefaultProject">
+        <delete verbose="true">
+            <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
+                <include name="*.png"/>
+                <include name="*.xml"/>
+            </fileset>
+        </delete>
+        <delete verbose="true">
+            <fileset dir="MyViskitProjects/DefaultProject/build">
+                <include name="*.class"/>
+                <include name="*.java"/>
+            </fileset>
+
+        </delete>
+    </target>
 
     <target name="reset.viskit" description="Replace an out-of-synch configuration with known good defaults">
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
