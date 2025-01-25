@@ -689,7 +689,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     JTextArea statsComments;
     JTextArea statsConclusions;
     JPanel statsSummaryPanel;
-    JPanel statsRepPanel;
+    JPanel statisticsRepPanel;
     JScrollPane repsJsp;
     JScrollPane summJsp;
 
@@ -717,9 +717,9 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatsReplications);
 
-        repsJsp = new JScrollPane(statsRepPanel = new JPanel());
+        repsJsp = new JScrollPane(statisticsRepPanel = new JPanel());
         repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsRepPanel.setLayout(new BoxLayout(statsRepPanel, BoxLayout.Y_AXIS));
+        statisticsRepPanel.setLayout(new BoxLayout(statisticsRepPanel, BoxLayout.Y_AXIS));
         p.add(repsJsp);
 
         wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
@@ -749,24 +749,24 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         bool = analystReportModel.isPrintSummaryStats();
         wantStatisticsSummary.setSelected(bool);
 
-        List reps = analystReportModel.getStatsReplicationsList();
-        statsRepPanel.removeAll();
+        List replicationsList = analystReportModel.getStatisticsReplicationsList();
+        statisticsRepPanel.removeAll();
         JLabel lab;
         JScrollPane jsp;
         JTable tab;
 
-        statsRepPanel.add(lab = new JLabel("Replication Reports"));
+        statisticsRepPanel.add(lab = new JLabel("Replication Reports"));
         lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsRepPanel.add(Box.createVerticalStrut(10));
+        statisticsRepPanel.add(Box.createVerticalStrut(10));
         String[] colNames = new String[] {"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
 
-        for (Iterator repItr = reps.iterator(); repItr.hasNext();) {
+        for (Iterator repItr = replicationsList.iterator(); repItr.hasNext();) {
             List r = (List) repItr.next();
             String nm = (String) r.get(0);
             String prop = (String) r.get(1);
-            statsRepPanel.add(lab = new JLabel("Entity: " + nm));
+            statisticsRepPanel.add(lab = new JLabel("Entity: " + nm));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            statsRepPanel.add(lab = new JLabel("Property: " + prop));
+            statisticsRepPanel.add(lab = new JLabel("Property: " + prop));
             lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
             List vals = (List) r.get(2);
@@ -775,12 +775,12 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
             for (Iterator r2 = vals.iterator(); r2.hasNext();) {
                 saa[i++] = (String[]) r2.next();
             }
-            statsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+            statisticsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
             tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
             jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-            statsRepPanel.add(Box.createVerticalStrut(20));
+            statisticsRepPanel.add(Box.createVerticalStrut(20));
         }
         List summs = analystReportModel.getStastSummaryList();
 

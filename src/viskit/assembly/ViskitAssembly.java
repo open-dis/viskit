@@ -67,8 +67,8 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void createReplicationStatistics() {
-        replicationStats = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener sampleStats : replicationStats) {
+        replicationStatisticsPropertyChangeListenerArray = GenericConversion.toArray(replicationStatistics.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener sampleStats : replicationStatisticsPropertyChangeListenerArray) {
             LOG.debug(((Named) sampleStats).getName() + " replicationStat created");
         }
     }
@@ -78,7 +78,7 @@ public class ViskitAssembly extends BasicAssembly {
         super.createDesignPointStats();
 
         // the super.
-        for (SampleStatistics sampleStats : designPointStats) {
+        for (SampleStatistics sampleStats : super.designPointStatistics) {
 //            LOG.debug(sampleStats.getName() + " designPointStat created");
             designPointStatistics.put(sampleStats.getName(), sampleStats);
         }
@@ -86,8 +86,8 @@ public class ViskitAssembly extends BasicAssembly {
 
     @Override
     protected void createPropertyChangeListeners() {
-        propertyChangeListener = GenericConversion.toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
-        for (PropertyChangeListener pcl : propertyChangeListener) {
+        propertyChangeListenerArray = GenericConversion.toArray(propertyChangeListeners.values(), new PropertyChangeListener[0]);
+        for (PropertyChangeListener pcl : propertyChangeListenerArray) {
             LOG.debug(pcl + " propertyChangeListener created");
         }
     }

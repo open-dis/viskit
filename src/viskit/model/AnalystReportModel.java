@@ -1203,7 +1203,7 @@ public final class AnalystReportModel extends MvcAbstractModel {
     public void setStatsDescription          (String s) { makeComments(statisticalResults,"SR", s); }
     public void setStatsConclusions          (String s) { makeConclusions(statisticalResults,"SR", s); }
     public String getStatsFilePath()         { return statisticalResults.getAttributeValue("file"); }
-    public List<Object> getStatsReplicationsList() {return unMakeReplicationList(statisticalResults);}
+    public List<Object> getStatisticsReplicationsList() {return unMakeReplicationList(statisticalResults);}
     public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResults);}
 
     public Map<String, AssemblyNode> getPclNodeCache() {

@@ -1,5 +1,5 @@
 /*
- * ReportStatisticsConfig.java
+ * ReportStatisticsConfiguration.java
  *
  * Created on July 15, 2006, 3:38 PM
  */
@@ -46,9 +46,9 @@ import viskit.doe.FileHandler;
  * @author Patrick Sullivan
  * @version $Id$
  */
-public class ReportStatisticsConfig {
+public class ReportStatisticsConfiguration {
 
-    static final Logger LOG = LogUtils.getLogger(ReportStatisticsConfig.class);
+    static final Logger LOG = LogUtils.getLogger(ReportStatisticsConfiguration.class);
 
     /**
      * The ordered list of Entities in the simulation that have property change
@@ -85,7 +85,7 @@ public class ReportStatisticsConfig {
     /** Creates a new instance of ReportStatisticsConfig
      * @param assemblyName name of assembly
      */
-    public ReportStatisticsConfig(String assemblyName) {
+    public ReportStatisticsConfiguration(String assemblyName) {
         this.assemblyName = assemblyName;
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setInfinity("inf");  // xml chokes on default
@@ -153,24 +153,24 @@ public class ReportStatisticsConfig {
      * Creates a replication record for each SampleStatistics object after each
      * run.
      * @param repNumber replication number
-     * @param repStats  replication statistics
+     * @param replicationStatisticsPropertyChangeListenerArray  replication statistics
      */
-    public void processReplicationStatistics(int repNumber, PropertyChangeListener[] repStats) {
-        LogUtils.getLogger(ReportStatisticsConfig.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+    public void processReplicationStatistics(int repNumber, PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray) {
+        LogUtils.getLogger(ReportStatisticsConfiguration.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
-        Element[] replicationUpdate = new Element[repStats.length];
+        Element[] replicationUpdate = new Element[replicationStatisticsPropertyChangeListenerArray.length];
         Element replication;
-        for (int i = 0; i < repStats.length; i++) {
+        for (int i = 0; i < replicationStatisticsPropertyChangeListenerArray.length; i++) {
 
             replication = new Element("Replication");
 
             replication.setAttribute("number", Integer.toString(repNumber));
-            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) repStats[i]).getCount()));
-            replication.setAttribute("minObs", df1.format(((SampleStatistics) repStats[i]).getMinObs()));
-            replication.setAttribute("maxObs", df1.format(((SampleStatistics) repStats[i]).getMaxObs()));
-            replication.setAttribute("mean", df3.format(((SampleStatistics) repStats[i]).getMean()));
-            replication.setAttribute("stdDeviation", df3.format(((SampleStatistics) repStats[i]).getStandardDeviation()));
-            replication.setAttribute("variance", df3.format(((SampleStatistics) repStats[i]).getVariance()));
+            replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getCount()));
+            replication.setAttribute("minObs", df1.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMinObs()));
+            replication.setAttribute("maxObs", df1.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMaxObs()));
+            replication.setAttribute("mean", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMean()));
+            replication.setAttribute("stdDeviation", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getStandardDeviation()));
+            replication.setAttribute("variance", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }
@@ -244,4 +244,4 @@ public class ReportStatisticsConfig {
         return f.getAbsolutePath();
     }
 
-} // end class ReportStatisticsConfig
+} // end class ReportStatisticsConfiguration

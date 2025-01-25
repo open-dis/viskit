@@ -574,10 +574,10 @@ public class MainFrame extends JFrame {
             rp2.soutTA.setText(null);
             rp2.soutTA.setText("Assembly output stream:" + rp2.lineEnd
                     + "----------------------" + rp2.lineEnd);
-            rp2.vcrSimTime.setText("");
-            rp2.vcrStopTime.setText("");
+            rp2.vcrSimTimeTF.setText("");
+            rp2.vcrStopTimeTF.setText("");
             rp2.numberReplicationsTF.setText("");
-            rp2.vcrVerbose.setSelected(false);
+            rp2.vcrVerboseCB.setSelected(false);
             rp2.printReplicationReportsCB.setSelected(false);
             rp2.printSummaryReportsCB.setSelected(false);
 

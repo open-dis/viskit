@@ -12,12 +12,12 @@ import javax.swing.ImageIcon;
  * tutorial: https://netbeans.apache.org/tutorial/main/kb/docs/java/quickstart-gui/
  * @author brutzman
  */
-public class ViskitApplication extends javax.swing.JFrame {
+public class ViskitApplicationRedesignLayout extends javax.swing.JFrame {
 
     /**
      * Creates new form NewViskitApplicationJFrame
      */
-    public ViskitApplication() {
+    public ViskitApplicationRedesignLayout() {
         initComponents();
         
         setTitle(" Viskit for Discrete Event Simulation (DES) using Simkit");
@@ -646,8 +646,10 @@ public class ViskitApplication extends javax.swing.JFrame {
         } 
         catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) 
         {
-            java.util.logging.Logger.getLogger(ViskitApplication.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ViskitApplicationRedesignLayout.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         
@@ -657,7 +659,7 @@ public class ViskitApplication extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ViskitApplication().setVisible(true);
+                new ViskitApplicationRedesignLayout().setVisible(true);
             }
         });
     }

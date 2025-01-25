@@ -116,15 +116,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // false will enable all VCR buttons. Currently, only start and stop work
         runPanel = new RunnerPanel2("Assembly Runner", true, analystReportPanelVisible);
         doMenus();
-        runPanel.vcrStop.addActionListener(assemblyRunStopListener = new StopListener());
-        runPanel.vcrPlay.addActionListener(new StartResumeListener());
-        runPanel.vcrRewind.addActionListener(new RewindListener());
-        runPanel.vcrStep.addActionListener(new StepListener());
-        runPanel.vcrVerbose.addActionListener(new VerboseListener());
-        runPanel.vcrStop.setEnabled(false);
-        runPanel.vcrPlay.setEnabled(false);
-        runPanel.vcrRewind.setEnabled(false);
-        runPanel.vcrStep.setEnabled(false);
+        runPanel.vcrStopButton.addActionListener(assemblyRunStopListener = new StopListener());
+        runPanel.vcrPlayButton.addActionListener(new StartResumeListener());
+        runPanel.vcrRewindButton.addActionListener(new RewindListener());
+        runPanel.vcrStepButton.addActionListener(new StepListener());
+        runPanel.vcrVerboseCB.addActionListener(new VerboseListener());
+        runPanel.vcrStopButton.setEnabled(false);
+        runPanel.vcrPlayButton.setEnabled(false);
+        runPanel.vcrRewindButton.setEnabled(false);
+        runPanel.vcrStepButton.setEnabled(false);
 
         // Viskit's current working ClassLoader
         lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
@@ -154,7 +154,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(assemblyClassName);
 
-        runPanel.vcrSimTime.setText("0.0");
+        runPanel.vcrSimTimeTF.setText("0.0");
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
@@ -203,13 +203,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         runPanel.numberReplicationsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
         runPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
         runPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
-        runPanel.saveRepDataCB.setSelected(saveReplicationDataToXml);
+        runPanel.saveReplicationDataCB.setSelected(saveReplicationDataToXml);
 
         // Set the run panel verboseness according to what the assembly XML value is
         setVerbose.invoke(assemblyInstance, verbose);
-        runPanel.vcrVerbose.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
+        runPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
         setStopTime.invoke(assemblyInstance, stopTime);
-        runPanel.vcrStopTime.setText("" + getStopTime.invoke(assemblyInstance));
+        runPanel.vcrStopTimeTF.setText("" + getStopTime.invoke(assemblyInstance));
     }
     JTextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
@@ -283,7 +283,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             setPrintSummaryReport.invoke(assemblyInstance, runPanel.printSummaryReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
-            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveRepDataCB.isSelected());
+            setSaveReplicationData.invoke(assemblyInstance, runPanel.saveReplicationDataCB.isSelected());
             setEnableAnalystReports.invoke(assemblyInstance, runPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
@@ -377,7 +377,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            runPanel.vcrSimTime.setText("0.0");    // because no pausing
+            runPanel.vcrSimTimeTF.setText("0.0");    // because no pausing
             twiddleButtons(Event.START);
             initRun();
         }
@@ -519,14 +519,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
      * @return overridden XML set value via the Run panel setting
      */
     double getStopTime() {
-        return Double.parseDouble(runPanel.vcrStopTime.getText());
+        return Double.parseDouble(runPanel.vcrStopTimeTF.getText());
     }
 
     /** Allow for overriding XML set value via the Run panel setting
      * @return overridden XML set value via the Run panel setting
      */
     boolean getVerbose() {
-        return runPanel.vcrVerbose.isSelected();
+        return runPanel.vcrVerboseCB.isSelected();
     }
 
     public enum Event {
@@ -537,38 +537,38 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         switch (evnt) {
             case START:
                 //System.out.println("twbutt start");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(true);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                runPanel.vcrPlayButton.setEnabled(false);
+                runPanel.vcrStopButton.setEnabled(true);
+                runPanel.vcrStepButton.setEnabled(false);
+                runPanel.vcrRewindButton.setEnabled(false);
                 break;
             case STOP:
                 //System.out.println("twbutt stop");
-                runPanel.vcrPlay.setEnabled(true);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(false); // TODO restore when working
-                runPanel.vcrRewind.setEnabled(true);
+                runPanel.vcrPlayButton.setEnabled(true);
+                runPanel.vcrStopButton.setEnabled(false);
+                runPanel.vcrStepButton.setEnabled(false); // TODO restore when working
+                runPanel.vcrRewindButton.setEnabled(true);
                 break;
             case STEP:
                 //System.out.println("twbutt step");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(true);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                runPanel.vcrPlayButton.setEnabled(false);
+                runPanel.vcrStopButton.setEnabled(true);
+                runPanel.vcrStepButton.setEnabled(false);
+                runPanel.vcrRewindButton.setEnabled(false);
                 break;
             case REWIND:
                 //System.out.println("twbutt rewind");
-                runPanel.vcrPlay.setEnabled(true);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(false); // TODO restore when working
-                runPanel.vcrRewind.setEnabled(false);
+                runPanel.vcrPlayButton.setEnabled(true);
+                runPanel.vcrStopButton.setEnabled(false);
+                runPanel.vcrStepButton.setEnabled(false); // TODO restore when working
+                runPanel.vcrRewindButton.setEnabled(false);
                 break;
             case OFF:
                 //System.out.println("twbutt off");
-                runPanel.vcrPlay.setEnabled(false);
-                runPanel.vcrStop.setEnabled(false);
-                runPanel.vcrStep.setEnabled(false);
-                runPanel.vcrRewind.setEnabled(false);
+                runPanel.vcrPlayButton.setEnabled(false);
+                runPanel.vcrStopButton.setEnabled(false);
+                runPanel.vcrStepButton.setEnabled(false);
+                runPanel.vcrRewindButton.setEnabled(false);
                 break;
             default:
                 LOG.warn("Unrecognized event {}", evnt);

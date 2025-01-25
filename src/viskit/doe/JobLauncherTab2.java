@@ -507,15 +507,15 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             sch = OpenAssembly.inst().jaxbFactory.createSchedule();
         }
 
-        String reps = numberReplicationsTF.getText().trim();
+        String replications = numberReplicationsTF.getText().trim();
         try {
-            Integer.valueOf(reps);
+            Integer.valueOf(replications);
         } catch (NumberFormatException e) {
-            reps = "1";
+            replications = "1";
             System.err.println("Bad number of replications...use 1");
         }
-        sch.setNumberReplications(reps);                            // rg: 2
-        exp.setReplicationsPerDesignPoint(reps);
+        sch.setNumberReplications(replications);                            // rg: 2
+        exp.setReplicationsPerDesignPoint(replications);
 
         String samps = numberCubesTF.getText().trim();
         try {
