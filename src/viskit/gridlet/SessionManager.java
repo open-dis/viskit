@@ -57,7 +57,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 public class SessionManager /* compliments DoeSessionDriver*/ {
 
     private Hashtable<String, String> sessions;
-    private JAXBContext jaxbCtx;
+    private JAXBContext jaxbContext;
 
     Logger LOG = LogUtils.getLogger(SessionManager.class);
 
@@ -70,7 +70,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     public SessionManager() { // public?
         sessions = new Hashtable<>();
         try {
-            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error(e);
         }
@@ -81,7 +81,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
         try {
             FileInputStream is = new FileInputStream(PASSWD);
-            Unmarshaller u = jaxbCtx.createUnmarshaller();
+            Unmarshaller u = jaxbContext.createUnmarshaller();
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);
             List<User> users = passwd.getUser();
             String passcrypt = null;
@@ -156,7 +156,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
             try {
                 String passcrypt = null;
-                Unmarshaller u = jaxbCtx.createUnmarshaller();
+                Unmarshaller u = jaxbContext.createUnmarshaller();
                 ObjectFactory of = new ObjectFactory();
                 //JAXB feature(?)
                 //createPasswordFile returns an Object which
@@ -204,7 +204,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
                     // write out to XML user database
                     try (FileOutputStream fos = new FileOutputStream(pwd)) {
-                        jaxbCtx.createMarshaller().marshal(passwd,fos);
+                        jaxbContext.createMarshaller().marshal(passwd,fos);
                         fos.flush();
                     }
                     LOG.info("New user created for "+newUser);
@@ -226,7 +226,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
         File pwd = new File(PASSWD);
         if ( getUser(usid).equals(username) || isAdmin(usid) ) {
             try {
-                Unmarshaller u = jaxbCtx.createUnmarshaller();
+                Unmarshaller u = jaxbContext.createUnmarshaller();
                 PasswordFile passwd;
                 try (FileInputStream is = new FileInputStream(pwd)) {
                     passwd = (PasswordFile) u.unmarshal(is);
@@ -251,7 +251,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
                     }
                 }
                 try (FileOutputStream fos = new FileOutputStream(pwd)) {
-                    jaxbCtx.createMarshaller().marshal(passwd,fos);
+                    jaxbContext.createMarshaller().marshal(passwd,fos);
                     fos.flush();
                 }
             } catch (JAXBException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
@@ -297,7 +297,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     private String getPasscrypt(String username) {
         try {
             String passcrypt = null;
-            Unmarshaller u = jaxbCtx.createUnmarshaller();
+            Unmarshaller u = jaxbContext.createUnmarshaller();
             File pwd = new File(PASSWD);
             FileInputStream is = new FileInputStream(pwd);
             PasswordFile passwd = (PasswordFile) u.unmarshal(is);

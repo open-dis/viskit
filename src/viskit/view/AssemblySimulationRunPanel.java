@@ -66,7 +66,7 @@ public class AssemblySimulationRunPanel extends JPanel
     public JSplitPane xsplitPane;
     public JButton vcrStopButton, vcrPlayButton, vcrRewindButton, vcrStepButton, closeButton;
     public JCheckBox vcrVerboseCB;
-    public JTextField vcrSimTimeTF, vcrStopTimeTF;
+    public JTextField vcrStartTimeTF, vcrStopTimeTF;
     public JCheckBox saveReplicationDataCB;
     public JCheckBox printReplicationReportsCB;
     public JCheckBox searchCB;
@@ -81,10 +81,11 @@ public class AssemblySimulationRunPanel extends JPanel
     public JLabel  viskitRunnerBannerLabel;
     private String viskitRunnerBannerString;
     public JLabel npsLabel;
+    private String title;
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
-    private JLabel title;
-    private final boolean aRPanelVisible;
+    private JLabel titleLabel;
+    private final boolean analystReportPanelVisible;
 
     /**
      * Create an Assembly Runner panel
@@ -94,23 +95,24 @@ public class AssemblySimulationRunPanel extends JPanel
      * Currently, only start and stop work
      * @param analystReportPanelVisible if true, will enable the analyst report check box
      */
-    public AssemblySimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible) {
-        this.aRPanelVisible = analystReportPanelVisible;
+    public AssemblySimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible)
+    {
+        this.analystReportPanelVisible = analystReportPanelVisible;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         if (newTitle != null)
         {
-            title = new JLabel(newTitle);
-            title.setHorizontalAlignment(JLabel.CENTER);
-            add(title, BorderLayout.NORTH);
+            titleLabel = new JLabel(newTitle);
+            titleLabel.setHorizontalAlignment(JLabel.CENTER);
+            add(titleLabel, BorderLayout.NORTH);
         }
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSideHorizontalSplit;
 
         outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
-        outputStreamTA.setEditable(true); // to allow for additional manual input for saving out
-        outputStreamTA.setToolTipText("This text area space is editable");
+        outputStreamTA.setEditable(true); // to allow for additional manual input prior to saving out
+        outputStreamTA.setToolTipText("This text space is editable, in order to support careful analysis");
         outputStreamTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputStreamTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller outputStreamTA.setRows(100);
@@ -155,17 +157,17 @@ public class AssemblySimulationRunPanel extends JPanel
     {
         JPanel upperLeftFlowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrSimTimeLabel = new JLabel("Sim start time: ");
+        JLabel vcrStartTimeLabel = new JLabel("Sim start time: ");
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
-        vcrSimTimeTF = new JTextField(10);
-        vcrSimTimeTF.setEditable(false);
-        ViskitStatics.clampSize(vcrSimTimeTF, vcrSimTimeTF, vcrSimTimeTF);
+        vcrStartTimeTF = new JTextField(10);
+        vcrStartTimeTF.setEditable(false);
+        ViskitStatics.clampSize(vcrStartTimeTF, vcrStartTimeTF, vcrStartTimeTF);
         JPanel vcrSimTimePanel = new JPanel();
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
-        vcrSimTimePanel.add(vcrSimTimeLabel);
-        vcrSimTimePanel.add(vcrSimTimeTF);
+        vcrSimTimePanel.add(vcrStartTimeLabel);
+        vcrSimTimePanel.add(vcrStartTimeTF);
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
@@ -229,13 +231,13 @@ public class AssemblySimulationRunPanel extends JPanel
         /* DIFF between OA3302 branch and trunk */
         saveReplicationDataCB = new JCheckBox("Save replication data to XML");
         saveReplicationDataCB.setToolTipText("Use in conjuction with Enable Analyst Reports to save replication data to XML");
-        saveReplicationDataCB.setSelected(aRPanelVisible);
-        saveReplicationDataCB.setEnabled(aRPanelVisible);
+        saveReplicationDataCB.setSelected(analystReportPanelVisible);
+        saveReplicationDataCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(saveReplicationDataCB);
         analystReportCB = new JCheckBox("Enable Analyst Reports");
         analystReportCB.setToolTipText("When enabled, replication data saved to XML will be used to generate HTML reports");
-        analystReportCB.setSelected(aRPanelVisible);
-        analystReportCB.setEnabled(aRPanelVisible);
+        analystReportCB.setSelected(analystReportPanelVisible);
+        analystReportCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(analystReportCB);
 
         // Initially, unselected
@@ -278,7 +280,7 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrStepButton.setText(null);
         vcrStepButton.setToolTipText("Single step");
         vcrStepButton.setEnabled(false); // TODO
-        runButtonPanel.add(vcrStepButton);
+        runButtonPanel.add(vcrStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStopButton.setToolTipText("Stop the simulation run");
@@ -369,5 +371,20 @@ public class AssemblySimulationRunPanel extends JPanel
     public void setViskitRunnerFeedbackString(String newViskitRunnerFeedbackString) {
         this.viskitRunnerBannerString = newViskitRunnerFeedbackString;
         viskitRunnerBannerLabel.setText(newViskitRunnerFeedbackString);
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param newTitle the title to set
+     */
+    public void setTitle(String newTitle) {
+        title = newTitle;
+        titleLabel.setText(newTitle);
     }
 }

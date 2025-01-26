@@ -134,12 +134,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JPanel clusterConfigurationPanel;
     private Boolean clusterConfigurationReturn = null;
     private JDialog configurationDialog;
-    private JAXBContext jaxbCtx;
+    private JAXBContext jaxbContext;
 
     public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame) {
         try {
-            jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            unmarshaller = jaxbCtx.createUnmarshaller();
+            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException je) {
             LogUtils.getLogger(JobLauncherTab2.class).error(je);
         }
@@ -1363,7 +1363,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     try {
                         // creating an unmarshaller each time here is supposed to be more thread safe
                         // if slower, however, this only gets hit by the swing thread
-                        // unmarshaller = jaxbCtx.createUnmarshaller();
+                        // unmarshaller = jaxbContext.createUnmarshaller();
                         if (viskit.ViskitStatics.debug) {
                             System.out.println("\tAdding data " + data);
                         }

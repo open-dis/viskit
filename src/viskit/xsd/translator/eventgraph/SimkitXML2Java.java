@@ -56,7 +56,7 @@ public class SimkitXML2Java {
     private SimEntity root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbCtx;
+    JAXBContext jaxbContext;
     private Unmarshaller unMarshaller;
     private Object unMarshalledObject;
 
@@ -72,7 +72,7 @@ public class SimkitXML2Java {
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
         try {
-            jaxbCtx = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
+            jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
         } catch (JAXBException ex) {
             LOG.error(ex);
             error(ex.getMessage());
@@ -110,7 +110,7 @@ public class SimkitXML2Java {
 
     public void unmarshal() {
         try {
-            setUnMarshaller(jaxbCtx.createUnmarshaller());
+            setUnMarshaller(jaxbContext.createUnmarshaller());
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
             root = (SimEntity) getUnMarshalledObject();
         } catch (JAXBException ex) {

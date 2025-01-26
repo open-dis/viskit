@@ -164,8 +164,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         inputStream = new ByteArrayInputStream(assembly.getBytes());
         try {
-            JAXBContext jaxbCtx = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            u = jaxbCtx.createUnmarshaller();
+            JAXBContext jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            u = jaxbContext.createUnmarshaller();
             this.root = (SimkitAssembly) u.unmarshal(inputStream);
         } catch (JAXBException e) {
             LOG.error(e);

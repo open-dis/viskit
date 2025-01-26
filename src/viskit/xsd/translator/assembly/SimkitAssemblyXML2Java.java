@@ -50,12 +50,12 @@ public class SimkitAssemblyXML2Java {
     private SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbCtx;
+    JAXBContext jaxbContext;
 
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
         try {
-            this.jaxbCtx = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
+            this.jaxbContext = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
         } catch (JAXBException ex) {
             LOG.error(ex);
         }
@@ -89,7 +89,7 @@ public class SimkitAssemblyXML2Java {
 
     public void unmarshal() {
         try {
-            Unmarshaller u = jaxbCtx.createUnmarshaller();
+            Unmarshaller u = jaxbContext.createUnmarshaller();
 
             this.root = (SimkitAssembly) u.unmarshal(fileInputStream);
 
@@ -112,22 +112,22 @@ public class SimkitAssemblyXML2Java {
     }
 
     public javax.xml.bind.Element unmarshalAny(String bindings) {
-        JAXBContext oldCtx = jaxbCtx;
+        JAXBContext oldCtx = jaxbContext;
         Unmarshaller u;
         try {
-            jaxbCtx = JAXBContext.newInstance(bindings);
-            u = jaxbCtx.createUnmarshaller();
-            jaxbCtx = oldCtx;
+            jaxbContext = JAXBContext.newInstance(bindings);
+            u = jaxbContext.createUnmarshaller();
+            jaxbContext = oldCtx;
             return (javax.xml.bind.Element) u.unmarshal(fileInputStream);
         } catch (JAXBException e) {
-            jaxbCtx = oldCtx;
+            jaxbContext = oldCtx;
             return null;
         }
     }
 
     public void marshalRoot() {
         try {
-            Marshaller m = jaxbCtx.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(this.root, System.out);
         } catch (JAXBException ex) {
@@ -147,7 +147,7 @@ public class SimkitAssemblyXML2Java {
             s = "<Errors/>";
         }
         try {
-            m = jaxbCtx.createMarshaller();
+            m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
             StringWriter sw = new StringWriter();
@@ -179,7 +179,7 @@ public class SimkitAssemblyXML2Java {
     public void marshal(Object node, OutputStream o) {
         Marshaller m;
         try {
-            m = jaxbCtx.createMarshaller();
+            m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(node,o);
         } catch (JAXBException e) {

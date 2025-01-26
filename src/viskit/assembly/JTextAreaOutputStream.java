@@ -100,6 +100,7 @@ public class JTextAreaOutputStream extends ByteArrayOutputStream implements Acti
     }
   }
 
+  /** swingTimer.stop() */
   public void kill()
   {
     swingTimer.stop();

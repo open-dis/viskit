@@ -40,6 +40,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     private ObjectFactory oFactory;
     private SimkitAssembly jaxbRoot;
     private File currentFile;
+    private String title = new String();
     private boolean modelDirty = false;
     private GraphMetadata metaData;
 
@@ -97,14 +98,17 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean newModel(File f) {
+    public boolean newModel(File f) 
+    {
         getNodeCache().clear();
         pointLess = new Point2D.Double(30, 60);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
         if (f == null) {
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
-        } else {
+        } 
+        else 
+        {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
 
@@ -121,27 +125,29 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetadata mymetaData = new GraphMetadata(this);
-                mymetaData.version = jaxbRoot.getVersion();
-                mymetaData.name = jaxbRoot.getName();
-                mymetaData.packageName = jaxbRoot.getPackage();
+                GraphMetadata myGraphMetaData = new GraphMetadata(this);
+                myGraphMetaData.version = jaxbRoot.getVersion();
+                myGraphMetaData.name = jaxbRoot.getName();
+                myGraphMetaData.packageName = jaxbRoot.getPackage();
 
                 Schedule sch = jaxbRoot.getSchedule();
                 if (sch != null) {
                     String stpTime = sch.getStopTime();
                     if (stpTime != null && stpTime.trim().length() > 0) {
-                        mymetaData.stopTime = stpTime.trim();
+                        myGraphMetaData.stopTime = stpTime.trim();
                     }
-                    mymetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+                    myGraphMetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
 
-                changeMetaData(mymetaData);
+                changeMetaData(myGraphMetaData);
                 buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
-            } catch (JAXBException e) {
+            } 
+            catch (JAXBException e) 
+            {
                 controller.messageUser(JOptionPane.ERROR_MESSAGE,
                         "XML I/O Error",
                         "Exception on JAXB unmarshalling of" +
@@ -153,8 +159,11 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return false;
             }
         }
-
         currentFile = f;
+        title = currentFile.getName();
+        if (title.contains(".xml"))
+            title = title.substring(0,title.indexOf(".xml"));
+        
         setDirty(false);
         return true;
     }
@@ -1140,6 +1149,20 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     public Map<String, AssemblyNode> getNodeCache() {
         return nodeCache;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
 } // end class AssemblyModelImpl

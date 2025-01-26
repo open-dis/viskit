@@ -328,25 +328,28 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      *
      * @param b if true, stops further simulation runs
      */
-    public void setStopRun(boolean b) {
+    public void setStopSimulationRun(boolean b) {
         stopRun = b;
-        if (stopRun) {
+        if (stopRun)
+        {
             Schedule.stopSimulation();
         }
     }
 
-    public void pause() {
+    public void pauseSimulation()
+    {
         Schedule.pause();
     }
 
-    public void resume() {
+    public void resumeSimulation()
+    {
         Schedule.startSimulation();
     }
 
-    /** this is getting called by the Assembly Runner stop
-     * button, which may get called on startup.
+    /** this is getting called by the Assembly Runner stopSimulationRun
+ button, which may get called on startup.
      */
-    public void stop() {
+    public void stopSimulationRun() {
         stopRun = true;
     }
 
@@ -356,11 +359,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
 
-    public final void setNumberReplications(int num) {
-        if (num < 1) {
-            throw new IllegalArgumentException("Number replications must be > 0: " + num);
+    public final void setNumberReplications(int newNumberReplications) {
+        if (newNumberReplications < 1) {
+            throw new IllegalArgumentException("Number replications must be > 0: " + newNumberReplications);
         }
-        numberReplications = num;
+        numberReplications = newNumberReplications;
     }
 
     /** How many replications have occurred so far during this simulation
@@ -471,7 +474,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //        boolean midReplications = lastReplicationNum < getNumberReplicationlications();
 //
 //        if (midReplications) {
-//            // middle of some rep, fell out because of GUI stop
+//            // middle of some rep, fell out because of GUI stopSimulationRun
 //            startReplicationNumber = lastReplicationNum;
 //        } else if (!midReplications && !midRun) {
 //            // done with all replications
@@ -483,10 +486,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //    }
 
 //    /**
-//     * Called at top of rep loop;  This will support "pause", but the GUI
+//     * Called at top of rep loop;  This will support "pauseSimulation", but the GUI
 //     * is not taking advantage of it presently.
 //     * <p/>
-//     * rg - try using Schedule.pause() directly from GUI?
+//     * rg - try using Schedule.pauseSimulation() directly from GUI?
 //     */
 //    private void maybeReset() {
 //        // We reset if we're not in the middle of a run
@@ -681,7 +684,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         runEntitiesSet = Schedule.getReruns();
 
-        Method setNumberOfReplications;
+        Method setNumberOfReplicationsMethod;
         // Convenience for Diskit if on the classpath
         for (ReRunnable entity : runEntitiesSet) {
 
@@ -690,8 +693,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             if (entity.getName().contains("ScenarioManager")) {
                 scenarioManager = entity;
                 try {
-                    setNumberOfReplications = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
-                    setNumberOfReplications.invoke(scenarioManager, getNumberReplications());
+                    setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
+                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplications());
                 } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error(ex);
                 }
@@ -828,8 +831,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.getReport(), pclNodeCache);
-                Method writeToXMLFile = clazz.getMethod("writeToXMLFile", File.class);
-                writeToXMLFile.invoke(arbObject, analystReportFile);
+                Method writeToXMLFileMethod = clazz.getMethod("writeToXMLFile", File.class);
+                writeToXMLFileMethod.invoke(arbObject, analystReportFile);
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
                 LOG.error(ex);
 //                ex.printStackTrace();

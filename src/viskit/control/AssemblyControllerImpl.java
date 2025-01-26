@@ -1632,7 +1632,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             clNam = paf.pkg + "." + clNam;
 
             execStrings = buildExecStrings(clNam);
-        } else {
+        } 
+        else {
             execStrings = null;
         }
     }
@@ -1648,7 +1649,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Prevent double clicking which will cause potential ClassLoader issues
         Runnable r = () -> {
-            ((AssemblyViewFrame) getView()).runButton.setEnabled(false);
+            ((AssemblyViewFrame) getView()).initializeAssemblySimulationRunButton.setEnabled(false);
         };
 
         try {
@@ -1671,7 +1672,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                         messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
-                    } else {
+                    } 
+                    else
+                    {
                         String msg = "Please locate and correct the source of the error in the assembly XML for proper compilation";
                         messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error", msg);
                     }
@@ -1701,11 +1704,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // Wait for the compile, save and Assembly preparations to finish
                     get();
 
-                } catch (InterruptedException | ExecutionException e) {
+                } 
+                catch (InterruptedException | ExecutionException e) {
                     LOG.error(e);
 //                    e.printStackTrace();
                 } finally {
-                    ((AssemblyViewFrame) getView()).runButton.setEnabled(true);
+                    ((AssemblyViewFrame) getView()).initializeAssemblySimulationRunButton.setEnabled(true);
                     mutex--;
                 }
             }
@@ -1718,7 +1722,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public static final int EXEC_STOPTIME_SWITCH = 2;;
 
     /** Prepare for running the loaded assembly file from java source.
-     * Maintain the above statics indicies to match the order used.
+     * Maintain the above statics indices to match the order used.
      * @param className the name of the Assembly file to compile
      * @return a parameter array
      */
@@ -1738,20 +1742,20 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void captureWindow() {
 
-        AssemblyModel vmod = (AssemblyModel) getModel();
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
         String fileName = "AssemblyScreenCapture";
-        if (vmod.getLastFile() != null) {
-            fileName = vmod.getLastFile().getName();
+        if (assemblyModel.getLastFile() != null) {
+            fileName = assemblyModel.getLastFile().getName();
         }
 
-        File fil = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true);
-        if (fil == null) {
+        File assemblyScreenCaptureFile = ((AssemblyView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", true);
+        if (assemblyScreenCaptureFile == null) {
             return;
         }
 
-        final Timer tim = new Timer(100, new timerCallback(fil, true));
-        tim.setRepeats(false);
-        tim.start();
+        final Timer captureWindowTimer = new Timer(100, new timerCallback(assemblyScreenCaptureFile, true));
+        captureWindowTimer.setRepeats(false);
+        captureWindowTimer.start();
 
         imgSaveCount = "" + (++imgSaveInt);
     }
@@ -1764,9 +1768,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void captureAssemblyImage(File assemblyImageFile) {
 
         // Don't display an extra frame while taking snapshots
-        final Timer tim = new Timer(100, new timerCallback(assemblyImageFile, false));
-        tim.setRepeats(false);
-        tim.start();
+        final Timer captureAssemblyImageTimer = new Timer(100, new timerCallback(assemblyImageFile, false));
+        captureAssemblyImageTimer.setRepeats(false);
+        captureAssemblyImageTimer.start();
     }
 
     public boolean isCloseAll() {

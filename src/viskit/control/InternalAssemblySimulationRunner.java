@@ -75,9 +75,9 @@ import viskit.model.AssemblyModelImpl;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class InternalAssemblyRunner implements PropertyChangeListener {
+public class InternalAssemblySimulationRunner implements PropertyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(InternalAssemblyRunner.class);
+    static final Logger LOG = LogUtils.getLogger(InternalAssemblySimulationRunner.class);
 
     /** The name of the basicAssembly to run */
     String assemblyClassName;
@@ -101,14 +101,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
     /** Captures the original RNG seed state */
     private long[] seeds;
-    private final StopListener assemblyRunStopListener;
+    private final StopListener assemblySimulationRunStopListener;
 
+    public final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Assembly Simulation Run Console";
     /**
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
      */
-    public InternalAssemblyRunner(boolean analystReportPanelVisible) {
-
+    public InternalAssemblySimulationRunner(boolean analystReportPanelVisible) 
+    {
         saveListener = new SaveListener();
 
         // NOTE:
@@ -116,7 +117,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         // false will enable all VCR buttons. Currently, only start and stop work
         assemblySimulationRunPanel = new AssemblySimulationRunPanel("Assembly Simulation Run Console", false, analystReportPanelVisible);
         doMenus();
-        assemblySimulationRunPanel.vcrStopButton.addActionListener(assemblyRunStopListener = new StopListener());
+        assemblySimulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
         assemblySimulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());
         assemblySimulationRunPanel.vcrRewindButton.addActionListener(new RewindListener());
         assemblySimulationRunPanel.vcrStepButton.addActionListener(new StepListener());
@@ -154,7 +155,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         doTitle(assemblyClassName);
 
-        assemblySimulationRunPanel.vcrSimTimeTF.setText("0.0");
+        assemblySimulationRunPanel.vcrStartTimeTF.setText("0.0");
 
         // These values are from the XML file
         boolean defaultVerbose = Boolean.parseBoolean(params[AssemblyControllerImpl.EXEC_VERBOSE_SWITCH]);
@@ -162,21 +163,23 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         double defaultStopTime = Double.parseDouble(params[AssemblyControllerImpl.EXEC_STOPTIME_SWITCH]);
 
         try {
-            fillRepWidgetsFromPreRunAssembly(defaultVerbose, saveRepDataToXml, defaultStopTime);
-        } catch (Throwable throwable) {
+            fillSimulationRunButtonsFromAssemblyInitialization(defaultVerbose, saveRepDataToXml, defaultStopTime);
+        } 
+        catch (Throwable throwable) 
+        {
             ViskitGlobals.instance().getAssemblyEditor().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
-            twiddleButtons(Event.OFF);
+            vcrButtonPressDisplayUpdate(Event.OFF);
 //            throwable.printStackTrace();
             return;
         }
-        twiddleButtons(Event.REWIND);
+        vcrButtonPressDisplayUpdate(Event.REWIND);
     }
 
-    private void fillRepWidgetsFromPreRunAssembly(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable {
+    private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable {
 
         assemblyClass = ViskitStatics.classForName(assemblyClassName);
         if (assemblyClass == null) {
@@ -191,38 +194,38 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
          */
         basicAssembly = (BasicAssembly) assemblyInstance;
 
-        Method getNumberReplications = assemblyClass.getMethod("getNumberReplications");
-//        Method isSaveReplicationData = assemblyClass.getMethod("isSaveReplicationData");
-        Method isPrintReplicationReports = assemblyClass.getMethod("isPrintReplicationReports");
-        Method isPrintSummaryReport = assemblyClass.getMethod("isPrintSummaryReport");
-        Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
-        Method isVerbose = assemblyClass.getMethod("isVerbose");
-        Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
-        Method getStopTime = assemblyClass.getMethod("getStopTime");
+        Method getNumberReplicationsMethod = assemblyClass.getMethod("getNumberReplications");
+        Method isSaveReplicationData = assemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
+        Method isPrintReplicationReportsMethod = assemblyClass.getMethod("isPrintReplicationReports");
+        Method isPrintSummaryReportMethod = assemblyClass.getMethod("isPrintSummaryReport");
+        Method setVerboseMethod = assemblyClass.getMethod("setVerbose", boolean.class);
+        Method isVerboseMethod = assemblyClass.getMethod("isVerbose");
+        Method setStopTimeMethod = assemblyClass.getMethod("setStopTime", double.class);
+        Method getStopTimeMethod = assemblyClass.getMethod("getStopTime");
 
-        assemblySimulationRunPanel.numberReplicationsTF.setText("" + getNumberReplications.invoke(assemblyInstance));
-        assemblySimulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReports.invoke(assemblyInstance));
-        assemblySimulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReport.invoke(assemblyInstance));
+        assemblySimulationRunPanel.numberReplicationsTF.setText("" + getNumberReplicationsMethod.invoke(assemblyInstance));
+        assemblySimulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReportsMethod.invoke(assemblyInstance));
+        assemblySimulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReportMethod.invoke(assemblyInstance));
         assemblySimulationRunPanel.saveReplicationDataCB.setSelected(saveReplicationDataToXml);
 
         // Set the run panel verboseness according to what the basicAssembly XML value is
-        setVerbose.invoke(assemblyInstance, verbose);
-        assemblySimulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerbose.invoke(assemblyInstance));
-        setStopTime.invoke(assemblyInstance, stopTime);
-        assemblySimulationRunPanel.vcrStopTimeTF.setText("" + getStopTime.invoke(assemblyInstance));
+        setVerboseMethod.invoke(assemblyInstance, verbose);
+        assemblySimulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerboseMethod.invoke(assemblyInstance));
+        setStopTimeMethod.invoke(assemblyInstance, stopTime);
+        assemblySimulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(assemblyInstance));
     }
     JTextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
 
-    protected void initRun() {
+    protected void initializeAssemblySimulationRun() {
 
         // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
             return;
 
-        try {
-
+        try // initializeAssemblySimulationRun
+        {
             ViskitGlobals.instance().resetFreshClassLoader();
             lastLoaderWithReset = ViskitGlobals.instance().getFreshClassLoader();
 
@@ -232,22 +235,21 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //            }
 //            LOG.info("\n");
 
-            // Now we are in the pure classloader realm where each basicAssembly run can
-            // be independent of any other
+            // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
             assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
             assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
 
-            Method setOutputStream = assemblyClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplications = assemblyClass.getMethod("setNumberReplications", int.class);
-            Method setPrintReplicationReports = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
-            Method setPrintSummaryReport = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
-            Method setSaveReplicationData = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
+            Method setOutputStreamMethod = assemblyClass.getMethod("setOutputStream", OutputStream.class);
+            Method setNumberReplicationsMethod = assemblyClass.getMethod("setNumberReplications", int.class);
+            Method setPrintReplicationReportsMethod = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
+            Method setPrintSummaryReportMethod = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
+            Method setSaveReplicationDataMethod = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
             Method setEnableAnalystReports = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
-            Method setVerbose = assemblyClass.getMethod("setVerbose", boolean.class);
-            Method setStopTime = assemblyClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplication = assemblyClass.getMethod("setVerboseReplication", int.class);
-            Method setPclNodeCache = assemblyClass.getMethod("setPclNodeCache", Map.class);
-            Method addPropertyChangeListener = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setVerboseMethod = assemblyClass.getMethod("setVerbose", boolean.class);
+            Method setStopTimeMethod = assemblyClass.getMethod("setStopTime", double.class);
+            Method setVerboseReplicationMethod = assemblyClass.getMethod("setVerboseReplication", int.class);
+            Method setPclNodeCacheMethod = assemblyClass.getMethod("setPclNodeCache", Map.class);
+            Method addPropertyChangeListenerMethod = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // As of discussion held 09 APR 2015, resetting the RNG seed state
             // is not necessary for basic Viskit operation.  Pseudo random
@@ -257,18 +259,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             // *** Resetting the RNG seed state ***
             // NOTE: This is currently disabled as the resetSeedStateCB is not
             // enabled nor visible
-            if (assemblySimulationRunPanel.resetSeedStateCB.isSelected()) {
-
+            if (assemblySimulationRunPanel.resetSeedStateCB.isSelected()) 
+            {
                 Class<?> rVFactClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
-                Method getDefaultRandomNumber = rVFactClass.getMethod("getDefaultRandomNumber");
-                Object rn = getDefaultRandomNumber.invoke(null);
+                Method getDefaultRandomNumberMethod = rVFactClass.getMethod("getDefaultRandomNumber");
+                Object rn = getDefaultRandomNumberMethod.invoke(null);
 
-                Method getSeeds = rn.getClass().getMethod("getSeeds");
-                seeds = (long[]) getSeeds.invoke(rn);
+                Method getSeedsMethod = rn.getClass().getMethod("getSeeds");
+                seeds = (long[]) getSeedsMethod.invoke(rn);
 
                 Class<?> rNClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
-                Method setSeeds = rNClass.getMethod("setSeeds", long[].class);
-                setSeeds.invoke(rn, seeds);
+                Method setSeedsMethod = rNClass.getMethod("setSeeds", long[].class);
+                setSeedsMethod.invoke(rn, seeds);
 
                 // TODO: We can also call RNG.resetSeed() which recreates the
                 // seed state (array) from the original seed
@@ -277,41 +279,44 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             textAreaOutputStream = new JTextAreaOutputStream(assemblySimulationRunPanel.outputStreamTA, 16*1024);
 
-            setOutputStream.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplications.invoke(assemblyInstance, Integer.valueOf(assemblySimulationRunPanel.numberReplicationsTF.getText().trim()));
-            setPrintReplicationReports.invoke(assemblyInstance, assemblySimulationRunPanel.printReplicationReportsCB.isSelected());
-            setPrintSummaryReport.invoke(assemblyInstance, assemblySimulationRunPanel.printSummaryReportsCB.isSelected());
+            setOutputStreamMethod.invoke(assemblyInstance, textAreaOutputStream);
+            setNumberReplicationsMethod.invoke(assemblyInstance, Integer.valueOf(assemblySimulationRunPanel.numberReplicationsTF.getText().trim()));
+            setPrintReplicationReportsMethod.invoke(assemblyInstance, assemblySimulationRunPanel.printReplicationReportsCB.isSelected());
+            setPrintSummaryReportMethod.invoke(assemblyInstance, assemblySimulationRunPanel.printSummaryReportsCB.isSelected());
 
             /* DIFF between OA3302 branch and trunk */
-            setSaveReplicationData.invoke(assemblyInstance, assemblySimulationRunPanel.saveReplicationDataCB.isSelected());
+            setSaveReplicationDataMethod.invoke(assemblyInstance, assemblySimulationRunPanel.saveReplicationDataCB.isSelected());
             setEnableAnalystReports.invoke(assemblyInstance, assemblySimulationRunPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
             // Allow panel values to override XML set values
-            setStopTime.invoke(assemblyInstance, getStopTime());
-            setVerbose.invoke(assemblyInstance, getVerbose());
+            setStopTimeMethod.invoke(assemblyInstance, getStopTime());
+            setVerboseMethod.invoke(assemblyInstance, getVerbose());
 
-            setVerboseReplication.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCache.invoke(assemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
-            addPropertyChangeListener.invoke(assemblyInstance, this);
+            setVerboseReplicationMethod.invoke(assemblyInstance, getVerboseReplicationNumber());
+            setPclNodeCacheMethod.invoke(assemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            addPropertyChangeListenerMethod.invoke(assemblyInstance, this);
             assemblyRunnable = (Runnable) assemblyInstance;
 
             // Start the simulation run(s)
             simulationRunnerThread = new Thread(assemblyRunnable);
-            new SimRunMonitor(simulationRunnerThread).execute();
+            new SimulationRunMonitor(simulationRunnerThread).execute();
 
             // Restore Viskit's working ClassLoader
             Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException ex) {
-            LOG.error(ex);
+        }
+        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
+        {
+            LOG.error(exception);
         }
     }
 
     /** Thread to perform simulation run and end of run cleanup items */
-    public class SimRunMonitor extends SwingWorker<Void, Void> {
+    public class SimulationRunMonitor extends SwingWorker<Void, Void> 
+    {
         Thread waitOn;
 
-        public SimRunMonitor(Thread toWaitOn) {
+        public SimulationRunMonitor(Thread toWaitOn) {
             waitOn = toWaitOn;
         }
 
@@ -336,8 +341,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
             // Grab the temp analyst report and signal the AnalystReportFrame
             try {
-                Method getAnalystReport = assemblyClass.getMethod("getAnalystReport");
-                analystReportTempFile = (String) getAnalystReport.invoke(assemblyInstance);
+                Method getAnalystReportMethod = assemblyClass.getMethod("getAnalystReport");
+                analystReportTempFile = (String) getAnalystReportMethod.invoke(assemblyInstance);
             } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                 LOG.error(ex);
                 return;
@@ -349,12 +354,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
             System.out.println("----------------");
 
             assemblySimulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
-            assemblyRunStopListener.actionPerformed(null);
+            assemblySimulationRunStopListener.actionPerformed(null);
         }
     }
 
     public ActionListener getAssemblyRunStopListener() {
-        return assemblyRunStopListener;
+        return assemblySimulationRunStopListener;
     }
 
     /**
@@ -376,18 +381,52 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     class StartResumeListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            assemblySimulationRunPanel.vcrSimTimeTF.setText("0.0");    // because no pausing
-            twiddleButtons(Event.START);
-            initRun();
+        public void actionPerformed(ActionEvent e) 
+        {
+            assemblySimulationRunPanel.vcrStartTimeTF.setText("0.0");    // because no pausing
+            vcrButtonPressDisplayUpdate(Event.START);
+            initializeAssemblySimulationRun();
         }
     }
 
     class StepListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            twiddleButtons(Event.STEP);
+        public void actionPerformed(ActionEvent e) // TODO editing in progress, not fully tested
+        {
+            try // StepListener
+            {
+                if (assemblyInstance != null) {
+
+                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+
+                    Method setStepRunMethod = assemblyClass.getMethod("setStepRun", boolean.class);
+                    setStepRunMethod.invoke(assemblyInstance, true);
+
+//                    if (textAreaOutputStream != null)
+//                        textAreaOutputStream.kill();
+//
+//                    mutex--;
+                }
+
+                Schedule.coldReset();
+
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                if (loader != null && !loader.equals(lastLoaderNoReset))
+                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+
+            } 
+            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+
+                // Some screwy stuff can happen here if a user jams around with
+                // the initialize Assembly run button and tabs back and forth
+                // between the Assembly editor and the Assembly runner panel, but it
+                // won't impede a correct Assembly run.  Catch the
+                // IllegalArgumentException and move on.
+//                LOG.error(ex);
+//                ex.printStackTrace();
+            }
+            vcrButtonPressDisplayUpdate(Event.STEP);
         }
     }
 
@@ -397,15 +436,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
     public class StopListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-
+        public void actionPerformed(ActionEvent e)
+        {
+            try // StopListener
+            {
                 if (assemblyInstance != null) {
 
                     Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
 
-                    Method setStopRun = assemblyClass.getMethod("setStopRun", boolean.class);
-                    setStopRun.invoke(assemblyInstance, true);
+                    Method setStopRunMethod = assemblyClass.getMethod("setStopRun", boolean.class);
+                    setStopRunMethod.invoke(assemblyInstance, true);
 
                     if (textAreaOutputStream != null)
                         textAreaOutputStream.kill();
@@ -419,7 +459,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 if (loader != null && !loader.equals(lastLoaderNoReset))
                     Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
 
-            } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+            } 
+            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
                 // the initialize Assembly run button and tabs back and forth
@@ -429,8 +470,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 //                LOG.error(ex);
 //                ex.printStackTrace();
             }
-
-            twiddleButtons(Event.STOP);
+            vcrButtonPressDisplayUpdate(Event.STOP);
         }
     }
 
@@ -438,7 +478,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            twiddleButtons(Event.REWIND);
+            vcrButtonPressDisplayUpdate(Event.REWIND);
         }
     }
 
@@ -536,45 +576,40 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         START, STOP, STEP, REWIND, OFF
     }
 
-    public void twiddleButtons(Event evnt) {
-        switch (evnt) {
+    public void vcrButtonPressDisplayUpdate(Event newEvent) {
+        switch (newEvent) {
             case START:
-                //System.out.println("twbutt start");
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(false);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
-            case STOP:
-                //System.out.println("twbutt stop");
+            case STEP:
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO restore when working
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStopButton.setEnabled(true);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(true);
                 break;
-            case STEP:
-                //System.out.println("twbutt step");
-                assemblySimulationRunPanel.vcrPlayButton.setEnabled(false);
-                assemblySimulationRunPanel.vcrStopButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(false);
+            case STOP:
+                assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
             case REWIND:
-                //System.out.println("twbutt rewind");
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(true); 
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO restore when working
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
             case OFF:
-                //System.out.println("twbutt off");
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(false);
-                assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrStepButton.setEnabled(false);
+                assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
             default:
-                LOG.warn("Unrecognized event {}", evnt);
+                LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                 break;
         }
     }
@@ -653,12 +688,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
                 tool = "gedit"; // assuming Linux here
             }
 
-            String s = assemblySimulationRunPanel.outputStreamTA.getText().trim();
+            String consoleText = assemblySimulationRunPanel.outputStreamTA.getText().trim();
             try {
                 f = TempFileManager.createTempFile("ViskitOutput", ".txt");
                 f.deleteOnExit();
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
-                    bw.append(s);
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(f))) {
+                    bufferedWriter.append(consoleText);
                 }
                 filePath = f.getCanonicalPath();
                 Desktop.getDesktop().open(new File(filePath));
@@ -721,4 +756,4 @@ public class InternalAssemblyRunner implements PropertyChangeListener {
         }
     }
 
-}  // end class file InternalAssemblyRunner.java
+}  // end class file InternalAssemblySimulationRunner.java

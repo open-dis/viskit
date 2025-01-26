@@ -123,14 +123,14 @@ public class FindFile extends SimpleFileVisitor<Path> {
             usage();
         }
 
-        Path startingDir = Paths.get(args[0]);
+        Path startingDirectory = Paths.get(args[0]);
         String pattern = args[2];
 
-        FindFile finder = new FindFile(pattern);
-        Files.walkFileTree(startingDir, finder);
+        FindFile findFile = new FindFile(pattern);
+        Files.walkFileTree(startingDirectory, findFile);
 
-        if (finder.path != null)
-            System.out.println("Path found: " + finder.path);
+        if (findFile.path != null)
+            System.out.println("Path found: " + findFile.path);
     }
 
 } // end class file FindFile.java

@@ -92,7 +92,7 @@ public class FileBasedClassManager {
     }
     FileBasedAssemblyNode fban = null;
     Class<?> fclass = null;
-    JAXBContext jaxbCtx = null;
+    JAXBContext jaxbContext = null;
     Unmarshaller um = null;
     PkgAndFile paf = null;
     File fXml = null;
@@ -109,8 +109,8 @@ public class FileBasedClassManager {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
         if (f.getName().toLowerCase().endsWith(".xml")) {
-            jaxbCtx = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
-            um = jaxbCtx.createUnmarshaller();
+            jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+            um = jaxbContext.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?
             if (!isCached(f)) {

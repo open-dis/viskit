@@ -130,8 +130,10 @@ import viskit.mvc.MvcRecentFileListener;
  *   to be used to configure an assembly file for sim running
  * </pre>
  */
-public class AssemblyViewFrame extends MvcAbstractJFrameView implements AssemblyView, DragStartListener {
-
+public class AssemblyViewFrame extends MvcAbstractJFrameView implements AssemblyView, DragStartListener
+{
+    private String title = new String();
+    
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
     public static final int SELECT_MODE = 0;
     public static final int ADAPTER_MODE = 1;
@@ -139,7 +141,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     public static final int PCL_MODE = 3;
 
     // The controller needs access to this
-    public JButton runButton;
+    public JButton initializeAssemblySimulationRunButton;
 
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
@@ -562,8 +564,8 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
                 "Zoom out on the graph"
         );
 
-        Action runAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
-        runButton = makeButton(runAction, "viskit/images/Play24.gif",
+        Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
+        initializeAssemblySimulationRunButton = makeButton(prepareSimulationRunnerAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -593,7 +595,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly Simulation Run: ");
         initializeAssemblyRunLabel.setToolTipText("First initialize Assembly Simulation Run from Assembly tab");
         getToolBar().add(initializeAssemblyRunLabel);
-        getToolBar().add(runButton);
+        getToolBar().add(initializeAssemblySimulationRunButton);
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);
@@ -1197,6 +1199,20 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
      */
     public RecentAssemblyFileListener getRecentAssemblyFileListener() {
         return recentAssemblyFileListener;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
 } // end class file AssemblyViewFrame.java

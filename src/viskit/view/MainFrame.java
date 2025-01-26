@@ -50,7 +50,7 @@ import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
-import viskit.control.InternalAssemblyRunner;
+import viskit.control.InternalAssemblySimulationRunner;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
@@ -62,6 +62,7 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
 import viskit.assembly.AssemblySimulationRunPlug;
+import viskit.model.AssemblyModelImpl;
 
 /**
  * MOVES Institute
@@ -77,7 +78,7 @@ public class MainFrame extends JFrame {
     MvcAbstractJFrameView eventGraphFrame;
     MvcAbstractJFrameView assemblyFrame;
     MvcAbstractJFrameView reportPanel;
-    InternalAssemblyRunner assemblyRunner;
+    InternalAssemblySimulationRunner assemblyRunner;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -104,7 +105,8 @@ public class MainFrame extends JFrame {
     private AssemblyController     assemblyController;
     private EventGraphController eventGraphController;
 
-    public MainFrame(String initialAssemblyFile) {
+    public MainFrame(String initialAssemblyFile) 
+    {
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME);
         this.initialAssemblyFile = initialAssemblyFile;
         ViskitGlobals.instance().setMainAppWindow(MainFrame.this);
@@ -225,7 +227,8 @@ public class MainFrame extends JFrame {
             menus.add(null); // placeholder
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX] = idx;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
-        } else 
+        } 
+        else 
         {
             tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX] = -1;
         }
@@ -259,7 +262,7 @@ public class MainFrame extends JFrame {
         }
 
         // Assembly Simulation Run
-        assemblyRunner = new InternalAssemblyRunner(analystReportPanelVisible); // TODO expose
+        assemblyRunner = new InternalAssemblySimulationRunner(analystReportPanelVisible); // TODO expose
 //        ViskitGlobals.instance().setSimulationRunnerPanel(assemblyRunner); // TODO align classes
         
         runTabbedPane.add(ViskitGlobals.instance().getSimulationRunnerPanel(), TAB1_LOCALRUN_INDEX);
@@ -274,7 +277,7 @@ public class MainFrame extends JFrame {
         AssemblyControllerImpl assemblyController = ((AssemblyControllerImpl) assemblyFrame.getController());
         assemblyController.setInitialAssemblyFile(initialAssemblyFile);
         assemblyController.setAssemblyRunner(new ThisAssemblyRunnerPlug());
-
+        
         /* DIFF between OA3302 branch and trunk */
 
         // Design of experiments
@@ -374,10 +377,13 @@ public class MainFrame extends JFrame {
 
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX]) {
+            if (i == tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX]) 
+            {
                 i = topTabbedPane.getTabCount() + runTabbedPane.getSelectedIndex();
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX], "Run simulation defined by assembly");
-            } else {
+            }
+            else
+            {
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_ASSEMBLYRUN_SUBTABS_INDEX], "First initialize Assembly Simulation Run from Assembly tab");
             }
 
@@ -582,16 +588,17 @@ public class MainFrame extends JFrame {
         {
             AssemblySimulationRunPanel runnerPanel = ViskitGlobals.instance().getSimulationRunnerPanel();
             runnerPanel.outputStreamTA.setText(null);
-            runnerPanel.outputStreamTA.setText("Assembly output stream:" + runnerPanel.lineEnd
-                    + "----------------------" + runnerPanel.lineEnd);
-            runnerPanel.vcrSimTimeTF.setText("");
+            runnerPanel.outputStreamTA.setText(
+                    "Assembly output stream:" + runnerPanel.lineEnd +
+                    "-----------------------" + runnerPanel.lineEnd);
+            runnerPanel.vcrStartTimeTF.setText("");
             runnerPanel.vcrStopTimeTF.setText("");
             runnerPanel.numberReplicationsTF.setText("");
             runnerPanel.vcrVerboseCB.setSelected(false);
             runnerPanel.printReplicationReportsCB.setSelected(false);
             runnerPanel.printSummaryReportsCB.setSelected(false);
 
-            assemblyRunner.twiddleButtons(InternalAssemblyRunner.Event.OFF);
+            assemblyRunner.vcrButtonPressDisplayUpdate(InternalAssemblySimulationRunner.Event.OFF); // initialize
             assemblyRunner.doTitle(null);
             
             runnerPanel.nowRunningLabel.setText("");

@@ -130,9 +130,9 @@ public class FileHandler {
     }
 
     public static void marshallJaxb(File of) throws Exception {
-        JAXBContext jaxbCtx = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+        JAXBContext jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         try (Writer fw = new FileWriter(of)) {
-            Marshaller m = jaxbCtx.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
             m.marshal(OpenAssembly.inst().jaxbRoot, fw);
