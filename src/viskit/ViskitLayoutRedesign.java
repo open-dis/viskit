@@ -40,7 +40,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphEditorPanel = new javax.swing.JPanel();
         assemblyEditorPanel = new javax.swing.JPanel();
         assemblySimulationRunTabbedPane = new javax.swing.JTabbedPane();
-        runLocalSimulationPanel = new javax.swing.JPanel();
+        localSimulationRunPanel = new javax.swing.JPanel();
         analystReportPanel = new javax.swing.JPanel();
         analystReportTabbedPane = new javax.swing.JTabbedPane();
         _1_HeaderPanel = new javax.swing.JPanel();
@@ -52,8 +52,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _7_StatisticalResultsPanel = new javax.swing.JPanel();
         _8_ConclusionsRecommendationsPanel = new javax.swing.JPanel();
         designOfExperimentsPanel = new javax.swing.JPanel();
-        cloudSimulationPanel = new javax.swing.JPanel();
-        runClusterSimulationPanel = new javax.swing.JPanel();
+        cloudSimulationRunTabbedPane = new javax.swing.JTabbedPane();
+        cloudSimulationRunPanel = new javax.swing.JPanel();
         viskitMenuBar = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         newViskitProjectMI = new javax.swing.JMenuItem();
@@ -125,6 +125,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         setName("Viskit"); // NOI18N
         setPreferredSize(new java.awt.Dimension(800, 600));
 
+        viskitTabbedPane.setToolTipText("DOE");
+
         javax.swing.GroupLayout eventGraphEditorPanelLayout = new javax.swing.GroupLayout(eventGraphEditorPanel);
         eventGraphEditorPanel.setLayout(eventGraphEditorPanelLayout);
         eventGraphEditorPanelLayout.setHorizontalGroup(
@@ -151,18 +153,18 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitTabbedPane.addTab("Assembly Editor", assemblyEditorPanel);
 
-        javax.swing.GroupLayout runLocalSimulationPanelLayout = new javax.swing.GroupLayout(runLocalSimulationPanel);
-        runLocalSimulationPanel.setLayout(runLocalSimulationPanelLayout);
-        runLocalSimulationPanelLayout.setHorizontalGroup(
-            runLocalSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout localSimulationRunPanelLayout = new javax.swing.GroupLayout(localSimulationRunPanel);
+        localSimulationRunPanel.setLayout(localSimulationRunPanelLayout);
+        localSimulationRunPanelLayout.setHorizontalGroup(
+            localSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 800, Short.MAX_VALUE)
         );
-        runLocalSimulationPanelLayout.setVerticalGroup(
-            runLocalSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        localSimulationRunPanelLayout.setVerticalGroup(
+            localSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 507, Short.MAX_VALUE)
         );
 
-        assemblySimulationRunTabbedPane.addTab("Run Local Simulation", runLocalSimulationPanel);
+        assemblySimulationRunTabbedPane.addTab("Local Simulation Run", localSimulationRunPanel);
 
         viskitTabbedPane.addTab("Assembly Simulation Run", assemblySimulationRunTabbedPane);
 
@@ -300,43 +302,22 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 542, Short.MAX_VALUE)
         );
 
-        viskitTabbedPane.addTab("Design of Experiments (DOE)", designOfExperimentsPanel);
+        viskitTabbedPane.addTab("Design of Experiments", designOfExperimentsPanel);
 
-        runClusterSimulationPanel.setEnabled(false);
-
-        javax.swing.GroupLayout runClusterSimulationPanelLayout = new javax.swing.GroupLayout(runClusterSimulationPanel);
-        runClusterSimulationPanel.setLayout(runClusterSimulationPanelLayout);
-        runClusterSimulationPanelLayout.setHorizontalGroup(
-            runClusterSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout cloudSimulationRunPanelLayout = new javax.swing.GroupLayout(cloudSimulationRunPanel);
+        cloudSimulationRunPanel.setLayout(cloudSimulationRunPanelLayout);
+        cloudSimulationRunPanelLayout.setHorizontalGroup(
+            cloudSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 800, Short.MAX_VALUE)
         );
-        runClusterSimulationPanelLayout.setVerticalGroup(
-            runClusterSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        cloudSimulationRunPanelLayout.setVerticalGroup(
+            cloudSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 507, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout cloudSimulationPanelLayout = new javax.swing.GroupLayout(cloudSimulationPanel);
-        cloudSimulationPanel.setLayout(cloudSimulationPanelLayout);
-        cloudSimulationPanelLayout.setHorizontalGroup(
-            cloudSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
-            .addGroup(cloudSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(cloudSimulationPanelLayout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(runClusterSimulationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
-        );
-        cloudSimulationPanelLayout.setVerticalGroup(
-            cloudSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 542, Short.MAX_VALUE)
-            .addGroup(cloudSimulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(cloudSimulationPanelLayout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(runClusterSimulationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
-        );
+        cloudSimulationRunTabbedPane.addTab("Cloud Simulation Run", cloudSimulationRunPanel);
 
-        viskitTabbedPane.addTab("Cloud", cloudSimulationPanel);
+        viskitTabbedPane.addTab("Cloud Simulation Run", cloudSimulationRunTabbedPane);
 
         fileMenu.setText("File  ");
 
@@ -558,7 +539,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(assemblySimulationRunMenu);
 
-        analystReportMenu.setText("Analyst Report  ");
+        analystReportMenu.setText("Analyst Report   ");
 
         displayAnalystReportHtmlMI.setMnemonic(KeyEvent.VK_D);
         displayAnalystReportHtmlMI.setText("Display Analyst Report HTML");
@@ -579,12 +560,18 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(analystReportMenu);
 
-        designOfExperimentsMenu.setText("Design of Experiments (DOE)   ");
+        designOfExperimentsMenu.setText("Design of Experiments");
+        designOfExperimentsMenu.setToolTipText("DOE");
         viskitMenuBar.add(designOfExperimentsMenu);
 
         gridkitCloudMenu.setText("Cloud");
 
-        viewCloudSimulationControllerMI.setText("jMenuItem1");
+        viewCloudSimulationControllerMI.setText("Cloud Simulation Run");
+        viewCloudSimulationControllerMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewCloudSimulationControllerMIActionPerformed(evt);
+            }
+        });
         gridkitCloudMenu.add(viewCloudSimulationControllerMI);
 
         viskitMenuBar.add(gridkitCloudMenu);
@@ -628,7 +615,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(viskitTabbedPane)
+            .addComponent(viskitTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -657,6 +644,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void cutAssemblyEditMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutAssemblyEditMenuItemActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cutAssemblyEditMenuItemActionPerformed
+
+    private void viewCloudSimulationControllerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewCloudSimulationControllerMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_viewCloudSimulationControllerMIActionPerformed
 
     /**
      * @param args the command line arguments
@@ -753,7 +744,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem closeAssemblyMI;
     private javax.swing.JMenuItem closeEventGraphMI;
     private javax.swing.JMenuItem closeViskitProjectMI;
-    private javax.swing.JPanel cloudSimulationPanel;
+    private javax.swing.JPanel cloudSimulationRunPanel;
+    private javax.swing.JTabbedPane cloudSimulationRunTabbedPane;
     private javax.swing.JMenuItem copyAssemblyEditMenuItem;
     private javax.swing.JMenuItem copyEventEditMenuItem;
     private javax.swing.JMenuItem cutAssemblyEditMenuItem;
@@ -777,6 +769,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JPanel localSimulationRunPanel;
     private javax.swing.JMenuItem newAssemblyMI;
     private javax.swing.JMenuItem newEventGraphMI;
     private javax.swing.JMenuItem newViskitProjectMI;
@@ -791,8 +784,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem pasteEventEditMenuItem;
     private javax.swing.JMenuItem redoAssemblyEditMenuItem;
     private javax.swing.JMenuItem redoEventEditMenuItem;
-    private javax.swing.JPanel runClusterSimulationPanel;
-    private javax.swing.JPanel runLocalSimulationPanel;
     private javax.swing.JMenuItem saveAnalystReportXml;
     private javax.swing.JMenuItem saveScreenImageMI;
     private javax.swing.JMenuItem saveSimulationConsoleMI;
