@@ -238,6 +238,7 @@ their descpritions.
         <echo message="Build started on ${TODAY_US}"/>
         <echo message="Base directory: ${basedir}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
+        <echo message="viskit.args=${viskit.args}"/>
 
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
@@ -624,7 +625,7 @@ their descpritions.
             description="Run Viskit, don't check dependencies, don't rebuild">
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
-                showduration="1000"/>
+                showduration="0"/>
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
@@ -634,8 +635,9 @@ their descpritions.
         </java>
     </target>
 
-    <target name="quick.run.ViskitApplication" description="new GUI">
-        <java classname="viskit.ViskitApplication"
+    <target name="quick.run.ViskitLayoutRedesign" depends="init" description="new GUI">
+        <echo message="consider new layout possibilities"/>
+        <java classname="viskit.ViskitLayoutRedesign"
               classpathref="runtime.classpath"
               fork="true">
             <jvmarg line="${run.args}"/>
@@ -676,7 +678,6 @@ their descpritions.
         <nbjpdastart addressproperty="jpda.address" name="${ant.project.name}" transport="dt_socket">
             <classpath refid="runtime.classpath"/>
         </nbjpdastart>
-        <echo message="viskit.args=${viskit.args}"/>
         <java classname="${debug.class}"
               classpathref="runtime.classpath"
               fork="true"
