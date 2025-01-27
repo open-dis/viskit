@@ -63,7 +63,7 @@ public class AssemblySimulationRunPanel extends JPanel
     public String lineEnd = System.getProperty("line.separator");
     public JScrollPane scrollPane;
     public JTextArea outputStreamTA;
-    public JSplitPane xsplitPane;
+//    public JSplitPane xsplitPane;
     public JButton vcrStopButton, vcrPlayButton, vcrRewindButton, vcrStepButton, closeButton;
     public JCheckBox vcrVerboseCB;
     public JTextField vcrStartTimeTF, vcrStopTimeTF;
@@ -97,22 +97,29 @@ public class AssemblySimulationRunPanel extends JPanel
      */
     public AssemblySimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible)
     {
-        this.analystReportPanelVisible = analystReportPanelVisible;
+        this.analystReportPanelVisible = analystReportPanelVisible; // TODO why?
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+//        JPanel titlePanel = new JPanel();
         if (newTitle != null)
         {
             titleLabel = new JLabel(newTitle);
             titleLabel.setHorizontalAlignment(JLabel.CENTER);
+            // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+            titleLabel.setBorder(new EmptyBorder(0,0,0,0));
             add(titleLabel, BorderLayout.NORTH);
         }
+//        titlePanel.add(titleLabel, BorderLayout.NORTH);
+//        titlePanel.add(clearConsoleButton, BorderLayout.EAST);
+//        add(titlePanel);
+        
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        JSplitPane leftSideHorizontalSplit;
+        JSplitPane leftSideVerticalSplit;
 
         outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
         outputStreamTA.setEditable(true); // to allow for additional manual input prior to saving out
-        outputStreamTA.setToolTipText("This text space is editable, in order to support careful analysis");
+        outputStreamTA.setToolTipText("This text space is editable to support copying and analysis");
         outputStreamTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputStreamTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller outputStreamTA.setRows(100);
@@ -136,17 +143,17 @@ public class AssemblySimulationRunPanel extends JPanel
         int w = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
-        leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), viskitRunnerBannerLabel);
-        leftSideHorizontalSplit.setDividerLocation((h/2) - 50); // TODO check with Ben, else -1
+        leftSideVerticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
+        leftSideVerticalSplit.setDividerLocation((h/2) - 60); // TODO check with Ben, else -1
 
-        leftRightSplit.setLeftComponent(leftSideHorizontalSplit);
+        leftRightSplit.setLeftComponent(leftSideVerticalSplit);
         leftRightSplit.setRightComponent(scrollPane);
-        leftRightSplit.setDividerLocation((w/2) - (w/4));
+        leftRightSplit.setDividerLocation((w/2) - (w/4) + 10);
 
         add(leftRightSplit, BorderLayout.CENTER);
     }
 
-    private final String VERBOSE_REPLICATION_DEFAULT_LABEL = "[replication #]";
+    private final String VERBOSE_REPLICATION_DEFAULT_HINT = "[replication #]";
     
     private JPanel makeVCRPanel()
     {
@@ -157,7 +164,10 @@ public class AssemblySimulationRunPanel extends JPanel
     {
         JPanel upperLeftFlowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrStartTimeLabel = new JLabel("Sim start time: ");
+        JLabel vcrStartTimeLabel = new JLabel("Sim start time:");
+        vcrStartTimeLabel.setToolTipText("Initial simulation start time");
+        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+        vcrStartTimeLabel.setBorder(new EmptyBorder(0,2,0,10));
         // TODO:  is this start time or current time of sim?
         // TODO:  is this used elsewhere, or else can it simply be removed?
         // TODO:  can a user use this to advance to a certain time in the sim?
@@ -171,8 +181,10 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
-        JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
+        JLabel vcrStopTimeLabel = new JLabel("Sim stop time:  ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
+        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+        vcrStopTimeLabel.setBorder(new EmptyBorder(0,2,0,10));
         vcrStopTimeTF = new JTextField(10);
         ViskitStatics.clampSize(vcrStopTimeTF, vcrStopTimeTF, vcrStopTimeTF);
         vcrSimTimePanel = new JPanel();
@@ -182,9 +194,13 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
+        JLabel numberReplicationsLabel = new JLabel("# replications:  ");
+        numberReplicationsLabel.setToolTipText("How many replications (simulation executions) to run");
+        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+        numberReplicationsLabel.setBorder(new EmptyBorder(0,2,0,10));
         numberReplicationsTF = new JTextField(10);
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
-        numberReplicationsTF.setBorder(new EmptyBorder(0,0,0,0));
+        numberReplicationsTF.setBorder(new EmptyBorder(0,2,0,0));
         numberReplicationsTF.addActionListener((ActionEvent e) -> {
             int numReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
             if (numReplications < 1) 
@@ -193,26 +209,28 @@ public class AssemblySimulationRunPanel extends JPanel
             }
         });
         ViskitStatics.clampSize(numberReplicationsTF, numberReplicationsTF, numberReplicationsTF);
-        JLabel numberReplicationsLabel = new JLabel("# replications: ");
+        
         vcrSimTimePanel = new JPanel();
-        vcrSimTimePanel.add(Box.createHorizontalStrut(10));
+//      vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
         vcrSimTimePanel.add(numberReplicationsLabel);
         vcrSimTimePanel.add(numberReplicationsTF);
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
         vcrVerboseCB = new JCheckBox("Verbose output", false);
+        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+        vcrVerboseCB.setBorder(new EmptyBorder(0,2,0,10));
         vcrVerboseCB.addActionListener(new vcrVerboseCBListener());
-        vcrVerboseCB.setToolTipText("Enables verbose output for all runs");
+        vcrVerboseCB.setToolTipText("Enables verbose output for all runs (or one run)");
         upperLeftFlowPanel.add(vcrVerboseCB);
 
         verboseReplicationNumberTF = new JTextField(7);
-        VerboseReplicationNumberTFListener listener = new VerboseReplicationNumberTFListener();
-        verboseReplicationNumberTF.addActionListener(listener);
-        verboseReplicationNumberTF.addCaretListener(listener);
+        VerboseReplicationNumberTFListener replicationListener = new VerboseReplicationNumberTFListener();
+        verboseReplicationNumberTF.addActionListener(replicationListener);
+        verboseReplicationNumberTF.addCaretListener(replicationListener);
         ViskitStatics.clampSize(verboseReplicationNumberTF);
-        verboseReplicationNumberTF.setToolTipText("Input a single replication run (1..n) to be verbose");
-        verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_LABEL);
+        verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_HINT);
+        verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
         upperLeftFlowPanel.add(verboseReplicationNumberTF);
 
         closeButton = new JButton("Close");
@@ -239,6 +257,8 @@ public class AssemblySimulationRunPanel extends JPanel
         analystReportCB.setSelected(analystReportPanelVisible);
         analystReportCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(analystReportCB);
+        
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
 
         // Initially, unselected
         resetSeedStateCB = new JCheckBox("Reset seed state each rerun");
@@ -248,15 +268,15 @@ public class AssemblySimulationRunPanel extends JPanel
 //      flowPanel.add(resetSeedStateCB);
         
         JPanel runLabelPanel = new JPanel();
-        JLabel runLabel = new JLabel("Run assembly: ");
+        JLabel runLabel = new JLabel("Run assembly:");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
-        runLabel.setBorder(new EmptyBorder(0,0,0,0));
+        runLabel.setBorder(new EmptyBorder(0,0,0,10));
         runLabelPanel.setToolTipText("Simulation replications control");
         runLabelPanel.add(runLabel);
         upperLeftFlowPanel.add(runLabelPanel);
 
-        JPanel runButtonPanel = new JPanel();
-        runButtonPanel.setLayout(new BoxLayout(runButtonPanel, BoxLayout.X_AXIS));
+        JPanel runButtonsPanel = new JPanel();
+        runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
 //        runButtonPanel.setBorder(new EmptyBorder(0,10,0,20));
 
         vcrRewindButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
@@ -265,14 +285,14 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrRewindButton.setBorder(BorderFactory.createEtchedBorder());
         vcrRewindButton.setText(null);
         if (showIncompleteButtons) {
-            runButtonPanel.add(vcrRewindButton);
+            runButtonsPanel.add(vcrRewindButton);
         }
 
         vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
         vcrPlayButton.setToolTipText("Start or resume the simulation run");
         vcrPlayButton.setBorder(BorderFactory.createEtchedBorder());
         vcrPlayButton.setText(null);
-        runButtonPanel.add(vcrPlayButton);
+        runButtonsPanel.add(vcrPlayButton);
 
         vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStepButton.setToolTipText("Step the simulation");
@@ -280,26 +300,44 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrStepButton.setText(null);
         vcrStepButton.setToolTipText("Single step");
         vcrStepButton.setEnabled(false); // TODO
-        runButtonPanel.add(vcrStepButton); // i.e. vcrPause
+        runButtonsPanel.add(vcrStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStopButton.setToolTipText("Stop the simulation run");
         vcrStopButton.setEnabled(false);
         vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStopButton.setText(null);
-        runButtonPanel.add(vcrStopButton);
+        runButtonsPanel.add(vcrStopButton);
+        
+        JButton clearConsoleButton = new JButton("X"); // Clear
+        // TODO get icon
+        // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
+        clearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
+        clearConsoleButton.setToolTipText("Clear console");
+        // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
+        clearConsoleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                outputStreamTA.selectAll();
+                outputStreamTA.replaceSelection(""); // cleears
+            }
+        });
+        runButtonsPanel.add(clearConsoleButton);
 
-        upperLeftFlowPanel.add(runButtonPanel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(runButtonsPanel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
         
         nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
-        nowRunningLabel.setBorder(new EmptyBorder(0,5,0,10));
+        nowRunningLabel.setBorder(new EmptyBorder(0,1,0,10));
         nowRunningLabel.setText(lineEnd);
         // text value is set by propertyChange listener
-        upperLeftFlowPanel.add(Box.createVerticalBox());
+        upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
         upperLeftFlowPanel.add(nowRunningLabel);
 //        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
 
-        runButtonPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        runButtonsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setPreferredSize(new Dimension(vcrPlayButton.getPreferredSize()));
         
@@ -313,7 +351,7 @@ public class AssemblySimulationRunPanel extends JPanel
         {
             if (verboseReplicationNumberTF.getText().isBlank())
             {
-                verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_LABEL);
+                verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_HINT);
             }
         }
     }
@@ -323,7 +361,7 @@ public class AssemblySimulationRunPanel extends JPanel
         @Override
         public void caretUpdate(CaretEvent event) {
             if (!verboseReplicationNumberTF.getText().isEmpty() || 
-                 verboseReplicationNumberTF.getText().equals(VERBOSE_REPLICATION_DEFAULT_LABEL)) 
+                 verboseReplicationNumberTF.getText().equals(VERBOSE_REPLICATION_DEFAULT_HINT)) 
             {
                 // probably no response needed, keep user in control of panel settings
                 // vcrVerboseCB.setSelected(false);

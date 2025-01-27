@@ -593,7 +593,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
             graphMetadata.name = n;
             view.setSelectedEventGraphName(graphMetadata.name);
-            mod.changeMetaData(graphMetadata); // might have renamed
+            mod.changeMetadata(graphMetadata); // might have renamed
 
             handleCompileAndSave(mod, saveFile);
             adjustRecentEventGraphFileSet(saveFile);
@@ -1051,7 +1051,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         boolean modified =
                 EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
         if (modified) {
-            ((Model) getModel()).changeMetaData(gmd);
+            ((Model) getModel()).changeMetadata(gmd);
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);

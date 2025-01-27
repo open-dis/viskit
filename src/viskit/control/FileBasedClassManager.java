@@ -87,13 +87,13 @@ public class FileBasedClassManager {
         return classMap.get(s);
     }
 
-    public void unloadFile(FileBasedAssemblyNode fban) {
-        removeFileClass(fban.loadedClass);
+    public void unloadFile(FileBasedAssemblyNode newFileBasedAssemblyNode) {
+        removeFileClass(newFileBasedAssemblyNode.loadedClass);
     }
-    FileBasedAssemblyNode fban = null;
+    FileBasedAssemblyNode fileBasedAssemblyNode = null;
     Class<?> fclass = null;
     JAXBContext jaxbContext = null;
-    Unmarshaller um = null;
+    Unmarshaller unmarshaller = null;
     PkgAndFile paf = null;
     File fXml = null;
     SimEntity simEntity = null;
@@ -112,7 +112,7 @@ public class FileBasedClassManager {
         {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
                 jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
-            um = jaxbContext.createUnmarshaller();
+            unmarshaller = jaxbContext.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?
             if (!isCached(f)) {
@@ -135,7 +135,7 @@ public class FileBasedClassManager {
                     // TODO: work situation where another build/classes gets added
                     // to the classpath as it won't readily be seen before the
                     // project's build/classes is. This causes ClassNotFoundExceptions
-                    addCache(f, fban.classFile);
+                    addCache(f, fileBasedAssemblyNode.classFile);
                 }
 
             // It's cached
@@ -150,7 +150,7 @@ public class FileBasedClassManager {
             fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
             if (fclass != null) {
                 String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-                fban = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
+                fileBasedAssemblyNode = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
 
                 // If we have an annotated ParameterMap, then cacheXML it. If not,
                 // then treat the fclass as something that belongs on the
@@ -170,9 +170,9 @@ public class FileBasedClassManager {
         if (fclass != null) {
             addFileClass(fclass);
         } else {
-            fban = null;
+            fileBasedAssemblyNode = null;
         }
-        return fban;
+        return fileBasedAssemblyNode;
     }
 
     private void setFileBasedAssemblyNode(File f) {
@@ -182,7 +182,7 @@ public class FileBasedClassManager {
 
         // since we're here, cacheXML the parameter names
         try {
-            simEntity = (fXml == null) ? (SimEntity) um.unmarshal(f) : (SimEntity) um.unmarshal(fXml);
+            simEntity = (fXml == null) ? (SimEntity) unmarshaller.unmarshal(f) : (SimEntity) unmarshaller.unmarshal(fXml);
 
             // NOTE: If the project's build directory got nuked and we have
             // cached our Event Graphs and classes with MD5 hash, we'll throw a
@@ -190,7 +190,7 @@ public class FileBasedClassManager {
             // TODO: Check for this and recompile the Event Graphs before loading their classes
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
-            fban =  (fXml == null) ?
+            fileBasedAssemblyNode =  (fXml == null) ?
                 new FileBasedAssemblyNode(paf.f, fclass.getName(), f, paf.pkg) :
                 new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 

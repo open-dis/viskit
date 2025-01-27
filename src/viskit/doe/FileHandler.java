@@ -132,11 +132,11 @@ public class FileHandler {
     public static void marshallJaxb(File of) throws Exception
     {
         JAXBContext jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-        try (Writer fw = new FileWriter(of)) {
-            Marshaller m = jaxbContext.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
-            m.marshal(OpenAssembly.inst().jaxbRoot, fw);
+        try (Writer fileWriter = new FileWriter(of)) {
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
+            marshaller.marshal(OpenAssembly.inst().jaxbRoot, fileWriter);
         }
     }
 
@@ -148,7 +148,7 @@ public class FileHandler {
      */
     public static void runFile(File fil, String title, JFrame mainFrame) {
         try {
-            new JobLauncher(true, fil.getAbsolutePath(), title, mainFrame);      // broken
+            new JobLauncher(true, fil.getAbsolutePath(), title, mainFrame); // TODO broken
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
