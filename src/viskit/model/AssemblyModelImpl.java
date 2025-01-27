@@ -88,7 +88,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public GraphMetadata getMetaData() {
+    public GraphMetadata getMetadata() {
         return metaData;
     }
 
@@ -211,7 +211,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
-            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimulationRunnerPanel().analystReportCB.isSelected()));
+            jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getAssemblySimulationRunPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
 
             m.marshal(jaxbRoot, fw);

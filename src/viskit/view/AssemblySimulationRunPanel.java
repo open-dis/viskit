@@ -44,6 +44,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.control.InternalAssemblySimulationRunner;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -424,5 +425,7 @@ public class AssemblySimulationRunPanel extends JPanel
     public void setTitle(String newTitle) {
         title = newTitle;
         titleLabel.setText(newTitle);
+        revalidate();
+        repaint();
     }
 }

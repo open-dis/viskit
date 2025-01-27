@@ -63,6 +63,7 @@ import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
+import viskit.util.OpenAssembly;
 
 /** Controller for the Assembly Run panel
  *
@@ -103,7 +104,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
     private long[] seeds;
     private final StopListener assemblySimulationRunStopListener;
 
-    public final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Assembly Simulation Run Console";
+    public static final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     /**
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
@@ -115,7 +116,8 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         // NOTE:
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
-        assemblySimulationRunPanel = new AssemblySimulationRunPanel("Assembly Simulation Run Console", false, analystReportPanelVisible);
+
+        assemblySimulationRunPanel = new AssemblySimulationRunPanel(ASSEMBLY_SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
         doMenus();
         assemblySimulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
         assemblySimulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());
@@ -131,7 +133,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setSimulationRunnerPanel(assemblySimulationRunPanel);
+        ViskitGlobals.instance().setAssemblySimulationRunPanel(assemblySimulationRunPanel);
     }
 
     public JMenuBar getMenus() {

@@ -66,6 +66,7 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
+import viskit.control.InternalAssemblySimulationRunner;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
@@ -266,7 +267,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
             if (mod.getLastFile() != null)
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
 
-            GraphMetadata gmd = mod.getMetaData();
+            GraphMetadata gmd = mod.getMetadata();
             if (gmd != null)
                 setSelectedAssemblyName(gmd.name);
             else if (viskit.ViskitStatics.debug)
@@ -1209,10 +1210,10 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     /**
-     * @param title the title to set
+     * @param newTitle the title to set
      */
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitle(String newTitle) {
+        this.title = newTitle;
     }
 
 } // end class file AssemblyViewFrame.java

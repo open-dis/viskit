@@ -69,6 +69,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import viskit.assembly.AssemblySimulationRunPlug;
+import viskit.view.AssemblySimulationRunPanel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -250,7 +251,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         if (assemblyModelImpl.newModel(file) && !isOpenAlready) 
         {
-            assemblyView.setSelectedAssemblyName(assemblyModelImpl.getMetaData().name);
+            assemblyView.setSelectedAssemblyName(assemblyModelImpl.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblySet(file);
@@ -456,7 +457,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void saveAs() {
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView assemblyView = (AssemblyView) getView();
-        GraphMetadata graphMetadata = model.getMetaData();
+        GraphMetadata graphMetadata = model.getMetadata();
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
@@ -482,14 +483,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void editGraphMetaData() {
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null) {return;}
-        GraphMetadata gmd = assemblyModel.getMetaData();
+        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), graphMetadata);
         if (modified) {
-            ((AssemblyModel) getModel()).changeMetaData(gmd);
+            ((AssemblyModel) getModel()).changeMetaData(graphMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(graphMetadata.name);
         }
     }
 
@@ -683,7 +684,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         GraphMetadata oldGmd = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
         if (viskitAssemblyModel != null) {
-            oldGmd = viskitAssemblyModel.getMetaData();
+            oldGmd = viskitAssemblyModel.getMetadata();
         }
 
         AssemblyModelImpl mod = new AssemblyModelImpl(this);
@@ -1374,7 +1375,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         String source = produceJavaAssemblyClass();
         AssemblyModel vmod = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
-            String className = vmod.getMetaData().packageName + "." + vmod.getMetaData().name;
+            String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
             ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
         }
     }
@@ -1622,7 +1623,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     // Known modelPath for Assembly compilation
     @Override
-    public void initAssemblyRun() {
+    public void initializeAssemblySimulationRun() 
+    {
         String src = produceJavaAssemblyClass(); // asks to save
 
         PkgAndFile paf = compileJavaClassAndSetPackage(src);
@@ -1658,17 +1660,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error(e);
         }
 
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
+        {
             @Override
             public Void doInBackground() {
 
                 // Compile and prep the execStrings
-                initAssemblyRun();
+                initializeAssemblySimulationRun();
 
                 if (execStrings == null) {
 
-                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null) {
+                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
+                    {
                         messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Opened",
                             "Please open an Assembly file");
@@ -1686,7 +1689,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
-
+        
+                    String        name = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
+                    String consoleName = InternalAssemblySimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
+                    if (!name.isBlank() && name.toLowerCase().contains("assembly"))
+                         consoleName += " for " + name;
+                    else if (!name.isBlank())
+                         consoleName += " for Assembly " + name;
+                    ((AssemblyViewFrame) getView()).setTitle(name);
+                    ViskitGlobals.instance().getAssemblySimulationRunPanel().setTitle(consoleName);
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
 
@@ -1730,8 +1741,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         List<String> v = new ArrayList<>();
 
         v.add(className);                                               // 0
-        v.add("" + ((AssemblyModel) getModel()).getMetaData().verbose); // 1
-        v.add(((AssemblyModel) getModel()).getMetaData().stopTime);     // 2
+        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 1
+        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 2
 
         String[] ra = new String[v.size()];
         return v.toArray(ra);

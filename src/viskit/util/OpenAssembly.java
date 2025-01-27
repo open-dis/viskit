@@ -55,6 +55,7 @@ public class OpenAssembly {
 
     private static OpenAssembly instance;
     private static final Object SYNCHER = new Object();
+    private static String name = new String();
 
     public static OpenAssembly inst() {
         if (instance != null) {
@@ -89,6 +90,11 @@ public class OpenAssembly {
             // this Assembly
             EventGraphCache.instance().makeEntityTable(file);
             doSendNewAssembly(file);
+            
+            // this works but TODO unnecessary?  can also see graphMetadata
+            this.name = f.getName();
+            if (name.toLowerCase().endsWith(".xml"))
+                name = name.substring(0, name.indexOf(".xml"));
         }
     }
     private final Set<AssembyChangeListener> listeners = new HashSet<>();
@@ -151,5 +157,19 @@ public class OpenAssembly {
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();
+    }
+
+    /**
+     * @return the name
+     */
+    public static String getName() {
+        return name;
+    }
+
+    /**
+     * @param newName the name to set
+     */
+    public static void setName(String newName) {
+        name = newName;
     }
 }

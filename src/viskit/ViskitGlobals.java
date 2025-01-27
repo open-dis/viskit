@@ -79,6 +79,7 @@ import viskit.view.ViskitProjectButtonPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
+import viskit.control.InternalAssemblySimulationRunner;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -104,7 +105,9 @@ public class ViskitGlobals {
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
-    private AssemblySimulationRunPanel simulationRunnerPanel;
+    private AssemblySimulationRunPanel assemblySimulationRunPanel;
+    
+    private InternalAssemblySimulationRunner internalAssemblySimulationRunner;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -763,14 +766,14 @@ public class ViskitGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public AssemblySimulationRunPanel getSimulationRunnerPanel()
+    public AssemblySimulationRunPanel getAssemblySimulationRunPanel()
     {
-        return simulationRunnerPanel;
+        return assemblySimulationRunPanel;
     }
 
-    public void setSimulationRunnerPanel(AssemblySimulationRunPanel runnerPanel) 
+    public void setAssemblySimulationRunPanel(AssemblySimulationRunPanel assemblySimulationRunPanel) 
     {
-        this.simulationRunnerPanel = runnerPanel;
+        this.assemblySimulationRunPanel = assemblySimulationRunPanel;
     }
 
     public ViskitProject getCurrentViskitProject() {
@@ -1077,6 +1080,20 @@ public class ViskitGlobals {
         catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    /**
+     * @return the internalAssemblySimulationRunner
+     */
+    public InternalAssemblySimulationRunner getInternalAssemblySimulationRunner() {
+        return internalAssemblySimulationRunner;
+    }
+
+    /**
+     * @param internalAssemblySimulationRunner the internalAssemblySimulationRunner to set
+     */
+    public void setInternalAssemblySimulationRunner(InternalAssemblySimulationRunner internalAssemblySimulationRunner) {
+        this.internalAssemblySimulationRunner = internalAssemblySimulationRunner;
     }
 
 } // end class file ViskitGlobals.java

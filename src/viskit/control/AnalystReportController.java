@@ -183,7 +183,7 @@ public class AnalystReportController extends MvcAbstractController {
     }
 
     public void generateHtmlReport() {
-        if (!ViskitGlobals.instance().getSimulationRunnerPanel().analystReportCB.isSelected()) {
+        if (!ViskitGlobals.instance().getAssemblySimulationRunPanel().analystReportCB.isSelected()) {
             ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
