@@ -56,7 +56,7 @@ public class SimkitXML2Java {
     private SimEntity root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
     private Unmarshaller unMarshaller;
     private Object unMarshalledObject;
 

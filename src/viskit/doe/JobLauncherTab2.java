@@ -134,7 +134,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JPanel clusterConfigurationPanel;
     private Boolean clusterConfigurationReturn = null;
     private JDialog configurationDialog;
-    private JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
 
     public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame)
     {

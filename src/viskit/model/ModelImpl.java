@@ -47,7 +47,7 @@ import viskit.mvc.MvcController;
  */
 public class ModelImpl extends MvcAbstractModel implements Model
 {
-    JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
     ObjectFactory objectFactory;
     SimEntity jaxbRoot;
     File currentFile;

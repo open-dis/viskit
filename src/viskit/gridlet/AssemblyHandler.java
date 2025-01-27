@@ -47,7 +47,7 @@ public class AssemblyHandler implements XmlRpcHandler {
     // during an addReport(), likewise enabling the appropriate
     // getReport() monitor.
     int port;
-    JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
     InputStream inputStream;
 
     public AssemblyHandler(int port) {

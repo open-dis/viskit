@@ -164,7 +164,7 @@ public class AssemblySimulationRunPanel extends JPanel
     {
         JPanel upperLeftFlowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        JLabel vcrStartTimeLabel = new JLabel("Sim start time:");
+        JLabel vcrStartTimeLabel = new JLabel("Sim start time: ");
         vcrStartTimeLabel.setToolTipText("Initial simulation start time");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         vcrStartTimeLabel.setBorder(new EmptyBorder(0,2,0,10));

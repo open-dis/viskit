@@ -57,7 +57,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 public class SessionManager /* compliments DoeSessionDriver*/ {
 
     private Hashtable<String, String> sessions;
-    private JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
 
     Logger LOG = LogUtils.getLogger(SessionManager.class);
 

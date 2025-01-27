@@ -50,7 +50,7 @@ public class SimkitAssemblyXML2Java {
     private SimkitAssembly root;
     InputStream fileInputStream;
     private String fileBaseName;
-    JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
 
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {

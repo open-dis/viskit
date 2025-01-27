@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -64,15 +64,15 @@ public class JTextAreaOutputStream extends ByteArrayOutputStream implements Acti
   
   private static final Logger LOG = LogUtils.getLogger(JTextAreaOutputStream.class);
   
-  private final JTextArea jta;
+  private final JTextArea jTextArea;
   private final Timer swingTimer;
   private final int delay = 125; //250;   // Performance adjuster for slow machines
   private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
                                     "----------------------------------------------\n";
-  public JTextAreaOutputStream(JTextArea ta, int buffSize)
+  public JTextAreaOutputStream(JTextArea textArea, int buffSize)
   {
     super(buffSize);
-    jta = ta;
+    jTextArea = textArea;
     swingTimer = new Timer(delay, this);
     swingTimer.start();
   }
@@ -86,12 +86,12 @@ public class JTextAreaOutputStream extends ByteArrayOutputStream implements Acti
       String inputString = this.toString();  // "this" = this output stream
       reset();
 
-      if (jta.getDocument().getLength() > OUTPUTLIMIT) {
+      if (jTextArea.getDocument().getLength() > OUTPUTLIMIT) {
         int backoff = Math.max(BACKOFFSIZE, inputSize);
-        jta.replaceRange(warningMsg, 0, backoff - 1);
+        jTextArea.replaceRange(warningMsg, 0, backoff - 1);
       }
-      jta.append(inputString);
-      jta.setCaretPosition(jta.getDocument().getLength()-1);
+      jTextArea.append(inputString);
+      jTextArea.setCaretPosition(jTextArea.getDocument().getLength()-1);
      }
     try {
         close();

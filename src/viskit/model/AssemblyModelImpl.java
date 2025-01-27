@@ -36,7 +36,7 @@ import viskit.mvc.MvcController;
  */
 public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel {
 
-    private JAXBContext jaxbContext;
+    private static JAXBContext jaxbContext;
     private ObjectFactory oFactory;
     private SimkitAssembly jaxbRoot;
     private File currentFile;

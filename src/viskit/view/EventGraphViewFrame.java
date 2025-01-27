@@ -320,7 +320,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 
-        JLabel descriptionLabel = new JLabel("Event Graph Description");
+        JLabel descriptionLabel = new JLabel("Event Graph Description (Ctrl-E to Edit)"); // TODO fix this functionality
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         descriptionLabel.setToolTipText(TODO_DESCRIPTION_WARNING);
 

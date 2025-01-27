@@ -817,8 +817,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         replaceChild(parent, _makeContent(commentTag, "Comments", commentText));
     }
 
-    /** @param commentTag the comment Element
-     * @param commentText the comment text
+    /** @param commentTag the comment Element, which actually contains description
+     * @param commentText the comment text, which actually contains description
      * @return the Comments Element
      */
     public Element xmakeComments(String commentTag, String commentText) {
