@@ -414,7 +414,11 @@
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="Comment" type="xs:string"/>
+  <xs:element name="Comment" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>Comment is actually a Description field. JAXB already uses 'Description' so the name can't be overloaded, ouch.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
   <xs:element name="Parameter">
     <xs:complexType>
       <xs:sequence>
